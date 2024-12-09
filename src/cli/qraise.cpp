@@ -8,9 +8,9 @@ using namespace std::literals;
 struct MyArgs : public argparse::Args {
     int& n_qpus                         = kwarg("n,num_qpus", "Number of QPUs to be raised.");
     std::string& time                   = kwarg("t,time", "Time for the QPUs to be raised.");
-    std::optional<std::string>& backend = kwarg("back,backend_path", "Path to the backend config file.");
+    std::optional<std::string>& backend = kwarg("b,backend_path", "Path to the backend config file.");
     std::string& simulator              = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer"); 
-    std::string& config_path            = kwarg("conf,config_path", "Path for saving the QPUs configurations.").set_default(std::getenv("STORE") + "/.api_simulator/qpu.json"s);
+    std::string& info_path              = kwarg("i,info_path", "Path for saving the QPUs information (configuration and net).").set_default(std::getenv("STORE") + "/.api_simulator/qpu.json"s);
 
 
     void welcome() {
@@ -42,18 +42,27 @@ int main(int argc, char* argv[]) {
     sbatchFile << "#SBATCH --output=qraise_%j\n";
     sbatchFile << "#SBATCH --mem-per-cpu=1G\n";
 
-
     sbatchFile << "\n";
     sbatchFile << "if [ ! -d \"$STORE/.api_simulator\" ]; then\n";
     sbatchFile << "mkdir $STORE/.api_simulator\n";
     sbatchFile << "fi\n";
-    sbatchFile << "CURRENT_DIR=$(pwd)\n";
-    sbatchFile << "export CONFIG_PATH=" << args.config_path.c_str() << "\n";
+
+    const char* var_name = "INSTALL_PATH"; // Replace with your variable name
+    const char* var_install_path = std::getenv(var_name);
+
+    if (var_install_path) {
+        sbatchFile << "BINARIES_DIR=" << var_install_path << "/bin\n";
+        sbatchFile << "echo \"Binaries directory: $BINARIES_DIR\"\n";
+    } else {
+        std::cerr << "Environment variable INSTALL_PATH is not set: aborting.\n"; 
+    }
+
+    sbatchFile << "export INFO_PATH=" << args.info_path.c_str() << "\n";
     if(args.backend.has_value())
-        sbatchFile << "srun --task-epilog=$CURRENT_DIR/epilog.sh setup_qpus $CONFIG_PATH " << args.simulator.c_str() << " " << args.backend.value().c_str() << "\n";
+        sbatchFile << "srun --task-epilog=$BINARIES_DIR/epilog.sh setup_qpus $INFO_PATH " << args.simulator.c_str() << " " << args.backend.value().c_str() << "\n";
     else
-        sbatchFile << "srun --task-epilog=$CURRENT_DIR/epilog.sh setup_qpus $CONFIG_PATH " << args.simulator.c_str() << "\n";
-    sbatchFile << "rm -rf $STORE/.api_simulator\n";
+        sbatchFile << "srun --task-epilog=$BINARIES_DIR/epilog.sh setup_qpus $INFO_PATH " << args.simulator.c_str() << "\n";
+    //sbatchFile << "rm -rf $STORE/.api_simulator\n";
     sbatchFile.close();
 
     std::system("sbatch qraise_sbatch_tmp.sbatch");

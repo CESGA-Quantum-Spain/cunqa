@@ -1,4 +1,4 @@
-# api-simulator
+# API-simulator
 API definition for communicating the user with the simulator.
 
 # Clone repository
@@ -14,11 +14,12 @@ bash setup_submodules.sh
 TO BE EXPLICITED
 
 # Installation 
-First of all, some modules have to be loaded.
+First of all, some modules have to be loaded and, also, if miniconda is activate, deactivate it to not interfere.
 
 - In the FT3, load the modules:
 ```console
 ml load cesga/2022 gcc/system gcccore/system openmpi/4.1.4 flexiblas/3.3.0 boost python/3.10.8 pybind11/2.12.0 cmake/3.27.6
+conda deactivate
 ```
 - In the QMIO, **TO BE DETERMINED**.
 
@@ -41,3 +42,9 @@ cmake -B build/
 cmake --build build/
 cmake --install build/
 ```
+
+Alternatively, one can use the `configure.sh` script in the `scripts/` folder.
+
+```console
+source configure.sh <your/installation/path>
+``` 

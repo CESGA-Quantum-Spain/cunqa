@@ -15,8 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/mnt/netapp1/Optcesga_FT2_RHEL7/2022/g
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 
 if(NOT DEFINED ENV{INSTALL_PATH})
-    message(STATUS "Install location will be: $ENV{STORE}/api-simulator/installation")
-    set(CMAKE_INSTALL_PREFIX "$ENV{STORE}/api-simulator/installation")
+    message(FATAL_ERROR "Install location is not set: define INSTALL_PATH environment variables")
 else()
     message(STATUS "Install location will be: (INSTALL_PATH) $ENV{INSTALL_PATH}")
     set(CMAKE_INSTALL_PREFIX "$ENV{INSTALL_PATH}")
@@ -26,7 +25,7 @@ set(CMAKE_INSTALL_LIBDIR "lib")
 set(CMAKE_INSTALL_INCLDIR "include")
 set(CMAKE_INSTALL_BINDIR "bin")
 
-find_package(Python 3.9 COMPONENTS Interpreter Development)
+find_package(Python 3.10 COMPONENTS Interpreter Development)
 
 if(DEFINED PYBIND_PATH)
     list(APPEND CMAKE_PREFIX_PATH "${PYBIND_PATH}")
@@ -43,6 +42,7 @@ else(NOT DEFINED PYBIND_PATH)
         )
     endif()
 endif()
+
 set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
 find_package(pybind11 2.12 REQUIRED)
 

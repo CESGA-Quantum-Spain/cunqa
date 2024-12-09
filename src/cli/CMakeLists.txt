@@ -15,7 +15,7 @@ target_link_libraries(qraise PUBLIC compiler_flags
                                      OpenMP::OpenMP_CXX LAPACK::LAPACK)
 
 install(TARGETS qraise DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_executable(setup_qpus setup_qpus.cpp)
 
