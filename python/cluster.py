@@ -1,15 +1,15 @@
 
 import os
-import zmq
+#import zmq
 import zlib
 import pickle, json
-from qiskit import * # qasm2, QuantumCircuit, transpile
-from qiskit_aer.backends.aer_simulator import *
-from backend_options import default_backends, allowed_backend_options, aer_default_configuration, all_allowed_backend_options, allowed_fakeqmio_options
+#from qiskit import * # qasm2, QuantumCircuit, transpile
+#from qiskit_aer.backends.aer_simulator import *
+#from python.backend_options import default_backends, allowed_backend_options, aer_default_configuration, all_allowed_backend_options, allowed_fakeqmio_options
 
-import dask.distributed
-import numpy as np
-from qmiotools.integrations.qiskitqmio import FakeQmio
+#import dask.distributed
+#import numpy as np
+#from qmiotools.integrations.qiskitqmio import FakeQmio
 
 from python.qclient import QClient
 
@@ -147,6 +147,7 @@ class QPU():
             self.server_endpoint=server_endpoint
         else:
             try:
+                STORE = os.getenv("STORE")
                 with open(STORE + "/.api_simulator/qpu.json") as net_data:
                     net_json = json.load(net_data)
                     serv_end = net_json["{}".format(self.id)]["IPs"][net] + net_json["{}".format(self.id)]["port"]
@@ -203,23 +204,26 @@ class QPU():
             print("QPU has no server endpoint")
             pass
         
-        if isinstance(circ, QuantumCircuit):
-            circ_json = from_qc_to_json(circ)
-        elif isinstance(circ, str):
-            circ_json = qasm2_to_json(circ)
-        else:
-            print("Circuit format not valid")
+        #if isinstance(circ, QuantumCircuit):
+        #    circ_json = from_qc_to_json(circ)
+        #elif isinstance(circ, str):
+        circ_json = json.loads(circ) #qasm2_to_json(circ)
+        circ_str = str(circ_json["instructions"])
+        #else:
+        #    print("Circuit format not valid")
 
-        execution_config = {"config":run_parameters, "instructions":circ_json["instructions"]}
+        #execution_config = {"config":run_parameters, "instructions":circ_json["instructions"]}
+        execution_config = {"config":run_parameters, "instructions":circ_str}
+        execution_config_str = json.dumps(execution_config)
         #execution_config_str = json.dumps(execution_config)
 
         c_client = QClient()
         c_client.connect(self.id)
-        c_client.send_data(execution_config)
+        c_client.send_data(execution_config_str)
         result = c_client.read_result()
         
-        c_client.send_data(close)
-        out = c_client.read_result()
+        #c_client.send_data(close)
+        #out = c_client.read_result()
        
         return result
 
@@ -337,9 +341,10 @@ class Backend():
                 _FQ_dict["noise_model"] = _FQ_dict["noise_model"].to_dict()
                 self._backend_dict = _FQ_dict
 
-        elif self.name in default_backends.keys():
-            print("Creating default backend {} ".format(self.name))
-            self.from_json(name = self.name, config_json = default_backends[self.name])
+        elif self.name == "ideal_aer": # in default_backends.keys():
+            #print("Creating default backend {} ".format(self.name))
+            #self.from_json(name = self.name, config_json = default_backends[self.name])
+            self._backend_dict = {}
 
         elif config_json != None:
             print("Creating backend from config_json")

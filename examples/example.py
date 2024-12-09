@@ -6,6 +6,9 @@ import json
 install_path = os.getenv("INSTALL_PATH")
 sys.path.insert(0, install_path)
 
+
+
+
 #print(os.getenv("PATH"))
 
 from python.qclient import QClient
@@ -25,7 +28,7 @@ from python.cluster import QPU, from_qc_to_json, qasm2_to_json
 qc_json = from_qc_to_json
 print("QuantumCircuit en json", qc_json)
 
-qpu = QPU(id_=0)
+qpu = QPU(id_=1)
 
 back = qpu.backend
 print("Backend", back)
@@ -67,13 +70,15 @@ circuit = """
 }
 """
 
-STORE = os.getenv("STORE")
-client = QClient(STORE + "/.api_simulator/qpu.json")
+#STORE = os.getenv("STORE")
+#client = QClient(STORE + "/.api_simulator/qpu.json")
 
-client.connect(0)
-client.send_data(circuit)
-result = client.read_result()
-client.send_data("CLOSE")
+#client.connect(0)
+#client.send_data(circuit)
+#result = client.read_result()
+#client.send_data("CLOSE")
+
+result = qpu.c_run(circuit) #, shots = 199, method = "statevector", memory_slots =  7)
 
 print(result)
 
