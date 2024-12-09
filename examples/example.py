@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from qiskit import QuantumCircuit
+#from qiskit import QuantumCircuit
 
 install_path = os.getenv("INSTALL_PATH")
 sys.path.insert(0, install_path)
