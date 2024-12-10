@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     sbatchFile << "#SBATCH --job-name=qraise \n";
     sbatchFile << "#SBATCH -c 2 \n";
     sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
+    sbatchFile << "#SBATCH -N 1 \n";
 
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
