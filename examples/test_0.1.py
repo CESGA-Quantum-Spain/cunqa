@@ -6,6 +6,9 @@ sys.path.insert(0, install_path)
 sys.path.insert(0, "/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/api-simulator/python")
 
 from qpu import QPU, getQPUs
+from qiskit import QuantumCircuit
+from scipy.optimize import differential_evolution
+
 
 lista = getQPUs()
 
@@ -40,6 +43,8 @@ circuit = {"instructions": [
     }
     ]
 }
+
+print(lista[0].server_id)
 
 result = lista[0].run(circ = circuit, shots=222)
 

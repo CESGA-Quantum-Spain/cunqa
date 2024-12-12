@@ -79,7 +79,7 @@ def qc_to_json(qc):
         elif qc.data[i].name != "measure":
             json_data["instructions"].append({"name":qc.data[i].name, 
                                               "qubits":[qc.data[i].qubits[j]._index for j in range(len(qc.data[i].qubits))],
-                                              "params":"{}".format(qc.data[i].params)
+                                              "params":qc.data[i].params
                                              })
         else:
             json_data["instructions"].append({"name":qc.data[i].name, 

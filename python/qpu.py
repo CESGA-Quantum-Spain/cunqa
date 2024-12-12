@@ -13,11 +13,9 @@ info_path = os.getenv("INFO_PATH")
 from python.qclient import QClient
 # importamos la clase Backend
 from backend import Backend
-from result import Result
+from qjob import QJob
 # importamos funciones para transformar circuitos a json
 from circuit import qasm2_to_json, qc_to_json
-
-
 
 class QPU():
     """
@@ -72,9 +70,32 @@ class QPU():
         else:
             print("backend type must be class Backend.")
             return
-        
+
 
     def run(self, circ, **run_parameters):
+        """
+            Class method to run a circuit in the QPU.
+
+            Args:
+            --------
+            circ (json): circuit to be run in the QPU.
+            **run_parameters : any simulation instructions such as shots, method, parameter_binds, meas_level, init_qubits, ...
+
+            Return:
+            --------
+            Result object.
+        """
+        qjob = QJob(self, circ, **run_parameters)
+        print("Dentro submit")
+        qjob.submit()
+        print("Submit hecho")
+
+        return qjob.result()
+
+    
+        
+
+    def _run(self, circ, **run_parameters):
         """
             Class method to run a circuit in the QPU.
 
