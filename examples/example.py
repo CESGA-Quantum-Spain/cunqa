@@ -5,6 +5,9 @@ import json
 install_path = os.getenv("INSTALL_PATH")
 sys.path.insert(0, install_path)
 
+
+
+
 #print(os.getenv("PATH"))
 
 from python.qclient import QClient
@@ -81,6 +84,47 @@ STORE = os.getenv("STORE")
 client = QClient(STORE + "/.api_simulator/qpu.json")
 
 client.connect("68802_1")
+client.send_data(circuit)
+result = client.read_result()
+client.send_data("CLOSE")
+
+result_dict = json.loads(result)
+#STORE = os.getenv("STORE")
+#client = QClient(STORE + "/.api_simulator/qpu.json")
+
+#client.connect(0)
+#client.send_data(circuit)
+#result = client.read_result()
+#client.send_data("CLOSE")
+
+
+
+counts = result_dict['results'][0]['data']['counts']
+
+
+
+#STORE = os.getenv("STORE")
+#client = QClient(STORE + "/.api_simulator/qpu.json")
+
+#client.connect(2)
+#client.send_data(circuit)
+#result = client.read_result()
+#client.send_data("CLOSE")
+
+
+
+
+#result = qpu.c_run(circuit, shots=199)
+
+#print(result)
+
+
+
+
+STORE = os.getenv("STORE")
+client = QClient(STORE + "/.api_simulator/qpu.json")
+
+client.connect(2)
 client.send_data(circuit)
 result = client.read_result()
 client.send_data("CLOSE")

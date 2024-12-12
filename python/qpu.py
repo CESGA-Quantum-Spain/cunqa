@@ -17,6 +17,9 @@ from qjob import QJob
 # importamos funciones para transformar circuitos a json
 from circuit import qasm2_to_json, qc_to_json
 
+
+
+
 class QPU():
     """
         Class to define a QPU.
@@ -102,6 +105,7 @@ class QPU():
             Args:
             --------
             circ (json): circuit to be run in the QPU.
+            circ (Quantumcircuit or QASM or json): circuit to be run in the QPU.
             **run_parameters : any simulation instructions such as shots, method, parameter_binds, meas_level, init_qubits, ...
 
             Return:
@@ -168,14 +172,6 @@ def getQPUs():
         i+=1
 
     return qpus
-
-
-
-
-
-
-
-
 
 
 

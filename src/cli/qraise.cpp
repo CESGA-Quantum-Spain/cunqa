@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
     sbatchFile << "#SBATCH -c 2 \n";
     sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
     sbatchFile << "#SBATCH -N 1 \n";
+<<<<<<< HEAD
 
     // TODO: Can the user decide the number of cores?
     if (check_mem_format(args.mem_per_qpu)) 
@@ -49,6 +50,8 @@ int main(int argc, char* argv[]) {
         sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu*2 << "G\n";
     } else
         std::cerr << "ERROR: Memory format is incorrect, must be: xG (where x is the number of Gigabytes)\n";
+=======
+>>>>>>> dac1ced1d24623f2a6038b518b97f01deb770b97
 
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
