@@ -13,11 +13,9 @@ info_path = os.getenv("INFO_PATH")
 from python.qclient import QClient
 # importamos la clase Backend
 from backend import Backend
-from qjob import QJob
+from qjob import QJob, gather
 # importamos funciones para transformar circuitos a json
 from circuit import qasm2_to_json, qc_to_json
-
-
 
 
 class QPU():
@@ -89,11 +87,8 @@ class QPU():
             Result object.
         """
         qjob = QJob(self, circ, **run_parameters)
-        print("Dentro submit")
         qjob.submit()
-        print("Submit hecho")
-
-        return qjob.result()
+        return qjob
 
     
         

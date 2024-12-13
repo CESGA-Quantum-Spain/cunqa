@@ -71,7 +71,8 @@ def qc_to_json(qc):
     json dict with the circuit information.
     """
     json_data = {
-        "instructions":[]
+        "instructions":[],
+        "num_clbits":qc.num_clbits
     }
     for i in range(len(qc.data)):
         if qc.data[i].name == "barrier":
@@ -79,9 +80,8 @@ def qc_to_json(qc):
         elif qc.data[i].name != "measure":
             json_data["instructions"].append({"name":qc.data[i].name, 
                                               "qubits":[qc.data[i].qubits[j]._index for j in range(len(qc.data[i].qubits))],
-                                              "params":qc.data[i].params
-                                              "params":"{}".format(qc.data[i].params)
-                                             })
+                                              "params":qc.data[i].params,
+                                              })
         else:
             json_data["instructions"].append({"name":qc.data[i].name, 
                                               "qubits":[qc.data[i].qubits[j]._index for j in range(len(qc.data[i].qubits))],

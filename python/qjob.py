@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import sys
 import pickle, json
+import time
 
 # path para acceder a los paquetes de c++
 installation_path = os.getenv("INSTALL_PATH")
@@ -75,7 +76,7 @@ def _run(QPU_id, circ, run_parameters):
             circuit = None
             
     
-        run_config = {"shots":1024, "method":"statevector", "memory_slots":7}
+        run_config = {"shots":1024, "method":"statevector", "memory_slots":circ["num_clbits"]}
         
         if run_parameters == None:
             pass
@@ -91,14 +92,21 @@ def _run(QPU_id, circ, run_parameters):
 
         execution_config = """ {{"config":{}, "instructions":{} }}""".format(run_config, instructions).replace("'", '"')
 
-        print("Vamos  conectar")
-        
+    
+        print("\tSearching for QClient...")
         STORE = os.getenv("STORE")
         client = QClient(STORE + "/.api_simulator/qpu.json")
-        
+        print("\tFound QClient: ", client)
+        print("\tConecting to QPU ", QPU_id)
         client.connect(QPU_id)
+        print("\tSuccessfully conected to QPU ", QPU_id,".")
+        print("\tSending data ...")
         client.send_data(execution_config)
+        print("\tData sent.")
+        print("\tReading result...")
         result = client.read_result()
+        print("\tResult read.")
+        print("\tShutting down QPU ", QPU_id,"...")
         client.send_data("CLOSE")
 
         return Result(json.loads(result))
@@ -112,38 +120,72 @@ class QJob():
         self._QPU = QPU
         self._circuit = circuit
         self._run_parameters = run_parameters
-        self._executor = ThreadPoolExecutor(max_workers=1)
+        self._executor = ThreadPoolExecutor(max_workers=4)
         self._future = None
+
+    #def __str__(self):
+        
 
     def submit(self):
         if self._future is not None:
             raise JobError("QJob has already been submitted.")
-        print(self._QPU.server_id, self._circuit, self._run_parameters)
+        print("Submitting QJob.")
         self._future = self._executor.submit(_run, self._QPU.server_id, self._circuit, self._run_parameters)
+        print("QJob submited.")
+        return self._future
 
 
     def result(self, timeout=None):
-        # pylint: disable=arguments-differ
-        """Get job result. The behavior is the same as the underlying
-        concurrent Future objects,
-
-        https://docs.python.org/3/library/concurrent.futures.html#future-objects
-
-        Args:
-            timeout (float): number of seconds to wait for results.
-
-        Returns:
-            qiskit.Result: Result object
-
-        Raises:
-            concurrent.futures.TimeoutError: if timeout occurred.
-            concurrent.futures.CancelledError: if job cancelled before completed.
-        """
         return self._future.result(timeout=timeout)
 
+    def state(self):
+        if self._future is None:
+            print("QJob not submited.")
+            return None
+        elif self._future.done():
+            return "DONE"
+        elif self._future.running():
+            return "PENDING"
+        else:
+            raise Error("Future not found.")
+
+
+def gather(qjobs):
+    """
+        Function to get result of several QJob objects, it also takes one QJob object.
+
+        Args:
+        ------
+        qjobs (list of QJob objects or QJob object)
+
+        Return:
+        -------
+        Result or list of results.
+    """
+    if isinstance(qjobs, QJob):
+        return qjobs.result()
+    elif type(qjobs) == list:
+        return [qj.result() for qj in qjobs]
+    else:
+        raise ValueError("Format invalid, qjobs must be QJob objet or list of QJob objects.")
+        
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
 
 

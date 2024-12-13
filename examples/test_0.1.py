@@ -7,17 +7,15 @@ sys.path.insert(0, "/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/api-simulato
 
 from qpu import QPU, getQPUs
 from qiskit import QuantumCircuit
-from scipy.optimize import differential_evolution
+# from scipy.optimize import differential_evolution
 
 
 lista = getQPUs()
 
-print("QPUs we are going to work with: ")
+print(f"QPUs we are going to work with ({len(lista)}): ")
 print(" ")
 for q in lista:
-    print("QPU backend info:")
-    print(" ")
-    q.backend.info()
+    print(f"QPU {q.id_}: {q.backend.name}")
 
 
 # we define a circuit, first as a json
@@ -44,12 +42,14 @@ circuit = {"instructions": [
     ]
 }
 
-print(lista[0].server_id)
+resultados = []
 
-result = lista[0].run(circ = circuit, shots=222)
+for q in lista[:4]:
+    resultados.append(q.run(circ = circuit, shots=222))
 
-print(result)
-print(result.get_counts())
+for i,r in enumerate(resultados):
+    print(f"For QPU {i}: {r.get_counts()}")
+
 
 
 
