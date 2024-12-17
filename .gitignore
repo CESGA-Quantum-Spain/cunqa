@@ -220,7 +220,9 @@ CMakeUserPresets.json
 prueba*
 main*
 installation
-qraise*
+qraise_*
+client.cpp
+server.cpp
 
 cargar_modulos.sh
 

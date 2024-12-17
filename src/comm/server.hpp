@@ -28,7 +28,9 @@ public:
         strategy{std::make_unique<SelectedServer>(net_config)} 
     { }
 
-    inline std::string recv_data() { return strategy->recv_data(); }
+    inline std::string recv_circuit() { return strategy->recv_data(); }
+    
+    inline void accept() { strategy->accept(); }
 
     inline void send_result(const std::string& result) { strategy->send_result(result); }
 };

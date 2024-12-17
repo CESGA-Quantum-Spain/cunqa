@@ -3,22 +3,42 @@
 #include "comm/client.hpp"
  
 namespace py = pybind11;
- 
+
+template <typename T>
+class FutureWrapper {
+public:
+    explicit FutureWrapper(std::future<T> f) : fut_(std::move(f)) {}
+
+    // Obtener el resultado (bloquea hasta que esté disponible)
+    T get() {
+        return fut_.get();
+    }
+
+    // Comprobar si el futuro aún es válido
+    bool valid() const {
+        return fut_.valid();
+    }
+
+private:
+    std::future<T> fut_;
+}; 
+
+
 PYBIND11_MODULE(qclient, m) {
+
+    m.doc() = "TODO";
  
-    m.doc() = "Clase QClient, que corresponde con la clase Client() en C++";
- 
+    py::class_<FutureWrapper<std::string>>(m, "FutureWrapper")
+        .def("get", &FutureWrapper<std::string>::get)
+        .def("valid", &FutureWrapper<std::string>::valid);
+
     py::class_<Client>(m, "QClient")
  
         .def(py::init<const std::optional<std::string> &>(), py::arg("filepath") = std::nullopt)  // Constructor sin argumentos
  
         .def("connect", &Client::connect, py::arg("task_id") = "", py::arg("net") = "ib0") // Metodo
  
-        .def("read_result", &Client::read_result) // Metodo
- 
-        .def("send_data", py::overload_cast<const std::string&>(&Client::send_data)) 
-        .def("send_data", py::overload_cast<std::ifstream&>(&Client::send_data)) 
-
-        .def("stop", &Client::stop); // Metodo
- 
+        .def("send_circuit", [](Client &c, const std::string& circuit) { 
+            return FutureWrapper<std::string>(c.send_circuit(circuit)); 
+        });
 }

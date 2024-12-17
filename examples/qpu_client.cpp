@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
     std::string close("CLOSE"); 
 
     if (mode == "qpu") {
-        std::cout << "hola!\n";
-        std::cout << backend_config.dump(4) << "\n";
         QPU qpu_prueba(backend_config);
         qpu_prueba.turn_ON();
     } else if (mode == "cliente") {
