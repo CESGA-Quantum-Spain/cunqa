@@ -116,7 +116,13 @@ void CustomJson::_write_locks(json local_data)
         file_in >> j;
     file_in.close();
 
-    auto task_id = std::getenv("SLURM_LOCALID");
+    // This is done because the task epilog does not 
+    // have access to SLURM_TASK_PID variable
+    std::string local_id = std::getenv("SLURM_LOCALID");
+    std::string job_id = std::getenv("SLURM_JOB_ID");
+    
+    auto task_id = job_id + "_" + local_id;
+    
     //j[std::to_string(j.size())] = local_data;
     j[task_id] = local_data;
 

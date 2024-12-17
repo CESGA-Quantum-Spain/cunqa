@@ -46,7 +46,7 @@ public:
 
     Simulator() : simulator{std::make_unique<typename SimClass<sim_type>::type>()} { }
 
-    inline json execute(json circuit_json, const config::run::RunConfig& run_config) {
+    inline json execute(json circuit_json, const config::RunConfig& run_config) {
         return simulator->execute(circuit_json, run_config);
     }
 

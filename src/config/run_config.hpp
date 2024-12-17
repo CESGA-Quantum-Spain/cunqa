@@ -2,15 +2,13 @@
 
 #include <nlohmann/json.hpp>
 #include <iostream>
-#include "config.hpp"
 
 using namespace std::literals;
 using json = nlohmann::json;
 
 namespace config{
-namespace run {
 
-class RunConfig : public Config {
+class RunConfig {
 public:
     int shots;
     std::string method;
@@ -18,9 +16,6 @@ public:
 
     RunConfig();
     RunConfig(json config);
-
-    void load(const json& config) override;
-    json dump() const override;
 };
 
 void to_json(json& j, const RunConfig& run_conf);
@@ -34,17 +29,7 @@ RunConfig::RunConfig() :
 
 RunConfig::RunConfig(json config)
 { 
-    load(config);
-}
-
-inline void RunConfig::load(const json& config) 
-{
     from_json(config, *this);
-}
-
-inline json RunConfig::dump() const 
-{
-    return json(*this);
 }
 
 void to_json(json& j, const RunConfig& run_conf)
@@ -63,5 +48,4 @@ void from_json(const json& j, RunConfig& run_conf)
     j.at("memory_slots").get_to(run_conf.memory_slots);
 }; 
 
-}
 };

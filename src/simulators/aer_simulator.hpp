@@ -15,13 +15,13 @@
 using json = nlohmann::json;
 using namespace std::literals;
 using namespace AER;
-using namespace config::run;
+using namespace config;
 
 class AerSimulator {
 public:
 
     // TODO: Añadir el modelo de ruido
-    json execute(json circuit_json, const config::run::RunConfig& run_config) {
+    json execute(json circuit_json, const config::RunConfig& run_config) {
 
         Circuit circuit(circuit_json);
         Noise::NoiseModel noise_default;

@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-#from qiskit import QuantumCircuit
 
 install_path = os.getenv("INSTALL_PATH")
 sys.path.insert(0, install_path)
@@ -12,7 +11,7 @@ sys.path.insert(0, install_path)
 #print(os.getenv("PATH"))
 
 from python.qclient import QClient
-from python.cluster import QPU, from_qc_to_json, qasm2_to_json
+#from python.cluster import QPU, from_qc_to_json, qasm2_to_json
 
 
 
@@ -25,16 +24,16 @@ from python.cluster import QPU, from_qc_to_json, qasm2_to_json
 #qc.cx(0,1)
 #qc.measure_all()
 
-qc_json = from_qc_to_json
-print("QuantumCircuit en json", qc_json)
+#qc_json = from_qc_to_json
+#print("QuantumCircuit en json", qc_json)
 
-qpu = QPU(id_=1)
+#qpu = QPU(id_=0)
 
-back = qpu.backend
-print("Backend", back)
+#back = qpu.backend
+#print("Backend", back)
 
-se = qpu.server_endpoint
-print("Server endpoint", se)
+#se = qpu.server_endpoint
+#print("Server endpoint", se)
 
 
 
@@ -70,31 +69,17 @@ circuit = """
 }
 """
 
-#STORE = os.getenv("STORE")
-#client = QClient(STORE + "/.api_simulator/qpu.json")
-
-#client.connect(0)
-#client.send_data(circuit)
-#result = client.read_result()
-#client.send_data("CLOSE")
-
-result = qpu.c_run(circuit) #, shots = 199, method = "statevector", memory_slots =  7)
-
-print(result)
 
 
-
-
-#STORE = os.getenv("STORE")
-#client = QClient(STORE + "/.api_simulator/qpu.json")
-
-#client.connect(2)
-#client.send_data(circuit)
-#result = client.read_result()
-#client.send_data("CLOSE")
-
-
-
-
+#result = qpu.c_run(circuit, shots=199)
 
 #print(result)
+
+STORE = os.getenv("STORE")
+client = QClient(STORE + "/.api_simulator/qpu.json")
+
+client.connect("72511_0")
+future = client.send_circuit(circuit)
+print("future enviado")
+print(future.get())
+

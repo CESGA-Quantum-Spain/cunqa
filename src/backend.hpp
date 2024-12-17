@@ -6,7 +6,7 @@
 #include "simulators/simulator.hpp"
 
 using json = nlohmann::json;
-using namespace config::backend;
+using namespace config;
 
 template <SimType sim_type>
 class Backend {
@@ -24,7 +24,7 @@ public:
         backend_config{config}
     { }
 
-    json run(json circuit_json, const config::run::RunConfig& run_config) 
+    json run(json circuit_json, const config::RunConfig& run_config) 
     {
         return simulator->execute(circuit_json, run_config);
     }

@@ -11,6 +11,7 @@ struct MyArgs : public argparse::Args {
     std::optional<std::string>& backend = kwarg("b,backend_path", "Path to the backend config file.");
     std::string& simulator              = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer"); 
     std::string& info_path              = kwarg("i,info_path", "Path for saving the QPUs information (configuration and net).").set_default(std::getenv("STORE") + "/.api_simulator/qpu.json"s);
+    std::string& mem_per_qpu            = kwarg("mem-per-qpu", "Memory given to each QPU.").set_default("1G");
 
 
     void welcome() {
@@ -24,6 +25,11 @@ bool check_time_format(const std::string& time)
     return std::regex_match(time, format);   
 }
 
+bool check_mem_format(const std::string& mem) {
+    std::regex format("^(\\d{1,2})G$");
+    return std::regex_match(mem, format);
+}
+
 int main(int argc, char* argv[]) {
     auto args = argparse::parse<MyArgs>(argc, argv);
 
@@ -34,13 +40,25 @@ int main(int argc, char* argv[]) {
     sbatchFile << "#SBATCH --job-name=qraise \n";
     sbatchFile << "#SBATCH -c 2 \n";
     sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
+    sbatchFile << "#SBATCH -N 1 \n";
+<<<<<<< HEAD
+
+    // TODO: Can the user decide the number of cores?
+    if (check_mem_format(args.mem_per_qpu)) 
+    {
+        int mem_per_qpu = args.mem_per_qpu[0] - '0';
+        sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu*2 << "G\n";
+    } else
+        std::cerr << "ERROR: Memory format is incorrect, must be: xG (where x is the number of Gigabytes)\n";
+=======
+>>>>>>> dac1ced1d24623f2a6038b518b97f01deb770b97
 
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
     else
-        std::cerr << "ERROR: Time format is incorrect, must be: XX:XX:XX\n";
+        std::cerr << "ERROR: Time format is incorrect, must be: xx:xx:xx\n";
+
     sbatchFile << "#SBATCH --output=qraise_%j\n";
-    sbatchFile << "#SBATCH --mem-per-cpu=1G\n";
 
     sbatchFile << "\n";
     sbatchFile << "if [ ! -d \"$STORE/.api_simulator\" ]; then\n";

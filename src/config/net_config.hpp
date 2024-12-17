@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <cstring>
 #include "utils/constants.hpp"
-#include "config.hpp"
+
 
 #ifndef __USE_POSIX
     #define __USE_POSIX
@@ -20,9 +20,8 @@ using namespace std::literals;
 using json = nlohmann::json;
 
 namespace config {
-namespace net {
 
-class NetConfig : Config {
+class NetConfig {
 public:
     std::string hostname;
     std::unordered_map<std::string, std::string> IPs;
@@ -34,9 +33,6 @@ public:
 
     static NetConfig myNetConfig();
     std::string get_endpoint(const std::string_view& net = INFINIBAND) const;
-
-    inline void load(const json& config) override;
-    inline json dump() const override;
 
     NetConfig& operator=(const NetConfig& other);
 };
@@ -58,7 +54,7 @@ NetConfig::NetConfig(const std::string& hostname, std::unordered_map<std::string
 
 NetConfig::NetConfig(const json& server_info)
 {
-    load(server_info);
+    from_json(server_info, *this);
 }
 
 NetConfig NetConfig::myNetConfig() 
@@ -69,16 +65,6 @@ NetConfig NetConfig::myNetConfig()
 std::string NetConfig::get_endpoint(const std::string_view& net) const 
 {
     return IPs.at(std::string(net)) + ":" + port;
-}
-
-inline void NetConfig::load(const json& config) 
-{
-    from_json(config, *this);
-}
-
-inline json NetConfig::dump() const 
-{
-    return json(*this);
 }
 
 NetConfig& NetConfig::operator=(const NetConfig& other) 
@@ -186,11 +172,9 @@ void from_json(const json& j, NetConfig& NetConfig)
     j.at("port").get_to(NetConfig.port);
 }; 
 
-
-}
 };
 
-std::ostream& operator<<(std::ostream& os, const config::net::NetConfig& config) {
+std::ostream& operator<<(std::ostream& os, const config::NetConfig& config) {
     os << "\nIPs: \n";
     for (const auto& net_bind : config.IPs) {
             os << net_bind.first << " ---> " << net_bind.second << "\n";

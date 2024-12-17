@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 #include <iostream>
-#include "config.hpp"
+
 #include "../utils/constants.hpp"
 #include "../simulators/simulator.hpp"
 
@@ -10,10 +10,9 @@ using namespace std::literals;
 using json = nlohmann::json;
 
 namespace config {
-namespace backend {
 
 template <SimType sim_type = SimType::Aer>
-class BackendConfig : Config {
+class BackendConfig {
 public:
     std::string name;
     std::string version;
@@ -66,7 +65,7 @@ public:
     BackendConfig(const json& config)
         : simulator{"AerSimulator"}
     {
-        load(config);
+        from_json(config, *this);
     }
 
     template<SimType T = sim_type,
@@ -74,15 +73,7 @@ public:
     BackendConfig(const json& config) 
         : simulator{"MunichSimulator"}
     {
-        load(config);
-    }
-
-    inline void load(const json& config) override {
         from_json(config, *this);
-    }
-
-    inline json dump() const override {
-        return json(*this);
     }
 };
 
@@ -126,10 +117,9 @@ void from_json(const json& j, BackendConfig<sim_type>& backend_conf)
     //j.at("gates").get_to(backend_conf.gates);
 }; 
 
-}
 };
 
-std::ostream& operator<<(std::ostream& os, const config::backend::BackendConfig<SimType::Aer>& config) {
+std::ostream& operator<<(std::ostream& os, const config::BackendConfig<SimType::Aer>& config) {
     /* os << "\nIPs: \n";
     for (const auto& net_bind : config.IPs) {
             os << net_bind.first << " ---> " << net_bind.second << "\n";

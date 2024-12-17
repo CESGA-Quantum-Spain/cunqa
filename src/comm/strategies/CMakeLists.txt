@@ -4,7 +4,7 @@ if(COMM_LIB STREQUAL "ASIO")
     target_link_libraries(strategy INTERFACE compiler_flags Boost::Boost)
     target_include_directories(strategy INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/asio")
     message(DEBUG "ASIO library added.")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/asio/asio_client.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/asio/asio_common.hpp" 
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/asio/asio_client.hpp"
               "${CMAKE_CURRENT_SOURCE_DIR}/asio/asio_server.hpp" 
             DESTINATION include/comm/strategies/asio
         )

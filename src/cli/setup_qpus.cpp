@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
 {
 
     std::cout << "argc: " << argc << "argv: " << argv[1] << " " << argv[2] << "\n";
-    json backend_config_json;
+    json qpu_config_json;
     if (argc == 4) 
     {
         std::ifstream f(argv[3]);
-        backend_config_json = json::parse(f);
+        qpu_config_json = json::parse(f);
     } 
     else  if (argc < 2)
         std::cerr << "Error, not a QPU configuration was given\n";
@@ -30,17 +30,19 @@ int main(int argc, char *argv[])
     //if (sim_names.contains(argv[2]))
         if (search->second == SimType::Aer) 
         {
-            config::QPUConfig<SimType::Aer> backend_config{backend_config_json, argv[1]};
-            QPU<SimType::Aer> qpu(backend_config);
+            config::QPUConfig<SimType::Aer> qpu_config{qpu_config_json, argv[1]};
+            QPU<SimType::Aer> qpu(qpu_config);
             qpu.turn_ON();
         } 
         else if (search->second == SimType::Munich)
         {
-            config::QPUConfig<SimType::Munich> backend_config{backend_config_json, argv[1]};
-            QPU<SimType::Munich> qpu(backend_config);
+            config::QPUConfig<SimType::Munich> qpu_config{qpu_config_json, argv[1]};
+            QPU<SimType::Munich> qpu(qpu_config);
             qpu.turn_ON();
         }  
-    } 
+    }
+    
+
     else
         std::cerr << "No such a simulator as " << argv[2] <<" is implemented\n";
 }
