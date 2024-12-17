@@ -78,58 +78,8 @@ circuit = """
 STORE = os.getenv("STORE")
 client = QClient(STORE + "/.api_simulator/qpu.json")
 
-client.connect("71943_3")
+client.connect("72511_0")
 future = client.send_circuit(circuit)
-
+print("future enviado")
 print(future.get())
 
-<<<<<<< HEAD
-result_dict = json.loads(result)
-#STORE = os.getenv("STORE")
-#client = QClient(STORE + "/.api_simulator/qpu.json")
-
-#client.connect(0)
-#client.send_data(circuit)
-#result = client.read_result()
-#client.send_data("CLOSE")
-
-
-
-counts = result_dict['results'][0]['data']['counts']
-
-
-
-#STORE = os.getenv("STORE")
-#client = QClient(STORE + "/.api_simulator/qpu.json")
-
-#client.connect(2)
-#client.send_data(circuit)
-#result = client.read_result()
-#client.send_data("CLOSE")
-
-
-
-
-#result = qpu.c_run(circuit, shots=199)
-
-#print(result)
-
-
-
-
-STORE = os.getenv("STORE")
-client = QClient(STORE + "/.api_simulator/qpu.json")
-
-client.connect(2)
-client.send_data(circuit)
-result = client.read_result()
-client.send_data("CLOSE")
-
-result_dict = json.loads(result)
-=======
-""" result_dict = json.loads(result)
->>>>>>> backend-dev
-
-counts = result_dict['results'][0]['data']['counts']
-
-print(counts) """
