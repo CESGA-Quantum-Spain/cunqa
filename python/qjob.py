@@ -93,20 +93,24 @@ def _run(QPU_id, circ, run_parameters):
         execution_config = """ {{"config":{}, "instructions":{} }}""".format(run_config, instructions).replace("'", '"')
 
     
-        print("\tSearching for QClient...")
+        print("\t [",QPU_id,"]:\tSearching for QClient...")
         STORE = os.getenv("STORE")
         client = QClient(STORE + "/.api_simulator/qpu.json")
-        print("\tFound QClient: ", client)
-        print("\tConecting to QPU ", QPU_id)
+        print("\t [",QPU_id,"]:\tFound QClient: ", client)
+        print(" ")
+        print("\t [",QPU_id,"]:\tConecting to QPU ", QPU_id)
         client.connect(QPU_id)
-        print("\tSuccessfully conected to QPU ", QPU_id,".")
-        print("\tSending data ...")
+        print("\t [",QPU_id,"]:\tSuccessfully conected to QPU ", QPU_id,".")
+        print(" ")
+        print("\t [",QPU_id,"]:\tSending data ...")
         client.send_data(execution_config)
-        print("\tData sent.")
-        print("\tReading result...")
+        print("\t [",QPU_id,"]:\tData sent.")
+        print(" ")
+        print("\t [",QPU_id,"]:\tReading result...")
         result = client.read_result()
-        print("\tResult read.")
-        print("\tShutting down QPU ", QPU_id,"...")
+        print("\t [",QPU_id,"]:\tResult read.")
+        print(" ")
+        print("\t [",QPU_id,"]:\tShutting down QPU ", QPU_id,"...")
         client.send_data("CLOSE")
 
         return Result(json.loads(result))
@@ -129,9 +133,9 @@ class QJob():
     def submit(self):
         if self._future is not None:
             raise JobError("QJob has already been submitted.")
-        print("Submitting QJob.")
+        print("Submitting QJob to ", self._QPU.server_id)
         self._future = self._executor.submit(_run, self._QPU.server_id, self._circuit, self._run_parameters)
-        print("QJob submited.")
+        print("QJob submited to ", self._QPU.server_id)
         return self._future
 
 

@@ -1,3 +1,4 @@
+import numpy as np
 
 def qasm2_to_json(qasm_str):
     """
@@ -89,3 +90,53 @@ def qc_to_json(qc):
                                              })
 
     return json_data
+
+
+
+def sample_circuit(nqubits=5, layers=2):
+    circuit = {"instructions":0, "num_clbits":nqubits+layers}
+    layer = []
+    # defino la layer
+    for q in range(nqubits-1):
+        if q%2 == 0:
+            layer.append({"name":"cx","qubits":[q,q+1], "params":[]})
+    for q in range(nqubits):
+        layer.append({"name":"rx","qubits":[q], "params":[np.random.uniform(0, 2 * np.pi)]})
+        layer.append({"name":"ry","qubits":[q], "params":[np.random.uniform(0, 2 * np.pi)]})
+    for q in range(nqubits):
+        layer.append({"name":"h", "qubits":[q], "params":[]})
+    # termino de definir la layer
+    
+    instructions = []
+    # comienzo con todo hadamards
+    for q in range(nqubits):
+        instructions.append({"name":"h", "qubits":[q], "params":[]})
+    # meto las layers
+    for i in range(layers):
+        for l in layer:
+            instructions.append(l)
+        instructions.append({"name": "measure", "qubits": [i], "memory": [i]})
+    # medidas finales
+    for q in range(nqubits):
+        instructions.append({"name": "measure", "qubits": [q], "memory": [q]})
+
+    circuit["instructions"] = instructions
+    return circuit
+        
+        
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+    
