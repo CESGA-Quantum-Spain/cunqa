@@ -148,8 +148,10 @@ Measure measure_json(json meas_json) {
 }
 
 
-// The input is a list of jsons, each of them corresponding to a gate/measure with all its properties.
-std::vector<bool> json_to_bin(json qc_json){
+// The input is a string of list of jsons, each json corresponding to a gate/measure with all its properties.
+std::vector<bool> from_json_to_bin(std::string qc_str){
+
+    json qc_json = json::parse(qc_str);
 
      //std::ofstream outFile("bin_circuit.txt");
      std::vector<bool> bool_vector;

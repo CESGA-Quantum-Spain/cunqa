@@ -237,8 +237,8 @@ myjob.sh
 .myjob_*
 hola.sh
 modules_alvaro.sh
-intstallations
-installation
+intstallations/
+installation/
 
 
 test_*

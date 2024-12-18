@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "comm/client.hpp"
+#include "utils/helpers.hpp"
  
 namespace py = pybind11;
 
@@ -41,4 +42,9 @@ PYBIND11_MODULE(qclient, m) {
         .def("send_circuit", [](Client &c, const std::string& circuit) { 
             return FutureWrapper<std::string>(c.send_circuit(circuit)); 
         });
+
+    m.def("from_json_to_bin", &from_json_to_bin, "A function that adds two numbers");
+
 }
+
+
