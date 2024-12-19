@@ -1,22 +1,20 @@
 #include <iostream>
+#include <string>
 
-void test_func(){
-
-    std::cout << "Hola \n" ;
+void Log (std::string *message){
+    std::cout << message << "\n";
 }
 
-void call_test(void(*lolo)()){
-
-    lolo();
-
+int Multiply(int a, int b){
+    std::string m = "Multiply";
+    Log(&m);
+    return a*b;
 }
 
 int main(){
 
-
-    call_test(&test_func);
-
-
+    char* x = "Hola";
+    std::cout << Multiply(2,3) << "\n";
 
     return 0;
 }
