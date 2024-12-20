@@ -43,8 +43,13 @@ PYBIND11_MODULE(qclient, m) {
             return FutureWrapper<std::string>(c.send_circuit(circuit)); 
         });
 
-    m.def("from_json_to_bin", &from_json_to_bin, "A function that adds two numbers");
+    
 
+}
+
+PYBIND11_MODULE(from_json_to_bin, m) {
+
+    m.def("from_json_to_bin", &from_json_to_bin, "Function to translate a json to a binary");
 }
 
 
