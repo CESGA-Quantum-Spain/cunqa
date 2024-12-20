@@ -70,16 +70,19 @@ circuit = """
 """
 
 
-
-#result = qpu.c_run(circuit, shots=199)
-
-#print(result)
-
 STORE = os.getenv("STORE")
-client = QClient(STORE + "/.api_simulator/qpu.json")
+conf_file = STORE + "/.api_simulator/qpu.json"
 
-client.connect("72511_0")
-future = client.send_circuit(circuit)
-print("future enviado")
-print(future.get())
+with open(conf_file, 'r', encoding='utf-8') as archivo:
+    datos = json.load(archivo)
 
+if isinstance(datos, dict):
+    claves_primer_nivel = list(datos.keys())
+
+for clave in claves_primer_nivel[1:]:
+    print(clave)
+    client = QClient(conf_file)
+    client.connect(clave)
+    future = client.send_circuit(circuit)
+
+    print(future.get())

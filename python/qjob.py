@@ -49,26 +49,18 @@ class Result():
         return self.counts
 
 
-def _run(QPU_id, circ, run_parameters):
-        """
-            Class method to run a circuit in the QPU.
 
-            Args:
-            --------
-            circ (json): circuit to be run in the QPU.
-            **run_parameters : any simulation instructions such as shots, method, parameter_binds, meas_level, init_qubits, ...
 
-            Return:
-            --------
-            Result in a dictionary
-        """
 
-        #if type(circ) == str:
-        #    if circ.lstrip().startswith("OPENQASM"):
-        #        circuit = qasm2_to_json(circ)
-        #    else:
-        #        circuito = None
-                
+
+
+class QJob():
+    def __init__(self, QPU, circ, **run_parameters):
+
+        self._QPU = QPU
+        self._future = None
+
+
         if isinstance(circ, dict):
             circuit = circ
 
@@ -90,59 +82,38 @@ def _run(QPU_id, circ, run_parameters):
             raise ValueError("Circuit format not valid, only json is supported.")
 
 
-        execution_config = """ {{"config":{}, "instructions":{} }}""".format(run_config, instructions).replace("'", '"')
-
+        self._execution_config = """ {{"config":{}, "instructions":{} }}""".format(run_config, instructions).replace("'", '"')
     
-        print("\t [",QPU_id,"]:\tSearching for QClient...")
-        STORE = os.getenv("STORE")
-        client = QClient(STORE + "/.api_simulator/qpu.json")
-        print("\t [",QPU_id,"]:\tFound QClient: ", client)
-        print(" ")
-        print("\t [",QPU_id,"]:\tConecting to QPU ", QPU_id)
-        client.connect(QPU_id)
-        print("\t [",QPU_id,"]:\tSuccessfully conected to QPU ", QPU_id,".")
-        print(" ")
-        print("\t [",QPU_id,"]:\tSending data ...")
-        client.send_data(execution_config)
-        print("\t [",QPU_id,"]:\tData sent.")
-        print(" ")
-        print("\t [",QPU_id,"]:\tReading result...")
-        result = client.read_result()
-        print("\t [",QPU_id,"]:\tResult read.")
-        print(" ")
-        print("\t [",QPU_id,"]:\tShutting down QPU ", QPU_id,"...")
-        client.send_data("CLOSE")
 
-        return Result(json.loads(result))
+    def submit(self, test = False):
+        self._test  = test
 
-
-
-
-class QJob():
-    def __init__(self, QPU, circuit, **run_parameters):
-
-        self._QPU = QPU
-        self._circuit = circuit
-        self._run_parameters = run_parameters
-        self._executor = ThreadPoolExecutor(max_workers=4)
-        self._future = None
-
-    #def __str__(self):
-        
-
-    def submit(self):
         if self._future is not None:
             raise JobError("QJob has already been submitted.")
-        print("Submitting QJob to ", self._QPU.server_id)
-        self._future = self._executor.submit(_run, self._QPU.server_id, self._circuit, self._run_parameters)
-        print("QJob submited to ", self._QPU.server_id)
-        return self._future
+
+        client = QClient("$STORE" + "/.api_simulator/qpu.json")
+
+        print(self._QPU.server_id)
+
+        client.connect(self._QPU.server_id)
+
+        if not test:
+            print("Submitting QJob to ", self._QPU.server_id)
+            self._future = client.send_circuit(self._execution_config)
+            print("QJob submited to ", self._QPU.server_id)
+        elif test:
+            print("QJob sent! (mentira)")
 
 
-    def result(self, timeout=None):
-        return self._future.result(timeout=timeout)
+    def result(self):
+        if self._future is not None:
+            if not self._test:
+                return Result(json.loads(self._future.get()))
+            elif self._test:
+                print("Result gotten!(mentira)")
 
     def state(self):
+        print("Method not avaliable.")
         if self._future is None:
             print("QJob not submited.")
             return None
@@ -173,21 +144,6 @@ def gather(qjobs):
     else:
         raise ValueError("Format invalid, qjobs must be QJob objet or list of QJob objects.")
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     
     
