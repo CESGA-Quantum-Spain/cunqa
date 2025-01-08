@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
         int mem_per_qpu = args.mem_per_qpu[0] - '0';
         sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu*2 << "G\n";
     } else
-        std::cerr << "ERROR: Memory format is incorrect, must be: xG (where x is the number of Gigabytes)\n"
-        
+        std::cerr << "ERROR: Memory format is incorrect, must be: xG (where x is the number of Gigabytes)\n";
+
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
     else

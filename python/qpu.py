@@ -87,7 +87,7 @@ class QPU():
             Result object.
         """
         qjob = QJob(self, circ, **run_parameters)
-        qjob.submit()
+        qjob.submit(test = True)
         return qjob
 
     
