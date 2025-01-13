@@ -54,8 +54,8 @@ qc.measure(range(num_qubits), range(num_qubits))
 def from_qc_to_json(qc):
     json_data = {
         
-        "qubits":0,
-        "bits":0,
+        "qubits":qc.num_qubits,
+        "bits":qc.num_clbits,
         "circuit":[]
     }
     for i in range(len(qc.data)):
@@ -77,5 +77,5 @@ def from_qc_to_json(qc):
 
 
 
-qc_js = from_qc_to_json(qc)
-print(qc_js)
+#qc_js = from_qc_to_json(qc)
+#print(qc_js)
