@@ -4,7 +4,7 @@ from numpy import random
 from translator import from_qc_to_json
 import json
 
-N_QUBITS = 2
+N_QUBITS = 10
 vector = [random.rand() for _ in range(2**N_QUBITS)]
 initial_state = vector/np.linalg.norm(vector)
 qc = QuantumCircuit(N_QUBITS,N_QUBITS)

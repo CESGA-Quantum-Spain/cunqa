@@ -1,42 +1,73 @@
 #include <iostream>
 #include <vector>
 #include "helpers.hpp"
-
+#include <bitset>
  #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+std::streamsize get_file_size(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate); // Abrir en modo binario y posicionar al final
+    if (!file) {
+        std::cerr << "No se pudo abrir el archivo: " << filename << std::endl;
+        return -1;
+    }
+    return file.tellg(); // Obtener la posición actual, que es el tamaño del archivo
+}
 
 
+void saveincsv(std::vector<int> x, std::vector<int> y) {
+    std::ofstream file("data.csv");
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo.\n";
+        return 1;
+    }
 
+    // Escribir encabezado
+    file << "x,y\n";
 
-int main(){
+    // Escribir datos
+    for (size_t i = 0; i < x.size(); ++i) {
+        file << x[i] << "," << y[i] << "\n";
+    }
 
-    std::string qc_str = R"([{"name": "h", "qubits": [0], "params": []}, {"name": "rx", "qubits": [0], "params": [-4.498329406323344]}, {"name": "rz", "qubits": [0], "params": [-2.598247866633914]}, {"name": "id", "qubits": [0], "params": []}, {"name": "z", "qubits": [0], "params": []}, {"name": "h", "qubits": [1], "params": []}, {"name": "rx", "qubits": [1], "params": [-3.7680817252564784]}, {"name": "rz", "qubits": [1], "params": [4.444628473483894]}, {"name": "id", "qubits": [1], "params": []}, {"name": "x", "qubits": [1], "params": []}, {"name": "h", "qubits": [2], "params": []}, {"name": "rx", "qubits": [2], "params": [-5.220801259972473]}, {"name": "rz", "qubits": [2], "params": [5.136558142532758]}, {"name": "id", "qubits": [2], "params": []}, {"name": "y", "qubits": [2], "params": []}, {"name": "h", "qubits": [3], "params": []}, {"name": "rx", "qubits": [3], "params": [0.8656806050775905]}, {"name": "rz", "qubits": [3], "params": [2.9731370621602076]}, {"name": "id", "qubits": [3], "params": []}, {"name": "z", "qubits": [3], "params": []}, {"name": "h", "qubits": [4], "params": []}, {"name": "rx", "qubits": [4], "params": [0.7011357162748363]}, {"name": "rz", "qubits": [4], "params": [2.6653278028466474]}, {"name": "id", "qubits": [4], "params": []}, {"name": "x", "qubits": [4], "params": []}, {"name": "h", "qubits": [5], "params": []}, {"name": "rx", "qubits": [5], "params": [6.2088771311672355]}, {"name": "rz", "qubits": [5], "params": [4.977146791627889]}, {"name": "id", "qubits": [5], "params": []}, {"name": "y", "qubits": [5], "params": []}, {"name": "h", "qubits": [6], "params": []}, {"name": "rx", "qubits": [6], "params": [3.2363123142693797]}, {"name": "rz", "qubits": [6], "params": [2.15620286032716]}, {"name": "id", "qubits": [6], "params": []}, {"name": "z", "qubits": [6], "params": []}, {"name": "h", "qubits": [7], "params": []}, {"name": "rx", "qubits": [7], "params": [0.24648558901048453]}, {"name": "rz", "qubits": [7], "params": [4.7233073912376184]}, {"name": "id", "qubits": [7], "params": []}, {"name": "x", "qubits": [7], "params": []}, {"name": "h", "qubits": [8], "params": []}, {"name": "rx", "qubits": [8], "params": [3.4758772324223397]}, {"name": "rz", "qubits": [8], "params": [3.8573918759359356]}, {"name": "id", "qubits": [8], "params": []}, {"name": "y", "qubits": [8], "params": []}, {"name": "h", "qubits": [9], "params": []}, {"name": "rx", "qubits": [9], "params": [1.2598009568498878]}, {"name": "rz", "qubits": [9], "params": [0.3296407277624788]}, {"name": "id", "qubits": [9], "params": []}, {"name": "z", "qubits": [9], "params": []}, {"name": "h", "qubits": [10], "params": []}, {"name": "rx", "qubits": [10], "params": [2.5550406791547684]}, {"name": "rz", "qubits": [10], "params": [3.6591217037092236]}, {"name": "id", "qubits": [10], "params": []}, {"name": "x", "qubits": [10], "params": []}, {"name": "h", "qubits": [11], "params": []}, {"name": "rx", "qubits": [11], "params": [5.6392571401619085]}, {"name": "rz", "qubits": [11], "params": [1.644371835286659]}, {"name": "id", "qubits": [11], "params": []}, {"name": "y", "qubits": [11], "params": []}, {"name": "h", "qubits": [12], "params": []}, {"name": "rx", "qubits": [12], "params": [2.025807748028415]}, {"name": "rz", "qubits": [12], "params": [2.8032360147353454]}, {"name": "id", "qubits": [12], "params": []}, {"name": "z", "qubits": [12], "params": []}, {"name": "h", "qubits": [13], "params": []}, {"name": "rx", "qubits": [13], "params": [1.8584966360072679]}, {"name": "rz", "qubits": [13], "params": [3.971835218916546]}, {"name": "id", "qubits": [13], "params": []}, {"name": "x", "qubits": [13], "params": []}, {"name": "h", "qubits": [14], "params": []}, {"name": "rx", "qubits": [14], "params": [5.651361312455286]}, {"name": "rz", "qubits": [14], "params": [2.9118023212849966]}, {"name": "id", "qubits": [14], "params": []}, {"name": "y", "qubits": [14], "params": []}, {"name": "h", "qubits": [15], "params": []}, {"name": "rx", "qubits": [15], "params": [3.032920629834137]}, {"name": "rz", "qubits": [15], "params": [5.999191810652034]}, {"name": "id", "qubits": [15], "params": []}, {"name": "z", "qubits": [15], "params": []}, {"name": "h", "qubits": [16], "params": []}, {"name": "rx", "qubits": [16], "params": [5.7394308219185435]}, {"name": "rz", "qubits": [16], "params": [0.9345698574040895]}, {"name": "id", "qubits": [16], "params": []}, {"name": "x", "qubits": [16], "params": []}, {"name": "h", "qubits": [17], "params": []}, {"name": "rx", "qubits": [17], "params": [0.15512614307818648]}, {"name": "rz", "qubits": [17], "params": [4.402460802159489]}, {"name": "id", "qubits": [17], "params": []}, {"name": "y", "qubits": [17], "params": []}, {"name": "h", "qubits": [18], "params": []}, {"name": "rx", "qubits": [18], "params": [0.8095719269054723]}, {"name": "rz", "qubits": [18], "params": [4.331168562961796]}, {"name": "id", "qubits": [18], "params": []}, {"name": "z", "qubits": [18], "params": []}, {"name": "h", "qubits": [19], "params": []}, {"name": "rx", "qubits": [19], "params": [0.8251432404075784]}, {"name": "rz", "qubits": [19], "params": [6.272686824340068]}, {"name": "id", "qubits": [19], "params": []}, {"name": "x", "qubits": [19], "params": []}, {"name": "h", "qubits": [20], "params": []}, {"name": "rx", "qubits": [20], "params": [3.626516629451491]}, {"name": "rz", "qubits": [20], "params": [2.201745376656351]}, {"name": "id", "qubits": [20], "params": []}, {"name": "y", "qubits": [20], "params": []}, {"name": "h", "qubits": [21], "params": []}, {"name": "rx", "qubits": [21], "params": [0.04302219110140827]}, {"name": "rz", "qubits": [21], "params": [5.180081312188305]}, {"name": "id", "qubits": [21], "params": []}, {"name": "z", "qubits": [21], "params": []}, {"name": "h", "qubits": [22], "params": []}, {"name": "rx", "qubits": [22], "params": [5.571751317863703]}, {"name": "rz", "qubits": [22], "params": [4.654342229051409]}, {"name": "id", "qubits": [22], "params": []}, {"name": "x", "qubits": [22], "params": []}, {"name": "h", "qubits": [23], "params": []}, {"name": "rx", "qubits": [23], "params": [5.0928601828010915]}, {"name": "rz", "qubits": [23], "params": [5.110366681883756]}, {"name": "id", "qubits": [23], "params": []}, {"name": "y", "qubits": [23], "params": []}, {"name": "h", "qubits": [24], "params": []}, {"name": "rx", "qubits": [24], "params": [1.7384931130838892]}, {"name": "rz", "qubits": [24], "params": [5.957739168193432]}, {"name": "id", "qubits": [24], "params": []}, {"name": "z", "qubits": [24], "params": []}, {"name": "h", "qubits": [25], "params": []}, {"name": "rx", "qubits": [25], "params": [0.12033314580443114]}, {"name": "rz", "qubits": [25], "params": [3.879905646579032]}, {"name": "id", "qubits": [25], "params": []}, {"name": "x", "qubits": [25], "params": []}, {"name": "h", "qubits": [26], "params": []}, {"name": "rx", "qubits": [26], "params": [0.9906373570522469]}, {"name": "rz", "qubits": [26], "params": [5.895490225807834]}, {"name": "id", "qubits": [26], "params": []}, {"name": "y", "qubits": [26], "params": []}, {"name": "h", "qubits": [27], "params": []}, {"name": "rx", "qubits": [27], "params": [3.444903351031766]}, {"name": "rz", "qubits": [27], "params": [1.0147171451064043]}, {"name": "id", "qubits": [27], "params": []}, {"name": "z", "qubits": [27], "params": []}, {"name": "h", "qubits": [28], "params": []}, {"name": "rx", "qubits": [28], "params": [0.7592656064938098]}, {"name": "rz", "qubits": [28], "params": [1.7718874719706554]}, {"name": "id", "qubits": [28], "params": []}, {"name": "x", "qubits": [28], "params": []}, {"name": "h", "qubits": [29], "params": []}, {"name": "rx", "qubits": [29], "params": [5.098798836458989]}, {"name": "rz", "qubits": [29], "params": [0.6509126679057926]}, {"name": "id", "qubits": [29], "params": []}, {"name": "y", "qubits": [29], "params": []}, {"name": "h", "qubits": [30], "params": []}, {"name": "rx", "qubits": [30], "params": [2.6794264312618954]}, {"name": "rz", "qubits": [30], "params": [2.2634414937948506]}, {"name": "id", "qubits": [30], "params": []}, {"name": "z", "qubits": [30], "params": []}, {"name": "h", "qubits": [31], "params": []}, {"name": "rx", "qubits": [31], "params": [1.4689540128392364]}, {"name": "rz", "qubits": [31], "params": [0.550250293026944]}, {"name": "id", "qubits": [31], "params": []}, {"name": "x", "qubits": [31], "params": []}, {"name": "h", "qubits": [32], "params": []}, {"name": "rx", "qubits": [32], "params": [1.134097554015158]}, {"name": "rz", "qubits": [32], "params": [4.881065564087238]}, {"name": "id", "qubits": [32], "params": []}, {"name": "y", "qubits": [32], "params": []}, {"name": "h", "qubits": [33], "params": []}, {"name": "rx", "qubits": [33], "params": [5.747057960975526]}, {"name": "rz", "qubits": [33], "params": [4.502875851500231]}, {"name": "id", "qubits": [33], "params": []}, {"name": "z", "qubits": [33], "params": []}, {"name": "h", "qubits": [34], "params": []}, {"name": "rx", "qubits": [34], "params": [3.877794255141651]}, {"name": "rz", "qubits": [34], "params": [1.5069894829844612]}, {"name": "id", "qubits": [34], "params": []}, {"name": "x", "qubits": [34], "params": []}, {"name": "cx", "qubits": [0, 1], "params": []}, {"name": "cy", "qubits": [0, 2], "params": []}, {"name": "cz", "qubits": [0, 3], "params": []}, {"name": "cx", "qubits": [2, 3], "params": []}, {"name": "cy", "qubits": [2, 4], "params": []}, {"name": "cz", "qubits": [2, 5], "params": []}, {"name": "cx", "qubits": [4, 5], "params": []}, {"name": "cy", "qubits": [4, 6], "params": []}, {"name": "cz", "qubits": [4, 7], "params": []}, {"name": "cx", "qubits": [6, 7], "params": []}, {"name": "cy", "qubits": [6, 8], "params": []}, {"name": "cz", "qubits": [6, 9], "params": []}, {"name": "cx", "qubits": [8, 9], "params": []}, {"name": "cy", "qubits": [8, 10], "params": []}, {"name": "cz", "qubits": [8, 11], "params": []}, {"name": "cx", "qubits": [10, 11], "params": []}, {"name": "cy", "qubits": [10, 12], "params": []}, {"name": "cz", "qubits": [10, 13], "params": []}, {"name": "cx", "qubits": [12, 13], "params": []}, {"name": "cy", "qubits": [12, 14], "params": []}, {"name": "cz", "qubits": [12, 15], "params": []}, {"name": "cx", "qubits": [14, 15], "params": []}, {"name": "cy", "qubits": [14, 16], "params": []}, {"name": "cz", "qubits": [14, 17], "params": []}, {"name": "cx", "qubits": [16, 17], "params": []}, {"name": "cy", "qubits": [16, 18], "params": []}, {"name": "cz", "qubits": [16, 19], "params": []}, {"name": "cx", "qubits": [18, 19], "params": []}, {"name": "cy", "qubits": [18, 20], "params": []}, {"name": "cz", "qubits": [18, 21], "params": []}, {"name": "cx", "qubits": [20, 21], "params": []}, {"name": "cy", "qubits": [20, 22], "params": []}, {"name": "cz", "qubits": [20, 23], "params": []}, {"name": "cx", "qubits": [22, 23], "params": []}, {"name": "cy", "qubits": [22, 24], "params": []}, {"name": "cz", "qubits": [22, 25], "params": []}, {"name": "cx", "qubits": [24, 25], "params": []}, {"name": "cy", "qubits": [24, 26], "params": []}, {"name": "cz", "qubits": [24, 27], "params": []}, {"name": "cx", "qubits": [26, 27], "params": []}, {"name": "cy", "qubits": [26, 28], "params": []}, {"name": "cz", "qubits": [26, 29], "params": []}, {"name": "cx", "qubits": [28, 29], "params": []}, {"name": "cy", "qubits": [28, 30], "params": []}, {"name": "cz", "qubits": [28, 31], "params": []}, {"name": "cx", "qubits": [30, 31], "params": []}, {"name": "cy", "qubits": [30, 32], "params": []}, {"name": "cz", "qubits": [30, 33], "params": []}, {"name": "cx", "qubits": [32, 33], "params": []}, {"name": "cy", "qubits": [32, 34], "params": []}, {"name": "measure", "qubits": [0], "memory": [0]}, {"name": "measure", "qubits": [7], "memory": [7]}, {"name": "measure", "qubits": [14], "memory": [14]}, {"name": "measure", "qubits": [21], "memory": [21]}, {"name": "measure", "qubits": [28], "memory": [28]}, {"name": "measure", "qubits": [0], "memory": [0]}, {"name": "measure", "qubits": [1], "memory": [1]}, {"name": "measure", "qubits": [2], "memory": [2]}, {"name": "measure", "qubits": [3], "memory": [3]}, {"name": "measure", "qubits": [4], "memory": [4]}, {"name": "measure", "qubits": [5], "memory": [5]}, {"name": "measure", "qubits": [6], "memory": [6]}, {"name": "measure", "qubits": [7], "memory": [7]}, {"name": "measure", "qubits": [8], "memory": [8]}, {"name": "measure", "qubits": [9], "memory": [9]}, {"name": "measure", "qubits": [10], "memory": [10]}, {"name": "measure", "qubits": [11], "memory": [11]}, {"name": "measure", "qubits": [12], "memory": [12]}, {"name": "measure", "qubits": [13], "memory": [13]}, {"name": "measure", "qubits": [14], "memory": [14]}, {"name": "measure", "qubits": [15], "memory": [15]}, {"name": "measure", "qubits": [16], "memory": [16]}, {"name": "measure", "qubits": [17], "memory": [17]}, {"name": "measure", "qubits": [18], "memory": [18]}, {"name": "measure", "qubits": [19], "memory": [19]}, {"name": "measure", "qubits": [20], "memory": [20]}, {"name": "measure", "qubits": [21], "memory": [21]}, {"name": "measure", "qubits": [22], "memory": [22]}, {"name": "measure", "qubits": [23], "memory": [23]}, {"name": "measure", "qubits": [24], "memory": [24]}, {"name": "measure", "qubits": [25], "memory": [25]}, {"name": "measure", "qubits": [26], "memory": [26]}, {"name": "measure", "qubits": [27], "memory": [27]}, {"name": "measure", "qubits": [28], "memory": [28]}, {"name": "measure", "qubits": [29], "memory": [29]}, {"name": "measure", "qubits": [30], "memory": [30]}, {"name": "measure", "qubits": [31], "memory": [31]}, {"name": "measure", "qubits": [32], "memory": [32]}, {"name": "measure", "qubits": [33], "memory": [33]}, {"name": "measure", "qubits": [34], "memory": [34]}])";
+    file.close();
+}
 
+int main(int argc, const char * argv[]) { 
 
-
-    //json qc_json = json::parse(qc_str);
-
-    std::vector<bool> bin_circ = from_json_to_bin(qc_str);
-
+    if (argc > 1) {
+        std::cout << "Generating new file of size " << argv[1] << "...\n";
+        generate_random_circuit(std::stoul(argv[1], nullptr, 0), "prueba.json");
+    }
     
-/*       for (int i = 0; i < bin_circ.size(); i++){
-        
-        std::cout << bin_circ[i];
-    } 
-    std::cout << "\n";    
-    std::cout << "Hace la conversion a binario \n";
-    std::cout << "Longitud: " << bin_circ.size() << "\n"; */
+    json j;
+    std::ifstream file_in("prueba.json");
+
+    if (file_in.peek() != std::ifstream::traits_type::eof())
+        file_in >> j;
+    file_in.close();
+
+    auto start = std::chrono::high_resolution_clock::now();
+    auto bin_circ = from_json_to_bin(j);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    double binario = static_cast<double>(bin_circ.size());
+    double string = static_cast<double>(get_file_size("prueba.json"));
+/* 
+    std::cout << binario << "\n";
+    std::cout << string << "\n";
+    std::cout << binario/string << "\n\n"; */
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Tiempo transcurrido: " << duration.count() << " ms." << std::endl;
+    
 
 
-    std::vector<json> circ_json = from_bin_to_json(bin_circ);
-     
-    std::cout << "Hola desde el main" << "\n";
-     for (int k = 0; k < circ_json.size(); k++){
-        std::cout << circ_json[k] << "\n"; 
-    }         
+    /* start = std::chrono::high_resolution_clock::now();
+    auto circ_json = from_bin_to_json(bin_circ); 
+    end = std::chrono::high_resolution_clock::now();
 
-
-
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Tiempo transcurrido: " << duration.count() << " ms." << std::endl; */
     return 0;
 }
