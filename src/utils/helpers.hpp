@@ -7,10 +7,12 @@
 #include <bitset>
 #include <cmath>
 #include <fstream> 
+#include "constants.hpp"
+#include <random>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
+using json = nlohmann::json;
 
 // Secure cast of size
 template<typename TO, typename FROM>
@@ -22,472 +24,192 @@ TO legacy_size_cast(FROM value)
     return result;
 }
 
-
-
-const int gate_bit_len(4);
-const int qubit_bit_len(6);
-const int cbit_bit_len(6);
-const int param_sign_bit_len(1);
-const int param_int_bit_len(8);
-const int param_dec_bit_len(23);
-const int precision(100000); // Number_of_digits_of(2^param_dec_bit_len) - 1
-const int og_bit_len(gate_bit_len + qubit_bit_len);
-const int opg_bit_len(gate_bit_len + qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len);
-const int tg_bit_len(gate_bit_len + 2*qubit_bit_len);
-const int tpg_bit_len(gate_bit_len + 2*qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len);
-const int meas_bit_len(gate_bit_len + qubit_bit_len + cbit_bit_len);
-
-struct OneGate
-{ 
-    uint16_t gate_name : gate_bit_len; 
-    uint16_t qubit : qubit_bit_len; 
-};
-
-struct OnePGate
-{
-    uint16_t gate_name : gate_bit_len; 
-    uint16_t qubit : qubit_bit_len; 
-    uint16_t parameter_sign: param_sign_bit_len;
-    int16_t parameter_int : param_int_bit_len;
-    uint32_t parameter_dec : param_dec_bit_len;
-
-};
-
-struct TwoGate
-{
-    uint16_t gate_name : gate_bit_len; 
-    uint16_t first_qubit : qubit_bit_len; 
-    uint16_t second_qubit : qubit_bit_len; 
-};
-
-struct TwoPGate
-{
-    uint16_t gate_name : gate_bit_len; 
-    uint16_t first_qubit : qubit_bit_len; 
-    uint16_t second_qubit : qubit_bit_len; 
-    uint16_t parameter_sign: param_sign_bit_len;
-    int16_t parameter_int : param_int_bit_len;
-    uint32_t parameter_dec : param_dec_bit_len;
-};
-
-struct Measure
-{
-    uint16_t measure : gate_bit_len; 
-    uint16_t qubit : qubit_bit_len; 
-    uint16_t cbit : cbit_bit_len;
-};
-
-
-std::vector<std::string> basic_gates = {"measure", "id", "x", "y", "z", "rx", "ry", "rz", "h", "cx", "cy", "cz"};
-std::list<std::string> one_gates_no_parameters = {"id", "x", "y", "z", "h"};
-std::list<std::string> one_gates_parameters = {"rx", "ry", "rz"};
-std::list<std::string> two_gates_no_parameters = {"cx", "cy", "cz"};
-std::list<std::string> two_gates_parameters = {};
-std::list<std::string> measures = {"measure"};
-
-
-OneGate onegate_json(json og_json) {
-
-    OneGate onegate;
-    onegate.gate_name = std::find(basic_gates.begin(), basic_gates.end(), og_json["name"]) - basic_gates.begin() + 1;
-    onegate.qubit = og_json["qubits"][0];
-
-    return onegate;
-}
-
-OnePGate onepgate_json(json opg_json) {
-
-    OnePGate onepgate;
-    onepgate.gate_name = std::find(basic_gates.begin(), basic_gates.end(), opg_json["name"]) - basic_gates.begin() + 1;
-    onepgate.qubit = static_cast<uint16_t>(opg_json["qubits"][0]);
-    double p = opg_json["params"][0];
-    uint16_t sign;
-    if (p <= 0 ){
-        sign = 1;
+void print_bits(uint8_t block) {
+    for(int i = 7; i >= 0; --i) {
+        std::cout << ((block >> i) & 1);
     }
-    else {
-        sign = 0;
+    std::cout << "\n";
+}
+
+void print_bits(std::vector<uint8_t> bin_circ) {
+    for(const auto& block: bin_circ) {
+        for(int i = 7; i >= 0; --i) {
+            std::cout << ((block >> i) & 1);
+        }
     }
-    p = std::abs(p);
-    int16_t intPart = static_cast<int16_t>(std::floor(p));
-    double decPart = p - intPart; 
-    uint32_t decPartInt = static_cast<uint32_t>(decPart * precision);
-    onepgate.parameter_sign = sign;
-    onepgate.parameter_int = intPart;
-    onepgate.parameter_dec = decPartInt;
-
-
-    return onepgate;
-
+    std::cout << "\n";
 }
-
-TwoGate twogate_json(json tg_json) {
-
-    TwoGate twogate;
-    twogate.gate_name = std::find(basic_gates.begin(), basic_gates.end(), tg_json["name"]) - basic_gates.begin() + 1;
-    twogate.first_qubit = tg_json["qubits"][0];
-    twogate.second_qubit = tg_json["qubits"][1];
-
-
-    return twogate;
-}
-
-TwoPGate twopgate_json(json tgp_json) {
-
-    TwoPGate twopgate;
-    twopgate.gate_name = std::find(basic_gates.begin(), basic_gates.end(), tgp_json["name"]) - basic_gates.begin() + 1;
-    twopgate.first_qubit = tgp_json["qubits"][0];
-    twopgate.second_qubit = tgp_json["qubits"][1];
-    double p = tgp_json["params"][0];
-    uint16_t sign;
-    if (p <= 0 ){
-        sign = 1;
-    }
-    else {
-        sign = 0;
-    }
-    p = std::abs(p);
-    int16_t intPart = static_cast<int16_t>(std::floor(p));
-    double decPart = p - intPart; 
-    uint32_t decPartInt = static_cast<uint32_t>(decPart * precision);
-    twopgate.parameter_sign = sign;
-    twopgate.parameter_int = intPart;
-    twopgate.parameter_dec = decPartInt;
-
-    return twopgate;
-}
-
-Measure measure_json(json meas_json) {
-
-    Measure measure;
-    measure.measure = 1;
-    measure.qubit = meas_json["qubits"][0];
-    measure.cbit = meas_json["memory"][0];
-
-
-    return measure;
-}
-
 
 // The input is a list of jsons in string format, each json corresponding to a gate/measure with all its properties.
-std::vector<bool> from_json_to_bin(std::string qc_str){
+std::vector<uint8_t> from_json_to_bin(json qc_json){
 
-    json qc_json = json::parse(qc_str);
+    std::string name;
+    std::vector<uint8_t> circ_binaries;
+    double p;
+    uint8_t p_arr[8];
 
-     //std::ofstream outFile("bin_circuit.txt");
-     std::vector<bool> bool_vector;
+    int bit_counter = 0;
+    for (const auto& gate: qc_json) {
+        name = gate["name"];
+        circ_binaries.push_back(GATE_NAMES[name]);
+        switch (GATE_NAMES[name]) {
+            case MEASURE: // MEASURE
+                circ_binaries.push_back(gate["qubits"][0]);
+                circ_binaries.push_back(gate["memory"][0]);
+                break;
+            case ID:
+            case X:
+            case Y:
+            case Z:
+            case H: // ONE GATE NO PARAM
+                circ_binaries.push_back(gate["qubits"][0]);
+                break;
+            case RX:
+            case RY:
+            case RZ: // ONE GATE PARAM
+                circ_binaries.push_back(gate["qubits"][0]);
+                p = gate["params"][0];
 
+                std::memcpy(p_arr, &p, sizeof(p));
+                circ_binaries.insert(circ_binaries.end(), std::begin(p_arr), std::end(p_arr));
 
-    //int sum = 0;
-
-    for (int j = 0; j < qc_json.size(); j++){
-        if (std::find(one_gates_no_parameters.begin(), one_gates_no_parameters.end(), qc_json[j]["name"]) != one_gates_no_parameters.end()){
-            OneGate res = onegate_json(qc_json[j]);
-
-            uint16_t concatenated = (res.gate_name << qubit_bit_len) | res.qubit;
-            std::bitset<10> z = concatenated;
-            
-            for (int i = 0; i < z.size(); i++) {
-                bool_vector.push_back(z[z.size() -1 - i]); 
-            }
-        
-            //sum = sum + og_bit_len;
-            //outFile << z ;
-
-
-            
+                break;
+            case CX:
+            case CY:
+            case CZ: // TWO GATE NO PARAM
+                circ_binaries.push_back(gate["qubits"][0]);
+                circ_binaries.push_back(gate["qubits"][1]);
+                break;
+            default:
+                std::cerr << "Unsupported gate: " << name << "\n";
+                return std::vector<uint8_t>();
         }
-        else if(std::find(one_gates_parameters.begin(), one_gates_parameters.end(), qc_json[j]["name"]) != one_gates_parameters.end()){
-            OnePGate res = onepgate_json(qc_json[j]);
-
-            uint64_t concatenated = (static_cast<uint64_t>(res.gate_name) << (opg_bit_len - gate_bit_len)) | (static_cast<uint64_t>(res.qubit) << (opg_bit_len - gate_bit_len - qubit_bit_len)) | (static_cast<uint64_t>(res.parameter_sign) << (opg_bit_len - gate_bit_len - qubit_bit_len - param_sign_bit_len)) | (static_cast<uint64_t>(res.parameter_int) << (opg_bit_len - gate_bit_len - qubit_bit_len - param_sign_bit_len - param_int_bit_len)) | static_cast<uint64_t>(res.parameter_dec);
-            std::bitset<opg_bit_len> z = concatenated;
-            
-            
-            for (int i = 0; i < z.size(); i++) {
-                bool_vector.push_back(z[z.size() - 1 -i]); 
-            }
-
-
-            //sum = sum + opg_bit_len;
-            //outFile << z ;
-
-
-        }
-        else if(std::find(two_gates_no_parameters.begin(), two_gates_no_parameters.end(), qc_json[j]["name"]) != two_gates_no_parameters.end()){
-            TwoGate res = twogate_json(qc_json[j]);
-
-            uint16_t concatenated = (res.gate_name << (tg_bit_len - gate_bit_len)) | (res.first_qubit << (tg_bit_len - gate_bit_len - qubit_bit_len)) | res.second_qubit;
-            std::bitset<tg_bit_len> z = concatenated;
-
-            for (int i = 0; i < z.size(); i++) {
-                bool_vector.push_back(z[z.size() - 1 -i]); 
-            }
-
-            //sum = sum + tg_bit_len;
-            //outFile << z  ;
-            
-
-            
-        }
-        else if(std::find(two_gates_parameters.begin(), two_gates_parameters.end(), qc_json[j]["name"]) != two_gates_parameters.end()){
-            TwoPGate res = twopgate_json(qc_json[j]);
-
-            uint64_t concatenated = (static_cast<uint64_t>(res.gate_name) << (tpg_bit_len - gate_bit_len)) | (static_cast<uint64_t>(res.first_qubit) << (tpg_bit_len - gate_bit_len - qubit_bit_len)) | (static_cast<uint64_t>(res.second_qubit) << (tpg_bit_len - gate_bit_len - 2*qubit_bit_len)) | (static_cast<uint64_t>(res.parameter_int) << (tpg_bit_len - gate_bit_len - 2*qubit_bit_len - param_int_bit_len)) | static_cast<uint64_t>(res.parameter_dec);
-            std::bitset<tpg_bit_len> z = concatenated;
-
-            for (int i = 0; i < z.size(); i++) {
-            bool_vector.push_back(z[z.size() - 1 -i]); 
-            }
-
-            //sum = sum + tpg_bit_len;
-            //outFile << z ;
-
-            
-        }
-        else if(std::find(measures.begin(), measures.end(), qc_json[j]["name"]) != measures.end()){
-            Measure res = measure_json(qc_json[j]);
-
-            uint16_t concatenated = (res.measure << (meas_bit_len - gate_bit_len)) | (res.qubit << (meas_bit_len - gate_bit_len - qubit_bit_len)) | res.cbit;
-            std::bitset<meas_bit_len> z = concatenated;
-
-            for (int i = 0; i < z.size(); i++) {
-            bool_vector.push_back(z[z.size() - 1 -i]);
-            }
-
-            //sum = sum + meas_bit_len;
-            //outFile << z ;
-
-            
-        }
-        else {
-            break;
-        }
-
-
     }
-    
 
-    return bool_vector;
-
+    return circ_binaries;
 }
 
-
-
-
-std::vector<json> from_bin_to_json(std::vector<bool> bool_vector){
+std::vector<json> from_bin_to_json(const std::vector<uint8_t>& circ_binaries){
     std::vector<json> circ_json;
     json aux_json;
-    int index0 = 0;
-    int index1 = 0;
-    int sign = 0;
-    double decimal = 0;
-    int step = 0;
+    double p;
 
-
-    while (step < bool_vector.size()){
-
-        std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + gate_bit_len);
-
-
-        for (size_t i = 0; i < aux_bool_vec.size(); i++) {
-            index0 = index0 + aux_bool_vec[i]*std::pow(2, aux_bool_vec.size() - 1 - i);
-        }  
-
-
-        aux_json["name"] = basic_gates[index0 - 1];
-        index0 = 0;
-        aux_bool_vec.clear();
-
-        step = step + gate_bit_len;
-
-
-        
-        if (std::find(one_gates_no_parameters.begin(), one_gates_no_parameters.end(), aux_json["name"]) != one_gates_no_parameters.end()){
-            
-            std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + (og_bit_len - gate_bit_len));
-
-            for (size_t i = 0; i < qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2,(qubit_bit_len-1) - i);
-            }
-
-            aux_json["qubits"] = {index0};
-            circ_json.push_back(aux_json);
-
-            aux_json = {};
-            aux_bool_vec.clear();
-            index0 = 0;
-
-            step = step + qubit_bit_len;
-            
-
+    int i = 0;
+    while (i < circ_binaries.size()) {
+        aux_json["name"] = INVERTED_GATE_NAMES[circ_binaries[i]];
+        switch (circ_binaries[i]) {
+            case MEASURE: // MEASURE
+                aux_json["qubits"] = {circ_binaries[i+1]};
+                aux_json["memory"] = {circ_binaries[i+2]};
+                i += 3;
+                break;
+            case ID:
+            case X:
+            case Y:
+            case Z:
+            case H: // ONE GATE NO PARAM
+                aux_json["qubits"] = {circ_binaries[i+1]};
+                i += 2;
+                break;
+            case RX:
+            case RY:
+            case RZ: // ONE GATE PARAM
+                aux_json["qubits"] = {circ_binaries[i+1]};
+                
+                std::memcpy(&p, &circ_binaries[i+2], sizeof(double));
+                aux_json["param"] = {p};
+                i += 10;
+                break;
+            case CX:
+            case CY:
+            case CZ: // TWO GATE NO PARAM
+                aux_json["qubits"] = {circ_binaries[i+1], circ_binaries[i+2]};
+                i += 3;
+                break;
+            default:
+                std::cerr << "Uncorrect bit sequence\n";
+                return std::vector<json>();
         }
 
-        else if (std::find(one_gates_parameters.begin(), one_gates_parameters.end(), aux_json["name"]) != one_gates_parameters.end()){
-            std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + (opg_bit_len - gate_bit_len));
-
-            for (size_t i = 0; i < qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2,(qubit_bit_len - 1) - i);
-                }
-
-            aux_json["qubits"] = {index0};
-            index0 = 0;
-
-            if (aux_bool_vec[qubit_bit_len] == 1){
-                sign = 1;
-            }
-            
-
-            for (size_t i = (qubit_bit_len + param_sign_bit_len); i < (qubit_bit_len + param_sign_bit_len + param_int_bit_len); i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2,(qubit_bit_len + param_sign_bit_len + param_int_bit_len  - 1) - i);
-                }
-            
-
-            for (size_t i = (qubit_bit_len + param_sign_bit_len + param_int_bit_len); i < (qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len); i++) {
-                index1 = index1 + static_cast<double>(aux_bool_vec[i])*std::pow(2,(qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len - 1) - i);
-                }
-            
-            
-            
-
-            double decimal = index1 / pow(10, std::to_string(index1).length());
-
-            
-
-            if (sign == 1){
-                index0 = -index0;
-                aux_json["params"] = {static_cast<double>(index0) - decimal};
-            }
-            else {
-                aux_json["params"] = {static_cast<double>(index0) + decimal};
-            }
-
-            circ_json.push_back(aux_json);
-            
-
-            aux_json = {};
-            aux_bool_vec.clear();          
-            index0 = 0;
-            index1 = 0;
-            sign = 0;
-            decimal = 0;
-
-            step = step + (opg_bit_len - gate_bit_len);
-            
-       
-        }
-        
-        else if (std::find(two_gates_no_parameters.begin(), two_gates_no_parameters.end(), aux_json["name"]) != two_gates_no_parameters.end()){
-            std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + (tg_bit_len - gate_bit_len));
-
-            for (size_t i = 0; i < qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (qubit_bit_len - 1) - i);
-                }
-
-            for (size_t i = qubit_bit_len; i < 2*qubit_bit_len; i++) {
-                index1 = index1 + aux_bool_vec[i]*std::pow(2, (2*qubit_bit_len - 1) - i);
-                }
-
-            aux_json["qubits"] = {index0, index1};
-            circ_json.push_back(aux_json);
-
-            aux_json = {};
-            aux_bool_vec.clear();
-            index0 = 0;
-            index1 = 0;
-
-            step = step + (tg_bit_len - gate_bit_len);
-            
-        }
-        
-        else if (std::find(two_gates_parameters.begin(), two_gates_parameters.end(), aux_json["name"]) != two_gates_parameters.end()){
-            std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + (tpg_bit_len - gate_bit_len));
-
-            for (size_t i = 0; i < qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (qubit_bit_len - 1) - i);
-                }
-
-            for (size_t i = qubit_bit_len; i < 2*qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (2*qubit_bit_len - 1) - i);
-                }
-
-            aux_json["qubits"] = {index0, index1};
-            index0 = 0;
-            index1 = 0;
-
-            if (aux_bool_vec[2*qubit_bit_len] == 1){
-                sign = 1;
-            }
-
-            for (size_t i = (2*qubit_bit_len + param_sign_bit_len); i < (2*qubit_bit_len + param_sign_bit_len + param_int_bit_len); i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (2*qubit_bit_len + param_sign_bit_len + param_int_bit_len - 1) - i);
-                }
-
-
-            for (size_t i = (2*qubit_bit_len + param_sign_bit_len + param_int_bit_len); i < (2*qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len); i++) {
-                index1 = index1 + aux_bool_vec[i]*std::pow(2, (2*qubit_bit_len + param_sign_bit_len + param_int_bit_len + param_dec_bit_len - 1) - i);
-                }
-
-            double decimal = index1 / pow(10, std::to_string(index1).length());
-
-            if (sign == 1){
-                index0 = -index0;
-                aux_json["params"] = {static_cast<double>(index0) - decimal};
-            }
-            else {
-                aux_json["params"] = {static_cast<double>(index0) + decimal};
-            }
-
-            circ_json.push_back(aux_json);
-
-            aux_json = {};
-            aux_bool_vec.clear();
-            index0 = 0;
-            index1 = 0;
-            sign = 0;
-
-            step = step + (tpg_bit_len - gate_bit_len);
-            
-        }
-        
-        else if (std::find(measures.begin(), measures.end(), aux_json["name"]) != measures.end()){
-
-            std::vector<bool> aux_bool_vec(bool_vector.begin() + step, bool_vector.begin() + step + (meas_bit_len - gate_bit_len));
-            for (size_t i = 0; i < qubit_bit_len; i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (qubit_bit_len - 1) - i);
-                }
-            
-            aux_json["qubits"] = {index0};
-            index0 = 0;
-
-            for (size_t i = qubit_bit_len; i < (qubit_bit_len + cbit_bit_len); i++) {
-                index0 = index0 + aux_bool_vec[i]*std::pow(2, (qubit_bit_len + cbit_bit_len - 1) - i);
-            }
-
-            aux_json["memory"] = {index0};
-            circ_json.push_back(aux_json);
-            
-            aux_json = {};
-            aux_bool_vec.clear();
-            index0 = 0;
-            index1 = 0;
-
-            step = step + (meas_bit_len - gate_bit_len);
-            
-        }
-
-        else {
-            std::cout << "No valid gate name \n"; 
-            break;
-        }
-    
-    } // End while
+        circ_json.push_back(aux_json);
+        aux_json = {};
+    }
 
     return circ_json;
 
+} 
+
+
+
+void generate_random_circuit(unsigned long size, const std::string& filename) {
+    
+    std::vector<int> keys;
+    for(auto gates : GATE_NAMES) {
+        keys.push_back(gates.second);
+    }
+
+    // Abrir el archivo en modo escritura
+    std::ofstream file(filename);
+    if (!file) {
+        std::cerr << "No se pudo abrir el archivo para escribir." << std::endl;
+        return;
+    }
+
+    // Inicializar el generador de números aleatorios
+    std::random_device rd;
+    
+    std::mt19937 gen_gates(rd());
+    std::uniform_int_distribution<> dist_gates(0, GATE_NAMES.size() - 1);
+
+    std::mt19937 gen_qubits(rd());
+    std::uniform_int_distribution<> dist_qubits(0, 31);
+
+    std::mt19937 gen_double(rd()); // Generador Mersenne Twister
+    std::uniform_real_distribution<> dist_double(-5.0, 5.0);
+
+    json gate_json = {};
+
+    // Escribir `count` nombres aleatorios en el archivo
+    file << "[";
+
+    std::cout << size << "\n";
+    for (unsigned long i = 0; i < size; ++i) {
+        auto gate = keys[dist_gates(gen_gates)];
+        gate_json["name"] = INVERTED_GATE_NAMES[gate];
+        switch (gate) {
+            case MEASURE: // MEASURE
+                gate_json["qubits"] = {dist_qubits(gen_qubits)};
+                gate_json["memory"] = {dist_qubits(gen_qubits)};
+                break;
+            case ID:
+            case X:
+            case Y:
+            case Z:
+            case H: // ONE GATE NO PARAM
+                gate_json["qubits"] = {dist_qubits(gen_qubits)};
+                break;
+            case RX:
+            case RY:
+            case RZ: // ONE GATE PARAM
+                gate_json["qubits"] = {dist_qubits(gen_qubits)};
+                gate_json["params"] = {dist_double(gen_double)};
+                break;
+            case CX:
+            case CY:
+            case CZ: // TWO GATE NO PARAM
+                gate_json["qubits"] = {dist_qubits(gen_qubits), dist_qubits(gen_qubits)};
+                break;
+            default:
+                std::cerr << "Uncorrect bit sequence\n";
+        }
+        file << gate_json.dump() << ", ";
+        gate_json = {};
+    }
+    file.seekp(-2, std::ios::end);
+    file << "]";
+
+    file.close();
 }
-
-
 
 
 
