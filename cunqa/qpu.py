@@ -101,7 +101,7 @@ class QPU():
         <class 'qjob.Result'> object.
         """
         try:
-            qjob = QJob(self, circuit, transpile = transpile, initial_layout = initial_layout, opt_level = opt_level **run_parameters)
+            qjob = QJob(self, circuit, transpile = transpile, initial_layout = initial_layout, opt_level = opt_level, **run_parameters)
             qjob.submit()
             logger.debug(f"Qjob submitted to QPU {self.id}.")
         except Exception as error:
