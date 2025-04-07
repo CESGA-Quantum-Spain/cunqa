@@ -1,11 +1,5 @@
-import os
-import sys
-import json
 import subprocess
 from subprocess import run
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import QFT
-from cunqa.circuit import qc_to_json
 from cunqa.qpu import getQPUs
 
 # Adding pyhton folder path to detect modules
