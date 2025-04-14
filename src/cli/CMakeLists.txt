@@ -2,6 +2,7 @@
 add_executable(qraise qraise.cpp)
 target_include_directories(qraise PRIVATE "${CMAKE_SOURCE_DIR}/src" 
                                           "${CMAKE_SOURCE_DIR}/src/third-party/aer-cpp/src"
+                                          "${CMAKE_SOURCE_DIR}/src/third-party/cunqasimulator/src"
                                           "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
 target_link_libraries(qraise PRIVATE custom-json logger_client
                                      nlohmann_json::nlohmann_json 
@@ -40,7 +41,8 @@ add_executable(setup_qpus setup_qpus.cpp)
 message(STATUS "libzmq_LIBRARIES: ${libzmq_LIBRARIES}")
 target_include_directories(setup_qpus PRIVATE "${CMAKE_SOURCE_DIR}/src" 
                                               "${CMAKE_SOURCE_DIR}/src/third-party/aer-cpp/src"
-                                              #"${libzmq_INCLUDE_DIRS}"
+                                              "${CMAKE_SOURCE_DIR}/src/third-party/cunqasimulator/src"
+                                              "${libzmq_INCLUDE_DIRS}"
                                               "${libzmq_BINARY_DIR}"
                                               "${CMAKE_SOURCE_DIR}/src/third-party/zmq"
                                               "${PROJECT_BINARY_DIR}/src/comm"

@@ -7,12 +7,17 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdexcept>
+#include <set>
+#include <nlohmann/json.hpp>
 #include "argparse.hpp"
 #include "logger/logger.hpp"
+
+using json = nlohmann::json;
 using namespace std::literals;
 struct MyArgs : public argparse::Args
 {
     std::optional<std::vector<uint32_t>>& ids = arg("Slurm IDs of the QPUs to be dropped.").multi_argument();
+    std::optional<std::string>& info_path     = kwarg("info_path", "PATH to the QPU information file.");
     bool &all                                 = flag("all", "All qraise jobs will be dropped.");
 };
 int isValidSlurmJobID(uint32_t jobID)
@@ -76,6 +81,24 @@ int main(int argc, char* argv[])
             std::cerr << "\033[1;31m" << "Error: " << "\033[0m" << "No qraise jobs are currently running.\n";
             return -1;
         }
+    } else if (args.info_path.has_value()) {
+        std::ifstream info_path(args.info_path.value());
+        json json_file;
+        std::set<std::string> unique_job_ids;
+
+        info_path >> json_file;
+
+        for (auto& k : json_file.items()) {
+            std::string key = k.key();
+            std::string job_id = key.substr(0, key.find('_'));
+            unique_job_ids.insert(job_id);
+
+        }
+
+        for (const auto& element : unique_job_ids) {
+            id_str += element + " ";
+        }
+
     } else if (!args.ids.has_value()) {
         std::cerr << "\033[1;31m" << "Error: " << "\033[0m" << "You must specify the IDs of the jobs to be removed or use the --all flag.\n";
         return -1;

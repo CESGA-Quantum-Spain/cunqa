@@ -19,10 +19,11 @@ CustomJson::~CustomJson() = default;
 
 void CustomJson::write(json local_data, const std::string &filename)
 {
-    int flag;
-    MPI_Initialized(&flag);
+    //int flag;
+    //MPI_Initialized(&flag);
     this->filename = filename;
-    flag ? CustomJson::_write_MPI(local_data) : CustomJson::_write_locks(local_data);
+    //flag ? CustomJson::_write_MPI(local_data) : CustomJson::_write_locks(local_data);
+    CustomJson::_write_locks(local_data);
 }
 
 const std::string CustomJson::dump()
@@ -119,7 +120,8 @@ void CustomJson::_write_locks(json local_data)
 
         // This is done because the task epilog does not 
         // have access to SLURM_TASK_PID variable
-        std::string local_id = std::getenv("SLURM_LOCALID");
+        //std::string local_id = std::getenv("SLURM_LOCALID");
+        std::string local_id = std::getenv("SLURM_TASK_PID");
         std::string job_id = std::getenv("SLURM_JOB_ID");
         
         auto task_id = job_id + "_" + local_id;

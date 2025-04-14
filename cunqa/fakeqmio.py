@@ -84,5 +84,5 @@ backend_json = {
 }
 
 
-with open("{}/.api_simulator/tmp_fakeqmio_backend_{}.json".format(STORE_PATH, args.SLURM_JOB_ID), 'w') as file:
+with open("{}/.cunqa/tmp_fakeqmio_backend_{}.json".format(STORE_PATH, args.SLURM_JOB_ID), 'w') as file:
     json.dump(backend_json, file)

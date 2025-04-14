@@ -14,7 +14,6 @@ class QJobError(Exception):
     """Exception for error during job submission to QPUs."""
     pass
 
-
 def _divide(string, lengths):
 
     """

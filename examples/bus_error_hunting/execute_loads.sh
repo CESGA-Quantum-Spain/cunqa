@@ -1,6 +1,6 @@
 #!/bin/bash
 
-json_file="$STORE/.api_simulator/qpus.json"
+json_file="$STORE/.cunqa/qpus.json"
 for i in {1..1000}
 do
     qraise_output=$(qraise -n 20 -t 00:10:00)

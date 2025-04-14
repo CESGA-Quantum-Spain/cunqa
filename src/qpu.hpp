@@ -48,10 +48,12 @@ template <SimType sim_type>
 QPU<sim_type>::QPU(config::QPUConfig<sim_type> qpu_config) : 
     qpu_config{qpu_config}, backend{qpu_config.backend_config}
 {
+    SPDLOG_LOGGER_INFO(logger, "QPU instanciated.");
     CustomJson c_json{};
     json config_json(qpu_config);
 
     c_json.write(config_json, qpu_config.filepath);
+    SPDLOG_LOGGER_INFO(logger, "Write finished.");
 }
 
 

@@ -4,6 +4,7 @@
 #include <any>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <cstdlib>
 
 #include "argparse.hpp"
 #include "logger/logger.hpp"
@@ -18,9 +19,11 @@ struct MyArgs : public argparse::Args
     //int& node = kwarg("node", "Specific node to raise the qpus."); //Alvaro 
     int& n_qpus                          = kwarg("n,num_qpus", "Number of QPUs to be raised.");
     std::string& time                    = kwarg("t,time", "Time for the QPUs to be raised.");
+    int& cores_per_qpu                  = kwarg("c,cores", "Number of cores per QPU.").set_default(2);
+    int& mem_per_qpu                    = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.").set_default(24);
+    int& number_of_nodes                = kwarg("N,n_nodes", "Number of nodes.").set_default(1);
     std::optional<std::string>& backend  = kwarg("b,backend", "Path to the backend config file.");
     std::string& simulator               = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer");
-    std::string& mem_per_qpu             = kwarg("mem-per-qpu", "Memory given to each QPU.").set_default("7G");
     std::optional<std::string>& fakeqmio = kwarg("fq,fakeqmio", "Raise FakeQmio backend from calibration file", /*implicit*/"last_calibrations");
 
     void welcome() {
@@ -34,10 +37,27 @@ bool check_time_format(const std::string& time)
     return std::regex_match(time, format);   
 }
 
-bool check_mem_format(const std::string& mem) 
+bool check_mem_format(const int& mem) 
 {
+    std::string mem_str = std::to_string(mem) + "G";
     std::regex format("^(\\d{1,2})G$");
-    return std::regex_match(mem, format);
+    return std::regex_match(mem_str, format);
+}
+
+int check_memory_specs(int& mem_per_qpu, int& cores_per_qpu)
+{
+    int mem_per_cpu = mem_per_qpu/cores_per_qpu;
+    const char* system_var = std::getenv("LMOD_SYSTEM_NAME");
+    if ((std::string(system_var) == "QMIO" && mem_per_cpu > 15)) {
+        return 1;
+    } else if ((std::string(system_var) == "FT3" && mem_per_cpu > 4)){
+        return 2;
+    }
+
+    SPDLOG_LOGGER_DEBUG(logger, "Correct memory per core.");
+
+    return 0;
+
 }
 
 int main(int argc, char* argv[]) 
@@ -52,15 +72,16 @@ int main(int argc, char* argv[])
     // Escribir el contenido del script SBATCH
     sbatchFile << "#!/bin/bash\n";
     sbatchFile << "#SBATCH --job-name=qraise \n";
-    sbatchFile << "#SBATCH -c 2 \n";
+    sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
     sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
-    sbatchFile << "#SBATCH -N 1 \n";
-    // sbatchFile << "#SBATCH --nodelist=c7-" << args.node << "\n"; //Alvaro
+    sbatchFile << "#SBATCH -N " << args.number_of_nodes << "\n";
+    // sbatchFile << "#SBATCH --nodelist=c7-" << args.node << "\n"; 
 
     // TODO: Can the user decide the number of cores?
     if (check_mem_format(args.mem_per_qpu)){
-        int mem_per_qpu = args.mem_per_qpu[0] - '0';
-        sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu*2 << "G\n";
+        int mem_per_qpu = args.mem_per_qpu;
+        int cores_per_qpu = args.cores_per_qpu;
+        sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu/cores_per_qpu << "G\n";
     } else {
         SPDLOG_LOGGER_DEBUG(logger, "Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
         return -1;
@@ -73,11 +94,21 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    int memory_specs = check_memory_specs(args.mem_per_qpu, args.cores_per_qpu);
+
+    if (memory_specs == 1) {
+        SPDLOG_LOGGER_ERROR(logger, "Too much memory per QPU in QMIO. Please, decrease the mem-per-QPU or increase the cores-per-qpu. (Max mem-per-cpu = 16)");
+        return -1;
+    } else if (memory_specs == 1) {
+        SPDLOG_LOGGER_ERROR(logger, "Too much memory per QPU in FT3. Please, decrease the mem-per-QPU or increase the cores-per-qpu. Max mem-per-cpu = 4");
+        return -1;
+    }
+
     sbatchFile << "#SBATCH --output=qraise_%j\n";
 
     sbatchFile << "\n";
-    sbatchFile << "if [ ! -d \"$STORE/.api_simulator\" ]; then\n";
-    sbatchFile << "mkdir $STORE/.api_simulator\n";
+    sbatchFile << "if [ ! -d \"$STORE/.cunqa\" ]; then\n";
+    sbatchFile << "mkdir $STORE/.cunqa\n";
     sbatchFile << "fi\n";
 
     const char* var_name = "INSTALL_PATH"; // Replace with your variable name
@@ -89,7 +120,7 @@ int main(int argc, char* argv[])
         std::cerr << "Environment variable INSTALL_PATH is not set: aborting.\n"; 
     }
 
-    sbatchFile << "export INFO_PATH=" << std::getenv("STORE") << "/.api_simulator/qpus.json\n";
+    sbatchFile << "export INFO_PATH=" << std::getenv("STORE") << "/.cunqa/qpus.json\n";
 
     std::string backend_path;
     std::string backend;
