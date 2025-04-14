@@ -46,6 +46,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+build_qraise/
 build*
 develop-eggs/
 dist/

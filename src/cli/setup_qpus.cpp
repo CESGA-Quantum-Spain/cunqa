@@ -15,16 +15,17 @@ using json = nlohmann::json;
 
 int main(int argc, char *argv[])
 {
-    SPDLOG_LOGGER_DEBUG(logger,"Setup QPUs arguments: argc={} argv= {} {}", argc, argv[1], argv[2]);
-    std::string info_path(argv[1]);
-    std::string simulator(argv[2]);
+    SPDLOG_LOGGER_DEBUG(logger,"Setup QPUs arguments: argc={} argv= {} {} {}", argc, argv[1], argv[2], argv[3]);
+    std::string family_name(argv[1]);
+    std::string info_path(argv[2]);
+    std::string simulator(argv[3]);
     std::string backend;
     json backend_json;
 
     json qpu_config_json = {};
     try {
-        if (argc == 4) {
-            backend = std::string(argv[3]);
+        if (argc == 5) {
+            backend = std::string(argv[4]);
             std::cout << backend << "\n";
             backend_json = json::parse(backend);
             if (backend_json.contains("fakeqmio_path")) {
@@ -40,8 +41,14 @@ int main(int argc, char *argv[])
                 throw std::runtime_error(std::string("Format not correct. Must be {\"backend_path\" : \"path/to/backend/json\"} or {\"fakeqmio_path\" : \"path/to/qmio/calibration/json\"}"));
             }
             
-        } else  if (argc < 2)
+        } else  if (argc < 3)
             SPDLOG_LOGGER_ERROR(logger, "Not a QPU configuration was given.");
+            
+        if (family_name == "default"){
+            family_name = (std::string)std::getenv("SLURM_JOB_ID");
+        }
+
+        qpu_config_json["family_name"] = family_name;
 
         if(auto search = SIM_NAMES.find(simulator); search != SIM_NAMES.end()) {
             if (search->second == SimType::Aer) {

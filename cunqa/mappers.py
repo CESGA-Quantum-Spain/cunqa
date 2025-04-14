@@ -1,10 +1,10 @@
 from cunqa.logger import logger
 from cunqa.qjob import gather
+from cunqa.circuit import from_json_to_qc
+from cunqa.qpu import QPU
 from qiskit import QuantumCircuit
 from qiskit.exceptions import QiskitError
 from qiskit.qasm2 import QASM2Error
-from cunqa.circuit import from_json_to_qc
-from cunqa.qpu import QPU
 import numpy as np
 
 

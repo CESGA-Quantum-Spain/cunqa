@@ -12,12 +12,13 @@ namespace config {
 template <SimType sim_type = SimType::Aer>
 class QPUConfig {
 public:
+    std::string family_name;
     BackendConfig<sim_type> backend_config;
     NetConfig net_config;
     std::string filepath;
 
     QPUConfig(const json& config, const std::string& filepath) :
-        filepath{filepath}
+        filepath{filepath}, family_name(config.at("family_name"))
     {
         if (config.contains("backend"))
             this->backend_config = config.contains("noise") ? 
@@ -48,10 +49,12 @@ public:
 template <SimType sim_type>
 void to_json(json& j, const QPUConfig<sim_type>& qpu_config)
 {
+    std::string family_name = qpu_config.family_name;
     json net = qpu_config.net_config;
     json backend = qpu_config.backend_config;
 
     j = {   
+            {"family_name", family_name},
             {"net", net}, 
             {"backend", backend}
         };
@@ -60,6 +63,7 @@ void to_json(json& j, const QPUConfig<sim_type>& qpu_config)
 template <SimType sim_type>
 void from_json(const json& j, QPUConfig<sim_type>& qpu_config) 
 {
+    qpu_config.fanmily_name = j.at("family_name");
     qpu_config.net_config = j.at("net").template get<NetConfig>();
     qpu_config.backend_config = j.at("backend").template get<BackendConfig<sim_type>>();
 }; 

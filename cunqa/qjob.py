@@ -5,8 +5,6 @@ from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 from cunqa.circuit import qc_to_json, from_json_to_qc, _registers_dict, _is_parametric
 from cunqa.transpile import transpiler, TranspilerError
-
-# importing logger
 from cunqa.logger import logger
 
 
