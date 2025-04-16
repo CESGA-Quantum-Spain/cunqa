@@ -92,7 +92,6 @@ class QPU:
             raise SystemExit # User's level
 
 
-
         # argument to track weather the QPU is connected. It will be connected at `run` method.
         self.connected = False
         
