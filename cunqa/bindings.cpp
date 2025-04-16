@@ -18,7 +18,7 @@ PYBIND11_MODULE(qclient, m) {
  
         .def(py::init<const std::optional<std::string> &>(), py::arg("filepath") = std::nullopt)  // Constructor sin argumentos
  
-        .def("connect", &Client::connect, py::arg("task_id") = "", py::arg("net") = "ib0") // Metodo
+        .def("connect", &Client::connect, py::arg("task_id") = "") // Metodo
  
         .def("send_circuit", [](Client &c, const std::string& circuit) { 
             return FutureWrapper(c.send_circuit(circuit)); 

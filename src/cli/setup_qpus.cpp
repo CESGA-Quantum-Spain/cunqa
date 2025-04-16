@@ -15,17 +15,18 @@ using json = nlohmann::json;
 
 int main(int argc, char *argv[])
 {
-    SPDLOG_LOGGER_DEBUG(logger,"Setup QPUs arguments: argc={} argv= {} {} {}", argc, argv[1], argv[2], argv[3]);
-    std::string family_name(argv[1]);
-    std::string info_path(argv[2]);
-    std::string simulator(argv[3]);
+    SPDLOG_LOGGER_DEBUG(logger,"Setup QPUs arguments: argc={} argv= {} {} {} {}", argc, argv[1], argv[2], argv[3], argv[4]);
+    std::string mode(argv[1]);
+    std::string family_name(argv[2]);
+    std::string info_path(argv[3]);
+    std::string simulator(argv[4]);
     std::string backend;
     json backend_json;
 
     json qpu_config_json = {};
     try {
-        if (argc == 5) {
-            backend = std::string(argv[4]);
+        if (argc == 6) {
+            backend = std::string(argv[5]);
             std::cout << backend << "\n";
             backend_json = json::parse(backend);
             if (backend_json.contains("fakeqmio_path")) {
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
                 throw std::runtime_error(std::string("Format not correct. Must be {\"backend_path\" : \"path/to/backend/json\"} or {\"fakeqmio_path\" : \"path/to/qmio/calibration/json\"}"));
             }
             
-        } else  if (argc < 3)
+        } else  if (argc < 4)
             SPDLOG_LOGGER_ERROR(logger, "Not a QPU configuration was given.");
             
         if (family_name == "default"){
@@ -49,16 +50,17 @@ int main(int argc, char *argv[])
         }
 
         qpu_config_json["family_name"] = family_name;
+        qpu_config_json["slurm_job_id"] = (std::string)std::getenv("SLURM_JOB_ID");
 
         if(auto search = SIM_NAMES.find(simulator); search != SIM_NAMES.end()) {
             if (search->second == SimType::Aer) {
-                config::QPUConfig<SimType::Aer> qpu_config{qpu_config_json, info_path};
+                config::QPUConfig<SimType::Aer> qpu_config{mode, qpu_config_json, info_path};
                 QPU<SimType::Aer> qpu(qpu_config);
                 SPDLOG_LOGGER_DEBUG(logger, "Turning ON the QPUs with the AER simulator.");
                 qpu.turn_ON();
             } else if (search->second == SimType::Munich) {
                 SPDLOG_LOGGER_DEBUG(logger, "QPU_config: {}", qpu_config_json["noise"].dump(4));
-                config::QPUConfig<SimType::Munich> qpu_config{qpu_config_json, info_path};
+                config::QPUConfig<SimType::Munich> qpu_config{mode, qpu_config_json, info_path};
                 SPDLOG_LOGGER_DEBUG(logger, "QPU_config post qpu_config: {}", qpu_config.backend_config.noise_model.dump(4));
                 QPU<SimType::Munich> qpu(qpu_config);
                 SPDLOG_LOGGER_DEBUG(logger, "Turning ON the QPUs with the Munich simulator.");

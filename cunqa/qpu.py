@@ -12,13 +12,13 @@ if info_path is None:
     info_path = STORE+"/.cunqa/qpus.json"
 
 
-class QPU():
+class QPU:
     """
     Class to define a QPU.
     ----------------------
     """
     
-    def __init__(self, id=None, qclient=None, backend=None, port = None):
+    def __init__(self, id=None, qclient=None, backend=None, family_name = None, port = None):
         """
         Initializes the QPU class.
 
@@ -80,6 +80,18 @@ class QPU():
             logger.error(f"QClient port must be str, but {type(port)} was provided [{TypeError.__name__}].")
             raise SystemExit # User's level
         
+        if family_name == None:
+            logger.error(f"Please provide QPU family name [{TypeError.__name__}].") # for staters we raise the same error as if qclient was not provided
+            raise SystemExit # User's level
+        
+        elif isinstance(port, str):
+            self._family_name = family_name
+
+        else:
+            logger.error(f"Family name must be str, but {type(family_name)} was provided [{TypeError.__name__}].")
+            raise SystemExit # User's level
+
+
         # argument to track weather the QPU is connected. It will be connected at `run` method.
         self.connected = False
         
@@ -129,55 +141,38 @@ class QPU():
             raise SystemExit # User's level
 
         return qjob
-    
 
 
-
-
-def getQPUs(path = info_path):
+class QFamily:
     """
-    Global function to get the QPU objects corresponding to the virtual QPUs raised.
-
-    Return:
-    ---------
-    List of QPU objects.
-    
+    Class to represent a group of QPUs that where raised in the same job.
     """
-    try:
-        with open(path, "r") as qpus_json:
-            dumps = load(qpus_json)
+    def __init__(self, name = None, jobid = None):
+        """
+        Initializes the QFamily class.
+        """
 
-    except FileNotFoundError as error:
-        logger.error(f"No such file as {path} was found. Please provide a correct file path or check that evironment variables are correct [{type(error).__name__}].")
-        raise SystemExit # User's level
+        if name is None:
+            logger.error("No family name provided.")
+            raise ValueError # capture this in qraise
+        
+        elif isinstance(name, str):
+            self.name = name
 
-    except TypeError as error:
-        logger.error(f"Path to qpus json file must be str, but {type(path)} was provided [{type(error).__name__}].")
-        raise SystemExit # User's level
+        else:
+            logger.error(f"QFamily name must be str, but {type(name)} was provided [{TypeError.__name__}].")
+        
+        if jobid is None:
+            logger.error("No family name provided.")
+            raise ValueError # capture this in qraise
+        
+        elif isinstance(name, str):
+            try:
+                self.jobid = int(jobid)
+            except Exception as error:
+                logger.error(f"Incorrect format for jobid [{type(error).__name__}].")
 
-    except JSONDecodeError as error:
-        logger.error(f"File format not correct, must be json and follow the correct structure. Please check that {path} adeuqates to the format [{type(error).__name__}].")
-        raise SystemExit # User's level
+        else:
+            logger.error(f"QFamily name must be str, but {type(name)} was provided [{TypeError.__name__}].")
 
-    except Exception as error:
-        logger.error(f"Some exception occurred [{type(error).__name__}].")
-        raise SystemExit # User's level
-    
-    logger.debug(f"File accessed correctly.")
-
-
-    
-    if len(dumps) != 0:
-        qpus = []
-        i = 0
-        for k, v in dumps.items():
-            client = QClient(path)
-            # client.connect(k)
-            qpus.append(  QPU(id = i, qclient = client, backend = Backend(v['backend']), port = k  )  ) # errors captured above
-            i+=1
-        logger.debug(f"{len(qpus)} QPU objects were created.")
-        return qpus
-    else:
-        logger.error(f"No QPUs were found, {path} is empty.")
-        raise SystemExit
-
+        

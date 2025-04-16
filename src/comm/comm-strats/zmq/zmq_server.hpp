@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <string_view>
 #include "utils/helpers.hpp"
 #include "utils/constants.hpp"
 #include "logger/logger.hpp"
@@ -14,17 +15,24 @@ using namespace config;
 
 class ZmqServer {
 public:
-    ZmqServer(const NetConfig& net_config, const std::string_view& net = INFINIBAND)
+    ZmqServer(const NetConfig& net_config)
         : net_config_{net_config},
           socket_{context_, zmq::socket_type::server}
     {
+        std::string net;
+        if (net_config.mode == "cloud") {
+            net = INFINIBAND;
+        } else {
+            net = LOCAL;
+        }
         try {
-            std::string endpoint = "tcp://" + net_config_.IPs.at(std::string(net)) + ":" + net_config_.port;
+            SPDLOG_LOGGER_DEBUG(logger, "Trying to bind ZMQ socket to selected IP");
+            std::string endpoint = "tcp://" + net_config_.IPs.at(net) + ":" + net_config_.port;
             socket_.bind(endpoint);
             SPDLOG_LOGGER_DEBUG(logger, "Server bound to {}.", endpoint);
         } catch (const zmq::error_t& e) {
             SPDLOG_LOGGER_ERROR(logger, "Error binding to endpoint {}: {}.", 
-                                  net_config_.IPs.at(std::string(net)) + ":" + net_config_.port, e.what());
+                                    net_config_.IPs.at(net) + ":" + net_config_.port, e.what());
             throw;
         }
     }

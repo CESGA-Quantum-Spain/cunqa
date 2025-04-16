@@ -82,7 +82,7 @@ def _convert_counts(counts, registers):
     return new_counts
 
 
-class Result():
+class Result:
     """
     Class to describe the result of an experiment.
     """
@@ -166,7 +166,7 @@ class Result():
 
 
 
-class QJob():
+class QJob:
     """
     Class to handle jobs sent to the simulator.
     """

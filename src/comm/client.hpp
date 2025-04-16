@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string_view>
 #include <memory>
 #include "comm_strat_def.h"
 #include "utils/constants.hpp"
@@ -53,13 +54,15 @@ public:
         }
     }
 
-    void connect(const std::string& task_id, const std::string_view& net = INFINIBAND) {
+    void connect(const std::string& task_id) {
         try {
             json server_ip_config_json = qpus_json.at(task_id).at("net");
             auto server_ip_config = server_ip_config_json.template get<NetConfig>();
             comm_strat->connect(server_ip_config);
         } catch (const json::out_of_range& e){
             SPDLOG_LOGGER_ERROR(logger, "No server has ID={}. Remember to set the servers with the command qraise.", task_id);
+        } catch (const std::exception& e) {
+            SPDLOG_LOGGER_ERROR(logger, "Error on when connecting the client");
         }
     }
 

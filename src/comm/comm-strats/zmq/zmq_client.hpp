@@ -3,6 +3,7 @@
 #include "zmq.hpp"
 #include <iostream>
 #include <string>
+#include <string_view>
 #include "config/net_config.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
@@ -38,15 +39,31 @@ public:
     }
 
     // Connect using a NetConfig; constructs an endpoint string like "tcp://<ip>:<port>".
-    void connect(const NetConfig& server_ipconfig, const std::string_view& net = INFINIBAND) 
-    {   
+    void connect(const NetConfig& server_ipconfig) 
+    {
+        std::string net;
         try {
-            std::string endpoint = "tcp://" + server_ipconfig.IPs.at(std::string(net)) + ":" + server_ipconfig.port;
+            if (server_ipconfig.mode == "cloud") {
+                net = INFINIBAND;
+                SPDLOG_LOGGER_DEBUG(logger, "CLOUD mode. INFINIBAND selected as net");
+            } else {
+                net = LOCAL;
+                SPDLOG_LOGGER_DEBUG(logger, "HPC mode. LOCALHOST selected as net");
+                std::string nodename = server_ipconfig.nodename;
+                const char* my_nodename = std::getenv("SLURMD_NODENAME");
+                if ((my_nodename == nullptr) || (nodename != (std::string)my_nodename)) {
+                    throw std::runtime_error("QPU deployed on node " + nodename + ".");
+                }
+            }
+            std::string endpoint = "tcp://" + server_ipconfig.IPs.at(net) + ":" + server_ipconfig.port;
             socket_.connect(endpoint);
             SPDLOG_LOGGER_DEBUG(logger, "Client successfully connected to server at {}.", endpoint);
         } catch (const zmq::error_t& e) {
             SPDLOG_LOGGER_ERROR(logger, "Unable to connect to endpoint {}:{}. Error: {}", 
-                                  server_ipconfig.IPs.at(std::string(net)), server_ipconfig.port, e.what());
+                                  server_ipconfig.IPs.at(net), server_ipconfig.port, e.what());
+        } catch (const std::exception& e) {
+            SPDLOG_LOGGER_ERROR(logger, "Trying to connect to a QPU located in a external node. {}", e.what());
+            throw;
         }
     }
 

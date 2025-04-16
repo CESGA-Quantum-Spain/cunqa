@@ -56,11 +56,11 @@ class ColoredFormatter(logging.Formatter):
 
 # Crear el logger
 logger = logging.getLogger('mi_logger_coloreado')
-logger.setLevel(logging.DEBUG)  # Establece el nivel mínimo de log
+logger.setLevel(logging.ERROR)  # Establece el nivel mínimo de log
 
 # Crear el handler para la consola
 console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.DEBUG)
+console_handler.setLevel(logging.ERROR)
 
 # Crear y asignar el formatter con colores, niveles en minúsculas y ruta completa para errores
 formatter = ColoredFormatter('\t%(levelname)s: %(message)s')

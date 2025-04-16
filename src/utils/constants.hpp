@@ -10,6 +10,7 @@ using json = nlohmann::json;
 constexpr std::string_view INFINIBAND = "ib0";
 constexpr std::string_view VLAN120 = "VLAN120";
 constexpr std::string_view VLAN117 = "VLAN117";
+constexpr std::string_view LOCAL = "lo";
 
 
 enum GATES {

@@ -58,4 +58,9 @@ target_link_options(setup_qpus PRIVATE -Wl,-Bsymbolic)
 
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
+# INFOQPUS executable
+add_executable(infoqpus infoqpus.cpp)
+target_include_directories(infoqpus PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+install(TARGETS infoqpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
 
