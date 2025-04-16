@@ -103,14 +103,7 @@
                     }
                 }
             }
-        },
-
-        "noise":
-        {
-            "description": "Path to a calibration file",
-            "type": "string"
         }
-
     },
 
     "required": ["backend"]

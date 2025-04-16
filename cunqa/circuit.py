@@ -292,20 +292,31 @@ def _is_parametric(circuit):
     """
     parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
     if isinstance(circuit, QuantumCircuit):
+        logger.debug("Possible parametric circuit is a QuantumCircuit.")
         for instruction in circuit.data:
             if instruction.operation.name in parametric_gates:
+                logger.debug("Parametric gate found, therefore circuit is considered parametric.")
                 return True
+        logger.debug("Parametric gate NOT found, therefore circuit is NOT considered parametric.")
         return False
+
     elif isinstance(circuit, dict):
+        logger.debug("Possible parametric circuit is a json.")
         for instruction in circuit['instructions']:
             if instruction['name'] in parametric_gates:
+                logger.debug("Parametric gate found, therefore circuit is considered parametric.")
                 return True
+        logger.debug("Parametric gate NOT found, therefore circuit is NOT considered parametric.")
         return False
+
     elif isinstance(circuit, str):
-        lines = circuit.splitlines()
-        for line in lines:
+        logger.debug(f"Possible parametric circuit is a QASM string. {type(circuit)}")
+
+        for line in circuit.splitlines():
+            logger.debug(f"Line: {line}")
             line = line.strip()
             if any(line.startswith(gate) for gate in parametric_gates):
+                logger.debug("Parametric gate found, therefore circuit is considered parametric.")
                 return True
+        logger.debug("Parametric gate NOT found, therefore circuit is NOT considered parametric.")
         return False
-           
