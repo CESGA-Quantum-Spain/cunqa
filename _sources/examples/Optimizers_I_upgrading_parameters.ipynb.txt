@@ -1,0 +1,472 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c532632a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os, sys\n",
+    "\n",
+    "# path to access c++ files\n",
+    "installation_path = os.getenv(\"INSTALL_PATH\")\n",
+    "sys.path.append(installation_path)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c2d0c54e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from cunqa import getQPUs\n",
+    "\n",
+    "qpus  = getQPUs()\n",
+    "\n",
+    "for q in qpus:\n",
+    "    print(f\"QPU {q.id}, backend: {q.backend.name}, simulator: {q.backend.simulator}, version: {q.backend.version}.\")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5db7e8c6",
+   "metadata": {},
+   "source": [
+    "# Examples for optimizations"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4faa81e1",
+   "metadata": {},
+   "source": [
+    "Before sending a circuit to the QClient, a transpilation process occurs (if not, it is done by the user). This process, in some cases, can take much time and resources, in addition to the sending cost itself. If we were to execute a single circuit once, it shouldn´t be a big problem, but it is when it comes to variational algorithms.\n",
+    "\n",
+    "This quantum-classical algorithms require several executions of the same circuit but changing the value of the parameters, which are optimized in the classical part. In order to optimize this, we developed a functionallity that allows the user to upgrade the circuit parameters with no extra transpilations of the circuit, sending to the `QClient` the list of the parameters **ONLY**. This is of much advantage to speed up the computation in the cases in which transpilation takes a significant part of the total time of the simulation.\n",
+    "\n",
+    "Let´s see how to work with this feature taking as an example a _Variational Quantum Algorithm_ for state preparation.\n",
+    "\n",
+    "We start from a _Hardware Efficient Ansatz_ to build our parametrized circuit:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b0a68703",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from qiskit import QuantumCircuit\n",
+    "from qiskit.circuit import Parameter\n",
+    "\n",
+    "def hardware_efficient_ansatz(num_qubits, num_layers):\n",
+    "    qc = QuantumCircuit(num_qubits)\n",
+    "    param_idx = 0\n",
+    "    for _ in range(num_layers):\n",
+    "        for qubit in range(num_qubits):\n",
+    "            phi = Parameter(f'phi_{param_idx}_{qubit}')\n",
+    "            lam = Parameter(f'lam_{param_idx}_{qubit}')\n",
+    "            qc.ry(phi, qubit)\n",
+    "            qc.rz(lam, qubit)\n",
+    "        param_idx += 1\n",
+    "        for qubit in range(num_qubits - 1):\n",
+    "            qc.cx(qubit, qubit + 1)\n",
+    "    qc.measure_all()\n",
+    "    return qc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6b9f1aa6",
+   "metadata": {},
+   "source": [
+    "The we need a cost function. We will define a target distribution and measure how far we are from it. We choose to prepare a normal distribution among all the $2^n$ possible outcomes of the circuit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4e4b9c38",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def target_distribution(num_qubits):\n",
+    "    # Define a normal distribution over the states\n",
+    "    num_states = 2 ** num_qubits\n",
+    "    states = np.arange(num_states)\n",
+    "    mean = num_states / 2\n",
+    "    std_dev = num_states / 4\n",
+    "    target_probs = norm.pdf(states, mean, std_dev)\n",
+    "    target_probs /= target_probs.sum()  # Normalize to make it a valid probability distribution\n",
+    "    target_dist = {format(i, f'0{num_qubits}b'): target_probs[i] for i in range(num_states)}\n",
+    "    return target_dist\n",
+    "\n",
+    "import pandas as pd\n",
+    "from scipy.stats import entropy, norm\n",
+    "\n",
+    "def KL_divergence(counts, n_shots, target_dist):\n",
+    "    # Convert counts to probabilities\n",
+    "    pdf = pd.DataFrame.from_dict(counts, orient=\"index\").reset_index()\n",
+    "    pdf.rename(columns={\"index\": \"state\", 0: \"counts\"}, inplace=True)\n",
+    "    pdf[\"probability\"] = pdf[\"counts\"] / n_shots\n",
+    "    \n",
+    "    # Create a dictionary for the obtained distribution\n",
+    "    obtained_dist = pdf.set_index(\"state\")[\"probability\"].to_dict()\n",
+    "    \n",
+    "    # Ensure all states are present in the obtained distribution\n",
+    "    for state in target_dist:\n",
+    "        if state not in obtained_dist:\n",
+    "            obtained_dist[state] = 0.0\n",
+    "    \n",
+    "    # Convert distributions to lists for KL divergence calculation\n",
+    "    target_probs = [target_dist[state] for state in sorted(target_dist)]\n",
+    "    obtained_probs = [obtained_dist[state] for state in sorted(obtained_dist)]\n",
+    "    \n",
+    "    # Calculate KL divergence\n",
+    "    kl_divergence = entropy(obtained_probs, target_probs)\n",
+    "    \n",
+    "    return kl_divergence\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c74e1438",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "num_qubits = 6\n",
+    "\n",
+    "num_layers = 3\n",
+    "\n",
+    "n_shots = 1e5"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d23f13db",
+   "metadata": {},
+   "source": [
+    "### Simply using the `QPU.run()` method"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fa26a3eb",
+   "metadata": {},
+   "source": [
+    "At first we should try the intiutive alternative: upgrading parameters at the QClient, transpiling and sending the whole circuit to the QPU."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5398907b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def cost_function_run(params):\n",
+    "    n_shots = 1e5\n",
+    "    target_dist = target_distribution(num_qubits)\n",
+    "    \n",
+    "    circuit = ansatz.assign_parameters(params)\n",
+    "    \n",
+    "    result = qpu.run(circuit, transpile = True, opt_level = 0, shots = n_shots).result()\n",
+    "    \n",
+    "    counts = result.get_counts()\n",
+    "    \n",
+    "    return KL_divergence(counts, n_shots, target_dist)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d3ec8a31",
+   "metadata": {},
+   "source": [
+    "Our cost function updates the parameters given by the optimizer, asigns them to the ansatz and sends the circuit with the transpilation option set `True`. Let´s choose a QPU to work with and go ahead with the optimization:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6e2d80b8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import time\n",
+    "\n",
+    "qpu = qpus[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "052a5b83",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "ansatz = hardware_efficient_ansatz(num_qubits, num_layers)\n",
+    "\n",
+    "num_parameters = ansatz.num_parameters\n",
+    "\n",
+    "initial_parameters = np.zeros(num_parameters)\n",
+    "\n",
+    "from scipy.optimize import minimize\n",
+    "\n",
+    "i = 0\n",
+    "\n",
+    "cost_run = []\n",
+    "individuals_run = []\n",
+    "\n",
+    "def callback(xk):\n",
+    "    global i\n",
+    "    e = cost_function_run(xk)\n",
+    "    individuals_run.append(xk)\n",
+    "    cost_run.append(e)\n",
+    "    if i%20 == 0:\n",
+    "        print(f\"Iteration step {i}: f(x) = {e}\")\n",
+    "    i+=1\n",
+    "\n",
+    "tick = time.time()\n",
+    "optimization_result_run = minimize(cost_function_run, initial_parameters, method='COBYLA',\n",
+    "        callback=callback, tol = 0.01,\n",
+    "        options={\n",
+    "        'disp': True,     # Print info at the end\n",
+    "        'maxiter': 4000   # Limit the number of iterations\n",
+    "    })\n",
+    "tack = time.time()\n",
+    "time_run = tack-tick\n",
+    "print()\n",
+    "print(\"Total optimization time: \", time_run, \" s\")\n",
+    "print()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bcc4cf95",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "\n",
+    "import matplotlib.pyplot as plt\n",
+    "plt.clf()\n",
+    "plt.plot(np.linspace(0, optimization_result_run.nfev, optimization_result_run.nfev), cost_run, label=\"Optimization path (run())\")\n",
+    "upper_bound = optimization_result_run.nfev\n",
+    "plt.plot(np.linspace(0, upper_bound, upper_bound), np.zeros(upper_bound), \"--\", label=\"Target cost\")\n",
+    "plt.xlabel(\"Step\"); plt.ylabel(\"Cost\"); plt.legend(loc=\"upper right\"); plt.title(f\"n = {num_qubits}, l = {num_layers}, # params = {num_parameters}\")\n",
+    "plt.grid(True)\n",
+    "plt.show()\n",
+    "# plt.savefig(f\"optimization_run_n_{num_qubits}_p_{num_parameters}.png\", dpi=200)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bdbc16b7",
+   "metadata": {},
+   "source": [
+    "### Using `QJob.upgrade_parameters()`"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9113393a",
+   "metadata": {},
+   "source": [
+    "The first step now is to create the `qjob.QJob` object that which parameters we are going to upgrade in each step of the optimization; for that, we must run a circuit with initial parameters in a QPU, the procedure is as we explained above:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d44dbc23",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ansatz = hardware_efficient_ansatz(num_qubits, num_layers)\n",
+    "\n",
+    "num_parameters = ansatz.num_parameters\n",
+    "\n",
+    "initial_parameters = np.zeros(num_parameters)\n",
+    "\n",
+    "circuit = ansatz.assign_parameters(initial_parameters)\n",
+    "\n",
+    "qjob = qpu.run(circuit, transpile = True, opt_level = 0, shots = n_shots)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e90da639",
+   "metadata": {},
+   "source": [
+    "Now that we have sent to the virtual QPU the transpiled circuit, we can use the method `qjob.QJob.upgrade_parameters()` to change the rotations of the gates:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ec54866c",
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "print(\"Result with initial_parameters: \")\n",
+    "print(qjob.result().get_counts())\n",
+    "\n",
+    "random_parameters = np.random.uniform(0, 2 * np.pi, num_parameters).tolist()\n",
+    "qjob.upgrade_parameters(random_parameters)\n",
+    "\n",
+    "print()\n",
+    "print(\"Result with random_parameters: \")\n",
+    "print(qjob.result().get_counts())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ada125fd",
+   "metadata": {},
+   "source": [
+    "**Important considerations:**\n",
+    "\n",
+    "- The method acepts parameters in a `list`, if you have a `numpy.array`, simply apply `.tolist()` to transform it.\n",
+    "\n",
+    "- When sending the circuit and setting `transpile=True`, we should be carefull that the transpilation process doesn't condense gates and combine parameters, therefore, if the user wants `cunqa`to transpile, they must set `opt_level=0`.\n",
+    "\n",
+    "Note that `qjob.QJob.upgrade_parameters()` is a non-blocking call, as it was `qpu.QPU.run()`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c2f430de",
+   "metadata": {},
+   "source": [
+    "Now that we are familiar with the procedure, we can design a cost funtion that takes a set of parameters, upgrades the `qjob.QJob`, gets the result and calculates the divergence from the desired distribution:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8c416b9b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def cost_function(params):\n",
+    "    n_shots = 100000\n",
+    "    target_dist = target_distribution(num_qubits)\n",
+    "    \n",
+    "    result = qjob.upgrade_parameters(params.tolist()).result()\n",
+    "    \n",
+    "    counts = result.get_counts()\n",
+    "    \n",
+    "    return KL_divergence(counts, n_shots, target_dist)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a4f3a056",
+   "metadata": {},
+   "source": [
+    "Now we are ready to start our optimization. We will use `scipy.optimize` to minimize the divergence of our result distribution from the target one:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3f9016ca",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "from scipy.optimize import minimize\n",
+    "import time\n",
+    "\n",
+    "i = 0\n",
+    "\n",
+    "initial_parameters = np.zeros(num_parameters)\n",
+    "\n",
+    "cost = []\n",
+    "individuals = []\n",
+    "\n",
+    "def callback(xk):\n",
+    "    global i\n",
+    "    e = cost_function(xk)\n",
+    "    individuals.append(xk)\n",
+    "    cost.append(e)\n",
+    "    if i%10 == 0:\n",
+    "        print(f\"Iteration step {i}: f(x) = {e}\")\n",
+    "    i+=1\n",
+    "\n",
+    "tick = time.time()\n",
+    "optimization_result = minimize(cost_function, initial_parameters, method='COBYLA',\n",
+    "        callback=callback, tol = 0.01,\n",
+    "        options={\n",
+    "        'disp': True,     # Print info during iterations\n",
+    "        'maxiter': 4000     # Limit the number of iterations\n",
+    "    })\n",
+    "tack = time.time()\n",
+    "time_up = tack-tick\n",
+    "print()\n",
+    "print(\"Total optimization time: \", time_up, \" s\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "82f8a67e",
+   "metadata": {},
+   "source": [
+    "We can plot the evolution of the cost function during the optimization:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0f269cf9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "\n",
+    "import matplotlib.pyplot as plt\n",
+    "plt.clf()\n",
+    "plt.plot(np.linspace(0, optimization_result.nfev, optimization_result.nfev), cost, label=\"Optimization path (upgrade_params())\")\n",
+    "plt.plot(np.linspace(0, optimization_result_run.nfev, optimization_result_run.nfev), cost_run, label=\"Optimization path (run())\")\n",
+    "upper_bound = max(optimization_result_run.nfev, optimization_result.nfev)\n",
+    "plt.plot(np.linspace(0, upper_bound, upper_bound), np.zeros(upper_bound), \"--\", label=\"Target cost\")\n",
+    "plt.xlabel(\"Step\"); plt.ylabel(\"Cost\"); plt.legend(loc=\"upper right\"); plt.title(f\"n = {num_qubits}, l = {num_layers}, # params = {num_parameters}\")\n",
+    "plt.grid(True)\n",
+    "plt.show()\n",
+    "# plt.savefig(f\"optimization_n_{num_qubits}_p_{num_parameters}.png\", dpi=200)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

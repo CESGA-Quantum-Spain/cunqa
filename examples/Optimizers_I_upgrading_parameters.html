@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples for optimizations &mdash; CUNQA 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=01f34227"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Paralelization for gradient-free optimizers: Differential Evolution" href="Optimizers_II_mapping.html" />
+    <link rel="prev" title="Example for execution of multiple circuits in QPUs" href="Multiple_circuits_execution.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CUNQA
+              <img src="../_static/logo_cesga_blanco.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modulesetup.html">Module Set Up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Distributed Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa.html">CUNQA Submodules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples_gallery.html">Examples gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples for optimizations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Simply-using-the-QPU.run()-method">Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Using-QJob.upgrade_parameters()">Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html">Paralelization for gradient-free optimizers: Differential Evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html#Paralelization-of-expectation-value-terms">Paralelization of expectation value terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html#Paralelization-for-gradient-optimizers">Paralelization for gradient optimizers</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples_gallery.html">Examples gallery</a></li>
+      <li class="breadcrumb-item active">Examples for optimizations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/Optimizers_I_upgrading_parameters.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># path to access c++ files</span>
+<span class="n">installation_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;INSTALL_PATH&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">installation_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[2], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">cunqa</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> getQPUs
+<span class="ansi-green-intense-fg ansi-bold">      3</span> qpus  <span style="color: rgb(98,98,98)">=</span> getQPUs()
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> q <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> qpus:
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;cunqa&#39;
+</pre></div></div>
+</div>
+<section id="Examples-for-optimizations">
+<h1>Examples for optimizations<a class="headerlink" href="#Examples-for-optimizations" title="Link to this heading"></a></h1>
+<p>Before sending a circuit to the QClient, a transpilation process occurs (if not, it is done by the user). This process, in some cases, can take much time and resources, in addition to the sending cost itself. If we were to execute a single circuit once, it shouldn´t be a big problem, but it is when it comes to variational algorithms.</p>
+<p>This quantum-classical algorithms require several executions of the same circuit but changing the value of the parameters, which are optimized in the classical part. In order to optimize this, we developed a functionallity that allows the user to upgrade the circuit parameters with no extra transpilations of the circuit, sending to the <code class="docutils literal notranslate"><span class="pre">QClient</span></code> the list of the parameters <strong>ONLY</strong>. This is of much advantage to speed up the computation in the cases in which transpilation takes a significant
+part of the total time of the simulation.</p>
+<p>Let´s see how to work with this feature taking as an example a <em>Variational Quantum Algorithm</em> for state preparation.</p>
+<p>We start from a <em>Hardware Efficient Ansatz</em> to build our parametrized circuit:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameter</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">):</span>
+    <span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+    <span class="n">param_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;phi_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">lam</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;lam_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+        <span class="n">param_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">qubit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">qc</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[3], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> QuantumCircuit
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">circuit</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Parameter
+<span class="ansi-green-intense-fg ansi-bold">      4</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">hardware_efficient_ansatz</span>(num_qubits, num_layers):
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;qiskit&#39;
+</pre></div></div>
+</div>
+<p>The we need a cost function. We will define a target distribution and measure how far we are from it. We choose to prepare a normal distribution among all the <span class="math notranslate nohighlight">\(2^n\)</span> possible outcomes of the circuit.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+    <span class="c1"># Define a normal distribution over the states</span>
+    <span class="n">num_states</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">num_qubits</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_states</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">std_dev</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">4</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std_dev</span><span class="p">)</span>
+    <span class="n">target_probs</span> <span class="o">/=</span> <span class="n">target_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Normalize to make it a valid probability distribution</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="p">{</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;0</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s1">b&#39;</span><span class="p">):</span> <span class="n">target_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_states</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">target_dist</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">norm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">):</span>
+    <span class="c1"># Convert counts to probabilities</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">pdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;counts&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;counts&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_shots</span>
+
+    <span class="c1"># Create a dictionary for the obtained distribution</span>
+    <span class="n">obtained_dist</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">)[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="c1"># Ensure all states are present in the obtained distribution</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">target_dist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obtained_dist</span><span class="p">:</span>
+            <span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Convert distributions to lists for KL divergence calculation</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">target_dist</span><span class="p">)]</span>
+    <span class="n">obtained_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obtained_dist</span><span class="p">)]</span>
+
+    <span class="c1"># Calculate KL divergence</span>
+    <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">obtained_probs</span><span class="p">,</span> <span class="n">target_probs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kl_divergence</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[4], line 12</span>
+<span class="ansi-green-intense-fg ansi-bold">      9</span>     target_dist <span style="color: rgb(98,98,98)">=</span> {<span style="color: rgb(0,135,0)">format</span>(i, <span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">0</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>num_qubits<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">b</span><span style="color: rgb(175,0,0)">&#39;</span>): target_probs[i] <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> i <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">range</span>(num_states)}
+<span class="ansi-green-intense-fg ansi-bold">     10</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> target_dist
+<span class="ansi-green-fg">---&gt; 12</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">pandas</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">as</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">pd</span>
+<span class="ansi-green-intense-fg ansi-bold">     13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">scipy</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">stats</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> entropy, norm
+<span class="ansi-green-intense-fg ansi-bold">     15</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">KL_divergence</span>(counts, n_shots, target_dist):
+<span class="ansi-green-intense-fg ansi-bold">     16</span>     <span style="color: rgb(95,135,135)"># Convert counts to probabilities</span>
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;pandas&#39;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">num_layers</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">n_shots</span> <span class="o">=</span> <span class="mf">1e5</span>
+</pre></div>
+</div>
+</div>
+<section id="Simply-using-the-QPU.run()-method">
+<h2>Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method<a class="headerlink" href="#Simply-using-the-QPU.run()-method" title="Link to this heading"></a></h2>
+<p>At first we should try the intiutive alternative: upgrading parameters at the QClient, transpiling and sending the whole circuit to the QPU.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function_run</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="n">n_shots</span> <span class="o">=</span> <span class="mf">1e5</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+
+    <span class="n">circuit</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">transpile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">opt_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="n">n_shots</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Our cost function updates the parameters given by the optimizer, asigns them to the ansatz and sends the circuit with the transpilation option set <code class="docutils literal notranslate"><span class="pre">True</span></code>. Let´s choose a QPU to work with and go ahead with the optimization:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[7], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">numpy</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">as</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">np</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">time</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> qpu <span style="color: rgb(98,98,98)">=</span> qpus[<span style="color: rgb(98,98,98)">0</span>]
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;numpy&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+
+<span class="n">num_parameters</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">num_parameters</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">cost_run</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">individuals_run</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">i</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">cost_function_run</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">individuals_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">cost_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">20</span> == 0:
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: f(x) = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">optimization_result_run</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">cost_function_run</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;COBYLA&#39;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># Print info at the end</span>
+        <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">4000</span>   <span class="c1"># Limit the number of iterations</span>
+    <span class="p">})</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">time_run</span> <span class="o">=</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total optimization time: &quot;</span><span class="p">,</span> <span class="n">time_run</span><span class="p">,</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[8], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> ansatz <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">hardware_efficient_ansatz</span>(num_qubits, num_layers)
+<span class="ansi-green-intense-fg ansi-bold">      3</span> num_parameters <span style="color: rgb(98,98,98)">=</span> ansatz<span style="color: rgb(98,98,98)">.</span>num_parameters
+<span class="ansi-green-intense-fg ansi-bold">      5</span> initial_parameters <span style="color: rgb(98,98,98)">=</span> np<span style="color: rgb(98,98,98)">.</span>zeros(num_parameters)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;hardware_efficient_ansatz&#39; is not defined
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost_run</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (run())&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plt.savefig(f&quot;optimization_run_n_{num_qubits}_p_{num_parameters}.png&quot;, dpi=200)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[9], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">get_ipython</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">run_line_magic</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">matplotlib</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">inline</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">pyplot</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">as</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">plt</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> plt<span style="color: rgb(98,98,98)">.</span>clf()
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/interactiveshell.py:2456</span>, in <span class="ansi-cyan-fg">InteractiveShell.run_line_magic</span><span class="ansi-blue-fg">(self, magic_name, line, _stack_depth)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2454</span>     kwargs[<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">local_ns</span><span style="color: rgb(175,0,0)">&#39;</span>] <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>get_local_scope(stack_depth)
+<span class="ansi-green-intense-fg ansi-bold">   2455</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>builtin_trap:
+<span class="ansi-green-fg">-&gt; 2456</span>     result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2458</span> <span style="color: rgb(95,135,135)"># The code below prevents the output from being displayed</span>
+<span class="ansi-green-intense-fg ansi-bold">   2459</span> <span style="color: rgb(95,135,135)"># when using magics with decorator @output_can_be_silenced</span>
+<span class="ansi-green-intense-fg ansi-bold">   2460</span> <span style="color: rgb(95,135,135)"># when the last Python token in the expression is a &#39;;&#39;.</span>
+<span class="ansi-green-intense-fg ansi-bold">   2461</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">getattr</span>(fn, magic<span style="color: rgb(98,98,98)">.</span>MAGIC_OUTPUT_CAN_BE_SILENCED, <span class="ansi-bold" style="color: rgb(0,135,0)">False</span>):
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/magics/pylab.py:99</span>, in <span class="ansi-cyan-fg">PylabMagics.matplotlib</span><span class="ansi-blue-fg">(self, line)</span>
+<span class="ansi-green-intense-fg ansi-bold">     97</span>     <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Available matplotlib backends: </span><span class="ansi-bold" style="color: rgb(175,95,135)">%s</span><span style="color: rgb(175,0,0)">&#34;</span> <span style="color: rgb(98,98,98)">%</span> backends_list)
+<span class="ansi-green-intense-fg ansi-bold">     98</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">---&gt; 99</span>     gui, backend <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">shell</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">enable_matplotlib</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">lower</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">if</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">isinstance</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">str</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">else</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    100</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_show_matplotlib_backend(args<span style="color: rgb(98,98,98)">.</span>gui, backend)
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/interactiveshell.py:3630</span>, in <span class="ansi-cyan-fg">InteractiveShell.enable_matplotlib</span><span class="ansi-blue-fg">(self, gui)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3609</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">enable_matplotlib</span>(<span style="color: rgb(0,135,0)">self</span>, gui<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-intense-fg ansi-bold">   3610</span> <span style="color: rgb(188,188,188)">    </span><span style="color: rgb(175,0,0)">&#34;&#34;&#34;Enable interactive matplotlib and inline figure support.</span>
+<span class="ansi-green-intense-fg ansi-bold">   3611</span>
+<span class="ansi-green-intense-fg ansi-bold">   3612</span> <span style="color: rgb(175,0,0)">    This takes the following steps:</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3628</span> <span style="color: rgb(175,0,0)">        display figures inline.</span>
+<span class="ansi-green-intense-fg ansi-bold">   3629</span> <span style="color: rgb(175,0,0)">    &#34;&#34;&#34;</span>
+<span class="ansi-green-fg">-&gt; 3630</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib_inline</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backend_inline</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> configure_inline_support
+<span class="ansi-green-intense-fg ansi-bold">   3632</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">IPython</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> pylabtools <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> pt
+<span class="ansi-green-intense-fg ansi-bold">   3633</span>     gui, backend <span style="color: rgb(98,98,98)">=</span> pt<span style="color: rgb(98,98,98)">.</span>find_gui_and_backend(gui, <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>pylab_gui_select)
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/matplotlib_inline/__init__.py:1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> backend_inline, config  <span style="color: rgb(95,135,135)"># noqa</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> __version__ <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">0.1.7</span><span style="color: rgb(175,0,0)">&#34;</span>  <span style="color: rgb(95,135,135)"># noqa</span>
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/matplotlib_inline/backend_inline.py:6</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;A matplotlib backend for publishing figures via display_data&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span style="color: rgb(95,135,135)"># Copyright (c) IPython Development Team.</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> <span style="color: rgb(95,135,135)"># Distributed under the terms of the BSD 3-Clause License.</span>
+<span class="ansi-green-fg">----&gt; 6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> colors
+<span class="ansi-green-intense-fg ansi-bold">      8</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backends</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> backend_agg
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
+</pre></div></div>
+</div>
+</section>
+<section id="Using-QJob.upgrade_parameters()">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code><a class="headerlink" href="#Using-QJob.upgrade_parameters()" title="Link to this heading"></a></h2>
+<p>The first step now is to create the <code class="docutils literal notranslate"><span class="pre">qjob.QJob</span></code> object that which parameters we are going to upgrade in each step of the optimization; for that, we must run a circuit with initial parameters in a QPU, the procedure is as we explained above:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+
+<span class="n">num_parameters</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">num_parameters</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="n">circuit</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">transpile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">opt_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="n">n_shots</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[10], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> ansatz <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">hardware_efficient_ansatz</span>(num_qubits, num_layers)
+<span class="ansi-green-intense-fg ansi-bold">      3</span> num_parameters <span style="color: rgb(98,98,98)">=</span> ansatz<span style="color: rgb(98,98,98)">.</span>num_parameters
+<span class="ansi-green-intense-fg ansi-bold">      5</span> initial_parameters <span style="color: rgb(98,98,98)">=</span> np<span style="color: rgb(98,98,98)">.</span>zeros(num_parameters)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;hardware_efficient_ansatz&#39; is not defined
+</pre></div></div>
+</div>
+<p>Now that we have sent to the virtual QPU the transpiled circuit, we can use the method <code class="docutils literal notranslate"><span class="pre">qjob.QJob.upgrade_parameters()</span></code> to change the rotations of the gates:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result with initial_parameters: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+
+<span class="n">random_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num_parameters</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">(</span><span class="n">random_parameters</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result with random_parameters: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">get_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Result with initial_parameters:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[11], line 2</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Result with initial_parameters: </span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-fg">----&gt; 2</span> <span style="color: rgb(0,135,0)">print</span>(<span class="ansi-yellow-bg">qjob</span><span style="color: rgb(98,98,98)">.</span>result()<span style="color: rgb(98,98,98)">.</span>get_counts())
+<span class="ansi-green-intense-fg ansi-bold">      4</span> random_parameters <span style="color: rgb(98,98,98)">=</span> np<span style="color: rgb(98,98,98)">.</span>random<span style="color: rgb(98,98,98)">.</span>uniform(<span style="color: rgb(98,98,98)">0</span>, <span style="color: rgb(98,98,98)">2</span> <span style="color: rgb(98,98,98)">*</span> np<span style="color: rgb(98,98,98)">.</span>pi, num_parameters)<span style="color: rgb(98,98,98)">.</span>tolist()
+<span class="ansi-green-intense-fg ansi-bold">      5</span> qjob<span style="color: rgb(98,98,98)">.</span>upgrade_parameters(random_parameters)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;qjob&#39; is not defined
+</pre></div></div>
+</div>
+<p><strong>Important considerations:</strong></p>
+<ul class="simple">
+<li><p>The method acepts parameters in a <code class="docutils literal notranslate"><span class="pre">list</span></code>, if you have a <code class="docutils literal notranslate"><span class="pre">numpy.array</span></code>, simply apply <code class="docutils literal notranslate"><span class="pre">.tolist()</span></code> to transform it.</p></li>
+<li><p>When sending the circuit and setting <code class="docutils literal notranslate"><span class="pre">transpile=True</span></code>, we should be carefull that the transpilation process doesn’t condense gates and combine parameters, therefore, if the user wants <code class="docutils literal notranslate"><span class="pre">cunqa</span></code>to transpile, they must set <code class="docutils literal notranslate"><span class="pre">opt_level=0</span></code>.</p></li>
+</ul>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">qjob.QJob.upgrade_parameters()</span></code> is a non-blocking call, as it was <code class="docutils literal notranslate"><span class="pre">qpu.QPU.run()</span></code>.</p>
+<p>Now that we are familiar with the procedure, we can design a cost funtion that takes a set of parameters, upgrades the <code class="docutils literal notranslate"><span class="pre">qjob.QJob</span></code>, gets the result and calculates the divergence from the desired distribution:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="n">n_shots</span> <span class="o">=</span> <span class="mi">100000</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now we are ready to start our optimization. We will use <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> to minimize the divergence of our result distribution from the target one:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">i</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">cost_function</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">cost</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">10</span> == 0:
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: f(x) = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">optimization_result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;COBYLA&#39;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># Print info during iterations</span>
+        <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">4000</span>     <span class="c1"># Limit the number of iterations</span>
+    <span class="p">})</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">time_up</span> <span class="o">=</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total optimization time: &quot;</span><span class="p">,</span> <span class="n">time_up</span><span class="p">,</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[13], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">scipy</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">optimize</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> minimize
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">time</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> i <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(98,98,98)">0</span>
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;scipy&#39;
+</pre></div></div>
+</div>
+<p>We can plot the evolution of the cost function during the optimization:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (upgrade_params())&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost_run</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (run())&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plt.savefig(f&quot;optimization_n_{num_qubits}_p_{num_parameters}.png&quot;, dpi=200)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[14], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">get_ipython</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">run_line_magic</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">matplotlib</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">inline</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">pyplot</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">as</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">plt</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> plt<span style="color: rgb(98,98,98)">.</span>clf()
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/interactiveshell.py:2456</span>, in <span class="ansi-cyan-fg">InteractiveShell.run_line_magic</span><span class="ansi-blue-fg">(self, magic_name, line, _stack_depth)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2454</span>     kwargs[<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">local_ns</span><span style="color: rgb(175,0,0)">&#39;</span>] <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>get_local_scope(stack_depth)
+<span class="ansi-green-intense-fg ansi-bold">   2455</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>builtin_trap:
+<span class="ansi-green-fg">-&gt; 2456</span>     result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2458</span> <span style="color: rgb(95,135,135)"># The code below prevents the output from being displayed</span>
+<span class="ansi-green-intense-fg ansi-bold">   2459</span> <span style="color: rgb(95,135,135)"># when using magics with decorator @output_can_be_silenced</span>
+<span class="ansi-green-intense-fg ansi-bold">   2460</span> <span style="color: rgb(95,135,135)"># when the last Python token in the expression is a &#39;;&#39;.</span>
+<span class="ansi-green-intense-fg ansi-bold">   2461</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">getattr</span>(fn, magic<span style="color: rgb(98,98,98)">.</span>MAGIC_OUTPUT_CAN_BE_SILENCED, <span class="ansi-bold" style="color: rgb(0,135,0)">False</span>):
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/magics/pylab.py:99</span>, in <span class="ansi-cyan-fg">PylabMagics.matplotlib</span><span class="ansi-blue-fg">(self, line)</span>
+<span class="ansi-green-intense-fg ansi-bold">     97</span>     <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Available matplotlib backends: </span><span class="ansi-bold" style="color: rgb(175,95,135)">%s</span><span style="color: rgb(175,0,0)">&#34;</span> <span style="color: rgb(98,98,98)">%</span> backends_list)
+<span class="ansi-green-intense-fg ansi-bold">     98</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">---&gt; 99</span>     gui, backend <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">shell</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">enable_matplotlib</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">lower</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">if</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">isinstance</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">str</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">else</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">gui</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    100</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_show_matplotlib_backend(args<span style="color: rgb(98,98,98)">.</span>gui, backend)
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/IPython/core/interactiveshell.py:3630</span>, in <span class="ansi-cyan-fg">InteractiveShell.enable_matplotlib</span><span class="ansi-blue-fg">(self, gui)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3609</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">enable_matplotlib</span>(<span style="color: rgb(0,135,0)">self</span>, gui<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-intense-fg ansi-bold">   3610</span> <span style="color: rgb(188,188,188)">    </span><span style="color: rgb(175,0,0)">&#34;&#34;&#34;Enable interactive matplotlib and inline figure support.</span>
+<span class="ansi-green-intense-fg ansi-bold">   3611</span>
+<span class="ansi-green-intense-fg ansi-bold">   3612</span> <span style="color: rgb(175,0,0)">    This takes the following steps:</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3628</span> <span style="color: rgb(175,0,0)">        display figures inline.</span>
+<span class="ansi-green-intense-fg ansi-bold">   3629</span> <span style="color: rgb(175,0,0)">    &#34;&#34;&#34;</span>
+<span class="ansi-green-fg">-&gt; 3630</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib_inline</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backend_inline</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> configure_inline_support
+<span class="ansi-green-intense-fg ansi-bold">   3632</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">IPython</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> pylabtools <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> pt
+<span class="ansi-green-intense-fg ansi-bold">   3633</span>     gui, backend <span style="color: rgb(98,98,98)">=</span> pt<span style="color: rgb(98,98,98)">.</span>find_gui_and_backend(gui, <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>pylab_gui_select)
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/matplotlib_inline/__init__.py:1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> backend_inline, config  <span style="color: rgb(95,135,135)"># noqa</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> __version__ <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">0.1.7</span><span style="color: rgb(175,0,0)">&#34;</span>  <span style="color: rgb(95,135,135)"># noqa</span>
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.9.21/x64/lib/python3.9/site-packages/matplotlib_inline/backend_inline.py:6</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;A matplotlib backend for publishing figures via display_data&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span style="color: rgb(95,135,135)"># Copyright (c) IPython Development Team.</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> <span style="color: rgb(95,135,135)"># Distributed under the terms of the BSD 3-Clause License.</span>
+<span class="ansi-green-fg">----&gt; 6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> colors
+<span class="ansi-green-intense-fg ansi-bold">      8</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backends</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> backend_agg
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Multiple_circuits_execution.html" class="btn btn-neutral float-left" title="Example for execution of multiple circuits in QPUs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Optimizers_II_mapping.html" class="btn btn-neutral float-right" title="Paralelization for gradient-free optimizers: Differential Evolution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESGA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

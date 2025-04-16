@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module Set Up &mdash; CUNQA 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=01f34227"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="First Distributed Execution" href="first_steps.html" />
+    <link rel="prev" title="Welcome to CUNQA’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CUNQA
+              <img src="_static/logo_cesga_blanco.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module Set Up</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cloning-the-repository">Cloning the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qmio">QMIO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-installation">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manual-installation">Manual installation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#finisterrae">FINISTERRAE</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Manual installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Distributed Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cunqa.html">CUNQA Submodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples_gallery.html">Examples gallery</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Module Set Up</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modulesetup.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-set-up">
+<span id="installation-label"></span><h1>Module Set Up<a class="headerlink" href="#module-set-up" title="Link to this heading"></a></h1>
+<section id="cloning-the-repository">
+<h2>Cloning the repository<a class="headerlink" href="#cloning-the-repository" title="Link to this heading"></a></h2>
+<p>GitHub provides different options for cloning a repository, which can be checked in the dropdown menu of the green “&lt;&gt; Code” buttom.
+For ensuring a correct cloning of the repository, the SSH is the one preferred. This can be achieved by running the following on your terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span> <span class="s2">&quot;$(ssh-agent -s)&quot;</span>
+<span class="n">ssh</span><span class="o">-</span><span class="n">add</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">SSH_KEY</span>
+</pre></div>
+</div>
+<p>We are set to retrieve the source code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">CESGA</span><span class="o">-</span><span class="n">Quantum</span><span class="o">-</span><span class="n">Spain</span><span class="o">/</span><span class="n">cunqa</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> option ensures that all submodules are correctly loaded when cloning. As a additional step, we encourage to run the setup_submodules.sh file, which removes some of the files unused in the submodules and makes the repository lighter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">cunqa</span><span class="o">/</span><span class="n">scripts</span>
+<span class="n">bash</span> <span class="n">setup_submodules</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="qmio">
+<h3>QMIO<a class="headerlink" href="#qmio" title="Link to this heading"></a></h3>
+<section id="automatic-installation">
+<h4>Automatic installation<a class="headerlink" href="#automatic-installation" title="Link to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">scripts/configure.sh</span></code> file is prepared to bring an automatic installation of the <strong>CUNQA</strong> platform. The user only has to execute this file followed by the path to the desire installation folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">configure</span><span class="o">.</span><span class="n">sh</span> <span class="o">&lt;</span><span class="n">your</span><span class="o">/</span><span class="n">installation</span><span class="o">/</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>If the automatic installation fails, try the manual installation.</p>
+</section>
+<section id="manual-installation">
+<h4>Manual installation<a class="headerlink" href="#manual-installation" title="Link to this heading"></a></h4>
+<ol class="arabic">
+<li><p>As a cautionary measure, deactivate miniconda to not interfere with the rest of the installation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">deactivate</span>
+</pre></div>
+</div>
+</li>
+<li><p>Then, load the following modules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ml</span> <span class="n">load</span> <span class="n">qmio</span><span class="o">/</span><span class="n">hpc</span> <span class="n">gcc</span><span class="o">/</span><span class="mf">12.3.0</span> <span class="n">hpcx</span><span class="o">-</span><span class="n">ompi</span> <span class="n">flexiblas</span><span class="o">/</span><span class="mf">3.3.0</span> <span class="n">boost</span> <span class="n">cmake</span><span class="o">/</span><span class="mf">3.27.6</span> <span class="n">pybind11</span><span class="o">/</span><span class="mf">2.12.0</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="mf">3.9.9</span> <span class="n">nlohmann_json</span><span class="o">/</span><span class="mf">3.11.3</span> <span class="n">ninja</span><span class="o">/</span><span class="mf">1.9.0</span> <span class="n">qiskit</span><span class="o">/</span><span class="mf">1.2.4</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="mf">3.9.9</span>
+</pre></div>
+</div>
+</li>
+<li><p>Define the enviroment variable <code class="docutils literal notranslate"><span class="pre">INSTALL_PATH</span></code> as the <strong>ABSOLUTE PATH</strong> to the directory where <strong>CUNQA</strong> is to be installed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">INSTALL_PATH</span><span class="o">=&lt;</span><span class="n">your</span><span class="o">/</span><span class="n">installation</span><span class="o">/</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Afterwards, add the bin folder to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> in order to correctly execute all the commands to use the platform.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=$PATH:$INSTALL_PATH/bin
+</pre></div>
+</div>
+</li>
+<li><p>Once the previous steps are done, everything is set for the build/installation. There are two options:</p>
+<blockquote>
+<div><ul>
+<li><p><strong>Standard way (slower)</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">-</span><span class="n">B</span> <span class="n">build</span><span class="o">/</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="n">build</span><span class="o">/</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">install</span> <span class="n">build</span><span class="o">/</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Using</strong> <a class="reference external" href="https://ninja-build.org/">Ninja</a> <strong>(faster)</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cmake -G Ninja -B build/
+ninja -C build -j $(nproc)
+cmake --install build/
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</section>
+</section>
+<section id="finisterrae">
+<h3>FINISTERRAE<a class="headerlink" href="#finisterrae" title="Link to this heading"></a></h3>
+<p>In the FT3, the installation is almost the same as in QMIO but with few exceptions.</p>
+<section id="id1">
+<h4>Automatic installation<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<p>For the <strong>automatic installation</strong>, the process is exactly the same as the one presented for QMIO:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">configure</span><span class="o">.</span><span class="n">sh</span> <span class="o">&lt;</span><span class="n">your</span><span class="o">/</span><span class="n">installation</span><span class="o">/</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Manual installation<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<p>In the case of a <strong>manual installation</strong>, the steps 1-4 are analogous to the shown above for QMIO:</p>
+<ol class="arabic">
+<li><p>Conda deactivation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">deactivate</span>
+</pre></div>
+</div>
+</li>
+<li><p>Loading modules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ml</span> <span class="n">load</span> <span class="n">cesga</span><span class="o">/</span><span class="mi">2022</span> <span class="n">gcc</span><span class="o">/</span><span class="n">system</span> <span class="n">flexiblas</span><span class="o">/</span><span class="mf">3.3.0</span> <span class="n">openmpi</span><span class="o">/</span><span class="mf">5.0.5</span> <span class="n">boost</span> <span class="n">pybind11</span> <span class="n">cmake</span> <span class="n">qiskit</span><span class="o">/</span><span class="mf">1.2.4</span>
+</pre></div>
+</div>
+</li>
+<li><p>INSTALL_PATH:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">INSTALL_PATH</span><span class="o">=&lt;</span><span class="n">your</span><span class="o">/</span><span class="n">installation</span><span class="o">/</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Bin PATH:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=$PATH:$INSTALL_PATH/bin
+</pre></div>
+</div>
+</li>
+<li><p>Instead of a simple <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">-B</span> <span class="pre">build/</span></code> as in QMIO, the user has to add the <code class="docutils literal notranslate"><span class="pre">-DPYBIND_DIR</span></code> option with the path to the pybind11 cmake modules:</p>
+<blockquote>
+<div><ul>
+<li><p><strong>Standard way (slower)</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">-</span><span class="n">B</span> <span class="n">build</span><span class="o">/</span> <span class="o">-</span><span class="n">DPYBIND_PATH</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">cesga</span><span class="o">/</span><span class="mi">2022</span><span class="o">/</span><span class="n">software</span><span class="o">/</span><span class="n">Compiler</span><span class="o">/</span><span class="n">gcccore</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">pybind11</span><span class="o">/</span><span class="mf">2.12.0</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">python3</span><span class="mf">.9</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pybind11</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="n">build</span><span class="o">/</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">install</span> <span class="n">build</span><span class="o">/</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Using</strong> <a class="reference external" href="https://ninja-build.org/">Ninja</a> <strong>(faster)</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cmake -G Ninja -B build/ -DPYBIND_PATH=/opt/cesga/2022/software/Compiler/gcccore/system/pybind11/2.12.0/lib64/python3.9/site-packages/pybind11
+ninja -C build -j $(nproc)
+cmake --install build/
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+<p>And that’s it! Everything is set—either on QMIO or in the FT3—to perform an execution. Next we’ll learn how to run a distributed program by means of a minimal example.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to CUNQA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="first_steps.html" class="btn btn-neutral float-right" title="First Distributed Execution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESGA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
