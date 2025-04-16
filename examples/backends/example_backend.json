@@ -9,7 +9,7 @@
         "memory": true,
         "max_shots": 1000000,
         "description": "FakeQmio backend",
-        "basis_gates": ["sx", "x", "rz", "ecr"], 
+        "basis_gates": ["cx", "ry", "rz"], 
         "custom_instructions": "",
         "gates": [],
         "coupling_map": [

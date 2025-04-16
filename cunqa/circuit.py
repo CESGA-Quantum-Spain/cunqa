@@ -320,4 +320,3 @@ def _is_parametric(circuit):
                 return True
         logger.debug("Parametric gate NOT found, therefore circuit is NOT considered parametric.")
         return False
-           
