@@ -7,7 +7,7 @@ class CunqaCircuit(QuantumCircuit):
     def __init__(self, circuit_id = None, *args):
 
         # assign circuit id
-        self._id = circuit_id
+        self.id = circuit_id
 
         # instanciation of cunqa_info dict to store instructions
         self.cunqa_info = {"instructions":[]}
@@ -21,61 +21,82 @@ class CunqaCircuit(QuantumCircuit):
 
     # TODO: modify more functions from QuantumCircuit that add instructions **here** =======================================
 
-    def _append_standard_gate(self, op, *args):
+    def _append_standard_gate(self, op, qargs,params,*args):
         
         self.cunqa_info["instructions"].append(
             {
                 "name":op.name,
-                "qubits":[],
+                "qubits":[q._index for q in qargs],
                 "clbits":[],
-                "params":[],
-                "qpus":[]
+                "params": params,
+                "circuits":[self.id]
             }
         )
-        return super._append_standard_gate(self,op,*args)
+        return super._append_standard_gate(self,op,qargs,params,*args)
 
     # ========================================================================================================================
 
     # send_gate function **here** ============================================================================================
-    def send_gate(self, gate, control_qubit, target_circuit, target_qubit):
+    def send_gate(self, gate, *params, control_qubit = None, target_circuit = None, target_qubit = None):
         """
-        self (QuantumCircuit): instruction will be added to the QuantumCircuit provided.
-
         gate(str): reference to the gate we want to send.
 
-        control(int): control qubit from self.
+        params (list[float]): parameters in case the gate supplied is parametric.
 
-        target(tuple(circuit_id, qubit)): circuit to which we will send the instruction and target qubit where the gate will be conditionally applied.
+        control_qubit (int): control qubit from self.
+
+        target_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit to which we will send the gate or the circuit itself.
+
+        target_qubit (int): qubit where the gate will be conditionally applied.
         """
-        instruction = Instruction(name = "d_c_if_"+gate, num_qubits = 1, num_clbits = 0)
 
-        # with this sintax only circuits with one sigle quantum register are supported
-        # TODO: adapt to several qregs, checkout how qiskit does it
-        control_qubit = self.qregs[0][control_qubit]
+        self.is_distributed = True
 
-        self.append(CircuitInstruction(instruction, control_qubit), target = "hola")
+        if gate is None:
+            logger.error("No gate provided.")
+            raise SystemExit
+        elif not isinstance(gate, str):
+            logger.error(f"`gate` must be an str referencing the gate to be applied, but a {type(gate)} was provided [TypeError].")
+            raise SystemExit
+        
+        if params:
+            if  not all([(isinstance(p, float) or isinstance(p, int)) for p in params]):
+                logger.error(f"Gate parameters must be int or float.")
+                raise SystemExit
+        else:
+            params = []
+
+        if target_circuit is None:
+            logger.error("target_circuit not provided.")
+            raise SystemExit
+        elif isinstance(target_circuit, str):
+            target_circuit = target_circuit
+        elif isinstance(target_circuit, CunqaCircuit):
+            target_circuit = target_circuit.id
+        else:
+            logger.error(f"target_circuit must be a str referencing the circuit to which the gate is sent, but {type(target_circuit)} was provided [TypeError].")
+            raise SystemExit
+        
+        if control_qubit and target_qubit:
+            if not all([isinstance(q,int) for q in [control_qubit, target_qubit]]):
+                logger.error("Control and target qubits must be specified by int index.")
+                raise SystemExit
+        else:
+            logger.error("Both control and target qubits must be supplied.")
+            raise SystemExit
 
         self.cunqa_info["instructions"].append(
             {
-                "name":gate,
-                "qubits":[],
-                "clbuts":[],
-                "params":[],
-                "qpus":[]
+                "name":"d_c_if_"+gate,
+                "qubits":[control_qubit, target_qubit],
+                "clbits": [],
+                "params":params,
+                "circuits":[self.id, target_circuit]
             }
         )
-        return self._append_standard_gate()
+        return self
     
-    # ========================================================================================================================
-    
-
-    # rcv_gate function **here** ============================================================================================
-    def rcv_gate(self, jdhksaj)
-        
-
-
-    # ========================================================================================================================
-
+    # ========================================
 
 
 
