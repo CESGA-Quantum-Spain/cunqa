@@ -1,4 +1,85 @@
 from cunqa.logger import logger
+from qiskit import QuantumCircuit, Instruction
+
+
+class CunqaCircuit(QuantumCircuit):
+
+    def __init__(self, circuit_id = None, *args):
+
+        # assign circuit id
+        self._id = circuit_id
+
+        # instanciation of cunqa_info dict to store instructions
+        self.cunqa_info = {"instructions":[]}
+
+        # class attribute to track weather a circuit supports communications
+        self.is_distributed = False
+
+        # initialization of the QuantumCircuit class
+        super.__init__(self, *args)
+
+
+    # TODO: modify more functions from QuantumCircuit that add instructions **here** =======================================
+
+    def _append_standard_gate(self, op, *args):
+        
+        self.cunqa_info["instructions"].append(
+            {
+                "name":op.name,
+                "qubits":[],
+                "clbits":[],
+                "params":[],
+                "qpus":[]
+            }
+        )
+        return super._append_standard_gate(self,op,*args)
+
+    # ========================================================================================================================
+
+    # send_gate function **here** ============================================================================================
+    def send_gate(self, gate, control_qubit, target_circuit, target_qubit):
+        """
+        self (QuantumCircuit): instruction will be added to the QuantumCircuit provided.
+
+        gate(str): reference to the gate we want to send.
+
+        control(int): control qubit from self.
+
+        target(tuple(circuit_id, qubit)): circuit to which we will send the instruction and target qubit where the gate will be conditionally applied.
+        """
+        instruction = Instruction(name = "d_c_if_"+gate, num_qubits = 1, num_clbits = 0)
+
+        # with this sintax only circuits with one sigle quantum register are supported
+        # TODO: adapt to several qregs, checkout how qiskit does it
+        control_qubit = self.qregs[0][control_qubit]
+
+        self.append(CircuitInstruction(instruction, control_qubit), target = "hola")
+
+        self.cunqa_info["instructions"].append(
+            {
+                "name":gate,
+                "qubits":[],
+                "clbuts":[],
+                "params":[],
+                "qpus":[]
+            }
+        )
+        return self._append_standard_gate()
+    
+    # ========================================================================================================================
+    
+
+    # rcv_gate function **here** ============================================================================================
+    def rcv_gate(self, jdhksaj)
+        
+
+
+    # ========================================================================================================================
+
+
+
+
+
 
 def _qasm2_to_json(qasm_str, version = None):
     """
