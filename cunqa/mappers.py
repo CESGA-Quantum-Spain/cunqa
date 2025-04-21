@@ -1,6 +1,7 @@
+import json
 from cunqa.logger import logger
 from cunqa.qjob import gather
-from cunqa.circuit import from_json_to_qc
+from cunqa.circuit import from_json_to_qc, CunqaCircuit
 from cunqa.qpu import QPU
 from qiskit import QuantumCircuit
 from qiskit.exceptions import QiskitError
@@ -23,7 +24,7 @@ def run_distributed(circuits, qpus, **run_args):
 
     Args:
     ---------
-    circuits (list[json dict, <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or QASM2 str]): circuits to be run.
+    circuits (list[json dict,  <class 'cunqa.circuit.CunqaCircuit'>]): circuits to be run.
 
     qpus (list[<class 'cunqa.qpu.QPU'>]): QPU objects associated to the virtual QPUs in which the circuits want to be run.
     
@@ -33,9 +34,25 @@ def run_distributed(circuits, qpus, **run_args):
     ---------
     List of <class `cunqa.qjob.QJobs`> objects.
     """
-
+    
     distributed_qjobs = []
+    circuit_jsons = []
 
+    #Check wether the circuits are valid and extract jsons
+    for circuit in circuits:
+        if not circuit.is_distributed:
+            logger.error(f"Circuits to run must be distributed.")
+            raise SystemExit # User's level
+        
+        if isinstance(circuit, CunqaCircuit):
+            circuit_jsons.append(circuit.cunqa_info)
+        elif isinstance(circuit, json):
+            circuit_jsons.append(circuit)
+        else:
+            logger.error(f"Objects of the list `circuits` must be  <class 'cunqa.circuit.CunqaCircuit'> or jsons, but {type(circuit)} was given. [{TypeError.__name__}].")
+            raise SystemExit # User's level
+
+    #Check wether the QPUs are valid
     if not all(qpu._family_name == qpus[0]._family_name for qpu in qpus):
         names = set()
         for qpu in qpus:
