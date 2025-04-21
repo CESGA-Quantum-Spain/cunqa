@@ -70,7 +70,66 @@ class CunqaCircuit(QuantumCircuit):
     
 
     # rcv_gate function **here** ============================================================================================
-    def rcv_gate(self, jdhksaj)
+    def rcv_gate(self, gate=None, target_qubit=None, control_circuit=None, control_qubit=None, params=None): 
+        """
+        Method to signal the target circuit that a gate controlled from another circuit is to be applied.
+
+        Args:
+        ---------
+        gate(str): reference to the gate we want to send.
+
+        target_qubit(int): qubit -from the CunqaCircuit self- where the received gate will be applied. 
+
+        control_circuit(str, <class 'cunqa.circuit.CunqaCircuit'>): circuit (or circuit id) where the control_qubit is located.
+
+        control_qubit(int): qubit from control_circuit that controls the operation.
+
+        params(float): parameters for parametric received gates. Default is None to account for non-parametric gates.
+        """
+        if gate is None:
+            logger.error("No gate provided.")
+            raise SystemExit
+        elif not isinstance(gate, str):
+            logger.error(f"`gate` must be an str referencing the gate to be applied, but a {type(gate)} was provided [TypeError].")
+            raise SystemExit
+        
+        if params:
+            if  not all([(isinstance(p, float) or isinstance(p, int)) for p in params]):
+                logger.error(f"Gate parameters must be int or float.")
+                raise SystemExit
+        else:
+            params = []
+
+        if control_circuit is None:
+            logger.error("control_circuit not provided.")
+            raise SystemExit
+        elif isinstance(control_circuit, str):
+            control_circuit = control_circuit
+        elif isinstance(control_circuit, CunqaCircuit):
+            control_circuit = control_circuit._id
+        else:
+            logger.error(f"control_circuit must be a str referencing the circuit from which the gate is sent, but {type(control_circuit)} was provided [TypeError].")
+            raise SystemExit
+        
+        if control_qubit and target_qubit:
+            if not all([isinstance(q,int) for q in [control_qubit, target_qubit]]):
+                logger.error("Control and target qubits must be specified by int index.")
+                raise SystemExit
+        else:
+            logger.error("Both control and target qubits must be supplied.")
+            raise SystemExit
+
+        #Append instructions to json describing the circuit
+        self.cunqa_info["instructions"].append(
+            {
+                "name":"d_c_if_"+gate,
+                "qubits":[control_qubit, target_qubit],
+                "clbits": [],
+                "params":params,
+                "circuits":[control_circuit, self.id]
+            }
+        )
+        return self
         
 
 
