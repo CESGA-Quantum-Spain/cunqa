@@ -33,7 +33,7 @@ qc1.measure(QR1,CR1)
 
 qc2.measure_all()
 
-
+print(qc1.cunqa_info["id"])
 
 print(f"cunqa info cirtuit 1: ")
 for q in qc1.cunqa_info["instructions"]:
@@ -43,4 +43,14 @@ print(f"cunqa info cirtuit 2: ")
 for q in qc2.cunqa_info["instructions"]:
     print(q)
 
-# run_distributed([qc1,qc2], qpus)
+
+from cunqa import getQPUs
+
+qpus = getQPUs(local = False)
+print(qpus)
+
+from cunqa.mappers import run_distributed
+qjobs = run_distributed([qc1,qc2], qpus)
+
+for qjob in qjobs:
+    print(qjob.result().get_counts())

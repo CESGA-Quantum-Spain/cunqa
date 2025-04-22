@@ -26,7 +26,7 @@ class CunqaCircuit(QuantumCircuit):
         self.id = circuit_id
 
         # instanciation of cunqa_info dict to store instructions
-        self.cunqa_info = {"instructions":[]}
+        self.cunqa_info = {"id":circuit_id, "instructions":[]}
 
         # class attribute to track weather a circuit supports communications
         self.is_distributed = False

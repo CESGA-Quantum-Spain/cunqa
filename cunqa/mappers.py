@@ -43,19 +43,19 @@ def run_distributed(circuits, qpus, **run_args):
 
     #Check wether the circuits are valid and extract jsons
     for circuit in circuits:
-        if (isinstance(circuit, CunqaCircuit) and not circuit.is_distributed):
+        if not circuit.is_distributed:
             logger.error(f"Circuits to run must be distributed.")
             raise SystemExit # User's level
         
         if isinstance(circuit, CunqaCircuit):
             circuit_jsons.append(circuit.cunqa_info)
-        elif isinstance(circuit, dict):
+        elif isinstance(circuit, json):
             circuit_jsons.append(circuit)
         else:
             logger.error(f"Objects of the list `circuits` must be  <class 'cunqa.circuit.CunqaCircuit'> or jsons, but {type(circuit)} was given. [{TypeError.__name__}].")
             raise SystemExit # User's level
         
-    for circuit, qpu in zip(circuits, qpus):
+    for circuit, qpu in zip(circuit_jsons, qpus):
         correspondence[circuit["id"]] = qpu.endpoint
         
 
@@ -72,6 +72,7 @@ def run_distributed(circuits, qpus, **run_args):
     
     #translate circuit ids in comm instruction to qpu endpoints
     for circuit in circuits:
+        print(type(circuit))
         for instr in circuit["instructions"]:
             if instr["name"] in distr_gates:
                 instr["qpus"] =  [correspondence[instr["circuits"][0]], correspondence[instr["circuits"][1]]]
