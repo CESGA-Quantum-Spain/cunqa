@@ -26,12 +26,12 @@ d_qc_0_zmq = {
     {
         "name":"d_c_if_x",
         "qubits":[0,0,-1],
-        "qpus":["{}".format(qpu0.endpoint), "{}".format(qpu1.endpoint)]
+        "qpus":["carballido", "losada"]
     },
     {
         "name":"d_c_if_x",
         "qubits":[0,0,-1],
-        "qpus":["{}".format(qpu2.endpoint), "{}".format(qpu0.endpoint)]
+        "qpus":["exposito", "carballido"]
     },
     {
         "name": "measure",
@@ -54,11 +54,12 @@ d_qc_0_zmq = {
 }
 
 d_qc_1_zmq = {
+    "id": "losada",
     "instructions": [
     {
         "name":"d_c_if_x",
         "qubits":[1,0,-1],
-        "qpus":["{}".format(qpu0.endpoint), "{}".format(qpu1.endpoint)]
+        "qpus":["carballido", "losada"]
     },
     {
         "name":"h",
@@ -85,6 +86,7 @@ d_qc_1_zmq = {
 }
 
 d_qc_2_zmq = {
+    "id": "exposito",
     "instructions": [
     {
         "name":"h",
@@ -93,7 +95,7 @@ d_qc_2_zmq = {
     {
         "name":"d_c_if_x",
         "qubits":[0,0,-1],
-        "qpus":["{}".format(qpu2.endpoint), "{}".format(qpu0.endpoint)]
+        "qpus":["exposito", "carballido"]
     },
     {
         "name": "measure",
