@@ -55,7 +55,7 @@ def run_distributed(circuits, qpus, **run_args):
             logger.error(f"Objects of the list `circuits` must be  <class 'cunqa.circuit.CunqaCircuit'> or jsons, but {type(circuit)} was given. [{TypeError.__name__}].")
             raise SystemExit # User's level
         
-    for circuit, qpu in zip(circuits, qpus):
+    for circuit, qpu in zip(circuit_jsons, qpus):
         correspondence[circuit["id"]] = qpu.endpoint
         
 
