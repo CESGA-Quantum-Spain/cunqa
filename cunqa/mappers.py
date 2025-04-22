@@ -56,6 +56,7 @@ def run_distributed(circuits, qpus, **run_args):
     distributed_qjobs = []
     distr_gates = ["d_c_if_h", "d_c_if_x","d_c_if_y","d_c_if_z","d_c_if_rx","d_c_if_ry","d_c_if_rz","d_c_if_cx","d_c_if_cy","d_c_if_cz", "d_c_if_ecr"]
     correspondence = {}
+    
     for circuit, qpu in zip(circuits, qpus):
         correspondence[circuit["id"]] = qpu.endpoint
 

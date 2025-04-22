@@ -1,5 +1,5 @@
 from cunqa.logger import logger
-from qiskit import QuantumCircuit, Instruction
+from qiskit import QuantumCircuit
 
 
 class CunqaCircuit(QuantumCircuit):
