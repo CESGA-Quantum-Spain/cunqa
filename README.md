@@ -148,7 +148,14 @@ export PATH=$PATH:$INSTALL_PATH/bin
 ```
 
 5. Instead of a simple `cmake -B build/` as in QMIO, the user has to add the `-DPYBIND_DIR` option with the path to the pybind11 cmake modules:
-6. 
+    
+* **Standard way (slower)**
+```console
+cmake -B build/ -DPYBIND_PATH=/opt/cesga/2022/software/Compiler/gcccore/system/pybind11/2.12.0/lib64/python3.9/site-packages/pybind11
+cmake --build build/
+cmake --install build/
+```
+
 * **Using [Ninja](https://ninja-build.org/) (faster)**
 ```console
 cmake -G Ninja -B build/ -DPYBIND_PATH=/opt/cesga/2022/software/Compiler/gcccore/system/pybind11/2.12.0/lib64/python3.9/site-packages/pybind11

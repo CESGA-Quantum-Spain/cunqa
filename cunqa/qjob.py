@@ -130,6 +130,8 @@ class Result:
 
                 if (isinstance(self.counts, dict)): # Aer and Munich
                     self.counts = _convert_counts(self.counts, registers)
+                if isinstance(self.counts, list): #Cunqa
+                    self.count = [[f'{count[0]:0b}', count[1]] for count in self.counts]
 
 
             except KeyError:

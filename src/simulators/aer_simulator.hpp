@@ -62,13 +62,13 @@ public:
 
 
     //Dynamic execution
-    inline int _apply_measure(std::array<int, 3>& qubits)
+    inline int _apply_measure(std::vector<int>& qubits)
     {
         SPDLOG_LOGGER_ERROR(logger, "Error. Dynamic execution is not available with Aer simulator. ");
         return -1;
     }
     
-    inline void _apply_gate(std::string& gate_name, std::array<int, 3>& qubits, std::vector<double>& param)
+    inline void _apply_gate(std::string& gate_name, std::vector<int>& qubits, std::vector<double>& param)
     {
         SPDLOG_LOGGER_ERROR(logger, "Error. Dynamic execution is not available with Aer simulator. ");
     }

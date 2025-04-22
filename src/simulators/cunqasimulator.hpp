@@ -39,7 +39,7 @@ public:
     
 
     //Dynamic execution
-    inline int _apply_measure(std::array<int, 3>& qubits)
+    inline int _apply_measure(std::vector<int>& qubits)
     {
         try {
             return this->executor->apply_measure(qubits); 
@@ -50,7 +50,7 @@ public:
 
     }
 
-    inline void _apply_gate(std::string& gate_name, std::array<int, 3>& qubits, std::vector<double>& param)
+    inline void _apply_gate(std::string& gate_name, std::vector<int>& qubits, std::vector<double>& param)
     {
         try {
 

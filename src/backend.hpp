@@ -25,8 +25,8 @@ public:
     Backend(BackendConfig<sim_type>& backend_config);
 
     inline json run(json& circuit_json);
-    inline int apply_measure(std::array<int, 3>& qubits);
-    inline void apply_gate(std::string& instruction_name, std::array<int, 3>& qubits, std::vector<double> param = {0.0});
+    inline int apply_measure(std::vector<int>& qubits);
+    inline void apply_gate(std::string& instruction_name, std::vector<int>& qubits, std::vector<double> param = {0.0});
     inline int get_shot_result();
     inline void restart_statevector();
 
@@ -59,14 +59,14 @@ inline json Backend<sim_type>::run(json& circuit_json)
 
 //Dynamic wrapper
 template <SimType sim_type>
-inline int Backend<sim_type>::apply_measure(std::array<int, 3>& qubits)
+inline int Backend<sim_type>::apply_measure(std::vector<int>& qubits)
 {
     return this->simulator->_apply_measure(qubits);
     //return SimClass<sim_type>::type::_apply_measure(qubits);
 }
 
 template <SimType sim_type>
-inline void Backend<sim_type>::apply_gate(std::string& gate_name, std::array<int, 3>& qubits, std::vector<double> param)
+inline void Backend<sim_type>::apply_gate(std::string& gate_name, std::vector<int>& qubits, std::vector<double> param)
 {
     this->simulator->_apply_gate(gate_name, qubits, param);
     //SimClass<sim_type>::type::_apply_gate(gate_name, qubits, param);

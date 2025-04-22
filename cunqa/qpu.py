@@ -96,7 +96,7 @@ class QPU:
             logger.error(f"Please provide QPU family name [{TypeError.__name__}].") # for staters we raise the same error as if qclient was not provided
             raise SystemExit # User's level
         
-        elif isinstance(port, str):
+        elif isinstance(family_name, str):
             self._family_name = family_name
 
         else:

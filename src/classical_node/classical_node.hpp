@@ -74,7 +74,7 @@ inline void QPUClassicalNode<sim_type>::send_instructions_to_execute(json& kerne
     json run_config_json(run_config);
     int shots = run_config_json.at("shots");
     std::string instruction_name;
-    std::array<int, 3> qubits;
+    std::vector<int> qubits;
     int measurement;
     std::array<std::string, 2> comm_endp;
     std::vector<double> param;
@@ -84,7 +84,7 @@ inline void QPUClassicalNode<sim_type>::send_instructions_to_execute(json& kerne
     for (int i = 0; i < shots; i++) {
         for (auto& instruction : instructions) {
             instruction_name = instruction.at("name");
-            qubits = instruction.at("qubits");
+            qubits = instruction.at("qubits").get<std::vector<int>>();
             switch (CUNQA::INSTRUCTIONS_MAP[instruction_name])
             {
                 case measure:
@@ -127,19 +127,19 @@ inline void QPUClassicalNode<sim_type>::send_instructions_to_execute(json& kerne
                 case CUNQA::D_C_IF_CZ:
                 case CUNQA::D_C_IF_ECR:
                     comm_endp = instruction.at("qpus").get<std::array<std::string, 2>>();
-                    SPDLOG_LOGGER_DEBUG(logger, "Communication endpoints: {}, {}", comm_endp[0], comm_endp[1]);
+                    //SPDLOG_LOGGER_DEBUG(logger, "Communication endpoints: {}, {}", comm_endp[0], comm_endp[1]);
                     if (this->comm_component.is_sender_qpu(comm_endp[0])) {
                         measurement = this->backend.apply_measure(qubits);
                         this->comm_component._send(measurement, comm_endp[1]);
-                        SPDLOG_LOGGER_DEBUG(logger, "Measurement sent to {}", comm_endp[1]);
+                        //SPDLOG_LOGGER_DEBUG(logger, "Measurement sent to {}", comm_endp[1]);
                     } else if (this->comm_component.is_receiver_qpu(comm_endp[1])) {
                         measurement = this->comm_component._recv(comm_endp[0]);
-                        SPDLOG_LOGGER_DEBUG(logger, "Measurement received from {}", comm_endp[0]);
+                        //SPDLOG_LOGGER_DEBUG(logger, "Measurement received from {}", comm_endp[0]);
                         if (measurement == 1) {
                             this->backend.apply_gate(CUNQA::CORRESPONDENCE_D_GATE_MAP[instruction_name], qubits);
                         }
                     } else {
-                        SPDLOG_LOGGER_ERROR(logger, "This QPU has no ID {} nor {}", comm_endp[0], comm_endp[1]); 
+                        //SPDLOG_LOGGER_ERROR(logger, "This QPU has no ID {} nor {}", comm_endp[0], comm_endp[1]); 
                         throw std::runtime_error("Error with the QPU IDs.");
                     }
                     break;
@@ -147,7 +147,7 @@ inline void QPUClassicalNode<sim_type>::send_instructions_to_execute(json& kerne
                 case CUNQA::D_C_IF_RY:
                 case CUNQA::D_C_IF_RZ:
                     comm_endp = instruction.at("qpus").get<std::array<std::string, 2>>();
-                    SPDLOG_LOGGER_DEBUG(logger, "Communication endpoint: {}, {}", comm_endp[0], comm_endp[1]);
+                    //SPDLOG_LOGGER_DEBUG(logger, "Communication endpoint: {}, {}", comm_endp[0], comm_endp[1]);
                     param = instruction.at("params").get<std::vector<double>>();
                     if (this->comm_component.is_sender_qpu(comm_endp[0])) {
                         measurement = this->backend.apply_measure(qubits);
