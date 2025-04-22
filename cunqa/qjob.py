@@ -82,7 +82,7 @@ def _convert_counts(counts, registers):
                 new_counts[_divide(k, lengths)] = v
     elif isinstance(counts, list):
         for count in counts:
-            new_counts[format(count[0],'0'+str(num_clbits)+'b')[::-1]] = count[1] 
+            new_counts[_divide(format(count[0],'0'+str(num_clbits)+'b')[::-1], lengths)] = count[1]
     return new_counts
 
 
