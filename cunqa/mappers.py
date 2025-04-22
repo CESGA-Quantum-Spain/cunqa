@@ -1,7 +1,7 @@
 import json
 from cunqa.logger import logger
 from cunqa.qjob import gather
-from cunqa.circuit import from_json_to_qc, CunqaCircuit
+from cunqa.circuit import from_json_to_qc, CunqaCircuit, _registers_dict
 from cunqa.qpu import QPU
 from qiskit import QuantumCircuit
 from qiskit.exceptions import QiskitError
@@ -48,8 +48,10 @@ def run_distributed(circuits, qpus, **run_args):
             raise SystemExit # User's level
         
         if isinstance(circuit, CunqaCircuit):
-            circuit_jsons.append(circuit.cunqa_info)
-        elif isinstance(circuit, json):
+            extended_cunqa_info = {"id":circuit.id, "instructions":circuit.cunqa_info, "num_qubits": circuit.num_qubits,"num_clbits": circuit.num_clbits,"classical_registers": _registers_dict(circuit)[1],"quantum_registers": _registers_dict(circuit)[0], "exec_type":"dynamic"}
+            circuit_jsons.append(extended_cunqa_info)
+
+        elif isinstance(circuit, dict):
             circuit_jsons.append(circuit)
         else:
             logger.error(f"Objects of the list `circuits` must be  <class 'cunqa.circuit.CunqaCircuit'> or jsons, but {type(circuit)} was given. [{TypeError.__name__}].")
@@ -71,9 +73,9 @@ def run_distributed(circuits, qpus, **run_args):
     logger.debug(f"Run arguments provided for simulation: {run_args}")
     
     #translate circuit ids in comm instruction to qpu endpoints
-    for circuit in circuits:
-        print(type(circuit))
+    for circuit in circuit_jsons:
         for instr in circuit["instructions"]:
+            print(instr)
             if instr["name"] in distr_gates:
                 instr["qpus"] =  [correspondence[instr["circuits"][0]], correspondence[instr["circuits"][1]]]
                 instr.pop("circuits")
@@ -88,7 +90,8 @@ def run_distributed(circuits, qpus, **run_args):
             run_parameters[k] = v
 
     # no need to capture errors bacuse they are captured at `QPU.run`
-    for circuit, qpu in zip(circuits, qpus):
+    for circuit, qpu in zip(circuit_jsons, qpus):
+        print("Mandamos: ",circuit)
         distributed_qjobs.append(qpu.run(circuit, **run_parameters))
 
     return distributed_qjobs

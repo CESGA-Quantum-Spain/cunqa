@@ -56,7 +56,7 @@ class ColoredFormatter(logging.Formatter):
 
 # Crear el logger
 logger = logging.getLogger('mi_logger_coloreado')
-logger.setLevel(logging.WARNING)  # Establece el nivel mínimo de log
+logger.setLevel(logging.DEBUG)  # Establece el nivel mínimo de log
 
 # Crear el handler para la consola
 console_handler = logging.StreamHandler(sys.stdout)

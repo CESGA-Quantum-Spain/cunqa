@@ -15,7 +15,7 @@ qc1 = CunqaCircuit("circuit_1", QR1, CR1)
 
 qc2 = CunqaCircuit("circuit_2", 3, 3)
 
-
+qc1.h(range(2))
 
 qc1.x(0)
 
@@ -33,14 +33,15 @@ qc1.measure(QR1,CR1)
 
 qc2.measure_all()
 
-print(qc1.cunqa_info["id"])
+print("qc.data: ")
+print(qc1.data)
 
 print(f"cunqa info cirtuit 1: ")
-for q in qc1.cunqa_info["instructions"]:
+for q in qc1.cunqa_info:
     print(q)
 print()
 print(f"cunqa info cirtuit 2: ")
-for q in qc2.cunqa_info["instructions"]:
+for q in qc2.cunqa_info:
     print(q)
 
 
@@ -50,7 +51,7 @@ qpus = getQPUs(local = False)
 print(qpus)
 
 from cunqa.mappers import run_distributed
-qjobs = run_distributed([qc1,qc2], qpus)
+qjobs = run_distributed([qc1,qc2], qpus[:2])
 
 for qjob in qjobs:
     print(qjob.result().get_counts())

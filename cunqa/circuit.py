@@ -9,6 +9,8 @@ def get_int(qubit):
         return [c._index for c in qubit._bits]
     elif isinstance(qubit, int):
         return qubit
+    elif isinstance(qubit, range):
+        return list(qubit)
 
 def flatten(nested):
     if isinstance(nested[0], list):
@@ -26,7 +28,7 @@ class CunqaCircuit(QuantumCircuit):
         self.id = circuit_id
 
         # instanciation of cunqa_info dict to store instructions
-        self.cunqa_info = {"id":circuit_id, "instructions":[]}
+        self.cunqa_info = []
 
         # class attribute to track weather a circuit supports communications
         self.is_distributed = False
@@ -38,19 +40,35 @@ class CunqaCircuit(QuantumCircuit):
     # TODO: modify more functions from QuantumCircuit that add instructions **here** =======================================
 
     def _append_standard_gate(self, op, qargs, params,**args):
+        logger.debug("About to add instruction for standard gate ...")
+
+        qubits = []
+        if isinstance(qargs, list):
+            # we should always be given a list
+            for qarg in qargs:
+                if isinstance(qarg, list):
+                    # for the case we are given lists
+                    for q in qarg:
+                        qubits.append(get_int(q))
+                else:
+                    qubits.append(get_int(qarg))
+
+        qubits = flatten(qubits)
+
+        for q in qubits:
         
-        self.cunqa_info["instructions"].append(
-            {
-                "name":op.name,
-                "qubits":[q for q in qargs],
-                "clbits":[],
-                "params": list(params),
-                "circuits":[self.id]
-            }
-        )
+            self.cunqa_info.append(
+                {
+                    "name":op.name,
+                    "qubits":[q],
+                    "clbits":[],
+                    "params": list(params)
+                }
+            )
         return super()._append_standard_gate(op,qargs,params,**args)
     
     def append(self, instruction, qargs, cargs, **args):
+        logger.debug("About to add instruction ...")
         qubits = []
         if instruction.name == "measure":
             if isinstance(qargs, list):
@@ -80,13 +98,12 @@ class CunqaCircuit(QuantumCircuit):
 
             for q,c in zip(qubits,clbits):
             
-                self.cunqa_info["instructions"].append(
+                self.cunqa_info.append(
                     {
                         "name":instruction.name,
-                        "qubits":q,
-                        "clbits":c,
-                        "params": list(instruction.params),
-                        "circuits":[self.id]
+                        "qubits":[q],
+                        "clbits":[c],
+                        "params": list(instruction.params)
                     }
                 )
         return super().append(instruction, qargs, cargs, **args)
@@ -104,7 +121,7 @@ class CunqaCircuit(QuantumCircuit):
 
         target_qubit (int): qubit where the gate will be conditionally applied.
         """
-
+        logger.debug("About to add instruction to send gate...")
         self.is_distributed = True
 
         if gate is None:
@@ -140,7 +157,7 @@ class CunqaCircuit(QuantumCircuit):
             logger.error("Both control and target qubits must be supplied.")
             raise SystemExit
 
-        self.cunqa_info["instructions"].append(
+        self.cunqa_info.append(
             {
                 "name":"d_c_if_"+gate,
                 "qubits":[control_qubit, target_qubit],
@@ -171,7 +188,7 @@ class CunqaCircuit(QuantumCircuit):
 
         params(float): parameters for parametric received gates. Default is None to account for non-parametric gates.
         """
-
+        logger.debug("About to add instruction to recieve gate...")
         self.is_distributed = True
 
         if gate is None:
@@ -208,7 +225,7 @@ class CunqaCircuit(QuantumCircuit):
             raise SystemExit
 
         #Append instructions to json describing the circuit
-        self.cunqa_info["instructions"].append(
+        self.cunqa_info.append(
             {
                 "name":"d_c_if_"+gate,
                 "qubits":[control_qubit, target_qubit],

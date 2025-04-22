@@ -129,7 +129,7 @@ from cunqa.mappers import run_distributed
 
 job0, job1, job2 = run_distributed([d_qc_0_zmq, d_qc_1_zmq,d_qc_2_zmq], qpus[:3], shots = 10, transpile=True )
 
-print("Result QPU0", job0.result().get_counts())
+print("Result QPU0", job0.result().result)
 print("Result QPU1", job1.result().get_counts())
 print("Result QPU2", job2.result().get_counts())
 

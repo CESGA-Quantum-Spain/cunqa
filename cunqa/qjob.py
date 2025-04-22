@@ -128,7 +128,7 @@ class Result:
                     self.counts = self.result["counts"]
                     self.time = self.result["time_taken"]
 
-                if (isinstance(self.counts, dict)): # Aer and Munich
+                if isinstance(self.counts, dict): # Aer and Munich
                     self.counts = _convert_counts(self.counts, registers)
                 if isinstance(self.counts, list): #Cunqa
                     self.counts = [[f'{count[0]:b}', count[1]] for count in self.counts]
@@ -322,7 +322,7 @@ class QJob:
             
         
         except KeyError as error:
-            logger.error(f"Format of the cirucit dict not correct, couldn't find 'num_clbits', 'classical_registers' or 'instructions' [{type(error).__name__}].")
+            logger.error(f"Format of the circuit dict not correct, couldn't find 'num_clbits', 'classical_registers' or 'instructions' [{type(error).__name__}].")
             raise QJobError # I capture the error in QPU.run() when creating the job
 
         except QASM2Error as error:
