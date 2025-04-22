@@ -43,7 +43,7 @@ def run_distributed(circuits, qpus, **run_args):
 
     #Check wether the circuits are valid and extract jsons
     for circuit in circuits:
-        if not circuit.is_distributed:
+        if (isinstance(circuit,CunqaCircuit) and not circuit.is_distributed):
             logger.error(f"Circuits to run must be distributed.")
             raise SystemExit # User's level
         
