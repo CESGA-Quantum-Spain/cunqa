@@ -74,11 +74,15 @@ def _convert_counts(counts, registers):
         raise QJobError # I capture this error in QJob.result()
 
     new_counts = {}
-    for k,v in counts.items():
-        if k.startswith('0x'): # converting to binary string and dividing in bit strings
-            new_counts[_divide(format( int(k, 16), '0'+str(num_clbits)+'b' ), lengths)]= v
-        else: # just dividing the bit stings
-            new_counts[_divide(k, lengths)] = v
+    if isinstance(counts, dict):
+        for k,v in counts.items():
+            if k.startswith('0x'): # converting to binary string and dividing in bit strings
+                new_counts[_divide(format( int(k, 16), '0'+str(num_clbits)+'b' ), lengths)]= v
+            else: # just dividing the bit stings
+                new_counts[_divide(k, lengths)] = v
+    elif isinstance(counts, list):
+        for count in counts:
+            new_counts[format(count[0],'0'+str(num_clbits)+'b')[::-1]] = count[1] 
     return new_counts
 
 
@@ -128,10 +132,7 @@ class Result:
                     self.counts = self.result["counts"]
                     self.time = self.result["time_taken"]
 
-                if isinstance(self.counts, dict): # Aer and Munich
-                    self.counts = _convert_counts(self.counts, registers)
-                if isinstance(self.counts, list): #Cunqa
-                    self.counts = [[f'{count[0]:b}', count[1]] for count in self.counts]
+                self.counts = _convert_counts(self.counts, registers)
 
 
             except KeyError:
