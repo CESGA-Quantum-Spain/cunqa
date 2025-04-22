@@ -38,6 +38,9 @@ def run_distributed(circuits, qpus, **run_args):
     distributed_qjobs = []
     circuit_jsons = []
 
+    distr_gates = ["d_c_if_h", "d_c_if_x","d_c_if_y","d_c_if_z","d_c_if_rx","d_c_if_ry","d_c_if_rz","d_c_if_cx","d_c_if_cy","d_c_if_cz", "d_c_if_ecr"]
+    correspondence = {}
+
     #Check wether the circuits are valid and extract jsons
     for circuit in circuits:
         if not circuit.is_distributed:
@@ -51,16 +54,28 @@ def run_distributed(circuits, qpus, **run_args):
         else:
             logger.error(f"Objects of the list `circuits` must be  <class 'cunqa.circuit.CunqaCircuit'> or jsons, but {type(circuit)} was given. [{TypeError.__name__}].")
             raise SystemExit # User's level
+        
+    for circuit, qpu in zip(circuits, qpus):
+        correspondence[circuit["id"]] = qpu.endpoint
+        
 
     #Check wether the QPUs are valid
     if not all(qpu._family_name == qpus[0]._family_name for qpu in qpus):
-        names = set()
-        for qpu in qpus:
-            names.add(qpu._family_name)
-        logger.error(f"QPU objects provided are from different families ({list(names)}). For this version, classical communications beyond families are not supported.")
-        raise SystemExit # User's level
+        if not all("zmq" in qpu.comm_info for qpu in qpus):
+            names = set()
+            for qpu in qpus:
+                names.add(qpu._family_name)
+            logger.error(f"QPU objects provided are from different families ({list(names)}). For this version, classical communications beyond families are only supported with zmq communication type.")
+            raise SystemExit # User's level
     
     logger.debug(f"Run arguments provided for simulation: {run_args}")
+    
+    #translate circuit ids in comm instruction to qpu endpoints
+    for circuit in circuits:
+        for instr in circuit["instructions"]:
+            if instr["name"] in distr_gates:
+                instr["qpus"] =  [correspondence[instr["circuits"][0]], correspondence[instr["circuits"][1]]]
+                instr.pop("circuits")
     
     warn = False
     run_parameters = {}

@@ -62,7 +62,7 @@ public:
         } catch (const json::out_of_range& e){
             SPDLOG_LOGGER_ERROR(logger, "No server has ID={}. Remember to set the servers with the command qraise.", task_id);
         } catch (const std::exception& e) {
-            SPDLOG_LOGGER_ERROR(logger, "Error on when connecting the client");
+            SPDLOG_LOGGER_ERROR(logger, "Error when connecting the client");
             throw;
         }
     }
