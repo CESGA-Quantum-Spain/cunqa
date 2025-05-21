@@ -1,6 +1,6 @@
 cloud_example
 =============
 
-.. literalinclude:: _examples/rst/cloud_example.py
+.. literalinclude:: _examples/cloud_example.py
    :language: python
    :linenos:
