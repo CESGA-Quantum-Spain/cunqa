@@ -7,3 +7,7 @@ Here you can peruse through some examples of CUNQA use that will help you get th
    _examples/Optimizers_I_upgrading_parameters.ipynb
    _examples/Optimizers_II_mapping.ipynb
 
+   _examples/cloud_example.py
+   _example/example_qraise.py
+   _example/hpc_example.py
+
