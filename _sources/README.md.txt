@@ -61,7 +61,7 @@ bash setup_submodules.sh
 The `scripts/configure.sh` file is prepared to bring an automatic installation of the **CUNQA** platform. The user only has to execute this file followed by the path to the desire installation folder: 
 
 ```console
-source configure.sh <your/installation/path>
+source configure.sh
 ``` 
 
 If the automatic installation fails, try the manual installation.
@@ -106,7 +106,7 @@ In the FT3, the installation is almost the same as in QMIO but with few exceptio
 For the **automatic installation**, the process is exactly the same as the one presented for QMIO:
 
 ```console
-source configure.sh <your/installation/path>
+source configure.sh
 ``` 
 
 #### Manual installation
