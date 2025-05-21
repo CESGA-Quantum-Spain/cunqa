@@ -1,6 +1,6 @@
 example_qraise
 ==============
 
-.. literalinclude:: code_examples/{filename}.py
+.. literalinclude:: _examples/rst/example_qraise.py
    :language: python
    :linenos:
