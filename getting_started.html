@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; CUNQA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/table.css?v=9571698f" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CUNQA Package" href="cunqa.html" />
+    <link rel="prev" title="Welcome to CUNQA’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CUNQA
+              <img src="_static/logo_cesga_blanco.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#clone-repository">Clone repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qmio">QMIO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-installation">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manual-installation">Manual installation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#finisterrae-iii-ft3">Finisterrae III (FT3)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Manual installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#run-your-first-distributed-program">Run your first distributed program</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qraise-command">1. <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-program-example">2. Python Program Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdrop-command">3. <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cunqa.html">CUNQA Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples_gallery.html">Examples gallery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_examples/Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Importing-and-adding-paths-to-sys.path">Importing and adding paths to <code class="docutils literal notranslate"><span class="pre">sys.path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Let's-get-the-QPUs-that-we-q-raised!">Let’s get the QPUs that we q-raised!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Let's-create-a-circuit-to-run-in-our-QPUs!">Let’s create a circuit to run in our QPUs!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Execution-time!-Let's-do-it-sequentially">Execution time! Let’s do it sequentially</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Cool-isn't-it?-But-this-circuit-is-too-simple,-let's-try-with-a-more-complex-one!">Cool isn’t it? But this circuit is too simple, let’s try with a more complex one!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#This-circuit-has-15-qubits-and-10-intermidiate-measurements,-let's-run-it-in-AerSimulator">This circuit has 15 qubits and 10 intermidiate measurements, let’s run it in AerSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Multiple_circuits_execution.html#Takes-much-longer-...-let's-parallelize-n-executions-in-n-different-QPUs">Takes much longer … let’s parallelize n executions in n different QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_examples/Optimizers_I_upgrading_parameters.html">Examples for optimizations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Optimizers_I_upgrading_parameters.html#Simply-using-the-QPU.run()-method">Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Optimizers_I_upgrading_parameters.html#Using-QJob.upgrade_parameters()">Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_examples/Optimizers_II_mapping.html">Paralelization for gradient-free optimizers: Differential Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Optimizers_II_mapping.html#QJobMapper">QJobMapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_examples/Optimizers_II_mapping.html#QPUCircuitMapper">QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_examples/Optimizers_II_mapping.html#Paralelization-of-expectation-value-terms">Paralelization of expectation value terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_examples/Optimizers_II_mapping.html#Paralelization-for-gradient-optimizers">Paralelization for gradient optimizers</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="clone-repository">
+<h2>Clone repository<a class="headerlink" href="#clone-repository" title="Link to this heading"></a></h2>
+<p>It is important to say that, for ensuring a correct cloning of the repository, the SSH is the one preferred. In order to get this to work one has to do:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">eval &quot;$(ssh-agent -s)&quot;</span>
+<span class="go">ssh-add ~/.ssh/SSH_KEY</span>
+</pre></div>
+</div>
+<p>Now, everything is set to get the source code.</p>
+<blockquote>
+<div><p>⚠️ <strong>Warning:</strong>
+In order to get all the submodules correctly loaded, please remember the <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> option when cloning.</p>
+</div></blockquote>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone --recursive git@github.com:CESGA-Quantum-Spain/cunqa.git</span>
+</pre></div>
+</div>
+<p>As a additional step, we encourage to run the <em>setup_submodules.sh</em> file, which removes some of the files unused in the submodules and makes the repository lighter:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd scripts</span>
+<span class="go">bash setup_submodules.sh</span>
+</pre></div>
+</div>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="qmio">
+<h3>QMIO<a class="headerlink" href="#qmio" title="Link to this heading"></a></h3>
+<section id="automatic-installation">
+<h4>Automatic installation<a class="headerlink" href="#automatic-installation" title="Link to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">scripts/configure.sh</span></code> file is prepared to bring an automatic installation of the <strong>CUNQA</strong> platform. The user only has to execute this file followed by the path to the desire installation folder:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">source configure.sh &lt;your/installation/path&gt;</span>
+</pre></div>
+</div>
+<p>If the automatic installation fails, try the manual installation.</p>
+</section>
+<section id="manual-installation">
+<h4>Manual installation<a class="headerlink" href="#manual-installation" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>First of all, deactivate miniconda to not interfere with the rest of the installation:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda deactivate</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>Then, load the following modules:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>Once the previous steps are done, everything is set for the build/installation. There are two options:</p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Standard way (slower)</strong></p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/</span>
+<span class="go">cmake --build build/</span>
+<span class="go">cmake --install build/</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Using `Ninja &lt;https://ninja-build.org/&gt;`_ (faster)</strong></p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/</span>
+<span class="go">ninja -C build -j $(nproc)</span>
+<span class="go">cmake --install build/</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>❗ <strong>Important:</strong>
+Is <strong>KEY</strong> that this compilation is done in a compute node with sufficient resources (if not, the compilation process could be killed).</p>
+</div></blockquote>
+</section>
+</section>
+<section id="finisterrae-iii-ft3">
+<h3>Finisterrae III (FT3)<a class="headerlink" href="#finisterrae-iii-ft3" title="Link to this heading"></a></h3>
+<p>In the FT3, the installation is almost the same as in QMIO but with few exceptions.</p>
+<section id="id1">
+<h4>Automatic installation<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<p>For the <strong>automatic installation</strong>, the process is exactly the same as the one presented for QMIO:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">source configure.sh &lt;your/installation/path&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Manual installation<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<p>In the case of a <strong>manual installation</strong>, the steps are analogous to the shown above for QMIO:</p>
+<ol class="arabic simple">
+<li><p>Conda deactivation:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda deactivate</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>Loading modules:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>Again: configure, compile and install using CMake:</p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Standard way (slower)</strong></p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/</span>
+<span class="go">cmake --build build/</span>
+<span class="go">cmake --install build/</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Using `Ninja &lt;https://ninja-build.org/&gt;`_ (faster)</strong></p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/</span>
+<span class="go">ninja -C build -j $(nproc)</span>
+<span class="go">cmake --install build/</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>❗ <strong>Important:</strong>
+Is <strong>KEY</strong> that this compilation is done in a compute node with sufficient resources (if not, the compilation process could be killed).</p>
+</div></blockquote>
+<p>And that’s it! Everything is set—either on QMIO or in the FT3—to perform an execution.</p>
+</section>
+</section>
+</section>
+<section id="run-your-first-distributed-program">
+<h2>Run your first distributed program<a class="headerlink" href="#run-your-first-distributed-program" title="Link to this heading"></a></h2>
+<p>Once <strong>CUNQA</strong> is installed, the basic workflow to use it is:</p>
+<ol class="arabic simple">
+<li><p>Raise the desired QPUs with the command <code class="docutils literal notranslate"><span class="pre">qraise</span></code>.</p></li>
+<li><p>Run circuits on the QPUs:</p>
+<ul class="simple">
+<li><p>Connect to the QPUs through the python API.</p></li>
+<li><p>Define the circuits to execute.</p></li>
+<li><p>Execute the circuits on the QPUs.</p></li>
+<li><p>Obtain the results.</p></li>
+</ul>
+</li>
+<li><p>Drop the raised QPUs with the command <code class="docutils literal notranslate"><span class="pre">qdrop</span></code>.</p></li>
+</ol>
+<blockquote>
+<div><p>❗ <strong>Important:</strong>
+Please, note that steps 1-4 of the <span class="xref std std-ref">Installation section</span> have to be done every time <strong>CUNQA</strong> wants to be used.</p>
+</div></blockquote>
+<section id="qraise-command">
+<h3>1. <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command<a class="headerlink" href="#qraise-command" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command raises as many QPUs as desired. Each QPU can be configured by the user to have a personalized backend. There is a help FLAG with a quick guide of how this command works:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qraise --help</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>The only two mandatory FLAGS of <code class="docutils literal notranslate"><span class="pre">qraise</span></code> are the <strong>number of QPUs</strong>, set up with <code class="docutils literal notranslate"><span class="pre">-n</span></code> or <code class="docutils literal notranslate"><span class="pre">--num_qpus</span></code> and the <strong>maximum time</strong> the QPUs will be raised, set up with <code class="docutils literal notranslate"><span class="pre">-t</span></code> or <code class="docutils literal notranslate"><span class="pre">--time</span></code>.
+So, for instance, the command</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qraise -n 4 -t 01:20:30</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>📘 <strong>Note:</strong>
+By default, all the QPUs will be raised with <a class="reference external" href="https://github.com/Qiskit/qiskit-aer">AerSimulator</a> as the background simulator and IdealAer as the background backend. That is, a backend of 32 qubits, all connected and without noise.</p>
+</div></blockquote>
+<p>will raise four QPUs during at most 1 hour, 20 minutes and 30 seconds. The time format is <code class="docutils literal notranslate"><span class="pre">hh:mm:ss</span></code>.
+2. The simulator and the backend configuration can be set by the user through <code class="docutils literal notranslate"><span class="pre">qraise</span></code> FLAGs:</p>
+<p><strong>Set simulator:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qraise -n 4 -t 01:20:30 --sim=Munich</span>
+</pre></div>
+</div>
+<p>The command above changes the default simulator by the <a class="reference external" href="https://github.com/cda-tum/mqt-ddsim">mqt-ddsim simulator</a>. Currently, <strong>CUNQA</strong> only allows two simulators: <code class="docutils literal notranslate"><span class="pre">--sim=Aer</span></code> and <code class="docutils literal notranslate"><span class="pre">--sim=Munich</span></code>.</p>
+<p><strong>Set FakeQmio:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qraise -n 4 -t 01:20:30 --fakeqmio=&lt;path/to/calibrations/file&gt;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--fakeqmio</span></code> FLAG raises the QPUs as simulated <cite>QMIO &lt;https://www.cesga.es/infraestructuras/cuantica/&gt;`_s. If no ``&lt;path/to/calibrations/file&gt;`</cite> is provided, last calibrations of de QMIO are used. With this FLAG, the background simulator is AerSimulator.</p>
+<p><strong>Set personalized backend:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qraise -n 4 -t 01:20:30 --backend=&lt;path/to/backend/json&gt;</span>
+</pre></div>
+</div>
+<p>The personalized backend has to be a <em>json</em> file with the following structure:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;backend&quot;</span><span class="p">:{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BackendExample&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;n_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;is_simulator&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;conditional&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;memory&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;max_shots&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;basis_gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nt">&quot;custom_instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nt">&quot;coupling_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="nt">&quot;noise&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>📘 <strong>Note:</strong>
+The “noise” key must be filled with a json with noise instructions supported by the chosen simulator.</p>
+</div></blockquote>
+<blockquote>
+<div><p>❗ <strong>Important:</strong>
+Several <code class="docutils literal notranslate"><span class="pre">qraise</span></code> commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The <code class="docutils literal notranslate"><span class="pre">getQPUs()</span></code> method presented in the section below will collect all the raised QPUs.</p>
+</div></blockquote>
+</section>
+<section id="python-program-example">
+<h3>2. Python Program Example<a class="headerlink" href="#python-program-example" title="Link to this heading"></a></h3>
+<p>Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow.</p>
+<blockquote>
+<div><p>⚠️ <strong>Warning:</strong>
+To execute the following python example it is needed  to load the <a class="reference external" href="https://github.com/Qiskit/qiskit">Qiskit</a> module:</p>
+</div></blockquote>
+<p>In QMIO:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.9.9</span>
+</pre></div>
+</div>
+<p>In FT3:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load cesga/2022 gcc/system qiskit/1.2.4</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Python Script Example</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># Adding pyhton folder path to detect modules</span>
+<span class="n">INSTALL_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;INSTALL_PATH&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">INSTALL_PATH</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s get the raised QPUs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span> <span class="c1"># List of raised QPUs</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, name: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s create a circuit to run in our QPUs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+
+<span class="n">N_QUBITS</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># Number of qubits</span>
+<span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">N_QUBITS</span><span class="p">)</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="c1"># Time to run</span>
+<span class="n">qpu0</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Select one of the raise QPUs</span>
+
+<span class="n">job</span> <span class="o">=</span> <span class="n">qpu0</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">qc</span><span class="p">,</span> <span class="n">transpile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="c1"># Get the result of the execution</span>
+
+<span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>📘 <strong>Note:</strong>
+It is not mandatory to run a <em>QuantumCircuit</em> from Qiskit. The <code class="docutils literal notranslate"><span class="pre">.run</span></code> method also supports <em>OpenQASM 2.0</em> with the following structure:</p>
+</div></blockquote>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="s2">&quot;OPENQASM 2.0;\ninclude \&quot;qelib1.inc\&quot;;\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0], q[1];\nmeasure q[0] -&gt; c[0];\nmeasure q[1] -&gt; c[1];&quot;</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;q&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]},</span><span class="w"> </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;other_measure_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;meas&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="p">]}}</span>
+</pre></div>
+</div>
+<p>and <em>json</em> format with the following structure:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.39528385768119634</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;measure&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;memory&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">]}],</span><span class="w"> </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;q&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]},</span><span class="w"> </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;other_measure_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;meas&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="p">]}}</span>
+</pre></div>
+</div>
+</section>
+<section id="qdrop-command">
+<h3>3. <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command<a class="headerlink" href="#qdrop-command" title="Link to this heading"></a></h3>
+<p>Once the work is finished, the raised QPUs should be dropped in order to not monopolize computational resources.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command can be used to drop all the QPUs raised with a single <code class="docutils literal notranslate"><span class="pre">qraise</span></code> by passing the corresponding qraise <code class="docutils literal notranslate"><span class="pre">SLURM_JOB_ID</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qdrop SLURM_JOB_ID</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">SLURM_JOB_ID</span></code> can be obtained, for instance, executing the <code class="docutils literal notranslate"><span class="pre">squeue</span></code> command.</p>
+<p>To drop all the raised QPUs, just execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qdrop --all</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to CUNQA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.html" class="btn btn-neutral float-right" title="CUNQA Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

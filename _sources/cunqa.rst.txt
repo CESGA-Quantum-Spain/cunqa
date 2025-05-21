@@ -1,18 +1,8 @@
-CUNQA Submodules
+CUNQA Package
 ===================
 .. autosummary::
+   :toctree: _autosummary
+   :template: custom-module-template.rst
    :recursive:
-   :toctree: generated
 
-   cunqa.qpu 
-   cunqa.qjob
-   cunqa.mappers
-   cunqa.transpile
-   cunqa.circuit 
-   cunqa.backend
-   
-   
-   
-
-   
-   
+   cunqa

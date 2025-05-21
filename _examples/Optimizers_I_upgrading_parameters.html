@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples for optimizations &mdash; CUNQA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Paralelization for gradient-free optimizers: Differential Evolution" href="Optimizers_II_mapping.html" />
+    <link rel="prev" title="Example for execution of multiple circuits in QPUs" href="Multiple_circuits_execution.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CUNQA
+              <img src="../_static/logo_cesga_blanco.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#clone-repository">Clone repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qmio">QMIO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#automatic-installation">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#manual-installation">Manual installation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#finisterrae-iii-ft3">Finisterrae III (FT3)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#id1">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#id2">Manual installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#run-your-first-distributed-program">Run your first distributed program</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qraise-command">1. <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#python-program-example">2. Python Program Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qdrop-command">3. <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa.html">CUNQA Package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples_gallery.html">Examples gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Importing-and-adding-paths-to-sys.path">Importing and adding paths to <code class="docutils literal notranslate"><span class="pre">sys.path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-get-the-QPUs-that-we-q-raised!">Let’s get the QPUs that we q-raised!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-create-a-circuit-to-run-in-our-QPUs!">Let’s create a circuit to run in our QPUs!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Execution-time!-Let's-do-it-sequentially">Execution time! Let’s do it sequentially</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Cool-isn't-it?-But-this-circuit-is-too-simple,-let's-try-with-a-more-complex-one!">Cool isn’t it? But this circuit is too simple, let’s try with a more complex one!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#This-circuit-has-15-qubits-and-10-intermidiate-measurements,-let's-run-it-in-AerSimulator">This circuit has 15 qubits and 10 intermidiate measurements, let’s run it in AerSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Takes-much-longer-...-let's-parallelize-n-executions-in-n-different-QPUs">Takes much longer … let’s parallelize n executions in n different QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples for optimizations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Simply-using-the-QPU.run()-method">Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Using-QJob.upgrade_parameters()">Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html">Paralelization for gradient-free optimizers: Differential Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_II_mapping.html#QJobMapper">QJobMapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_II_mapping.html#QPUCircuitMapper">QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html#Paralelization-of-expectation-value-terms">Paralelization of expectation value terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_II_mapping.html#Paralelization-for-gradient-optimizers">Paralelization for gradient optimizers</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples_gallery.html">Examples gallery</a></li>
+      <li class="breadcrumb-item active">Examples for optimizations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_examples/Optimizers_I_upgrading_parameters.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># path to access c++ files</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+QPU 0, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+QPU 1, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+QPU 2, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+</pre></div></div>
+</div>
+<section id="Examples-for-optimizations">
+<h1>Examples for optimizations<a class="headerlink" href="#Examples-for-optimizations" title="Link to this heading"></a></h1>
+<p>Before sending a circuit to the QClient, a transpilation process occurs (if not, it is done by the user). This process, in some cases, can take much time and resources, in addition to the sending cost itself. If we were to execute a single circuit once, it shouldn´t be a big problem, but it is when it comes to variational algorithms.</p>
+<p>This quantum-classical algorithms require several executions of the same circuit but changing the value of the parameters, which are optimized in the classical part. In order to optimize this, we developed a functionallity that allows the user to upgrade the circuit parameters with no extra transpilations of the circuit, sending to the <code class="docutils literal notranslate"><span class="pre">QClient</span></code> the list of the parameters <strong>ONLY</strong>. This is of much advantage to speed up the computation in the cases in which transpilation takes a significant
+part of the total time of the simulation.</p>
+<p>Let´s see how to work with this feature taking as an example a <em>Variational Quantum Algorithm</em> for state preparation.</p>
+<p>We start from a <em>Hardware Efficient Ansatz</em> to build our parametrized circuit:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameter</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">):</span>
+    <span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+    <span class="n">param_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;phi_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">lam</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;lam_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+        <span class="n">param_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">qubit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">qc</span>
+</pre></div>
+</div>
+</div>
+<p>The we need a cost function. We will define a target distribution and measure how far we are from it. We choose to prepare a normal distribution among all the <span class="math notranslate nohighlight">\(2^n\)</span> possible outcomes of the circuit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+    <span class="c1"># Define a normal distribution over the states</span>
+    <span class="n">num_states</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">num_qubits</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_states</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">std_dev</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">4</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std_dev</span><span class="p">)</span>
+    <span class="n">target_probs</span> <span class="o">/=</span> <span class="n">target_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Normalize to make it a valid probability distribution</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="p">{</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;0</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s1">b&#39;</span><span class="p">):</span> <span class="n">target_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_states</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">target_dist</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">norm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">):</span>
+    <span class="c1"># Convert counts to probabilities</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">pdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;counts&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;counts&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_shots</span>
+
+    <span class="c1"># Create a dictionary for the obtained distribution</span>
+    <span class="n">obtained_dist</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">)[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="c1"># Ensure all states are present in the obtained distribution</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">target_dist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obtained_dist</span><span class="p">:</span>
+            <span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Convert distributions to lists for KL divergence calculation</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">target_dist</span><span class="p">)]</span>
+    <span class="n">obtained_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obtained_dist</span><span class="p">)]</span>
+
+    <span class="c1"># Calculate KL divergence</span>
+    <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">obtained_probs</span><span class="p">,</span> <span class="n">target_probs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kl_divergence</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">num_layers</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">n_shots</span> <span class="o">=</span> <span class="mf">1e5</span>
+</pre></div>
+</div>
+</div>
+<section id="Simply-using-the-QPU.run()-method">
+<h2>Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method<a class="headerlink" href="#Simply-using-the-QPU.run()-method" title="Link to this heading"></a></h2>
+<p>At first we should try the intiutive alternative: upgrading parameters at the QClient, transpiling and sending the whole circuit to the QPU.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function_run</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="n">n_shots</span> <span class="o">=</span> <span class="mf">1e5</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+
+    <span class="n">circuit</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">transpile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">opt_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="n">n_shots</span><span class="p">)</span><span class="o">.</span><span class="n">result</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Our cost function updates the parameters given by the optimizer, asigns them to the ansatz and sends the circuit with the transpilation option set <code class="docutils literal notranslate"><span class="pre">True</span></code>. Let´s choose a QPU to work with and go ahead with the optimization:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+
+<span class="n">num_parameters</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">num_parameters</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">cost_run</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">individuals_run</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">i</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">cost_function_run</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">individuals_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">cost_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">20</span> == 0:
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: f(x) = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">optimization_result_run</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">cost_function_run</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;COBYLA&#39;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># Print info at the end</span>
+        <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">4000</span>   <span class="c1"># Limit the number of iterations</span>
+    <span class="p">})</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">time_run</span> <span class="o">=</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total optimization time: &quot;</span><span class="p">,</span> <span class="n">time_run</span><span class="p">,</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Iteration step 0: f(x) = 5.644885693319627
+Iteration step 20: f(x) = 3.2489683099416027
+Iteration step 40: f(x) = 0.700518505677799
+Iteration step 60: f(x) = 0.5086090832144972
+Iteration step 80: f(x) = 0.43838720938090936
+Iteration step 100: f(x) = 0.3712628503801477
+Iteration step 120: f(x) = 0.26705681526906927
+Iteration step 140: f(x) = 0.19667531489860712
+Iteration step 160: f(x) = 0.1557449733702997
+Iteration step 180: f(x) = 0.12627009394865418
+Iteration step 200: f(x) = 0.09875260103360035
+Iteration step 220: f(x) = 0.0796950348124891
+Iteration step 240: f(x) = 0.08664296063303309
+Iteration step 260: f(x) = 0.07786113607509895
+Iteration step 280: f(x) = 0.07138004921940413
+Iteration step 300: f(x) = 0.06928285629833203
+Iteration step 320: f(x) = 0.06625305423998329
+Iteration step 340: f(x) = 0.06791448821860378
+Iteration step 360: f(x) = 0.06584292813374018
+Iteration step 380: f(x) = 0.06878749095657292
+
+   Normal return from subroutine COBYLA
+
+   NFVALS =  391   F = 6.630927E-02    MAXCV = 0.000000E+00
+   X = 2.483621E-01  -4.507945E-01   4.142488E-02   1.693378E-01   9.101863E-01
+       7.824475E-02   2.095159E-01   3.357104E-01  -1.846450E-01   5.492609E-01
+       6.121254E-01   5.378724E-01   6.303580E-01  -2.833794E-01  -9.201173E-02
+       4.659155E-01   2.156028E-01  -1.392999E+00   8.187967E-02   4.551563E-01
+       1.093445E+00   5.679521E-01   1.143250E+00   6.251608E-01   1.570452E+00
+      -3.110023E-01   7.930667E-01  -3.996242E-01   8.965306E-01  -1.083956E-01
+      -4.277121E-01   1.343497E+00  -7.796074E-02   1.690255E+00  -1.356059E-01
+       1.691876E+00
+
+Total optimization time:  28.403029203414917  s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost_run</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (run())&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plt.savefig(f&quot;optimization_run_n_{num_qubits}_p_{num_parameters}.png&quot;, dpi=200)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_14_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_14_0.png" />
+</div>
+</div>
+</section>
+<section id="Using-QJob.upgrade_parameters()">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code><a class="headerlink" href="#Using-QJob.upgrade_parameters()" title="Link to this heading"></a></h2>
+<p>The first step now is to create the <code class="docutils literal notranslate"><span class="pre">qjob.QJob</span></code> object that which parameters we are going to upgrade in each step of the optimization; for that, we must run a circuit with initial parameters in a QPU, the procedure is as we explained above:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+
+<span class="n">num_parameters</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">num_parameters</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="n">circuit</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">transpile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">opt_level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="n">n_shots</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now that we have sent to the virtual QPU the transpiled circuit, we can use the method <code class="docutils literal notranslate"><span class="pre">qjob.QJob.upgrade_parameters()</span></code> to change the rotations of the gates:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result with initial_parameters: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+<span class="n">random_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num_parameters</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">random_parameters</span><span class="p">)</span>
+<span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">(</span><span class="n">random_parameters</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result with random_parameters: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Result with initial_parameters:
+{&#39;000000&#39;: 100000}
+[4.800769084169513, 1.2169894739610545, 4.308700639089514, 0.53228562699461, 4.572801942653737, 4.101667458095368, 1.085851890521249, 1.985892017022019, 4.0998922550688555, 2.6840994154719735, 2.9905197241774086, 2.9828536502963163, 2.193155663585044, 0.5546078957132934, 4.238713832258263, 5.409654114813467, 1.6005697271722092, 0.7034015057004601, 4.371946879506468, 1.264525265909713, 4.220949121372601, 3.541658508539978, 6.122463529488255, 1.4360914785130126, 1.2467862938893313, 1.1552122896705421, 1.7255569300107159, 1.4221512402804461, 3.6973504071781655, 5.528075365251304, 0.3505244857885771, 1.8120744822423005, 0.9420785391076939, 2.6013685195652054, 5.262298544374022, 3.4664558110869947]
+
+Result with random_parameters:
+{&#39;000000&#39;: 230, &#39;000001&#39;: 1221, &#39;000010&#39;: 57, &#39;000011&#39;: 963, &#39;000100&#39;: 1478, &#39;000101&#39;: 2214, &#39;000110&#39;: 2206, &#39;000111&#39;: 126, &#39;001000&#39;: 1082, &#39;001001&#39;: 247, &#39;001010&#39;: 265, &#39;001011&#39;: 1762, &#39;001100&#39;: 600, &#39;001101&#39;: 235, &#39;001110&#39;: 3517, &#39;001111&#39;: 2204, &#39;010000&#39;: 2878, &#39;010001&#39;: 1813, &#39;010010&#39;: 787, &#39;010011&#39;: 2882, &#39;010100&#39;: 689, &#39;010101&#39;: 2055, &#39;010110&#39;: 464, &#39;010111&#39;: 1664, &#39;011000&#39;: 466, &#39;011001&#39;: 637, &#39;011010&#39;: 194, &#39;011011&#39;: 4234, &#39;011100&#39;: 2381, &#39;011101&#39;: 5051, &#39;011110&#39;: 676, &#39;011111&#39;: 1441, &#39;100000&#39;: 1450, &#39;100001&#39;: 721, &#39;100010&#39;: 765, &#39;100011&#39;: 3636, &#39;100100&#39;: 1742, &#39;100101&#39;: 5417, &#39;100110&#39;: 609, &#39;100111&#39;: 2073, &#39;101000&#39;: 1626, &#39;101001&#39;: 323, &#39;101010&#39;: 120, &#39;101011&#39;: 1520, &#39;101100&#39;: 360, &#39;101101&#39;: 4173, &#39;101110&#39;: 1745, &#39;101111&#39;: 517, &#39;110000&#39;: 2991, &#39;110001&#39;: 3656, &#39;110010&#39;: 116, &#39;110011&#39;: 202, &#39;110100&#39;: 1315, &#39;110101&#39;: 2523, &#39;110110&#39;: 227, &#39;110111&#39;: 904, &#39;111000&#39;: 4230, &#39;111001&#39;: 2280, &#39;111010&#39;: 333, &#39;111011&#39;: 1481, &#39;111100&#39;: 111, &#39;111101&#39;: 1333, &#39;111110&#39;: 1267, &#39;111111&#39;: 3515}
+</pre></div></div>
+</div>
+<p><strong>Important considerations:</strong></p>
+<ul class="simple">
+<li><p>The method acepts parameters in a <code class="docutils literal notranslate"><span class="pre">list</span></code>, if you have a <code class="docutils literal notranslate"><span class="pre">numpy.array</span></code>, simply apply <code class="docutils literal notranslate"><span class="pre">.tolist()</span></code> to transform it.</p></li>
+<li><p>When sending the circuit and setting <code class="docutils literal notranslate"><span class="pre">transpile=True</span></code>, we should be carefull that the transpilation process doesn’t condense gates and combine parameters, therefore, if the user wants <code class="docutils literal notranslate"><span class="pre">cunqa</span></code>to transpile, they must set <code class="docutils literal notranslate"><span class="pre">opt_level=0</span></code>.</p></li>
+</ul>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">qjob.QJob.upgrade_parameters()</span></code> is a non-blocking call, as it was <code class="docutils literal notranslate"><span class="pre">qpu.QPU.run()</span></code>.</p>
+<p>Now that we are familiar with the procedure, we can design a cost funtion that takes a set of parameters, upgrades the <code class="docutils literal notranslate"><span class="pre">qjob.QJob</span></code>, gets the result and calculates the divergence from the desired distribution:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="n">n_shots</span> <span class="o">=</span> <span class="mi">100000</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+
+    <span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now we are ready to start our optimization. We will use <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> to minimize the divergence of our result distribution from the target one:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">i</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">cost_function</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">cost</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">10</span> == 0:
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: f(x) = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">optimization_result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;COBYLA&#39;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># Print info during iterations</span>
+        <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">4000</span>     <span class="c1"># Limit the number of iterations</span>
+    <span class="p">})</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">time_up</span> <span class="o">=</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total optimization time: &quot;</span><span class="p">,</span> <span class="n">time_up</span><span class="p">,</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Iteration step 0: f(x) = 4.808127828547751
+Iteration step 10: f(x) = 3.2277447214466535
+Iteration step 20: f(x) = 1.4546159328320607
+Iteration step 30: f(x) = 0.8280370465217498
+Iteration step 40: f(x) = 0.7268863480351391
+Iteration step 50: f(x) = 0.6002777280561791
+Iteration step 60: f(x) = 0.6310585988580937
+Iteration step 70: f(x) = 0.531624604820937
+Iteration step 80: f(x) = 0.49413409044044915
+Iteration step 90: f(x) = 0.28276705189385987
+Iteration step 100: f(x) = 0.28315153947896776
+Iteration step 110: f(x) = 0.20441926998831558
+Iteration step 120: f(x) = 0.20818472830794493
+Iteration step 130: f(x) = 0.20255824135914952
+Iteration step 140: f(x) = 0.17140823564605984
+Iteration step 150: f(x) = 0.17354475356274046
+Iteration step 160: f(x) = 0.15458380797622073
+Iteration step 170: f(x) = 0.1711286646144804
+Iteration step 180: f(x) = 0.18543970743296512
+Iteration step 190: f(x) = 0.13357890094906225
+Iteration step 200: f(x) = 0.12809092212518816
+Iteration step 210: f(x) = 0.12599209681896256
+Iteration step 220: f(x) = 0.10140538835702381
+Iteration step 230: f(x) = 0.059547306164707076
+Iteration step 240: f(x) = 0.04761332250259291
+Iteration step 250: f(x) = 0.05008134672726648
+Iteration step 260: f(x) = 0.053307487225548414
+Iteration step 270: f(x) = 0.0460627777766594
+Iteration step 280: f(x) = 0.0412203148752551
+Iteration step 290: f(x) = 0.02949268274755688
+Iteration step 300: f(x) = 0.029702041986933683
+Iteration step 310: f(x) = 0.029368454456454612
+Iteration step 320: f(x) = 0.020242468782134097
+Iteration step 330: f(x) = 0.022896600154442524
+Iteration step 340: f(x) = 0.02440388389920066
+Iteration step 350: f(x) = 0.02136227945999611
+Iteration step 360: f(x) = 0.01699669415502308
+Iteration step 370: f(x) = 0.015584717555711291
+Iteration step 380: f(x) = 0.014365914175310331
+Iteration step 390: f(x) = 0.013330609474756292
+Iteration step 400: f(x) = 0.013018092381938575
+Iteration step 410: f(x) = 0.011943676000667106
+Iteration step 420: f(x) = 0.012111982447111237
+Iteration step 430: f(x) = 0.011964575772810473
+Iteration step 440: f(x) = 0.012022413597904028
+Iteration step 450: f(x) = 0.011539412823483365
+Iteration step 460: f(x) = 0.011866703502954939
+
+   Normal return from subroutine COBYLA
+
+   NFVALS =  468   F = 1.154528E-02    MAXCV = 0.000000E+00
+   X = 1.445694E+00   4.761625E-01   1.406031E+00   1.517224E+00  -4.462020E-01
+       4.634130E-01   8.257513E-01   1.322178E+00   1.593436E+00  -6.847369E-02
+      -1.637136E-01   3.511552E-01   1.616953E+00  -2.493556E-01   1.420238E+00
+       8.484528E-01   7.009079E-01  -1.572803E-01   1.875096E+00  -1.109267E+00
+       1.233791E+00   2.716658E-01   1.541790E+00   2.519028E-01   1.469977E+00
+       9.737024E-01   1.623521E+00   7.760460E-01  -3.942303E-01  -5.036106E-01
+       2.973732E-01   7.718844E-01  -3.806809E-01   3.187416E-01   5.901928E-01
+      -8.671375E-01
+
+Total optimization time:  29.011065244674683  s
+</pre></div></div>
+</div>
+<p>We can plot the evolution of the cost function during the optimization:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (upgrade_params())&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">),</span> <span class="n">cost_run</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (run())&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">optimization_result_run</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">optimization_result</span><span class="o">.</span><span class="n">nfev</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plt.savefig(f&quot;optimization_n_{num_qubits}_p_{num_parameters}.png&quot;, dpi=200)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_26_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_26_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Multiple_circuits_execution.html" class="btn btn-neutral float-left" title="Example for execution of multiple circuits in QPUs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Optimizers_II_mapping.html" class="btn btn-neutral float-right" title="Paralelization for gradient-free optimizers: Differential Evolution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,2512 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paralelization for gradient-free optimizers: Differential Evolution &mdash; CUNQA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Examples for optimizations" href="Optimizers_I_upgrading_parameters.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CUNQA
+              <img src="../_static/logo_cesga_blanco.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#clone-repository">Clone repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qmio">QMIO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#automatic-installation">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#manual-installation">Manual installation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#finisterrae-iii-ft3">Finisterrae III (FT3)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#id1">Automatic installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started.html#id2">Manual installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#run-your-first-distributed-program">Run your first distributed program</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qraise-command">1. <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#python-program-example">2. Python Program Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qdrop-command">3. <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa.html">CUNQA Package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples_gallery.html">Examples gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Importing-and-adding-paths-to-sys.path">Importing and adding paths to <code class="docutils literal notranslate"><span class="pre">sys.path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-get-the-QPUs-that-we-q-raised!">Let’s get the QPUs that we q-raised!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-create-a-circuit-to-run-in-our-QPUs!">Let’s create a circuit to run in our QPUs!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Execution-time!-Let's-do-it-sequentially">Execution time! Let’s do it sequentially</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Cool-isn't-it?-But-this-circuit-is-too-simple,-let's-try-with-a-more-complex-one!">Cool isn’t it? But this circuit is too simple, let’s try with a more complex one!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#This-circuit-has-15-qubits-and-10-intermidiate-measurements,-let's-run-it-in-AerSimulator">This circuit has 15 qubits and 10 intermidiate measurements, let’s run it in AerSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Takes-much-longer-...-let's-parallelize-n-executions-in-n-different-QPUs">Takes much longer … let’s parallelize n executions in n different QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html">Examples for optimizations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html#Simply-using-the-QPU.run()-method">Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html#Using-QJob.upgrade_parameters()">Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Paralelization for gradient-free optimizers: Differential Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#QJobMapper">QJobMapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#QPUCircuitMapper">QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Paralelization-of-expectation-value-terms">Paralelization of expectation value terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Paralelization-for-gradient-optimizers">Paralelization for gradient optimizers</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples_gallery.html">Examples gallery</a></li>
+      <li class="breadcrumb-item active">Paralelization for gradient-free optimizers: Differential Evolution</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_examples/Optimizers_II_mapping.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="c1"># path to access c++ files</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+QPU 0, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+QPU 1, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+QPU 2, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+</pre></div></div>
+</div>
+<section id="Paralelization-for-gradient-free-optimizers:-Differential-Evolution">
+<h1>Paralelization for gradient-free optimizers: Differential Evolution<a class="headerlink" href="#Paralelization-for-gradient-free-optimizers:-Differential-Evolution" title="Link to this heading"></a></h1>
+<p>#TODO: <em>Introduction and explanation</em></p>
+<p>We recover the variational circuit used before:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameter</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">):</span>
+    <span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+    <span class="n">param_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;phi_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">lam</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;lam_</span><span class="si">{</span><span class="n">param_idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+        <span class="n">param_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">qubit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">qc</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+    <span class="c1"># Define a normal distribution over the states</span>
+    <span class="n">num_states</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">num_qubits</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_states</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">std_dev</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">4</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std_dev</span><span class="p">)</span>
+    <span class="n">target_probs</span> <span class="o">/=</span> <span class="n">target_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Normalize to make it a valid probability distribution</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="p">{</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;0</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s1">b&#39;</span><span class="p">):</span> <span class="n">target_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_states</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">target_dist</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">norm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">):</span>
+    <span class="c1"># Convert counts to probabilities</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">pdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;counts&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;counts&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_shots</span>
+
+    <span class="c1"># Create a dictionary for the obtained distribution</span>
+    <span class="n">obtained_dist</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">)[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="c1"># Ensure all states are present in the obtained distribution</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">target_dist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obtained_dist</span><span class="p">:</span>
+            <span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Convert distributions to lists for KL divergence calculation</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">target_dist</span><span class="p">)]</span>
+    <span class="n">obtained_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obtained_dist</span><span class="p">)]</span>
+
+    <span class="c1"># Calculate KL divergence</span>
+    <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">obtained_probs</span><span class="p">,</span> <span class="n">target_probs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kl_divergence</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">num_layers</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">n_shots</span> <span class="o">=</span> <span class="mi">999</span>
+
+<span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+
+    <span class="k">global</span> <span class="n">target_dist</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+
+<span class="n">num_parameters</span> <span class="o">=</span> <span class="n">ansatz</span><span class="o">.</span><span class="n">num_parameters</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+
+<span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+36
+</pre></div></div>
+</div>
+<section id="QJobMapper">
+<h2>QJobMapper<a class="headerlink" href="#QJobMapper" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">init_qjobs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">init_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_parameters</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">num_parameters</span><span class="p">):</span><span class="c1"># we set pop=1 as the population size is pop*num_parameters</span>
+    <span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="n">i</span><span class="o">%</span><span class="k">len</span>(qpus)]# we select the qpu
+    <span class="n">init_qjobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">init_params</span><span class="p">),</span> <span class="n">transpile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">n_shots</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">QJobMapper</span>
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">init_qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">total_pop</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">num_parameters</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_pop</span><span class="p">):</span>
+    <span class="n">initial_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num_parameters</span><span class="p">)</span>
+    <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_point</span><span class="p">)</span>
+
+<span class="n">bounds</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">num_parameters</span><span class="p">):</span>
+    <span class="n">bounds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounds:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial population:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">))</span>
+
+<span class="n">best_individual</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span><span class="n">convergence</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    <span class="n">best_individual</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="p">[</span><span class="n">xk</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">differential_evolution</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">updating</span><span class="o">=</span><span class="s1">&#39;deferred&#39;</span><span class="p">,</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;best1bin&#39;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">pop</span><span class="p">,</span> <span class="n">polish</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time:&quot;</span><span class="p">,</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Bounds: 36
+Initial population: 36
+differential_evolution step 1: f(x)= 0.4295568558810298
+differential_evolution step 2: f(x)= 0.4295568558810298
+differential_evolution step 3: f(x)= 0.3326150363348188
+differential_evolution step 4: f(x)= 0.2925710401822603
+differential_evolution step 5: f(x)= 0.2925710401822603
+differential_evolution step 6: f(x)= 0.2925710401822603
+differential_evolution step 7: f(x)= 0.2925710401822603
+differential_evolution step 8: f(x)= 0.2925710401822603
+differential_evolution step 9: f(x)= 0.2925710401822603
+differential_evolution step 10: f(x)= 0.2925710401822603
+differential_evolution step 11: f(x)= 0.2925710401822603
+differential_evolution step 12: f(x)= 0.2925710401822603
+differential_evolution step 13: f(x)= 0.2925710401822603
+differential_evolution step 14: f(x)= 0.2925710401822603
+differential_evolution step 15: f(x)= 0.2925710401822603
+differential_evolution step 16: f(x)= 0.2925710401822603
+differential_evolution step 17: f(x)= 0.2925710401822603
+differential_evolution step 18: f(x)= 0.27957904933544764
+differential_evolution step 19: f(x)= 0.27957904933544764
+differential_evolution step 20: f(x)= 0.27957904933544764
+differential_evolution step 21: f(x)= 0.27957904933544764
+differential_evolution step 22: f(x)= 0.27957904933544764
+differential_evolution step 23: f(x)= 0.27957904933544764
+differential_evolution step 24: f(x)= 0.27957904933544764
+differential_evolution step 25: f(x)= 0.27957904933544764
+differential_evolution step 26: f(x)= 0.27957904933544764
+differential_evolution step 27: f(x)= 0.27957904933544764
+differential_evolution step 28: f(x)= 0.27957904933544764
+differential_evolution step 29: f(x)= 0.27957904933544764
+differential_evolution step 30: f(x)= 0.27957904933544764
+differential_evolution step 31: f(x)= 0.27957904933544764
+differential_evolution step 32: f(x)= 0.27957904933544764
+differential_evolution step 33: f(x)= 0.27957904933544764
+differential_evolution step 34: f(x)= 0.27957904933544764
+differential_evolution step 35: f(x)= 0.27957904933544764
+differential_evolution step 36: f(x)= 0.27957904933544764
+differential_evolution step 37: f(x)= 0.27957904933544764
+differential_evolution step 38: f(x)= 0.27957904933544764
+differential_evolution step 39: f(x)= 0.27957904933544764
+differential_evolution step 40: f(x)= 0.27957904933544764
+differential_evolution step 41: f(x)= 0.27957904933544764
+differential_evolution step 42: f(x)= 0.27957904933544764
+differential_evolution step 43: f(x)= 0.27957904933544764
+differential_evolution step 44: f(x)= 0.27957904933544764
+differential_evolution step 45: f(x)= 0.27957904933544764
+differential_evolution step 46: f(x)= 0.27957904933544764
+differential_evolution step 47: f(x)= 0.27957904933544764
+differential_evolution step 48: f(x)= 0.27957904933544764
+differential_evolution step 49: f(x)= 0.27957904933544764
+differential_evolution step 50: f(x)= 0.27957904933544764
+differential_evolution step 51: f(x)= 0.27957904933544764
+differential_evolution step 52: f(x)= 0.27957904933544764
+differential_evolution step 53: f(x)= 0.27957904933544764
+differential_evolution step 54: f(x)= 0.27957904933544764
+differential_evolution step 55: f(x)= 0.27957904933544764
+differential_evolution step 56: f(x)= 0.27957904933544764
+differential_evolution step 57: f(x)= 0.27957904933544764
+differential_evolution step 58: f(x)= 0.27957904933544764
+differential_evolution step 59: f(x)= 0.27957904933544764
+differential_evolution step 60: f(x)= 0.27957904933544764
+differential_evolution step 61: f(x)= 0.27957904933544764
+differential_evolution step 62: f(x)= 0.27957904933544764
+differential_evolution step 63: f(x)= 0.27957904933544764
+differential_evolution step 64: f(x)= 0.27957904933544764
+differential_evolution step 65: f(x)= 0.27957904933544764
+differential_evolution step 66: f(x)= 0.27957904933544764
+differential_evolution step 67: f(x)= 0.27957904933544764
+differential_evolution step 68: f(x)= 0.27957904933544764
+differential_evolution step 69: f(x)= 0.27957904933544764
+differential_evolution step 70: f(x)= 0.27957904933544764
+differential_evolution step 71: f(x)= 0.27957904933544764
+differential_evolution step 72: f(x)= 0.27957904933544764
+differential_evolution step 73: f(x)= 0.27957904933544764
+differential_evolution step 74: f(x)= 0.27957904933544764
+differential_evolution step 75: f(x)= 0.27957904933544764
+differential_evolution step 76: f(x)= 0.27957904933544764
+differential_evolution step 77: f(x)= 0.27957904933544764
+differential_evolution step 78: f(x)= 0.27957904933544764
+differential_evolution step 79: f(x)= 0.27957904933544764
+differential_evolution step 80: f(x)= 0.27957904933544764
+differential_evolution step 81: f(x)= 0.27957904933544764
+differential_evolution step 82: f(x)= 0.27957904933544764
+differential_evolution step 83: f(x)= 0.27957904933544764
+differential_evolution step 84: f(x)= 0.27957904933544764
+differential_evolution step 85: f(x)= 0.27957904933544764
+differential_evolution step 86: f(x)= 0.27957904933544764
+differential_evolution step 87: f(x)= 0.27957904933544764
+differential_evolution step 88: f(x)= 0.27957904933544764
+differential_evolution step 89: f(x)= 0.27957904933544764
+differential_evolution step 90: f(x)= 0.27957904933544764
+differential_evolution step 91: f(x)= 0.27957904933544764
+differential_evolution step 92: f(x)= 0.27957904933544764
+differential_evolution step 93: f(x)= 0.27957904933544764
+differential_evolution step 94: f(x)= 0.27957904933544764
+differential_evolution step 95: f(x)= 0.27957904933544764
+differential_evolution step 96: f(x)= 0.27957904933544764
+differential_evolution step 97: f(x)= 0.27957904933544764
+differential_evolution step 98: f(x)= 0.27957904933544764
+differential_evolution step 99: f(x)= 0.27957904933544764
+differential_evolution step 100: f(x)= 0.27957904933544764
+differential_evolution step 101: f(x)= 0.27957904933544764
+differential_evolution step 102: f(x)= 0.27957904933544764
+differential_evolution step 103: f(x)= 0.27957904933544764
+differential_evolution step 104: f(x)= 0.27957904933544764
+differential_evolution step 105: f(x)= 0.27957904933544764
+differential_evolution step 106: f(x)= 0.27957904933544764
+differential_evolution step 107: f(x)= 0.27957904933544764
+differential_evolution step 108: f(x)= 0.27957904933544764
+differential_evolution step 109: f(x)= 0.27957904933544764
+differential_evolution step 110: f(x)= 0.27957904933544764
+differential_evolution step 111: f(x)= 0.27957904933544764
+differential_evolution step 112: f(x)= 0.27957904933544764
+differential_evolution step 113: f(x)= 0.27957904933544764
+differential_evolution step 114: f(x)= 0.27957904933544764
+differential_evolution step 115: f(x)= 0.27957904933544764
+differential_evolution step 116: f(x)= 0.27957904933544764
+differential_evolution step 117: f(x)= 0.27957904933544764
+differential_evolution step 118: f(x)= 0.27957904933544764
+differential_evolution step 119: f(x)= 0.27957904933544764
+differential_evolution step 120: f(x)= 0.27957904933544764
+differential_evolution step 121: f(x)= 0.27957904933544764
+differential_evolution step 122: f(x)= 0.27957904933544764
+differential_evolution step 123: f(x)= 0.27957904933544764
+differential_evolution step 124: f(x)= 0.27957904933544764
+differential_evolution step 125: f(x)= 0.27957904933544764
+differential_evolution step 126: f(x)= 0.27957904933544764
+differential_evolution step 127: f(x)= 0.27957904933544764
+differential_evolution step 128: f(x)= 0.27957904933544764
+differential_evolution step 129: f(x)= 0.27957904933544764
+differential_evolution step 130: f(x)= 0.27957904933544764
+differential_evolution step 131: f(x)= 0.27957904933544764
+differential_evolution step 132: f(x)= 0.27957904933544764
+differential_evolution step 133: f(x)= 0.27957904933544764
+differential_evolution step 134: f(x)= 0.27957904933544764
+differential_evolution step 135: f(x)= 0.27957904933544764
+differential_evolution step 136: f(x)= 0.27957904933544764
+differential_evolution step 137: f(x)= 0.27957904933544764
+differential_evolution step 138: f(x)= 0.27957904933544764
+differential_evolution step 139: f(x)= 0.27957904933544764
+differential_evolution step 140: f(x)= 0.27957904933544764
+differential_evolution step 141: f(x)= 0.27957904933544764
+differential_evolution step 142: f(x)= 0.27957904933544764
+differential_evolution step 143: f(x)= 0.27957904933544764
+differential_evolution step 144: f(x)= 0.27957904933544764
+differential_evolution step 145: f(x)= 0.27957904933544764
+differential_evolution step 146: f(x)= 0.27957904933544764
+differential_evolution step 147: f(x)= 0.27957904933544764
+differential_evolution step 148: f(x)= 0.27957904933544764
+differential_evolution step 149: f(x)= 0.27957904933544764
+differential_evolution step 150: f(x)= 0.27957904933544764
+differential_evolution step 151: f(x)= 0.27957904933544764
+differential_evolution step 152: f(x)= 0.27957904933544764
+differential_evolution step 153: f(x)= 0.27957904933544764
+differential_evolution step 154: f(x)= 0.27957904933544764
+differential_evolution step 155: f(x)= 0.27957904933544764
+differential_evolution step 156: f(x)= 0.27957904933544764
+differential_evolution step 157: f(x)= 0.27957904933544764
+differential_evolution step 158: f(x)= 0.27957904933544764
+differential_evolution step 159: f(x)= 0.27957904933544764
+differential_evolution step 160: f(x)= 0.27957904933544764
+differential_evolution step 161: f(x)= 0.27957904933544764
+differential_evolution step 162: f(x)= 0.27957904933544764
+differential_evolution step 163: f(x)= 0.27957904933544764
+differential_evolution step 164: f(x)= 0.27957904933544764
+differential_evolution step 165: f(x)= 0.27957904933544764
+differential_evolution step 166: f(x)= 0.27957904933544764
+differential_evolution step 167: f(x)= 0.27957904933544764
+differential_evolution step 168: f(x)= 0.27957904933544764
+differential_evolution step 169: f(x)= 0.27957904933544764
+differential_evolution step 170: f(x)= 0.27957904933544764
+differential_evolution step 171: f(x)= 0.27957904933544764
+differential_evolution step 172: f(x)= 0.27957904933544764
+differential_evolution step 173: f(x)= 0.27957904933544764
+differential_evolution step 174: f(x)= 0.27957904933544764
+differential_evolution step 175: f(x)= 0.27957904933544764
+differential_evolution step 176: f(x)= 0.27957904933544764
+differential_evolution step 177: f(x)= 0.27957904933544764
+differential_evolution step 178: f(x)= 0.27957904933544764
+differential_evolution step 179: f(x)= 0.27957904933544764
+differential_evolution step 180: f(x)= 0.27957904933544764
+differential_evolution step 181: f(x)= 0.27957904933544764
+differential_evolution step 182: f(x)= 0.27957904933544764
+differential_evolution step 183: f(x)= 0.27957904933544764
+differential_evolution step 184: f(x)= 0.27957904933544764
+differential_evolution step 185: f(x)= 0.27957904933544764
+differential_evolution step 186: f(x)= 0.1940782830560342
+differential_evolution step 187: f(x)= 0.1940782830560342
+differential_evolution step 188: f(x)= 0.1940782830560342
+differential_evolution step 189: f(x)= 0.1940782830560342
+differential_evolution step 190: f(x)= 0.1940782830560342
+differential_evolution step 191: f(x)= 0.1940782830560342
+differential_evolution step 192: f(x)= 0.1940782830560342
+differential_evolution step 193: f(x)= 0.1940782830560342
+differential_evolution step 194: f(x)= 0.1940782830560342
+differential_evolution step 195: f(x)= 0.1940782830560342
+differential_evolution step 196: f(x)= 0.1940782830560342
+differential_evolution step 197: f(x)= 0.1940782830560342
+differential_evolution step 198: f(x)= 0.1940782830560342
+differential_evolution step 199: f(x)= 0.1940782830560342
+differential_evolution step 200: f(x)= 0.1940782830560342
+differential_evolution step 201: f(x)= 0.1940782830560342
+differential_evolution step 202: f(x)= 0.1940782830560342
+differential_evolution step 203: f(x)= 0.1940782830560342
+differential_evolution step 204: f(x)= 0.1940782830560342
+differential_evolution step 205: f(x)= 0.1940782830560342
+differential_evolution step 206: f(x)= 0.1940782830560342
+differential_evolution step 207: f(x)= 0.1940782830560342
+differential_evolution step 208: f(x)= 0.1940782830560342
+differential_evolution step 209: f(x)= 0.1940782830560342
+differential_evolution step 210: f(x)= 0.1940782830560342
+differential_evolution step 211: f(x)= 0.1940782830560342
+differential_evolution step 212: f(x)= 0.1940782830560342
+differential_evolution step 213: f(x)= 0.1940782830560342
+differential_evolution step 214: f(x)= 0.1940782830560342
+differential_evolution step 215: f(x)= 0.1940782830560342
+differential_evolution step 216: f(x)= 0.1940782830560342
+differential_evolution step 217: f(x)= 0.1940782830560342
+differential_evolution step 218: f(x)= 0.1940782830560342
+differential_evolution step 219: f(x)= 0.1940782830560342
+differential_evolution step 220: f(x)= 0.1940782830560342
+differential_evolution step 221: f(x)= 0.1940782830560342
+differential_evolution step 222: f(x)= 0.1940782830560342
+differential_evolution step 223: f(x)= 0.1940782830560342
+differential_evolution step 224: f(x)= 0.1940782830560342
+differential_evolution step 225: f(x)= 0.1940782830560342
+differential_evolution step 226: f(x)= 0.1940782830560342
+differential_evolution step 227: f(x)= 0.1940782830560342
+differential_evolution step 228: f(x)= 0.1940782830560342
+differential_evolution step 229: f(x)= 0.1940782830560342
+differential_evolution step 230: f(x)= 0.1940782830560342
+differential_evolution step 231: f(x)= 0.1940782830560342
+differential_evolution step 232: f(x)= 0.1940782830560342
+differential_evolution step 233: f(x)= 0.1940782830560342
+differential_evolution step 234: f(x)= 0.1940782830560342
+differential_evolution step 235: f(x)= 0.1940782830560342
+differential_evolution step 236: f(x)= 0.1940782830560342
+differential_evolution step 237: f(x)= 0.1940782830560342
+differential_evolution step 238: f(x)= 0.1940782830560342
+differential_evolution step 239: f(x)= 0.1940782830560342
+differential_evolution step 240: f(x)= 0.1940782830560342
+differential_evolution step 241: f(x)= 0.1940782830560342
+differential_evolution step 242: f(x)= 0.1940782830560342
+differential_evolution step 243: f(x)= 0.1940782830560342
+differential_evolution step 244: f(x)= 0.1940782830560342
+differential_evolution step 245: f(x)= 0.1940782830560342
+differential_evolution step 246: f(x)= 0.1940782830560342
+differential_evolution step 247: f(x)= 0.1940782830560342
+differential_evolution step 248: f(x)= 0.1940782830560342
+differential_evolution step 249: f(x)= 0.1940782830560342
+differential_evolution step 250: f(x)= 0.1940782830560342
+differential_evolution step 251: f(x)= 0.1940782830560342
+differential_evolution step 252: f(x)= 0.1940782830560342
+differential_evolution step 253: f(x)= 0.1940782830560342
+differential_evolution step 254: f(x)= 0.1940782830560342
+differential_evolution step 255: f(x)= 0.1940782830560342
+differential_evolution step 256: f(x)= 0.1940782830560342
+differential_evolution step 257: f(x)= 0.1940782830560342
+differential_evolution step 258: f(x)= 0.1940782830560342
+differential_evolution step 259: f(x)= 0.1940782830560342
+differential_evolution step 260: f(x)= 0.1940782830560342
+differential_evolution step 261: f(x)= 0.1940782830560342
+differential_evolution step 262: f(x)= 0.1940782830560342
+differential_evolution step 263: f(x)= 0.1940782830560342
+differential_evolution step 264: f(x)= 0.1940782830560342
+differential_evolution step 265: f(x)= 0.1940782830560342
+differential_evolution step 266: f(x)= 0.1940782830560342
+differential_evolution step 267: f(x)= 0.1940782830560342
+differential_evolution step 268: f(x)= 0.1940782830560342
+differential_evolution step 269: f(x)= 0.1940782830560342
+differential_evolution step 270: f(x)= 0.1940782830560342
+differential_evolution step 271: f(x)= 0.1940782830560342
+differential_evolution step 272: f(x)= 0.1940782830560342
+differential_evolution step 273: f(x)= 0.1940782830560342
+differential_evolution step 274: f(x)= 0.1940782830560342
+differential_evolution step 275: f(x)= 0.1940782830560342
+differential_evolution step 276: f(x)= 0.1940782830560342
+differential_evolution step 277: f(x)= 0.1940782830560342
+differential_evolution step 278: f(x)= 0.1940782830560342
+differential_evolution step 279: f(x)= 0.1940782830560342
+differential_evolution step 280: f(x)= 0.1940782830560342
+differential_evolution step 281: f(x)= 0.1940782830560342
+differential_evolution step 282: f(x)= 0.1940782830560342
+differential_evolution step 283: f(x)= 0.1940782830560342
+differential_evolution step 284: f(x)= 0.1940782830560342
+differential_evolution step 285: f(x)= 0.1940782830560342
+differential_evolution step 286: f(x)= 0.1940782830560342
+differential_evolution step 287: f(x)= 0.1940782830560342
+differential_evolution step 288: f(x)= 0.1940782830560342
+differential_evolution step 289: f(x)= 0.1940782830560342
+differential_evolution step 290: f(x)= 0.1940782830560342
+differential_evolution step 291: f(x)= 0.1940782830560342
+differential_evolution step 292: f(x)= 0.1940782830560342
+differential_evolution step 293: f(x)= 0.1940782830560342
+differential_evolution step 294: f(x)= 0.1940782830560342
+differential_evolution step 295: f(x)= 0.1940782830560342
+differential_evolution step 296: f(x)= 0.1940782830560342
+differential_evolution step 297: f(x)= 0.1940782830560342
+differential_evolution step 298: f(x)= 0.1940782830560342
+differential_evolution step 299: f(x)= 0.1940782830560342
+differential_evolution step 300: f(x)= 0.1940782830560342
+differential_evolution step 301: f(x)= 0.1940782830560342
+differential_evolution step 302: f(x)= 0.1940782830560342
+differential_evolution step 303: f(x)= 0.1940782830560342
+differential_evolution step 304: f(x)= 0.1940782830560342
+differential_evolution step 305: f(x)= 0.1940782830560342
+differential_evolution step 306: f(x)= 0.1940782830560342
+differential_evolution step 307: f(x)= 0.1940782830560342
+differential_evolution step 308: f(x)= 0.1940782830560342
+differential_evolution step 309: f(x)= 0.1940782830560342
+differential_evolution step 310: f(x)= 0.1940782830560342
+differential_evolution step 311: f(x)= 0.1940782830560342
+differential_evolution step 312: f(x)= 0.1940782830560342
+differential_evolution step 313: f(x)= 0.1940782830560342
+differential_evolution step 314: f(x)= 0.1940782830560342
+differential_evolution step 315: f(x)= 0.1940782830560342
+differential_evolution step 316: f(x)= 0.1940782830560342
+differential_evolution step 317: f(x)= 0.1940782830560342
+differential_evolution step 318: f(x)= 0.1940782830560342
+differential_evolution step 319: f(x)= 0.1940782830560342
+differential_evolution step 320: f(x)= 0.1940782830560342
+differential_evolution step 321: f(x)= 0.1940782830560342
+differential_evolution step 322: f(x)= 0.1940782830560342
+differential_evolution step 323: f(x)= 0.1940782830560342
+differential_evolution step 324: f(x)= 0.1940782830560342
+differential_evolution step 325: f(x)= 0.1940782830560342
+differential_evolution step 326: f(x)= 0.1940782830560342
+differential_evolution step 327: f(x)= 0.1940782830560342
+differential_evolution step 328: f(x)= 0.1940782830560342
+differential_evolution step 329: f(x)= 0.1940782830560342
+differential_evolution step 330: f(x)= 0.1940782830560342
+differential_evolution step 331: f(x)= 0.1940782830560342
+differential_evolution step 332: f(x)= 0.1940782830560342
+differential_evolution step 333: f(x)= 0.1940782830560342
+differential_evolution step 334: f(x)= 0.1940782830560342
+differential_evolution step 335: f(x)= 0.1940782830560342
+differential_evolution step 336: f(x)= 0.1940782830560342
+differential_evolution step 337: f(x)= 0.1940782830560342
+differential_evolution step 338: f(x)= 0.1940782830560342
+differential_evolution step 339: f(x)= 0.1940782830560342
+differential_evolution step 340: f(x)= 0.1940782830560342
+differential_evolution step 341: f(x)= 0.1940782830560342
+differential_evolution step 342: f(x)= 0.1940782830560342
+differential_evolution step 343: f(x)= 0.1940782830560342
+differential_evolution step 344: f(x)= 0.1940782830560342
+differential_evolution step 345: f(x)= 0.1940782830560342
+differential_evolution step 346: f(x)= 0.1940782830560342
+differential_evolution step 347: f(x)= 0.1940782830560342
+differential_evolution step 348: f(x)= 0.1940782830560342
+differential_evolution step 349: f(x)= 0.1940782830560342
+differential_evolution step 350: f(x)= 0.1940782830560342
+differential_evolution step 351: f(x)= 0.1940782830560342
+differential_evolution step 352: f(x)= 0.1940782830560342
+differential_evolution step 353: f(x)= 0.1940782830560342
+differential_evolution step 354: f(x)= 0.1940782830560342
+differential_evolution step 355: f(x)= 0.1940782830560342
+differential_evolution step 356: f(x)= 0.1940782830560342
+differential_evolution step 357: f(x)= 0.1940782830560342
+differential_evolution step 358: f(x)= 0.1940782830560342
+differential_evolution step 359: f(x)= 0.1940782830560342
+differential_evolution step 360: f(x)= 0.1940782830560342
+differential_evolution step 361: f(x)= 0.1940782830560342
+differential_evolution step 362: f(x)= 0.1940782830560342
+differential_evolution step 363: f(x)= 0.1940782830560342
+differential_evolution step 364: f(x)= 0.1940782830560342
+differential_evolution step 365: f(x)= 0.1940782830560342
+differential_evolution step 366: f(x)= 0.1940782830560342
+differential_evolution step 367: f(x)= 0.1940782830560342
+differential_evolution step 368: f(x)= 0.1940782830560342
+differential_evolution step 369: f(x)= 0.1940782830560342
+differential_evolution step 370: f(x)= 0.1940782830560342
+differential_evolution step 371: f(x)= 0.1940782830560342
+differential_evolution step 372: f(x)= 0.1940782830560342
+differential_evolution step 373: f(x)= 0.1940782830560342
+differential_evolution step 374: f(x)= 0.1940782830560342
+differential_evolution step 375: f(x)= 0.1940782830560342
+differential_evolution step 376: f(x)= 0.1940782830560342
+differential_evolution step 377: f(x)= 0.1940782830560342
+differential_evolution step 378: f(x)= 0.1940782830560342
+differential_evolution step 379: f(x)= 0.1940782830560342
+differential_evolution step 380: f(x)= 0.1940782830560342
+differential_evolution step 381: f(x)= 0.1940782830560342
+differential_evolution step 382: f(x)= 0.1940782830560342
+differential_evolution step 383: f(x)= 0.1940782830560342
+differential_evolution step 384: f(x)= 0.1940782830560342
+differential_evolution step 385: f(x)= 0.1940782830560342
+differential_evolution step 386: f(x)= 0.1940782830560342
+differential_evolution step 387: f(x)= 0.1940782830560342
+differential_evolution step 388: f(x)= 0.1940782830560342
+differential_evolution step 389: f(x)= 0.1940782830560342
+differential_evolution step 390: f(x)= 0.1940782830560342
+differential_evolution step 391: f(x)= 0.1940782830560342
+differential_evolution step 392: f(x)= 0.1940782830560342
+differential_evolution step 393: f(x)= 0.1940782830560342
+differential_evolution step 394: f(x)= 0.1940782830560342
+differential_evolution step 395: f(x)= 0.1940782830560342
+differential_evolution step 396: f(x)= 0.1940782830560342
+differential_evolution step 397: f(x)= 0.1940782830560342
+differential_evolution step 398: f(x)= 0.1940782830560342
+differential_evolution step 399: f(x)= 0.1940782830560342
+differential_evolution step 400: f(x)= 0.1940782830560342
+differential_evolution step 401: f(x)= 0.1940782830560342
+differential_evolution step 402: f(x)= 0.1940782830560342
+differential_evolution step 403: f(x)= 0.1940782830560342
+differential_evolution step 404: f(x)= 0.1940782830560342
+differential_evolution step 405: f(x)= 0.1940782830560342
+differential_evolution step 406: f(x)= 0.1940782830560342
+differential_evolution step 407: f(x)= 0.1940782830560342
+differential_evolution step 408: f(x)= 0.1940782830560342
+differential_evolution step 409: f(x)= 0.1940782830560342
+differential_evolution step 410: f(x)= 0.1940782830560342
+differential_evolution step 411: f(x)= 0.1940782830560342
+differential_evolution step 412: f(x)= 0.1940782830560342
+differential_evolution step 413: f(x)= 0.1940782830560342
+differential_evolution step 414: f(x)= 0.1940782830560342
+differential_evolution step 415: f(x)= 0.1940782830560342
+differential_evolution step 416: f(x)= 0.1940782830560342
+differential_evolution step 417: f(x)= 0.1940782830560342
+differential_evolution step 418: f(x)= 0.1940782830560342
+differential_evolution step 419: f(x)= 0.1940782830560342
+differential_evolution step 420: f(x)= 0.1940782830560342
+differential_evolution step 421: f(x)= 0.1940782830560342
+differential_evolution step 422: f(x)= 0.1940782830560342
+differential_evolution step 423: f(x)= 0.1940782830560342
+differential_evolution step 424: f(x)= 0.1940782830560342
+differential_evolution step 425: f(x)= 0.1940782830560342
+differential_evolution step 426: f(x)= 0.1940782830560342
+differential_evolution step 427: f(x)= 0.1940782830560342
+differential_evolution step 428: f(x)= 0.1940782830560342
+differential_evolution step 429: f(x)= 0.1940782830560342
+differential_evolution step 430: f(x)= 0.1940782830560342
+differential_evolution step 431: f(x)= 0.1940782830560342
+differential_evolution step 432: f(x)= 0.1940782830560342
+differential_evolution step 433: f(x)= 0.1940782830560342
+differential_evolution step 434: f(x)= 0.1940782830560342
+differential_evolution step 435: f(x)= 0.1940782830560342
+differential_evolution step 436: f(x)= 0.1940782830560342
+differential_evolution step 437: f(x)= 0.1940782830560342
+differential_evolution step 438: f(x)= 0.1940782830560342
+differential_evolution step 439: f(x)= 0.1940782830560342
+differential_evolution step 440: f(x)= 0.1940782830560342
+differential_evolution step 441: f(x)= 0.1940782830560342
+differential_evolution step 442: f(x)= 0.1940782830560342
+differential_evolution step 443: f(x)= 0.1940782830560342
+differential_evolution step 444: f(x)= 0.1940782830560342
+differential_evolution step 445: f(x)= 0.1940782830560342
+differential_evolution step 446: f(x)= 0.1940782830560342
+differential_evolution step 447: f(x)= 0.1940782830560342
+differential_evolution step 448: f(x)= 0.1940782830560342
+differential_evolution step 449: f(x)= 0.1940782830560342
+differential_evolution step 450: f(x)= 0.1940782830560342
+differential_evolution step 451: f(x)= 0.1940782830560342
+differential_evolution step 452: f(x)= 0.1940782830560342
+differential_evolution step 453: f(x)= 0.1940782830560342
+differential_evolution step 454: f(x)= 0.1940782830560342
+differential_evolution step 455: f(x)= 0.1940782830560342
+differential_evolution step 456: f(x)= 0.1940782830560342
+differential_evolution step 457: f(x)= 0.1940782830560342
+differential_evolution step 458: f(x)= 0.1940782830560342
+differential_evolution step 459: f(x)= 0.1940782830560342
+differential_evolution step 460: f(x)= 0.1940782830560342
+differential_evolution step 461: f(x)= 0.1940782830560342
+differential_evolution step 462: f(x)= 0.1940782830560342
+differential_evolution step 463: f(x)= 0.1940782830560342
+differential_evolution step 464: f(x)= 0.1940782830560342
+differential_evolution step 465: f(x)= 0.1940782830560342
+differential_evolution step 466: f(x)= 0.1940782830560342
+differential_evolution step 467: f(x)= 0.1940782830560342
+differential_evolution step 468: f(x)= 0.1940782830560342
+differential_evolution step 469: f(x)= 0.1940782830560342
+differential_evolution step 470: f(x)= 0.1940782830560342
+differential_evolution step 471: f(x)= 0.1940782830560342
+differential_evolution step 472: f(x)= 0.1940782830560342
+differential_evolution step 473: f(x)= 0.1940782830560342
+differential_evolution step 474: f(x)= 0.1940782830560342
+differential_evolution step 475: f(x)= 0.1940782830560342
+differential_evolution step 476: f(x)= 0.1940782830560342
+differential_evolution step 477: f(x)= 0.1940782830560342
+differential_evolution step 478: f(x)= 0.1940782830560342
+differential_evolution step 479: f(x)= 0.1940782830560342
+differential_evolution step 480: f(x)= 0.1940782830560342
+differential_evolution step 481: f(x)= 0.1940782830560342
+differential_evolution step 482: f(x)= 0.1940782830560342
+differential_evolution step 483: f(x)= 0.1940782830560342
+differential_evolution step 484: f(x)= 0.1940782830560342
+differential_evolution step 485: f(x)= 0.1940782830560342
+differential_evolution step 486: f(x)= 0.1940782830560342
+differential_evolution step 487: f(x)= 0.1940782830560342
+differential_evolution step 488: f(x)= 0.1940782830560342
+differential_evolution step 489: f(x)= 0.1940782830560342
+differential_evolution step 490: f(x)= 0.1940782830560342
+differential_evolution step 491: f(x)= 0.1940782830560342
+differential_evolution step 492: f(x)= 0.1940782830560342
+differential_evolution step 493: f(x)= 0.1940782830560342
+differential_evolution step 494: f(x)= 0.1940782830560342
+differential_evolution step 495: f(x)= 0.1940782830560342
+differential_evolution step 496: f(x)= 0.1940782830560342
+differential_evolution step 497: f(x)= 0.1940782830560342
+differential_evolution step 498: f(x)= 0.1940782830560342
+differential_evolution step 499: f(x)= 0.1940782830560342
+differential_evolution step 500: f(x)= 0.1940782830560342
+differential_evolution step 501: f(x)= 0.1940782830560342
+differential_evolution step 502: f(x)= 0.1940782830560342
+differential_evolution step 503: f(x)= 0.1940782830560342
+differential_evolution step 504: f(x)= 0.1940782830560342
+differential_evolution step 505: f(x)= 0.1940782830560342
+differential_evolution step 506: f(x)= 0.1940782830560342
+differential_evolution step 507: f(x)= 0.1940782830560342
+differential_evolution step 508: f(x)= 0.1940782830560342
+differential_evolution step 509: f(x)= 0.1940782830560342
+differential_evolution step 510: f(x)= 0.1940782830560342
+differential_evolution step 511: f(x)= 0.1940782830560342
+differential_evolution step 512: f(x)= 0.1940782830560342
+differential_evolution step 513: f(x)= 0.1940782830560342
+differential_evolution step 514: f(x)= 0.1940782830560342
+differential_evolution step 515: f(x)= 0.1940782830560342
+differential_evolution step 516: f(x)= 0.1940782830560342
+differential_evolution step 517: f(x)= 0.1940782830560342
+differential_evolution step 518: f(x)= 0.1940782830560342
+differential_evolution step 519: f(x)= 0.1940782830560342
+differential_evolution step 520: f(x)= 0.1940782830560342
+differential_evolution step 521: f(x)= 0.1940782830560342
+differential_evolution step 522: f(x)= 0.1940782830560342
+differential_evolution step 523: f(x)= 0.1940782830560342
+differential_evolution step 524: f(x)= 0.1940782830560342
+differential_evolution step 525: f(x)= 0.1940782830560342
+differential_evolution step 526: f(x)= 0.1940782830560342
+differential_evolution step 527: f(x)= 0.1940782830560342
+differential_evolution step 528: f(x)= 0.1940782830560342
+differential_evolution step 529: f(x)= 0.1940782830560342
+differential_evolution step 530: f(x)= 0.1940782830560342
+differential_evolution step 531: f(x)= 0.1940782830560342
+differential_evolution step 532: f(x)= 0.1940782830560342
+differential_evolution step 533: f(x)= 0.1940782830560342
+differential_evolution step 534: f(x)= 0.1940782830560342
+differential_evolution step 535: f(x)= 0.1940782830560342
+differential_evolution step 536: f(x)= 0.1940782830560342
+differential_evolution step 537: f(x)= 0.1940782830560342
+differential_evolution step 538: f(x)= 0.1940782830560342
+differential_evolution step 539: f(x)= 0.1940782830560342
+differential_evolution step 540: f(x)= 0.1940782830560342
+differential_evolution step 541: f(x)= 0.1940782830560342
+differential_evolution step 542: f(x)= 0.1940782830560342
+differential_evolution step 543: f(x)= 0.1940782830560342
+differential_evolution step 544: f(x)= 0.1940782830560342
+differential_evolution step 545: f(x)= 0.1940782830560342
+differential_evolution step 546: f(x)= 0.1940782830560342
+differential_evolution step 547: f(x)= 0.1940782830560342
+differential_evolution step 548: f(x)= 0.1940782830560342
+differential_evolution step 549: f(x)= 0.1940782830560342
+differential_evolution step 550: f(x)= 0.1940782830560342
+differential_evolution step 551: f(x)= 0.1940782830560342
+differential_evolution step 552: f(x)= 0.1940782830560342
+differential_evolution step 553: f(x)= 0.1940782830560342
+differential_evolution step 554: f(x)= 0.1940782830560342
+differential_evolution step 555: f(x)= 0.1940782830560342
+differential_evolution step 556: f(x)= 0.1940782830560342
+differential_evolution step 557: f(x)= 0.1940782830560342
+differential_evolution step 558: f(x)= 0.1940782830560342
+differential_evolution step 559: f(x)= 0.1940782830560342
+differential_evolution step 560: f(x)= 0.1940782830560342
+differential_evolution step 561: f(x)= 0.1940782830560342
+differential_evolution step 562: f(x)= 0.1940782830560342
+differential_evolution step 563: f(x)= 0.1940782830560342
+differential_evolution step 564: f(x)= 0.1940782830560342
+differential_evolution step 565: f(x)= 0.1940782830560342
+differential_evolution step 566: f(x)= 0.1940782830560342
+differential_evolution step 567: f(x)= 0.1940782830560342
+differential_evolution step 568: f(x)= 0.1940782830560342
+differential_evolution step 569: f(x)= 0.1940782830560342
+differential_evolution step 570: f(x)= 0.1940782830560342
+differential_evolution step 571: f(x)= 0.1940782830560342
+differential_evolution step 572: f(x)= 0.1940782830560342
+differential_evolution step 573: f(x)= 0.1940782830560342
+differential_evolution step 574: f(x)= 0.1940782830560342
+differential_evolution step 575: f(x)= 0.1940782830560342
+differential_evolution step 576: f(x)= 0.1940782830560342
+differential_evolution step 577: f(x)= 0.1940782830560342
+differential_evolution step 578: f(x)= 0.1940782830560342
+differential_evolution step 579: f(x)= 0.1940782830560342
+differential_evolution step 580: f(x)= 0.1940782830560342
+differential_evolution step 581: f(x)= 0.1940782830560342
+differential_evolution step 582: f(x)= 0.1940782830560342
+differential_evolution step 583: f(x)= 0.1940782830560342
+differential_evolution step 584: f(x)= 0.1940782830560342
+differential_evolution step 585: f(x)= 0.1940782830560342
+differential_evolution step 586: f(x)= 0.1940782830560342
+differential_evolution step 587: f(x)= 0.1940782830560342
+differential_evolution step 588: f(x)= 0.1940782830560342
+differential_evolution step 589: f(x)= 0.1940782830560342
+differential_evolution step 590: f(x)= 0.1940782830560342
+differential_evolution step 591: f(x)= 0.1940782830560342
+differential_evolution step 592: f(x)= 0.1940782830560342
+differential_evolution step 593: f(x)= 0.1940782830560342
+differential_evolution step 594: f(x)= 0.1940782830560342
+differential_evolution step 595: f(x)= 0.1940782830560342
+differential_evolution step 596: f(x)= 0.1940782830560342
+differential_evolution step 597: f(x)= 0.1940782830560342
+differential_evolution step 598: f(x)= 0.1940782830560342
+differential_evolution step 599: f(x)= 0.1940782830560342
+differential_evolution step 600: f(x)= 0.1940782830560342
+differential_evolution step 601: f(x)= 0.1940782830560342
+differential_evolution step 602: f(x)= 0.1940782830560342
+differential_evolution step 603: f(x)= 0.1940782830560342
+differential_evolution step 604: f(x)= 0.1940782830560342
+differential_evolution step 605: f(x)= 0.1940782830560342
+differential_evolution step 606: f(x)= 0.1940782830560342
+differential_evolution step 607: f(x)= 0.1940782830560342
+differential_evolution step 608: f(x)= 0.1940782830560342
+differential_evolution step 609: f(x)= 0.1940782830560342
+differential_evolution step 610: f(x)= 0.1940782830560342
+differential_evolution step 611: f(x)= 0.1940782830560342
+differential_evolution step 612: f(x)= 0.1940782830560342
+differential_evolution step 613: f(x)= 0.1940782830560342
+differential_evolution step 614: f(x)= 0.1940782830560342
+differential_evolution step 615: f(x)= 0.1940782830560342
+differential_evolution step 616: f(x)= 0.1940782830560342
+differential_evolution step 617: f(x)= 0.1940782830560342
+differential_evolution step 618: f(x)= 0.1940782830560342
+differential_evolution step 619: f(x)= 0.1940782830560342
+differential_evolution step 620: f(x)= 0.1940782830560342
+differential_evolution step 621: f(x)= 0.1940782830560342
+differential_evolution step 622: f(x)= 0.1940782830560342
+differential_evolution step 623: f(x)= 0.1940782830560342
+differential_evolution step 624: f(x)= 0.1940782830560342
+differential_evolution step 625: f(x)= 0.1940782830560342
+differential_evolution step 626: f(x)= 0.1940782830560342
+differential_evolution step 627: f(x)= 0.1940782830560342
+differential_evolution step 628: f(x)= 0.1940782830560342
+differential_evolution step 629: f(x)= 0.1940782830560342
+differential_evolution step 630: f(x)= 0.1940782830560342
+differential_evolution step 631: f(x)= 0.1940782830560342
+differential_evolution step 632: f(x)= 0.1940782830560342
+differential_evolution step 633: f(x)= 0.1940782830560342
+differential_evolution step 634: f(x)= 0.1940782830560342
+differential_evolution step 635: f(x)= 0.1940782830560342
+differential_evolution step 636: f(x)= 0.1940782830560342
+differential_evolution step 637: f(x)= 0.1940782830560342
+differential_evolution step 638: f(x)= 0.1940782830560342
+differential_evolution step 639: f(x)= 0.1940782830560342
+differential_evolution step 640: f(x)= 0.1940782830560342
+differential_evolution step 641: f(x)= 0.1940782830560342
+differential_evolution step 642: f(x)= 0.1940782830560342
+differential_evolution step 643: f(x)= 0.1940782830560342
+differential_evolution step 644: f(x)= 0.1940782830560342
+differential_evolution step 645: f(x)= 0.1940782830560342
+differential_evolution step 646: f(x)= 0.1940782830560342
+differential_evolution step 647: f(x)= 0.1940782830560342
+differential_evolution step 648: f(x)= 0.1940782830560342
+differential_evolution step 649: f(x)= 0.1940782830560342
+differential_evolution step 650: f(x)= 0.1940782830560342
+differential_evolution step 651: f(x)= 0.1940782830560342
+differential_evolution step 652: f(x)= 0.1940782830560342
+differential_evolution step 653: f(x)= 0.1940782830560342
+differential_evolution step 654: f(x)= 0.1940782830560342
+differential_evolution step 655: f(x)= 0.1940782830560342
+differential_evolution step 656: f(x)= 0.1940782830560342
+differential_evolution step 657: f(x)= 0.1940782830560342
+differential_evolution step 658: f(x)= 0.1940782830560342
+differential_evolution step 659: f(x)= 0.1940782830560342
+differential_evolution step 660: f(x)= 0.1940782830560342
+differential_evolution step 661: f(x)= 0.1940782830560342
+differential_evolution step 662: f(x)= 0.1940782830560342
+differential_evolution step 663: f(x)= 0.1940782830560342
+differential_evolution step 664: f(x)= 0.1940782830560342
+differential_evolution step 665: f(x)= 0.1940782830560342
+differential_evolution step 666: f(x)= 0.1940782830560342
+differential_evolution step 667: f(x)= 0.1940782830560342
+differential_evolution step 668: f(x)= 0.1940782830560342
+differential_evolution step 669: f(x)= 0.1940782830560342
+differential_evolution step 670: f(x)= 0.1940782830560342
+differential_evolution step 671: f(x)= 0.1940782830560342
+differential_evolution step 672: f(x)= 0.1940782830560342
+differential_evolution step 673: f(x)= 0.1940782830560342
+differential_evolution step 674: f(x)= 0.1940782830560342
+differential_evolution step 675: f(x)= 0.1940782830560342
+differential_evolution step 676: f(x)= 0.1940782830560342
+differential_evolution step 677: f(x)= 0.1940782830560342
+differential_evolution step 678: f(x)= 0.1940782830560342
+differential_evolution step 679: f(x)= 0.1940782830560342
+differential_evolution step 680: f(x)= 0.1940782830560342
+differential_evolution step 681: f(x)= 0.1940782830560342
+differential_evolution step 682: f(x)= 0.1940782830560342
+differential_evolution step 683: f(x)= 0.1940782830560342
+differential_evolution step 684: f(x)= 0.1940782830560342
+differential_evolution step 685: f(x)= 0.1940782830560342
+differential_evolution step 686: f(x)= 0.1940782830560342
+differential_evolution step 687: f(x)= 0.1940782830560342
+differential_evolution step 688: f(x)= 0.1940782830560342
+differential_evolution step 689: f(x)= 0.1940782830560342
+differential_evolution step 690: f(x)= 0.1940782830560342
+differential_evolution step 691: f(x)= 0.1940782830560342
+differential_evolution step 692: f(x)= 0.1940782830560342
+differential_evolution step 693: f(x)= 0.1940782830560342
+differential_evolution step 694: f(x)= 0.1940782830560342
+differential_evolution step 695: f(x)= 0.1940782830560342
+differential_evolution step 696: f(x)= 0.1940782830560342
+differential_evolution step 697: f(x)= 0.1940782830560342
+differential_evolution step 698: f(x)= 0.1940782830560342
+differential_evolution step 699: f(x)= 0.1940782830560342
+differential_evolution step 700: f(x)= 0.1940782830560342
+differential_evolution step 701: f(x)= 0.1940782830560342
+differential_evolution step 702: f(x)= 0.1940782830560342
+differential_evolution step 703: f(x)= 0.1940782830560342
+differential_evolution step 704: f(x)= 0.1940782830560342
+differential_evolution step 705: f(x)= 0.1940782830560342
+differential_evolution step 706: f(x)= 0.1940782830560342
+differential_evolution step 707: f(x)= 0.1940782830560342
+differential_evolution step 708: f(x)= 0.1940782830560342
+differential_evolution step 709: f(x)= 0.1940782830560342
+differential_evolution step 710: f(x)= 0.1940782830560342
+differential_evolution step 711: f(x)= 0.1940782830560342
+differential_evolution step 712: f(x)= 0.1940782830560342
+differential_evolution step 713: f(x)= 0.1940782830560342
+differential_evolution step 714: f(x)= 0.1940782830560342
+differential_evolution step 715: f(x)= 0.1940782830560342
+differential_evolution step 716: f(x)= 0.1940782830560342
+differential_evolution step 717: f(x)= 0.1940782830560342
+differential_evolution step 718: f(x)= 0.1940782830560342
+differential_evolution step 719: f(x)= 0.1940782830560342
+differential_evolution step 720: f(x)= 0.1940782830560342
+differential_evolution step 721: f(x)= 0.1940782830560342
+differential_evolution step 722: f(x)= 0.1940782830560342
+differential_evolution step 723: f(x)= 0.1940782830560342
+differential_evolution step 724: f(x)= 0.1940782830560342
+differential_evolution step 725: f(x)= 0.1940782830560342
+differential_evolution step 726: f(x)= 0.1940782830560342
+differential_evolution step 727: f(x)= 0.1940782830560342
+differential_evolution step 728: f(x)= 0.1940782830560342
+differential_evolution step 729: f(x)= 0.1940782830560342
+differential_evolution step 730: f(x)= 0.1940782830560342
+differential_evolution step 731: f(x)= 0.1940782830560342
+differential_evolution step 732: f(x)= 0.1940782830560342
+differential_evolution step 733: f(x)= 0.1940782830560342
+differential_evolution step 734: f(x)= 0.1940782830560342
+differential_evolution step 735: f(x)= 0.1940782830560342
+differential_evolution step 736: f(x)= 0.1940782830560342
+differential_evolution step 737: f(x)= 0.1940782830560342
+differential_evolution step 738: f(x)= 0.1940782830560342
+differential_evolution step 739: f(x)= 0.1940782830560342
+differential_evolution step 740: f(x)= 0.1940782830560342
+differential_evolution step 741: f(x)= 0.1940782830560342
+differential_evolution step 742: f(x)= 0.1940782830560342
+differential_evolution step 743: f(x)= 0.1940782830560342
+differential_evolution step 744: f(x)= 0.1940782830560342
+differential_evolution step 745: f(x)= 0.1940782830560342
+differential_evolution step 746: f(x)= 0.1940782830560342
+differential_evolution step 747: f(x)= 0.1940782830560342
+differential_evolution step 748: f(x)= 0.1940782830560342
+differential_evolution step 749: f(x)= 0.1940782830560342
+differential_evolution step 750: f(x)= 0.1940782830560342
+differential_evolution step 751: f(x)= 0.1940782830560342
+differential_evolution step 752: f(x)= 0.1940782830560342
+differential_evolution step 753: f(x)= 0.1940782830560342
+differential_evolution step 754: f(x)= 0.1940782830560342
+differential_evolution step 755: f(x)= 0.1940782830560342
+differential_evolution step 756: f(x)= 0.1940782830560342
+differential_evolution step 757: f(x)= 0.1940782830560342
+differential_evolution step 758: f(x)= 0.1940782830560342
+differential_evolution step 759: f(x)= 0.1940782830560342
+differential_evolution step 760: f(x)= 0.1940782830560342
+differential_evolution step 761: f(x)= 0.1940782830560342
+differential_evolution step 762: f(x)= 0.1940782830560342
+differential_evolution step 763: f(x)= 0.1940782830560342
+differential_evolution step 764: f(x)= 0.1940782830560342
+differential_evolution step 765: f(x)= 0.1940782830560342
+differential_evolution step 766: f(x)= 0.1940782830560342
+differential_evolution step 767: f(x)= 0.1940782830560342
+differential_evolution step 768: f(x)= 0.1940782830560342
+differential_evolution step 769: f(x)= 0.1940782830560342
+differential_evolution step 770: f(x)= 0.1940782830560342
+differential_evolution step 771: f(x)= 0.1940782830560342
+differential_evolution step 772: f(x)= 0.1940782830560342
+differential_evolution step 773: f(x)= 0.1940782830560342
+differential_evolution step 774: f(x)= 0.1940782830560342
+differential_evolution step 775: f(x)= 0.1940782830560342
+differential_evolution step 776: f(x)= 0.1940782830560342
+differential_evolution step 777: f(x)= 0.1940782830560342
+differential_evolution step 778: f(x)= 0.1940782830560342
+differential_evolution step 779: f(x)= 0.1940782830560342
+differential_evolution step 780: f(x)= 0.1940782830560342
+differential_evolution step 781: f(x)= 0.1940782830560342
+differential_evolution step 782: f(x)= 0.1940782830560342
+differential_evolution step 783: f(x)= 0.1940782830560342
+differential_evolution step 784: f(x)= 0.1940782830560342
+differential_evolution step 785: f(x)= 0.1940782830560342
+differential_evolution step 786: f(x)= 0.1940782830560342
+differential_evolution step 787: f(x)= 0.1940782830560342
+differential_evolution step 788: f(x)= 0.1940782830560342
+differential_evolution step 789: f(x)= 0.1940782830560342
+differential_evolution step 790: f(x)= 0.1940782830560342
+differential_evolution step 791: f(x)= 0.1940782830560342
+differential_evolution step 792: f(x)= 0.1940782830560342
+differential_evolution step 793: f(x)= 0.1940782830560342
+differential_evolution step 794: f(x)= 0.1940782830560342
+differential_evolution step 795: f(x)= 0.1940782830560342
+differential_evolution step 796: f(x)= 0.1940782830560342
+differential_evolution step 797: f(x)= 0.1940782830560342
+differential_evolution step 798: f(x)= 0.1940782830560342
+differential_evolution step 799: f(x)= 0.1940782830560342
+differential_evolution step 800: f(x)= 0.1940782830560342
+differential_evolution step 801: f(x)= 0.1940782830560342
+differential_evolution step 802: f(x)= 0.1940782830560342
+differential_evolution step 803: f(x)= 0.1940782830560342
+differential_evolution step 804: f(x)= 0.1940782830560342
+differential_evolution step 805: f(x)= 0.1940782830560342
+differential_evolution step 806: f(x)= 0.1940782830560342
+differential_evolution step 807: f(x)= 0.1940782830560342
+differential_evolution step 808: f(x)= 0.1940782830560342
+differential_evolution step 809: f(x)= 0.1940782830560342
+differential_evolution step 810: f(x)= 0.1940782830560342
+differential_evolution step 811: f(x)= 0.1940782830560342
+differential_evolution step 812: f(x)= 0.1940782830560342
+differential_evolution step 813: f(x)= 0.1940782830560342
+differential_evolution step 814: f(x)= 0.1940782830560342
+differential_evolution step 815: f(x)= 0.1940782830560342
+differential_evolution step 816: f(x)= 0.1940782830560342
+differential_evolution step 817: f(x)= 0.1940782830560342
+differential_evolution step 818: f(x)= 0.1940782830560342
+differential_evolution step 819: f(x)= 0.1940782830560342
+differential_evolution step 820: f(x)= 0.1940782830560342
+differential_evolution step 821: f(x)= 0.1940782830560342
+differential_evolution step 822: f(x)= 0.1940782830560342
+differential_evolution step 823: f(x)= 0.1940782830560342
+differential_evolution step 824: f(x)= 0.1940782830560342
+differential_evolution step 825: f(x)= 0.1940782830560342
+differential_evolution step 826: f(x)= 0.1940782830560342
+differential_evolution step 827: f(x)= 0.1940782830560342
+differential_evolution step 828: f(x)= 0.1940782830560342
+differential_evolution step 829: f(x)= 0.1940782830560342
+differential_evolution step 830: f(x)= 0.1940782830560342
+differential_evolution step 831: f(x)= 0.1940782830560342
+differential_evolution step 832: f(x)= 0.1940782830560342
+differential_evolution step 833: f(x)= 0.1940782830560342
+differential_evolution step 834: f(x)= 0.1940782830560342
+differential_evolution step 835: f(x)= 0.1940782830560342
+differential_evolution step 836: f(x)= 0.1940782830560342
+differential_evolution step 837: f(x)= 0.1940782830560342
+differential_evolution step 838: f(x)= 0.1940782830560342
+differential_evolution step 839: f(x)= 0.1940782830560342
+differential_evolution step 840: f(x)= 0.1940782830560342
+differential_evolution step 841: f(x)= 0.1940782830560342
+differential_evolution step 842: f(x)= 0.1940782830560342
+differential_evolution step 843: f(x)= 0.1940782830560342
+differential_evolution step 844: f(x)= 0.1940782830560342
+differential_evolution step 845: f(x)= 0.1940782830560342
+differential_evolution step 846: f(x)= 0.1940782830560342
+differential_evolution step 847: f(x)= 0.1940782830560342
+differential_evolution step 848: f(x)= 0.1940782830560342
+differential_evolution step 849: f(x)= 0.1940782830560342
+differential_evolution step 850: f(x)= 0.1940782830560342
+differential_evolution step 851: f(x)= 0.1940782830560342
+differential_evolution step 852: f(x)= 0.1940782830560342
+differential_evolution step 853: f(x)= 0.1940782830560342
+differential_evolution step 854: f(x)= 0.1940782830560342
+differential_evolution step 855: f(x)= 0.1940782830560342
+differential_evolution step 856: f(x)= 0.1940782830560342
+differential_evolution step 857: f(x)= 0.1940782830560342
+differential_evolution step 858: f(x)= 0.1940782830560342
+differential_evolution step 859: f(x)= 0.1940782830560342
+differential_evolution step 860: f(x)= 0.1940782830560342
+differential_evolution step 861: f(x)= 0.1940782830560342
+differential_evolution step 862: f(x)= 0.1940782830560342
+differential_evolution step 863: f(x)= 0.1940782830560342
+differential_evolution step 864: f(x)= 0.1940782830560342
+differential_evolution step 865: f(x)= 0.1940782830560342
+differential_evolution step 866: f(x)= 0.1940782830560342
+differential_evolution step 867: f(x)= 0.1940782830560342
+differential_evolution step 868: f(x)= 0.1940782830560342
+differential_evolution step 869: f(x)= 0.1940782830560342
+differential_evolution step 870: f(x)= 0.1940782830560342
+differential_evolution step 871: f(x)= 0.1940782830560342
+differential_evolution step 872: f(x)= 0.1940782830560342
+differential_evolution step 873: f(x)= 0.1940782830560342
+differential_evolution step 874: f(x)= 0.1940782830560342
+differential_evolution step 875: f(x)= 0.1940782830560342
+differential_evolution step 876: f(x)= 0.1940782830560342
+differential_evolution step 877: f(x)= 0.1940782830560342
+differential_evolution step 878: f(x)= 0.1940782830560342
+differential_evolution step 879: f(x)= 0.1940782830560342
+differential_evolution step 880: f(x)= 0.1940782830560342
+differential_evolution step 881: f(x)= 0.1940782830560342
+differential_evolution step 882: f(x)= 0.1940782830560342
+differential_evolution step 883: f(x)= 0.1940782830560342
+differential_evolution step 884: f(x)= 0.1940782830560342
+differential_evolution step 885: f(x)= 0.1940782830560342
+differential_evolution step 886: f(x)= 0.1940782830560342
+differential_evolution step 887: f(x)= 0.1940782830560342
+differential_evolution step 888: f(x)= 0.1940782830560342
+differential_evolution step 889: f(x)= 0.1940782830560342
+differential_evolution step 890: f(x)= 0.1940782830560342
+differential_evolution step 891: f(x)= 0.1940782830560342
+differential_evolution step 892: f(x)= 0.1940782830560342
+differential_evolution step 893: f(x)= 0.1940782830560342
+differential_evolution step 894: f(x)= 0.1940782830560342
+differential_evolution step 895: f(x)= 0.1940782830560342
+differential_evolution step 896: f(x)= 0.1940782830560342
+differential_evolution step 897: f(x)= 0.1940782830560342
+differential_evolution step 898: f(x)= 0.1940782830560342
+differential_evolution step 899: f(x)= 0.1940782830560342
+differential_evolution step 900: f(x)= 0.1940782830560342
+differential_evolution step 901: f(x)= 0.1940782830560342
+differential_evolution step 902: f(x)= 0.1940782830560342
+differential_evolution step 903: f(x)= 0.1940782830560342
+differential_evolution step 904: f(x)= 0.1940782830560342
+differential_evolution step 905: f(x)= 0.1940782830560342
+differential_evolution step 906: f(x)= 0.1940782830560342
+differential_evolution step 907: f(x)= 0.1940782830560342
+differential_evolution step 908: f(x)= 0.1940782830560342
+differential_evolution step 909: f(x)= 0.1940782830560342
+differential_evolution step 910: f(x)= 0.1940782830560342
+differential_evolution step 911: f(x)= 0.1940782830560342
+differential_evolution step 912: f(x)= 0.1940782830560342
+differential_evolution step 913: f(x)= 0.1940782830560342
+differential_evolution step 914: f(x)= 0.1940782830560342
+differential_evolution step 915: f(x)= 0.1940782830560342
+differential_evolution step 916: f(x)= 0.1940782830560342
+differential_evolution step 917: f(x)= 0.1940782830560342
+differential_evolution step 918: f(x)= 0.1940782830560342
+differential_evolution step 919: f(x)= 0.1940782830560342
+differential_evolution step 920: f(x)= 0.1940782830560342
+differential_evolution step 921: f(x)= 0.1940782830560342
+differential_evolution step 922: f(x)= 0.1940782830560342
+differential_evolution step 923: f(x)= 0.1940782830560342
+differential_evolution step 924: f(x)= 0.1940782830560342
+differential_evolution step 925: f(x)= 0.1940782830560342
+differential_evolution step 926: f(x)= 0.1940782830560342
+differential_evolution step 927: f(x)= 0.1940782830560342
+differential_evolution step 928: f(x)= 0.1940782830560342
+differential_evolution step 929: f(x)= 0.1940782830560342
+differential_evolution step 930: f(x)= 0.1940782830560342
+differential_evolution step 931: f(x)= 0.1940782830560342
+differential_evolution step 932: f(x)= 0.1940782830560342
+differential_evolution step 933: f(x)= 0.1940782830560342
+differential_evolution step 934: f(x)= 0.1940782830560342
+differential_evolution step 935: f(x)= 0.1940782830560342
+differential_evolution step 936: f(x)= 0.1940782830560342
+differential_evolution step 937: f(x)= 0.1940782830560342
+differential_evolution step 938: f(x)= 0.1940782830560342
+differential_evolution step 939: f(x)= 0.1940782830560342
+differential_evolution step 940: f(x)= 0.1940782830560342
+differential_evolution step 941: f(x)= 0.1940782830560342
+differential_evolution step 942: f(x)= 0.1940782830560342
+differential_evolution step 943: f(x)= 0.1940782830560342
+differential_evolution step 944: f(x)= 0.1940782830560342
+differential_evolution step 945: f(x)= 0.1940782830560342
+differential_evolution step 946: f(x)= 0.1940782830560342
+differential_evolution step 947: f(x)= 0.1940782830560342
+differential_evolution step 948: f(x)= 0.1940782830560342
+differential_evolution step 949: f(x)= 0.1940782830560342
+differential_evolution step 950: f(x)= 0.1940782830560342
+differential_evolution step 951: f(x)= 0.1940782830560342
+differential_evolution step 952: f(x)= 0.1940782830560342
+differential_evolution step 953: f(x)= 0.1940782830560342
+differential_evolution step 954: f(x)= 0.1940782830560342
+differential_evolution step 955: f(x)= 0.1940782830560342
+differential_evolution step 956: f(x)= 0.1940782830560342
+differential_evolution step 957: f(x)= 0.1940782830560342
+differential_evolution step 958: f(x)= 0.1940782830560342
+differential_evolution step 959: f(x)= 0.1940782830560342
+differential_evolution step 960: f(x)= 0.1940782830560342
+differential_evolution step 961: f(x)= 0.1940782830560342
+differential_evolution step 962: f(x)= 0.1940782830560342
+differential_evolution step 963: f(x)= 0.1940782830560342
+differential_evolution step 964: f(x)= 0.1940782830560342
+differential_evolution step 965: f(x)= 0.1940782830560342
+differential_evolution step 966: f(x)= 0.1940782830560342
+differential_evolution step 967: f(x)= 0.1940782830560342
+differential_evolution step 968: f(x)= 0.1940782830560342
+differential_evolution step 969: f(x)= 0.1940782830560342
+differential_evolution step 970: f(x)= 0.1940782830560342
+differential_evolution step 971: f(x)= 0.1940782830560342
+differential_evolution step 972: f(x)= 0.1940782830560342
+differential_evolution step 973: f(x)= 0.1940782830560342
+differential_evolution step 974: f(x)= 0.1940782830560342
+differential_evolution step 975: f(x)= 0.1940782830560342
+differential_evolution step 976: f(x)= 0.1940782830560342
+differential_evolution step 977: f(x)= 0.1940782830560342
+differential_evolution step 978: f(x)= 0.1940782830560342
+differential_evolution step 979: f(x)= 0.1940782830560342
+differential_evolution step 980: f(x)= 0.1940782830560342
+differential_evolution step 981: f(x)= 0.1940782830560342
+differential_evolution step 982: f(x)= 0.1940782830560342
+differential_evolution step 983: f(x)= 0.1940782830560342
+differential_evolution step 984: f(x)= 0.1940782830560342
+differential_evolution step 985: f(x)= 0.1940782830560342
+differential_evolution step 986: f(x)= 0.1940782830560342
+differential_evolution step 987: f(x)= 0.1940782830560342
+differential_evolution step 988: f(x)= 0.1940782830560342
+differential_evolution step 989: f(x)= 0.1940782830560342
+differential_evolution step 990: f(x)= 0.1940782830560342
+differential_evolution step 991: f(x)= 0.1940782830560342
+differential_evolution step 992: f(x)= 0.1940782830560342
+differential_evolution step 993: f(x)= 0.1940782830560342
+differential_evolution step 994: f(x)= 0.1940782830560342
+differential_evolution step 995: f(x)= 0.1940782830560342
+differential_evolution step 996: f(x)= 0.1940782830560342
+differential_evolution step 997: f(x)= 0.1940782830560342
+differential_evolution step 998: f(x)= 0.1940782830560342
+differential_evolution step 999: f(x)= 0.1940782830560342
+differential_evolution step 1000: f(x)= 0.1940782830560342
+             message: Maximum number of iterations has been exceeded.
+             success: False
+                 fun: 0.1940782830560342
+                   x: [ 2.754e+00 -1.292e+00 ...  1.580e+00  3.451e-01]
+                 nit: 1000
+                nfev: 36036
+          population: [[ 2.754e+00 -1.292e+00 ...  1.580e+00  3.451e-01]
+                       [ 1.822e+00 -2.226e+00 ...  1.900e+00 -2.355e+00]
+                       ...
+                       [ 7.596e-01 -9.884e-01 ...  2.056e+00 -2.730e+00]
+                       [ 2.530e+00 -6.505e-01 ...  1.736e+00  3.176e-01]]
+ population_energies: [ 1.941e-01  2.926e-01 ...  2.822e-01  3.428e-01]
+Time: 157.86841440200806
+</pre></div></div>
+</div>
+</section>
+<section id="QPUCircuitMapper">
+<h2>QPUCircuitMapper<a class="headerlink" href="#QPUCircuitMapper" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">QJobMapper</span><span class="p">,</span> <span class="n">QPUCircuitMapper</span>
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">QPUCircuitMapper</span><span class="p">(</span><span class="n">qpus</span><span class="p">,</span> <span class="n">ansatz</span><span class="p">,</span> <span class="n">transpile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">n_shots</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">total_pop</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">num_parameters</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_pop</span><span class="p">):</span>
+    <span class="n">initial_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num_parameters</span><span class="p">)</span>
+    <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_point</span><span class="p">)</span>
+
+<span class="n">bounds</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">num_parameters</span><span class="p">):</span>
+    <span class="n">bounds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounds:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial population:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">))</span>
+
+<span class="n">best_individual_</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">energies_</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span><span class="n">convergence</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    <span class="n">best_individual_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="p">[</span><span class="n">xk</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">energies_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">differential_evolution</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">result_</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">updating</span><span class="o">=</span><span class="s1">&#39;deferred&#39;</span><span class="p">,</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;best1bin&#39;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">pop</span><span class="p">,</span> <span class="n">polish</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result_</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time:&quot;</span><span class="p">,</span> <span class="n">tack</span><span class="o">-</span><span class="n">tick</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Bounds: 36
+Initial population: 36
+differential_evolution step 1: f(x)= 0.24715219402452426
+differential_evolution step 2: f(x)= 0.24715219402452426
+differential_evolution step 3: f(x)= 0.24715219402452426
+differential_evolution step 4: f(x)= 0.24715219402452426
+differential_evolution step 5: f(x)= 0.24715219402452426
+differential_evolution step 6: f(x)= 0.24715219402452426
+differential_evolution step 7: f(x)= 0.24715219402452426
+differential_evolution step 8: f(x)= 0.24715219402452426
+differential_evolution step 9: f(x)= 0.24715219402452426
+differential_evolution step 10: f(x)= 0.24715219402452426
+differential_evolution step 11: f(x)= 0.24715219402452426
+differential_evolution step 12: f(x)= 0.24715219402452426
+differential_evolution step 13: f(x)= 0.24715219402452426
+differential_evolution step 14: f(x)= 0.24715219402452426
+differential_evolution step 15: f(x)= 0.24715219402452426
+differential_evolution step 16: f(x)= 0.24715219402452426
+differential_evolution step 17: f(x)= 0.24715219402452426
+differential_evolution step 18: f(x)= 0.24715219402452426
+differential_evolution step 19: f(x)= 0.24715219402452426
+differential_evolution step 20: f(x)= 0.24715219402452426
+differential_evolution step 21: f(x)= 0.24715219402452426
+differential_evolution step 22: f(x)= 0.24715219402452426
+differential_evolution step 23: f(x)= 0.24715219402452426
+differential_evolution step 24: f(x)= 0.24715219402452426
+differential_evolution step 25: f(x)= 0.24715219402452426
+differential_evolution step 26: f(x)= 0.24715219402452426
+differential_evolution step 27: f(x)= 0.24715219402452426
+differential_evolution step 28: f(x)= 0.24715219402452426
+differential_evolution step 29: f(x)= 0.24715219402452426
+differential_evolution step 30: f(x)= 0.24715219402452426
+differential_evolution step 31: f(x)= 0.24715219402452426
+differential_evolution step 32: f(x)= 0.24715219402452426
+differential_evolution step 33: f(x)= 0.24715219402452426
+differential_evolution step 34: f(x)= 0.24715219402452426
+differential_evolution step 35: f(x)= 0.24715219402452426
+differential_evolution step 36: f(x)= 0.24715219402452426
+differential_evolution step 37: f(x)= 0.24715219402452426
+differential_evolution step 38: f(x)= 0.24715219402452426
+differential_evolution step 39: f(x)= 0.24715219402452426
+differential_evolution step 40: f(x)= 0.24715219402452426
+differential_evolution step 41: f(x)= 0.24715219402452426
+differential_evolution step 42: f(x)= 0.24715219402452426
+differential_evolution step 43: f(x)= 0.24715219402452426
+differential_evolution step 44: f(x)= 0.24715219402452426
+differential_evolution step 45: f(x)= 0.24715219402452426
+differential_evolution step 46: f(x)= 0.24715219402452426
+differential_evolution step 47: f(x)= 0.24715219402452426
+differential_evolution step 48: f(x)= 0.24715219402452426
+differential_evolution step 49: f(x)= 0.24715219402452426
+differential_evolution step 50: f(x)= 0.24715219402452426
+differential_evolution step 51: f(x)= 0.24715219402452426
+differential_evolution step 52: f(x)= 0.24715219402452426
+differential_evolution step 53: f(x)= 0.24715219402452426
+differential_evolution step 54: f(x)= 0.24715219402452426
+differential_evolution step 55: f(x)= 0.24715219402452426
+differential_evolution step 56: f(x)= 0.24715219402452426
+differential_evolution step 57: f(x)= 0.24715219402452426
+differential_evolution step 58: f(x)= 0.24715219402452426
+differential_evolution step 59: f(x)= 0.24715219402452426
+differential_evolution step 60: f(x)= 0.24715219402452426
+differential_evolution step 61: f(x)= 0.24715219402452426
+differential_evolution step 62: f(x)= 0.24715219402452426
+differential_evolution step 63: f(x)= 0.24715219402452426
+differential_evolution step 64: f(x)= 0.24715219402452426
+differential_evolution step 65: f(x)= 0.24715219402452426
+differential_evolution step 66: f(x)= 0.24715219402452426
+differential_evolution step 67: f(x)= 0.24715219402452426
+differential_evolution step 68: f(x)= 0.24715219402452426
+differential_evolution step 69: f(x)= 0.24715219402452426
+differential_evolution step 70: f(x)= 0.24715219402452426
+differential_evolution step 71: f(x)= 0.24715219402452426
+differential_evolution step 72: f(x)= 0.24715219402452426
+differential_evolution step 73: f(x)= 0.24715219402452426
+differential_evolution step 74: f(x)= 0.24715219402452426
+differential_evolution step 75: f(x)= 0.24715219402452426
+differential_evolution step 76: f(x)= 0.24715219402452426
+differential_evolution step 77: f(x)= 0.24715219402452426
+differential_evolution step 78: f(x)= 0.24715219402452426
+differential_evolution step 79: f(x)= 0.24715219402452426
+differential_evolution step 80: f(x)= 0.24715219402452426
+differential_evolution step 81: f(x)= 0.24715219402452426
+differential_evolution step 82: f(x)= 0.24715219402452426
+differential_evolution step 83: f(x)= 0.24715219402452426
+differential_evolution step 84: f(x)= 0.24715219402452426
+differential_evolution step 85: f(x)= 0.24715219402452426
+differential_evolution step 86: f(x)= 0.24715219402452426
+differential_evolution step 87: f(x)= 0.24715219402452426
+differential_evolution step 88: f(x)= 0.24715219402452426
+differential_evolution step 89: f(x)= 0.24715219402452426
+differential_evolution step 90: f(x)= 0.24715219402452426
+differential_evolution step 91: f(x)= 0.24715219402452426
+differential_evolution step 92: f(x)= 0.24715219402452426
+differential_evolution step 93: f(x)= 0.24715219402452426
+differential_evolution step 94: f(x)= 0.24715219402452426
+differential_evolution step 95: f(x)= 0.24715219402452426
+differential_evolution step 96: f(x)= 0.24715219402452426
+differential_evolution step 97: f(x)= 0.24715219402452426
+differential_evolution step 98: f(x)= 0.24715219402452426
+differential_evolution step 99: f(x)= 0.24715219402452426
+differential_evolution step 100: f(x)= 0.24715219402452426
+differential_evolution step 101: f(x)= 0.24715219402452426
+differential_evolution step 102: f(x)= 0.24715219402452426
+differential_evolution step 103: f(x)= 0.24715219402452426
+differential_evolution step 104: f(x)= 0.24715219402452426
+differential_evolution step 105: f(x)= 0.24715219402452426
+differential_evolution step 106: f(x)= 0.24715219402452426
+differential_evolution step 107: f(x)= 0.24715219402452426
+differential_evolution step 108: f(x)= 0.24715219402452426
+differential_evolution step 109: f(x)= 0.24715219402452426
+differential_evolution step 110: f(x)= 0.24715219402452426
+differential_evolution step 111: f(x)= 0.24715219402452426
+differential_evolution step 112: f(x)= 0.24715219402452426
+differential_evolution step 113: f(x)= 0.24715219402452426
+differential_evolution step 114: f(x)= 0.24715219402452426
+differential_evolution step 115: f(x)= 0.24715219402452426
+differential_evolution step 116: f(x)= 0.24715219402452426
+differential_evolution step 117: f(x)= 0.24715219402452426
+differential_evolution step 118: f(x)= 0.24715219402452426
+differential_evolution step 119: f(x)= 0.24715219402452426
+differential_evolution step 120: f(x)= 0.24715219402452426
+differential_evolution step 121: f(x)= 0.24715219402452426
+differential_evolution step 122: f(x)= 0.24715219402452426
+differential_evolution step 123: f(x)= 0.24715219402452426
+differential_evolution step 124: f(x)= 0.24715219402452426
+differential_evolution step 125: f(x)= 0.24715219402452426
+differential_evolution step 126: f(x)= 0.24715219402452426
+differential_evolution step 127: f(x)= 0.24715219402452426
+differential_evolution step 128: f(x)= 0.24715219402452426
+differential_evolution step 129: f(x)= 0.24715219402452426
+differential_evolution step 130: f(x)= 0.24715219402452426
+differential_evolution step 131: f(x)= 0.24715219402452426
+differential_evolution step 132: f(x)= 0.24715219402452426
+differential_evolution step 133: f(x)= 0.24715219402452426
+differential_evolution step 134: f(x)= 0.24715219402452426
+differential_evolution step 135: f(x)= 0.24715219402452426
+differential_evolution step 136: f(x)= 0.24715219402452426
+differential_evolution step 137: f(x)= 0.24715219402452426
+differential_evolution step 138: f(x)= 0.24715219402452426
+differential_evolution step 139: f(x)= 0.24715219402452426
+differential_evolution step 140: f(x)= 0.24715219402452426
+differential_evolution step 141: f(x)= 0.24715219402452426
+differential_evolution step 142: f(x)= 0.24715219402452426
+differential_evolution step 143: f(x)= 0.24715219402452426
+differential_evolution step 144: f(x)= 0.24715219402452426
+differential_evolution step 145: f(x)= 0.24715219402452426
+differential_evolution step 146: f(x)= 0.24715219402452426
+differential_evolution step 147: f(x)= 0.24715219402452426
+differential_evolution step 148: f(x)= 0.24715219402452426
+differential_evolution step 149: f(x)= 0.24715219402452426
+differential_evolution step 150: f(x)= 0.24715219402452426
+differential_evolution step 151: f(x)= 0.24715219402452426
+differential_evolution step 152: f(x)= 0.24715219402452426
+differential_evolution step 153: f(x)= 0.24715219402452426
+differential_evolution step 154: f(x)= 0.24715219402452426
+differential_evolution step 155: f(x)= 0.24715219402452426
+differential_evolution step 156: f(x)= 0.24715219402452426
+differential_evolution step 157: f(x)= 0.24715219402452426
+differential_evolution step 158: f(x)= 0.24715219402452426
+differential_evolution step 159: f(x)= 0.24715219402452426
+differential_evolution step 160: f(x)= 0.24715219402452426
+differential_evolution step 161: f(x)= 0.24715219402452426
+differential_evolution step 162: f(x)= 0.24715219402452426
+differential_evolution step 163: f(x)= 0.24715219402452426
+differential_evolution step 164: f(x)= 0.24715219402452426
+differential_evolution step 165: f(x)= 0.24715219402452426
+differential_evolution step 166: f(x)= 0.24715219402452426
+differential_evolution step 167: f(x)= 0.24715219402452426
+differential_evolution step 168: f(x)= 0.24715219402452426
+differential_evolution step 169: f(x)= 0.24715219402452426
+differential_evolution step 170: f(x)= 0.24715219402452426
+differential_evolution step 171: f(x)= 0.24715219402452426
+differential_evolution step 172: f(x)= 0.24715219402452426
+differential_evolution step 173: f(x)= 0.24715219402452426
+differential_evolution step 174: f(x)= 0.24715219402452426
+differential_evolution step 175: f(x)= 0.24715219402452426
+differential_evolution step 176: f(x)= 0.24715219402452426
+differential_evolution step 177: f(x)= 0.24715219402452426
+differential_evolution step 178: f(x)= 0.24715219402452426
+differential_evolution step 179: f(x)= 0.24715219402452426
+differential_evolution step 180: f(x)= 0.24715219402452426
+differential_evolution step 181: f(x)= 0.24715219402452426
+differential_evolution step 182: f(x)= 0.24715219402452426
+differential_evolution step 183: f(x)= 0.24715219402452426
+differential_evolution step 184: f(x)= 0.24715219402452426
+differential_evolution step 185: f(x)= 0.24715219402452426
+differential_evolution step 186: f(x)= 0.24715219402452426
+differential_evolution step 187: f(x)= 0.2228514282885164
+differential_evolution step 188: f(x)= 0.2228514282885164
+differential_evolution step 189: f(x)= 0.2228514282885164
+differential_evolution step 190: f(x)= 0.2228514282885164
+differential_evolution step 191: f(x)= 0.2228514282885164
+differential_evolution step 192: f(x)= 0.2228514282885164
+differential_evolution step 193: f(x)= 0.2228514282885164
+differential_evolution step 194: f(x)= 0.2228514282885164
+differential_evolution step 195: f(x)= 0.2228514282885164
+differential_evolution step 196: f(x)= 0.2228514282885164
+differential_evolution step 197: f(x)= 0.2228514282885164
+differential_evolution step 198: f(x)= 0.2228514282885164
+differential_evolution step 199: f(x)= 0.2228514282885164
+differential_evolution step 200: f(x)= 0.2228514282885164
+differential_evolution step 201: f(x)= 0.2228514282885164
+differential_evolution step 202: f(x)= 0.2228514282885164
+differential_evolution step 203: f(x)= 0.2228514282885164
+differential_evolution step 204: f(x)= 0.2228514282885164
+differential_evolution step 205: f(x)= 0.2228514282885164
+differential_evolution step 206: f(x)= 0.2228514282885164
+differential_evolution step 207: f(x)= 0.2228514282885164
+differential_evolution step 208: f(x)= 0.2228514282885164
+differential_evolution step 209: f(x)= 0.2228514282885164
+differential_evolution step 210: f(x)= 0.2228514282885164
+differential_evolution step 211: f(x)= 0.2228514282885164
+differential_evolution step 212: f(x)= 0.2228514282885164
+differential_evolution step 213: f(x)= 0.2228514282885164
+differential_evolution step 214: f(x)= 0.2228514282885164
+differential_evolution step 215: f(x)= 0.2228514282885164
+differential_evolution step 216: f(x)= 0.2228514282885164
+differential_evolution step 217: f(x)= 0.2228514282885164
+differential_evolution step 218: f(x)= 0.2228514282885164
+differential_evolution step 219: f(x)= 0.2228514282885164
+differential_evolution step 220: f(x)= 0.2228514282885164
+differential_evolution step 221: f(x)= 0.2228514282885164
+differential_evolution step 222: f(x)= 0.2228514282885164
+differential_evolution step 223: f(x)= 0.2228514282885164
+differential_evolution step 224: f(x)= 0.2228514282885164
+differential_evolution step 225: f(x)= 0.2228514282885164
+differential_evolution step 226: f(x)= 0.2228514282885164
+differential_evolution step 227: f(x)= 0.2228514282885164
+differential_evolution step 228: f(x)= 0.2228514282885164
+differential_evolution step 229: f(x)= 0.2228514282885164
+differential_evolution step 230: f(x)= 0.2228514282885164
+differential_evolution step 231: f(x)= 0.2228514282885164
+differential_evolution step 232: f(x)= 0.2228514282885164
+differential_evolution step 233: f(x)= 0.2228514282885164
+differential_evolution step 234: f(x)= 0.2228514282885164
+differential_evolution step 235: f(x)= 0.2228514282885164
+differential_evolution step 236: f(x)= 0.2228514282885164
+differential_evolution step 237: f(x)= 0.2228514282885164
+differential_evolution step 238: f(x)= 0.2228514282885164
+differential_evolution step 239: f(x)= 0.2228514282885164
+differential_evolution step 240: f(x)= 0.2228514282885164
+differential_evolution step 241: f(x)= 0.2228514282885164
+differential_evolution step 242: f(x)= 0.2228514282885164
+differential_evolution step 243: f(x)= 0.2228514282885164
+differential_evolution step 244: f(x)= 0.2228514282885164
+differential_evolution step 245: f(x)= 0.2228514282885164
+differential_evolution step 246: f(x)= 0.2228514282885164
+differential_evolution step 247: f(x)= 0.2228514282885164
+differential_evolution step 248: f(x)= 0.2228514282885164
+differential_evolution step 249: f(x)= 0.2228514282885164
+differential_evolution step 250: f(x)= 0.2228514282885164
+differential_evolution step 251: f(x)= 0.2228514282885164
+differential_evolution step 252: f(x)= 0.2228514282885164
+differential_evolution step 253: f(x)= 0.2228514282885164
+differential_evolution step 254: f(x)= 0.2228514282885164
+differential_evolution step 255: f(x)= 0.2228514282885164
+differential_evolution step 256: f(x)= 0.2228514282885164
+differential_evolution step 257: f(x)= 0.2228514282885164
+differential_evolution step 258: f(x)= 0.2228514282885164
+differential_evolution step 259: f(x)= 0.2228514282885164
+differential_evolution step 260: f(x)= 0.2228514282885164
+differential_evolution step 261: f(x)= 0.2228514282885164
+differential_evolution step 262: f(x)= 0.2228514282885164
+differential_evolution step 263: f(x)= 0.2228514282885164
+differential_evolution step 264: f(x)= 0.2228514282885164
+differential_evolution step 265: f(x)= 0.2228514282885164
+differential_evolution step 266: f(x)= 0.2228514282885164
+differential_evolution step 267: f(x)= 0.2228514282885164
+differential_evolution step 268: f(x)= 0.2228514282885164
+differential_evolution step 269: f(x)= 0.2228514282885164
+differential_evolution step 270: f(x)= 0.2228514282885164
+differential_evolution step 271: f(x)= 0.2228514282885164
+differential_evolution step 272: f(x)= 0.2228514282885164
+differential_evolution step 273: f(x)= 0.2228514282885164
+differential_evolution step 274: f(x)= 0.2228514282885164
+differential_evolution step 275: f(x)= 0.2228514282885164
+differential_evolution step 276: f(x)= 0.2228514282885164
+differential_evolution step 277: f(x)= 0.2228514282885164
+differential_evolution step 278: f(x)= 0.2228514282885164
+differential_evolution step 279: f(x)= 0.2228514282885164
+differential_evolution step 280: f(x)= 0.2228514282885164
+differential_evolution step 281: f(x)= 0.2228514282885164
+differential_evolution step 282: f(x)= 0.2228514282885164
+differential_evolution step 283: f(x)= 0.2228514282885164
+differential_evolution step 284: f(x)= 0.2228514282885164
+differential_evolution step 285: f(x)= 0.2228514282885164
+differential_evolution step 286: f(x)= 0.2228514282885164
+differential_evolution step 287: f(x)= 0.2228514282885164
+differential_evolution step 288: f(x)= 0.2228514282885164
+differential_evolution step 289: f(x)= 0.2228514282885164
+differential_evolution step 290: f(x)= 0.2228514282885164
+differential_evolution step 291: f(x)= 0.2228514282885164
+differential_evolution step 292: f(x)= 0.2228514282885164
+differential_evolution step 293: f(x)= 0.2228514282885164
+differential_evolution step 294: f(x)= 0.2228514282885164
+differential_evolution step 295: f(x)= 0.2228514282885164
+differential_evolution step 296: f(x)= 0.2228514282885164
+differential_evolution step 297: f(x)= 0.2228514282885164
+differential_evolution step 298: f(x)= 0.2228514282885164
+differential_evolution step 299: f(x)= 0.2228514282885164
+differential_evolution step 300: f(x)= 0.2228514282885164
+differential_evolution step 301: f(x)= 0.2228514282885164
+differential_evolution step 302: f(x)= 0.2228514282885164
+differential_evolution step 303: f(x)= 0.2228514282885164
+differential_evolution step 304: f(x)= 0.2228514282885164
+differential_evolution step 305: f(x)= 0.2228514282885164
+differential_evolution step 306: f(x)= 0.2228514282885164
+differential_evolution step 307: f(x)= 0.2228514282885164
+differential_evolution step 308: f(x)= 0.2228514282885164
+differential_evolution step 309: f(x)= 0.2228514282885164
+differential_evolution step 310: f(x)= 0.2228514282885164
+differential_evolution step 311: f(x)= 0.2228514282885164
+differential_evolution step 312: f(x)= 0.2228514282885164
+differential_evolution step 313: f(x)= 0.2228514282885164
+differential_evolution step 314: f(x)= 0.2228514282885164
+differential_evolution step 315: f(x)= 0.2228514282885164
+differential_evolution step 316: f(x)= 0.2228514282885164
+differential_evolution step 317: f(x)= 0.2228514282885164
+differential_evolution step 318: f(x)= 0.2228514282885164
+differential_evolution step 319: f(x)= 0.2228514282885164
+differential_evolution step 320: f(x)= 0.2228514282885164
+differential_evolution step 321: f(x)= 0.2228514282885164
+differential_evolution step 322: f(x)= 0.2228514282885164
+differential_evolution step 323: f(x)= 0.2228514282885164
+differential_evolution step 324: f(x)= 0.2228514282885164
+differential_evolution step 325: f(x)= 0.2228514282885164
+differential_evolution step 326: f(x)= 0.2228514282885164
+differential_evolution step 327: f(x)= 0.2228514282885164
+differential_evolution step 328: f(x)= 0.2228514282885164
+differential_evolution step 329: f(x)= 0.2228514282885164
+differential_evolution step 330: f(x)= 0.2228514282885164
+differential_evolution step 331: f(x)= 0.2228514282885164
+differential_evolution step 332: f(x)= 0.2228514282885164
+differential_evolution step 333: f(x)= 0.2228514282885164
+differential_evolution step 334: f(x)= 0.2228514282885164
+differential_evolution step 335: f(x)= 0.2228514282885164
+differential_evolution step 336: f(x)= 0.2228514282885164
+differential_evolution step 337: f(x)= 0.2228514282885164
+differential_evolution step 338: f(x)= 0.2228514282885164
+differential_evolution step 339: f(x)= 0.2228514282885164
+differential_evolution step 340: f(x)= 0.2228514282885164
+differential_evolution step 341: f(x)= 0.2228514282885164
+differential_evolution step 342: f(x)= 0.2228514282885164
+differential_evolution step 343: f(x)= 0.2228514282885164
+differential_evolution step 344: f(x)= 0.2228514282885164
+differential_evolution step 345: f(x)= 0.2228514282885164
+differential_evolution step 346: f(x)= 0.2228514282885164
+differential_evolution step 347: f(x)= 0.2228514282885164
+differential_evolution step 348: f(x)= 0.2228514282885164
+differential_evolution step 349: f(x)= 0.2228514282885164
+differential_evolution step 350: f(x)= 0.2228514282885164
+differential_evolution step 351: f(x)= 0.2228514282885164
+differential_evolution step 352: f(x)= 0.2228514282885164
+differential_evolution step 353: f(x)= 0.2228514282885164
+differential_evolution step 354: f(x)= 0.2228514282885164
+differential_evolution step 355: f(x)= 0.2228514282885164
+differential_evolution step 356: f(x)= 0.2228514282885164
+differential_evolution step 357: f(x)= 0.2228514282885164
+differential_evolution step 358: f(x)= 0.2228514282885164
+differential_evolution step 359: f(x)= 0.2228514282885164
+differential_evolution step 360: f(x)= 0.2228514282885164
+differential_evolution step 361: f(x)= 0.2228514282885164
+differential_evolution step 362: f(x)= 0.2228514282885164
+differential_evolution step 363: f(x)= 0.2228514282885164
+differential_evolution step 364: f(x)= 0.2228514282885164
+differential_evolution step 365: f(x)= 0.2228514282885164
+differential_evolution step 366: f(x)= 0.2228514282885164
+differential_evolution step 367: f(x)= 0.2228514282885164
+differential_evolution step 368: f(x)= 0.2228514282885164
+differential_evolution step 369: f(x)= 0.2228514282885164
+differential_evolution step 370: f(x)= 0.2228514282885164
+differential_evolution step 371: f(x)= 0.2228514282885164
+differential_evolution step 372: f(x)= 0.2228514282885164
+differential_evolution step 373: f(x)= 0.2228514282885164
+differential_evolution step 374: f(x)= 0.2228514282885164
+differential_evolution step 375: f(x)= 0.2228514282885164
+differential_evolution step 376: f(x)= 0.2228514282885164
+differential_evolution step 377: f(x)= 0.2228514282885164
+differential_evolution step 378: f(x)= 0.2228514282885164
+differential_evolution step 379: f(x)= 0.2228514282885164
+differential_evolution step 380: f(x)= 0.2228514282885164
+differential_evolution step 381: f(x)= 0.2228514282885164
+differential_evolution step 382: f(x)= 0.2228514282885164
+differential_evolution step 383: f(x)= 0.2228514282885164
+differential_evolution step 384: f(x)= 0.2228514282885164
+differential_evolution step 385: f(x)= 0.2228514282885164
+differential_evolution step 386: f(x)= 0.2228514282885164
+differential_evolution step 387: f(x)= 0.2228514282885164
+differential_evolution step 388: f(x)= 0.2228514282885164
+differential_evolution step 389: f(x)= 0.2228514282885164
+differential_evolution step 390: f(x)= 0.2228514282885164
+differential_evolution step 391: f(x)= 0.2228514282885164
+differential_evolution step 392: f(x)= 0.2228514282885164
+differential_evolution step 393: f(x)= 0.2228514282885164
+differential_evolution step 394: f(x)= 0.2228514282885164
+differential_evolution step 395: f(x)= 0.2228514282885164
+differential_evolution step 396: f(x)= 0.2228514282885164
+differential_evolution step 397: f(x)= 0.2228514282885164
+differential_evolution step 398: f(x)= 0.2228514282885164
+differential_evolution step 399: f(x)= 0.2228514282885164
+differential_evolution step 400: f(x)= 0.2228514282885164
+differential_evolution step 401: f(x)= 0.2228514282885164
+differential_evolution step 402: f(x)= 0.2228514282885164
+differential_evolution step 403: f(x)= 0.2228514282885164
+differential_evolution step 404: f(x)= 0.2228514282885164
+differential_evolution step 405: f(x)= 0.2228514282885164
+differential_evolution step 406: f(x)= 0.2228514282885164
+differential_evolution step 407: f(x)= 0.2228514282885164
+differential_evolution step 408: f(x)= 0.2228514282885164
+differential_evolution step 409: f(x)= 0.2228514282885164
+differential_evolution step 410: f(x)= 0.2228514282885164
+differential_evolution step 411: f(x)= 0.2228514282885164
+differential_evolution step 412: f(x)= 0.2228514282885164
+differential_evolution step 413: f(x)= 0.2228514282885164
+differential_evolution step 414: f(x)= 0.2228514282885164
+differential_evolution step 415: f(x)= 0.2228514282885164
+differential_evolution step 416: f(x)= 0.2228514282885164
+differential_evolution step 417: f(x)= 0.2228514282885164
+differential_evolution step 418: f(x)= 0.2228514282885164
+differential_evolution step 419: f(x)= 0.2228514282885164
+differential_evolution step 420: f(x)= 0.2228514282885164
+differential_evolution step 421: f(x)= 0.2228514282885164
+differential_evolution step 422: f(x)= 0.2228514282885164
+differential_evolution step 423: f(x)= 0.2228514282885164
+differential_evolution step 424: f(x)= 0.2228514282885164
+differential_evolution step 425: f(x)= 0.2228514282885164
+differential_evolution step 426: f(x)= 0.2228514282885164
+differential_evolution step 427: f(x)= 0.2228514282885164
+differential_evolution step 428: f(x)= 0.2228514282885164
+differential_evolution step 429: f(x)= 0.2228514282885164
+differential_evolution step 430: f(x)= 0.2228514282885164
+differential_evolution step 431: f(x)= 0.2228514282885164
+differential_evolution step 432: f(x)= 0.2228514282885164
+differential_evolution step 433: f(x)= 0.2228514282885164
+differential_evolution step 434: f(x)= 0.2228514282885164
+differential_evolution step 435: f(x)= 0.2228514282885164
+differential_evolution step 436: f(x)= 0.2228514282885164
+differential_evolution step 437: f(x)= 0.2228514282885164
+differential_evolution step 438: f(x)= 0.2228514282885164
+differential_evolution step 439: f(x)= 0.2228514282885164
+differential_evolution step 440: f(x)= 0.2228514282885164
+differential_evolution step 441: f(x)= 0.2228514282885164
+differential_evolution step 442: f(x)= 0.2228514282885164
+differential_evolution step 443: f(x)= 0.2228514282885164
+differential_evolution step 444: f(x)= 0.2228514282885164
+differential_evolution step 445: f(x)= 0.2228514282885164
+differential_evolution step 446: f(x)= 0.2228514282885164
+differential_evolution step 447: f(x)= 0.2228514282885164
+differential_evolution step 448: f(x)= 0.2228514282885164
+differential_evolution step 449: f(x)= 0.2228514282885164
+differential_evolution step 450: f(x)= 0.2228514282885164
+differential_evolution step 451: f(x)= 0.2228514282885164
+differential_evolution step 452: f(x)= 0.2228514282885164
+differential_evolution step 453: f(x)= 0.2228514282885164
+differential_evolution step 454: f(x)= 0.2228514282885164
+differential_evolution step 455: f(x)= 0.2228514282885164
+differential_evolution step 456: f(x)= 0.2228514282885164
+differential_evolution step 457: f(x)= 0.2228514282885164
+differential_evolution step 458: f(x)= 0.2228514282885164
+differential_evolution step 459: f(x)= 0.2228514282885164
+differential_evolution step 460: f(x)= 0.2228514282885164
+differential_evolution step 461: f(x)= 0.2228514282885164
+differential_evolution step 462: f(x)= 0.2228514282885164
+differential_evolution step 463: f(x)= 0.2228514282885164
+differential_evolution step 464: f(x)= 0.2228514282885164
+differential_evolution step 465: f(x)= 0.2228514282885164
+differential_evolution step 466: f(x)= 0.2228514282885164
+differential_evolution step 467: f(x)= 0.2228514282885164
+differential_evolution step 468: f(x)= 0.2228514282885164
+differential_evolution step 469: f(x)= 0.2228514282885164
+differential_evolution step 470: f(x)= 0.2228514282885164
+differential_evolution step 471: f(x)= 0.2228514282885164
+differential_evolution step 472: f(x)= 0.2228514282885164
+differential_evolution step 473: f(x)= 0.2228514282885164
+differential_evolution step 474: f(x)= 0.2228514282885164
+differential_evolution step 475: f(x)= 0.2228514282885164
+differential_evolution step 476: f(x)= 0.2228514282885164
+differential_evolution step 477: f(x)= 0.2228514282885164
+differential_evolution step 478: f(x)= 0.2228514282885164
+differential_evolution step 479: f(x)= 0.2228514282885164
+differential_evolution step 480: f(x)= 0.2228514282885164
+differential_evolution step 481: f(x)= 0.2228514282885164
+differential_evolution step 482: f(x)= 0.2228514282885164
+differential_evolution step 483: f(x)= 0.2228514282885164
+differential_evolution step 484: f(x)= 0.2228514282885164
+differential_evolution step 485: f(x)= 0.2228514282885164
+differential_evolution step 486: f(x)= 0.2228514282885164
+differential_evolution step 487: f(x)= 0.2228514282885164
+differential_evolution step 488: f(x)= 0.2228514282885164
+differential_evolution step 489: f(x)= 0.2228514282885164
+differential_evolution step 490: f(x)= 0.2228514282885164
+differential_evolution step 491: f(x)= 0.2228514282885164
+differential_evolution step 492: f(x)= 0.2228514282885164
+differential_evolution step 493: f(x)= 0.2228514282885164
+differential_evolution step 494: f(x)= 0.2228514282885164
+differential_evolution step 495: f(x)= 0.2228514282885164
+differential_evolution step 496: f(x)= 0.2228514282885164
+differential_evolution step 497: f(x)= 0.2228514282885164
+differential_evolution step 498: f(x)= 0.2228514282885164
+differential_evolution step 499: f(x)= 0.2228514282885164
+differential_evolution step 500: f(x)= 0.2228514282885164
+differential_evolution step 501: f(x)= 0.2228514282885164
+differential_evolution step 502: f(x)= 0.2228514282885164
+differential_evolution step 503: f(x)= 0.2228514282885164
+differential_evolution step 504: f(x)= 0.2228514282885164
+differential_evolution step 505: f(x)= 0.2228514282885164
+differential_evolution step 506: f(x)= 0.2228514282885164
+differential_evolution step 507: f(x)= 0.2228514282885164
+differential_evolution step 508: f(x)= 0.2228514282885164
+differential_evolution step 509: f(x)= 0.2228514282885164
+differential_evolution step 510: f(x)= 0.2228514282885164
+differential_evolution step 511: f(x)= 0.2228514282885164
+differential_evolution step 512: f(x)= 0.2228514282885164
+differential_evolution step 513: f(x)= 0.2228514282885164
+differential_evolution step 514: f(x)= 0.2228514282885164
+differential_evolution step 515: f(x)= 0.2228514282885164
+differential_evolution step 516: f(x)= 0.2228514282885164
+differential_evolution step 517: f(x)= 0.2228514282885164
+differential_evolution step 518: f(x)= 0.2228514282885164
+differential_evolution step 519: f(x)= 0.2228514282885164
+differential_evolution step 520: f(x)= 0.2228514282885164
+differential_evolution step 521: f(x)= 0.2228514282885164
+differential_evolution step 522: f(x)= 0.2228514282885164
+differential_evolution step 523: f(x)= 0.2228514282885164
+differential_evolution step 524: f(x)= 0.2228514282885164
+differential_evolution step 525: f(x)= 0.2228514282885164
+differential_evolution step 526: f(x)= 0.2228514282885164
+differential_evolution step 527: f(x)= 0.2228514282885164
+differential_evolution step 528: f(x)= 0.2228514282885164
+differential_evolution step 529: f(x)= 0.2228514282885164
+differential_evolution step 530: f(x)= 0.2228514282885164
+differential_evolution step 531: f(x)= 0.2228514282885164
+differential_evolution step 532: f(x)= 0.2228514282885164
+differential_evolution step 533: f(x)= 0.2228514282885164
+differential_evolution step 534: f(x)= 0.2228514282885164
+differential_evolution step 535: f(x)= 0.2228514282885164
+differential_evolution step 536: f(x)= 0.2228514282885164
+differential_evolution step 537: f(x)= 0.2228514282885164
+differential_evolution step 538: f(x)= 0.2228514282885164
+differential_evolution step 539: f(x)= 0.2228514282885164
+differential_evolution step 540: f(x)= 0.2228514282885164
+differential_evolution step 541: f(x)= 0.2228514282885164
+differential_evolution step 542: f(x)= 0.2228514282885164
+differential_evolution step 543: f(x)= 0.2228514282885164
+differential_evolution step 544: f(x)= 0.2228514282885164
+differential_evolution step 545: f(x)= 0.2228514282885164
+differential_evolution step 546: f(x)= 0.2228514282885164
+differential_evolution step 547: f(x)= 0.2228514282885164
+differential_evolution step 548: f(x)= 0.2228514282885164
+differential_evolution step 549: f(x)= 0.2228514282885164
+differential_evolution step 550: f(x)= 0.2228514282885164
+differential_evolution step 551: f(x)= 0.2228514282885164
+differential_evolution step 552: f(x)= 0.2228514282885164
+differential_evolution step 553: f(x)= 0.2228514282885164
+differential_evolution step 554: f(x)= 0.2228514282885164
+differential_evolution step 555: f(x)= 0.2228514282885164
+differential_evolution step 556: f(x)= 0.2228514282885164
+differential_evolution step 557: f(x)= 0.2228514282885164
+differential_evolution step 558: f(x)= 0.2228514282885164
+differential_evolution step 559: f(x)= 0.2228514282885164
+differential_evolution step 560: f(x)= 0.2228514282885164
+differential_evolution step 561: f(x)= 0.2228514282885164
+differential_evolution step 562: f(x)= 0.2228514282885164
+differential_evolution step 563: f(x)= 0.2228514282885164
+differential_evolution step 564: f(x)= 0.2228514282885164
+differential_evolution step 565: f(x)= 0.2228514282885164
+differential_evolution step 566: f(x)= 0.2228514282885164
+differential_evolution step 567: f(x)= 0.2228514282885164
+differential_evolution step 568: f(x)= 0.2228514282885164
+differential_evolution step 569: f(x)= 0.2228514282885164
+differential_evolution step 570: f(x)= 0.2228514282885164
+differential_evolution step 571: f(x)= 0.2228514282885164
+differential_evolution step 572: f(x)= 0.2228514282885164
+differential_evolution step 573: f(x)= 0.2228514282885164
+differential_evolution step 574: f(x)= 0.2228514282885164
+differential_evolution step 575: f(x)= 0.2228514282885164
+differential_evolution step 576: f(x)= 0.2228514282885164
+differential_evolution step 577: f(x)= 0.2228514282885164
+differential_evolution step 578: f(x)= 0.2228514282885164
+differential_evolution step 579: f(x)= 0.2228514282885164
+differential_evolution step 580: f(x)= 0.2228514282885164
+differential_evolution step 581: f(x)= 0.2228514282885164
+differential_evolution step 582: f(x)= 0.2228514282885164
+differential_evolution step 583: f(x)= 0.2228514282885164
+differential_evolution step 584: f(x)= 0.2228514282885164
+differential_evolution step 585: f(x)= 0.2228514282885164
+differential_evolution step 586: f(x)= 0.2228514282885164
+differential_evolution step 587: f(x)= 0.2228514282885164
+differential_evolution step 588: f(x)= 0.2228514282885164
+differential_evolution step 589: f(x)= 0.2228514282885164
+differential_evolution step 590: f(x)= 0.2228514282885164
+differential_evolution step 591: f(x)= 0.2228514282885164
+differential_evolution step 592: f(x)= 0.2228514282885164
+differential_evolution step 593: f(x)= 0.2228514282885164
+differential_evolution step 594: f(x)= 0.2228514282885164
+differential_evolution step 595: f(x)= 0.2228514282885164
+differential_evolution step 596: f(x)= 0.2228514282885164
+differential_evolution step 597: f(x)= 0.2228514282885164
+differential_evolution step 598: f(x)= 0.2228514282885164
+differential_evolution step 599: f(x)= 0.2228514282885164
+differential_evolution step 600: f(x)= 0.2228514282885164
+differential_evolution step 601: f(x)= 0.2228514282885164
+differential_evolution step 602: f(x)= 0.2228514282885164
+differential_evolution step 603: f(x)= 0.2228514282885164
+differential_evolution step 604: f(x)= 0.2228514282885164
+differential_evolution step 605: f(x)= 0.2228514282885164
+differential_evolution step 606: f(x)= 0.2228514282885164
+differential_evolution step 607: f(x)= 0.2228514282885164
+differential_evolution step 608: f(x)= 0.2228514282885164
+differential_evolution step 609: f(x)= 0.2228514282885164
+differential_evolution step 610: f(x)= 0.2228514282885164
+differential_evolution step 611: f(x)= 0.2228514282885164
+differential_evolution step 612: f(x)= 0.2228514282885164
+differential_evolution step 613: f(x)= 0.2228514282885164
+differential_evolution step 614: f(x)= 0.2228514282885164
+differential_evolution step 615: f(x)= 0.2228514282885164
+differential_evolution step 616: f(x)= 0.2228514282885164
+differential_evolution step 617: f(x)= 0.2228514282885164
+differential_evolution step 618: f(x)= 0.2228514282885164
+differential_evolution step 619: f(x)= 0.2228514282885164
+differential_evolution step 620: f(x)= 0.2228514282885164
+differential_evolution step 621: f(x)= 0.2228514282885164
+differential_evolution step 622: f(x)= 0.2228514282885164
+differential_evolution step 623: f(x)= 0.2228514282885164
+differential_evolution step 624: f(x)= 0.2228514282885164
+differential_evolution step 625: f(x)= 0.2228514282885164
+differential_evolution step 626: f(x)= 0.2228514282885164
+differential_evolution step 627: f(x)= 0.2228514282885164
+differential_evolution step 628: f(x)= 0.2228514282885164
+differential_evolution step 629: f(x)= 0.2228514282885164
+differential_evolution step 630: f(x)= 0.2228514282885164
+differential_evolution step 631: f(x)= 0.2228514282885164
+differential_evolution step 632: f(x)= 0.2228514282885164
+differential_evolution step 633: f(x)= 0.2228514282885164
+differential_evolution step 634: f(x)= 0.2228514282885164
+differential_evolution step 635: f(x)= 0.2228514282885164
+differential_evolution step 636: f(x)= 0.2228514282885164
+differential_evolution step 637: f(x)= 0.2228514282885164
+differential_evolution step 638: f(x)= 0.2228514282885164
+differential_evolution step 639: f(x)= 0.2228514282885164
+differential_evolution step 640: f(x)= 0.2228514282885164
+differential_evolution step 641: f(x)= 0.2228514282885164
+differential_evolution step 642: f(x)= 0.2228514282885164
+differential_evolution step 643: f(x)= 0.2228514282885164
+differential_evolution step 644: f(x)= 0.2228514282885164
+differential_evolution step 645: f(x)= 0.2228514282885164
+differential_evolution step 646: f(x)= 0.2228514282885164
+differential_evolution step 647: f(x)= 0.2228514282885164
+differential_evolution step 648: f(x)= 0.2228514282885164
+differential_evolution step 649: f(x)= 0.2228514282885164
+differential_evolution step 650: f(x)= 0.2228514282885164
+differential_evolution step 651: f(x)= 0.2228514282885164
+differential_evolution step 652: f(x)= 0.2228514282885164
+differential_evolution step 653: f(x)= 0.2228514282885164
+differential_evolution step 654: f(x)= 0.2228514282885164
+differential_evolution step 655: f(x)= 0.2228514282885164
+differential_evolution step 656: f(x)= 0.2228514282885164
+differential_evolution step 657: f(x)= 0.2228514282885164
+differential_evolution step 658: f(x)= 0.2228514282885164
+differential_evolution step 659: f(x)= 0.2228514282885164
+differential_evolution step 660: f(x)= 0.2228514282885164
+differential_evolution step 661: f(x)= 0.2228514282885164
+differential_evolution step 662: f(x)= 0.2228514282885164
+differential_evolution step 663: f(x)= 0.2228514282885164
+differential_evolution step 664: f(x)= 0.2228514282885164
+differential_evolution step 665: f(x)= 0.2228514282885164
+differential_evolution step 666: f(x)= 0.2228514282885164
+differential_evolution step 667: f(x)= 0.2228514282885164
+differential_evolution step 668: f(x)= 0.2228514282885164
+differential_evolution step 669: f(x)= 0.2228514282885164
+differential_evolution step 670: f(x)= 0.2228514282885164
+differential_evolution step 671: f(x)= 0.2228514282885164
+differential_evolution step 672: f(x)= 0.2228514282885164
+differential_evolution step 673: f(x)= 0.2228514282885164
+differential_evolution step 674: f(x)= 0.2228514282885164
+differential_evolution step 675: f(x)= 0.2228514282885164
+differential_evolution step 676: f(x)= 0.2228514282885164
+differential_evolution step 677: f(x)= 0.2228514282885164
+differential_evolution step 678: f(x)= 0.2228514282885164
+differential_evolution step 679: f(x)= 0.2228514282885164
+differential_evolution step 680: f(x)= 0.2228514282885164
+differential_evolution step 681: f(x)= 0.2228514282885164
+differential_evolution step 682: f(x)= 0.2228514282885164
+differential_evolution step 683: f(x)= 0.2228514282885164
+differential_evolution step 684: f(x)= 0.2228514282885164
+differential_evolution step 685: f(x)= 0.2228514282885164
+differential_evolution step 686: f(x)= 0.2228514282885164
+differential_evolution step 687: f(x)= 0.2228514282885164
+differential_evolution step 688: f(x)= 0.2228514282885164
+differential_evolution step 689: f(x)= 0.2228514282885164
+differential_evolution step 690: f(x)= 0.2228514282885164
+differential_evolution step 691: f(x)= 0.2228514282885164
+differential_evolution step 692: f(x)= 0.2228514282885164
+differential_evolution step 693: f(x)= 0.2228514282885164
+differential_evolution step 694: f(x)= 0.2228514282885164
+differential_evolution step 695: f(x)= 0.2228514282885164
+differential_evolution step 696: f(x)= 0.2228514282885164
+differential_evolution step 697: f(x)= 0.2228514282885164
+differential_evolution step 698: f(x)= 0.2228514282885164
+differential_evolution step 699: f(x)= 0.2228514282885164
+differential_evolution step 700: f(x)= 0.2228514282885164
+differential_evolution step 701: f(x)= 0.2228514282885164
+differential_evolution step 702: f(x)= 0.2228514282885164
+differential_evolution step 703: f(x)= 0.2228514282885164
+differential_evolution step 704: f(x)= 0.2228514282885164
+differential_evolution step 705: f(x)= 0.2228514282885164
+differential_evolution step 706: f(x)= 0.2228514282885164
+differential_evolution step 707: f(x)= 0.2228514282885164
+differential_evolution step 708: f(x)= 0.2228514282885164
+differential_evolution step 709: f(x)= 0.2228514282885164
+differential_evolution step 710: f(x)= 0.2228514282885164
+differential_evolution step 711: f(x)= 0.2228514282885164
+differential_evolution step 712: f(x)= 0.2228514282885164
+differential_evolution step 713: f(x)= 0.2228514282885164
+differential_evolution step 714: f(x)= 0.2228514282885164
+differential_evolution step 715: f(x)= 0.2228514282885164
+differential_evolution step 716: f(x)= 0.2228514282885164
+differential_evolution step 717: f(x)= 0.2228514282885164
+differential_evolution step 718: f(x)= 0.2228514282885164
+differential_evolution step 719: f(x)= 0.2228514282885164
+differential_evolution step 720: f(x)= 0.2228514282885164
+differential_evolution step 721: f(x)= 0.2228514282885164
+differential_evolution step 722: f(x)= 0.2228514282885164
+differential_evolution step 723: f(x)= 0.2228514282885164
+differential_evolution step 724: f(x)= 0.2228514282885164
+differential_evolution step 725: f(x)= 0.2228514282885164
+differential_evolution step 726: f(x)= 0.2228514282885164
+differential_evolution step 727: f(x)= 0.2228514282885164
+differential_evolution step 728: f(x)= 0.2228514282885164
+differential_evolution step 729: f(x)= 0.2228514282885164
+differential_evolution step 730: f(x)= 0.2228514282885164
+differential_evolution step 731: f(x)= 0.2228514282885164
+differential_evolution step 732: f(x)= 0.2228514282885164
+differential_evolution step 733: f(x)= 0.2228514282885164
+differential_evolution step 734: f(x)= 0.2228514282885164
+differential_evolution step 735: f(x)= 0.2228514282885164
+differential_evolution step 736: f(x)= 0.2228514282885164
+differential_evolution step 737: f(x)= 0.2228514282885164
+differential_evolution step 738: f(x)= 0.2228514282885164
+differential_evolution step 739: f(x)= 0.2228514282885164
+differential_evolution step 740: f(x)= 0.2228514282885164
+differential_evolution step 741: f(x)= 0.2228514282885164
+differential_evolution step 742: f(x)= 0.2228514282885164
+differential_evolution step 743: f(x)= 0.2228514282885164
+differential_evolution step 744: f(x)= 0.2228514282885164
+differential_evolution step 745: f(x)= 0.2228514282885164
+differential_evolution step 746: f(x)= 0.2228514282885164
+differential_evolution step 747: f(x)= 0.2228514282885164
+differential_evolution step 748: f(x)= 0.2228514282885164
+differential_evolution step 749: f(x)= 0.2228514282885164
+differential_evolution step 750: f(x)= 0.2228514282885164
+differential_evolution step 751: f(x)= 0.2228514282885164
+differential_evolution step 752: f(x)= 0.2228514282885164
+differential_evolution step 753: f(x)= 0.2228514282885164
+differential_evolution step 754: f(x)= 0.2228514282885164
+differential_evolution step 755: f(x)= 0.2228514282885164
+differential_evolution step 756: f(x)= 0.2228514282885164
+differential_evolution step 757: f(x)= 0.2228514282885164
+differential_evolution step 758: f(x)= 0.2228514282885164
+differential_evolution step 759: f(x)= 0.2228514282885164
+differential_evolution step 760: f(x)= 0.2228514282885164
+differential_evolution step 761: f(x)= 0.2228514282885164
+differential_evolution step 762: f(x)= 0.2228514282885164
+differential_evolution step 763: f(x)= 0.2228514282885164
+differential_evolution step 764: f(x)= 0.2228514282885164
+differential_evolution step 765: f(x)= 0.2228514282885164
+differential_evolution step 766: f(x)= 0.2228514282885164
+differential_evolution step 767: f(x)= 0.2228514282885164
+differential_evolution step 768: f(x)= 0.2228514282885164
+differential_evolution step 769: f(x)= 0.2228514282885164
+differential_evolution step 770: f(x)= 0.2228514282885164
+differential_evolution step 771: f(x)= 0.2228514282885164
+differential_evolution step 772: f(x)= 0.2228514282885164
+differential_evolution step 773: f(x)= 0.2228514282885164
+differential_evolution step 774: f(x)= 0.2228514282885164
+differential_evolution step 775: f(x)= 0.2228514282885164
+differential_evolution step 776: f(x)= 0.2228514282885164
+differential_evolution step 777: f(x)= 0.2228514282885164
+differential_evolution step 778: f(x)= 0.2228514282885164
+differential_evolution step 779: f(x)= 0.2228514282885164
+differential_evolution step 780: f(x)= 0.2228514282885164
+differential_evolution step 781: f(x)= 0.2228514282885164
+differential_evolution step 782: f(x)= 0.2228514282885164
+differential_evolution step 783: f(x)= 0.2228514282885164
+differential_evolution step 784: f(x)= 0.2228514282885164
+differential_evolution step 785: f(x)= 0.2228514282885164
+differential_evolution step 786: f(x)= 0.2228514282885164
+differential_evolution step 787: f(x)= 0.2228514282885164
+differential_evolution step 788: f(x)= 0.2228514282885164
+differential_evolution step 789: f(x)= 0.2228514282885164
+differential_evolution step 790: f(x)= 0.2228514282885164
+differential_evolution step 791: f(x)= 0.2228514282885164
+differential_evolution step 792: f(x)= 0.2228514282885164
+differential_evolution step 793: f(x)= 0.2228514282885164
+differential_evolution step 794: f(x)= 0.2228514282885164
+differential_evolution step 795: f(x)= 0.2228514282885164
+differential_evolution step 796: f(x)= 0.2228514282885164
+differential_evolution step 797: f(x)= 0.2228514282885164
+differential_evolution step 798: f(x)= 0.2228514282885164
+differential_evolution step 799: f(x)= 0.2228514282885164
+differential_evolution step 800: f(x)= 0.2228514282885164
+differential_evolution step 801: f(x)= 0.2228514282885164
+differential_evolution step 802: f(x)= 0.2228514282885164
+differential_evolution step 803: f(x)= 0.2228514282885164
+differential_evolution step 804: f(x)= 0.2228514282885164
+differential_evolution step 805: f(x)= 0.2228514282885164
+differential_evolution step 806: f(x)= 0.2228514282885164
+differential_evolution step 807: f(x)= 0.2228514282885164
+differential_evolution step 808: f(x)= 0.2228514282885164
+differential_evolution step 809: f(x)= 0.2228514282885164
+differential_evolution step 810: f(x)= 0.2228514282885164
+differential_evolution step 811: f(x)= 0.2228514282885164
+differential_evolution step 812: f(x)= 0.2228514282885164
+differential_evolution step 813: f(x)= 0.2228514282885164
+differential_evolution step 814: f(x)= 0.2228514282885164
+differential_evolution step 815: f(x)= 0.2228514282885164
+differential_evolution step 816: f(x)= 0.2228514282885164
+differential_evolution step 817: f(x)= 0.2228514282885164
+differential_evolution step 818: f(x)= 0.2228514282885164
+differential_evolution step 819: f(x)= 0.2228514282885164
+differential_evolution step 820: f(x)= 0.2228514282885164
+differential_evolution step 821: f(x)= 0.2228514282885164
+differential_evolution step 822: f(x)= 0.2228514282885164
+differential_evolution step 823: f(x)= 0.2228514282885164
+differential_evolution step 824: f(x)= 0.2228514282885164
+differential_evolution step 825: f(x)= 0.2228514282885164
+differential_evolution step 826: f(x)= 0.2228514282885164
+differential_evolution step 827: f(x)= 0.2228514282885164
+differential_evolution step 828: f(x)= 0.2228514282885164
+differential_evolution step 829: f(x)= 0.2228514282885164
+differential_evolution step 830: f(x)= 0.2228514282885164
+differential_evolution step 831: f(x)= 0.2228514282885164
+differential_evolution step 832: f(x)= 0.2228514282885164
+differential_evolution step 833: f(x)= 0.2228514282885164
+differential_evolution step 834: f(x)= 0.2228514282885164
+differential_evolution step 835: f(x)= 0.2228514282885164
+differential_evolution step 836: f(x)= 0.2228514282885164
+differential_evolution step 837: f(x)= 0.2228514282885164
+differential_evolution step 838: f(x)= 0.2228514282885164
+differential_evolution step 839: f(x)= 0.2228514282885164
+differential_evolution step 840: f(x)= 0.2228514282885164
+differential_evolution step 841: f(x)= 0.2228514282885164
+differential_evolution step 842: f(x)= 0.2228514282885164
+differential_evolution step 843: f(x)= 0.2228514282885164
+differential_evolution step 844: f(x)= 0.2228514282885164
+differential_evolution step 845: f(x)= 0.2228514282885164
+differential_evolution step 846: f(x)= 0.2228514282885164
+differential_evolution step 847: f(x)= 0.2228514282885164
+differential_evolution step 848: f(x)= 0.2228514282885164
+differential_evolution step 849: f(x)= 0.2228514282885164
+differential_evolution step 850: f(x)= 0.2228514282885164
+differential_evolution step 851: f(x)= 0.2228514282885164
+differential_evolution step 852: f(x)= 0.2228514282885164
+differential_evolution step 853: f(x)= 0.2228514282885164
+differential_evolution step 854: f(x)= 0.2228514282885164
+differential_evolution step 855: f(x)= 0.2228514282885164
+differential_evolution step 856: f(x)= 0.2228514282885164
+differential_evolution step 857: f(x)= 0.2228514282885164
+differential_evolution step 858: f(x)= 0.2228514282885164
+differential_evolution step 859: f(x)= 0.2228514282885164
+differential_evolution step 860: f(x)= 0.2228514282885164
+differential_evolution step 861: f(x)= 0.2228514282885164
+differential_evolution step 862: f(x)= 0.2228514282885164
+differential_evolution step 863: f(x)= 0.2228514282885164
+differential_evolution step 864: f(x)= 0.2228514282885164
+differential_evolution step 865: f(x)= 0.2228514282885164
+differential_evolution step 866: f(x)= 0.2228514282885164
+differential_evolution step 867: f(x)= 0.2228514282885164
+differential_evolution step 868: f(x)= 0.2228514282885164
+differential_evolution step 869: f(x)= 0.2228514282885164
+differential_evolution step 870: f(x)= 0.2228514282885164
+differential_evolution step 871: f(x)= 0.2228514282885164
+differential_evolution step 872: f(x)= 0.2228514282885164
+differential_evolution step 873: f(x)= 0.2228514282885164
+differential_evolution step 874: f(x)= 0.2228514282885164
+differential_evolution step 875: f(x)= 0.2228514282885164
+differential_evolution step 876: f(x)= 0.2228514282885164
+differential_evolution step 877: f(x)= 0.2228514282885164
+differential_evolution step 878: f(x)= 0.2228514282885164
+differential_evolution step 879: f(x)= 0.2228514282885164
+differential_evolution step 880: f(x)= 0.2228514282885164
+differential_evolution step 881: f(x)= 0.2228514282885164
+differential_evolution step 882: f(x)= 0.2228514282885164
+differential_evolution step 883: f(x)= 0.2228514282885164
+differential_evolution step 884: f(x)= 0.2228514282885164
+differential_evolution step 885: f(x)= 0.2228514282885164
+differential_evolution step 886: f(x)= 0.2228514282885164
+differential_evolution step 887: f(x)= 0.2228514282885164
+differential_evolution step 888: f(x)= 0.2228514282885164
+differential_evolution step 889: f(x)= 0.2228514282885164
+differential_evolution step 890: f(x)= 0.2228514282885164
+differential_evolution step 891: f(x)= 0.2228514282885164
+differential_evolution step 892: f(x)= 0.2228514282885164
+differential_evolution step 893: f(x)= 0.2228514282885164
+differential_evolution step 894: f(x)= 0.2228514282885164
+differential_evolution step 895: f(x)= 0.2228514282885164
+differential_evolution step 896: f(x)= 0.2228514282885164
+differential_evolution step 897: f(x)= 0.2228514282885164
+differential_evolution step 898: f(x)= 0.2228514282885164
+differential_evolution step 899: f(x)= 0.2228514282885164
+differential_evolution step 900: f(x)= 0.2228514282885164
+differential_evolution step 901: f(x)= 0.2228514282885164
+differential_evolution step 902: f(x)= 0.2228514282885164
+differential_evolution step 903: f(x)= 0.2228514282885164
+differential_evolution step 904: f(x)= 0.2228514282885164
+differential_evolution step 905: f(x)= 0.2228514282885164
+differential_evolution step 906: f(x)= 0.2228514282885164
+differential_evolution step 907: f(x)= 0.2228514282885164
+differential_evolution step 908: f(x)= 0.2228514282885164
+differential_evolution step 909: f(x)= 0.2228514282885164
+differential_evolution step 910: f(x)= 0.2228514282885164
+differential_evolution step 911: f(x)= 0.2228514282885164
+differential_evolution step 912: f(x)= 0.2228514282885164
+differential_evolution step 913: f(x)= 0.2228514282885164
+differential_evolution step 914: f(x)= 0.2228514282885164
+differential_evolution step 915: f(x)= 0.2228514282885164
+differential_evolution step 916: f(x)= 0.2228514282885164
+differential_evolution step 917: f(x)= 0.2228514282885164
+differential_evolution step 918: f(x)= 0.2228514282885164
+differential_evolution step 919: f(x)= 0.2228514282885164
+differential_evolution step 920: f(x)= 0.2228514282885164
+differential_evolution step 921: f(x)= 0.2228514282885164
+differential_evolution step 922: f(x)= 0.2228514282885164
+differential_evolution step 923: f(x)= 0.2228514282885164
+differential_evolution step 924: f(x)= 0.2228514282885164
+differential_evolution step 925: f(x)= 0.2228514282885164
+differential_evolution step 926: f(x)= 0.2228514282885164
+differential_evolution step 927: f(x)= 0.2228514282885164
+differential_evolution step 928: f(x)= 0.2228514282885164
+differential_evolution step 929: f(x)= 0.2228514282885164
+differential_evolution step 930: f(x)= 0.2228514282885164
+differential_evolution step 931: f(x)= 0.2228514282885164
+differential_evolution step 932: f(x)= 0.2228514282885164
+differential_evolution step 933: f(x)= 0.2228514282885164
+differential_evolution step 934: f(x)= 0.2228514282885164
+differential_evolution step 935: f(x)= 0.2228514282885164
+differential_evolution step 936: f(x)= 0.2228514282885164
+differential_evolution step 937: f(x)= 0.2228514282885164
+differential_evolution step 938: f(x)= 0.2228514282885164
+differential_evolution step 939: f(x)= 0.2228514282885164
+differential_evolution step 940: f(x)= 0.2228514282885164
+differential_evolution step 941: f(x)= 0.2228514282885164
+differential_evolution step 942: f(x)= 0.2228514282885164
+differential_evolution step 943: f(x)= 0.2228514282885164
+differential_evolution step 944: f(x)= 0.2228514282885164
+differential_evolution step 945: f(x)= 0.2228514282885164
+differential_evolution step 946: f(x)= 0.2228514282885164
+differential_evolution step 947: f(x)= 0.2228514282885164
+differential_evolution step 948: f(x)= 0.2228514282885164
+differential_evolution step 949: f(x)= 0.2228514282885164
+differential_evolution step 950: f(x)= 0.2228514282885164
+differential_evolution step 951: f(x)= 0.2228514282885164
+differential_evolution step 952: f(x)= 0.2228514282885164
+differential_evolution step 953: f(x)= 0.2228514282885164
+differential_evolution step 954: f(x)= 0.2228514282885164
+differential_evolution step 955: f(x)= 0.2228514282885164
+differential_evolution step 956: f(x)= 0.2228514282885164
+differential_evolution step 957: f(x)= 0.2228514282885164
+differential_evolution step 958: f(x)= 0.2228514282885164
+differential_evolution step 959: f(x)= 0.2228514282885164
+differential_evolution step 960: f(x)= 0.2228514282885164
+differential_evolution step 961: f(x)= 0.2228514282885164
+differential_evolution step 962: f(x)= 0.2228514282885164
+differential_evolution step 963: f(x)= 0.2228514282885164
+differential_evolution step 964: f(x)= 0.2228514282885164
+differential_evolution step 965: f(x)= 0.2228514282885164
+differential_evolution step 966: f(x)= 0.2228514282885164
+differential_evolution step 967: f(x)= 0.2228514282885164
+differential_evolution step 968: f(x)= 0.2228514282885164
+differential_evolution step 969: f(x)= 0.2228514282885164
+differential_evolution step 970: f(x)= 0.2228514282885164
+differential_evolution step 971: f(x)= 0.2228514282885164
+differential_evolution step 972: f(x)= 0.2228514282885164
+differential_evolution step 973: f(x)= 0.2228514282885164
+differential_evolution step 974: f(x)= 0.2228514282885164
+differential_evolution step 975: f(x)= 0.2228514282885164
+differential_evolution step 976: f(x)= 0.2228514282885164
+differential_evolution step 977: f(x)= 0.2228514282885164
+differential_evolution step 978: f(x)= 0.2228514282885164
+differential_evolution step 979: f(x)= 0.2228514282885164
+differential_evolution step 980: f(x)= 0.2228514282885164
+differential_evolution step 981: f(x)= 0.2228514282885164
+differential_evolution step 982: f(x)= 0.2228514282885164
+differential_evolution step 983: f(x)= 0.2228514282885164
+differential_evolution step 984: f(x)= 0.2228514282885164
+differential_evolution step 985: f(x)= 0.2228514282885164
+differential_evolution step 986: f(x)= 0.2228514282885164
+differential_evolution step 987: f(x)= 0.2228514282885164
+differential_evolution step 988: f(x)= 0.2228514282885164
+differential_evolution step 989: f(x)= 0.2228514282885164
+differential_evolution step 990: f(x)= 0.2228514282885164
+differential_evolution step 991: f(x)= 0.2228514282885164
+differential_evolution step 992: f(x)= 0.2228514282885164
+differential_evolution step 993: f(x)= 0.2228514282885164
+differential_evolution step 994: f(x)= 0.2228514282885164
+differential_evolution step 995: f(x)= 0.2228514282885164
+differential_evolution step 996: f(x)= 0.2228514282885164
+differential_evolution step 997: f(x)= 0.2228514282885164
+differential_evolution step 998: f(x)= 0.2228514282885164
+differential_evolution step 999: f(x)= 0.2228514282885164
+differential_evolution step 1000: f(x)= 0.2228514282885164
+             message: Maximum number of iterations has been exceeded.
+             success: False
+                 fun: 0.2228514282885164
+                   x: [-2.840e+00  9.429e-01 ...  1.341e+00 -1.942e+00]
+                 nit: 1000
+                nfev: 36036
+          population: [[-2.840e+00  9.429e-01 ...  1.341e+00 -1.942e+00]
+                       [ 2.305e+00  1.808e+00 ... -2.901e-01 -7.143e-01]
+                       ...
+                       [-2.503e-01  5.725e-01 ...  2.661e+00  1.878e+00]
+                       [-2.168e+00  1.356e+00 ... -1.368e+00 -1.498e+00]]
+ population_energies: [ 2.229e-01  2.431e-01 ...  2.815e-01  2.493e-01]
+Time: 161.42283535003662
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">nit</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">nit</span><span class="p">),</span> <span class="n">energies</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (QJobMapper)&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">nit</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">result_</span><span class="o">.</span><span class="n">nit</span><span class="p">,</span> <span class="n">result_</span><span class="o">.</span><span class="n">nit</span><span class="p">),</span> <span class="n">energies_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (QPUCircuitMapper)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plt.savefig(f&quot;optimization_de_n_{num_qubits}_p_{num_parameters}.png&quot;, dpi=200)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_Optimizers_II_mapping_16_0.png" src="../_images/_examples_Optimizers_II_mapping_16_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Paralelization-of-expectation-value-terms">
+<h1>Paralelization of expectation value terms<a class="headerlink" href="#Paralelization-of-expectation-value-terms" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Paralelization-for-gradient-optimizers">
+<h1>Paralelization for gradient optimizers<a class="headerlink" href="#Paralelization-for-gradient-optimizers" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO</span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Optimizers_I_upgrading_parameters.html" class="btn btn-neutral float-left" title="Examples for optimizations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

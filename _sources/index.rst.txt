@@ -8,24 +8,19 @@ Welcome to CUNQA's documentation!
 
 **CUNQA** is a Python/C++ platform to simulate distributed quantum computing on the `CESGA HPC environment <https://cesga-docs.gitlab.io/index.html>`_.
 
-CUNQA creates and manages virtual QPUs, which are classical resources allocated for emulation tasks, where distributed quantum programs can be executed.
-The Python API is structured in a way which will be familiar to Qiskit users, while the backend is written in C++ for performance.
-All code available on our `GitHub repository <https://github.com/CESGA-Quantum-Spain/cunqa>`_. 
+.. CUNQA creates and manages virtual QPUs, which are classical resources allocated for emulation tasks, where distributed quantum programs can be executed.
+ The Python API is structured in a way which will be familiar to Qiskit users, while the backend is written in C++ for performance.
+ All code available on our `GitHub repository <https://github.com/CESGA-Quantum-Spain/cunqa>`_. 
 
-First time users can find an installation guide in :doc:`modulesetup`. Additionally, a tutorial to learn how to use **CUNQA** can be found in :doc:`first_steps`. 
+.. First time users can find an installation guide in :doc:`modulesetup`. Additionally, a tutorial to learn how to use **CUNQA** can be found in :doc:`first_steps`. 
 
-For documentation of individual objects and functions check :doc:`cunqa`. Illustrative examples of use can be found in :doc:`examples_gallery`.
+.. For documentation of individual objects and functions check :doc:`cunqa`. Illustrative examples of use can be found in :doc:`examples_gallery`.
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   modulesetup
-   first_steps
+   getting_started
    cunqa
    examples_gallery
-
-
-    
-
