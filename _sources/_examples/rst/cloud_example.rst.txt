@@ -1,0 +1,6 @@
+cloud_example
+=============
+
+.. literalinclude:: code_examples/{filename}.py
+   :language: python
+   :linenos:
