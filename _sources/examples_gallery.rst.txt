@@ -11,9 +11,9 @@ Here you can peruse through some examples of CUNQA use that will help you get th
    :maxdepth: 2
    :caption: Other examples
 
-   _examples/rst/cloud_example
-   _examples/rst/example_qraise
-   _examples/rst/hpc_example
+   _examples/py_file_examples/cloud_example
+   _examples/py_file_examples/example_qraise
+   _examples/py_file_examples/hpc_example
 
 
 
