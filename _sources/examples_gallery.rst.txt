@@ -1,6 +1,6 @@
 Examples gallery
 ====================================
-Here you can peruse through some examples of CUNQA use that will help you get the hang of its workflow.
+Click on the following thumbnails to peruse some jupyter notebooks showing how to use **CUNQA**. On other examples you can find simple examples of the **CUNQA** workflow.
 
 .. nbgallery::
    _examples/Multiple_circuits_execution.ipynb
