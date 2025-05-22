@@ -1,0 +1,24 @@
+cunqa.mappers.QJobMapper
+========================
+
+.. currentmodule:: cunqa.mappers
+
+.. autoclass:: QJobMapper
+   :members:
+   :show-inheritance:
+   :inherited-members:
+   :special-members: __call__, __add__, __mul__
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :nosignatures:
+   
+   
+   
+
+   
+   
+   
