@@ -6,6 +6,7 @@ import numpy as np
 import random
 import string
 from typing import Tuple, Union, Optional
+from qiskit import QuantumCircuit
 
 def generate_id(size=4):
     chars = string.ascii_letters + string.digits
@@ -264,7 +265,115 @@ class CunqaCircuit:
 
         return new_name
     
+    # ================ CIRCUIT MODIFICATION METHODS ===========
+
+    # Horizontal concatenation methods
+
+    def __add__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit]) -> 'CunqaCircuit':
+        """
+        Overloading the "+" operator to perform horizontal concatenation. This means that summing two CunqaCircuits will return a circuit that
+        applies the operations of the first circuit and then those of the second circuit. Not a commutative operation.
+
+        Args
+            other_circuit (<class.cunqa.circuit.CunqaCircuit>, <class.qiskit.QuantumCircuit>): circuit to be horizontally concatenated after self.
+        Returns
+            summed_circuit (<class.cunqa.circuit.CunqaCircuit>): circuit with instructions from both summands.
+        """
+        n = self.num_qubits
+        if  n == other_circuit.num_qubits:
+            summed_circuit = CunqaCircuit(n, n) 
+
+            if isinstance(other_circuit, CunqaCircuit):
+                other_instr = other_circuit.instructions
+                sum_id = self._id + " + " + other_circuit._id
+
+            elif isinstance(other_circuit, QuantumCircuit):
+                other_instr = qc_to_json(other_circuit)['instructions']
+                sum_id = self._id + " + qc"
+                
+            else:
+                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+                raise SystemExit
+            
+            self_instr = self.instructions
+            summed_circuit._id = sum_id
+            for instruction in list(self_instr + other_instr):
+                summed_circuit._add_instruction(instruction)
+            
+            return summed_circuit
+        
+        else:
+            logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
+            raise SystemExit
+
+    def __radd__(self, left_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
+        """
+        Overloading the "+" operator to perform horizontal concatenation. In this case circ_1 + circ_2 is interpreted as circ_2.__radd__(circ_1). 
+        Implementing it ensures that the order QuantumCircuit + CunqaCircuit also works, as QuantumCircuit.__add__() only accepts QuantumCircuits. 
+        """
+        n = self.num_qubits
+        if  n == left_circuit.num_qubits:
+             
+
+            if isinstance(left_circuit, CunqaCircuit):
+                return left_circuit.__add__(self)
+
+            elif isinstance(left_circuit, QuantumCircuit):
+                sum_id = self._id + " + qc"
+                summed_circuit = CunqaCircuit(n, n, id = sum_id)
+                left_instr = qc_to_json(left_circuit)['instructions']
+                
+                for instruction in list(left_instr + self.instructions):
+                    summed_circuit._add_instruction(instruction)
+                
+                return summed_circuit
+        
+            else:
+                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(left_circuit)} was provided.[{NotImplemented.__name__}].")
+                raise SystemExit
+                   
+        else:
+            logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
+            raise SystemExit
+
+    def __iadd__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit]):
+        """
+        Overloading the "+=" operator to concatenate horizontally the circuit self with other_circuit. This means adding the operations from 
+        the other_circuit to self. No return as the modifications are performed locally on self.
+        Args
+            other_circuit (<class.cunqa.circuit.CunqaCircuit>, <class.qiskit.QuantumCircuit>): circuit to be horizontally concatenated after self.
+        """
+
+        n = self.num_qubits
+        if  n == other_circuit.num_qubits:
+            if isinstance(other_circuit, CunqaCircuit):
+                other_instr = other_circuit.instructions
+
+            elif isinstance(other_circuit, QuantumCircuit):
+                other_instr = qc_to_json(other_circuit)['instructions']
+                
+            else:
+                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+                raise SystemExit
+            
+            
+            for instruction in list(other_instr):
+                self._add_instruction(instruction)
+        
+        else:
+            logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
+            raise SystemExit
+
+
+    # Vertical concatenation methods
+    def __or__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
+        pass
+    def __ror__(self, left_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
+        pass
+    def __ior__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit]):
+        pass
     
+
     # =============== INSTRUCTIONS ===============
     
     # Methods for implementing non parametric single-qubit gates
