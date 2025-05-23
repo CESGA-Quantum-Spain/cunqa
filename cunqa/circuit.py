@@ -280,9 +280,7 @@ class CunqaCircuit:
             summed_circuit (<class.cunqa.circuit.CunqaCircuit>): circuit with instructions from both summands.
         """
         n = self.num_qubits
-        if  n == other_circuit.num_qubits:
-            summed_circuit = CunqaCircuit(n, n) 
-
+        if  n == other_circuit.num_qubits:            
             if isinstance(other_circuit, CunqaCircuit):
                 other_instr = other_circuit.instructions
                 sum_id = self._id + " + " + other_circuit._id
@@ -296,7 +294,8 @@ class CunqaCircuit:
                 raise SystemExit
             
             self_instr = self.instructions
-            summed_circuit._id = sum_id
+            summed_circuit = CunqaCircuit(n, n, id = sum_id) 
+
             for instruction in list(self_instr + other_instr):
                 summed_circuit._add_instruction(instruction)
             
@@ -367,11 +366,68 @@ class CunqaCircuit:
 
     # Vertical concatenation methods
     def __or__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
-        pass
+        if isinstance(other_circuit, CunqaCircuit):
+            other_instr = other_circuit.instructions
+            union_id = self._id + " | " + other_circuit._id
+
+        elif isinstance(other_circuit, QuantumCircuit):
+            other_instr = qc_to_json(other_circuit)['instructions']
+            union_id = self._id + " | qc"
+                
+        else:
+            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+        
+        n=self.num_qubits; m=other_circuit.num_qubits
+        union_circuit = CunqaCircuit(n+m,n+m, id = union_id)
+
+        for instr in self.instructions:
+            union_circuit._add_instruction(instr)
+        for instrr in other_instr:
+            instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]]
+            union_circuit._add_instruction(instrr)
+
+        return union_circuit
+    
     def __ror__(self, left_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
-        pass
+        if isinstance(left_circuit, CunqaCircuit):
+            left_instr = left_circuit.instructions
+            union_id = self._id + " | " + left_circuit._id
+
+        elif isinstance(left_circuit, QuantumCircuit):
+            left_instr = qc_to_json(left_circuit)['instructions']
+            union_id = self._id + " | qc"
+                
+        else:
+            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(left_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+        
+        n=self.num_qubits; m=left_circuit.num_qubits
+        union_circuit = CunqaCircuit(n+m,n+m, id = union_id)
+
+        for instr in left_instr:
+            union_circuit._add_instruction(instr)
+        for instrr in self.instructions:
+            instrr["qubits"] = [qubit + m for qubit in instrr["qubits"]]
+            union_circuit._add_instruction(instrr)
+
+        return union_circuit
+    
     def __ior__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit]):
-        pass
+        if isinstance(other_circuit, CunqaCircuit):
+            other_instr = other_circuit.instructions
+
+        elif isinstance(other_circuit, QuantumCircuit):
+            other_instr = qc_to_json(other_circuit)['instructions']
+                
+        else:
+            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+        
+        n=self.num_qubits
+        for instrr in other_instr:
+            instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]]
+            self._add_instruction(instrr)
     
 
     # =============== INSTRUCTIONS ===============
