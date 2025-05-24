@@ -7,4 +7,3 @@ flock $INFO_PATH -c "/mnt/netapp1/Optcesga_FT2_RHEL7/2020/gentoo/22072020/usr/bi
 if compgen -G "$STORE/.cunqa/tmp_fakeqmio_backend_$SLURM_JOB_ID.json" > /dev/null; then
     rm $STORE/.cunqa/tmp_fakeqmio_backend_$SLURM_JOB_ID.json
 fi
-

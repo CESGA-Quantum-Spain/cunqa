@@ -1,18 +1,18 @@
 import os
 import sys
 
-installation_path = os.getenv("INSTALL_PATH")
+installation_path = os.getenv("HOME")+"/cunqa/"
 sys.path.append(installation_path)
 
-from cunqa.logger import logger
+from logger import logger
 import argparse
 import json
 from jsonschema import validate, ValidationError
 
 from qiskit_aer.noise import NoiseModel
 
-schema_noise_properties = installation_path + "/cunqa/noise_model/json_schema/calibrations_schema.json"
-schema_backend = installation_path + "/cunqa/noise_model/json_schema/backend_schema.json"
+schema_noise_properties = installation_path + "noise_model/json_schema/calibrations_schema.json"
+schema_backend = installation_path + "noise_model/json_schema/backend_schema.json"
 
 # constructing NoiseModel from calibrations using qmiotools
 from qmiotools.integrations.qiskitqmio import FakeQmio 
@@ -84,10 +84,10 @@ backend = CunqaBackend(noise_properties_json = noise_properties_json)
 from qiskit_aer.noise import NoiseModel
 
 noise_model = NoiseModel.from_backend(
-        backend, thermal_relaxation=True,
+        backend, thermal_relaxation=thermal_relaxation,
         temperature=True,
-        gate_error=True,
-        readout_error=True)
+        gate_error=gate_error,
+        readout_error=readout_error)
 
 noise_model_json = noise_model_json = noise_model.to_dict(serializable = True)
 

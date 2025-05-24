@@ -33,7 +33,8 @@ void turn_ON_QPU(const JSON& backend_json, const std::string& mode, const std::s
 
 std::string generate_FakeQMIO(JSON back_path_json, std::string& family)
 {
-    std::string command("python "s + std::getenv("INSTALL_PATH") + "/cunqa/noise_model/fakeqmio.py "s
+    LOGGER_DEBUG("About to generate FakeQmio instructions...");
+    std::string command("python "s + std::getenv("HOME") + "/cunqa/noise_model/fakeqmio.py "s
                                    + back_path_json.at("fakeqmio_path").get<std::string>() + " "s
                                    + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
                                    + back_path_json.at("readout_error").get<std::string>() + " "s
@@ -56,7 +57,7 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
         LOGGER_DEBUG("No backend_path provided, defining backend from noise_properties.");
         backend_path = "default";
     }
-    std::string command("python "s + std::getenv("INSTALL_PATH") + "/cunqa/noise_model/noise_instructions.py "s
+    std::string command("python "s + std::getenv("HOME") + "/cunqa/noise_model/noise_instructions.py "s
                                    + back_path_json.at("noise_properties_path").get<std::string>() + " "s
                                    + backend_path.c_str() + " "s
                                    + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
@@ -98,13 +99,17 @@ int main(int argc, char *argv[])
     if (family == "default")
         family = std::getenv("SLURM_JOB_ID");
 
+    LOGGER_DEBUG("Family name assigned.");
+
     switch(murmur::hash(communications)) {
         case murmur::hash("no_comm"): 
             switch(murmur::hash(sim_arg)) {
-                case murmur::hash("Aer"): 
+                case murmur::hash("Aer"):
+                    LOGGER_DEBUG("Turning on Aer QPUs");
                     turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, family);
                     break;
                 case murmur::hash("Munich"):
+                LOGGER_DEBUG("Turning on Munic QPUs");
                     turn_ON_QPU<MunichSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, family);
                     break;
                 default:

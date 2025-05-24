@@ -19,7 +19,6 @@
 
 #include "logger.hpp"
 
-#include "logger.hpp"
 
 using namespace std::literals;
 
