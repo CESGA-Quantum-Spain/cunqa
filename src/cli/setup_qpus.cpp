@@ -21,18 +21,53 @@ using namespace cunqa::sim;
 template<typename Simulator, typename Config, typename BackendType>
 void turn_ON_QPU(const JSON& backend_json, const std::string& mode, const std::string& family)
 {
-    JSON config_json = Config();
-    Config config = (backend_json.empty() ? config_json : backend_json);
-    LOGGER_DEBUG("Ready to create QPUs");
-    QPU qpu(std::make_unique<BackendType>(config, std::make_unique<Simulator>()), mode, family);
+    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
+    Config config;
+    if (!backend_json.empty())
+        config = backend_json;
+    JSON config_json = config;
+    QPU qpu(std::make_unique<BackendType>(config, std::move(simulator)), mode, family);
+    LOGGER_DEBUG("QPU instantiated.");
     qpu.turn_ON();
 }
 
-std::string generate_FakeQMIO(JSON back_path_json)
+std::string generate_FakeQMIO(JSON back_path_json, std::string& family)
 {
-    std::string command("python "s + std::getenv("HOME") + "/cunqa/fakeqmio.py "s + back_path_json.at("fakeqmio_path").get<std::string>() + " "s +  std::getenv("SLURM_JOB_ID"));
+    std::string command("python "s + std::getenv("INSTALL_PATH") + "/cunqa/noise_model/fakeqmio.py "s
+                                   + back_path_json.at("fakeqmio_path").get<std::string>() + " "s
+                                   + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
+                                   + back_path_json.at("readout_error").get<std::string>() + " "s
+                                   + back_path_json.at("gate_error").get<std::string>() + " "s
+                                   +  family.c_str());
+
+
     std::system(("ml load qmio/hpc gcc/12.3.0 qmio-tools/0.2.0-python-3.9.9 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
-    return std::getenv("STORE") + "/.cunqa/tmp_fakeqmio_backend_"s + std::getenv("SLURM_JOB_ID") + ".json"s;
+    return std::getenv("STORE") + "/.cunqa/tmp_fakeqmio_backend_"s + family.c_str() + ".json"s;
+}
+
+std::string generate_noise_instructions(JSON back_path_json, std::string& family)
+{
+    std::string backend_path;
+
+    if (back_path_json.contains("backend_path")){
+        LOGGER_DEBUG("backend_path provided");
+        backend_path=back_path_json.at("backend_path").get<std::string>();
+    } else {
+        LOGGER_DEBUG("No backend_path provided, defining backend from noise_properties.");
+        backend_path = "default";
+    }
+    std::string command("python "s + std::getenv("INSTALL_PATH") + "/cunqa/noise_model/noise_instructions.py "s
+                                   + back_path_json.at("noise_properties_path").get<std::string>() + " "s
+                                   + backend_path.c_str() + " "s
+                                   + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
+                                   + back_path_json.at("readout_error").get<std::string>() + " "s
+                                   + back_path_json.at("gate_error").get<std::string>() + " "s
+                                   + family.c_str());
+                                   
+
+    LOGGER_DEBUG("Command: {}", command);
+    std::system(("ml load qmio/hpc gcc/12.3.0 qmio-tools/0.2.0-python-3.9.9 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
+    return std::getenv("STORE") + "/.cunqa/tmp_noisy_backend_"s + family.c_str() + ".json"s;
 }
 
 int main(int argc, char *argv[])
@@ -48,11 +83,16 @@ int main(int argc, char *argv[])
 
     JSON backend_json;
     if (back_path_json.contains("fakeqmio_path")) {
-        std::ifstream f(generate_FakeQMIO(back_path_json));
+        std::ifstream f(generate_FakeQMIO(back_path_json, family));
+        backend_json = JSON::parse(f);
+    } else if (back_path_json.contains("noise_properties_path")) {
+        std::ifstream f(generate_noise_instructions(back_path_json, family));
         backend_json = JSON::parse(f);
     } else if (back_path_json.contains("backend_path")) {
         std::ifstream f(back_path_json.at("backend_path").get<std::string>());
         backend_json = JSON::parse(f);
+    } else {
+        LOGGER_DEBUG("No backend_path, fakeqmio_path nor noise_properties_path were provided.");
     }
 
     if (family == "default")

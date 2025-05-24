@@ -12,8 +12,9 @@
 #include "utils/qraise/utils_qraise.hpp"
 #include "utils/qraise/args_qraise.hpp"
 #include "utils/qraise/fakeqmio_conf_qraise.hpp"
+#include "utils/qraise/noise_model_conf_qraise.hpp"
 #include "utils/qraise/no_comm_conf_qraise.hpp"
-#include "utils/qraise/class_comm_conf_qraise.hpp"
+#include "utils/qraise/classical_comm_conf_qraise.hpp"
 #include "utils/qraise/quantum_comm_conf_qraise.hpp"
 
 #include "logger.hpp"
@@ -99,10 +100,10 @@ int main(int argc, char* argv[])
     int memory_specs = check_memory_specs(args.mem_per_qpu, args.cores_per_qpu);
 
     if (memory_specs == 1) {
-        LOGGER_ERROR("Too much memory per QPU in QMIO. Please, decrease the mem-per-qpu or increase the cores-per-qpu. (Max mem-per-cpu = 16)");
+        LOGGER_ERROR("Too much memory per QPU in QMIO. Please, decrease the mem-per-QPU or increase the cores-per-qpu. (Max mem-per-cpu = 16)");
         return -1;
     } else if (memory_specs == 2) {
-        LOGGER_ERROR("Too much memory per QPU in FT3. Please, decrease the mem-per-qpu or increase the cores-per-qpu. Max mem-per-cpu = 4");
+        LOGGER_ERROR("Too much memory per QPU in FT3. Please, decrease the mem-per-QPU or increase the cores-per-qpu. Max mem-per-cpu = 4");
         return -1;
     }
 
@@ -113,11 +114,20 @@ int main(int argc, char* argv[])
     sbatchFile << "mkdir $STORE/.cunqa\n";
     sbatchFile << "fi\n";
 
-    sbatchFile << "BINARIES_DIR=" << std::getenv("STORE") << "/.cunqa\n";
+    const char* var_name = "INSTALL_PATH"; // Replace with your variable name
+    const char* var_install_path = std::getenv(var_name);
+
+    if (var_install_path) {
+        sbatchFile << "BINARIES_DIR=" << var_install_path << "/bin\n";
+    } else {
+        std::cerr << "Environment variable INSTALL_PATH is not set: aborting.\n"; 
+    }
+
+    
     sbatchFile << "export INFO_PATH=" << info_path + "\n";
 
     //Checking duplicate family name
-    std::string family = std::any_cast<std::string>(args.family);
+    std::string family = std::any_cast<std::string>(args.family_name);
     if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
         std::system("rm qraise_sbatch_tmp.sbatch");
@@ -132,16 +142,37 @@ int main(int argc, char* argv[])
         mode = "hpc";
     }
 
+
     //Get srun command
     if (args.fakeqmio.has_value()) {
         LOGGER_DEBUG("Fakeqmio provided as a FLAG");
+        if (args.simulator == "Munich" or args.simulator == "Cunqa"){
+            LOGGER_WARN("Personalized noise model only supported for AerSimulator, switching simulator setting from {} to Aer.", args.simulator.c_str());
+        }
         run_command = get_fakeqmio_run_command(args, mode);
+    
+    } else if (args.noise_properties.has_value()){
+        LOGGER_DEBUG("noise_properties json path provided");
+        if (args.simulator == "Munich" or args.simulator == "Cunqa"){
+            LOGGER_WARN("Personalized noise model only supported for AerSimulator, switching simulator setting from {} to Aer.", args.simulator.c_str());
+        }
+        run_command = get_noise_model_run_command(args, mode);
+
+    } else if (!args.fakeqmio.has_value() && (args.no_thermal_relaxation || args.no_gate_error || args.no_readout_error)){
+        LOGGER_ERROR("FakeQmio flags where provided but --fakeqmio was not included.");
+        return 0;
+
+    } else if (!args.noise_properties.has_value() && (args.no_thermal_relaxation || args.no_gate_error || args.no_readout_error)){
+        LOGGER_ERROR("noise_properties flags where provided but --noise_properties arg was not included.");
+        return 0;
+
     } else {
         if (args.classical_comm) {
             LOGGER_DEBUG("Classical communications");
-            LOGGER_ERROR("Classical communications are not implemented yet");
-            std::system("rm qraise_sbatch_tmp.sbatch");
-            return 0;
+            run_command = get_classical_comm_run_command(args, mode);
+            if (run_command == "0") {
+                return 0;
+            }
         } else if (args.quantum_comm) {
             LOGGER_ERROR("Quantum communications are not implemented yet");
             std::system("rm qraise_sbatch_tmp.sbatch");
@@ -155,7 +186,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    LOGGER_DEBUG("Run command: ", run_command);
+    LOGGER_DEBUG("Run command: {}", run_command);
     sbatchFile << run_command;
 
     sbatchFile.close();

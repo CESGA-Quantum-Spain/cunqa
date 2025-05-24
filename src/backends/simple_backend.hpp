@@ -25,6 +25,7 @@ struct SimpleConfig {
     std::string custom_instructions;
     std::vector<std::string> gates;
     JSON noise_model;
+    JSON noise_properties;
 
     friend void from_json(const JSON& j, SimpleConfig &obj)
     {
@@ -37,6 +38,7 @@ struct SimpleConfig {
         j.at("custom_instructions").get_to(obj.custom_instructions);
         j.at("gates").get_to(obj.gates);
         j.at("noise_model").get_to(obj.noise_model);
+        j.at("noise_properties").get_to(obj.noise_properties);
     }
 
     friend void to_json(JSON& j, const SimpleConfig& obj) 
@@ -50,7 +52,7 @@ struct SimpleConfig {
             {"basis_gates", obj.basis_gates}, 
             {"custom_instructions", obj.custom_instructions},
             {"gates", obj.gates},
-            {"noise_model", obj.noise_model}
+            {"noise_properties", obj.noise_properties}
         };
     }
     

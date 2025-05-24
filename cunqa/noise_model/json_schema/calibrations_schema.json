@@ -1,0 +1,152 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "calibrations",
+    "title": "CalibrationsFile",
+    "description": "Json schema for the calibration file used to model the QPU noise",
+    "type": "object",
+    "properties": 
+    {
+        "Qubits":
+        {
+            "description": "Qubits calibrations",
+            "type" : "object",
+            "properties":
+            {
+                "type":
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "T1 (s)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "T2 (s)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "Drive Frequency (Hz)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "Measuring Frequency (Hz)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "Readout duration (s)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "Readout fidelity(RB)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "T1 error (s)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        },
+                        "T2 error (s)":
+                        {
+                            "description": "",
+                            "type":"number"
+                        }
+                    }
+                }
+            }   
+        },
+
+        "Q1Gates":
+        {
+            "description": "Calibrations of one-qubit gates",
+            "type": "object",
+            "properties":
+            {
+                "type":
+                {
+                    "type":"object",
+                    "properties":
+                    {
+                        "type": 
+                        {
+                            "type": "object",
+                            "properties":
+                            {
+                                "Gate duration (s)":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                },
+                                "Fidelity(RB)":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                },
+                                "Fidelity error":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        
+        "Q2Gates(RB)":
+        {
+            "description": "Calibrations of two-qubits gates",
+            "type": "object",
+            "properties":
+            {
+                "type":
+                {
+                    "type":"object",
+                    "properties":
+                    {
+                        "type": 
+                        {
+                            "type":"object",
+                            "properties":
+                            {
+                                "Control":
+                                {
+                                    "description": "",
+                                    "type":"integer"
+                                },
+                                "Target":
+                                {
+                                    "description": "",
+                                    "type":"integer"
+                                },
+                                "Duration (s)":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                },
+                                "Fidelity(RB)":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                },
+                                "Fidelity error":
+                                {
+                                    "description": "",
+                                    "type":"number"
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+}
