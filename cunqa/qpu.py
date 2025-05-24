@@ -85,6 +85,7 @@ class QPU:
             ip, port = self._endpoint
             self._qclient.connect(ip, port)
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
+            self._connected = True
 
         if transpile:
             try:
