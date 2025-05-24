@@ -27,7 +27,7 @@ struct MyArgs : public argparse::Args
     bool& no_readout_error               = flag("no-readout-error", "Deactivate readout error on FakeQmio.").set_default("false");
     bool& no_gate_error                  = flag("no-gate-error", "Deactivate gate error on FakeQmio.").set_default("false");
 
-    std::string& family_name             = kwarg("fam,family_name", "Name that identifies which QPUs were raised together.").set_default("default");
+    std::string& family                  = kwarg("fam,family", "Name that identifies which QPUs were raised together.").set_default("default");
     //bool& hpc                          = flag("hpc", "Default HPC mode. The user can connect with the local node QPUs.");
     bool& cloud                          = flag("cloud", "CLOUD mode. The user can connect with any deployed QPU.");
     bool& classical_comm                 = flag("classical_comm", "Enable classical communications.");

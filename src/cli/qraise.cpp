@@ -14,8 +14,10 @@
 #include "utils/qraise/fakeqmio_conf_qraise.hpp"
 #include "utils/qraise/noise_model_conf_qraise.hpp"
 #include "utils/qraise/no_comm_conf_qraise.hpp"
-#include "utils/qraise/classical_comm_conf_qraise.hpp"
+#include "utils/qraise/class_comm_conf_qraise.hpp"
 #include "utils/qraise/quantum_comm_conf_qraise.hpp"
+
+#include "logger.hpp"
 
 #include "logger.hpp"
 
@@ -127,7 +129,7 @@ int main(int argc, char* argv[])
     sbatchFile << "export INFO_PATH=" << info_path + "\n";
 
     //Checking duplicate family name
-    std::string family = std::any_cast<std::string>(args.family_name);
+    std::string family = std::any_cast<std::string>(args.family);
     if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
         std::system("rm qraise_sbatch_tmp.sbatch");
@@ -169,7 +171,7 @@ int main(int argc, char* argv[])
     } else {
         if (args.classical_comm) {
             LOGGER_DEBUG("Classical communications");
-            run_command = get_classical_comm_run_command(args, mode);
+            run_command = get_class_comm_run_command(args, mode);
             if (run_command == "0") {
                 return 0;
             }
