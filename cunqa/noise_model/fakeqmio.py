@@ -6,7 +6,6 @@ from qmiotools.integrations.qiskitqmio import FakeQmio
 from qiskit_aer.noise import NoiseModel
 
 STORE_PATH = os.getenv("STORE")
-INSTALL_PATH = os.getenv("INSTALL_PATH")
 BASIS_GATES = ["sx", "x", "rz", "ecr"]
 COUPLING_MAP = [
     [0,1],

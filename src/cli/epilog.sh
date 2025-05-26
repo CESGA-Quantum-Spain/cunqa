@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "We are in the epilog"
+
 JOB_ID="${SLURM_JOB_ID}"
 
 flock $INFO_PATH -c "/mnt/netapp1/Optcesga_FT2_RHEL7/2020/gentoo/22072020/usr/bin/jq --arg job_id \"$SLURM_JOB_ID\" 'with_entries(select(.key | startswith(\$job_id) | not))' $INFO_PATH > tmp.json && mv tmp.json $INFO_PATH"

@@ -223,8 +223,7 @@ import os
 import sys
 
 # Adding pyhton folder path to detect modules
-INSTALL_PATH = os.getenv("INSTALL_PATH")
-sys.path.insert(0, INSTALL_PATH)
+sys.path.append(os.getenv("HOME"))
 
 # Let's get the raised QPUs
 from cunqa.qutils import getQPUs
