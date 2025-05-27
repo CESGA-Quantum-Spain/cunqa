@@ -5,6 +5,7 @@ from cunqa.logger import logger
 import numpy as np
 import random
 import string
+import itertools
 from typing import Tuple, Union, Optional
 from qiskit import QuantumCircuit
 
@@ -430,6 +431,135 @@ class CunqaCircuit:
             self._add_instruction(instrr)
     
 
+    # Methods to retrieve information from the circuit
+
+    def __len__(self):
+        """Returns the number of gates on a circuit."""
+        return len(self.instructions)
+    
+    def index(self, gate, multiple = False):
+        """
+        Method to determine the position of a certain gate.
+
+        Args
+            gate (str, dict): gate to be found 
+            multiple (bool): option to return the position of all instances of the gate on the circuit instead of just the first one.
+        Returns
+            index (int, list[int]): position of the gate (index on the list self.instructions)
+        """
+
+        if isinstance(gate, str):
+            if multiple:
+                index = [i for i, instr in enumerate(self.instructions) if instr["name"] == gate]
+                if len(index) != 0:
+                    return index
+                else:
+                    raise ValueError
+            else:
+                for instr in self.instructions:
+                    if instr["name"] == gate:
+                        return self.instructions.index(instr)
+                
+        elif isinstance(gate, dict):
+            self._check_instruction(gate)
+            if multiple:
+                index = [i for i, instr in enumerate(self.instructions) if all(instr[k] == gate[k] for k, _ in gate.items())]
+                if len(index) != 0:
+                    return index
+                else:
+                    raise ValueError
+            else:
+                for instr in self.instructions:
+                    if all(instr[k] == gate[k] for k, _ in gate.items()):
+                        return self.instructions.index(instr)
+                    
+        else:
+            logger.error(f"Gate should be str (its name) or dict, but {type(gate)} was provided [{TypeError.__name__}].")
+            raise SystemExit
+    
+
+
+    def __contains__(self, gate):
+        """Method to check if a certain gate or sequence of gates is present in the circuit instructions.
+            Implemented by overloading the "in" operator.
+
+        Args:
+            gate (str, dict): gate or sequence of gates to check for presence in the circuit. TODO: accept all of (list[str], str, list[dict], dict)
+
+        Returns
+            (bool): True if gate is on the circuit, False otherwise
+        """
+        try:
+            self.index(gate)
+            return True
+        except ValueError:
+            return False
+        except Exception as e:
+            logger.error(repr(e))
+            raise SystemExit
+        
+        # Filter through the input format possibilities. Strings could be used to find gate structures while dicts, with more information to match,
+        # could be used to find a particular instance of a gate structure.
+        # if isinstance(gate_seq, str):
+        #     pass
+        # if isinstance(gate_seq, dict):
+        #     pass
+        # if isinstance(gate_seq, list):
+        #     if all(isinstance(gate, str) for gate in gate_seq):
+        #         pass
+        #     if all(isinstance(gate, dict) for gate in gate_seq):
+        #         pass
+
+    def __getitem__(self, indexes):
+        """
+        Returns the gates on the positions given by the input indexes. Overloads the "[ ]" operator. The circuit is interpreted as a list of instructions on a certain order.
+
+        Args
+            indexes (int, list[int]): positions to be queried. The circuit is 0-indexed, as usual.
+        Returns
+            gates (dict, list[dict]): objects found on the input indexes of the circuit. 
+        """
+        if isinstance(indexes, list):
+            gates = []
+            for index in indexes:
+                if isinstance(index, int):
+                    gates.append(self.instructions[index])
+                else:
+                    logger.error(f"Indexes must be ints, but a {type(index)} was provided [{TypeError.__name__}].")
+                    raise SystemExit
+            return gates
+        
+        elif isinstance(indexes, int):
+            return self.instructions[indexes]
+        
+        else:
+            logger.error(f"Indexes must be list[int] or int, but {type(indexes)} was provided [{TypeError.__name__}].")
+            raise SystemExit
+
+    def __setitem__(self, indexes, gate_seq):
+        """
+        Assigns a new gates to the positions given by the input indexes. Called by the "=" operator on commands like "cunqa_circuit[3] = {"name":"x", "qubits":[0]}".
+
+        Args
+            indexes (int, list[int]): positions of the circuit to be modified.
+            gate_seq (dict, list(dict)): gates to be assigned in order on the input positions.
+        """
+        if (isinstance(indexes, list) and isinstance(gate_seq, list)):
+            if len(indexes) == len(gate_seq):
+                for index, gate in zip(indexes, gate_seq):
+                    self._check_instruction(gate)
+                    self.instructions[index] = gate
+            else:
+                logger.error(f"The indexes and gate_seq lists must have equal lenght [{ValueError.__name__}]")
+                raise SystemExit
+        elif (isinstance(indexes, int) and isinstance(gate_seq, dict)):
+            self._check_instruction(gate_seq)
+            self.instructions[indexes] = gate_seq
+        else:
+            logger.error(f"Both the indexes and gate_seq should be lists, or an int and a dict respectively. Instead a {type(indexes)} indexes and a {type(gate_seq)} gate_seq was provided [{TypeError.__name__}]")
+            raise SystemExit
+        
+    
     # =============== INSTRUCTIONS ===============
     
     # Methods for implementing non parametric single-qubit gates
@@ -1589,3 +1719,25 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
             if any(line.startswith(gate) for gate in parametric_gates):
                 return True
         return False
+
+def all_suborder_preserving_shuffles(*lists):
+    """Randomly combines lists while preserving each or their internal order.
+    
+    Args:
+        *lists (list[list]): list of lists to be combined.
+    Returns:
+        permutations (list[list]): all possible ways to combine the input lists such that the resulting list preserves the order of each input sublist
+    """   
+    lst_to_combine = list(*lists)
+    list_ids = [i for i, _ in enumerate(lst_to_combine) for _ in range(len(lists[i]))]
+    permutations = list(itertools.permutations(list_ids))
+
+    pointers = [0] * len(lists) # list with elements that track in which position of each of the lists we are: [i, j, k] going from all zeros to [len(list_1), len(list_2), len(list_3)]
+    
+    for perm in permutations:
+        for i, list_id in enumerate(perm):
+            perm[i] = lst_to_combine[list_id][pointers[list_id]]
+            pointers[list_id] += 1
+
+    return permutations
+

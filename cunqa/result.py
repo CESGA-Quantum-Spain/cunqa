@@ -1,4 +1,4 @@
-
+"""Contains the Result class, which deals with the output of QJobs using any simulator."""
 from typing import Optional
 
 from cunqa.logger import logger
