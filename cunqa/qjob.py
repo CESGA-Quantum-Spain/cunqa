@@ -9,7 +9,7 @@ from qiskit import QuantumCircuit
 from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
-from cunqa.circuit import qc_to_json, registers_dict, is_parametric, CunqaCircuit
+from cunqa.circuit import qc_to_json, CunqaCircuit
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
