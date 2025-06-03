@@ -42,7 +42,7 @@
                             "description": "",
                             "type":"number"
                         },
-                        "Readout fidelity(RB)":
+                        "Readout fidelity (RB)":
                         {
                             "description": "",
                             "type":"number"

@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
     std::string SEED = std::to_string(intSEED);
 
     auto args = argparse::parse<MyArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
-
     const char* store = std::getenv("STORE");
     std::string info_path = std::string(store) + "/.cunqa/qpus.json";
 
@@ -43,6 +42,7 @@ int main(int argc, char* argv[])
     sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
     sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
     sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
+
 
     if (args.qpus_per_node.has_value()) {
         if (args.n_qpus < args.qpus_per_node) {
@@ -107,7 +107,6 @@ int main(int argc, char* argv[])
         LOGGER_ERROR("Too much memory per QPU in FT3. Please, decrease the mem-per-QPU or increase the cores-per-qpu. Max mem-per-cpu = 4");
         return -1;
     }
-
     sbatchFile << "#SBATCH --output=qraise_%j\n";
 
     sbatchFile << "\n";
@@ -133,6 +132,7 @@ int main(int argc, char* argv[])
     } else {
         mode = "hpc";
     }
+
 
 
     //Get srun command
