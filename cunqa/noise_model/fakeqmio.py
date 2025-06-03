@@ -53,6 +53,8 @@ parser.add_argument("family_name", type = str, help = "family_name for QPUs")
 
 args = parser.parse_args()
 
+print(args)
+
 # set defaults
 thermal_relaxation, readout_error, gate_error = True, False, False
 # read arguments
@@ -69,12 +71,14 @@ if (args.backend_path == "last_calibrations"):
     files = glob.glob(files)
     calibration_file=max(files, key=os.path.getctime) 
     args.backend_path = calibration_file
-    
-    fakeqmio = FakeQmio(None,thermal_relaxation, readout_error, gate_error)
-else:
-    fakeqmio = FakeQmio(args.backend_path,thermal_relaxation, readout_error, gate_error)
 
-noise_model = NoiseModel.from_backend(fakeqmio)
+    print(thermal_relaxation, readout_error, gate_error)
+    
+    fakeqmio = FakeQmio(calibration_file=None,thermal_relaxation=thermal_relaxation, readout_error=readout_error, gate_error=gate_error)
+else:
+    fakeqmio = FakeQmio(calibration_file=args.backend_path,thermal_relaxation=thermal_relaxation, readout_error=readout_error, gate_error=gate_error)
+
+noise_model = NoiseModel.from_backend(fakeqmio,thermal_relaxation=thermal_relaxation, readout_error=readout_error, gate_error=gate_error)
 noise_model_json = noise_model.to_dict(serializable = True)
 
 description = "FakeQmio backend with: "

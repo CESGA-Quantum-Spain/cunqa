@@ -1135,7 +1135,7 @@ def qc_to_json(qc: QuantumCircuit):
     # Actual translation
     try:
         
-        quantum_registers, classical_registers = _registers_dict(qc)
+        quantum_registers, classical_registers = registers_dict(qc)
         
         json_data = {
             "id": "",
@@ -1175,7 +1175,7 @@ def qc_to_json(qc: QuantumCircuit):
 
                 json_data["instructions"].append({"name":qc.data[i].name,
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg,qubit)],
-                                                "memory":[classical_registers[k][b] for k,b in zip(creg,bit)]
+                                                "clbits":[classical_registers[k][b] for k,b in zip(creg,bit)]
                                                 })
                     
 

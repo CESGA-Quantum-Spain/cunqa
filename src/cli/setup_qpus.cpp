@@ -41,7 +41,7 @@ std::string generate_FakeQMIO(JSON back_path_json, std::string& family)
                                    + back_path_json.at("gate_error").get<std::string>() + " "s
                                    +  family.c_str());
 
-
+    LOGGER_DEBUG("Command: {}", command);
     std::system(("ml load qmio/hpc gcc/12.3.0 qmio-tools/0.2.0-python-3.9.9 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
     return std::getenv("STORE") + "/.cunqa/tmp_fakeqmio_backend_"s + family.c_str() + ".json"s;
 }
