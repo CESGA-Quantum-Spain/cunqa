@@ -38,7 +38,7 @@ std::string get_fakeqmio_run_command(auto& args, std::string& mode)
 
     backend_path = std::any_cast<std::string>(args.fakeqmio.value());
 
-    backend = R"({"fakeqmio_path":")" + backend_path
+    backend = R"({"noise_properties_path":")" + backend_path
             + R"(","thermal_relaxation":")" +  std::to_string(thermal_relaxation)
             + R"(","readout_error":")" +  std::to_string(readout_error)
             + R"(","gate_error":")" +  std::to_string(gate_error)+ R"("})" ;

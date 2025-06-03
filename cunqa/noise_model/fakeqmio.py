@@ -69,7 +69,7 @@ if (args.backend_path == "last_calibrations"):
     jsonpath=os.getenv("QMIO_CALIBRATIONS",".")
     files=jsonpath+"/????_??_??__??_??_??.json"
     files = glob.glob(files)
-    calibration_file=max(files, key=os.path.getctime) 
+    calibration_file=max(files, key=os.path.getctime)
     args.backend_path = calibration_file
 
     print(thermal_relaxation, readout_error, gate_error)

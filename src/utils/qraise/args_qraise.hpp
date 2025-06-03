@@ -22,7 +22,7 @@ struct MyArgs : public argparse::Args
     std::string& simulator               = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer");
     
     // fakeqmio kwarg and flags
-    std::optional<std::string>& fakeqmio = kwarg("fq,fakeqmio", "Raise FakeQmio backend from calibration file.", /*implicit*/"last_calibrations");
+    std::optional<std::string>& fakeqmio = kwarg("fq,fakeqmio", "Raise FakeQmio backend from calibration file.", /*implicit*/"Qmio_last_calibrations");
     bool& no_thermal_relaxation          = flag("no-thermal-relaxation", "Deactivate thermal relaxation on FakeQmio.").set_default("false");
     bool& no_readout_error               = flag("no-readout-error", "Deactivate readout error on FakeQmio.").set_default("false");
     bool& no_gate_error                  = flag("no-gate-error", "Deactivate gate error on FakeQmio.").set_default("false");
