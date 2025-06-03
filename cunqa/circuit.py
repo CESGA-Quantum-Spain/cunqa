@@ -1146,34 +1146,51 @@ def qc_to_json(qc: QuantumCircuit):
             "quantum_registers":quantum_registers,
             "classical_registers":classical_registers
         }
-        for i in range(len(qc.data)):
-            if qc.data[i].name == "barrier":
+        for instruction in qc.data:
+
+            qreg = [r._register.name for r in instruction.qubits]
+            qubit = [q._index for q in instruction.qubits]
+            
+            creg = [r._register.name for r in instruction.clbits]
+            bit = [b._index for b in instruction.clbits]
+
+            if instruction.name == "barrier":
                 pass
-            elif qc.data[i].name == "unitary":
-                qreg = [r._register.name for r in qc.data[i].qubits]
-                qubit = [q._index for q in qc.data[i].qubits]
+            elif instruction.operation._condition is not None:
+                 
+                name = "c_if_" + instruction.operation.name
 
-                json_data["instructions"].append({"name":qc.data[i].name, 
+                control, condition = instruction.operation._condition
+
+                control_qreg = [r._register.name for r in control]
+                control_qubit = [b._index for b in control]
+
+                control = []
+
+                if condition:
+
+                    json_data["instructions"].append({"name":name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg,qubit)],
-                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in qc.data[i].params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
+                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
                                                 })
-            elif qc.data[i].name != "measure":
 
-                qreg = [r._register.name for r in qc.data[i].qubits]
-                qubit = [q._index for q in qc.data[i].qubits]
 
-                json_data["instructions"].append({"name":qc.data[i].name, 
+            elif instruction.name == "unitary":
+
+                json_data["instructions"].append({"name":instruction.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg,qubit)],
-                                                "params":qc.data[i].params
+                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
+                                                })
+                
+            elif instruction.name != "measure":
+
+                json_data["instructions"].append({"name":instruction.name, 
+                                                "qubits":[quantum_registers[k][q] for k,q in zip(qreg,qubit)],
+                                                "params":instruction.params
                                                 })
             else:
-                qreg = [r._register.name for r in qc.data[i].qubits]
-                qubit = [q._index for q in qc.data[i].qubits]
-                
-                creg = [r._register.name for r in qc.data[i].clbits]
-                bit = [b._index for b in qc.data[i].clbits]
 
-                json_data["instructions"].append({"name":qc.data[i].name,
+                json_data["instructions"].append({"name":instruction.name,
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg,qubit)],
                                                 "memory":[classical_registers[k][b] for k,b in zip(creg,bit)]
                                                 })
