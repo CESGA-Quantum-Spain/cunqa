@@ -25,6 +25,7 @@ SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
 SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
 SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "remote_c_if_unitary", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"]
+SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "distr_unitary", "distr_h", "distr_x", "distr_y", "distr_z", "distr_rx", "distr_ry", "distr_rz", "distr_cx","distr_cy","distr_cz","distr_ecr"]
 
 class CunqaCircuitError(Exception):
     """Exception for error during circuit desing in CunqaCircuit."""
@@ -80,6 +81,7 @@ class CunqaCircuit:
         self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
         self.classical_regs = {}
         self.sending_to = []
+        self.qsending_to = []
 
         if not isinstance(num_qubits, int):
             logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
@@ -108,7 +110,7 @@ class CunqaCircuit:
     
     @property
     def info(self) -> dict:
-        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "is_distributed":self.is_distributed, "is_parametric":self.is_parametric, "sending_to":self.sending_to}
+        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "is_distributed":self.is_distributed, "is_parametric":self.is_parametric, "sending_to":self.sending_to, "qsending_to":self.qsending_to}
 
     @property
     def num_clbits(self):
@@ -1595,22 +1597,21 @@ class CunqaCircuit:
 
         self.sending_to.append(target_circuit_id)
 
+    
 
     def remote_c_if(self, gate: str, target_qubits: Union[int, "list[int]"], param: float, control_circuit: Optional[Union[str, 'CunqaCircuit']] = None)-> None:
         """
-        Class method to apply a distributed instruction as a gate condioned by a non local classical measurement from a remote circuit and applied locally.
+        Class method to apply a distributed instruction as a gate conditioned by a non local classical measurement from a remote circuit and applied locally.
         
         Args:
         -------
         gate (str): gate to be applied. Has to be supported by CunqaCircuit.
 
+        target_qubits (int): target qubits from self.
+
         param (float or int): parameter in case the gate provided is parametric.
 
-        control_qubit (int): control qubit from self.
-
-        target_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit to which we will send the gate or the circuit itself.
-
-        target_qubit (int): qubit where the gate will be conditionally applied.       
+        control_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit (or the circuit itself) from which we receive the gate.      
         """
 
         self.is_distributed = True
@@ -1660,6 +1661,110 @@ class CunqaCircuit:
             raise SystemExit
             # TODO: maybe in the future this can be check at the begining for a more efficient processing
                 
+    def qsend(self, control_qubit: Optional[int] = None, target_circuit: Optional[Union[str, 'CunqaCircuit']] = None) -> None:
+            """
+            Class method to send a qubit from the current circuit to a remote one.
+            
+            Args:
+            -------
+
+            control_qubit (int): control qubit from self.
+
+            target_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit to which we will send the gate or the circuit itself.
+
+            """
+
+            self.is_distributed = True
+
+            if isinstance(control_qubit, int):
+                list_control_qubit = [control_qubit]
+            else:
+                logger.error(f"control qubit must be int, but {type(control_qubit)} was provided [TypeError].")
+                raise SystemExit
+
+            if target_circuit is None:
+                logger.error("target_circuit not provided.")
+                raise SystemExit
+            
+            elif isinstance(target_circuit, str):
+                target_circuit_id = target_circuit
+
+            elif isinstance(target_circuit, CunqaCircuit):
+                target_circuit_id = target_circuit.id
+            else:
+                logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
+                raise SystemExit
+            
+
+            self._add_instruction({
+                "name": "qsend",
+                "qubits": flatten([list_control_qubit]),
+                "circuits": [target_circuit_id]
+            })
+
+            self.qsending_to.append(target_circuit_id)
+
+    def qrecv(self, gate: str, target_qubits: Union[int, "list[int]"], param: float, control_circuit: Optional[Union[str, 'CunqaCircuit']] = None)-> None:
+        """
+        Class method to apply a distributed instruction as a gate controlled by a non-local qubit (from a remote circuit).
+        
+        Args:
+        -------
+        gate (str): gate to be applied. Has to be supported by CunqaCircuit.
+
+        target_qubits (int): target qubits from self.
+
+        param (float or int): parameter in case the gate provided is parametric.
+
+        control_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit (or circuit itself) from which we will receive a qubit.       
+        """
+
+        self.is_distributed = True
+
+        if isinstance(gate, str):
+            name = "distr_" + gate
+        else:
+            logger.error(f"gate specification must be str, but {type(gate)} was provided [TypeError].")
+            raise SystemExit
+        
+        if isinstance(target_qubits, int):
+            target_qubits = [target_qubits]
+        elif isinstance(target_qubits, list):
+            pass
+        else:
+            logger.error(f"target qubits must be int ot list, but {type(target_qubits)} was provided [TypeError].")
+            raise SystemExit
+        
+        if param is not None:
+            params = [param]
+        else:
+            params = []
+
+        if control_circuit is None:
+            logger.error("target_circuit not provided.")
+            raise SystemExit
+        
+        elif isinstance(control_circuit, str):
+            control_circuit = control_circuit
+
+        elif isinstance(control_circuit, CunqaCircuit):
+            control_circuit = control_circuit.id
+        else:
+            logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
+            raise SystemExit
+        
+        if name in SUPPORTED_GATES_DISTRIBUTED:
+
+            self._add_instruction({
+                "name": name,
+                "qubits": flatten([target_qubits]),
+                "params":params,
+                "circuits": [control_circuit]
+            })
+        else:
+            logger.error(f"Gate {name} is not supported for quantum communications.")
+            raise SystemExit
+            # TODO: maybe in the future this can be check at the begining for a more efficient processing
 
 def flatten(lists: "list[list]"):
     return [element for sublist in lists for element in sublist]
