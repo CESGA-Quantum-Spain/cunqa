@@ -23,6 +23,10 @@ Welcome to CUNQA's documentation!
 
    getting_started
 
-:doc:`CUNQA Package <cunqa/index>`
+.. toctree::
+   :maxdepth: 1
+   :caption: CUNQA Package
+   :glob:
 
+   cunqa/*
    examples_gallery
