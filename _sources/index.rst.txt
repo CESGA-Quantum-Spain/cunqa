@@ -23,9 +23,13 @@ Welcome to CUNQA's documentation!
 
    getting_started
 
-.. toctree::
-   :maxdepth: 1
-   :glob:
+.. autosummary::
+   :toctree: _autosummary
+   :template: custom-module-template.rst
+   :recursive:
 
    cunqa
+
+.. toctree::
+   :maxdepth: 2
    examples_gallery
