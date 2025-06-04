@@ -218,14 +218,18 @@
 can occur, for example if the QPU has a noise model with error associated to specific gates, if the circuit is not transpiled errors might not appear.</p>
 <p>If <cite>transpile</cite> is False and <cite>initial_layout</cite> is provided, it will be ignored.</p>
 <p>Possible instructions to add as <cite>**run_parameters</cite> can be: shots, method, parameter_binds, meas_level, …</p>
-<dl>
-<dt>Args:</dt><dd><p>circuit (json dict or &lt;class ‘qiskit.circuit.CunqaCircuit’&gt;): circuit to be run in the QPU.</p>
-<p>transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p>
-<p>initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.</p>
-<p>opt_level (int): optimization level for transpilation, default set to 1.</p>
-<p><a href="#id1"><span class="problematic" id="id2">**</span></a>run_parameters : any other simulation instructions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>json dict</em><em> or </em><em>&lt;class 'qiskit.circuit.CunqaCircuit'&gt;</em>) – circuit to be run in the QPU.</p></li>
+<li><p><strong>transpile</strong> (<em>bool</em>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
+<li><p><strong>initial_layout</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
+<li><p><strong>opt_level</strong> (<em>int</em>) – optimization level for transpilation, default set to 1.</p></li>
+<li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>&lt;class ‘QJob’&gt; object.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>&lt;class ‘QJob’&gt; object.</p>
 </dd>
 </dl>
 </dd></dl>

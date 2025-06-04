@@ -200,11 +200,15 @@
 <dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="Link to this definition"></a></dt>
 <dd><p>Callable method to map the function to the QPUs.</p>
-<dl>
-<dt>Args:</dt><dd><p>func (func): function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p>
-<p>params (list[list]): population of vectors to be mapped to the circuits sent to the QPUs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>func</em>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
+<li><p><strong>params</strong> (<em>list</em><em>[</em><em>list</em><em>]</em>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>List of the results of the function applied to the output of the circuits sent to the QPUs.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of the results of the function applied to the output of the circuits sent to the QPUs.</p>
 </dd>
 </dl>
 </dd></dl>
