@@ -25,8 +25,7 @@ Welcome to CUNQA's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: CUNQA Package
    :glob:
 
-   cunqa/*
+   cunqa
    examples_gallery
