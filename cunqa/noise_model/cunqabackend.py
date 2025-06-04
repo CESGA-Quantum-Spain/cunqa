@@ -40,7 +40,7 @@ class CunqaBackend(BackendV2):
         for k,q in qubits.items():
             # TODO: check if key is the correct format q[i]
             qubits_properties.append(QubitProperties(t1=q["T1 (s)"],t2=q["T2 (s)"],frequency=q["Drive Frequency (Hz)"]))
-            readout_errors[(_get_qubit_index(k),)] = InstructionProperties(duration=q["Readout duration (s)"], error = 1-q["Readout fidelity (RB)"])
+            readout_errors[(_get_qubit_index(k),)] = InstructionProperties(duration=q["Readout duration (s)"], error = 1-q["Fidelity readout"])
         
         logger.debug(f"{self._num_qubits} qubits properties loaded from noise_properties_json.")
 
