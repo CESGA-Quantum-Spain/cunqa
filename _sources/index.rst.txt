@@ -22,9 +22,9 @@ Welcome to CUNQA's documentation!
    :caption: Contents:
 
    getting_started
-   
-.. include:: cunqa.rst 
-   :start-after: .. autosummary::   
 
-   cunqa
+.. include:: cunqa.rst 
+   :start-after: .. autosummary:: 
+   :end-before: cunqa  
+
    examples_gallery
