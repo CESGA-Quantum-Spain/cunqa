@@ -24,7 +24,9 @@
       <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cloud_example" href="py_file_examples/cloud_example.html" />
+    <link rel="prev" title="Examples for optimizations" href="Optimizers_I_upgrading_parameters.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -206,6 +208,36 @@
 </ul>
 </li>
 </ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../examples_gallery.html">Examples gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Importing-and-adding-paths-to-sys.path">Importing and adding paths to <code class="docutils literal notranslate"><span class="pre">sys.path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-get-the-QPUs-that-we-q-raised!">Let’s get the QPUs that we q-raised!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Let's-create-a-circuit-to-run-in-our-QPUs!">Let’s create a circuit to run in our QPUs!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Execution-time!-Let's-do-it-sequentially">Execution time! Let’s do it sequentially</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Cool-isn't-it?-But-this-circuit-is-too-simple,-let's-try-with-a-more-complex-one!">Cool isn’t it? But this circuit is too simple, let’s try with a more complex one!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#This-circuit-has-15-qubits-and-10-intermidiate-measurements,-let's-run-it-in-AerSimulator">This circuit has 15 qubits and 10 intermidiate measurements, let’s run it in AerSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Multiple_circuits_execution.html#Takes-much-longer-...-let's-parallelize-n-executions-in-n-different-QPUs">Takes much longer … let’s parallelize n executions in n different QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html">Examples for optimizations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html#Simply-using-the-QPU.run()-method">Simply using the <code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code> method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html#Using-QJob.upgrade_parameters()">Using <code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Paralelization for gradient-free optimizers: Differential Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#QJobMapper">QJobMapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#QPUCircuitMapper">QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Paralelization-of-expectation-value-terms">Paralelization of expectation value terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Paralelization-for-gradient-optimizers">Paralelization for gradient optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="py_file_examples/cloud_example.html">cloud_example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="py_file_examples/example_qraise.html">example_qraise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="py_file_examples/hpc_example.html">hpc_example</a></li>
+</ul>
+</li>
+</ul>
 
         </div>
       </div>
@@ -221,6 +253,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples_gallery.html">Examples gallery</a></li>
       <li class="breadcrumb-item active">Paralelization for gradient-free optimizers: Differential Evolution</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/_examples/Optimizers_II_mapping.ipynb.txt" rel="nofollow"> View page source</a>
@@ -2587,7 +2620,10 @@ Time: 161.42283535003662
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Optimizers_I_upgrading_parameters.html" class="btn btn-neutral float-left" title="Examples for optimizations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="py_file_examples/cloud_example.html" class="btn btn-neutral float-right" title="cloud_example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
