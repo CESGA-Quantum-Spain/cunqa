@@ -81,7 +81,6 @@ class CunqaCircuit:
         self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
         self.classical_regs = {}
         self.sending_to = []
-        self.qsending_to = []
 
         if not isinstance(num_qubits, int):
             logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
@@ -110,7 +109,7 @@ class CunqaCircuit:
     
     @property
     def info(self) -> dict:
-        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "is_distributed":self.is_distributed, "is_parametric":self.is_parametric, "sending_to":self.sending_to, "qsending_to":self.qsending_to}
+        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "is_distributed":self.is_distributed, "is_parametric":self.is_parametric, "sending_to":self.sending_to}
 
     @property
     def num_clbits(self):
@@ -1702,7 +1701,7 @@ class CunqaCircuit:
                 "circuits": [target_circuit_id]
             })
 
-            self.qsending_to.append(target_circuit_id)
+            self.sending_to.append(target_circuit_id)
 
     def qrecv(self, gate: str, target_qubits: Union[int, "list[int]"], param: float, control_circuit: Optional[Union[str, 'CunqaCircuit']] = None)-> None:
         """
