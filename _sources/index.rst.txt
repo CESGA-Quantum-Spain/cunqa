@@ -23,8 +23,11 @@ Welcome to CUNQA's documentation!
 
    getting_started
 
-.. include:: cunqa.rst 
-   :start-after: .. autosummary:: 
-   :end-before: cunqa  
+.. autosummary::
+   :toctree: _autosummary
+   :template: custom-module-template.rst
+   :recursive:
+
+   cunqa  
 
    examples_gallery
