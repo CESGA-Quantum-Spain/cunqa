@@ -2,6 +2,7 @@
     Holds functions to transform between valid circuit formats and extract circuit information.
 """
 from cunqa.logger import logger
+from cunqa.qutils import transitive_combinations
 import numpy as np
 import random
 import string
@@ -10,14 +11,17 @@ import functools
 from typing import Tuple, Union, Optional
 from qiskit import QuantumCircuit
 
+import matplotlib.pyplot as plt #I use this for drawing circuits with LaTeX (quantikz)
+from matplotlib import rc
+
 def generate_id(size=4):
     chars = string.ascii_letters + string.digits
     return ''.join(random.choices(chars, k=size))
 
 
 
-SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz"]
-SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr", "remote_c_if_unitary","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"]
+SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz", "remote_c_if_ecr"]
+SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr", "remote_c_if_unitary","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz"]
 SUPPORTED_GATES_3Q = [ "ccx","ccy", "ccz","cswap"]
 SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz", "remote_c_if_rx","remote_c_if_ry","remote_c_if_rz"]
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
@@ -38,6 +42,9 @@ class InstanceTracker:
         self._cls = cls
         self._instances = {}
 
+        self._connected = None
+        self._new_inst = False
+
         # Override the __init__ method to track instance creation
         self._original_init = cls.__init__
         cls.__init__ = self._new_init
@@ -47,9 +54,20 @@ class InstanceTracker:
         self._original_init(instance, *args, **kwargs) # Call the original __init__ method
         
         self._instances[instance._id] = instance # Store reference to instance on the key with its id
+        self._new_inst = True
 
     def access_other_instances(self):
         return self._instances
+    
+    def connectivity(self):
+        if (self._connected is None or self._new_inst):
+            # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
+            first_connections = {frozenset({idd, sent}) for idd, circuit in self.access_other_instances().items() for sent in circuit.sending_to}
+            # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
+            self._connected = transitive_combinations(first_connections) 
+            self._new_inst = False
+
+        return self._connected
 
     def __call__(self, *args, **kwargs):
         return self._cls(*args, **kwargs)
@@ -114,6 +132,24 @@ class CunqaCircuit:
     @property
     def num_clbits(self):
         return len(flatten([[c for c in cr] for cr in self.classical_regs.values()]))
+    
+    @property
+    def layers(self):
+        layer_dict = {f"{i}": [] for i in range(self.num_qubits)} 
+        self.last_active_layer = [0 for _ in range(self.num_qubits)]
+
+        for i, instr in enumerate(self.instructions):
+            if instr["name"] in SUPPORTED_GATES_1Q:
+                self.last_active_layer[instr["qubits"][0]]+=1
+                layer_dict[str(instr["qubits"][0])].append([self.last_active_layer[instr["qubits"][0]], i, instr["name"]])
+
+            elif instr["name"] in SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q:
+                max_layer_qubit = max([self.last_active_layer[j] for j in instr["qubits"]])
+                for j in instr["qubits"]:
+                    self.last_active_layer[j] = max_layer_qubit + 1
+                    layer_dict[str(j)].append([self.last_active_layer[j], i, instr["name"]])
+
+        return layer_dict
 
     """ @property
     def idd(self) -> str:
@@ -328,7 +364,23 @@ class CunqaCircuit:
                         i += 1 # Advance index on the list specifying if we should change the control or target key of the instruction
 
 
-    
+    def check_connected(self, other_circuit):
+        """Checks if execution would wait forever for self + other_circuit. ON DEVELOPMENT."""
+        circuits_connected = lambda x: (self._id in x and other_circuit._id in x) # Returns True if both summand ids appear in the set
+        connections = [path for path in self.connectivity if circuits_connected(path)]
+        if connections: # If there's a connection we'll check that its order makes the sum valid
+            other_instances = self.access_other_instances
+            for connection in connections: # A connection is a set of circuits that talk to eachother and form a chain that joins self and other_circuit
+                distr_layers = {}
+                for circuit in connection:
+                    circ_object = other_instances[circuit]
+                    distr_layers[circuit]=[(circ_object.instructions[gate[1]]["circuits"], gate[0]) for gate in circ_object.layers if gate[2] in SUPPORTED_GATES_DISTRIBUTED]
+                # Recorrer todos los circuitos comprobando que no hay una violación del orden :(
+                # Locally at each circuit check that there's no distr instruction pointing to circ2 before all the ones pointing to circ1
+                # For this, probably we could find the maximun layer pointing to circ1 and the minimun layer w a instruction pointing to circ2 
+
+        return False
+
 
     def __add__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit], force_execution = False) -> 'CunqaCircuit':
         """
@@ -344,10 +396,11 @@ class CunqaCircuit:
         n = self.num_qubits
         if  n == other_circuit.num_qubits:        
             instances_to_change = set() # If our circuits have distributed gates, as the id changes, we will need to update it on the other circuits that communicate with this one
+
             if isinstance(other_circuit, CunqaCircuit):
                 if not force_execution:
-                    if all([self.is_distributed, other_circuit.is_distributed]): # Here we will have the connectivity check when this function is implemented
-                        logger.error(f"Both circuits are distributed. If they reference eachother or are connected through a chain of other circuits execution could wait forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
+                    if any([(self._id in path and other_circuit._id in path) for path in self.connectivity]):
+                        logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
                         raise SystemExit
                     
                 other_instr = other_circuit.instructions
@@ -366,9 +419,6 @@ class CunqaCircuit:
             
             self_instr = self.instructions
             instances_to_change.union({instr["circuits"][0] for instr in self_instr if instr["name"] in SUPPORTED_GATES_DISTRIBUTED})
-            if (other_id in instances_to_change or self._id in instances_to_change):
-                logger.error("The circuits to be summed contain distributed instructions that reference eachother.")
-                raise SystemExit
 
             summed_circuit = CunqaCircuit(n, n, id = sum_id) 
 
@@ -435,8 +485,8 @@ class CunqaCircuit:
             instances_to_change = set()
             if isinstance(other_circuit, CunqaCircuit):
                 if not force_execution:
-                    if all([self.is_distributed, other_circuit.is_distributed]): # Here we will have the connectivity check when this function is implemented
-                        logger.error(f"Both circuits are distributed. If they reference eachother or are connected through a chain of other circuits execution could wait forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
+                    if any([(self._id in connection and other_circuit._id in connection) for connection in self.connectivity]):
+                        logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
                         raise SystemExit
                     
                 other_instr = other_circuit.instructions
@@ -646,9 +696,10 @@ class CunqaCircuit:
 
     # Methods to retrieve information from the circuit
 
-    def __len__(self): # TODO: substitute this for circuit depth, ie number of layers, once they are implemented
-        """Returns the number of gates on a circuit."""
-        return len(self.instructions)
+    def __len__(self): 
+        """Returns the layer depth of the circuit."""
+        self.layers
+        return max(self.last_active_layer)
     
     def index(self, gate, multiple = False):
         """
@@ -775,10 +826,22 @@ class CunqaCircuit:
     # TODO: create circuit dividing methods
 
     def vert_split(self, position):
-        pass
+        """Divides a circuit vertically in two, separating all instructions before and after a certain layer."""
+        left_circuit = self
+        right_circuit = self
+        return left_circuit, right_circuit
 
-    def hor_split(self, position):
-        pass
+    def hor_split(self, n):
+        """Divides a circuit horizontally in two, separating the first n qubits from the last num_qubits-n qubits. """
+        rest = self.num_qubits - n 
+        
+        up_id = self._id + f" up{n}"
+        down_id = self._id + f" down{rest}"
+
+        upper_circuit = CunqaCircuit(n,n, id=up_id)
+        lower_circuit = CunqaCircuit(rest, rest, id=down_id)
+
+        return upper_circuit, lower_circuit
     
     # =============== INSTRUCTIONS ===============
     
@@ -1765,6 +1828,41 @@ class CunqaCircuit:
             raise SystemExit
             # TODO: maybe in the future this can be check at the begining for a more efficient processing
 
+    def draw(self, include_comm = False):
+        rc('text', usetex=True)
+
+        #Create the Tikz code from the circuit (use r""" """ for a raw string literal that preserves special characters)
+        tikz_code = r"""\begin{quantikz}
+        """
+        # Iterate throught the layers to convert the gates to quantikz instructions
+        for intructions in self.layers.values():
+            new_line = r"""&"""
+            for layer, instr_index in intructions:
+                new_line += r"""\gate[]{} """# Write the gates 
+            new_line+r"""
+            """
+            tikz_code+=new_line
+
+        tikz_code + r"""\end{quantikz}"""
+        
+        # Create the figure and save it to a file
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.text(0.5, 0.5, tikz_code, ha='center', va='center', transform=ax.transAxes)
+        ax.set_xlim(0, 2)
+        ax.set_ylim(0, 2)
+        ax.set_axis_off()
+        plt.savefig('quantikz_diagram.png')
+
+        # Display the saved image within the matplotlib figure
+        plt.figure(figsize=(8, 6))
+        img = plt.imread('quantikz_diagram.png')
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()        
+
+
+
+
 def flatten(lists: "list[list]"):
     return [element for sublist in lists for element in sublist]
 
@@ -2063,4 +2161,3 @@ def all_suborder_preserving_shuffles(*lists):
             pointers[list_id] += 1
 
     return permutations
-
