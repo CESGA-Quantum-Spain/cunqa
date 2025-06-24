@@ -220,7 +220,7 @@ class QJob:
         except QiskitError as error:
             logger.error(f"Format of the circuit not correct  [{type(error).__name__}].")
             raise QJobError # I capture the error in QPU.run() when creating the job
-    
+        
         except Exception as error:
             logger.error(f"Some error occured with the circuit dict provided [{type(error).__name__}].")
             raise QJobError # I capture the error in QPU.run() when creating the job
