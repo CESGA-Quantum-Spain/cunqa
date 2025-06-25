@@ -50,7 +50,7 @@ jobs:
 
         EOF
 
-    - name: Remote ssh execution LOGIN
+    - name: Remote ssh execution 
       uses: appleboy/ssh-action@v1.2.0
       with:
         host: ${{ secrets.HOST }}
