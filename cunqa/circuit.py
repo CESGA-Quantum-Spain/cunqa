@@ -28,10 +28,10 @@ class CunqaCircuitError(Exception):
     pass
 
 class CunqaCircuit:
-    """
+    f"""
     Class to define a quantum circuit for the `cunqa` api.
 
-    Supported gates
+    Supported gates:
         {all_gates!r}
     """
 

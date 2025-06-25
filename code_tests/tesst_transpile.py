@@ -2,10 +2,9 @@ import os
 import sys
 import unittest
 from cunqa.transpile import transpiler
-import cunqa.circuit as circuit
-import cunqa.backend as backend
-from cunqa.qpu import getQPUs
-from qpu_api import create_QPU, qdrop
+from cunqa.circuit import qc_to_json
+from cunqa.backend import Backend
+from cunqa.qutils import qraise, qdrop, getQPUs
 
 from qiskit import QuantumCircuit
 from qiskit.qasm2 import dumps
@@ -26,10 +25,8 @@ class TestTranspErrors(unittest.TestCase):
 
     @classmethod 
     def setUpClass(cls): #Method that runs once for each class instantiation
-        cls.jobs_to_qdrop = [create_QPU(1, '00:10:00', '--fakeqmio')]
-        os.system('sleep 1')
-        cls.jobs_to_qdrop.append(create_QPU(1, '00:10:00'))
-        os.system('sleep 3') 
+        cls.jobs_to_qdrop = [qraise(1, '00:10:00', fakeqmio=True)]
+        cls.jobs_to_qdrop.append(qraise(1, '00:10:00'))
         cls.qpus=getQPUs()
 
     @classmethod
@@ -45,7 +42,7 @@ class TestTranspErrors(unittest.TestCase):
         return self.assertRaises(SystemExit, transpiler, self.qc, self.qpus[0].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_json(self):
-        return self.assertRaises(SystemExit, transpiler, circuit.qc_to_json(self.qc), self.qpus[0].backend, initial_layout=[1,0,2])
+        return self.assertRaises(SystemExit, transpiler, qc_to_json(self.qc), self.qpus[0].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_QASM(self):
         return self.assertRaises(SystemExit, transpiler, dumps(self.qc), self.qpus[0].backend, initial_layout=[1,0,2])
@@ -69,12 +66,12 @@ class TestTranspErrors(unittest.TestCase):
         return self.assertRaises(SystemExit, transpiler, self.qc, invalid_backend, initial_layout=[1,0,2,3,4])
     
     def test_KeyError(self):
-        aux_backend=backend.Backend(self.qpus[-2].backend.__dict__) 
+        aux_backend=Backend(self.qpus[-2].backend.__dict__) 
         aux_backend.__dict__.pop("basis_gates") #erase one key from the backend dictionary
         return self.assertRaises(SystemExit, transpiler, self.qc, aux_backend, initial_layout=[1,0,2,3,4])
     
     def test_configuration_Exception(self):
-        aux2_backend=backend.Backend(self.qpus[-1].backend.__dict__)
+        aux2_backend=Backend(self.qpus[-1].backend.__dict__)
         aux2_backend.__dict__["basis_gates"] = True #put nonsense on one key
         return self.assertRaises(SystemExit, transpiler, self.qc, aux2_backend, initial_layout=[1,0,2,3,4])
     

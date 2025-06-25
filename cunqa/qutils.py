@@ -45,9 +45,9 @@ def qraise(n, time, *,
         quantum_comm (bool): if True the raised QPUs have quantum communications.
         simulator (str): name of the desired simulator to use. Default in this branch is Cunqasimulator.
         family (str): name to identify the group of QPUs raised on the specific call of the function.
-        mode (str): infrastructure type for the raised QPUs:  "hpc" or "cloud". First one associates QPUs to different nodes.
+        cloud (str): with this option multiple QPUs can fall on the same node, in contrast to the deafult 'hpc' mode where QPUs are treated as GPUs each associated to a node.
         cores (str):  number of cores for the SLURM job.
-        mem_per_qpu (str): memory to allocate for each QPU, format to use is  "xG".
+        mem_per_qpu (str): memory to allocate for each QPU, with format "xG", x being your number.
         n_nodes (str): number of nodes for the SLURM job.
         node_list (str): option to select specifically on which nodes the simulation job should run.
         qpus_per_node (str): sets the number of QPUs that should be raised on each requested node.
@@ -83,7 +83,9 @@ def qraise(n, time, *,
         output = run(cmd, capture_output=True, text=True).stdout #run the command on terminal and capture ist output on the variable 'output'
         job_id = ''.join(e for e in str(output) if e.isdecimal()) #sees the output on the console (looks like 'Submitted batch job 136285') and selects the number
         
-        return family if family is not None else str(job_id)
+        if 'error' in output: 
+            raise QRaiseError
+        return family if family is not None else int(job_id)
     
     except Exception as error:
         raise QRaiseError(f"Unable to raise requested QPUs [{error}].")
@@ -123,8 +125,8 @@ def qdrop(*families: Union[tuple, str]):
                         cmd.append(str(job_id)) 
                         break #pass to the next family name (two qraises must have different family names)
 
-            elif isinstance(family, tuple):
-                cmd.append(family[1])
+            elif isinstance(family, int):
+                cmd.append(str(family))
             else:
                 logger.error(f"Arguments for qdrop must be strings or QFamilies.")
                 raise SystemExit
