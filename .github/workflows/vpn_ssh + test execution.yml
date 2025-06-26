@@ -62,6 +62,7 @@ jobs:
         script: |
           echo $LMOD_SYSTEM_NAME
           cd /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/cunqa
+          echo $PATH
 
           # In the next line (LOADING MODULES) &> /dev/null redirects output so terminal isn't clogged (it will be ignored in /dev/null)                    
           module load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 &> /dev/null
@@ -69,17 +70,18 @@ jobs:
           echo "                  "
 
           # Run a trivial program on node c7-18 and continue executing (& at the end) to reduce waiting time
-          qraise -n 1 -t 00:01:00 --node_list=c7-18 & 
+          qraise -n 1 -t 00:00:01 --node_list=c7-18 &> /dev/null
+ 
 
           python /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/code_tests/tesst_runner.py
           echo "After LOGIN tests"
+          echo "                  "
 
           # Start interactive session for all tests that don't use the python qraise command. qcompute would be faster but would take 5mins to power on sleeping nodes
           qcompute -c 60 --node c7-18
           module load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 &> /dev/null
 
           echo "                  "
-
 
           python /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/code_tests/tesst_runner_interactive.py
 

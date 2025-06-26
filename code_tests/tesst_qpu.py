@@ -25,7 +25,7 @@ class TestQPU(unittest.TestCase):
     """
     def __init__(self, methodName = "runTest"):
         self.backend_instance = Backend({"basis_gates": ["sx", "x", "rz", "ecr"], "conditional": True, "coupling_map": [[0, 1], [2, 1], [2, 3], [4, 3], [5, 4], [6, 3], [6, 12], [7, 0], [7, 9], [9, 10], [11, 10], [11, 12], [13, 21], [14, 11], [14, 18], [15, 8], [15, 16], [18, 17], [18, 19], [20, 19], [22, 21], [22, 31], [23, 20], [23, 30], [24, 17], [24, 27], [25, 16], [25, 26], [26, 27], [28, 27], [28, 29], [30, 29], [30, 31]], "custom_instructions": "", "description": "FakeQmio backend", "gates": [], "is_simulator": True, "max_shots": 1000000, "memory": True, "n_qubits": 32, "name": "FakeQmio", "simulator": "AerSimulator", "url": "", "version": "/opt/cesga/qmio/hpc/calibrations/2025_04_03__12_00_03.json"})
-        self.qclient_instance = QClient(info_path)
+        self.qclient_instance = QClient()
         super().__init__(methodName)
 
     @classmethod

@@ -5,7 +5,7 @@ import unittest
 import cunqa.backend as backend
 import cunqa.circuit as circuit
 import numpy as np
-from cunqa.qjob import _divide, Result, QJob, gather, QJobError
+from cunqa.qjob import Result, QJob, gather, QJobError
 from cunqa.qutils import qraise, qdrop,  getQPUs
 
 from qiskit import QuantumCircuit

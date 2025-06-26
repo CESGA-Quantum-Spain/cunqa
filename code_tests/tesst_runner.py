@@ -1,14 +1,16 @@
 import os
+import os
 import sys
+
+sys.path.insert(0, os.path.abspath('$HOME/cunqa'))
+
 import unittest
 from tesst_transpile import TestTranspErrors
-from tesst_circuit import TestCircuitConversion
 from tesst_qjob import TestQJob, TestGather
 from tesst_qpu import TestQPU
 from tesst_qutils import Test_qraise, Test_qdrop, Test_getQPUs
-from tesst_result_and_backend import TestBackend, TestResult
 
-sys.path.insert(0, os.path.abspath('..'))
+
 
 if __name__ == "__main__":
     # Create a TestLoader instance
