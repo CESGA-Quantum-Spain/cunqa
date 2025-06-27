@@ -2,7 +2,10 @@ import os
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('$HOME/cunqa'))
+HOME = os.getenv("HOME")
+home_cunqa = HOME+"/cunqa"
+sys.path.insert(0, HOME)
+sys.path.insert(0, home_cunqa)
 
 import unittest
 from tesst_transpile import TestTranspErrors
