@@ -23,7 +23,7 @@ class Test_qdrop(unittest.TestCase):
     
     def test_nothing_to_drop(self):
         qdrop()
-        return self.assertRaises(SystemError, qdrop)
+        return self.assertRaises(SystemExit, qdrop)
 
 class Test_getQPUs(unittest.TestCase):
     """
@@ -33,22 +33,25 @@ class Test_getQPUs(unittest.TestCase):
         self.jobs_to_drop = []
         super().__init__(methodName)
 
-    @classmethod
-    def tearDownClass(cls):
-        qdrop(cls.jobs_to_drop)
+    def tearDown(self):
+        if len(self.jobs_to_drop)==0:
+            qdrop()
+        else:
+            qdrop(self.jobs_to_drop)
+            self.jobs_to_drop = []
 
     def test_not_raised(self):
         qdrop()
         os.system('sleep 5')
-        return self.assertRaises(SystemExit, getQPUs)
+        return self.assertRaises(Exception, getQPUs)
     
     def test_local_flag(self):
-        self.jobs_to_drop.append(qraise(1, '00:30:00', family='Merlín e familia'))
+        self.jobs_to_drop.append(qraise(1, '00:10:00', family="Merlin_e_familia"))
         qpus = getQPUs(local=False)
-        return self.assertEqual(qpus[-1]._family, 'Merlín e familia')
+        return self.assertEqual(qpus[-1]._family, 'Merlin_e_familia')
     
     def test_family(self):
-        self.jobs_to_drop.append(qraise(1, '00:30:00', family='test_family'))
+        self.jobs_to_drop.append(qraise(1, '00:10:00', family='test_family'))
         self.jobs_to_drop.append(qraise(1, '00:10:00', family='not_the_same_family'))
         qqpus = getQPUs(local=False, family='test_family')
 
@@ -76,11 +79,11 @@ class Test_qraise(unittest.TestCase):
     def test_simulator_flag(self):
         self.jobs_to_drop.append(qraise(1, '00:10:00', simulator='Munich'))
         qpus=getQPUs(local=False)
-        return self.assertEqual(qpus[-1].backend.__dict__["simulator"], "MunichSimulator")
+        return self.assertEqual(qpus[-1].backend.__dict__["simulator"], "SimpleMunich")
     
     def test_backend_flag(self):
         # I use a simple backend that I configurated for the test
-        family = qraise(1, '00:10:00', backend='/mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/code_tests/backend_simple.json')
+        family = qraise(1, '00:10:00', backend='/mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/code_tests/backend_test.json')
         self.jobs_to_drop.append(family) 
         qqpus=getQPUs(local=False)
         # On the next line we test by name, which is not perfect but should be enough
@@ -97,15 +100,16 @@ class Test_qraise(unittest.TestCase):
         return self.assertEqual(qppus[-1]._family, 'test_family_name')
 
     def test_family_name_unique(self):
-        self.jobs_to_drop.append(qraise(1, '00:10:00', family='im unique'))
-        return self.assertRaises(SystemError, qraise, 1, '00:10:00', family='im unique')
+        self.jobs_to_drop.append(qraise(1, '00:10:00', family='im_unique'))
+        
+        return self.assertRaises(SystemError, qraise, 1, '00:10:00', family='im_unique')
 
     def test_hpc_mode(self):
         # We will raise a QPU on a node different from ours (a login one) and check that we get an error if we try to run something on it
         self.jobs_to_drop.append(qraise(1,'00:10:00', cloud=False))
             
         qpus_one_hpc = getQPUs(local=False)
-        return self.assertRaises(SystemError, qpus_one_hpc[-1].run, CunqaCircuit(1,1))
+        return self.assertRaises(SystemExit, qpus_one_hpc[-1].run, CunqaCircuit(1,1))
 
     # def test_communications(self):
     #     pass

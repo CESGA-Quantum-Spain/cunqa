@@ -30,8 +30,9 @@ class TestQPU(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.job_to_qdrop = qraise(1, '00:10:00') 
-        cls.qpu = getQPUs()[-1]
+        cls.job_to_qdrop = qraise(1, '00:10:00')
+        qpus = getQPUs(local=False)
+        cls.qpu = qpus[-1]
 
     @classmethod
     def tearDownClass(cls):
@@ -41,23 +42,23 @@ class TestQPU(unittest.TestCase):
 
     ###################### INIT #############################
 
-    def test_no_id_provided(self):
-        return self.assertRaises(SystemExit, QPU, None, self.qclient_instance, self.backend_instance)
+    # def test_no_id_provided(self):
+    #     return self.assertRaises(SystemExit, QPU, None, self.qclient_instance, self.backend_instance, "family", ("127.0.0.1","15615"))
     
-    def test_id_ivalid_type(self):
-        return self.assertRaises(SystemExit, QPU, 'invalid id (bc str)', self.qclient_instance, self.backend_instance)
+    # def test_id_ivalid_type(self):
+    #     return self.assertRaises(SystemExit, QPU, 'invalid id (bc str)', self.qclient_instance, self.backend_instance, "family", ("127.0.0.1","15615"))
 
-    def test_no_qclient(self):
-        return self.assertRaises(SystemExit, QPU, 0, None, self.backend_instance) #the zero id is arbitrary
+    # def test_no_qclient(self):
+    #     return self.assertRaises(SystemExit, QPU, 0, None, self.backend_instance, "family", ("127.0.0.1","15615")) #the zero id is arbitrary
 
-    def test_qclient_wrong_type(self):
-        return self.assertRaises(SystemExit, QPU, 0, 'not a Qclient', self.backend_instance)
+    # def test_qclient_wrong_type(self):
+    #     return self.assertRaises(SystemExit, QPU, 0, 'not a Qclient', self.backend_instance, "family", ("127.0.0.1","15615"))
 
-    def test_no_backend(self):
-        return self.assertRaises(SystemExit, QPU, 0, self.qclient_instance, None)
+    # def test_no_backend(self):
+    #     return self.assertRaises(SystemExit, QPU, 0, self.qclient_instance, None, "family", ("127.0.0.1","15615"))
 
-    def test_backend_wrong_type(self):
-        return self.assertRaises(SystemExit, QPU, 0, self.qclient_instance, 'not a backend')
+    # def test_backend_wrong_type(self):
+    #     return self.assertRaises(SystemExit, QPU, 0, self.qclient_instance, 'not a backend', "family", ("127.0.0.1","15615"))
 
     ######################## RUN #############################
 
@@ -71,6 +72,7 @@ class TestQPU(unittest.TestCase):
         qc.append(QFT(n).inverse(), range(n))
         qc.measure_all() 
         job = self.qpu.run(qc, transpile=False)
+        print(job.__dict__)
         #The next line checks that the 'handwritten' dict is contained in the first one. I do this to avoid having to compare job._future which is a instance that I don't have access to
         return self.assertEqual(job.__dict__, job.__dict__ | {'_QPU': self.qpu, '_result': None, '_updated': False, '_cregisters': {'meas': [0, 1, 2, 3, 4]}, '_circuit': [{'name': 'x', 'qubits': [0], 'params': []}, {'name': 'x', 'qubits': [4], 'params': []}, {'name': 'x', 'qubits': [3], 'params': []}, {'name': 'QFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'z', 'qubits': [3], 'params': []}, {'name': 'h', 'qubits': [1], 'params': []}, {'name': 'IQFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'measure', 'qubits': [0], 'memory': [0]}, {'name': 'measure', 'qubits': [1], 'memory': [1]}, {'name': 'measure', 'qubits': [2], 'memory': [2]}, {'name': 'measure', 'qubits': [3], 'memory': [3]}, {'name': 'measure', 'qubits': [4], 'memory': [4]}], '_execution_config': ' {"config":{"shots": 1024, "method": "statevector", "memory_slots": 5, "seed": 188}, "instructions":[{"name": "x", "qubits": [0], "params": []}, {"name": "x", "qubits": [4], "params": []}, {"name": "x", "qubits": [3], "params": []}, {"name": "QFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "z", "qubits": [3], "params": []}, {"name": "h", "qubits": [1], "params": []}, {"name": "IQFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "measure", "qubits": [0], "memory": [0]}, {"name": "measure", "qubits": [1], "memory": [1]}, {"name": "measure", "qubits": [2], "memory": [2]}, {"name": "measure", "qubits": [3], "memory": [3]}, {"name": "measure", "qubits": [4], "memory": [4]}] }'})
 

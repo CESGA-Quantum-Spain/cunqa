@@ -1,5 +1,4 @@
 {
-    "backend":{
     "name": "Backend test test test this name is unique and won't coincide by chance",
     "version": "",
     "n_qubits": 32,
@@ -15,7 +14,7 @@
     ],
     "basis_gates": ["sx", "x", "rz", "ecr"],
     "custom_instructions": "",
-    "gates": [ ]
-    },
-    "noise": {}
-    }
+    "gates": [ ],
+    "noise_model": ""
+
+}

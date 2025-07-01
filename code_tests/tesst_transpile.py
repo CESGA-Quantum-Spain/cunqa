@@ -27,7 +27,7 @@ class TestTranspErrors(unittest.TestCase):
     def setUpClass(cls): #Method that runs once for each class instantiation
         cls.jobs_to_qdrop = [qraise(1, '00:10:00', fakeqmio=True)]
         cls.jobs_to_qdrop.append(qraise(1, '00:10:00'))
-        cls.qpus=getQPUs()
+        cls.qpus=getQPUs(local=False)
 
     @classmethod
     def tearDownClass(cls):  #Method that runs after all tests have been performed

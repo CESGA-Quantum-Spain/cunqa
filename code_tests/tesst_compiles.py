@@ -15,7 +15,6 @@ class Test_compiles(unittest.TestCase):
     def test_does_it_compile(self):
         error_occurred = False 
         try:
-            os.system('cmake -G Ninja -B build_test/')
             os.system('ninja -C build_test -j $(nproc)')
         except:
             error_occurred = True

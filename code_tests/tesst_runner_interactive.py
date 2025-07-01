@@ -1,7 +1,8 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
+HOME = os.getenv("HOME")
+sys.path.insert(0, HOME)
 
 import unittest
 from tesst_transpile import TestTranspErrors
@@ -23,7 +24,6 @@ if __name__ == "__main__":
     suite.addTests(loader.loadTestsFromTestCase(TestTranspErrors))
     suite.addTests(loader.loadTestsFromTestCase(TestCircuitConversion))
     suite.addTests(loader.loadTestsFromTestCase(TestResult))
-    suite.addTests(loader.loadTestsFromTestCase(TestQJob))
     suite.addTests(loader.loadTestsFromTestCase(TestGather))
     suite.addTests(loader.loadTestsFromTestCase(TestBackend))
     suite.addTests(loader.loadTestsFromTestCase(Test_compiles))

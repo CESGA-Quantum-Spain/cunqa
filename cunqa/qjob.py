@@ -204,7 +204,7 @@ class QJob:
                 circuit = qc_to_json(qc_from_qasm)['instructions']
 
             else:
-                logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circ)} was provided [{TypeError.__name__}].")
+                logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circuit)} was provided [{TypeError.__name__}].")
                 raise QJobError # I capture the error in QPU.run() when creating the job
             
             self._circuit = circuit
