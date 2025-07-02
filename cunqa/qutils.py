@@ -55,44 +55,67 @@ def qraise(n, time, *,
         backend (str): path to a file containing backend information.
 
     """
+    SLURMD_NODENAME = os.getenv("SLURMD_NODENAME")
+    if SLURMD_NODENAME == None:
+        command = f"qraise -n {n} -t {time}"
+    else: 
+        logger.warning("Be careful, you are deploying QPUs from an interactive session.")
+        HOSTNAME = os.getenv("HOSTNAME")
+        command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {time}"
 
     try:
-        cmd = ["qraise", "-n", str(n), '-t', str(time)]
-
         # Add specified flags
         if fakeqmio:
             if calibrations is not None:
-                cmd.append(f"--fakeqmio={calibrations}")
+                command += f" --fakeqmio={calibrations}"
             else:
-                cmd.append(f"--fakeqmio")
+                command += f" --fakeqmio"
         if simulator is not None:
-            cmd.append(f"--simulator={str(simulator)}")
+            command += f" --simulator={str(simulator)}"
         if family is not None:
-            cmd.append(f"--family={str(family)}")
+            command += f" --family={str(family)}"
         if cloud:
-            cmd.append(f"--cloud")
+            command += f" --cloud"
         if cores is not None:
-            cmd.append(f"--cores={str(cores)}")
+            command += f" --cores={str(cores)}"
         if mem_per_qpu is not None:
-            cmd.append(f"--mem_per_qpu={str(mem_per_qpu)}")
+            command += f" --mem_per_qpu={str(mem_per_qpu)}"
         if n_nodes is not None:
-            cmd.append(f"--n_nodes={str(n_nodes)}")
+            command += f"--n_nodes={str(n_nodes)}"
         if node_list is not None:
-            cmd.append(f"--node_list={str(node_list)}")
+            command += f" --node_list={str(node_list)}"
         if qpus_per_node is not None:
-            cmd.append(f"--qpus_per_node={str(qpus_per_node)}")
+            command += f" --qpus_per_node={str(qpus_per_node)}"
         if backend is not None:
-            cmd.append(f"--backend={str(backend)}")
+            command += f" --backend={str(backend)}"
+
+        if SLURMD_NODENAME != None:
+            command += "\""
+
+        if not os.path.exists(info_path):
+           with open(info_path, "w") as file:
+                file.write("{}")
+
+        old_time = os.stat(info_path).st_mtime # establish when the file qpus.json was modified last to check later that we did modify it
+        output = run(command, shell=True, capture_output=True, text=True) #run the command on terminal and capture ist output on the variable 'output'
+        logger.info(output)
+        logger.info 
+        job_id = ''.join(e for e in str(output.stdout) if e.isdecimal()) #sees the output on the console (looks like 'Submitted batch job 136285') and selects the number
+
+        # Wait for QPUs to be raised, so that getQPUs can be executed inmediately
+        while True:
+            if old_time != os.stat(info_path).st_mtime: #checks that the file has been modified
+                break
         
-        output = run(cmd, capture_output=True, text=True).stdout #run the command on terminal and capture ist output on the variable 'output'
-        job_id = ''.join(e for e in str(output) if e.isdecimal()) #sees the output on the console (looks like 'Submitted batch job 136285') and selects the number
+        if 'error' in output.stderr: 
+            logger.error(f"There was an error when running qraise command: {output}.")
+            raise QRaiseError
         
-        if 'error' in output: 
-            raise QRaiseError(output)
         return family if family is not None else int(job_id)
     
     except Exception as error:
-        raise QRaiseError(f"Unable to raise requested QPUs [{error}].")
+        logger.error(f"An error was encoutered when qraising: {error}.")
+        raise QRaiseError
 
 def qdrop(*families: Union[tuple, str]):
     """
@@ -132,12 +155,15 @@ def qdrop(*families: Union[tuple, str]):
                 elif isinstance(family, int):
                     cmd.append(str(family))
                 else:
-                    logger.error(f"Arguments for qdrop must be strings or QFamilies.")
+                    logger.error(f"Arguments for qdrop must be strings or ints, but a {type(family)} was provided.")
                     raise SystemExit
         else:
             logger.debug(f"qpus.json is empty, the specified families must have reached the time limit.")
- 
-    run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
+    try:
+        run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
+    except Exception as error:
+        logger.error(f"Some error when trying to qdrop: {error}.")
+        raise SystemExit
 
 
 def nodeswithQPUs() -> list[set]:

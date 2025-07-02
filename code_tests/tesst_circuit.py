@@ -1,9 +1,8 @@
 import unittest
-import cunqa.circuit as circuit
+from cunqa.circuit import qc_to_json, from_json_to_qc, _registers_dict
 from qiskit import QuantumCircuit, QuantumRegister , ClassicalRegister
 import numpy as np
 import math
-import qiskit
 
 # Define the basis_gates list with dictionaries containing Qiskit gate info and gate name
 basis_gates = [
@@ -92,7 +91,7 @@ class TestCircuitConversion(unittest.TestCase):
                 qc.measure_all()
 
             self.qcs.append(qc) #We store the minimal circuits to reuse them in the next test
-            json_transf = circuit.qc_to_json(qc)
+            json_transf = qc_to_json(qc)
             conversions.append(json_transf)  
 
             #let's create the corresponding dictionary circuits
@@ -122,9 +121,9 @@ class TestCircuitConversion(unittest.TestCase):
         #comparing two instances of a class it's hard - two instances are not equal despite having the same attributes. If their dict has classes in it, the same problem will occur if one tries to compare classes' dicts.
         # This is the case for QuantumCircuit, thus I chose to test from_json_to_qc and then test json_to_qc by passing to json again. If the first function is wrong both tests should fail, if the second is wrong only this one should fail 
 
-        double_converted = map(lambda x: circuit.qc_to_json(circuit.from_json_to_qc(x)), self.json_circuits) #convert all handcrafted jsons to qcs and back again to json
+        double_converted = map(lambda x: qc_to_json(from_json_to_qc(x)), self.json_circuits) #convert all handcrafted jsons to qcs and back again to json
 
-        once_converted= map(circuit.qc_to_json, self.qcs) #convert all handcafted quantum circuits to json
+        once_converted= map(qc_to_json, self.qcs) #convert all handcafted quantum circuits to json
         
         return self.assertListEqual(list(double_converted), list(once_converted)) 
     
@@ -135,7 +134,7 @@ class TestCircuitConversion(unittest.TestCase):
     
     def test_registers_dict(self):
         qc_0 = QuantumCircuit(QuantumRegister(4), ClassicalRegister(3))
-        return self.assertListEqual(circuit.registers_dict(qc_0) ,[{"q0":[0,1,2,3]},{"c0":[0,1,2]}])
+        return self.assertListEqual(_registers_dict(qc_0) ,[{"q0":[0,1,2,3]},{"c0":[0,1,2]}])
 
 
 

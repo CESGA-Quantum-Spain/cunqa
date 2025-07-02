@@ -22,8 +22,8 @@ class Test_compiles(unittest.TestCase):
         # Avoids the giant traceback that would muddy other tests. Otherwise we could let the error unhandled, the test would appear as ERROR and the traceback would be printed
         self.assertFalse(error_occurred, 'There was an error during compilation.')
 
-    def test_submodules_updated(self):
-        pass
+    # def test_submodules_updated(self):
+    #     pass
         
 
 if __name__ == "__main__":

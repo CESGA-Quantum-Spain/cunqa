@@ -25,8 +25,10 @@ class TestTranspErrors(unittest.TestCase):
 
     @classmethod 
     def setUpClass(cls): #Method that runs once for each class instantiation
-        cls.jobs_to_qdrop = [qraise(1, '00:10:00', fakeqmio=True)]
+        cls.jobs_to_qdrop = []
+        cls.jobs_to_qdrop.append(qraise(1, '00:10:00', fakeqmio=True, calibrations='/opt/cesga/qmio/hpc/calibrations/2025_05_26__12_00_02.json'))
         cls.jobs_to_qdrop.append(qraise(1, '00:10:00'))
+
         cls.qpus=getQPUs(local=False)
 
     @classmethod
@@ -38,18 +40,18 @@ class TestTranspErrors(unittest.TestCase):
     #Key detail for the following three tests: qc has 5 qubits, initial_layout=[1, 0, 2] has 3 qubits 
 
     def test_init_layout_size_error_qc(self):
-        #syntax is assertRaises(exception, callable, *args, **kwds)
-        return self.assertRaises(SystemExit, transpiler, self.qc, self.qpus[0].backend, initial_layout=[1,0,2])
+        #syntax is assertRaises(exception, callable, *args, **kwargs)
+        return self.assertRaises(SystemExit, transpiler, self.qc, self.qpus[-2].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_json(self):
-        return self.assertRaises(SystemExit, transpiler, qc_to_json(self.qc), self.qpus[0].backend, initial_layout=[1,0,2])
+        return self.assertRaises(SystemExit, transpiler, qc_to_json(self.qc), self.qpus[-2].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_QASM(self):
-        return self.assertRaises(SystemExit, transpiler, dumps(self.qc), self.qpus[0].backend, initial_layout=[1,0,2])
+        return self.assertRaises(SystemExit, transpiler, dumps(self.qc), self.qpus[-2].backend, initial_layout=[1,0,2])
 
     def test_invalid_circ_format(self):
         invalid_circ = [0,'h', 2, 'some gate', 3,'x'] #transpiler won't recognize this circuit format, as expected
-        return self.assertRaises(SystemExit, transpiler, invalid_circ, self.qpus[0].backend, initial_layout=[1,0,2])
+        return self.assertRaises(SystemExit, transpiler, invalid_circ, self.qpus[-2].backend, initial_layout=[1,0,2])
 
     # def test_QASM2_Error(self):
 

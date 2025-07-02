@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from cunqa.qutils import qraise, qdrop, getQPUs
+from cunqa.qutils import qraise, qdrop, getQPUs, QRaiseError
 from cunqa.circuit import CunqaCircuit
 import random
 
@@ -15,9 +15,10 @@ class Test_qdrop(unittest.TestCase):
     """
 
     def test_qdrop(self):
-        last_raised = qraise(1, '00:10:00', family='unique name 25.06.2025 goku super saiyan')
+        last_raised = qraise(1, '00:10:00', family='unique_name_25.06.2025_goku_super_saiyan')
         qpus_before = getQPUs(local=False)
-        qdrop(last_raised) # I don't wait cause qdrop locks the file, let's see if this raises any problem 
+        qdrop(last_raised) 
+        os.system('sleep 2')
         qpus_after = getQPUs(local=False)
         return self.assertNotEqual(qpus_before, qpus_after), self.assertNotEqual(qpus_after[-1]._family, 'unique name 25.06.2025 goku super saiyan')
     
@@ -35,13 +36,13 @@ class Test_getQPUs(unittest.TestCase):
 
     def tearDown(self):
         if len(self.jobs_to_drop)==0:
-            qdrop()
+            pass
         else:
-            qdrop(self.jobs_to_drop)
+            qdrop(*self.jobs_to_drop)
             self.jobs_to_drop = []
 
     def test_not_raised(self):
-        qdrop()
+        qdrop() # if no jobs are up will give an error
         os.system('sleep 5')
         return self.assertRaises(Exception, getQPUs)
     
@@ -66,12 +67,12 @@ class Test_qraise(unittest.TestCase):
     """
 
     def __init__(self, methodName = "runTest"):
-        self.jobs_to_drop =[]
+        self.jobs_to_drop = []
         super().__init__(methodName)
 
     def tearDown(self):
-        qdrop(self.jobs_to_drop[0]) #drops exactly the QPU we created on each test
-        self.jobs_to_drop =[]
+        qdrop(*self.jobs_to_drop) #drops exactly the QPU we created on each test
+        self.jobs_to_drop = []
         os.system('sleep 1')
 
 
@@ -90,7 +91,7 @@ class Test_qraise(unittest.TestCase):
         return self.assertEqual(qqpus[-1].backend.__dict__["name"],"Backend test test test this name is unique and won't coincide by chance")
     
     def test_fakeqmio_flag(self):
-        self.jobs_to_drop.append(qraise(1, '00:10:00', fakeqmio=True))
+        self.jobs_to_drop.append(qraise(1, '00:10:00', fakeqmio=True, calibrations='/opt/cesga/qmio/hpc/calibrations/2025_05_26__12_00_02.json'))
         qpuss=getQPUs(local=False)
         return self.assertEqual(qpuss[-1].backend.__dict__["name"], "FakeQmio" )
     
@@ -101,13 +102,11 @@ class Test_qraise(unittest.TestCase):
 
     def test_family_name_unique(self):
         self.jobs_to_drop.append(qraise(1, '00:10:00', family='im_unique'))
-        
-        return self.assertRaises(SystemError, qraise, 1, '00:10:00', family='im_unique')
+        return self.assertRaises(QRaiseError, qraise, 1, '00:10:00', family='im_unique')
 
     def test_hpc_mode(self):
         # We will raise a QPU on a node different from ours (a login one) and check that we get an error if we try to run something on it
         self.jobs_to_drop.append(qraise(1,'00:10:00', cloud=False))
-            
         qpus_one_hpc = getQPUs(local=False)
         return self.assertRaises(SystemExit, qpus_one_hpc[-1].run, CunqaCircuit(1,1))
 

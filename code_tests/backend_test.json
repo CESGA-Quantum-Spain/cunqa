@@ -4,6 +4,7 @@
     "n_qubits": 32,
     "url": "",
     "is_simulator": true,
+    "simulator":"Aer",
     "conditional": true,
     "memory": true,
     "max_shots": 1000000,

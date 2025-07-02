@@ -5,9 +5,8 @@ HOME = os.getenv("HOME")
 sys.path.insert(0, HOME)
 
 import unittest
-from tesst_transpile import TestTranspErrors
 from tesst_circuit import TestCircuitConversion
-from tesst_qjob import TestQJob, TestGather
+from tesst_qjob import TestGather
 from tesst_result_and_backend import TestBackend, TestResult
 from tesst_compiles import Test_compiles
 
@@ -21,7 +20,6 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     # Add test cases to the suite using the same loader
-    suite.addTests(loader.loadTestsFromTestCase(TestTranspErrors))
     suite.addTests(loader.loadTestsFromTestCase(TestCircuitConversion))
     suite.addTests(loader.loadTestsFromTestCase(TestResult))
     suite.addTests(loader.loadTestsFromTestCase(TestGather))

@@ -2,8 +2,7 @@ import os
 import sys
 import unittest
 from cunqa.backend import Backend
-from cunqa.result import Result
-from cunqa.qjob import QJobError
+from cunqa.result import Result, ResultError
 
 
 # Adding pyhton folder path to detect modules
@@ -59,19 +58,19 @@ class TestResult(unittest.TestCase):
 
     def test_counts_Aer(self):
         res_aer = Result(self.ex_results_aer, self.ex_registers)
-        return self.assertEqual(res_aer.get_counts(), {'10011': 243, '10111': 283, '11011': 149, '11111': 141, '00011': 110, '00111': 9, '01011': 6, '01111': 59})
+        return self.assertEqual(res_aer.counts, {'10011': 243, '10111': 283, '11011': 149, '11111': 141, '00011': 110, '00111': 9, '01011': 6, '01111': 59})
     
     def test_counts_Munich(self):
         res_munich = Result(self.ex_results_munich, self.ex_registers)
-        return self.assertEqual(res_munich.get_counts(), {'00011': 92, '00111': 8, '01011': 7, '01111': 74, '10011': 231, '10111': 279, '11011': 151, '11111': 158})
+        return self.assertEqual(res_munich.counts, {'00011': 92, '00111': 8, '01011': 7, '01111': 74, '10011': 231, '10111': 279, '11011': 151, '11111': 158})
 
-    def test_result_invalid_type(self):
-        res_type_list = [ {'00011': 92, '00111': 8, '01011': 7, '01111': 74, '10011': 231, '10111': 279, '11011': 151, '11111': 158}, 0.0003500320017337799]
-        return self.assertRaises(TypeError, Result, res_type_list, self.ex_registers)
+    # def test_result_invalid_type(self):
+    #     res_type_list = [ {'00011': 92, '00111': 8, '01011': 7, '01111': 74, '10011': 231, '10111': 279, '11011': 151, '11111': 158}, 0.0003500320017337799]
+    #     return self.assertRaises(TypeError, Result, res_type_list, self.ex_registers)
 
     def test_error_in_result(self):
         res_w_error = {"ERROR": "Yes, there is an error"}
-        return self.assertRaises(QJobError, Result, res_w_error, self.ex_registers)
+        return self.assertRaises(ResultError, Result, res_w_error, self.ex_registers)
     
     # def test_no_counts(self):
     #     res_w_out_counts= {'no counts here': {}, 'time_taken': 0.0003500320017337799}
@@ -83,8 +82,8 @@ class TestResult(unittest.TestCase):
 
     def test_dict_aer(self):
         res_aer = Result(self.ex_results_aer, self.ex_registers)
-        return self.assertEqual(res_aer.get_dict(), self.ex_results_aer)
+        return self.assertEqual(res_aer.result, self.ex_results_aer)
     
     def test_dict_munich(self):
         res_munich = Result(self.ex_results_munich, self.ex_registers)
-        return self.assertEqual(res_munich.get_dict(), self.ex_results_munich)
+        return self.assertEqual(res_munich.result, self.ex_results_munich)

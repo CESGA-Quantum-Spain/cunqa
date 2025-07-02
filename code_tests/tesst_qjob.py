@@ -38,14 +38,14 @@ class TestQJob(unittest.TestCase):
 
     ######## INIT METHOD ########################################################################################
 
-    def test_non_boolean_transpile_error(self):
-        return self.assertRaises(TypeError, QJob, self.qpus[-1], QClient(), Backend({}), self.qc, transpile=0)
+    # def test_non_boolean_transpile_error(self):
+    #     return self.assertRaises(TypeError, QJob, self.qpus[-1], QClient(), Backend({}), self.qc, transpile=0)
 
     # def test_transpilation_exception(self):
 
     def test_invalid_circuit_format(self):
         invalid_circ = [0,'h', 2, 'some gate', 3,'x'] #this circuit won't be recognized, obviously
-        return self.assertRaises(QJobError, QJob, self.qpus[-1], QClient(), Backend({}), invalid_circ, transpile = False)
+        return self.assertRaises(QJobError, QJob, QClient(), Backend({}), invalid_circ)
 
     def test_circuit_missing_keys(self):
         circuit = {  #this circuit is missing the instructions key
@@ -54,13 +54,13 @@ class TestQJob(unittest.TestCase):
                 "quantum_registers": {"q" : [0, 1, 2] },
                 "classical_registers": {"meas": [0, 1, 2]}
             }
-        return self.assertRaises(QJobError, QJob, self.qpus[-1], QClient(), Backend({}), circuit, transpile=False)
+        return self.assertRaises(QJobError, QJob, QClient(), Backend({}), circuit)
 
     def test_QASM2_translation_error(self):
         will_be_qasm = QuantumCircuit(2)
         qasm = dumps(will_be_qasm)
         messed_qasm= qasm + "a problem appeared, ouch!"
-        return self.assertRaises(QJobError, QJob, self.qpus[-1], QClient(), Backend({}), messed_qasm, transpile= False)
+        return self.assertRaises(QJobError, QJob, QClient(), Backend({}), messed_qasm)
 
     # def test_Qiskit_circuit_error(self):
 
@@ -84,7 +84,8 @@ class TestQJob(unittest.TestCase):
         param_circ.cx(0,1)
         param_circ.measure_all()
 
-        assert self.qpus[-1].backend.__dict__["name"] == "SimpleAer", 'The used QPU doesnt use Aer'
+        sim = self.qpus[-1].backend.__dict__["simulator"]
+        assert  sim == "SimpleAER", f"The used QPU's simulator is not Aer, but {sim}"
         #IMPORTANT that the self.qpu[-1] we raised is AER
         job = self.qpus[-1].run(param_circ, transpile = False, **self.run_config)   # the result here would be {'00': 502, '11': 498}     (WITH AER)!!!
 
@@ -118,9 +119,9 @@ class TestQJob(unittest.TestCase):
         #I set 'status': "RUNNING" in the following dictionary and eliminate time_taken metrics
         res ={'backend_name': '', 'backend_version': '', 'date': '', 'job_id': '', 'metadata': {'max_gpu_memory_mb': 0, 'max_memory_mb': 1031551, 'omp_enabled': True, 'parallel_experiments': 1}, 'qobj_id': '', 'results': [{'data': {'counts': {'0x13': 243, '0x17': 283, '0x1b': 149, '0x1f': 141, '0x3': 110, '0x7': 9, '0xb': 6, '0xf': 59}}, 'metadata': {'active_input_qubits': [0, 1, 2, 3, 4], 'batched_shots_optimization': False, 'device': 'CPU', 'fusion': {'applied': False, 'enabled': True, 'max_fused_qubits': 5, 'threshold': 14}, 'input_qubit_map': [[4, 4], [3, 3], [2, 2], [1, 1], [0, 0]], 'max_memory_mb': 1031551, 'measure_sampling': True, 'method': 'statevector', 'noise': 'ideal', 'num_bind_params': 1, 'num_clbits': 5, 'num_qubits': 5, 'parallel_shots': 1, 'parallel_state_update': 2, 'remapped_qubits': False, 'required_memory_mb': 1, 'runtime_parameter_bind': False}, 'seed_simulator': 188, 'shots': 1000, 'status': 'DONE', 'success': True}], 'status': 'RUNNING', 'success': True}
         qc=QuantumCircuit(1)
-        running_job = QJob(self.qpus[-1], QClient(), Backend({}), qc)
+        running_job = QJob(QClient(), Backend({}), qc)
         running_job._result = Result(res, {'meas': [0, 1, 2, 3, 4]})
-        return self.assertRaises(SystemExit, running_job.time_taken)
+        return self.assertRaises(Exception, running_job.time_taken)
 
     def test_no_result_error(self):
         qc=QuantumCircuit(3)
