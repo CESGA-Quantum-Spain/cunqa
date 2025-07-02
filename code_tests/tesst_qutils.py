@@ -101,6 +101,7 @@ class Test_qraise(unittest.TestCase):
         return self.assertEqual(qppus[-1]._family, 'test_family_name')
 
     def test_family_name_unique(self):
+        
         self.jobs_to_drop.append(qraise(1, '00:10:00', family='im_unique'))
         return self.assertRaises(QRaiseError, qraise, 1, '00:10:00', family='im_unique')
 
