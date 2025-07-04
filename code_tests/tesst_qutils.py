@@ -20,11 +20,12 @@ class Test_qdrop(unittest.TestCase):
         qdrop(last_raised) 
         os.system('sleep 2')
         qpus_after = getQPUs(local=False)
-        return self.assertNotEqual(qpus_before, qpus_after), self.assertNotEqual(qpus_after[-1]._family, 'unique name 25.06.2025 goku super saiyan')
+        return self.assertNotEqual(qpus_before, qpus_after), self.assertNotEqual(qpus_after[-1]._family, 'unique_name_25.06.2025_goku_super_saiyan')
     
     def test_nothing_to_drop(self):
         qdrop()
         return self.assertRaises(SystemExit, qdrop)
+
 
 class Test_getQPUs(unittest.TestCase):
     """
@@ -42,7 +43,10 @@ class Test_getQPUs(unittest.TestCase):
             self.jobs_to_drop = []
 
     def test_not_raised(self):
-        qdrop() # if no jobs are up will give an error
+        try:
+            qdrop() # if no jobs are up will give an error
+        except:
+            pass
         os.system('sleep 5')
         return self.assertRaises(Exception, getQPUs)
     
@@ -61,6 +65,7 @@ class Test_getQPUs(unittest.TestCase):
     # def test_QPUs_with_diff_backends(self):
     #     return
 
+
 class Test_qraise(unittest.TestCase):
     """
     Class to test correct functioning of the qraise command
@@ -71,11 +76,10 @@ class Test_qraise(unittest.TestCase):
         super().__init__(methodName)
 
     def tearDown(self):
-        qdrop(*self.jobs_to_drop) #drops exactly the QPU we created on each test
-        self.jobs_to_drop = []
         os.system('sleep 1')
-
-
+        qdrop(*self.jobs_to_drop) 
+        self.jobs_to_drop = []
+        
 
     def test_simulator_flag(self):
         self.jobs_to_drop.append(qraise(1, '00:10:00', simulator='Munich'))
@@ -101,13 +105,12 @@ class Test_qraise(unittest.TestCase):
         return self.assertEqual(qppus[-1]._family, 'test_family_name')
 
     def test_family_name_unique(self):
-        
         self.jobs_to_drop.append(qraise(1, '00:10:00', family='im_unique'))
-        return self.assertRaises(QRaiseError, qraise, 1, '00:10:00', family='im_unique')
+        return self.assertRaises(QRaiseError, qraise, 1, '00:10:00', family="im_unique")
 
     def test_hpc_mode(self):
         # We will raise a QPU on a node different from ours (a login one) and check that we get an error if we try to run something on it
-        self.jobs_to_drop.append(qraise(1,'00:10:00', cloud=False))
+        self.jobs_to_drop.append(qraise(1,'00:10:00', cloud=False, family="hpc"))
         qpus_one_hpc = getQPUs(local=False)
         return self.assertRaises(SystemExit, qpus_one_hpc[-1].run, CunqaCircuit(1,1))
 

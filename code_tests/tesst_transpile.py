@@ -44,7 +44,7 @@ class TestTranspErrors(unittest.TestCase):
         return self.assertRaises(SystemExit, transpiler, self.qc, self.qpus[-2].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_json(self):
-        return self.assertRaises(SystemExit, transpiler, qc_to_json(self.qc), self.qpus[-2].backend, initial_layout=[1,0,2])
+        return self.assertRaises(SystemExit, transpiler, qc_to_json(self.qc) | {"num_qubits": 5}, self.qpus[-2].backend, initial_layout=[1,0,2])
 
     def test_init_layout_size_error_QASM(self):
         return self.assertRaises(SystemExit, transpiler, dumps(self.qc), self.qpus[-2].backend, initial_layout=[1,0,2])

@@ -35,7 +35,7 @@ def qraise(n, time, *,
            qpus_per_node= None, 
            backend = None) -> Union[tuple, str]:
     """
-    Raises a QPU and returns its job_id.
+    Raises a QPU and returns its family name/job_id.
 
     Args
         n (int): number of QPUs to be raised.
@@ -63,35 +63,36 @@ def qraise(n, time, *,
         HOSTNAME = os.getenv("HOSTNAME")
         command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {time}"
 
+   
+    # Add specified flags
+    if fakeqmio:
+        if calibrations is not None:
+            command += f" --fakeqmio={calibrations}"
+        else:
+            command += f" --fakeqmio"
+    if simulator is not None:
+        command += f" --simulator={str(simulator)}"
+    if family is not None:
+        command += f" --family={str(family)}"
+    if cloud:
+        command += f" --cloud"
+    if cores is not None:
+        command += f" --cores={str(cores)}"
+    if mem_per_qpu is not None:
+        command += f" --mem_per_qpu={str(mem_per_qpu)}"
+    if n_nodes is not None:
+        command += f"--n_nodes={str(n_nodes)}"
+    if node_list is not None:
+        command += f" --node_list={str(node_list)}"
+    if qpus_per_node is not None:
+        command += f" --qpus_per_node={str(qpus_per_node)}"
+    if backend is not None:
+        command += f" --backend={str(backend)}"
+
+    if SLURMD_NODENAME != None:
+        command += "\""
+
     try:
-        # Add specified flags
-        if fakeqmio:
-            if calibrations is not None:
-                command += f" --fakeqmio={calibrations}"
-            else:
-                command += f" --fakeqmio"
-        if simulator is not None:
-            command += f" --simulator={str(simulator)}"
-        if family is not None:
-            command += f" --family={str(family)}"
-        if cloud:
-            command += f" --cloud"
-        if cores is not None:
-            command += f" --cores={str(cores)}"
-        if mem_per_qpu is not None:
-            command += f" --mem_per_qpu={str(mem_per_qpu)}"
-        if n_nodes is not None:
-            command += f"--n_nodes={str(n_nodes)}"
-        if node_list is not None:
-            command += f" --node_list={str(node_list)}"
-        if qpus_per_node is not None:
-            command += f" --qpus_per_node={str(qpus_per_node)}"
-        if backend is not None:
-            command += f" --backend={str(backend)}"
-
-        if SLURMD_NODENAME != None:
-            command += "\""
-
         if not os.path.exists(info_path):
            with open(info_path, "w") as file:
                 file.write("{}")
@@ -99,17 +100,18 @@ def qraise(n, time, *,
         old_time = os.stat(info_path).st_mtime # establish when the file qpus.json was modified last to check later that we did modify it
         output = run(command, shell=True, capture_output=True, text=True) #run the command on terminal and capture ist output on the variable 'output'
         logger.info(output)
-        logger.info 
         job_id = ''.join(e for e in str(output.stdout) if e.isdecimal()) #sees the output on the console (looks like 'Submitted batch job 136285') and selects the number
 
+        # check errors here to avoid getting stuck in the while True loop in weird cases
+        errors = ['error', 'Error', 'ERROR'] 
+        if any([error in output.stderr for error in errors]):
+            logger.error(f"There was an error when running qraise command: {output}.")
+            raise QRaiseError
+        
         # Wait for QPUs to be raised, so that getQPUs can be executed inmediately
         while True:
             if old_time != os.stat(info_path).st_mtime: #checks that the file has been modified
                 break
-        
-        if 'error' in output.stderr: 
-            logger.error(f"There was an error when running qraise command: {output}.")
-            raise QRaiseError
         
         return family if family is not None else int(job_id)
     

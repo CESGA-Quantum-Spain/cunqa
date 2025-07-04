@@ -80,7 +80,8 @@ class QJob:
                     self._updated = True
             else:
                 logger.debug(f"self._future is None or non-valid, None is returned.")
-        except Exception as _:
+        except Exception as error:
+                logger.error(f"Error while obtaining the result: {error}.")
                 raise SystemExit # User's level
 
         return self._result

@@ -26,7 +26,8 @@ class TestQJob(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.job_to_qdrop = qraise(1, '00:10:00')
-        cls.qpus = getQPUs(local=False)
+        qpus = getQPUs(local=False)
+        cls.qpu = qpus[-1]
         cls.qc= QuantumCircuit(3)
         cls.run_config = {"shots":1024, "method":"statevector", "seed": 188}
 
@@ -84,10 +85,10 @@ class TestQJob(unittest.TestCase):
         param_circ.cx(0,1)
         param_circ.measure_all()
 
-        sim = self.qpus[-1].backend.__dict__["simulator"]
+        sim = self.qpu.backend.__dict__["simulator"]
         assert  sim == "SimpleAER", f"The used QPU's simulator is not Aer, but {sim}"
         #IMPORTANT that the self.qpu[-1] we raised is AER
-        job = self.qpus[-1].run(param_circ, transpile = False, **self.run_config)   # the result here would be {'00': 502, '11': 498}     (WITH AER)!!!
+        job = self.qpu.run(param_circ, transpile = False, **self.run_config)   # the result here would be {'00': 502, '11': 498}     (WITH AER)!!!
 
         updated_job = job.upgrade_parameters([np.pi/4]) #whereas the result here should be {'00': 859, '11': 141}            (WITH AER)!!!
 
@@ -125,8 +126,8 @@ class TestQJob(unittest.TestCase):
 
     def test_no_result_error(self):
         qc=QuantumCircuit(3)
-        not_to_be_submitted = QJob(self.qpus[-1], qc, False)
-        return self.assertRaises(SystemExit, not_to_be_submitted.time_taken)
+        not_to_be_submitted = QJob(QClient(),Backend({}), qc)
+        return self.assertRaises(QJobError, not_to_be_submitted.time_taken)
 
 
 
