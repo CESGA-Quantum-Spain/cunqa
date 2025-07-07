@@ -89,7 +89,7 @@ noise_model = NoiseModel.from_backend(
         gate_error=gate_error,
         readout_error=readout_error)
 
-noise_model_json = noise_model_json = noise_model.to_dict(serializable = True)
+noise_model_json = noise_model.to_dict(serializable = True)
 
 
 
