@@ -22,15 +22,5 @@ Welcome to CUNQA's documentation!
    :caption: Contents:
 
    getting_started
-
-.. autosummary::
-   :toctree: _autosummary
-   :template: module_template_2.rst
-   :recursive:
-
    cunqa
-
-.. toctree::
-   :maxdepth: 2
-
    examples_gallery
