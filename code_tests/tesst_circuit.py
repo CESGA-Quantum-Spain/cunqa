@@ -47,6 +47,8 @@ basis_gates = [
     {"name": "cswap", "gate": QuantumCircuit.cswap, "qubits": 3, "param": None}
 ]
 #n = len(basis_gates)
+SUPPORTED_GATES_PARAMETRIC = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz", "d_c_if_rx","d_c_if_ry","d_c_if_rz", "u2", "r", "u", "u3", "cu3", "cu"]
+
 
 class TestCircuitConversion(unittest.TestCase):
     """
@@ -98,6 +100,8 @@ class TestCircuitConversion(unittest.TestCase):
             _params = params if params is not None else []
             
             json1 = {
+                "id":"",
+                "is_parametric": True if gate_info["name"] in SUPPORTED_GATES_PARAMETRIC else False,
                 "instructions":[{"name": gate_info["name"], "qubits": list(range(num_qubits)),"params":_params }, {'memory': [0], 'name': 'measure', 'qubits': [0]}],
                 "num_qubits": num_qubits,
                 "num_clbits": num_qubits,
@@ -109,7 +113,7 @@ class TestCircuitConversion(unittest.TestCase):
             if num_qubits == 3:
                 json1["instructions"].append({'memory': [2], 'name': 'measure', 'qubits': [2]})
             self.json_circuits.append(json1)
-
+            self.MaxDiff=None
         return self.assertListEqual(conversions, self.json_circuits) #Check that all elements on the list of converted circuits coincide with the elements of the list with the same circuits 'handwritten' as jsons
     
 

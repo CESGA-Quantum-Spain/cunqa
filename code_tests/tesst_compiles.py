@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+import subprocess
 
 
 # Adding pyhton folder path to detect modules
@@ -12,18 +13,15 @@ class Test_compiles(unittest.TestCase):
     Class to test if the code compiles without crashing.
     """
 
-    def test_does_it_compile(self):
-        error_occurred = False 
+    def test_does_it_compile(self): 
         try:
-            os.system('ninja -C build_test -j $(nproc)')
-        except:
-            error_occurred = True
+            # cpu_count = os.cpu_count() or 1
+            subprocess.run('ninja -C /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/build_test -j $(nproc)', shell=True, check=True, capture_output=True, text=True) # Check=true raises exception if error appears
 
-        # Avoids the giant traceback that would muddy other tests. Otherwise we could let the error unhandled, the test would appear as ERROR and the traceback would be printed
-        self.assertFalse(error_occurred, 'There was an error during compilation.')
+        except subprocess.CalledProcessError as e:
+            self.fail(f"Compilation failed") # . Error output: {e.stderr}
 
-    # def test_submodules_updated(self):
-    #     pass
+    
         
 
 if __name__ == "__main__":
