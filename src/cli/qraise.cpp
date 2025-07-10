@@ -125,9 +125,15 @@ int main(int argc, char* argv[])
     //Checking duplicate family name
     std::string family = std::any_cast<std::string>(args.family);
     if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
-        LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
         std::system("rm qraise_sbatch_tmp.sbatch");
-        return 0;
+        std::cerr << "\033[1;31m" << "Error: There are QPUs with the same family name as the one provided: " << family << "\033[0m" << std::endl;
+        return -1;
+        /* try{
+            throw std::runtime_error("There are QPUs with the same family name");
+        } catch (const std::exception& e) {
+            std::cerr << "\033[1;31m" << "Error: " << e.what() << " as the one provided: " << family << "\033[0m" << std::endl;
+            return -1;  
+        } */
     }
 
     //Get mode: hpc or cloud

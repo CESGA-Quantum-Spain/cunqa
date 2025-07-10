@@ -2,7 +2,7 @@
 import os
 import sys
 from typing import Union
-from subprocess import run
+import subprocess
 from json import load
 from cunqa.qclient import QClient  # importamos api en C++
 from cunqa.backend import Backend
@@ -37,7 +37,7 @@ def qraise(n, time, *,
     """
     Raises a QPU and returns its family name/job_id.
 
-    Args
+    Args:
         n (int): number of QPUs to be raised.
         time (str, format: 'D-HH:MM:SS'): maximun time that the classical resources will be reserved for the QPU.
         
@@ -98,7 +98,7 @@ def qraise(n, time, *,
                 file.write("{}")
 
         old_time = os.stat(info_path).st_mtime # establish when the file qpus.json was modified last to check later that we did modify it
-        output = run(command, shell=True, capture_output=True, text=True) #run the command on terminal and capture ist output on the variable 'output'
+        output = subprocess.run(command, shell=True, check=True, capture_output=True, text=True) #run the command on terminal and capture ist output on the variable 'output'
         logger.info(output)
         job_id = ''.join(e for e in str(output.stdout) if e.isdecimal()) #sees the output on the console (looks like 'Submitted batch job 136285') and selects the number
 
@@ -115,23 +115,23 @@ def qraise(n, time, *,
         
         return family if family is not None else int(job_id)
     
-    except Exception as error:
-        logger.error(f"An error was encoutered when qraising: {error}.")
+    except subprocess.CalledProcessError as error:
+        logger.error(f"An error was encoutered while qraising:\n {error.stderr}.")
         raise QRaiseError
 
 def qdrop(*families: Union[tuple, str]):
     """
     Drops the QPU families corresponding to the the entered QPU objects. By default, all raised QPUs will be dropped.
 
-    Args
+    Args:
         qpus (tuple(<class cunqa.qpu.QPU>)): list of QPUs to drop. All QPUs that share a qraise will these will drop.
     """
     
-    cmd = ['qdrop']
+    cmd = 'qdrop '
 
     # If no families are provided we drop all QPU slurm jobs
     if len( families ) == 0:
-        cmd.append('--all')
+        cmd += '--all'
     else:
         # Access the large dictionary containing all QPU dictionaries
         try:
@@ -151,22 +151,30 @@ def qdrop(*families: Union[tuple, str]):
                     for _, dictionary in qpus_json.items():
                         if dictionary.get("family") == family:
                             job_id=dictionary.get("slurm_job_id")   
-                            cmd.append(str(job_id)) 
+                            cmd += str(job_id)
+                            cmd += ' '
                             break #pass to the next family name (two qraises must have different family names)
 
                 elif isinstance(family, int):
-                    cmd.append(str(family))
+                    cmd += str(family)
+                    cmd += ' '
                 else:
                     logger.error(f"Arguments for qdrop must be strings or ints, but a {type(family)} was provided.")
                     raise SystemExit
         else:
             logger.debug(f"qpus.json is empty, the specified families must have reached the time limit.")
     try:
-        run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
-    except Exception as error:
-        logger.error(f"Some error when trying to qdrop: {error}.")
-        raise SystemExit
+        logger.debug(f"Command to run (qdrop function): {cmd}")
+        subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
 
+    except subprocess.CalledProcessError as error:
+        logger.error(f"Some error when trying to qdrop:\n {error.stderr}.")
+        raise SystemExit
+    
+    except Exception as error:
+        logger.error(f"Some exception when trying to qdrop:\n {error}.")
+        raise SystemExit
+    
 
 def nodeswithQPUs() -> list[set]:
     """
@@ -195,7 +203,7 @@ def infoQPUs(local: bool = True, node_name: str = None) -> list[dict]:
     """
     Global function that returns information about the QPUs available either in the local node or globaly.
 
-    It is possible also to filter by `node_names`. If `local = True` and `node_names` provided are different from the local node, only local node will be chosen.
+    It is possible also to filter by `node_name`. If `local = True` and the `node_name` provided is different from the local node, only local node will be chosen.
     """
 
     try:
@@ -289,8 +297,9 @@ def getQPUs(local: bool = True, family: str = None) -> list[QPU]:
     i = 0
     for _, info in targets.items():
         client = QClient()
+        node_mode = (info["net"]["nodename"], info["net"]["mode"])
         endpoint = (info["net"]["ip"], info["net"]["port"])
-        qpus.append(QPU(id = i, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint))
+        qpus.append(QPU(id = i, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint, node_mode=node_mode))
         i+=1
     logger.debug(f"{len(qpus)} QPU objects were created.")
     return qpus

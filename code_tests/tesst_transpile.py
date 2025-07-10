@@ -1,6 +1,10 @@
 import os
 import sys
 import unittest
+
+# HOME = os.getenv("HOME")
+# sys.path.insert(0, HOME)
+
 from cunqa.transpile import transpiler
 from cunqa.circuit import qc_to_json
 from cunqa.backend import Backend

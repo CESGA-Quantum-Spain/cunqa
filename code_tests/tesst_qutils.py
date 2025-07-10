@@ -1,6 +1,10 @@
 import os
 import sys
 import unittest
+
+HOME = os.getenv("HOME")
+sys.path.insert(0, HOME)
+
 from cunqa.qutils import qraise, qdrop, getQPUs, QRaiseError
 from cunqa.circuit import CunqaCircuit
 import random
@@ -48,7 +52,7 @@ class Test_getQPUs(unittest.TestCase):
         except:
             pass
         os.system('sleep 5')
-        return self.assertRaises(Exception, getQPUs)
+        return self.assertRaises(SystemExit, getQPUs)
     
     def test_local_flag(self):
         self.jobs_to_drop.append(qraise(1, '00:10:00', family="Merlin_e_familia"))
@@ -96,6 +100,7 @@ class Test_qraise(unittest.TestCase):
     
     def test_fakeqmio_flag(self):
         self.jobs_to_drop.append(qraise(1, '00:10:00', fakeqmio=True, calibrations='/opt/cesga/qmio/hpc/calibrations/2025_05_26__12_00_02.json'))
+        os.system('sleep 3')
         qpuss=getQPUs(local=False)
         return self.assertEqual(qpuss[-1].backend.__dict__["name"], "FakeQmio" )
     

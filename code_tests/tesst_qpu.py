@@ -1,6 +1,10 @@
 import os
 import sys
 import unittest
+
+# HOME = os.getenv("HOME")
+# sys.path.insert(0, HOME)
+
 from cunqa.backend import Backend
 from cunqa.qclient import QClient
 from cunqa.qpu import QPU
@@ -74,7 +78,7 @@ class TestQPU(unittest.TestCase):
         job = self.qpu.run(qc, transpile=False)
         print(job.__dict__)
         #The next line checks that the 'handwritten' dict is contained in the first one. I do this to avoid having to compare job._future which is a instance that I don't have access to
-        return self.assertEqual(job.__dict__, job.__dict__ | {'_QPU': self.qpu, '_result': None, '_updated': False, '_cregisters': {'meas': [0, 1, 2, 3, 4]}, '_circuit': [{'name': 'x', 'qubits': [0], 'params': []}, {'name': 'x', 'qubits': [4], 'params': []}, {'name': 'x', 'qubits': [3], 'params': []}, {'name': 'QFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'z', 'qubits': [3], 'params': []}, {'name': 'h', 'qubits': [1], 'params': []}, {'name': 'IQFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'measure', 'qubits': [0], 'memory': [0]}, {'name': 'measure', 'qubits': [1], 'memory': [1]}, {'name': 'measure', 'qubits': [2], 'memory': [2]}, {'name': 'measure', 'qubits': [3], 'memory': [3]}, {'name': 'measure', 'qubits': [4], 'memory': [4]}], '_execution_config': ' {"config":{"shots": 1024, "method": "statevector", "memory_slots": 5, "seed": 188}, "instructions":[{"name": "x", "qubits": [0], "params": []}, {"name": "x", "qubits": [4], "params": []}, {"name": "x", "qubits": [3], "params": []}, {"name": "QFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "z", "qubits": [3], "params": []}, {"name": "h", "qubits": [1], "params": []}, {"name": "IQFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "measure", "qubits": [0], "memory": [0]}, {"name": "measure", "qubits": [1], "memory": [1]}, {"name": "measure", "qubits": [2], "memory": [2]}, {"name": "measure", "qubits": [3], "memory": [3]}, {"name": "measure", "qubits": [4], "memory": [4]}] }'})
+        return self.assertEqual(job.__dict__, job.__dict__ | {'_result': None, '_updated': False, '_cregisters': {'meas': [0, 1, 2, 3, 4]}, '_circuit': [{'name': 'x', 'qubits': [0], 'params': []}, {'name': 'x', 'qubits': [4], 'params': []}, {'name': 'x', 'qubits': [3], 'params': []}, {'name': 'QFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'z', 'qubits': [3], 'params': []}, {'name': 'h', 'qubits': [1], 'params': []}, {'name': 'IQFT', 'qubits': [0, 1, 2, 3, 4], 'params': []}, {'name': 'measure', 'qubits': [0], 'memory': [0]}, {'name': 'measure', 'qubits': [1], 'memory': [1]}, {'name': 'measure', 'qubits': [2], 'memory': [2]}, {'name': 'measure', 'qubits': [3], 'memory': [3]}, {'name': 'measure', 'qubits': [4], 'memory': [4]}], '_execution_config': ' {"config":{"shots": 1024, "method": "statevector", "num_clbits": 5, "num_qubits": 5, "seed": 188}, "instructions":[{"name": "x", "qubits": [0], "params": []}, {"name": "x", "qubits": [4], "params": []}, {"name": "x", "qubits": [3], "params": []}, {"name": "QFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "z", "qubits": [3], "params": []}, {"name": "h", "qubits": [1], "params": []}, {"name": "IQFT", "qubits": [0, 1, 2, 3, 4], "params": []}, {"name": "measure", "qubits": [0], "memory": [0]}, {"name": "measure", "qubits": [1], "memory": [1]}, {"name": "measure", "qubits": [2], "memory": [2]}, {"name": "measure", "qubits": [3], "memory": [3]}, {"name": "measure", "qubits": [4], "memory": [4]}], "num_qubits":5 }'})
 
     def test_run_error_passed_from_qjob(self): #I want to test that the error is correctly captured during the call to QJob. One unique test should suffice as all errors share behaviour
         invalid_circ = [0,'h', 2, 'some gate', 3,'x']

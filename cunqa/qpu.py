@@ -24,7 +24,7 @@ class QPU:
     Class to define a QPU.
     """
     
-    def __init__(self, id : int, qclient : QClient, backend : Backend, family : str, endpoint : tuple):
+    def __init__(self, id : int, qclient : QClient, backend : Backend, family : str, endpoint : tuple, node_mode: tuple):
         """
         Initializes the QPU class.
 
@@ -40,11 +40,12 @@ class QPU:
         """
         
         self._id = id
-        self._backend = backend
-        self._connected = False
         self._qclient = qclient
-        self._endpoint = endpoint
+        self._backend = backend
         self._family = family
+        self._endpoint = endpoint
+        self._node_mode = node_mode
+        self._connected = False
         
         logger.debug(f"Object for QPU {id} created correctly.")
 
@@ -81,6 +82,11 @@ class QPU:
         Return:
             <class 'QJob'> object.
         """
+        local_node = os.getenv("SLURMD_NODENAME")
+        if (self._node_mode[1] == "hpc" and self._node_mode[0] !=local_node):
+            logger.error(f"Error while running: trying to run a job from node {local_node} on a QPU in HPC mode connected to node {self._node_mode[0]}." )
+            raise SystemExit
+    
         if not self._connected:
             ip, port = self._endpoint
             self._qclient.connect(ip, port)
