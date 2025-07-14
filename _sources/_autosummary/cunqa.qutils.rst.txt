@@ -1,0 +1,43 @@
+cunqa.qutils
+============
+
+.. automodule:: cunqa.qutils
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      are_qpus_raised
+      getQPUs
+      infoQPUs
+      nodeswithQPUs
+      qdrop
+      qraise
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+      :toctree:
+   
+      QRaiseError
+   
+   
+
+
+

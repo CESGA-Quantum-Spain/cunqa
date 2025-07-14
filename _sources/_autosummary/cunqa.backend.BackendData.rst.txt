@@ -1,0 +1,50 @@
+cunqa.backend.BackendData
+=========================
+
+.. currentmodule:: cunqa.backend
+
+.. autoclass:: BackendData
+   :members:
+   :show-inheritance:
+   :inherited-members:
+   :special-members: __call__, __add__, __mul__
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :nosignatures:
+   
+      ~BackendData.clear
+      ~BackendData.copy
+      ~BackendData.fromkeys
+      ~BackendData.get
+      ~BackendData.items
+      ~BackendData.keys
+      ~BackendData.pop
+      ~BackendData.popitem
+      ~BackendData.setdefault
+      ~BackendData.update
+      ~BackendData.values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BackendData.basis_gates
+      ~BackendData.coupling_map
+      ~BackendData.custom_instructions
+      ~BackendData.description
+      ~BackendData.gates
+      ~BackendData.n_qubits
+      ~BackendData.name
+      ~BackendData.noise_model
+      ~BackendData.simulator
+      ~BackendData.version
+   
+   

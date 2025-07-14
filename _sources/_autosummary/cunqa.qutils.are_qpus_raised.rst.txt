@@ -1,0 +1,6 @@
+cunqa.qutils.are\_qpus\_raised
+==============================
+
+.. currentmodule:: cunqa.qutils
+
+.. autofunction:: are_qpus_raised

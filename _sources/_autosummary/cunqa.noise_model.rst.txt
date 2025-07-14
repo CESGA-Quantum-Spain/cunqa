@@ -1,0 +1,32 @@
+cunqa.noise\_model
+==================
+
+.. automodule:: cunqa.noise_model
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   cunqabackend
+   fakeqmio
+   noise_instructions
+
