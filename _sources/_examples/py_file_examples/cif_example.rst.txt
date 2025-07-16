@@ -1,6 +1,0 @@
-cif_example
-===========
-
-.. literalinclude:: cif_example.py
-   :language: python
-   :linenos:

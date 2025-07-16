@@ -1,6 +1,0 @@
-simple_raw
-==========
-
-.. literalinclude:: simple_raw.py
-   :language: python
-   :linenos:

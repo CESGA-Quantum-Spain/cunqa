@@ -200,27 +200,26 @@
 <span class="linenos"> 8</span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="c1"># Raise QPUs (allocates classical resources for the simulation job) and retrieve them using getQPUs</span>
-<span class="linenos">11</span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Cunqa&quot;</span><span class="p">,</span> <span class="n">cloud</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-<span class="linenos">12</span>
-<span class="linenos">13</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="n">qc</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span>
-<span class="linenos">16</span><span class="n">qc</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="linenos">11</span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Munich&quot;</span><span class="p">,</span> <span class="n">cloud</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="linenos">12</span><span class="n">sleep</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="n">qc</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="linenos">17</span><span class="n">qc</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="linenos">18</span><span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="linenos">19</span><span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 <span class="linenos">20</span>
 <span class="linenos">21</span><span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="linenos">22</span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">qc</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span><span class="c1"># non-blocking call</span>
+<span class="linenos">22</span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">qc</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span><span class="c1"># non-blocking call</span>
 <span class="linenos">23</span>
 <span class="linenos">24</span><span class="n">counts</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
 <span class="linenos">25</span><span class="n">time</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">time_taken</span>
 <span class="linenos">26</span>
-<span class="linenos">27</span><span class="nb">print</span><span class="p">(</span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
-<span class="linenos">28</span><span class="c1">#print(f&quot;Result: \n{counts}\n Time taken: {time} s.&quot;)</span>
-<span class="linenos">29</span>
-<span class="linenos">30</span><span class="c1">########## Drop the deployed QPUs #</span>
-<span class="linenos">31</span><span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+<span class="linenos">27</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="se">\n</span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2"> Time taken: </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="c1">########## Drop the deployed QPUs #</span>
+<span class="linenos">30</span><span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
