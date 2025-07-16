@@ -1054,6 +1054,12 @@ class CunqaCircuit:
             # TODO: maybe in the future this can be check at the begining for a more efficient processing 
 
     def reset(self, qubits: Union[list[int], int]):
+        """
+        To be applied after a measure. It ensure that the qubit returns to the zero state.
+
+        Args:
+            qubits (int, list[int]): qubit or list of qubits to reset
+        """
         if isinstance(qubits, list):
             for q in qubits:
                 self.c_if("x", q, q)
