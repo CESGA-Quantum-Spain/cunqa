@@ -1,3 +1,11 @@
+"""
+ Title: EMCZ circuit class
+ Description: class that creates and manages the circuit with the structure froms https://arxiv.org/abs/2310.20671
+
+Created 10/07/2025
+@author: dexposito (algorithm idea: jdviqueira)
+"""
+
 import os, sys
 import math
 import numpy as np
@@ -175,7 +183,7 @@ class CircuitEMCZ:
             **run_parameters : any other simulation instructions. For instance transpile (bool), initial_layout (list with qubit layout for transpilation) 
         
         Returns:
-            (class cunqa.QJob): object with the quantum simulation job. Results can be obtained with QJob.result
+            (class cunqa.QJob): object with the quantum simulation job. Results can be obtained doing QJob.result
         """
         return QPU(self, **run_parameters)
           

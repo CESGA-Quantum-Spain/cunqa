@@ -1052,6 +1052,18 @@ class CunqaCircuit:
             logger.error(f"Gate {gate} is not supported for conditional operation.")
             raise SystemExit
             # TODO: maybe in the future this can be check at the begining for a more efficient processing 
+
+    def reset(self, qubits: Union[list[int], int]):
+        if isinstance(qubits, list):
+            for q in qubits:
+                self.c_if("x", q, q)
+
+        elif isinstance(qubits, int):
+            self.c_if("x", qubits, qubits)
+
+        else:
+            logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
+        
         
 
     def measure_and_send(self, control_qubit: Optional[int] = None, target_circuit: Optional[Union[str, 'CunqaCircuit']] = None) -> None:
