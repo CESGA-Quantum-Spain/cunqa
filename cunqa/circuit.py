@@ -109,7 +109,12 @@ class CunqaCircuit:
         if id is None:
             self._id = "cunqacircuit_" + generate_id()
         elif isinstance(id, str):
-            self._id = id
+            other_circuits = self.access_other_instances()
+            if id in other_circuits.keys():
+                logger.error(f"Id {id} was already used for another circuit.")
+                raise SystemExit
+            else:
+                self._id = id
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
             raise SystemExit
