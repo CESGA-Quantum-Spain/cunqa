@@ -44,6 +44,7 @@ cunqa.circuit.CunqaCircuit
       ~CunqaCircuit.qsend
       ~CunqaCircuit.r
       ~CunqaCircuit.remote_c_if
+      ~CunqaCircuit.reset
       ~CunqaCircuit.rx
       ~CunqaCircuit.rxx
       ~CunqaCircuit.ry
