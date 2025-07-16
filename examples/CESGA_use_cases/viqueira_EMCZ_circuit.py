@@ -131,7 +131,7 @@ class CircuitEMCZ:
                 add_EMCZ_ansatz(self.circuit, nE, nM, self._x, self._theta, repeat_encode, repeat_evolution, time_step)
             except Exception as error:
                 logger.error(f"An error occurred while creating the circuit [{error.__name__}].")
-                raise SystemExit
+                raise CircuitEMCError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
             self.circuit.reset([i for i in range(nE)]) # This instruction needs to be implemented hehe

@@ -18,6 +18,7 @@ sys.path.append(os.getenv("HOME"))
 
 from cunqa.circuit import CunqaCircuit
 from viqueira_EMCZ_circuit import CircuitEMCZ
+from viqueira_gradients_and_costs import GrandientMethod, CostFunction
 from cunqa.logger import logger
 from cunqa.qutils import getQPUs, qraise, qdrop, QRaiseError
 from cunqa.mappers import run_distributed
@@ -37,23 +38,30 @@ class ViqueiraEMCZModel:
 
         except subprocess.CalledProcessError as error:
             logger.error(f"Error while raising QPUs:\n {error.stderr}.")
-            raise QRaiseError
+            raise SystemExit
 
         self.nE = nE
         self.nM = nM
         self.nT = nT
+        self._trained = False
+
         self.circuit = CircuitEMCZ(nE, nM, nT, repeat_encode, repeat_evolution)
 
-        # TODO: add the waiting til QPUs are raised for the getQPUs. Problem: diff qraises and maybe sleeping and awake nodes
-        self.qpus=getQPUs(local=False)
+        self.qpus=getQPUs(local=False)# TODO: add the waiting til QPUs are raised for the getQPUs. Problem: diff qraises and maybe sleeping and awake nodes
         self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit structure with parameters zero on all QPUs
-        self._trained = False
+
 
     def train(self, population: list[np.array], theta_init: np.array, gradient_method: Optional[str] = "finite_diferences", stop_criteria: float = 1e-5):
         """
         Method for training the theta parameters of the EMCZ recursive neural network. Uses the gradient method chosen by the user, parallelizing between 
         different QPUs using CUNQA.
         """
+        calc_gradient = GrandientMethod(gradient_method)
+        calc_cost = CostFunction() # By default it's RMSE
+
+        
+
+
         self._trained = True
         pass
 
@@ -81,6 +89,7 @@ class ViqueiraEMCZModel:
                 raise SystemExit
             
             return [cost_func(self.predict(new_time_series[i]), y_new[i]) for i in range(len(y_new))]
+        
         elif (isinstance(new_time_series, np.array) and isinstance(y_new, np.array)): # Here the arrays should be of shape (nT,nE) and (nT), mayeb add checks later
             return cost_func(self.predict(new_time_series), y_new)
 
