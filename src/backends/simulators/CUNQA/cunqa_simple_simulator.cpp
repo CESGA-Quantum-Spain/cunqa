@@ -13,7 +13,7 @@ namespace sim {
 JSON CunqaSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask& quantum_task)
 {
     LOGGER_DEBUG("We are in the execute() method of SimpleCunqa.");
-    return cunqa_execution_<SimpleBackend>(backend, quantum_task);
+    return cunqa_execution_(quantum_task);
 }
 
 } // End namespace sim

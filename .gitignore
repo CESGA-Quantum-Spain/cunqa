@@ -253,6 +253,9 @@ logs/
 # vscode
 .vscode
 
+# Valgrind
+cachegrind*
+
 ############ CUSTOM IGNORES ################
 *.qasm
 prueba*

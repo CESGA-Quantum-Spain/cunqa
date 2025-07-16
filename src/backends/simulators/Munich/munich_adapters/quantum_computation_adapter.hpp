@@ -12,7 +12,6 @@ class QuantumComputationAdapter : public qc::QuantumComputation
 {
 public:
     // Constructors
-    QuantumComputationAdapter() = default;
     QuantumComputationAdapter(const QuantumTask& quantum_task) : 
         qc::QuantumComputation(quantum_task.config.at("num_qubits").get<std::size_t>(), quantum_task.config.at("num_clbits").get<std::size_t>()),
         quantum_tasks{quantum_task}

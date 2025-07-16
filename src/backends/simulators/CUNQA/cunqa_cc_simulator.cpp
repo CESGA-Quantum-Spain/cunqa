@@ -19,7 +19,7 @@ CunqaCCSimulator::CunqaCCSimulator()
 JSON CunqaCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {
     LOGGER_DEBUG("We are in the execute() method of CCCunqa.");
-    return cunqa_execution_<CCBackend>(backend, quantum_task, &classical_channel);
+    return cunqa_execution_(quantum_task, &classical_channel);
 }
 
 

@@ -70,3 +70,7 @@ endif()
 add_subdirectory(src)
 add_subdirectory(cunqa)
 add_subdirectory(examples)
+
+# Enable testing
+enable_testing()
+add_subdirectory(cpptests)

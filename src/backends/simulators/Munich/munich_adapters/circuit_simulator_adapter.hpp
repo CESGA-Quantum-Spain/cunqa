@@ -14,7 +14,6 @@ class CircuitSimulatorAdapter : public CircuitSimulator<dd::DDPackageConfig>
 public:
 
     // Constructors
-    CircuitSimulatorAdapter() = default;
     CircuitSimulatorAdapter(std::unique_ptr<QuantumComputationAdapter>&& qc_) : CircuitSimulator(std::unique_ptr<QuantumComputationAdapter>(std::move(qc_)))
     {}
 

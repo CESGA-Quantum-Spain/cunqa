@@ -13,8 +13,7 @@
 
 namespace cunqa {
 
-template <class BackendType>
-inline JSON cunqa_execution_(const BackendType& backend, const QuantumTask& quantum_task, comm::ClassicalChannel* classical_channel = nullptr)
+inline JSON cunqa_execution_(const QuantumTask& quantum_task, comm::ClassicalChannel* classical_channel = nullptr)
 {
     LOGGER_DEBUG("Starting cunqa_execution_.");
     // Connect to the classical communications endpoints

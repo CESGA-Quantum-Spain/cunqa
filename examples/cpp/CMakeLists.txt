@@ -17,3 +17,13 @@ install(TARGETS example3 DESTINATION example)
 add_executable(qc_example qc_example.cpp)
 target_link_libraries(qc_example PRIVATE client json) 
 install(TARGETS qc_example DESTINATION example)
+
+#Example 4: Adapter example
+add_executable(munich_adapter_example munich_adapter_example.cpp)
+target_link_libraries(munich_adapter_example PRIVATE munich_adapters quantum_task MQT::DDSim) 
+install(TARGETS munich_adapter_example DESTINATION example)
+
+#Example 4: Adapter example
+add_executable(cunqa_executor_example cunqa_executor_example.cpp)
+target_link_libraries(cunqa_executor_example PRIVATE quantum_task cunqa_simple_simulator) 
+install(TARGETS cunqa_executor_example DESTINATION example)
