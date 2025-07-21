@@ -94,8 +94,7 @@ def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta:
 
     
     
-
-
+# The next class is non-stateful to not mess with parallelization
 class CircuitEMCZ:
     """
     Function to create a EMCZ QRNN circuit. This circuit modifies a time series (sequence of data where each point depends on the ones before it)
@@ -119,60 +118,45 @@ class CircuitEMCZ:
 
         self._repeat_encode = repeat_encode
         self._repeat_evolution = repeat_evolution
-        self._x = np.zeros((nT,nE)) # Initialize the parameters to zero as placeholders
-        self._theta = np.zeros(2*nE*repeat_encode + 2*(nE+nM)*repeat_evolution + 1*nE)
+        x_init = np.zeros((nT,nE)) # Initialize the parameters to zero as placeholders
+        theta_init = np.zeros(2*nE*repeat_encode + 2*(nE+nM)*repeat_evolution + 1*nE)
         
-        self._submitted = False
-        self.qjob = None
         self.circuit = CunqaCircuit(nE + nM, nE*nT) # Number of cl_bits motivated by the measure of the Environment/Exchange register on each time_step
 
         for time_step in range(nT):
             try:
-                add_EMCZ_ansatz(self.circuit, nE, nM, self._x, self._theta, repeat_encode, repeat_evolution, time_step)
+                add_EMCZ_ansatz(self.circuit, nE, nM, x_init, theta_init, repeat_encode, repeat_evolution, time_step)
             except Exception as error:
                 logger.error(f"An error occurred while creating the circuit [{error.__name__}].")
                 raise CircuitEMCError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
-            self.circuit.reset([i for i in range(nE)]) # This instruction needs to be implemented hehe
-
-        @property
-        def x(self):
-            return self._x
-
-        @property
-        def theta(self):
-            return self._theta
+            self.circuit.reset([i for i in range(nE)]) # This instruction needs to be implemented hehe        
         
-        
-    def assign(self, x_value: np.array, theta_value: np.array):
+    def parameters(self, new_x: np.array, new_theta: np.array) -> list:
         """
-        Method for updating the time series information x and the parameter theta values.
+        Method for combining the data from the time series and the theta parameters to update the circuit.
 
         Args:
             theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 2nE*repeat_encode + 2(nE + nM)*repeat_evolution + nE.
             x (numpy.array): Input data representing a time series. Its shape must be (nT, nE)
-        """
-        if self._submitted:
-            self._x = x_value
-            self._theta = theta_value
-            
-            # Join all parameters of the circuit on a list with the right order for the upgrade_params method
-            all_params = []
-            for t in range(self):
-                for i in range(self._repeat_encode):
-                    all_params += x_value[t,:]
-                    all_params += theta_value[i*2*self.nE : (i+1)*2*self.nE]
-                all_params += x_value[t,:]
-                for j in range(self._repeat_evolution):
-                    all_params += theta_value[j*2*(self.nE+self.nM) : (j+1)*2*(self.nE+self.nM)]
-                all_params += theta_value[2*self.nE*self._repeat_encode + 2*(self.nE+self.nM)*self._repeat_evolution:]
-            
-            self.qjob.upgrade_parameters(all_params)
 
-        else:
-            self._x = x_value
-            self._theta = theta_value
+        Return:
+            all_params (list[float]): parameters to insert on the circuit organized in the right order
+        """
+
+        # Join all parameters of the circuit on a list with the right order for the upgrade_params method
+        all_params = []
+        for t in range(self):
+            for i in range(self._repeat_encode):
+                all_params += new_x[t,:]
+                all_params += new_theta[i*2*self.nE : (i+1)*2*self.nE]
+            all_params += new_x[t,:]
+            for j in range(self._repeat_evolution):
+                all_params += new_theta[j*2*(self.nE+self.nM) : (j+1)*2*(self.nE+self.nM)]
+            all_params += new_theta[2*self.nE*self._repeat_encode + 2*(self.nE+self.nM)*self._repeat_evolution:]
+
+        return all_params
 
     def run_on_QPU(self, QPU: QPU, **run_parameters: Any) -> QJob:
         """
@@ -185,6 +169,13 @@ class CircuitEMCZ:
         Returns:
             (class cunqa.QJob): object with the quantum simulation job. Results can be obtained doing QJob.result
         """
-        return QPU(self, **run_parameters)
+        try:
+            qjob = QPU.run(self, **run_parameters)
+
+        except Exception as e:
+            logger.error(f"Error while running the EMCZ circuit on a QPU:\n {e}")
+            raise CircuitEMCError
+        
+        return qjob
           
 
