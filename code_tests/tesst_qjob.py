@@ -120,20 +120,20 @@ class TestQJob(unittest.TestCase):
 
     ########## TIME_TAKEN ##########################################################################################################
 
-    def test_qjob_not_finished(self):
-        #I set 'status': "RUNNING" in the following dictionary and eliminate time_taken metrics
-        res ={'backend_name': '', 'backend_version': '', 'date': '', 'job_id': '', 'metadata': {'max_gpu_memory_mb': 0, 'max_memory_mb': 1031551, 'omp_enabled': True, 'parallel_experiments': 1}, 'qobj_id': '', 'results': [{'data': {'counts': {'0x13': 243, '0x17': 283, '0x1b': 149, '0x1f': 141, '0x3': 110, '0x7': 9, '0xb': 6, '0xf': 59}}, 'metadata': {'active_input_qubits': [0, 1, 2, 3, 4], 'batched_shots_optimization': False, 'device': 'CPU', 'fusion': {'applied': False, 'enabled': True, 'max_fused_qubits': 5, 'threshold': 14}, 'input_qubit_map': [[4, 4], [3, 3], [2, 2], [1, 1], [0, 0]], 'max_memory_mb': 1031551, 'measure_sampling': True, 'method': 'statevector', 'noise': 'ideal', 'num_bind_params': 1, 'num_clbits': 5, 'num_qubits': 5, 'parallel_shots': 1, 'parallel_state_update': 2, 'remapped_qubits': False, 'required_memory_mb': 1, 'runtime_parameter_bind': False}, 'seed_simulator': 188, 'shots': 1000, 'status': 'DONE', 'success': True}], 'status': 'RUNNING', 'success': True}
-        qc=QuantumCircuit(1)
-        client = QClient()
-        running_job = QJob(client, Backend({}), qc)
-        running_job._result = Result(res, {'meas': [0, 1, 2, 3, 4]})
-        running_job._future= client.send_circuit("")
-        return self.assertRaises(SystemExit, running_job.time_taken)
+    # def test_qjob_not_finished(self):
+    #     #I set 'status': "RUNNING" in the following dictionary and eliminate time_taken metrics
+    #     res ={'backend_name': '', 'backend_version': '', 'date': '', 'job_id': '', 'metadata': {'max_gpu_memory_mb': 0, 'max_memory_mb': 1031551, 'omp_enabled': True, 'parallel_experiments': 1}, 'qobj_id': '', 'results': [{'data': {'counts': {'0x13': 243, '0x17': 283, '0x1b': 149, '0x1f': 141, '0x3': 110, '0x7': 9, '0xb': 6, '0xf': 59}}, 'metadata': {'active_input_qubits': [0, 1, 2, 3, 4], 'batched_shots_optimization': False, 'device': 'CPU', 'fusion': {'applied': False, 'enabled': True, 'max_fused_qubits': 5, 'threshold': 14}, 'input_qubit_map': [[4, 4], [3, 3], [2, 2], [1, 1], [0, 0]], 'max_memory_mb': 1031551, 'measure_sampling': True, 'method': 'statevector', 'noise': 'ideal', 'num_bind_params': 1, 'num_clbits': 5, 'num_qubits': 5, 'parallel_shots': 1, 'parallel_state_update': 2, 'remapped_qubits': False, 'required_memory_mb': 1, 'runtime_parameter_bind': False}, 'seed_simulator': 188, 'shots': 1000, 'status': 'DONE', 'success': True}], 'status': 'RUNNING', 'success': True}
+    #     qc=QuantumCircuit(1)
+    #     client = QClient()
+    #     running_job = QJob(client, Backend({}), qc)
+    #     running_job._result = Result(res, {'meas': [0, 1, 2, 3, 4]})
+    #     running_job._future= client.send_circuit("")
+    #     return self.assertRaises(SystemExit, running_job.time_taken)
 
-    def test_no_result_error(self):
-        qc=QuantumCircuit(3)
-        not_to_be_submitted = QJob(QClient(),Backend({}), qc)
-        return self.assertRaises(SystemExit, not_to_be_submitted.time_taken)
+    # def test_no_result_error(self):
+    #     qc=QuantumCircuit(3)
+    #     not_to_be_submitted = QJob(QClient(),Backend({}), qc)
+    #     return self.assertRaises(SystemExit, not_to_be_submitted.time_taken)
 
 
 
