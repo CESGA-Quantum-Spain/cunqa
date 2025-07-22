@@ -1,6 +1,6 @@
 """
  Title: EMCZ main class
- Description: class implementing the EMCZ QRNN algorithm from https://arxiv.org/abs/2310.20671
+ Description: definition of a class implementing the EMCZ QRNN model from https://arxiv.org/abs/2310.20671
 
 Created 11/07/2025
 @author: dexposito (algorithm idea: jdviqueira)

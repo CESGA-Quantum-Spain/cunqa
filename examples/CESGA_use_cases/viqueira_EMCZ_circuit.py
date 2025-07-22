@@ -1,6 +1,6 @@
 """
  Title: EMCZ circuit class
- Description: class that creates and manages the circuit with the structure froms https://arxiv.org/abs/2310.20671
+ Description: class that manages quantum circuits with the structure from https://arxiv.org/abs/2310.20671
 
 Created 10/07/2025
 @author: dexposito (algorithm idea: jdviqueira)
@@ -28,7 +28,7 @@ class CircuitEMCError(Exception):
 
 def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution:int , time_step: int):
     """
-    Function that adds to a circuit the ansatz for the EMC QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
+    Function that adds to a circuit the ansatz for the EMCZ QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
 
     Args:
         circuit (CunqaCircuit): circuit to which the ansatz will be added. Must have nE + nM qubits.
@@ -90,42 +90,123 @@ def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta:
         circuit.rx(white[qubit], qubit)
         
 
-
-
-    
-    
-# The next class is non-stateful to not mess with parallelization
-class CircuitEMCZ:
+def add_EMCZ3_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution:int , time_step: int):
     """
-    Function to create a EMCZ QRNN circuit. This circuit modifies a time series (sequence of data where each point depends on the ones before it)
-    to obtain another time series after executing. Doing this recursively constitutes the Exchange-Memory w Controlled Z-gates algorithm (https://arxiv.org/abs/2310.20671).
+    Function that adds to a circuit the ansatz for the EMCZ3 QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZme3.png for a picture.
 
     Args:
+        circuit (CunqaCircuit): circuit to which the ansatz will be added. Must have nE + nM qubits.
         nE (int): number of qubits for the Environment/Exchange register
         nM (int): number of qubits for the Memory register
-        nT (int): number of time steps of the time series
-        repeat_encode (int): number of times that the encoding block should be repeated in the circuit
-        repeat_evolution (int): number of times that the evolution block should be repeated in the circuit
-    Return:
-        circuit (CunqaCircuit): circuit implementing the QRNN structure
+        theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 3nE*R + 3(nE + nM)*L + 3nE.
+        x (numpy.array): Input data. Its shape must be (nT, nE), where this is the number of qubits on each register of the EMC QRNN circuit (function below).
+        repeat_encode (int): number of times that the encoding block should be repeated.
+        repeat_evolution (int): number of times that the evolution block should be repeated.
+        time_step (int): indicates in which point of the time series we're on, ie the row of x that should be used.
+
     """
+    assert np.shape(x)[1] == nE, "Error: The data x should have nE columns." 
+
+    group1 = 3*nE*repeat_encode
+    group2 = 3*(nE+nM)*repeat_evolution
+    group3 = 3*nE
+    total_lenght = group1+group2+group3
+
+    # Check correct format of theta
+    if len(theta)==total_lenght:
+        pass
+    else:
+        logger.error(f"Theta must have lenght equal to {total_lenght} but a lenght {len(theta)} vector was provided.")
+        raise  CircuitEMCError
+    
+    # Slice theta into the parameters that will be used for the encoding part (orange on the image),
+    # the evolution part (blue on the image) and the final evolution part (white on the image).
+    # Image, again: https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZme3.png
+    orange = theta[:group1]
+    blue = theta[group1:group1+group2]
+    white = theta[group1+group2:]
+
+    # Encoding block
+    for i in range(repeat_encode):
+        for qubit in range(nE):
+            circuit.ry(x[time_step][qubit], qubit)
+            circuit.rx(orange[3*i*nE + 3*qubit], qubit)
+            circuit.rz(orange[3*i*nE + 3*qubit + 1], qubit)
+            circuit.rx(orange[3*i*nE + 3*qubit + 2],qubit)
+    
+    # Non-theta dependent part of the encoding
+    for qubit in range(nE):
+        circuit.ry(x[time_step][qubit], qubit)
+
+    # Evolution block
+    for j in range(repeat_evolution):
+        # E register part (CZ are performed)
+        for qubit in range(nE): 
+
+            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
+            circuit.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
+            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
+
+            for qubit_m in range(nM):
+                circuit.cz(qubit, nE + qubit_m)
+
+        # M register part (CZ are received)
+        for qubit in range(nE): 
+
+            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
+            circuit.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
+            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
+
+    # Final part of the evolution
+    for qubit in range(nE):
+        circuit.rx(white[3*i*nE + 3*qubit], qubit)
+        circuit.rz(white[3*i*nE + 3*qubit + 1], qubit)
+        circuit.rx(white[3*i*nE + 3*qubit + 2], qubit)
+
+    
+    
+# The next class is non-stateful to avoid messing with parallelization
+class CircuitEMCZ:
     # Later on we could accept another argument which determines the initial state of the Memory register
-    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int):
+    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, ansatz: int = 2):
+        """
+        Class to manage a EMCZ QRNN circuit. This circuit modifies a time series 
+        to obtain another time series after executing. Doing this recursively constitutes the 
+        Exchange-Memory w Controlled Z-gates algorithm (https://arxiv.org/abs/2310.20671).
+
+        Args:
+            nE (int): number of qubits for the Environment/Exchange register
+            nM (int): number of qubits for the Memory register
+            nT (int): number of time steps of the time series
+            repeat_encode (int): number of times that the encoding block should be repeated in the circuit
+            repeat_evolution (int): number of times that the evolution block should be repeated in the circuit
+            ansatz (int): specify wether to use the model with U_2 = R_x R_z or the one with U_3 = R_x R_z R_x
+        Return:
+            circuit (CunqaCircuit): circuit implementing the QRNN structure
+        """
 
         self.nE = nE
         self.nM = nM
         self.nT = nT
-
         self._repeat_encode = repeat_encode
         self._repeat_evolution = repeat_evolution
+        
+        self.ansatz = ansatz
         x_init = np.zeros((nT,nE)) # Initialize the parameters to zero as placeholders
         theta_init = np.zeros(2*nE*repeat_encode + 2*(nE+nM)*repeat_evolution + 1*nE)
         
         self.circuit = CunqaCircuit(nE + nM, nE*nT) # Number of cl_bits motivated by the measure of the Environment/Exchange register on each time_step
 
+        # Determine which ansatz to use on the circuit
+        if self.ansatz == 2:
+            add_ansatz = add_EMCZ_ansatz
+        elif self.ansatz == 3:
+            add_ansatz = add_EMCZ3_ansatz
+
+        # Build the circuit
         for time_step in range(nT):
             try:
-                add_EMCZ_ansatz(self.circuit, nE, nM, x_init, theta_init, repeat_encode, repeat_evolution, time_step)
+                add_ansatz(self.circuit, nE, nM, x_init, theta_init, repeat_encode, repeat_evolution, time_step)
             except Exception as error:
                 logger.error(f"An error occurred while creating the circuit [{error.__name__}].")
                 raise CircuitEMCError
@@ -146,17 +227,33 @@ class CircuitEMCZ:
         """
 
         # Join all parameters of the circuit on a list with the right order for the upgrade_params method
-        all_params = []
-        for t in range(self):
-            for i in range(self._repeat_encode):
+        if self.ansatz == 2:
+            # Case of ansatz with U_2 = R_x R_z
+            all_params = []
+            for t in range(self):
+                for i in range(self._repeat_encode):
+                    all_params += new_x[t,:]
+                    all_params += new_theta[i*2*self.nE : (i+1)*2*self.nE]
                 all_params += new_x[t,:]
-                all_params += new_theta[i*2*self.nE : (i+1)*2*self.nE]
-            all_params += new_x[t,:]
-            for j in range(self._repeat_evolution):
-                all_params += new_theta[j*2*(self.nE+self.nM) : (j+1)*2*(self.nE+self.nM)]
-            all_params += new_theta[2*self.nE*self._repeat_encode + 2*(self.nE+self.nM)*self._repeat_evolution:]
+                for j in range(self._repeat_evolution):
+                    all_params += new_theta[j*2*(self.nE+self.nM) : (j+1)*2*(self.nE+self.nM)]
+                all_params += new_theta[2*self.nE*self._repeat_encode + 2*(self.nE+self.nM)*self._repeat_evolution:]
 
-        return all_params
+            return all_params
+        
+        elif self.ansatz == 3:
+            # Case of ansatz with U_3 = R_x R_z R_x
+            all_params3 = []
+            for t in range(self):
+                for i in range(self._repeat_encode):
+                    all_params3 += new_x[t,:]
+                    all_params3 += new_theta[i*3*self.nE : (i+1)*3*self.nE]
+                all_params3 += new_x[t,:]
+                for j in range(self._repeat_evolution):
+                    all_params3 += new_theta[j*3*(self.nE+self.nM) : (j+1)*3*(self.nE+self.nM)]
+                all_params3 += new_theta[3*self.nE*self._repeat_encode + 3*(self.nE+self.nM)*self._repeat_evolution:]
+
+            return all_params3
 
     def run_on_QPU(self, QPU: QPU, **run_parameters: Any) -> QJob:
         """

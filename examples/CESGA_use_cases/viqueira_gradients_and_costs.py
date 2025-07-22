@@ -106,12 +106,12 @@ class GrandientMethod:
             time_series (np.array): information of the time series being considered
             theta_now (np.array): initial value of theta at which to calculate the gradient 
             y_true (np.array): true label that circuit should produce from time_series
-            cost_func (<class CostFunction>): function that claculates the loss 
+            cost_func (<class CostFunction>): function that calculates the loss 
             diff (float): small difference to put on each coordinate to calculate derivatives
 
         Return:
             gradient (np.array): array of lenght len(theta_now) with the estimated gradient of theta
-            """
+        """
         n = len(theta_now)
         n_qjobs = len(qjobs)
         gradient = [0.0 for _ in range(n)]
@@ -126,7 +126,7 @@ class GrandientMethod:
             )
 
         reference = final_results.pop().probabilities
-        final_deriv = list(map( lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff , final_results))
+        final_deriv = [ (cost_func(reference, y_true) - cost_func(res.probabilities, y_true))/diff for res in final_results]
         gradient[final_start:n] = final_deriv
         
         # We go through the components of theta n_qjobs at a time 
@@ -137,26 +137,60 @@ class GrandientMethod:
             end = (i+1)*n_qjobs
 
             # Concurrent execution of circuits with small differences on one component
-            results = gather([self.perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs])
-            deriv = list(map( lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff , results))
+            results = gather( [self.perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs] )
+            deriv = [ (cost_func(reference, y_true) - cost_func(res.probabilities, y_true))/diff for res in results]
             gradient[start:end] = deriv
 
         return np.array(gradient)
 
-    def parameter_shift_rule(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
+
+    def parameter_shift_rule(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction):
         """
         Parameter shift rule method for estimating the gradient of continuous parameters of quantum circuits.
-        
+        Based on the formula grad_{theta}f(x; theta) = [f(x; theta + pi/2) + f(x; theta - pi/2)]/2 for quantum functions
+
+        Args:
+            circuit (<class CircuitEMCZ>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
+            qjobs (list[<class cunqa.qjob>]): qjob objects representing the QPUs to which we submitted circuit. Use .upgrade_parameters() on them to input the desired parameters
+            time_series (np.array): information of the time series being considered
+            theta_now (np.array): initial value of theta at which to calculate the gradient 
+            y_true (np.array): true label that circuit should produce from time_series
+            cost_func (<class CostFunction>): function that calculates the loss 
+
+        Return:
+            gradient (np.array): array of lenght len(theta_now) with the estimated gradient of theta
         """
-        pass
+        n = len(theta_now)
+        n_qjobs = len(qjobs)
+        gradient = [0.0 for _ in range(n)]
+
+        # We go through the components of theta n_qjobs at a time 
+        for i in range(n // n_qjobs):
+
+            # Range of components for which we calculate the derivative on this loop iteration
+            start = i*n_qjobs
+            end = (i+1)*n_qjobs
+
+            # Concurrent execution of circuits with the parameter shifted +-pi/2 on one component
+            results = gather([self.shifted_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob)) for qjob in qjobs])
+            deriv = [(cost_func(plus.probabilities, y_true) + cost_func(minus.probabilities, y_true))/2 for plus, minus in zip(results[0::2], results[1::2])]
+
+            gradient[start:end] = deriv
+        
+        # Last remaining n % n_qjobs components
+        final_start = n-(n % n_qjobs)
+        final_results = gather( [self.shifted_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i) for i in range(n % n_qjobs)] )
+
+        final_deriv = [ (cost_func(plus.probabilities, y_true) + cost_func(minus.probabilities, y_true))/2 for plus, minus in zip(final_results[0::2], final_results[1::2])] # the zip goes through even and odd elements together
+        gradient[final_start:n] = final_deriv
+
+        return np.array(gradient)
 
     def gradient_with_bias(self):
         """ """
         pass
 
-    def perturbed_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
-        theta_aux = theta; theta_aux[index] += diff
-        return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
+
 
     def update_gradient_method(self, new_gradient_method):
         logger.debug(f"Changing gradient method from {self.choice_method} to {new_gradient_method}")
@@ -164,3 +198,18 @@ class GrandientMethod:
 
     def __call__(self, *args, **kwds):
         return self.method(*args, **kwds)
+
+    ################ AUXILIARY METHODS FOR THE GRADIENTS #####################
+
+    def perturbed_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
+        theta_aux = theta; theta_aux[index] += diff
+        return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
+    
+    def shifted_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
+        theta_plus = theta; theta_plus[index] += np.pi/2
+        theta_minus = theta; theta_minus[index] -= np.pi/2
+
+        qjob_plus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_plus))
+        qjob_minus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_minus))
+        return qjob_plus, qjob_minus
+
