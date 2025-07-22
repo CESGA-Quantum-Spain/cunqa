@@ -50,7 +50,7 @@ class ViqueiraEMCZModel:
         self.circuit = CircuitEMCZ(nE, nM, nT, repeat_encode, repeat_evolution)
 
         self.qpus=getQPUs(local=False) 
-        self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit structure with parameters zero on all QPUs
+        self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit with parameters zero on all QPUs
 
 
     def train(self, population: list[np.array], y_labels: list[np.array], theta_init: np.array = None, gradient_method: Optional[str] = "finite_differences", cost_func: Optional[str] = "rmse", learn_rate: float = 1e-3, epochs: int = 2000):
@@ -85,7 +85,7 @@ class ViqueiraEMCZModel:
                 best_loss = len(theta_init) * 100 # Unreasonably large number to initialize best_loss and inmediatly update it
                 for i, time_series in enumerate(population):
 
-                    gradient = self.calc_gradient(model=self, qjobs=self.qjobs , time_series=time_series, theta_now = theta_aux,  y_true= y_labels[i], cost_func=self.calc_cost)
+                    gradient = self.calc_gradient(circuit=self.circuit, qjobs=self.qjobs , time_series=time_series, theta_now = theta_aux,  y_true= y_labels[i], cost_func=self.calc_cost)
                     theta_aux += learn_rate * gradient
                     
                     new_result = self.qjobs[randint(0, len(self.qjobs))].upgrade_parameters(self.circuit.parameters(time_series, theta_aux)).result.probabilities
@@ -124,7 +124,7 @@ class ViqueiraEMCZModel:
 
 
 
-    def validate(self, new_time_series: Union[list[np.array], np.array], y_new: Union[list[np.array], np.array], cost_func: Optional[str]) -> float:
+    def validate(self, new_population: Union[list[np.array], np.array], y_new: Union[list[np.array], np.array], cost_func: Optional[str]) -> float:
         """
         Method for obtaining the error on new time series with a given cost function and the true labels.
 
@@ -140,15 +140,15 @@ class ViqueiraEMCZModel:
         if cost_func != self.calc_cost.choice_function:
             self.calc_cost.update_cost_function(cost_func)
 
-        if (isinstance(new_time_series, list) and isinstance(y_new, list)):
-            if len(new_time_series) != len(y_new):
+        if (isinstance(new_population, list) and isinstance(y_new, list)):
+            if len(new_population) != len(y_new):
                 logger.error("Lenght of the lists of time series and labels do not match")
                 raise SystemExit
             
-            return [cost_func(self.predict(new_time_series[i]), y_new[i]) for i in range(len(y_new))]
+            return [cost_func(self.predict(new_population[i]), y_new[i]) for i in range(len(y_new))]
         
-        elif (isinstance(new_time_series, np.array) and isinstance(y_new, np.array)): # Here the arrays should be of shape (nT,nE) and (nT), mayeb add checks later
-            return cost_func(self.predict(new_time_series), y_new)
+        elif (isinstance(new_population, np.array) and isinstance(y_new, np.array)): # Here the arrays should be of shape (nT,nE) and (nT), mayeb add checks later
+            return cost_func(self.predict(new_population), y_new)
 
 
         

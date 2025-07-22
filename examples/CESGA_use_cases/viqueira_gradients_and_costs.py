@@ -95,40 +95,41 @@ class GrandientMethod:
             logger.error(f"Chosen gradient method is not supported: {choose_method}.")
             raise GradientMethodError
 
-    def finite_differences(self, model: ViqueiraEMCZModel, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
+    def finite_differences(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
         """
         Finite differences method for calculating the gradient. It estimates the derivative on 
         each component of the gradient, parallelizing the calculation between QPUs.
 
         Args:
-            qjobs (list[<class cunqa.qjob>]): 
-            time_series (np.array):
-            theta_now (np.array):
-            y_true (np.array):
-            cost_func (class CostFunction):
-            diff (float):
+            circuit (<class CircuitEMCZ>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
+            qjobs (list[<class cunqa.qjob>]): qjob objects representing the QPUs to which we submitted circuit. Use .upgrade_parameters() on them to input the desired parameters
+            time_series (np.array): information of the time series being considered
+            theta_now (np.array): initial value of theta at which to calculate the gradient 
+            y_true (np.array): true label that circuit should produce from time_series
+            cost_func (<class CostFunction>): function that claculates the loss 
+            diff (float): small difference to put on each coordinate to calculate derivatives
 
         Return:
-            gradient (np.array):
+            gradient (np.array): array of lenght len(theta_now) with the estimated gradient of theta
             """
         n = len(theta_now)
         n_qjobs = len(qjobs)
-        gradient = [0.0 for _ in len(theta_now)]
+        gradient = [0.0 for _ in range(n)]
 
         # We will traverse the components of theta n_qjobs elements at a time
         # on a loop. First we go through the last n % n_qjobs objects and 
         # WE OPTIMIZE BY ADDING THE NON-PERTURBED CIRCUIT ON THIS BATCH (it will be our reference)
-        separate_start = n-(n % n_qjobs)
-        separate_results = gather(
-            [self.perturbed_circ_result(qjobs[i], model, time_series, theta_now, separate_start + i, diff) for i in range(n % n_qjobs)] 
-            + [qjobs[-1].upgrade_parameters(model.circuit.parameters(time_series, theta_now))] 
+        final_start = n-(n % n_qjobs)
+        final_results = gather(
+            [self.perturbed_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i, diff) for i in range(n % n_qjobs)] 
+            + [qjobs[-1].upgrade_parameters(circuit.parameters(time_series, theta_now))] 
             )
 
-        reference = separate_results.pop().probabilities
-        separate_deriv = list(map(lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff, separate_results))
-        gradient[separate_start:n] = separate_deriv
+        reference = final_results.pop().probabilities
+        final_deriv = list(map( lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff , final_results))
+        gradient[final_start:n] = final_deriv
         
-        # We go through the components of theta n_qjobs at a time (the key use of the index is inside gather statement)
+        # We go through the components of theta n_qjobs at a time 
         for i in range(n // n_qjobs):
 
             # Range of components for which we calculate the derivative on this loop iteration
@@ -136,23 +137,26 @@ class GrandientMethod:
             end = (i+1)*n_qjobs
 
             # Concurrent execution of circuits with small differences on one component
-            results = gather([self.perturbed_circ_result(qjob, model, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs])
-            deriv = list(map(lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff, results))
+            results = gather([self.perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs])
+            deriv = list(map( lambda x: (cost_func(reference, y_true) - cost_func(x.probabilities, y_true))/diff , results))
             gradient[start:end] = deriv
 
         return np.array(gradient)
 
-    def parameter_shift_rule(self):
-        """ """
+    def parameter_shift_rule(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
+        """
+        Parameter shift rule method for estimating the gradient of continuous parameters of quantum circuits.
+        
+        """
         pass
 
     def gradient_with_bias(self):
         """ """
         pass
 
-    def perturbed_circ_result(qjob: QJob, model : ViqueiraEMCZModel, time_series: np.array, theta: np.array, index: int, diff: float):
+    def perturbed_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
         theta_aux = theta; theta_aux[index] += diff
-        return qjob.upgrade_parameters(model.circuit.parameters(time_series, theta_aux))
+        return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
 
     def update_gradient_method(self, new_gradient_method):
         logger.debug(f"Changing gradient method from {self.choice_method} to {new_gradient_method}")
