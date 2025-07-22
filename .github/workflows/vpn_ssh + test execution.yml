@@ -69,8 +69,15 @@ jobs:
 
           echo "                  "
 
+          # Find which nodes are idle between c7-4 and c7-22
+          IDLE_NODES=$(sinfo -h -N -R -t idle | awk '{print $1}')
+          filtered_nodes=$(echo "$IDLE_NODES" | awk -F'-' '$2 > 3 && $2 < 23 {print $0}')
+
+          # Pick one random idle node
+          random_node=$(echo "$filtered_nodes" | shuf -n 1)
+
           # Run a trivial program on node c7-18 and continue executing (& at the end) to reduce waiting time
-          qraise -n 1 -t 00:00:01 --node_list=c7-18 &> /dev/null
+          qraise -n 1 -t 00:00:01 --node_list=$random_node &> /dev/null
 
           python /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/CUNQA/code_tests/tesst_runner.py
           echo "After LOGIN tests"
@@ -82,7 +89,7 @@ jobs:
 
 
           # Start interactive session for all tests that don't use the python qraise command
-          qcompute -c 62 --node c7-18 --no-shell
+          qcompute -c 62 --node $random_node --no-shell
           module load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 &> /dev/null
           echo "                    "
 
@@ -91,7 +98,7 @@ jobs:
           echo "                   "
           
           # Now kill the qinteractive session to free the resources
-          job_id=$(squeue -w c7-18 -o "%i" -h -u dexposito)
+          job_id=$(squeue -w $random_node -o "%i" -h -u dexposito)
           scancel $job_id
           echo "After INTERACTIVE tests"
 
