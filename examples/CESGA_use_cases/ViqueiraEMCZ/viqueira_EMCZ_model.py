@@ -32,7 +32,7 @@ class ViqueiraEMCZModel:
 
     def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, shots: Optional[int] = 1000, rseed: Optional[int] = None):
 
-        # Run a bash script raising QPUs in six empty nodes (should amount to 192 QPUs)
+        # Run a bash script raising QPUs in six empty nodes (should amount to 192 QPUs). Command waits until jobs are finished configuring
         try:
             command = 'source /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/cunqa_QRNN_side_project/examples/CESGA_use_cases/raise_QPUs_idle_nodes.sh'
             subprocess.run(command, shell=True, check=True, capture_output=True, text=True) 
@@ -40,7 +40,6 @@ class ViqueiraEMCZModel:
         except subprocess.CalledProcessError as error:
             logger.error(f"Error while raising QPUs:\n {error.stderr}.")
             raise SystemExit
-        # ADD WAITING FOR QPUs TO DEPLOY (FORMER STRATEGY DOESN'T WORK). Problem: several qraises -> maybe sleeping + awake nodes
 
         self.nE = nE
         self.nM = nM
@@ -85,7 +84,7 @@ class ViqueiraEMCZModel:
                 best_loss = len(theta_init) * 100 # Unreasonably large number to initialize best_loss and inmediatly update it
                 for i, time_series in enumerate(population):
 
-                    gradient = self.calc_gradient(circuit=self.circuit, qjobs=self.qjobs , time_series=time_series, theta_now = theta_aux,  y_true= y_labels[i], cost_func=self.calc_cost)
+                    gradient = self.calc_gradient(circuit=self.circuit, qjobs=self.qjobs , time_series=time_series, theta_now=theta_aux,  y_true=y_labels[i], cost_func=self.calc_cost)
                     theta_aux += learn_rate * gradient
                     
                     new_result = self.qjobs[randint(0, len(self.qjobs))].upgrade_parameters(self.circuit.parameters(time_series, theta_aux)).result.probabilities
