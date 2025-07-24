@@ -761,8 +761,10 @@ class CunqaCircuit:
         try:
             self.index(gate)
             return True
+        
         except ValueError:
             return False
+        
         except Exception as e:
             logger.error(repr(e))
             raise SystemExit
@@ -828,23 +830,87 @@ class CunqaCircuit:
             logger.error(f"Both the indexes and gate_seq should be lists, or an int and a dict respectively. Instead a {type(indexes)} indexes and a {type(gate_seq)} gate_seq was provided [{TypeError.__name__}]")
             raise SystemExit
         
-    # TODO: create circuit dividing methods
+    ################ CIRRCUIT DIVIDING METHODS ##################
 
-    def vert_split(self, position):
-        """Divides a circuit vertically in two, separating all instructions before and after a certain layer."""
-        left_circuit = self
-        right_circuit = self
+    def vert_split(self, position: int) -> Tuple["CunqaCircuit", "CunqaCircuit"]:
+        """Divides a circuit vertically in two, separating all instructions up to and after a certain layer."""
+        n_qubits = self.num_qubits; n_clbits=self.num_clbits
+
+        left_id = self._id + f" left_{position}"
+        right_id = self._id + f" right_{position}"
+
+        left_circuit = CunqaCircuit(n_qubits,n_clbits, id=left_id)
+        right_circuit = CunqaCircuit(n_qubits,n_clbits, id=right_id)
+
+        left_instrs = []; right_instrs = []
+        for qubit_instrs in self.layers.values():
+            for instr in qubit_instrs:
+                if instr[0] > position:
+                    right_instrs.append(self.instructions[instr[1]])
+                else:
+                    left_instrs.append(self.instructions[instr[1]])
+
+        left_circuit.from_instructions(left_instrs)
+        right_circuit.from_instructions(right_instrs)
+
         return left_circuit, right_circuit
 
-    def hor_split(self, n):
+    def hor_split(self, n: int) -> Tuple["CunqaCircuit", "CunqaCircuit"]:
         """Divides a circuit horizontally in two, separating the first n qubits from the last num_qubits-n qubits. """
         rest = self.num_qubits - n 
         
-        up_id = self._id + f" up{n}"
-        down_id = self._id + f" down{rest}"
+        up_id = self._id + f" up_{n}"
+        down_id = self._id + f" down_{rest}"
 
         upper_circuit = CunqaCircuit(n,n, id=up_id)
         lower_circuit = CunqaCircuit(rest, rest, id=down_id)
+
+        up_instrs = []; down_instrs = []
+        # Add instructions to the two pieces according to their position
+        for instr in self.instructions:
+            if instr["name"] in SUPPORTED_GATES_1Q:
+                if instr["qubits"][0] > n:
+                    down_instrs.append(instr)
+                else:
+                    up_instrs.append(instr)
+
+            # All subsequent options have more than one qubit        
+            elif all(instr["qubits"] > n):
+                down_instrs.append(instr)
+
+            elif all(instr["qubits"] < n+1):
+                up_instrs.append(instr)
+
+            else: # We have a multiple qubit gate that involves both up and down pieces, needs to be made distributed (classical)
+
+                if instr["qubits"][0] > n: # Down sends to up
+                    down_instrs.append({
+                        "name": "measure_and_send",
+                        "qubits": flatten(instr["qubits"]),
+                        "circuits": [up_id]
+                    })
+                    up_instrs.append({
+                        "name": instr["name"],
+                        "qubits": flatten(instr["qubits"][1:]),
+                        "params": instr["params"],
+                        "circuits": [down_id]
+                    })
+
+                else:                      # Up sends to down
+                    up_instrs.append({
+                        "name": "measure_and_send",
+                        "qubits": flatten(instr["qubits"]),
+                        "circuits": [down_id]
+                    })
+                    down_instrs.append({
+                        "name": instr["name"],
+                        "qubits": flatten(instr["qubits"][1:]),
+                        "params": instr["params"],
+                        "circuits": [up_id]
+                    })
+
+        upper_circuit.from_instructions(up_instrs)
+        lower_circuit.from_instructions(down_instrs)
 
         return upper_circuit, lower_circuit
     
@@ -2145,24 +2211,3 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
             if any(line.startswith(gate) for gate in parametric_gates):
                 return True
         return False
-
-def all_suborder_preserving_shuffles(*lists):
-    """Randomly combines lists while preserving each or their internal order.
-    
-    Args:
-        *lists (list[list]): list of lists to be combined.
-    Returns:
-        permutations (list[list]): all possible ways to combine the input lists such that the resulting list preserves the order of each input sublist
-    """   
-    lst_to_combine = list(*lists)
-    list_ids = [i for i, _ in enumerate(lst_to_combine) for _ in range(len(lists[i]))]
-    permutations = list(itertools.permutations(list_ids))
-
-    pointers = [0] * len(lists) # list with elements that track in which position of each of the lists we are: [i, j, k] going from all zeros to [len(list_1), len(list_2), len(list_3)]
-    
-    for perm in permutations:
-        for i, list_id in enumerate(perm):
-            perm[i] = lst_to_combine[list_id][pointers[list_id]]
-            pointers[list_id] += 1
-
-    return permutations
