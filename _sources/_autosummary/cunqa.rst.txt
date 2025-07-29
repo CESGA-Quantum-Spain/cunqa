@@ -29,7 +29,6 @@
    backend
    circuit
    mappers
-   noise_model
    qjob
    qpu
    qutils
