@@ -20,5 +20,5 @@
 	path = src/third-party/libzmq
 	url = git@github.com:CESGA-Quantum-Spain/libzmq.git
 [submodule "cunqasimulator"]
-    path = src/third-party/cunqasimulator
-    url = git@github.com:CESGA-Quantum-Spain/cunqasimulator.git
+	path = src/third-party/cunqasimulator
+	url = git@github.com:CESGA-Quantum-Spain/cunqasimulator.git

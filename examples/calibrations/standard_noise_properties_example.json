@@ -1,0 +1,168 @@
+{
+    "Qubits":{
+        "q[0]":{
+            "T1 (s)": 2.3857e-05,
+            "T2 (s)": 3.6112e-05,
+            "Drive Frequency (Hz)": 4372600000.0,
+            "Measuring Frequency (Hz)": 10276000000.0,
+            "Readout duration (s)": 2.8599e-06,
+            "Readout fidelity(RB)": 0.6287,
+            "T1 error (s)":9.8e-07,
+            "T2 error (s)":9.8e-07
+        },
+        "q[1]":{
+            "T1 (s)": 2.3857e-05,
+            "T2 (s)": 3.6112e-05,
+            "Drive Frequency (Hz)": 4372600000.0,
+            "Measuring Frequency (Hz)": 10276000000.0,
+            "Readout duration (s)": 2.8599e-06,
+            "Readout fidelity(RB)": 0.6287,
+            "T1 error (s)":9.8e-07,
+            "T2 error (s)":9.8e-07
+        },
+        "q[2]":{
+            "T1 (s)": 2.3857e-05,
+            "T2 (s)": 3.6112e-05,
+            "Drive Frequency (Hz)": 4372600000.0,
+            "Measuring Frequency (Hz)": 10276000000.0,
+            "Readout duration (s)": 2.8599e-06,
+            "Readout fidelity(RB)": 0.6287,
+            "T1 error (s)":9.8e-07,
+            "T2 error (s)":9.8e-07
+        },
+        "q[3]":{
+            "T1 (s)": 2.3857e-05,
+            "T2 (s)": 3.6112e-05,
+            "Drive Frequency (Hz)": 4372600000.0,
+            "Measuring Frequency (Hz)": 10276000000.0,
+            "Readout duration (s)": 2.8599e-06,
+            "Readout fidelity(RB)": 0.6287,
+            "T1 error (s)":9.8e-07,
+            "T2 error (s)":9.8e-07
+        },
+        "q[4]":{
+            "T1 (s)": 2.3857e-05,
+            "T2 (s)": 3.6112e-05,
+            "Drive Frequency (Hz)": 4372600000.0,
+            "Measuring Frequency (Hz)": 10276000000.0,
+            "Readout duration (s)": 2.8599e-06,
+            "Readout fidelity(RB)": 0.6287,
+            "T1 error (s)":9.8e-07,
+            "T2 error (s)":9.8e-07
+        }
+    },
+    "Q1Gates": {
+      "q[0]": {
+         "Ry": {
+            "Gate duration (s)": 5.7e-08,
+            "Fidelity(RB)": 0.99177,
+            "Fidelity error": 0.047523
+        },
+         "Rx": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         },
+         "Rz": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         }},
+         "q[1]": {
+         "Ry": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.99177,
+            "Fidelity error": 0.047523
+        },
+         "Rx": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         },
+         "Rz": {
+            "Gate duration (s)": 7.4e-08,
+            "Fidelity(RB)": 1
+         }},
+         "q[2]": {
+         "Ry": {
+            "Gate duration (s)": 4.4e-08,
+            "Fidelity(RB)": 0.99177,
+            "Fidelity error": 0.047523
+        },
+         "Rx": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         },
+         "Rz": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         }},
+         "q[3]": {
+         "Ry": {
+            "Gate duration (s)": 7.9e-08,
+            "Fidelity(RB)": 0.99177,
+            "Fidelity error": 0.047523
+        },
+         "Rx": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         },
+         "Rz": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         }},
+         "q[4]": {
+         "Ry": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.99177,
+            "Fidelity error": 0.047523
+        },
+         "Rx": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 1
+         },
+         "Rz": {
+            "Gate duration (s)": 6.5e-08,
+            "Fidelity(RB)": 1
+         }}
+    },
+    "Q2Gates(RB)": {
+      "0-1": {
+         "CX": {
+            "Control": 0,
+            "Target": 1,
+            "Gate duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.90663
+         }
+      },
+      "1-2": {
+         "CX": {
+            "Control": 1,
+            "Target": 2,
+            "Gate duration (s)": 4.17e-07,
+            "Fidelity(RB)": 0.91663
+         }
+      },
+      "2-3": {
+         "CX": {
+            "Control": 2,
+            "Target": 3,
+            "Gate duration (s)": 4.57e-07,
+            "Fidelity(RB)": 0.81663
+         }
+      },
+      "3-4": {
+         "CX": {
+            "Control": 3,
+            "Target": 4,
+            "Gate duration (s)": 4.57e-07,
+            "Fidelity(RB)": 0.71663
+         }
+      },
+      "4-0": {
+         "CX": {
+            "Control": 4,
+            "Target": 0,
+            "Gate duration (s)": 4.57e-07,
+            "Fidelity(RB)": 0.81663
+         }
+      }
+    }
+}

@@ -43,10 +43,11 @@ struct Server::Impl {
     void send(const std::string& result) 
     {
         try {
+            LOGGER_DEBUG("Entra en el send.");
             zmq::message_t message(result.begin(), result.end());
             message.set_routing_id(rid_queue_.front());
             rid_queue_.pop();
-
+            
             socket_.send(message, zmq::send_flags::none);
             LOGGER_DEBUG("Sent result: {}", result);
         } catch (const zmq::error_t& e) {
@@ -66,6 +67,7 @@ Server::Server(const std::string& mode) :
     hostname{get_hostname()},
     nodename{get_nodename()},
     ip{get_IP_address(mode)},
+    global_ip{get_global_IP_address()},
     port{get_port()},
     pimpl_{std::make_unique<Impl>(ip, port)}
 { }

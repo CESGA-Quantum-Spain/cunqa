@@ -1,9 +1,11 @@
 #pragma once
 
+#include <vector>
 #include <complex>
 #include <unordered_map>
 
 namespace cunqa {
+namespace constants{
 
 enum INSTRUCTIONS {
     UNITARY,
@@ -17,6 +19,7 @@ enum INSTRUCTIONS {
     RX,
     RY,
     RZ,
+    SWAP,
     CX,
     CY,
     CZ,
@@ -24,10 +27,12 @@ enum INSTRUCTIONS {
     CRY,
     CRZ,
     ECR,
-    C_IF_H,
+    CECR,
     C_IF_X,
     C_IF_Y,
     C_IF_Z,
+    C_IF_H,
+    C_IF_SX,
     C_IF_RX,
     C_IF_RY,
     C_IF_RZ,
@@ -35,17 +40,10 @@ enum INSTRUCTIONS {
     C_IF_CY,
     C_IF_CZ,
     C_IF_ECR,
-    D_C_IF_H,
-    D_C_IF_X,
-    D_C_IF_Y,
-    D_C_IF_Z,
-    D_C_IF_RX,
-    D_C_IF_RY,
-    D_C_IF_RZ,
-    D_C_IF_CX,
-    D_C_IF_CY,
-    D_C_IF_CZ,
-    D_C_IF_ECR,
+    MEASURE_AND_SEND,
+    RECV,
+    QSEND,
+    QRECV
 };
 
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
@@ -69,6 +67,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rz", RZ},
 
     // TWO GATE NO PARAM
+    {"swap", SWAP},
     {"cx", CX},
     {"cy", CY},
     {"cz", CZ},
@@ -77,12 +76,16 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"crz", CRZ},
     {"ecr", ECR},
 
-    //CONTROLLED GATES
-    {"c_if_h", C_IF_H},
+    // TWO GATE NO PARAM
+    {"cecr", CECR},
+
+    //CLASSICAL CONTROLLED GATES
     {"c_if_x", C_IF_X},
     {"c_if_y", C_IF_Y},
     {"c_if_z", C_IF_Z},
-    {"c_if_rx", C_IF_RX},
+    {"c_if_h", C_IF_H},
+    {"c_if_sx", C_IF_H},
+    {"c_if_rx", C_IF_SX},
     {"c_if_ry", C_IF_RY},
     {"c_if_rz", C_IF_RZ},
     {"c_if_cx", C_IF_CX},
@@ -90,39 +93,13 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"c_if_cz", C_IF_CZ},
     {"c_if_ecr", C_IF_ECR},
 
-    //DISTRIBUTED GATES
-    {"d_c_if_h", D_C_IF_H},
-    {"d_c_if_x", D_C_IF_X},
-    {"d_c_if_y", D_C_IF_Y},
-    {"d_c_if_z", D_C_IF_Z},
-    {"d_c_if_rx", D_C_IF_RX},
-    {"d_c_if_ry", D_C_IF_RY},
-    {"d_c_if_rz", D_C_IF_RZ},
-    {"d_c_if_cx", D_C_IF_CX},
-    {"d_c_if_cy", D_C_IF_CY},
-    {"d_c_if_cz", D_C_IF_CZ},
-    {"d_c_if_ecr", D_C_IF_ECR},
-};
+    // SEND CLASSICAL QUBIT
+    {"measure_and_send", MEASURE_AND_SEND},
+    {"recv", RECV},
 
-const std::unordered_map<int, std::string> INVERTED_GATE_NAMES = {
-    {UNITARY, "unitary"},
-    {MEASURE, "measure"},
-    {ID, "id"},
-    {X, "x"},
-    {Y, "y"},
-    {Z, "z"},
-    {H, "h"},
-    {SX, "sx"},
-    {RX, "rx"},
-    {RY, "ry"},
-    {RZ, "rz"},
-    {CX, "cx"},
-    {CY, "cy"},
-    {CZ, "cz"},
-    {CRX, "crx"},
-    {CRY, "cry"},
-    {CRZ, "crz"},
-    {ECR, "ecr"},
+    // REMOTE CONTROLLED GATES
+    {"qsend", QSEND},
+    {"qrecv", QRECV}
 };
 
 const std::vector<std::string> BASIS_GATES = {
@@ -134,24 +111,26 @@ const std::vector<std::string> BASIS_GATES = {
 };
 
 const std::vector<std::string> BASIS_AND_DISTRIBUTED_GATES = {
-    "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "d_c_if_h", "d_c_if_x","d_c_if_y","d_c_if_z","d_c_if_rx","d_c_if_ry","d_c_if_rz","d_c_if_cx","d_c_if_cy","d_c_if_cz", "d_c_if_ecr"
+    "id", "x", "y", "z", "h", "sx", "cx", "cy", "cz", "ecr", "c_if_x","c_if_y","c_if_z", "c_if_h", "c_if_sx", "c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "measure_and_send", "remote_c_if_x","remote_c_if_y","remote_c_if_z", "remote_c_if_h", "remote_c_if_sx", "remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"
 };
 
-const std::unordered_map<std::string, std::string> CORRESPONDENCE_D_GATE_MAP = {
-    {"d_c_if_h", "h"},
-    {"d_c_if_x", "x"},
-    {"d_c_if_y", "y"},
-    {"d_c_if_z", "z"},
-    {"d_c_if_rx", "rx"},
-    {"d_c_if_ry", "ry"},
-    {"d_c_if_rz", "rz"},
-    {"d_c_if_cx", "cx"},
-    {"d_c_if_cy", "cy"},
-    {"d_c_if_cz", "cz"},
-    {"d_c_if_ecr", "ecr"},
+const std::unordered_map<std::string, std::string> CORRESPONDENCE_REMOTE_GATE_MAP = {
+    {"remote_c_if_x", "x"},
+    {"remote_c_if_y", "y"},
+    {"remote_c_if_z", "z"},
+    {"remote_c_if_h", "h"},
+    {"remote_c_if_sx", "sx"},
+    {"remote_c_if_rx", "rx"},
+    {"remote_c_if_ry", "ry"},
+    {"remote_c_if_rz", "rz"},
+    {"remote_c_if_cx", "cx"},
+    {"remote_c_if_cy", "cy"},
+    {"remote_c_if_cz", "cz"},
+    {"remote_c_if_ecr", "ecr"},
 };
 
-} //End namespace CUNQA
+} // End namespace constants
+} //End namespace cunqa
 
 
 

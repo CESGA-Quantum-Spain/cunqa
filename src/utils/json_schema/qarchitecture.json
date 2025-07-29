@@ -1,0 +1,54 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "cunqa_architecture",
+    "title": "CunqaArchitecture",
+    "description": "Json schema to specify an architecture of virtual QPUs, its connectivity and associated simulators",
+    "type": "object",
+    "patternProperties": 
+    {           
+                "^island[0-9]+$":{
+                    "type":"object",
+                    "properties":{
+                        "qpus":{
+                            "type": "object",
+                            "patternProperties": 
+                            {
+                                "^qpu[0-9]+$": 
+                                {
+                                    "description":"Array with two objects: the path to the file describing the QPU and the simulator associated to it.",
+                                    "type":"array",
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                    "items":
+                                    {
+                                        "type":"string"
+                                    }
+                                }
+                            }
+                        },
+                        "connectivity":
+                        {   
+                            "description":"Topology of the connections between QPUs. There is a subarray [1,2] if QPU 1 is connected to QPU 2",
+                            "type":"array",
+                            "items":
+                            {
+                                "type":"array",
+                                "minItems": 2,
+                                "maxItems": 2,
+                                "items":
+                                {
+                                    "type":"integer"
+                                }
+                            }
+                        },
+                        "communications":
+                        {
+                            "description":"Type of communications: None, classical or quantum.",
+                            "type":"string"
+                        }
+                    }
+                }
+                
+            }
+
+}

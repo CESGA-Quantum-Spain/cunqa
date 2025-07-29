@@ -11,13 +11,21 @@
   <br> 
 </ul>
 
-<a href="https://www.cesga.es/"><img src="docs/source/_static/logotipo_CESGA_negro.png" alt="CESGA Logo" width="200" height="60"></a> 
+<a href="https://www.cesga.es/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cesga_blanco.png" width="250" height="60">
+    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logotipo_CESGA_negro.png" width="200" height="60">
+    <img alt="CESGA Logo" src="docs/source/_static/logotipo_CESGA_negro.png" width="200" height="60">
+  </picture>
+</a> 
+
 <br> 
 <br>
 
 # Table of contents
-  - [CLONE REPOSITORY](#clone-repository)
+  - [USE AS LMOD MODULE](#use-as-lmod-module)
   - [INSTALLATION](#installation)
+    - [CLONE REPOSITORY](#clone-repository)
     - [QMIO](#qmio)
       - [Automatic installation](#automatic-installation)
       - [Manual installation](#manual-installation)
@@ -31,7 +39,13 @@
   - [ACKNOWLEDGEMENTS](#acknowledgements)
 
 
-## Clone repository
+## Use as Lmod module
+Cunqa is available as Lmod module in CESGA. To use it all you have to do is:
+- In QMIO: `module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi`
+- In FT3: `module load cesga/2022 gcc/system cunqa/0.3.1`
+
+## Installation 
+### Clone repository
 It is important to say that, for ensuring a correct cloning of the repository, the SSH is the one preferred. In order to get this to work one has to do:
 
 ```console
@@ -54,7 +68,6 @@ cd scripts
 bash setup_submodules.sh
 ```
 
-## Installation 
 ### QMIO
 #### Automatic installation
 The `scripts/configure.sh` file is prepared to bring an automatic installation of the **CUNQA** platform. The user only has to execute this file followed by the path to the desire installation folder: 
@@ -84,7 +97,7 @@ ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind1
 * **Standard way (slower)**
 ```console
 cmake -B build/ 
-cmake --build build/
+cmake --build build/ --parallel $(nproc)
 cmake --install build/
 ```
 
@@ -125,14 +138,14 @@ ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake
 
 5. Again: configure, compile and install using CMake:
 
-* **Standard way (slower)**
+* **Standard way**
 ```console
 cmake -B build/ 
 cmake --build build/
 cmake --install build/
 ```
 
-* **Using [Ninja](https://ninja-build.org/) (faster)**
+* **Using [Ninja](https://ninja-build.org/)**
 ```console
 cmake -G Ninja -B build/
 ninja -C build -j $(nproc)
@@ -143,6 +156,21 @@ cmake --install build/
 > Is **KEY** that this compilation is done in a compute node with sufficient resources (if not, the compilation process could be killed).
 
 And that's it! Everything is set—either on QMIO or in the FT3—to perform an execution. 
+
+## Uninstall
+There has also been developed a Make directive to uninstall CUNQA if needed: 
+
+1. If you installed using the standard way: `make uninstall`. 
+
+2. If you installed using Ninja: `ninja uninstall`.
+
+Be sure to execute this command inside the `build/` directory in both cases. An alternative is using:
+
+```console
+cmake --build build/ --target uninstall
+``` 
+
+to abstract from the installation method.
 
 ## Run your first distributed program
 
@@ -222,8 +250,7 @@ import os
 import sys
 
 # Adding pyhton folder path to detect modules
-INSTALL_PATH = os.getenv("INSTALL_PATH")
-sys.path.insert(0, INSTALL_PATH)
+sys.path.append(os.getenv("HOME"))
 
 # Let's get the raised QPUs
 from cunqa.qutils import getQPUs

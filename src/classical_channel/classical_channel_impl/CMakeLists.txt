@@ -1,0 +1,7 @@
+if(USE_MPI_BTW_QPU)
+    add_subdirectory(mpi)
+    message(STATUS "Added mpi folder for classical communications.")
+elseif(USE_ZMQ_BTW_QPU)
+    add_subdirectory(zmq)
+    message(STATUS "Added zmq folder for classical communications.")
+endif()

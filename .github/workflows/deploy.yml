@@ -3,6 +3,7 @@ name: Deploy Sphinx Docs to GitHub Pages
 on:
   push:
     branches:
+      - 169-general-improvement-of-documentation
       - main  # or master, depending on your default branch
 
 jobs:

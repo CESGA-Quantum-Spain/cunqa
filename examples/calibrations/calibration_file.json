@@ -1,0 +1,958 @@
+{
+   "Qubits": {
+      "q[0]": {
+         "Measuring frequency": 10276000000.0,
+         "T1 (s)": 2.3857e-05,
+         "T2 (s)": 3.6112e-05,
+         "Drive Frequency (Hz)": 4372600000.0,
+         "Measuring Frequency (Hz)": 10276000000.0,
+         "Readout duration (s)": 2.8599e-06,
+         "Measuring frequency (Hz)": 10277000000.0,
+         "Readout fidelity(RB)": 0.6287
+      },
+      "q[1]": {
+         "T1": 44.057,
+         "T2e": 25.749,
+         "Drive Frequency ": 4257400000.0,
+         "Measuring frequency": 9652600000.0,
+         "Measuring time": 0.005515,
+         "Fidelity init": 0.933,
+         "Fidelity readout": 0.9174,
+         "Drive Frequency": 4257411225.1399617,
+         "Readout duration": 5515.015015015015,
+         "T1 (s)": 5.5039e-05,
+         "T2 (s)": 3.3123e-05,
+         "Drive Frequency (Hz)": 4257400000.0,
+         "Measuring Frequency (Hz)": 9652600000.0,
+         "Readout duration (s)": 6.7853e-06,
+         "Measuring frequency (Hz)": 9652600000.0,
+         "Readout fidelity(RB)": 0.9274
+      },
+      "q[2]": {
+         "T1": 2611.1,
+         "T2e": 160.96,
+         "Drive Frequency ": 4369200000.0,
+         "Measuring frequency": 10077000000.0,
+         "Measuring time": 0.0056952,
+         "Fidelity init": 0.851,
+         "Fidelity readout": 0.8643,
+         "Drive Frequency": 4369176489.942258,
+         "Readout duration": 5695.195195195195,
+         "T1 (s)": 6.6382e-05,
+         "T2 (s)": 8.7695e-05,
+         "Drive Frequency (Hz)": 4369200000.0,
+         "Measuring Frequency (Hz)": 10077000000.0,
+         "Readout duration (s)": 1.2e-05,
+         "Measuring frequency (Hz)": 10077000000.0,
+         "Readout fidelity(RB)": 0.8724
+      },
+      "q[3]": {
+         "T1": 57.905,
+         "T2e": 106.2,
+         "Drive Frequency ": 4220000000.0,
+         "Measuring frequency": 9850800000.0,
+         "Measuring time": 0.0057032,
+         "Fidelity init": 0.949,
+         "Fidelity readout": 0.9177,
+         "Drive Frequency": 4219992286.125655,
+         "Readout duration": 7016.516516516515,
+         "T1 (s)": 4.4893e-05,
+         "T2 (s)": 0.00011292,
+         "Drive Frequency (Hz)": 4220000000.0,
+         "Measuring Frequency (Hz)": 9850800000.0,
+         "Readout duration (s)": 5.968e-06,
+         "Measuring frequency (Hz)": 9850800000.0,
+         "Readout fidelity(RB)": 0.9131
+      },
+      "q[4]": {
+         "T1": 39.806,
+         "T2e": 59.079,
+         "Drive Frequency ": 4340900000.0,
+         "Measuring frequency": 9644900000.0,
+         "Measuring time": 0.005,
+         "Fidelity init": 0.772,
+         "Fidelity readout": 0.7892,
+         "Drive Frequency": 4340947930.728189,
+         "Readout duration": 5000.0,
+         "T1 (s)": 6.2614e-05,
+         "T2 (s)": 0.00014265,
+         "Drive Frequency (Hz)": 4340900000.0,
+         "Measuring Frequency (Hz)": 9644900000.0,
+         "Readout duration (s)": 5.3233e-06,
+         "Measuring frequency (Hz)": 9644900000.0,
+         "Readout fidelity(RB)": 0.801
+      },
+      "q[5]": {
+         "T1": 71.91,
+         "T2e": 82.617,
+         "Drive Frequency ": 4398400000.0,
+         "Measuring frequency": 9848200000.0,
+         "Measuring time": 0.0042012,
+         "Fidelity init": 0.885,
+         "Fidelity readout": 0.887,
+         "Drive Frequency": 4398416817.5094185,
+         "Readout duration": 4201.201201201201,
+         "T1 (s)": 8.1266e-05,
+         "T2 (s)": 9.1296e-05,
+         "Drive Frequency (Hz)": 4398400000.0,
+         "Measuring Frequency (Hz)": 9848200000.0,
+         "Readout duration (s)": 1.0791e-05,
+         "Measuring frequency (Hz)": 9848300000.0,
+         "Readout fidelity(RB)": 0.8872
+      }
+   },
+   "Q1Gates": {
+      "q[0]": {
+         "SX": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.99177
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[1]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99849
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[2]": {
+         "SX": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.9865
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[3]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99715
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[4]": {
+         "SX": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.99817
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[5]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.98555
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[6]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99868
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[7]": {
+         "SX": {
+            "Gate duration (s)": 1.28e-07,
+            "Fidelity(RB)": 0.98904
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[8]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99888
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[9]": {
+         "SX": {
+            "Gate duration (s)": 6.4e-08,
+            "Fidelity(RB)": 0.97257
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[10]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.999
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[11]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99642
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[12]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99717
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[13]": {
+         "SX": {
+
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99336
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[14]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99901
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[15]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99969
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[16]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99971
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[17]": {
+         "SX": {
+            "Gate duration (s)": 1.28e-07,
+            "Fidelity(RB)": 0.99173
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[18]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99574
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[19]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99916
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[20]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99956
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[21]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99862
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[22]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99914
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[23]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99965
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[24]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.98128
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[25]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 1.0
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[26]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99924
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[27]": {
+         "SX": {
+            "Gate duration (s)": 9.6e-08,
+            "Fidelity(RB)": 0.99484
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[28]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.9799
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[29]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99883
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[30]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99033
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "q[31]": {
+         "SX": {
+            "Gate duration (s)": 3.2e-08,
+            "Fidelity(RB)": 0.99993
+         },
+         "Rz": {
+            "duration (ns)": 0,
+            "Fidelity": 100.0,
+            "Fidelity(RB)": 1.0
+         }
+      }
+   },
+   "Q2Gates": {
+      "ZXpi/4[0,1]": {
+         "Control": 0,
+         "Target": 1,
+         "Duration (ns)": 144.0,
+         "Fidelity": 92,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[2,1]": {
+         "Control": 2,
+         "Target": 1,
+         "Duration (ns)": 288.0,
+         "Fidelity": 92,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[2,3]": {
+         "Control": 2,
+         "Target": 3,
+         "Duration (ns)": 288.0,
+         "Fidelity": 95,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[4,3]": {
+         "Control": 4,
+         "Target": 3,
+         "Duration (ns)": 144.0,
+         "Fidelity": 90,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[5,4]": {
+         "Control": 5,
+         "Target": 4,
+         "Duration (ns)": 176.0,
+         "Fidelity": 95,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[6,3]": {
+         "Control": 6,
+         "Target": 3,
+         "Duration (ns)": 144.0,
+         "Fidelity": 81,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[6,12]": {
+         "Control": 6,
+         "Target": 12,
+         "Duration (ns)": 144.0,
+         "Fidelity": 96,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[7,0]": {
+         "Control": 7,
+         "Target": 0,
+         "Duration (ns)": 144.0,
+         "Fidelity": 71,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[7,9]": {
+         "Control": 7,
+         "Target": 9,
+         "Duration (ns)": 208.0,
+         "Fidelity": 80,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[9,10]": {
+         "Control": 9,
+         "Target": 10,
+         "Duration (ns)": 184.0,
+         "Fidelity": 84,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[11,10]": {
+         "Control": 11,
+         "Target": 10,
+         "Duration (ns)": 144.0,
+         "Fidelity": 95,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[11,12]": {
+         "Control": 11,
+         "Target": 12,
+         "Duration (ns)": 176.0,
+         "Fidelity": 93,
+         " Fidelity error": 0.047523
+      },
+      "ZXpi/4[13,21]": {
+         "Control": 13,
+         "Target": 21,
+         "Duration (ns)": 192.0,
+         "Fidelity": 95,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[14,11]": {
+         "Control": 14,
+         "Target": 11,
+         "Duration (ns)": 128.0,
+         "Fidelity": 95,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[14,18]": {
+         "Control": 14,
+         "Target": 18,
+         "Duration (ns)": 216.0,
+         "Fidelity": 72,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[15,8]": {
+         "Control": 15,
+         "Target": 8,
+         "Duration (ns)": 288.0,
+         "Fidelity": 97,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[15,16]": {
+         "Control": 15,
+         "Target": 16,
+         "Duration (ns)": 288.0,
+         "Fidelity": 97,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[18,17]": {
+         "Control": 18,
+         "Target": 17,
+         "Duration (ns)": 168.0,
+         "Fidelity": 91,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[18,19]": {
+         "Control": 18,
+         "Target": 19,
+         "Duration (ns)": 144.0,
+         "Fidelity": 93,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[20,19]": {
+         "Control": 20,
+         "Target": 19,
+         "Duration (ns)": 144.0,
+         "Fidelity": 97,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[22,21]": {
+         "Control": 22,
+         "Target": 21,
+         "Duration (ns)": 144.0,
+         "Fidelity": 96,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[22,31]": {
+         "Control": 22,
+         "Target": 31,
+         "Duration (ns)": 288.0,
+         "Fidelity": 93,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[23,20]": {
+         "Control": 23,
+         "Target": 20,
+         "Duration (ns)": 144.0,
+         "Fidelity": 98,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[23,30]": {
+         "Control": 23,
+         "Target": 30,
+         "Duration (ns)": 144.0,
+         "Fidelity": 97,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[24,17]": {
+         "Control": 24,
+         "Target": 17,
+         "Duration (ns)": 304.0,
+         "Fidelity": 58,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[24,27]": {
+         "Control": 24,
+         "Target": 27,
+         "Duration (ns)": 320.0,
+         "Fidelity": 72,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[25,16]": {
+         "Control": 25,
+         "Target": 16,
+         "Duration (ns)": 144.0,
+         "Fidelity": 98,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[25,26]": {
+         "Control": 25,
+         "Target": 26,
+         "Duration (ns)": 176.0,
+         "Fidelity": 97,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[26,27]": {
+         "Control": 26,
+         "Target": 27,
+         "Duration (ns)": 304.0,
+         "Fidelity": 92,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[28,27]": {
+         "Control": 28,
+         "Target": 27,
+         "Duration (ns)": 288.0,
+         "Fidelity": 93,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[28,29]": {
+         "Control": 28,
+         "Target": 29,
+         "Duration (ns)": 224.0,
+         "Fidelity": 91,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[30,29]": {
+         "Control": 30,
+         "Target": 29,
+         "Duration (ns)": 144.0,
+         "Fidelity": 94,
+         "Fidelity error": 0.047523
+      },
+      "ZXpi/4[30,31]": {
+         "Control": 30,
+         "Target": 31,
+         "Duration (ns)": 144.0,
+         "Fidelity": 95,
+         "Fidelity error": 0.047523
+      }
+   },
+   "Q2Gates(RB)": {
+      "0-1": {
+         "ECR": {
+            "Control": 0,
+            "Target": 1,
+            "Duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.90663
+         }
+      },
+      "2-1": {
+         "ECR": {
+            "Control": 2,
+            "Target": 1,
+            "Duration (s)": 7.04e-07,
+            "Fidelity(RB)": 0.93923
+         }
+      },
+      "2-3": {
+         "ECR": {
+            "Control": 2,
+            "Target": 3,
+            "Duration (s)": 7.04e-07,
+            "Fidelity(RB)": 0.93145
+         }
+      },
+      "4-3": {
+         "ECR": {
+            "Control": 4,
+            "Target": 3,
+            "Duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.98797
+         }
+      },
+      "5-4": {
+         "ECR": {
+            "Control": 5,
+            "Target": 4,
+            "Duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.95132
+         }
+      },
+      "6-3": {
+         "ECR": {
+            "Control": 6,
+            "Target": 3,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.97104
+         }
+      },
+      "6-12": {
+         "ECR": {
+            "Control": 6,
+            "Target": 12,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.9877
+         }
+      },
+      "7-0": {
+         "ECR": {
+            "Control": 7,
+            "Target": 0,
+            "Duration (s)": 5.44e-07,
+            "Fidelity(RB)": 0.48558
+         }
+      },
+      "7-9": {
+         "ECR": {
+            "Control": 7,
+            "Target": 9,
+            "Duration (s)": 6.72e-07,
+            "Fidelity(RB)": 0.67407
+         }
+      },
+      "9-10": {
+         "ECR": {
+            "Control": 9,
+            "Target": 10,
+            "Duration (s)": 4.96e-07,
+            "Fidelity(RB)": 0.91484
+         }
+      },
+      "11-10": {
+         "ECR": {
+            "Control": 11,
+            "Target": 10,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.98604
+         }
+      },
+      "11-12": {
+         "ECR": {
+            "Control": 11,
+            "Target": 12,
+            "Duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.98303
+         }
+      },
+      "13-21": {
+         "ECR": {
+            "Control": 13,
+            "Target": 21,
+            "Duration (s)": 4.48e-07,
+            "Fidelity(RB)": 0.9562
+         }
+      },
+      "14-11": {
+         "ECR": {
+            "Control": 14,
+            "Target": 11,
+            "Duration (s)": 3.2e-07,
+            "Fidelity(RB)": 0.98346
+         }
+      },
+      "14-18": {
+         "ECR": {
+            "Control": 14,
+            "Target": 18,
+            "Duration (s)": 4.96e-07,
+            "Fidelity(RB)": 0.97202
+         }
+      },
+      "15-8": {
+         "ECR": {
+            "Control": 15,
+            "Target": 8,
+            "Duration (s)": 6.4e-07,
+            "Fidelity(RB)": 0.98162
+         }
+      },
+      "15-16": {
+         "ECR": {
+            "Control": 15,
+            "Target": 16,
+            "Duration (s)": 6.4e-07,
+            "Fidelity(RB)": 0.97816
+         }
+      },
+      "18-17": {
+         "ECR": {
+            "Control": 18,
+            "Target": 17,
+            "Duration (s)": 4e-07,
+            "Fidelity(RB)": 0.46941
+         }
+      },
+      "18-19": {
+         "ECR": {
+            "Control": 18,
+            "Target": 19,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.98607
+         }
+      },
+      "20-19": {
+         "ECR": {
+            "Control": 20,
+            "Target": 19,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.98796
+         }
+      },
+      "22-21": {
+         "ECR": {
+            "Control": 22,
+            "Target": 21,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.98806
+         }
+      },
+      "22-31": {
+         "ECR": {
+            "Control": 22,
+            "Target": 31,
+            "Duration (s)": 6.4e-07,
+            "Fidelity(RB)": 0.98218
+         }
+      },
+      "23-20": {
+         "ECR": {
+            "Control": 23,
+            "Target": 20,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.987
+         }
+      },
+      "23-30": {
+         "ECR": {
+            "Control": 23,
+            "Target": 30,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.93245
+         }
+      },
+      "24-17": {
+         "ECR": {
+            "Control": 24,
+            "Target": 17,
+            "Duration (s)": 6.72e-07,
+            "Fidelity(RB)": 1.0
+         }
+      },
+      "24-27": {
+         "ECR": {
+            "Control": 24,
+            "Target": 27,
+            "Duration (s)": 7.04e-07,
+            "Fidelity(RB)": 0.89133
+         }
+      },
+      "25-16": {
+         "ECR": {
+            "Control": 25,
+            "Target": 16,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.98866
+         }
+      },
+      "25-26": {
+         "ECR": {
+            "Control": 25,
+            "Target": 26,
+            "Duration (s)": 4.16e-07,
+            "Fidelity(RB)": 0.98149
+         }
+      },
+      "26-27": {
+         "ECR": {
+            "Control": 26,
+            "Target": 27,
+            "Duration (s)": 6.72e-07,
+            "Fidelity(RB)": 0.97123
+         }
+      },
+      "28-27": {
+         "ECR": {
+            "Control": 28,
+            "Target": 27,
+            "Duration (s)": 6.4e-07,
+            "Fidelity(RB)": 0.8671
+         }
+      },
+      "28-29": {
+         "ECR": {
+            "Control": 28,
+            "Target": 29,
+            "Duration (s)": 5.12e-07,
+            "Fidelity(RB)": 0.93226
+         }
+      },
+      "30-29": {
+         "ECR": {
+            "Control": 30,
+            "Target": 29,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.9587
+         }
+      },
+      "30-31": {
+         "ECR": {
+            "Control": 30,
+            "Target": 31,
+            "Duration (s)": 3.52e-07,
+            "Fidelity(RB)": 0.9631
+         }
+      }
+   }
+}

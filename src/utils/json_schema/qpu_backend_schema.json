@@ -1,0 +1,89 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "cunqa_qpu_file",
+    "title": "CunqaQPUFile",
+    "description": "Json schema to determine the files defining a QPU.",
+    "type": "object",
+    "properties": 
+    {
+                "id":{
+                    "type": "object"
+                },
+                "backend":
+                {   
+                    "description":"Backend ",
+                    "type": "object",
+                    "properties": 
+                    {           
+                                "basis_gates":
+                                {
+                                    "description":"List of native gates admited by the QPU",
+                                    "type":"array",
+                                    "items":
+                                    {
+                                        "type": "string"
+                                    }
+                                },
+                                "coupling_map":
+                                {   
+                                    "description":"Topology of the QPU's qubits",
+                                    "type":"array",
+                                    "items":
+                                    {
+                                        "type":"array",
+                                        "items":
+                                        {
+                                            "type":"integer"
+                                        }
+                                    }
+                                },
+                                "custom_instructions":
+                                {
+                                    "type":"string"
+                                },
+                                "description":
+                                {
+                                    "description":"Description of the QPU backend",
+                                    "type":"string",
+                                    "default": "Default backend"
+                                },
+                                "gates":
+                                {
+                                    "type":"array",
+                                    "items":
+                                    {
+                                        "type": "string"
+                                    }
+                                },
+                                "n_qubits":
+                                {
+                                    "description":"Number of qubits of the QPU",
+                                    "type":"integer",
+                                    "default": 15
+                                },
+                                "name": 
+                                {
+                                    "description":"Name of the QPU backend",
+                                    "type":"string",
+                                    "default": "DefaultBackend"
+                                },
+                                "noise_model":
+                                {
+                                    "description": "Path to the temporal file describing the noise instructions for the simulator.",
+                                    "type": ["null", "string"]
+                                },
+                                "simulator":
+                                {
+                                    "description": "Name of the simulator bieng used by the QPU.",
+                                    "type":"string"
+                                },
+                                "version":
+                                {
+                                    "description":"Specific version of the QPU backend",
+                                    "type":"string",
+                                    "default": "0.0.1"
+                                }
+                    }
+                }
+            }
+}

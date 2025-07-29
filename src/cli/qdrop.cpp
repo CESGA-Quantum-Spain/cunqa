@@ -15,7 +15,7 @@
 
 using namespace std::literals;
 
-struct MyArgs : public argparse::Args
+struct CunqaArgs : public argparse::Args
 {
     std::optional<std::vector<uint32_t>>& ids = arg("Slurm IDs of the QPUs to be dropped.").multi_argument();
     std::optional<std::string>& info_path     = kwarg("info_path", "PATH to the QPU information file.");
@@ -69,15 +69,19 @@ void removeAllJobs(std::string& id_str)
 
 int main(int argc, char* argv[]) 
 {
-    auto args = argparse::parse<MyArgs>(argc, argv);
-    std::string install_path = getenv("HOME");
-    setenv("SLURM_CONF", (install_path + "/slurm.conf").c_str(), 1); 
+    auto args = argparse::parse<CunqaArgs>(argc, argv);
+    std::string system = getenv("LMOD_SYSTEM_NAME");
+    if(system == "QMIO")
+        setenv("SLURM_CONF", "/var/spool/slurmd/conf-cache/slurm.conf", 1); 
+    else if (system == "FT3")
+        setenv("SLURM_CONF", "/etc/slurm/slurm.conf", 1); 
+    
     std::string id_str;
     std::string cmd;
 
     if (args.all) {
         if (args.ids.has_value())
-        std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" << "Both IDs and the --all flag where given (every qraise process will be eliminated).\n";
+        std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" << "You are setting the --all flag and putting IDs (every qraise process will be eliminated).\n";
         removeAllJobs(id_str); 
         if (id_str.empty()) {
             std::cerr << "\033[1;31m" << "Error: " << "\033[0m" << "No qraise jobs are currently running.\n";
@@ -112,7 +116,7 @@ int main(int argc, char* argv[])
                     LOGGER_DEBUG("Removed QPUs from qraise job {}.", id);
                     break;
                 case 1:
-                    std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" << "You are removing a job different than qraise, use scancel if wou want to stop it.\n";
+                    std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" << "You are removing a job different than qraise, use scancel if you want to stop it.\n";
                     return -1;
                     break;
                 default:

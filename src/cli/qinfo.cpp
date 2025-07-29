@@ -12,7 +12,7 @@
 
 using namespace std::literals;
 
-struct MyArgs : public argparse::Args
+struct CunqaArgs : public argparse::Args
 {
     std::optional<std::string>& node     = arg("node", "Info about the QPUs on the selected node.");
     bool& my_node                        = flag("mynode", "Info about the QPUs on the current node.");
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
     const std::string indent = "    ";
 
-    auto args = argparse::parse<MyArgs>(argc, argv);
+    auto args = argparse::parse<CunqaArgs>(argc, argv);
 
     const char* store = std::getenv("STORE");
     std::string info_path = std::string(store) + "/.cunqa/qpus.json";
@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
 
     cunqa::JSON qpus_json;
     file >> qpus_json;
+    file.close();
 
     if (qpus_json.empty()) {
         std::cerr << "\033[31mThere are not deployed QPUs!\033[0m" << "\n";

@@ -44,10 +44,12 @@ class ColoredFormatter(logging.Formatter):
         return message
 
 logger = logging.getLogger('mi_logger_coloreado')
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.WARN)  # Establece el nivel mínimo de log
+logger.propagate = False
+logger.handlers.clear()
 
 console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.ERROR)
+console_handler.setLevel(logging.WARN)
 
 formatter = ColoredFormatter('\t%(levelname)s: %(message)s')
 console_handler.setFormatter(formatter)

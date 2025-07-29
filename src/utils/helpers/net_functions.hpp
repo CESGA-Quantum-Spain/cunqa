@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <cstring>
 
+#include "logger.hpp"
 #include "utils/constants.hpp"
 
 using namespace std::string_literals;
@@ -40,7 +41,7 @@ inline std::string get_nodename(){
     return nodename;
 }
 
-std::string get_IP_address(const std::string& mode) 
+inline std::string get_IP_address(const std::string& mode) 
 {
     struct ifaddrs *interfaces, *ifa;
     
@@ -66,8 +67,32 @@ std::string get_IP_address(const std::string& mode)
     freeifaddrs(interfaces);
     return ip;
 }
+
+inline std::string get_global_IP_address() 
+{
+    struct ifaddrs *interfaces, *ifa;
+
+    if (getifaddrs(&interfaces) == -1) {
+        std::cerr << "Error getting the network interfaces\n";
+        return std::string();
+    }
+
+    char ip[INET6_ADDRSTRLEN];
+    for (ifa = interfaces; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == nullptr || std::string(ifa->ifa_name) != "ib0") continue;
+        int family = ifa->ifa_addr->sa_family;
+        if (family == AF_INET) {
+            void *addr;
+            addr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            inet_ntop(family, addr, ip, sizeof(ip));
+            break;
+        }
+    }
+    freeifaddrs(interfaces);
+    return ip;
+}
  
-std::string get_port() 
+inline std::string get_port(const bool comm = false) 
 {
     auto id = std::getenv("SLURM_LOCALID");
     auto ports = std::getenv("SLURM_STEP_RESV_PORTS");
@@ -76,7 +101,7 @@ std::string get_port()
         std::string ports_str(ports);
         size_t pos = ports_str.find('-');
         if (pos != std::string::npos) {
-            std::string base_port_str = ports_str.substr(0, pos);
+            std::string base_port_str = comm ? ports_str.substr(pos + 1) : ports_str.substr(0, pos);
             int base_port = std::stoi(base_port_str);
             
             return std::to_string(base_port + std::stoi(id));

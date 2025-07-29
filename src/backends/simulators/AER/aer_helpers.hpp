@@ -2,10 +2,13 @@
 
 #include <regex>
 #include <string>
-#include "quantum_task.hpp"
-#include "utils/json.hpp"
+#include <bitset>
+#include <chrono>
 
-#include "logger.hpp"
+#include "utils/helpers/reverse_bitstring.hpp"
+
+using namespace std::string_literals;
+using namespace AER;
 
 namespace cunqa {
 namespace sim {
@@ -27,6 +30,26 @@ QuantumTask quantum_task_to_AER(const QuantumTask& quantum_task)
     };
 
     return QuantumTask(new_circuit, new_config);
+}
+
+
+void convert_standard_results_Aer(JSON& res, const int& num_clbits) 
+{
+    JSON counts = res.at("results")[0].at("data").at("counts").get<JSON>();
+    JSON modified_counts;
+    std::vector<std::string> keys_to_erase; 
+
+    for (const auto& [key, inner] : counts.items()) {
+        int decimalValue = std::stoi(key, nullptr, 16);
+        std::bitset<64> binary_key(decimalValue); // 64 is the maximun size of bitset. I need to give a const that is known at compile time so i choose this one
+        std::string binary_string = binary_key.to_string();
+        std::string trunc_bitstring(binary_string.rbegin(), binary_string.rbegin() + num_clbits); // Truncate out any unwanted zeros coming from the first hex character
+        std::string reversed_counts = reverse_string(trunc_bitstring);
+
+        modified_counts[reversed_counts] = inner; 
+    }
+
+    res.at("results")[0].at("data").at("counts") = modified_counts;
 }
 
 } // End of sim namespace

@@ -44,7 +44,7 @@ constexpr uint32_t MurmurHash3_x86_32(const char *key,
 
     //----------
     // body
-    for (int i = 0; i < nblocks; ++i) {
+    for (unsigned i = 0; i < nblocks; ++i) {
         uint32_t k1 = get_block(key, i);
 
         k1 *= c1;
@@ -66,11 +66,16 @@ constexpr uint32_t MurmurHash3_x86_32(const char *key,
     // returns the i:th tail byte.
     const unsigned tail_start = len - (len % 4);
     switch (len & 3) {
-    case 3: k1 ^= key[tail_start + 2] << 16;
-    case 2: k1 ^= key[tail_start + 1] << 8;
-    case 1: k1 ^= key[tail_start + 0];
-            k1 *= c1; k1 = rotl32(k1,15);
-            k1 *= c2; h1 ^= k1;
+    case 3: 
+        k1 ^= key[tail_start + 2] << 16;
+        [[fallthrough]];
+    case 2: 
+        k1 ^= key[tail_start + 1] << 8;
+        [[fallthrough]];
+    case 1: 
+        k1 ^= key[tail_start + 0];
+        k1 *= c1; k1 = rotl32(k1,15);
+        k1 *= c2; h1 ^= k1;
     };
 
     //----------

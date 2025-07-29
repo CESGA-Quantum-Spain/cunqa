@@ -5,6 +5,7 @@
 #include "backends/simulators/simulator_strategy.hpp"
 
 #include "utils/json.hpp"
+#include "logger.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -15,8 +16,8 @@ public:
     AerSimpleSimulator() = default;
     ~AerSimpleSimulator() override;
 
-    inline std::string get_name() const override { return "SimpleAER"; } 
-    JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) const override;
+    inline std::string get_name() const override {return "AerSimulator";} 
+    JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;
 };
 
 } // End of sim namespace
