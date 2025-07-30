@@ -187,8 +187,66 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="nbinput nblast docutils container">
+  <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>module<span class="w"> </span>load<span class="w"> </span>qmio/hpc<span class="w"> </span>gcc/12.3.0<span class="w"> </span>cunqa/0.3.1-python-3.9.9-mpi
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+qmio/hpc unloaded
+        Preparing the environment for use of the sistema software stack.
+        Please rebuild modules cache: module --ignore-cache avail
+
+qmio/hpc loaded
+gcccore/12.3.0 loaded
+binutils/2.40 loaded
+gcc/12.3.0 loaded
+sqlite/3.45.3 loaded
+libffi/3.4.2 loaded
+python/3.9.9 loaded
+nlohmann_json/3.11.3 loaded
+rust/1.75.0 loaded
+cmake/3.27.6 loaded
+
+imkl/2023.2.0 loaded
+ninja/1.9.0 loaded
+meson/1.4.0-python-3.9.9 loaded
+meson-python/0.16.0-python-3.9.9 loaded
+cython/3.0.9-python-3.9.9 loaded
+numpy/1.26.4-python-3.9.9 loaded
+pythran/0.15.0-python-3.9.9 loaded
+pybind11/2.12.0-python-3.9.9 loaded
+xsimd/12.1.1 loaded
+scipy/1.13.0-python-3.9.9 loaded
+llvm/16.0.0 loaded
+gmp/6.3.0 loaded
+mpfr/4.2.1 loaded
+mpc/1.3.1 loaded
+flint/3.1.2 loaded
+symengine/0.11.2 loaded
+symengine-python/0.11.0-python-3.9.9 loaded
+spdlog/1.9.2 loaded
+pylatexenc/2.10-python-3.9.9 loaded
+libgd/2.3.3 loaded
+nasm/2.16.03 loaded
+libjpeg-turbo/3.0.2 loaded
+matplotlib/3.5.3-python-3.9.9 loaded
+pandas/2.2.2-python-3.9.9 loaded
+seaborn/0.12.2-python-3.9.9 loaded
+hpcx-mt-ompi loaded
+qiskit/1.2.4-python-3.9.9-mpi loaded
+cunqa/0.3.1-python-3.9.9-mpi loaded
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
@@ -199,7 +257,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
@@ -216,9 +274,42 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-QPU 0, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
-QPU 1, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
-QPU 2, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ImportError</span>                               Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[3], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">cunqa</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> getQPUs
+<span class="ansi-green-intense-fg ansi-bold">      3</span> qpus  <span style="color: rgb(98,98,98)">=</span> getQPUs(local<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">False</span>)
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> q <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> qpus:
+
+File <span class="ansi-green-fg">~/cunqa/__init__.py:1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">cunqa</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">qjob</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> QJob, gather
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">cunqa</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">qutils</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> getQPUs
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">cunqa</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">transpile</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> transpiler
+
+File <span class="ansi-green-fg">~/cunqa/qjob.py:8</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">json</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">typing</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span>  Optional, Union, Any
+<span class="ansi-green-fg">----&gt; 8</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> QuantumCircuit
+<span class="ansi-green-intense-fg ansi-bold">      9</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">qasm2</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">exceptions</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> QASM2Error
+<span class="ansi-green-intense-fg ansi-bold">     10</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">exceptions</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">import</span> QiskitError
+
+File <span class="ansi-green-fg">/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/venv/lib/python3.9/site-packages/qiskit/__init__.py:38</span>
+<span class="ansi-green-intense-fg ansi-bold">     36</span>     _suppress_error <span style="color: rgb(98,98,98)">=</span> os<span style="color: rgb(98,98,98)">.</span>environ<span style="color: rgb(98,98,98)">.</span>get(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">QISKIT_SUPPRESS_1_0_IMPORT_ERROR</span><span style="color: rgb(175,0,0)">&#34;</span>, <span class="ansi-bold" style="color: rgb(0,135,0)">False</span>) <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">1</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     37</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">int</span>(_major) <span style="color: rgb(98,98,98)">&gt;</span> <span style="color: rgb(98,98,98)">0</span> <span class="ansi-bold" style="color: rgb(175,0,255)">and</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> _suppress_error:
+<span class="ansi-green-fg">---&gt; 38</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ImportError</span>(
+<span class="ansi-green-intense-fg ansi-bold">     39</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Qiskit is installed in an invalid environment that has both Qiskit &gt;=1.0</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     40</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> and an earlier version.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> You should create a new virtual environment, and ensure that you do not mix</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     42</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> dependencies between Qiskit &lt;1.0 and &gt;=1.0.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     43</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> Any packages that depend on </span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">qiskit-terra</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)"> are not compatible with Qiskit 1.0 and</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     44</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> will need to be updated.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     45</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> Qiskit unfortunately cannot enforce this requirement during environment resolution.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     46</span>             <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> See https://qisk.it/packaging-1-0 for more detail.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     47</span>         )
+<span class="ansi-green-intense-fg ansi-bold">     49</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">_accelerate</span>
+<span class="ansi-green-intense-fg ansi-bold">     50</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,0,255)">qiskit</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">_numpy_compat</span>
+
+<span class="ansi-red-fg">ImportError</span>: Qiskit is installed in an invalid environment that has both Qiskit &gt;=1.0 and an earlier version. You should create a new virtual environment, and ensure that you do not mix dependencies between Qiskit &lt;1.0 and &gt;=1.0. Any packages that depend on &#39;qiskit-terra&#39; are not compatible with Qiskit 1.0 and will need to be updated. Qiskit unfortunately cannot enforce this requirement during environment resolution. See https://qisk.it/packaging-1-0 for more detail.
 </pre></div></div>
 </div>
 <section id="Examples-for-optimizations">
@@ -446,7 +537,7 @@ Total optimization time:  28.403029203414917  s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_14_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_14_0.png" />
+<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_15_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_15_0.png" />
 </div>
 </div>
 </section>
@@ -653,7 +744,7 @@ Total optimization time:  29.011065244674683  s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_26_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_26_0.png" />
+<img alt="../_images/_examples_Optimizers_I_upgrading_parameters_27_0.png" src="../_images/_examples_Optimizers_I_upgrading_parameters_27_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">

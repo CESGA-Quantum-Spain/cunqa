@@ -278,7 +278,7 @@
 <td><p>Class method to send a qubit from the current circuit to a remote one.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.qsend" title="cunqa.circuit.CunqaCircuit.qsend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qsend</span></code></a></p></td>
-<td><p>Class method to send a qubit from the current circuit to a remote one.</p></td>
+<td><p>Class method to send a qubit from the current circuit to another one.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.r" title="cunqa.circuit.CunqaCircuit.r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">r</span></code></a></p></td>
 <td><p>Class method to apply r gate to the given qubit.</p></td>
@@ -655,21 +655,15 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.measure_and_send">
-<span class="sig-name descname"><span class="pre">measure_and_send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.measure_and_send" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">measure_and_send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.measure_and_send" title="Link to this definition"></a></dt>
 <dd><p>Class method to measure and send a bit from the current circuit to a remote one.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p>
-</dd>
-</dl>
-<hr class="docutils" />
+<section id="args">
+<h2>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h2>
 <blockquote>
-<div><p>control_qubit (int): control qubit from self.</p>
-<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit to which we will send the gate or the circuit itself.</p>
-<p>target_qubit (int): qubit where the gate will be conditionally applied.</p>
-<p>param (float or int): parameter in case the gate provided is parametric.</p>
+<div><p>qubit (int): qubit to be measured and sent.</p>
+<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit or circuit to which the result of the measurement is sent.</p>
 </div></blockquote>
-<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit to which we will send the gate or the circuit itself.</p>
+</section>
 </dd></dl>
 
 <dl class="py method">
@@ -688,23 +682,25 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.qrecv">
-<span class="sig-name descname"><span class="pre">qrecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recv_qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qrecv" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qrecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qrecv" title="Link to this definition"></a></dt>
 <dd><p>Class method to send a qubit from the current circuit to a remote one.</p>
-<section id="args">
-<h2>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h2>
-<p>sent_qubit (int): control qubit from self.</p>
-<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit to which we will send the gate or the circuit itself.</p>
+<section id="id1">
+<h2>Args:<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>qubit (int): ancilla to which the received qubit is assigned.</p>
+<p>control_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit from which the qubit is received.</p>
+</div></blockquote>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.qsend">
-<span class="sig-name descname"><span class="pre">qsend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sent_qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qsend" title="Link to this definition"></a></dt>
-<dd><p>Class method to send a qubit from the current circuit to a remote one.</p>
-<section id="id1">
-<h2>Args:<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<p>sent_qubit (int): control qubit from self.</p>
-<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit to which we will send the gate or the circuit itself.</p>
+<span class="sig-name descname"><span class="pre">qsend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qsend" title="Link to this definition"></a></dt>
+<dd><p>Class method to send a qubit from the current circuit to another one.</p>
+<section id="id2">
+<h2>Args:<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>qubit (int): qubit to be sent.</p>
+<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit or circuit to which the qubit is sent.</p>
 </section>
 </dd></dl>
 
@@ -725,19 +721,17 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.remote_c_if">
-<span class="sig-name descname"><span class="pre">remote_c_if</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.remote_c_if" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">remote_c_if</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.remote_c_if" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply a distributed instruction as a gate condioned by a non local classical measurement from a remote circuit and applied locally.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter in case the gate provided is parametric.</p></li>
-<li><p><strong>control_qubit</strong> (<em>int</em>) – control qubit from self.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em>, </em><em>&lt;class 'cunqa.circuit.CunqaCircuit'&gt;</em>) – id of the circuit to which we will send the gate or the circuit itself.</p></li>
-<li><p><strong>target_qubit</strong> (<em>int</em>) – qubit where the gate will be conditionally applied.</p></li>
-</ul>
-</dd>
-</dl>
+<section id="id3">
+<h2>Args:<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>gate (str): gate to be applied. Has to be supported by CunqaCircuit.</p>
+<p>target_qubits (int, list[int]): qubit or qubits to which the gate is conditionally applied.</p>
+<p>param (float or int): parameter in case the gate provided is parametric.</p>
+<p>target_circuit (str, &lt;class ‘cunqa.circuit.CunqaCircuit’&gt;): id of the circuit or circuit from which the condition is sent.</p>
+</div></blockquote>
+</section>
 </dd></dl>
 
 <dl class="py method">
