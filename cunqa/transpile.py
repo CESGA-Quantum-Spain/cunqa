@@ -59,15 +59,18 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
             else:
                 qc = from_json_to_qc(circuit)
     
-        elif isinstance(circuit, str):
+        elif isinstance(circuit, str): 
             qc = QuantumCircuit.from_qasm_str(circuit)
+            if initial_layout is not None and len(initial_layout) != qc.num_qubits:
+                logger.error(f"initial_layout must be of the size of the circuit: {qc.num_qubits} [{TypeError.__name__}].")
+                raise SystemExit # User's level
 
         else:
             logger.error(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or dict, but {type(circuit)} was provided [{TypeError.__name__}].")
             raise SystemExit # User's level
 
     except QASM2Error as error:
-        logger.error(f"Error with QASM2 string, please check that the sintex is correct [{type(error).__name__}]: {error}.")
+        logger.error(f"Error with QASM2 string, please check that the syntax is correct [{type(error).__name__}]: {error}.")
         raise SystemExit # User's level
     
     except  QiskitError as error:

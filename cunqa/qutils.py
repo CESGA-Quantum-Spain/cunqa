@@ -47,6 +47,7 @@ def qraise(n, t, *,
            quantum_comm = False,  
            simulator = None, 
            fakeqmio = False, 
+           calibrations = None,
            family = None, 
            cloud = True, 
            cores = None, 
@@ -56,9 +57,9 @@ def qraise(n, t, *,
            qpus_per_node= None, 
            backend = None) -> Union[tuple, str]:
     """
-    Raises a QPU and returns its job_id.
+    Raises a QPU and returns its family name/job_id.
 
-    Args
+    Args:
         n (int): number of QPUs to be raised.
         t (str, format: 'D-HH:MM:SS'): maximun time that the classical resources will be reserved for the QPU.
         
@@ -67,9 +68,9 @@ def qraise(n, t, *,
         quantum_comm (bool): if True the raised QPUs have quantum communications.
         simulator (str): name of the desired simulator to use. Default in this branch is Cunqasimulator.
         family (str): name to identify the group of QPUs raised on the specific call of the function.
-        mode (str): infrastructure type for the raised QPUs:  "hpc" or "cloud". First one associates QPUs to different nodes.
+        cloud (str): with this option multiple QPUs can fall on the same node, in contrast to the deafult 'hpc' mode where QPUs are treated as GPUs each associated to a node.
         cores (str):  number of cores for the SLURM job.
-        mem_per_qpu (str): memory to allocate for each QPU, format to use is  "xG".
+        mem_per_qpu (str): memory to allocate for each QPU, with format "xG", x being your number.
         n_nodes (str): number of nodes for the SLURM job.
         node_list (str): option to select specifically on which nodes the simulation job should run.
         qpus_per_node (str): sets the number of QPUs that should be raised on each requested node.
@@ -148,14 +149,15 @@ def qraise(n, t, *,
 
         return (family, str(job_id)) if family is not None else str(job_id)
     
-    except Exception as error:
-        raise QRaiseError(f"Unable to raise requested QPUs [{error}].")
+    except subprocess.CalledProcessError as error:
+        logger.error(f"An error was encoutered while qraising:\n {error.stderr}.")
+        raise QRaiseError
 
 def qdrop(*families: Union[tuple, str]):
     """
     Drops the QPU families corresponding to the the entered QPU objects. By default, all raised QPUs will be dropped.
 
-    Args
+    Args:
         qpus (tuple(<class cunqa.qpu.QPU>)): list of QPUs to drop. All QPUs that share a qraise will these will drop.
     """
     
@@ -207,7 +209,7 @@ def infoQPUs(local: bool = True, node_name: Optional[str] = None) -> "list[dict]
     """
     Global function that returns information about the QPUs available either in the local node or globaly.
 
-    It is possible also to filter by `node_names`. If `local = True` and `node_names` provided are different from the local node, only local node will be chosen.
+    It is possible also to filter by `node_name`. If `local = True` and the `node_name` provided is different from the local node, only local node will be chosen.
     """
 
     try:
@@ -305,6 +307,7 @@ def getQPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
     qpus = []
     for id, info in targets.items():
         client = QClient()
+        node_mode = (info["net"]["nodename"], info["net"]["mode"])
         endpoint = (info["net"]["ip"], info["net"]["port"])
         qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint))
     if len(qpus) != 0:

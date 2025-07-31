@@ -33,10 +33,10 @@ class CunqaCircuitError(Exception):
     pass
 
 class CunqaCircuit:
-    """
+    f"""
     Class to define a quantum circuit for the `cunqa` api.
 
-    Supported gates
+    Supported gates:
         {all_gates!r}
     TODO: Indicate supported gates, supported gates dor send() and recv(),... etc
 
@@ -1451,7 +1451,7 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
     Return:
         True if the circuit is considered parametric, False if it's not.
     """
-    parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
+    parametric_gates = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz", "d_c_if_rx","d_c_if_ry","d_c_if_rz", "u2", "r", "u", "u3", "cu3", "cu"]
     if isinstance(circuit, QuantumCircuit):
         for instruction in circuit.data:
             if instruction.operation.name in parametric_gates:
