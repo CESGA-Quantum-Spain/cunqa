@@ -12,6 +12,7 @@ cunqa.qpu.QPU
    
    
    .. rubric:: Attributes
+==========
 
    .. autosummary::
    

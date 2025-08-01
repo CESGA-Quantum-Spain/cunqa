@@ -12,6 +12,7 @@ cunqa.result.Result
    
    
    .. rubric:: Attributes
+==========
 
    .. autosummary::
    

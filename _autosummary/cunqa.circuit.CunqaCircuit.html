@@ -277,41 +277,36 @@ In this scheme, generally an acilla qubit would be neccesary to perform the comm
 </div>
 <p>It is important to note that the qubit used for the communication, the one send, after the operation it is reset, so in a general basis it wouldn’t need to be measured.
 If we want to send more qubits afer, we can use it since it is reset to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">ivar quantum_regs<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary of quantum registers of the circuit as {“name” : &lt;list of qubits assigned&gt;}.</p>
+</dd>
+<dt class="field-even">ivar classical_regs<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of classical registers of the circuit as {“name” : &lt;list of clbits assigned&gt;}</p>
+</dd>
+<dt class="field-odd">ivar instructions<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Set of operations applied to the circuit.</p>
+</dd>
+<dt class="field-even">ivar is_parametric<span class="colon">:</span></dt>
+<dd class="field-even"><p>Weather the circuit contains parametric gates.</p>
+</dd>
+<dt class="field-odd">ivar has_cc<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Weather the circuit contains classical communications with other circuit.</p>
+</dd>
+<dt class="field-even">ivar is_dynamic<span class="colon">:</span></dt>
+<dd class="field-even"><p>Weather the circuit has local non-unitary operations.</p>
+</dd>
+<dt class="field-odd">ivar sending_to<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of circuit ids to which the current circuit is sending measurement outcomes or qubits.</p>
+</dd>
+</dl>
 <p class="rubric">Attributes</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_clbits</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_parametric</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_cc</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_dynamic</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">instructions</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantum_regs</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">classical_regs</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sending_to</span></code></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.info">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.info" title="Link to this definition"></a></dt>
+<dd><p>Information about the main class attributes given as a dictinary.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.from_instructions">
 <span class="sig-name descname"><span class="pre">from_instructions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="Link to this definition"></a></dt>
@@ -946,6 +941,43 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 </section>
 </dd></dl>
 
+<hr class="docutils" />
+<blockquote>
+<div><table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.info" title="cunqa.circuit.CunqaCircuit.info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code></a></p></td>
+<td><p>Information about the main class attributes given as a dictinary.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_clbits</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_parametric</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_cc</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_dynamic</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">instructions</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantum_regs</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">classical_regs</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sending_to</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 </section>
 
 

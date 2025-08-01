@@ -12,6 +12,7 @@ cunqa.mappers.QJobMapper
    
    
    .. rubric:: Attributes
+==========
 
    .. autosummary::
    
