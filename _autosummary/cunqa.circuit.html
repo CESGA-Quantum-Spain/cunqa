@@ -22,7 +22,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cunqa.circuit.flatten" href="cunqa.circuit.flatten.html" />
+    <link rel="next" title="cunqa.circuit.from_json_to_qc" href="cunqa.circuit.from_json_to_qc.html" />
     <link rel="prev" title="cunqa.backend.BackendData" href="cunqa.backend.BackendData.html" /> 
 </head>
 
@@ -79,9 +79,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.circuit</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.flatten.html">cunqa.circuit.flatten</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.generate_id.html">cunqa.circuit.generate_id</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
@@ -187,18 +185,12 @@
              
   <section id="module-cunqa.circuit">
 <span id="cunqa-circuit"></span><h1>cunqa.circuit<a class="headerlink" href="#module-cunqa.circuit" title="Link to this heading"></a></h1>
-<p>Holds our custom circuit class and functions to transform between circuit formats.</p>
+<p>Holds Cunqa’s custom circuit class and functions to translate its instructions into other formats for circuit definition.</p>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.flatten.html#cunqa.circuit.flatten" title="cunqa.circuit.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html#cunqa.circuit.from_json_to_qc" title="cunqa.circuit.from_json_to_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json_to_qc</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html#cunqa.circuit.from_json_to_qc" title="cunqa.circuit.from_json_to_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json_to_qc</span></code></a></p></td>
 <td><p>Function to transform a circuit in json dict format to &lt;class 'qiskit.circuit.quantumcircuit.QuantumCircuit'&gt;.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.generate_id.html#cunqa.circuit.generate_id" title="cunqa.circuit.generate_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_id</span></code></a></p></td>
-<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.qc_to_json.html#cunqa.circuit.qc_to_json" title="cunqa.circuit.qc_to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qc_to_json</span></code></a></p></td>
 <td><p>Transforms a QuantumCircuit to json dict.</p></td>
@@ -209,7 +201,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a></p></td>
-<td><p>Class to define a quantum circuit for the <cite>cunqa</cite> api.</p></td>
+<td><p>Class to define a quantum circuit for the <code class="docutils literal notranslate"><span class="pre">cunqa</span></code> api.</p></td>
 </tr>
 </tbody>
 </table>
@@ -228,7 +220,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cunqa.backend.BackendData.html" class="btn btn-neutral float-left" title="cunqa.backend.BackendData" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.circuit.flatten.html" class="btn btn-neutral float-right" title="cunqa.circuit.flatten" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.circuit.from_json_to_qc.html" class="btn btn-neutral float-right" title="cunqa.circuit.from_json_to_qc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

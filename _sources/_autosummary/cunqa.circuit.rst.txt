@@ -15,9 +15,7 @@ cunqa.circuit
       :toctree:
       :nosignatures:
    
-      flatten
       from_json_to_qc
-      generate_id
       qc_to_json
    
    
