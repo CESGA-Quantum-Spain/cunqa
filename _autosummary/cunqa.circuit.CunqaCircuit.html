@@ -277,29 +277,16 @@ In this scheme, generally an acilla qubit would be neccesary to perform the comm
 </div>
 <p>It is important to note that the qubit used for the communication, the one send, after the operation it is reset, so in a general basis it wouldn’t need to be measured.
 If we want to send more qubits afer, we can use it since it is reset to zero.</p>
-<dl class="field-list simple">
-<dt class="field-odd">ivar quantum_regs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary of quantum registers of the circuit as {“name” : &lt;list of qubits assigned&gt;}.</p>
-</dd>
-<dt class="field-even">ivar classical_regs<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary of classical registers of the circuit as {“name” : &lt;list of clbits assigned&gt;}</p>
-</dd>
-<dt class="field-odd">ivar instructions<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Set of operations applied to the circuit.</p>
-</dd>
-<dt class="field-even">ivar is_parametric<span class="colon">:</span></dt>
-<dd class="field-even"><p>Weather the circuit contains parametric gates.</p>
-</dd>
-<dt class="field-odd">ivar has_cc<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Weather the circuit contains classical communications with other circuit.</p>
-</dd>
-<dt class="field-even">ivar is_dynamic<span class="colon">:</span></dt>
-<dd class="field-even"><p>Weather the circuit has local non-unitary operations.</p>
-</dd>
-<dt class="field-odd">ivar sending_to<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of circuit ids to which the current circuit is sending measurement outcomes or qubits.</p>
-</dd>
-</dl>
+<p>Atributes:</p>
+<blockquote>
+<div><p>quantum_regs: Dictionary of quantum registers of the circuit as {“name” : &lt;list of qubits assigned&gt;}.</p>
+<p>classical_regs: Dictionary of classical registers of the circuit as {“name” : &lt;list of clbits assigned&gt;}</p>
+<p>instructions: Set of operations applied to the circuit.</p>
+<p>is_parametric: Weather the circuit contains parametric gates.</p>
+<p>has_cc: Weather the circuit contains classical communications with other circuit.</p>
+<p>is_dynamic: Weather the circuit has local non-unitary operations.</p>
+<p>sending_to: List of circuit ids to which the current circuit is sending measurement outcomes or qubits.</p>
+</div></blockquote>
 <p class="rubric">Attributes</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.info">
