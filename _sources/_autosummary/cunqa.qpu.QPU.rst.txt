@@ -11,17 +11,6 @@ cunqa.qpu.QPU
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-      ~QPU.run
-   
-   
-
-   
-   
    .. rubric:: Attributes
 
    .. autosummary::

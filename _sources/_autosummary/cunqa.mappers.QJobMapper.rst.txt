@@ -11,16 +11,6 @@ cunqa.mappers.QJobMapper
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-   
-   
-
-   
-   
    .. rubric:: Attributes
 
    .. autosummary::

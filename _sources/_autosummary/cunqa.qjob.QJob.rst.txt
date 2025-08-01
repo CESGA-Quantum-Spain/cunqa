@@ -11,18 +11,6 @@ cunqa.qjob.QJob
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-      ~QJob.submit
-      ~QJob.upgrade_parameters
-   
-   
-
-   
-   
    .. rubric:: Attributes
 
    .. autosummary::

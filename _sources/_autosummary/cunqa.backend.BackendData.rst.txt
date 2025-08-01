@@ -11,27 +11,6 @@ cunqa.backend.BackendData
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-      ~BackendData.clear
-      ~BackendData.copy
-      ~BackendData.fromkeys
-      ~BackendData.get
-      ~BackendData.items
-      ~BackendData.keys
-      ~BackendData.pop
-      ~BackendData.popitem
-      ~BackendData.setdefault
-      ~BackendData.update
-      ~BackendData.values
-   
-   
-
-   
-   
    .. rubric:: Attributes
 
    .. autosummary::

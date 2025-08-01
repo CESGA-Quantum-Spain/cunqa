@@ -206,7 +206,7 @@ This sending operations require that the virtual QPUs to which the circuits are 
 <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.swap" title="cunqa.circuit.CunqaCircuit.swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">swap()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cx" title="cunqa.circuit.CunqaCircuit.cx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cy" title="cunqa.circuit.CunqaCircuit.cy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cy()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cz" title="cunqa.circuit.CunqaCircuit.cz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cz()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.csx" title="cunqa.circuit.CunqaCircuit.csx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">csx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cp" title="cunqa.circuit.CunqaCircuit.cp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cp()</span></code></a>,
 <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu" title="cunqa.circuit.CunqaCircuit.cu"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu1" title="cunqa.circuit.CunqaCircuit.cu1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu1()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu3" title="cunqa.circuit.CunqaCircuit.cu3"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu3()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rxx" title="cunqa.circuit.CunqaCircuit.rxx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rxx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ryy" title="cunqa.circuit.CunqaCircuit.ryy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ryy()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rzz" title="cunqa.circuit.CunqaCircuit.rzz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzz()</span></code></a>,
 <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rzx" title="cunqa.circuit.CunqaCircuit.rzx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.crx" title="cunqa.circuit.CunqaCircuit.crx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cry" title="cunqa.circuit.CunqaCircuit.cry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cry()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.crz" title="cunqa.circuit.CunqaCircuit.crz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crz()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ecr" title="cunqa.circuit.CunqaCircuit.ecr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ecr()</span></code></a>,</p>
-<p><strong>Thre-qubits gates:</strong>
+<p><strong>Three-qubits gates:</strong>
 <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccx" title="cunqa.circuit.CunqaCircuit.ccx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccx()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccy" title="cunqa.circuit.CunqaCircuit.ccy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccy()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccz" title="cunqa.circuit.CunqaCircuit.ccz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccz()</span></code></a>, <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cswap" title="cunqa.circuit.CunqaCircuit.cswap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cswap()</span></code></a>.</p>
 <p><strong>n-qubits gates:</strong>
 <a class="reference internal" href="#cunqa.circuit.CunqaCircuit.unitary" title="cunqa.circuit.CunqaCircuit.unitary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unitary()</span></code></a>.</p>
@@ -232,7 +232,7 @@ This sending operations require that the virtual QPUs to which the circuits are 
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Once the circuit is ready, it is ready to be sent to a QPU by the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">qpu.run()</span></code>.</p>
+<p>Once the circuit is ready, it is ready to be sent to a QPU by the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">cunqa.qpu.run()</span></code>.</p>
 </section>
 <section id="classical-communications-among-circuits">
 <h2>Classical communications among circuits<a class="headerlink" href="#classical-communications-among-circuits" title="Link to this heading"></a></h2>
@@ -247,7 +247,7 @@ We can define the sending of a classical bit from one circuit to another by:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Then, circuits can be sent to QPUs that support classical communications using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">mappers.run_distributed()</span></code> function.</p>
+<p>Then, circuits can be sent to QPUs that support classical communications using the <a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed" title="cunqa.mappers.run_distributed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cunqa.mappers.run_distributed()</span></code></a> function.</p>
 <p>Circuits can also be referend to through their <em>id</em> string. When a CunqaCircuit is created, by default a random <em>id</em> is assigned, but it can also be personalized:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
@@ -275,164 +275,8 @@ In this scheme, generally an acilla qubit would be neccesary to perform the comm
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.c_if" title="cunqa.circuit.CunqaCircuit.c_if"><code class="xref py py-obj docutils literal notranslate"><span class="pre">c_if</span></code></a></p></td>
-<td><p>Method for implementing a gate contiioned to a classical measurement.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccx" title="cunqa.circuit.CunqaCircuit.ccx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ccx</span></code></a></p></td>
-<td><p>Class method to apply ccx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccy" title="cunqa.circuit.CunqaCircuit.ccy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ccy</span></code></a></p></td>
-<td><p>Class method to apply ccy gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ccz" title="cunqa.circuit.CunqaCircuit.ccz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ccz</span></code></a></p></td>
-<td><p>Class method to apply ccz gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cp" title="cunqa.circuit.CunqaCircuit.cp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cp</span></code></a></p></td>
-<td><p>Class method to apply cp gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.crx" title="cunqa.circuit.CunqaCircuit.crx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crx</span></code></a></p></td>
-<td><p>Class method to apply crx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cry" title="cunqa.circuit.CunqaCircuit.cry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cry</span></code></a></p></td>
-<td><p>Class method to apply cry gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.crz" title="cunqa.circuit.CunqaCircuit.crz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crz</span></code></a></p></td>
-<td><p>Class method to apply crz gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cswap" title="cunqa.circuit.CunqaCircuit.cswap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cswap</span></code></a></p></td>
-<td><p>Class method to apply cswap gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.csx" title="cunqa.circuit.CunqaCircuit.csx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csx</span></code></a></p></td>
-<td><p>Class method to apply csx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu" title="cunqa.circuit.CunqaCircuit.cu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cu</span></code></a></p></td>
-<td><p>Class method to apply cu gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu1" title="cunqa.circuit.CunqaCircuit.cu1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cu1</span></code></a></p></td>
-<td><p>Class method to apply cu1 gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cu3" title="cunqa.circuit.CunqaCircuit.cu3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cu3</span></code></a></p></td>
-<td><p>Class method to apply cu3 gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cx" title="cunqa.circuit.CunqaCircuit.cx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cx</span></code></a></p></td>
-<td><p>Class method to apply cx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cy" title="cunqa.circuit.CunqaCircuit.cy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cy</span></code></a></p></td>
-<td><p>Class method to apply cy gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.cz" title="cunqa.circuit.CunqaCircuit.cz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cz</span></code></a></p></td>
-<td><p>Class method to apply cz gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ecr" title="cunqa.circuit.CunqaCircuit.ecr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ecr</span></code></a></p></td>
-<td><p>Class method to apply ecr gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="cunqa.circuit.CunqaCircuit.from_instructions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_instructions</span></code></a></p></td>
-<td><p>Class method to</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.h" title="cunqa.circuit.CunqaCircuit.h"><code class="xref py py-obj docutils literal notranslate"><span class="pre">h</span></code></a></p></td>
-<td><p>Class method to apply h gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.id" title="cunqa.circuit.CunqaCircuit.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
-<td><p>Class method to apply id gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.measure" title="cunqa.circuit.CunqaCircuit.measure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure</span></code></a></p></td>
-<td><p>Class method to add a measurement of a qubit or a list of qubits and to register that measurement in the given classical bits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.measure_all" title="cunqa.circuit.CunqaCircuit.measure_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_all</span></code></a></p></td>
-<td><p>Class to apply a global measurement of all of the qubits of the circuit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.measure_and_send" title="cunqa.circuit.CunqaCircuit.measure_and_send"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_and_send</span></code></a></p></td>
-<td><p>Class method to measure and send a bit from the current circuit to a remote one.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.p" title="cunqa.circuit.CunqaCircuit.p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code></a></p></td>
-<td><p>Class method to apply p gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.qrecv" title="cunqa.circuit.CunqaCircuit.qrecv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qrecv</span></code></a></p></td>
-<td><p>Class method to send a qubit from the current circuit to a remote one.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.qsend" title="cunqa.circuit.CunqaCircuit.qsend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qsend</span></code></a></p></td>
-<td><p>Class method to send a qubit from the current circuit to another one.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.r" title="cunqa.circuit.CunqaCircuit.r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">r</span></code></a></p></td>
-<td><p>Class method to apply r gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.remote_c_if" title="cunqa.circuit.CunqaCircuit.remote_c_if"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remote_c_if</span></code></a></p></td>
-<td><p>Class method to apply a distributed instruction as a gate condioned by a non local classical measurement from a remote circuit and applied locally.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rx" title="cunqa.circuit.CunqaCircuit.rx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rx</span></code></a></p></td>
-<td><p>Class method to apply rx gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rxx" title="cunqa.circuit.CunqaCircuit.rxx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rxx</span></code></a></p></td>
-<td><p>Class method to apply rxx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ry" title="cunqa.circuit.CunqaCircuit.ry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ry</span></code></a></p></td>
-<td><p>Class method to apply ry gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.ryy" title="cunqa.circuit.CunqaCircuit.ryy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ryy</span></code></a></p></td>
-<td><p>Class method to apply ryy gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rz" title="cunqa.circuit.CunqaCircuit.rz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rz</span></code></a></p></td>
-<td><p>Class method to apply rz gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rzx" title="cunqa.circuit.CunqaCircuit.rzx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rzx</span></code></a></p></td>
-<td><p>Class method to apply rzx gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.rzz" title="cunqa.circuit.CunqaCircuit.rzz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rzz</span></code></a></p></td>
-<td><p>Class method to apply rzz gate to the given qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.s" title="cunqa.circuit.CunqaCircuit.s"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s</span></code></a></p></td>
-<td><p>Class method to apply s gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.sdg" title="cunqa.circuit.CunqaCircuit.sdg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sdg</span></code></a></p></td>
-<td><p>Class method to apply sdg gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.swap" title="cunqa.circuit.CunqaCircuit.swap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap</span></code></a></p></td>
-<td><p>Class method to apply swap gate to the given qubits.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.sx" title="cunqa.circuit.CunqaCircuit.sx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sx</span></code></a></p></td>
-<td><p>Class method to apply sx gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.sxdg" title="cunqa.circuit.CunqaCircuit.sxdg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sxdg</span></code></a></p></td>
-<td><p>Class method to apply sxdg gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.t" title="cunqa.circuit.CunqaCircuit.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
-<td><p>Class method to apply t gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.tdg" title="cunqa.circuit.CunqaCircuit.tdg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tdg</span></code></a></p></td>
-<td><p>Class method to apply tdg gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.u" title="cunqa.circuit.CunqaCircuit.u"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code></a></p></td>
-<td><p>Class method to apply u gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.u1" title="cunqa.circuit.CunqaCircuit.u1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u1</span></code></a></p></td>
-<td><p>Class method to apply u1 gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.u2" title="cunqa.circuit.CunqaCircuit.u2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u2</span></code></a></p></td>
-<td><p>Class method to apply u2 gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.u3" title="cunqa.circuit.CunqaCircuit.u3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u3</span></code></a></p></td>
-<td><p>Class method to apply u3 gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.unitary" title="cunqa.circuit.CunqaCircuit.unitary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unitary</span></code></a></p></td>
-<td><p>Class method to apply a unitary gate created from an unitary matrix provided.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.x" title="cunqa.circuit.CunqaCircuit.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
-<td><p>Class method to apply x gate to the given qubit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.y" title="cunqa.circuit.CunqaCircuit.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
-<td><p>Class method to apply y gate to the given qubit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.z" title="cunqa.circuit.CunqaCircuit.z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code></a></p></td>
-<td><p>Class method to apply z gate to the given qubit.</p></td>
-</tr>
-</tbody>
-</table>
+<p>It is important to note that the qubit used for the communication, the one send, after the operation it is reset, so in a general basis it wouldn’t need to be measured.
+If we want to send more qubits afer, we can use it since it is reset to zero.</p>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>

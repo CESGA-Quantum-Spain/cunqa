@@ -11,15 +11,4 @@ cunqa.backend.Backend
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-      ~Backend.info
-   
-   
-
-   
-   
    

@@ -11,67 +11,6 @@ cunqa.circuit.CunqaCircuit
 
    
    
-   .. rubric:: Methods
-
-   .. autosummary::
-      :nosignatures:
-   
-      ~CunqaCircuit.c_if
-      ~CunqaCircuit.ccx
-      ~CunqaCircuit.ccy
-      ~CunqaCircuit.ccz
-      ~CunqaCircuit.cp
-      ~CunqaCircuit.crx
-      ~CunqaCircuit.cry
-      ~CunqaCircuit.crz
-      ~CunqaCircuit.cswap
-      ~CunqaCircuit.csx
-      ~CunqaCircuit.cu
-      ~CunqaCircuit.cu1
-      ~CunqaCircuit.cu3
-      ~CunqaCircuit.cx
-      ~CunqaCircuit.cy
-      ~CunqaCircuit.cz
-      ~CunqaCircuit.ecr
-      ~CunqaCircuit.from_instructions
-      ~CunqaCircuit.h
-      ~CunqaCircuit.id
-      ~CunqaCircuit.measure
-      ~CunqaCircuit.measure_all
-      ~CunqaCircuit.measure_and_send
-      ~CunqaCircuit.p
-      ~CunqaCircuit.qrecv
-      ~CunqaCircuit.qsend
-      ~CunqaCircuit.r
-      ~CunqaCircuit.remote_c_if
-      ~CunqaCircuit.reset
-      ~CunqaCircuit.rx
-      ~CunqaCircuit.rxx
-      ~CunqaCircuit.ry
-      ~CunqaCircuit.ryy
-      ~CunqaCircuit.rz
-      ~CunqaCircuit.rzx
-      ~CunqaCircuit.rzz
-      ~CunqaCircuit.s
-      ~CunqaCircuit.sdg
-      ~CunqaCircuit.swap
-      ~CunqaCircuit.sx
-      ~CunqaCircuit.sxdg
-      ~CunqaCircuit.t
-      ~CunqaCircuit.tdg
-      ~CunqaCircuit.u
-      ~CunqaCircuit.u1
-      ~CunqaCircuit.u2
-      ~CunqaCircuit.u3
-      ~CunqaCircuit.unitary
-      ~CunqaCircuit.x
-      ~CunqaCircuit.y
-      ~CunqaCircuit.z
-   
-   
-
-   
-   
    .. rubric:: Attributes
 
    .. autosummary::
