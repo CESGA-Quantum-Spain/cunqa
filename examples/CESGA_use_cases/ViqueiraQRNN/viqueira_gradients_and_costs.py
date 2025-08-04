@@ -17,8 +17,8 @@ from typing import  Union, Any, Optional
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.circuit import CunqaCircuit
-from viqueira_EMCZ_circuit import CircuitQRNN
-from viqueira_EMCZ_model import ViqueiraQRNN
+from viqueira_QRNN_circuit import CircuitQRNN
+from viqueira_QRNN_model import ViqueiraQRNN
 from cunqa.logger import logger
 from cunqa.qjob import QJob, gather
 

@@ -17,7 +17,7 @@ from random import randint
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from viqueira_EMCZ_circuit import CircuitQRNN
+from viqueira_QRNN_circuit import CircuitQRNN
 from viqueira_gradients_and_costs import GradientMethod, CostFunction
 from cunqa.logger import logger
 from cunqa.qutils import getQPUs

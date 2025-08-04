@@ -21,7 +21,7 @@ from cunqa.qpu import QPU
 from cunqa.qjob import QJob
 
 
-class CircuitEMCZError(Exception):
+class CircuitQRNNError(Exception):
     """Exception for error during EMC circuit creation."""
     pass
 
@@ -53,7 +53,7 @@ def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta:
         pass
     else:
         logger.error(f"Theta must have lenght equal to {total_lenght} but a lenght {len(theta)} vector was provided.")
-        raise  CircuitEMCZError
+        raise  CircuitQRNNError
     
     # Slice theta into the parameters that will be used for the encoding part (orange on the image),
     # the evolution part (blue on the image) and the final evolution part (white on the image).
@@ -117,7 +117,7 @@ def add_EMCZ3_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta
         pass
     else:
         logger.error(f"Theta must have lenght equal to {total_lenght} but a lenght {len(theta)} vector was provided.")
-        raise  CircuitEMCZError
+        raise  CircuitQRNNError
     
     # Slice theta into the parameters that will be used for the encoding part (orange on the image),
     # the evolution part (blue on the image) and the final evolution part (white on the image).
@@ -209,7 +209,7 @@ class CircuitQRNN:
                 add_ansatz(self.circuit, nE, nM, x_init, theta_init, repeat_encode, repeat_evolution, time_step)
             except Exception as error:
                 logger.error(f"An error occurred while creating the circuit [{error.__name__}].")
-                raise CircuitEMCZError
+                raise CircuitQRNNError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
             self.circuit.reset([i for i in range(nE)]) # This instruction needs to be implemented hehe        
@@ -271,7 +271,7 @@ class CircuitQRNN:
 
         except Exception as e:
             logger.error(f"Error while running the EMCZ circuit on a QPU:\n {e}")
-            raise CircuitEMCZError
+            raise CircuitQRNNError
         
         return qjob
           
