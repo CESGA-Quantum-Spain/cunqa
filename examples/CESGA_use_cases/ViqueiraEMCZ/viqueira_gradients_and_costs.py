@@ -17,11 +17,9 @@ from typing import  Union, Any, Optional
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.circuit import CunqaCircuit
-from viqueira_EMCZ_circuit import CircuitEMCZ
-from viqueira_EMCZ_model import ViqueiraEMCZModel
+from viqueira_EMCZ_circuit import CircuitQRNN
+from viqueira_EMCZ_model import ViqueiraQRNN
 from cunqa.logger import logger
-from cunqa.qutils import getQPUs, qraise, qdrop, QRaiseError
-from cunqa.mappers import run_distributed
 from cunqa.qjob import QJob, gather
 
 class CostFunctionError(Exception):
@@ -36,12 +34,15 @@ class CostFunction:
 
         if choose_function == "rmse":
             self.function = self.rmse
+            self.deriv = self.rmse_deriv
 
         # Add more cost functions as needed
 
         else:
             logger.error(f"Chosen cost function is not supported: {choose_function}.")
             raise CostFunctionError
+
+    #################### COST FUNCTIONS ####################
 
     def rmse(self, prediction, y_true):
         """
@@ -53,6 +54,15 @@ class CostFunction:
 
         return math.sqrt(sum([(prediction[i] - y_true[i])**2 for i in range(len(y_true))])/len(y_true)) # if they are np.arrays the for can be eliminated
     
+    #################### DERIVATIVES ####################
+
+    def rmse_deriv(self, prediction, y_true):
+        rmse = self.rmse(prediction, y_true)
+
+        return 2*sum([prediction[i]-y_true[i] for i in range(len(y_true))])/(len(y_true)*2*rmse)
+    
+    #################### INTERFACE METHODS ####################
+
     def update_cost_function(self, new_cost_function):
         logger.debug(f"Changing cost function from {self.choice_function} to {new_cost_function}")
         self.__init__(new_cost_function)
@@ -64,15 +74,16 @@ class CostFunction:
 
 
 
-
+ 
 
 
 class GradientMethodError(Exception):
     """Exception for signaling errors during gradient calculations."""
     pass
 
-class GrandientMethod:
+class GradientMethod:
     """ Callable class that handles all methods to calculate the gradient for the EMCZ algorithm. """
+    
     def __init__(self, choose_method: str = "finite_differences"):
         """
         Args:
@@ -95,7 +106,9 @@ class GrandientMethod:
             logger.error(f"Chosen gradient method is not supported: {choose_method}.")
             raise GradientMethodError
 
-    def finite_differences(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
+    #################### GRADIENTS ####################
+
+    def finite_differences(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
         """
         Finite differences method for calculating the gradient. It estimates the derivative on 
         each component of the gradient, parallelizing the calculation between QPUs.
@@ -144,10 +157,10 @@ class GrandientMethod:
         return np.array(gradient)
 
 
-    def parameter_shift_rule(self, circuit: CircuitEMCZ, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction):
+    def parameter_shift_rule(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction):
         """
         Parameter shift rule method for estimating the gradient of continuous parameters of quantum circuits.
-        Based on the formula grad_{theta}f(x; theta) = [f(x; theta + pi/2) + f(x; theta - pi/2)]/2 for quantum functions
+        Based on the formula grad_{theta}f(x; theta) = [f(x; theta + pi/2) + f(x; theta - pi/2)]/2 for quantum functions.
 
         Args:
             circuit (<class CircuitEMCZ>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
@@ -190,7 +203,7 @@ class GrandientMethod:
         """ """
         pass
 
-
+    #################### INTERFACE METHODS ####################
 
     def update_gradient_method(self, new_gradient_method):
         logger.debug(f"Changing gradient method from {self.choice_method} to {new_gradient_method}")
@@ -199,13 +212,13 @@ class GrandientMethod:
     def __call__(self, *args, **kwds):
         return self.method(*args, **kwds)
 
-    ################ AUXILIARY METHODS FOR THE GRADIENTS #####################
+    #################### AUXILIARY METHODS FOR THE GRADIENTS ####################
 
-    def perturbed_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
+    def perturbed_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
         theta_aux = theta; theta_aux[index] += diff
         return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
     
-    def shifted_i_circ(qjob: QJob, circuit : CircuitEMCZ, time_series: np.array, theta: np.array, index: int, diff: float):
+    def shifted_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
         theta_plus = theta; theta_plus[index] += np.pi/2
         theta_minus = theta; theta_minus[index] -= np.pi/2
 

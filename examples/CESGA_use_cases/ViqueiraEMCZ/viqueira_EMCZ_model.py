@@ -17,15 +17,13 @@ from random import randint
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.circuit import CunqaCircuit
-from viqueira_EMCZ_circuit import CircuitEMCZ
-from viqueira_gradients_and_costs import GrandientMethod, CostFunction
+from viqueira_EMCZ_circuit import CircuitQRNN
+from viqueira_gradients_and_costs import GradientMethod, CostFunction
 from cunqa.logger import logger
-from cunqa.qutils import getQPUs, qraise, qdrop, QRaiseError
-from cunqa.mappers import run_distributed
-from cunqa.qjob import QJob, gather
+from cunqa.qutils import getQPUs
 
-class ViqueiraEMCZModel:
+
+class ViqueiraQRNN:
     """
     Implementation using CUNQA of the QRNN Exchange-Memory with Controlled Z-gates model from the paper https://arxiv.org/abs/2310.20671 .
     """
@@ -34,7 +32,7 @@ class ViqueiraEMCZModel:
 
         # Run a bash script raising QPUs in six empty nodes (should amount to 192 QPUs). Command waits until jobs are finished configuring
         try:
-            command = 'source /mnt/netapp1/Store_CESGA/home/cesga/dexposito/repos/cunqa_QRNN_side_project/examples/CESGA_use_cases/raise_QPUs_idle_nodes.sh'
+            command = 'source raise_QPUs_idle_nodes.sh'
             subprocess.run(command, shell=True, check=True, capture_output=True, text=True) 
 
         except subprocess.CalledProcessError as error:
@@ -46,7 +44,7 @@ class ViqueiraEMCZModel:
         self.nT = nT
         self._trained = False
 
-        self.circuit = CircuitEMCZ(nE, nM, nT, repeat_encode, repeat_evolution)
+        self.circuit = CircuitQRNN(nE, nM, nT, repeat_encode, repeat_evolution)
 
         self.qpus=getQPUs(local=False) 
         self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit with parameters zero on all QPUs
@@ -67,7 +65,7 @@ class ViqueiraEMCZModel:
             stop_criteria (float): describes how low the error should be before stopping the optimization. Default: 1e-5
         """
 
-        self.calc_gradient = GrandientMethod(gradient_method) # These classes are stateless (important for parallelizing)
+        self.calc_gradient = GradientMethod(gradient_method) # Check if remembering the gradient method messes with parallelizing (same cost_function)
         self.calc_cost = CostFunction() # By default it's RMSE
 
         if theta_init == None:
