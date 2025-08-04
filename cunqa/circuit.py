@@ -369,24 +369,6 @@ class CunqaCircuit:
                         i += 1 # Advance index on the list specifying if we should change the control or target key of the instruction
 
 
-    def check_connected(self, other_circuit):
-        """Checks if execution would wait forever for self + other_circuit. ON DEVELOPMENT."""
-        circuits_connected = lambda x: (self._id in x and other_circuit._id in x) # Returns True if both summand ids appear in the set
-        connections = [path for path in self.connectivity if circuits_connected(path)]
-        if connections: # If there's a connection we'll check that its order makes the sum valid
-            other_instances = self.access_other_instances
-            for connection in connections: # A connection is a set of circuits that talk to eachother and form a chain that joins self and other_circuit
-                distr_layers = {}
-                for circuit in connection:
-                    circ_object = other_instances[circuit]
-                    distr_layers[circuit]=[(circ_object.instructions[gate[1]]["circuits"], gate[0]) for gate in circ_object.layers if gate[2] in SUPPORTED_GATES_DISTRIBUTED]
-                # Recorrer todos los circuitos comprobando que no hay una violación del orden :(
-                # Locally at each circuit check that there's no distr instruction pointing to circ2 before all the ones pointing to circ1
-                # For this, probably we could find the maximun layer pointing to circ1 and the minimun layer w a instruction pointing to circ2 
-
-        return False
-
-
     def __add__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit], force_execution = False) -> 'CunqaCircuit':
         """
         Overloading the "+" operator to perform horizontal concatenation. This means that summing two CunqaCircuits will return a circuit that
@@ -769,18 +751,6 @@ class CunqaCircuit:
             logger.error(repr(e))
             raise SystemExit
         
-        # Filter through the input format possibilities. Strings could be used to find gate structures while dicts, with more information to match,
-        # could be used to find a particular instance of a gate structure.
-        # if isinstance(gate_seq, str):
-        #     pass
-        # if isinstance(gate_seq, dict):
-        #     pass
-        # if isinstance(gate_seq, list):
-        #     if all(isinstance(gate, str) for gate in gate_seq):
-        #         pass
-        #     if all(isinstance(gate, dict) for gate in gate_seq):
-        #         pass
-
     def __getitem__(self, indexes):
         """
         Returns the gates on the positions given by the input indexes. Overloads the "[ ]" operator. The circuit is interpreted as a list of instructions on a certain order.
