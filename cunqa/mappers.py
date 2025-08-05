@@ -18,7 +18,7 @@ import copy
 
 
 
-def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any):
+def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any) -> "list[QJob]":
     """
     Method to send circuits to serveral QPUs allowing classical communications among them. 
     
