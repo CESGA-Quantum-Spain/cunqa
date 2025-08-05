@@ -1,19 +1,16 @@
-
 #include "cunqa_simple_simulator.hpp"
-#include "cunqa_executors.hpp"
 
-#include "quantum_task.hpp"
-#include "backends/classical_comm_backend.hpp"
-#include "backends/simulators/simulator_strategy.hpp"
-#include "utils/json.hpp"
+#include "cunqa_adapters/cunqa_computation_adapter.hpp"
+#include "cunqa_adapters/cunqa_simulator_adapter.hpp"
 
 namespace cunqa {
 namespace sim {
 
-JSON CunqaSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask& quantum_task)
+JSON CunqaSimpleSimulator::execute([[maybe_unused]] const SimpleBackend& backend, const QuantumTask& quantum_task)
 {
-    LOGGER_DEBUG("We are in the execute() method of SimpleCunqa.");
-    return cunqa_execution_<SimpleBackend>(backend, quantum_task);
+    CunqaComputationAdapter cunqa_ca(quantum_task);
+    CunqaSimulatorAdapter cunqa_sa(cunqa_ca);
+    return cunqa_sa.simulate(&backend);
 }
 
 } // End namespace sim

@@ -19,6 +19,7 @@ enum INSTRUCTIONS {
     RX,
     RY,
     RZ,
+    SWAP,
     CX,
     CY,
     CZ,
@@ -40,18 +41,9 @@ enum INSTRUCTIONS {
     C_IF_CZ,
     C_IF_ECR,
     MEASURE_AND_SEND,
-    REMOTE_C_IF_X,
-    REMOTE_C_IF_Y,
-    REMOTE_C_IF_Z,
-    REMOTE_C_IF_H,
-    REMOTE_C_IF_SX,
-    REMOTE_C_IF_RX,
-    REMOTE_C_IF_RY,
-    REMOTE_C_IF_RZ,
-    REMOTE_C_IF_CX,
-    REMOTE_C_IF_CY,
-    REMOTE_C_IF_CZ,
-    REMOTE_C_IF_ECR,
+    RECV,
+    QSEND,
+    QRECV
 };
 
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
@@ -75,6 +67,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rz", RZ},
 
     // TWO GATE NO PARAM
+    {"swap", SWAP},
     {"cx", CX},
     {"cy", CY},
     {"cz", CZ},
@@ -102,41 +95,11 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // SEND CLASSICAL QUBIT
     {"measure_and_send", MEASURE_AND_SEND},
+    {"recv", RECV},
 
     // REMOTE CONTROLLED GATES
-    {"remote_c_if_x", REMOTE_C_IF_X},
-    {"remote_c_if_y", REMOTE_C_IF_Y},
-    {"remote_c_if_z", REMOTE_C_IF_Z},
-    {"remote_c_if_h", REMOTE_C_IF_H},
-    {"remote_c_if_sx", REMOTE_C_IF_SX},
-    {"remote_c_if_rx", REMOTE_C_IF_RX},
-    {"remote_c_if_ry", REMOTE_C_IF_RY},
-    {"remote_c_if_rz", REMOTE_C_IF_RZ},
-    {"remote_c_if_cx", REMOTE_C_IF_CX},
-    {"remote_c_if_cy", REMOTE_C_IF_CY},
-    {"remote_c_if_cz", REMOTE_C_IF_CZ},
-    {"remote_c_if_ecr", REMOTE_C_IF_ECR},
-};
-
-const std::unordered_map<int, std::string> INVERTED_GATE_NAMES = {
-    {UNITARY, "unitary"},
-    {MEASURE, "measure"},
-    {ID, "id"},
-    {X, "x"},
-    {Y, "y"},
-    {Z, "z"},
-    {H, "h"},
-    {SX, "sx"},
-    {RX, "rx"},
-    {RY, "ry"},
-    {RZ, "rz"},
-    {CX, "cx"},
-    {CY, "cy"},
-    {CZ, "cz"},
-    {CRX, "crx"},
-    {CRY, "cry"},
-    {CRZ, "crz"},
-    {ECR, "ecr"},
+    {"qsend", QSEND},
+    {"qrecv", QRECV}
 };
 
 const std::vector<std::string> BASIS_GATES = {

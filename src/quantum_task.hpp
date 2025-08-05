@@ -11,18 +11,20 @@ public:
     JSON circuit;
     JSON config;
     std::vector<std::string> sending_to;
-    bool is_dynamic = false; // C_IF gates
-    bool is_distributed = false; // Classical Communications
+    bool is_dynamic = false; // C_IF gates & Classical Communications
+    bool has_cc = false; // Classical Communications
+    std::string id;
 
     QuantumTask() = default;
-
+    QuantumTask(const std::string& quantum_task);
     QuantumTask(const JSON& circuit, const JSON& config): circuit(circuit), config(config) {};
 
     void update_circuit(const std::string& quantum_task);
-
-private:
     
+private:
     void update_params_(const std::vector<double> params);
 };
+
+std::string to_string(const QuantumTask& data);
 
 } // End of cunqa namespace

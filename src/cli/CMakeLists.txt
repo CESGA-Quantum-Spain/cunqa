@@ -2,6 +2,13 @@
 add_executable(qraise qraise.cpp)
 target_include_directories(qraise PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
 target_link_libraries(qraise PRIVATE json logger_client)
+
+if(USE_MPI_BTW_QPU)
+    target_compile_definitions(qraise PUBLIC USE_MPI_BTW_QPU)
+elseif(USE_ZMQ_BTW_QPU)
+    target_compile_definitions(qraise PUBLIC USE_ZMQ_BTW_QPU)
+endif()
+
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QDROP executable
@@ -11,23 +18,29 @@ add_executable(qdrop qdrop.cpp)
 target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
 target_link_libraries(qdrop PRIVATE logger_client SLURM::SLURM json)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa")
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
-if("$ENV{LMOD_SYSTEM_NAME}" STREQUAL "QMIO")
-    install(FILES "slurm_qmio.conf" DESTINATION "${CMAKE_INSTALL_PREFIX}" RENAME "slurm.conf")
-else()
-    install(FILES "slurm_ft3.conf" DESTINATION "${CMAKE_INSTALL_PREFIX}" RENAME "slurm.conf")
-endif()
+file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
+install(FILES ${NOISE_SCRIPTS} DESTINATION "$ENV{STORE}/.cunqa/noise_model")
 
 # SETUP_QPUS executable
 add_executable(setup_qpus setup_qpus.cpp)
-target_link_libraries(setup_qpus PRIVATE json logger_qpu qpu aer_simulator munich_simple_simulator munich_classical_comm_simulator cunqa_simple_simulator cunqa_classical_comm_sim)
-target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src")
+target_link_libraries(setup_qpus PRIVATE json logger_qpu qpu 
+                                         aer_simple_simulator aer_cc_simulator aer_qc_simulator
+                                         munich_simple_simulator munich_cc_simulator munich_qc_simulator 
+                                         cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator)
+target_include_directories(setup_qpus PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# EXECUTOR executable
+add_executable(setup_executor setup_executor.cpp)
+target_link_libraries(setup_executor PRIVATE aer_executor munich_executor cunqa_executor logger_executor)
+target_include_directories(setup_executor PRIVATE "${CMAKE_SOURCE_DIR}/src")
+install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QINFO executable
 add_executable(qinfo qinfo.cpp)
-target_link_libraries(qinfo PRIVATE json)
+target_link_libraries(qinfo PRIVATE json logger_client)
 target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 

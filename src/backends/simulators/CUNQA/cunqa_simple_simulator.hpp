@@ -17,7 +17,9 @@ public:
     ~CunqaSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "CunqaSimulator";}
-    JSON execute(const SimpleBackend& backend, const QuantumTask& quantumtask) override;
+
+    // TODO: The [[maybe_unused]] annotation is a temporary approach while CunqaSimulator does not take into account the backend info
+    JSON execute([[maybe_unused]] const SimpleBackend& backend, const QuantumTask& quantum_task) override;
 
 };
 

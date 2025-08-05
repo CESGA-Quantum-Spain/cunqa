@@ -1,0 +1,94 @@
+# FT3 EasyBuild file for CUNQA
+# Author:
+#   - Álvaro Carballido Costas
+#   - Marta Losada Estévez
+#   - Jorge Vázquez Pérez 
+#   - Daniel Expósito Patiño 
+# Fundacion Publica Galega Centro Tecnoloxico de Supercomputacion de Galicia (CESGA)
+
+easyblock = 'CMakePythonPackage'
+
+name = 'cunqa'
+version = '0.3.1'
+
+homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
+description = """ 
+CUNQA is a program for executing distributed quantum computations employing CESGA 
+resources as emulated QPUs. It defines an API for communicating with the QPUs and 
+the necessary tools to manage them.
+"""
+
+toolchain = {'name': 'GCC', 'version': 'system'}
+
+#sources = [{
+#    'filename': '%(namelower)s-%(version)s.tar.gz',
+#    'git_config': {
+#        'url': 'https://github.com/CESGA-Quantum-Spain',
+#        'repo_name': '%(namelower)s',
+#        'recursive': True,
+#        'tag': '%(version)s',
+#    },
+#}]
+#
+#unpack_options = '--strip-components=1'
+
+sources = ['%(name)s-%(version)s.tar.gz']
+
+builddependencies = [
+   ('FlexiBLAS', '3.3.0'),
+   ('OpenMPI', '5.0.5'),
+   ('Boost', '1.83.0'),
+   ('pybind11', '2.12.0'),
+   ('CMake', '3.27.6')
+]
+
+dependencies = [
+    ('Qiskit', '1.2.4')
+]
+
+sanity_check_paths = {
+    'files': ['bin/qraise', 'bin/qdrop', 'bin/setup_qpus'],
+    'dirs': ['bin', 'lib'],
+}
+
+configopts = [
+    "-DCMAKE_CXX_FLAGS=",
+]
+
+modextrapaths = {
+    'PYTHONPATH': ['.'],
+}
+
+moduleclass = 'tools'
+
+#CESGA areas
+#area_bioinformatics
+#area_chemistryandmaterials
+#area_compiler
+#area_editor
+#area_machinelearning
+#area_mathlibrary
+#area_mpi
+#area_multiphysicsandcfd
+#area_profiling
+#area_scientificanalysis
+#area_simulation
+#area_softwaremanagement
+#area_tools
+#area_visualizationanddataformats
+#area_quantumcomputing
+modluafooter = 'add_property("type0","area_quantumcomputing")'
+
+usage = """
+\033[94mINTERACTIVE USE:\033[0m
+\tmodule load ]] .. modhier() .. [[\n
+
+\033[94mRECOMENDED OPTIONS:\033[0m
+
+\033[94mSPECIFIC INFO:\033[0m
+"""
+
+examples = """
+"""
+
+#docurls = [ '%(installdir)s/...' ]

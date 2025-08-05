@@ -1,5 +1,5 @@
 """
-    Contains classes related to the virtual QPUs.
+    Contains our virtual QPU class.
 """
 
 import os
@@ -30,7 +30,6 @@ if INFO_PATH is None:
 class QPU:
     """
     Class to define a QPU.
-    ----------------------
     """
     _id: int 
     _qclient: 'QClient' 
@@ -44,15 +43,14 @@ class QPU:
         Initializes the QPU class.
 
         Args:
-        -----------
-        id (int): Id assigned to the qpu, simply a int from 0 to n_qpus-1.
+            id (int): Id assigned to the qpu, simply a int from 0 to n_qpus-1.
 
-        qclient (<class 'python.qclient.QClient'>): object that holds the information to communicate with the server
-            endpoint for a given QPU.
-            
-        backend (<class 'backend.Backend'>): object that provides information about the QPU backend.
+            qclient (<class 'python.qclient.QClient'>): object that holds the information to communicate with the server
+                endpoint for a given QPU.
+                
+            backend (<class 'backend.Backend'>): object that provides information about the QPU backend.
 
-        endpoint (str): String refering to the endpoint of the server to which the QPU corresponds.
+            endpoint (str): String refering to the endpoint of the server to which the QPU corresponds.
         """
         
         self._id = id
@@ -84,29 +82,27 @@ class QPU:
         Possible instructions to add as `**run_parameters` can be: shots, method, parameter_binds, meas_level, ...
 
         Args:
-        --------
-        circuit (json dict or <class 'qiskit.circuit.CunqaCircuit'>): circuit to be run in the QPU.
+            circuit (json dict or <class 'qiskit.circuit.CunqaCircuit'>): circuit to be run in the QPU.
 
-        transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
+            transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
 
-        initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.
+            initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.
 
-        opt_level (int): optimization level for transpilation, default set to 1.
+            opt_level (int): optimization level for transpilation, default set to 1.
 
-        **run_parameters : any other simulation instructions.
+            **run_parameters : any other simulation instructions.
 
         Return:
-        --------
-        <class 'QJob'> object.
+            <class 'QJob'> object.
         """
         # Disallow execution of distributed circuits
         if inspect.stack()[1].function != "run_distributed": # Checks if the run() is called from run_distributed()
             if isinstance(circuit, CunqaCircuit):
-                if circuit.is_distributed:
+                if circuit.has_cc:
                     logger.error("Distributed circuits can't run using QPU.run(), try run_distributed() instead.")
                     raise SystemExit
             elif isinstance(circuit, dict):
-                if 'is_distributed' in circuit and circuit["is_distributed"]:
+                if 'has_cc' in circuit and circuit["has_cc"]:
                     logger.error("Distributed circuits can't run using QPU.run(), try run_distributed() instead.")
                     raise SystemExit
 
@@ -118,6 +114,7 @@ class QPU:
             self._qclient.connect(ip, port)
             self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
+            self._connected = True
 
         if transpile:
             try:

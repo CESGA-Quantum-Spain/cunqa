@@ -9,7 +9,7 @@ from qiskit import QuantumCircuit
 from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
-from cunqa.circuit import qc_to_json, _registers_dict, _is_parametric, CunqaCircuit
+from cunqa.circuit import qc_to_json,CunqaCircuit, _registers_dict
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
@@ -32,7 +32,7 @@ class QJob:
     _circuit_id: str 
     _sending_to: "list[str]"
     _is_dynamic: bool
-    _is_distributed:bool
+    _has_cc:bool
 
     def __init__(self, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], **run_parameters: Any):
         """
@@ -47,18 +47,17 @@ class QJob:
 
 
         Args:
-        -----------
-        QPU (<class 'qpu.QPU'>): QPU object that represents the virtual QPU to which the job is going to be sent.
+            QPU (<class 'qpu.QPU'>): QPU object that represents the virtual QPU to which the job is going to be sent.
 
-        circ (json dict or <class 'cunqa.circuit.CunqaCircuit'>): circuit to be run.
+            circ (json dict or <class 'cunqa.circuit.CunqaCircuit'>): circuit to be run.
 
-        transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
+            transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
 
-        initial_layout (list[int]):  initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.
+            initial_layout (list[int]):  initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.
 
-        opt_level (int): optimization level for transpilation, default set to 1.
+            opt_level (int): optimization level for transpilation, default set to 1.
 
-        **run_parameters : any other simulation instructions.
+            **run_parameters : any other simulation instructions.
 
         """
 
@@ -96,6 +95,9 @@ class QJob:
         except Exception as error:
                 logger.error(f"Error while reading the results {error}")
                 raise SystemExit # User's level
+        
+        if self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
+            logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
 
         return self._result
 
@@ -138,8 +140,7 @@ class QJob:
         Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.
 
         Args:
-        -----------
-        parameters (list[float]): list of parameters to assign to the parametrized circuit.
+            parameters (list[float]): list of parameters to assign to the parametrized circuit.
         """
 
         if self._result is None:
@@ -180,14 +181,14 @@ class QJob:
                     self._sending_to = circuit["sending_to"]
                 else:
                     self._sending_to = []
-                if "is_distributed" in circuit:
-                    self._is_distributed = circuit["is_distributed"]
+                if "has_cc" in circuit:
+                    self._has_cc = circuit["has_cc"]
                     self._is_dynamic = True
                 elif "is_dynamic" in  circuit:
                     self._is_dynamic = circuit["is_dynamic"]
                 else:
                     self._is_dynamic = False
-                    self._is_distributed = False
+                    self._has_cc = False
 
                 logger.debug("Translation to dict not necessary...")
 
@@ -206,7 +207,7 @@ class QJob:
                 self._circuit_id = circuit._id
                 self._sending_to = circuit.sending_to
                 self._is_dynamic = circuit.is_dynamic
-                self._is_distributed = circuit.is_distributed
+                self._has_cc = circuit.has_cc
                 
                 logger.debug("Translating to dict from CunqaCircuit...")
 
@@ -220,15 +221,14 @@ class QJob:
                 self.num_qubits = circuit.num_qubits
                 self.num_clbits = sum([c.size for c in circuit.cregs])
                 self._cregisters = _registers_dict(circuit)[1]
-                # TODO: ¿self.circuit_id?
                 self._sending_to = []
-                
+
                 logger.debug("Translating to dict from QuantumCircuit...")
 
                 circuit_json, is_dynamic = qc_to_json(circuit)
                 instructions = circuit_json['instructions']
                 self._is_dynamic = is_dynamic
-                self._is_distributed = False
+                self._has_cc = False
 
             elif isinstance(circuit, str):
 
@@ -237,6 +237,7 @@ class QJob:
                 qc_from_qasm = QuantumCircuit.from_qasm_str(circuit)
 
                 self.num_qubits = qc_from_qasm.num_qubits
+                self._cregisters = _registers_dict(qc_from_qasm)[1]
                 self.num_clbits = sum(len(k) for k in self._cregisters.values())
                 self._cregisters = _registers_dict(qc_from_qasm)[1]
                 # TODO: ¿self.circuit_id?
@@ -247,7 +248,7 @@ class QJob:
                 circuit_json, is_dynamic = qc_to_json(circuit)
                 instructions = circuit_json['instructions']
                 self._is_dynamic = is_dynamic
-                self._is_distributed = False
+                self._has_cc = False
 
             else:
                 logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circuit)} was provided [{TypeError.__name__}].")
@@ -277,11 +278,11 @@ class QJob:
         try:
             # config dict
             run_config = {
-                "shots":1024, 
+                "shots": 1024, 
                 "method":"statevector", 
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
-                "seed": 188}
+                "seed": 123123}
 
             if (run_parameters == None) or (len(run_parameters) == 0):
                 logger.debug("No run parameters provided, default were set.")
@@ -294,11 +295,12 @@ class QJob:
             
             logger.debug("Before exec_config")
             exec_config = {
-                "config":run_config, 
-                "instructions":self._circuit,
-                "sending_to":self._sending_to,
-                "is_dynamic":self._is_dynamic,
-                "is_distributed":self._is_distributed
+                "id": self._circuit_id,
+                "config": run_config, 
+                "instructions": self._circuit,
+                "sending_to": self._sending_to,
+                "is_dynamic": self._is_dynamic,
+                "has_cc": self._has_cc
             }
             self._execution_config = json.dumps(exec_config)
 
@@ -320,12 +322,10 @@ def gather(qjobs: Union[QJob, "list['QJob']"]) -> Union[Result, "list['Result']"
         Function to get result of several QJob objects, it also takes one QJob object.
 
         Args:
-        ------
-        qjobs (QJob object or list of QJob objects)
+            qjobs (list of QJob objects or QJob object)
 
         Return:
-        ------- 
-        Result or list of results.
+            Result or list of results.
     """
     if isinstance(qjobs, list):
         if all([isinstance(q, QJob) for q in qjobs]):
@@ -340,4 +340,3 @@ def gather(qjobs: Union[QJob, "list['QJob']"]) -> Union[Result, "list['Result']"
     else:
         logger.error(f"qjobs must be <class 'qjob.QJob'> or list, but {type(qjobs)} was provided [{TypeError.__name__}].")
         raise SystemError # User's level
-    

@@ -7,7 +7,9 @@
 #include "zmq.hpp"
 
 #include "classical_channel.hpp"
-#include "zmq_classical_channel_helpers.hpp"
+#include "utils/helpers/net_functions.hpp"
+
+#include "utils/json.hpp"
 #include "logger.hpp"
 
 namespace cunqa {
@@ -15,103 +17,135 @@ namespace comm {
 
 struct ClassicalChannel::Impl
 {
-    std::unique_ptr<zmq::context_t> zmq_context;
-    std::unordered_map<std::string, zmq::socket_t> zmq_connected_clients;
-    zmq::socket_t zmq_comm_server;
     std::string zmq_endpoint;
-    std::unordered_map<std::string, std::queue<int>> message_queue;
+    std::string zmq_id;
 
-    Impl()
+    zmq::context_t zmq_context;
+    std::unordered_map<std::string, zmq::socket_t> zmq_sockets;
+    zmq::socket_t zmq_comm_server;
+    std::unordered_map<std::string, std::queue<std::string>> message_queue;
+
+    Impl(const std::string& id)
     {
-        //Context
-        zmq::context_t aux_context;
-        zmq_context = std::make_unique<zmq::context_t>(std::move(aux_context));
-
         //Endpoint part
-        zmq_endpoint = get_my_endpoint();
+        auto port = get_port(true);
+        auto IP = get_global_IP_address();
+        zmq_endpoint = "tcp://" + IP + ":" + port;
+
+        zmq_id = id == "" ? zmq_endpoint : id;
 
         //Server part
-        zmq::socket_t qpu_server_socket_(*zmq_context, zmq::socket_type::router);
+        zmq::socket_t qpu_server_socket_(zmq_context, zmq::socket_type::router);
         qpu_server_socket_.bind(zmq_endpoint);
         zmq_comm_server = std::move(qpu_server_socket_);
-
-        LOGGER_DEBUG("ZMQ communication of Communication Component configured."); 
     }
+
     ~Impl() = default;
 
-    void send(int& measurement, std::string& target)
-    {
-        // Client part
-        if (zmq_connected_clients.find(target) == zmq_connected_clients.end()) {
-            LOGGER_ERROR("No connections was established with endpoint {}.", target);
-            throw std::runtime_error("Error with endpoint connection.");
+
+    void connect(const std::string& endpoint, const std::string& id = "")
+    {   
+        auto client_id = id == "" ? endpoint : id; 
+        if (zmq_sockets.find(client_id) == zmq_sockets.end()) {
+            zmq::socket_t tmp_client_socket(zmq_context, zmq::socket_type::dealer);
+            tmp_client_socket.setsockopt(ZMQ_IDENTITY, zmq_id.c_str(), zmq_id.size());
+            zmq_sockets[client_id] = std::move(tmp_client_socket);
+            zmq_sockets[client_id].connect(endpoint);
         }
-        zmq::message_t message(sizeof(int));
-        std::memcpy(message.data(), &measurement, sizeof(int));
-        zmq_connected_clients[target].send(message);
     }
 
-    int recv(std::string& origin)
+    void send(const std::string& data, const std::string& target) 
     {
-        int measurement;
+        if (zmq_sockets.find(target) == zmq_sockets.end()) {
+            LOGGER_ERROR("No connections were established with endpoint {}.", target);
+            throw std::runtime_error("Error with endpoint connection.");
+        }
+        zmq::message_t message(data.begin(), data.end());
+        zmq_sockets[target].send(message, zmq::send_flags::none);
+    }
+    
+    std::string recv(const std::string& origin)
+    {
         if (!message_queue[origin].empty()) {
-            measurement = message_queue[origin].front();
+            std::string stored_data = message_queue[origin].front();
             message_queue[origin].pop();
-            return measurement;
+            return stored_data;
         } else {
             while (true) {
-                zmq::message_t client_id;
+                zmq::message_t id;
                 zmq::message_t message;
-
-                zmq_comm_server.recv(client_id, zmq::recv_flags::none);
-                zmq_comm_server.recv(message, zmq::recv_flags::none);
-                std::string client_id_str(static_cast<char*>(client_id.data()), client_id.size());
-                std::memcpy(&measurement, message.data(), sizeof(int));
                 
-                if (client_id_str == origin) {
-                    return measurement;
+                [[maybe_unused]] auto ret1 = zmq_comm_server.recv(id, zmq::recv_flags::none);
+                [[maybe_unused]] auto ret2 = zmq_comm_server.recv(message, zmq::recv_flags::none);
+                std::string id_str(static_cast<char*>(id.data()), id.size());
+                std::string data(static_cast<char*>(message.data()), message.size());
+
+                if (id_str == origin) {
+                    return data;
                 } else {
-                    this->message_queue[client_id_str].push(measurement);
+                    message_queue[id_str].push(data);
                 }
             }
         }
     }
-
-    void set_connections(std::vector<std::string>& endpoints)
-    {
-        for (auto& endpoint : endpoints) {
-            if (zmq_connected_clients.find(endpoint) == zmq_connected_clients.end()) {
-                zmq::socket_t tmp_client_socket(*zmq_context, zmq::socket_type::dealer);
-                tmp_client_socket.setsockopt(ZMQ_IDENTITY, zmq_endpoint.c_str(), zmq_endpoint.size());
-                zmq_connected_clients[endpoint] = std::move(tmp_client_socket);
-                zmq_connected_clients[endpoint].connect(endpoint);
-            }
-        }
-        LOGGER_DEBUG("ZMQ client sockets instanciated.");
-    }
 };
 
 
-ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>()}, endpoint{pimpl_->zmq_endpoint}
-{}
+ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>("")} 
+{ 
+    endpoint = pimpl_->zmq_endpoint;
+}
+
+ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)} 
+{ 
+    endpoint = pimpl_->zmq_endpoint;
+}
 
 ClassicalChannel::~ClassicalChannel() = default;
 
-void ClassicalChannel::send_measure(int& measurement, std::string& target)
+//-------------------------------------------------
+// Publish the endpoint for other processes to read
+//-------------------------------------------------
+void ClassicalChannel::publish() 
 {
-    pimpl_->send(measurement, target);
+    const std::string store = getenv("STORE");
+    const std::string filepath = store + "/.cunqa/communications.json"s;
+    JSON communications_endpoint = 
+    {
+        {"communications_endpoint", endpoint}
+    };
+    write_on_file(communications_endpoint, filepath);
 }
 
-int ClassicalChannel::recv_measure(std::string& origin)
+
+//--------------------------------------------------
+// Functions to stablish the other devices connected
+//--------------------------------------------------
+void ClassicalChannel::connect(const std::string& endpoint, const std::string& id) 
 {
-    return pimpl_->recv(origin);
+    pimpl_->connect(endpoint, id);
 }
 
-void ClassicalChannel::set_classical_connections(std::vector<std::string>& qpus_id)
+// No id in this overload because is thought for classical communications,
+// which do not care for ids, its ok for them to use only the endpoints
+void ClassicalChannel::connect(const std::vector<std::string>& endpoints) 
 {
-    LOGGER_DEBUG("Setting connections on classical channel.");
-    pimpl_->set_connections(qpus_id);
+    for (const auto& endpoint : endpoints) {
+        pimpl_->connect(endpoint);
+    }
 }
+
+//------------------------------------------------------------------------------------
+// Send and recv functions for arbitrary info (such as a whole circuit or an endpoint)
+//------------------------------------------------------------------------------------
+void ClassicalChannel::send_info(const std::string& data, const std::string& target) { pimpl_->send(data, target); }
+std::string ClassicalChannel::recv_info(const std::string& origin) { return pimpl_->recv(origin); }
+
+//-----------------------------------------
+// Send and recv functions for measurements
+//-----------------------------------------
+void ClassicalChannel::send_measure(const int& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
+int ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
 
 
 } // End of comm namespace

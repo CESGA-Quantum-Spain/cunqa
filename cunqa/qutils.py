@@ -1,5 +1,7 @@
+""" Holds functions that manage virtual QPUs or provide information about them."""
 import os
 import sys
+import time
 from typing import Union, Optional
 from subprocess import run
 from json import load
@@ -40,7 +42,7 @@ def are_qpus_raised(family: Optional[str] = None) -> bool:
     
 
 
-def qraise(n, time, *, 
+def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
            simulator = None, 
@@ -57,32 +59,31 @@ def qraise(n, time, *,
     Raises a QPU and returns its job_id.
 
     Args
-    -----------
-    n (int): number of QPUs to be raised.
-    time (str, format: 'D-HH:MM:SS'): maximun time that the classical resources will be reserved for the QPU.
-    
-    fakeqmio (bool): if True the raised QPUs will have the fakeqmio backend.
-    classical_comm (bool): if True the raised QPUs are communicated classically.
-    quantum_comm (bool): if True the raised QPUs have quantum communications.
-    simulator (str): name of the desired simulator to use. Default in this branch is Cunqasimulator.
-    family (str): name to identify the group of QPUs raised on the specific call of the function.
-    mode (str): infrastructure type for the raised QPUs:  "hpc" or "cloud". First one associates QPUs to different nodes.
-    cores (str): 
-    mem_per_qpu (str): 
-    n_nodes (str): 
-    node_list (str): 
-    qpus_per_node (str): 
-    backend (str): 
+        n (int): number of QPUs to be raised.
+        t (str, format: 'D-HH:MM:SS'): maximun time that the classical resources will be reserved for the QPU.
+        
+        fakeqmio (bool): if True the raised QPUs will have the fakeqmio backend.
+        classical_comm (bool): if True the raised QPUs are communicated classically.
+        quantum_comm (bool): if True the raised QPUs have quantum communications.
+        simulator (str): name of the desired simulator to use. Default is AerSimulator.
+        family (str): name to identify the group of QPUs raised on the specific call of the function.
+        mode (str): infrastructure type for the raised QPUs:  "hpc" or "cloud". First one associates QPUs to different nodes.
+        cores (str):  number of cores for the SLURM job.
+        mem_per_qpu (str): memory to allocate for each QPU, format to use is  "xG".
+        n_nodes (str): number of nodes for the SLURM job.
+        node_list (str): option to select specifically on which nodes the simulation job should run.
+        qpus_per_node (str): sets the number of QPUs that should be raised on each requested node.
+        backend (str): path to a file containing backend information.
 
     """
-
+    print("Setting up the requested QPUs...")
     SLURMD_NODENAME = os.getenv("SLURMD_NODENAME")
     if SLURMD_NODENAME == None:
-        command = f"qraise -n {n} -t {time}"
+        command = f"qraise -n {n} -t {t}"
     else: 
         logger.warning("Be careful, you are deploying QPUs from an interactive session.")
         HOSTNAME = os.getenv("HOSTNAME")
-        command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {time}"
+        command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {t}"
 
     try:
         # Add specified flags
@@ -118,15 +119,32 @@ def qraise(n, time, *,
            with open(INFO_PATH, "w") as file:
                 file.write("{}")
 
-        old_time = os.stat(INFO_PATH).st_mtime # establish when the file qpus.json was modified last to check later that we did modify it
         output = run(command, shell=True, capture_output=True, text=True).stdout #run the command on terminal and capture its output on the variable 'output'
         logger.info(output)
         job_id = ''.join(e for e in str(output) if e.isdecimal()) #sees the output on the console (looks like 'Submitted sbatch job 136285') and selects the number
         
-        # Wait for QPUs to be raised, so that getQPUs can be executed inmediately
+        cmd_getstate = ["squeue", "-h", "-j", job_id, "-o", "%T"]
+        
+        i = 0
         while True:
-            if old_time != os.stat(INFO_PATH).st_mtime: #checks that the file has been modified
-                break
+            state = run(cmd_getstate, capture_output=True, text=True, check=True).stdout.strip()
+            if state == "RUNNING":
+                try:     
+                    with open(INFO_PATH, "r") as file:
+                        data = json.load(file)
+                except json.JSONDecodeError:
+                    continue
+                count = sum(1 for key in data if key.startswith(job_id))
+                if count == n:
+                    break
+            # We do this to prevent an overload to the Slurm deamon through the 
+            if i == 500:
+                time.sleep(2)
+            else:
+                i += 1
+
+        # Wait for QPUs to be raised, so that getQPUs can be executed inmediately
+        print("QPUs ready to work \U00002705")
 
         return (family, str(job_id)) if family is not None else str(job_id)
     
@@ -138,8 +156,7 @@ def qdrop(*families: Union[tuple, str]):
     Drops the QPU families corresponding to the the entered QPU objects. By default, all raised QPUs will be dropped.
 
     Args
-    --------
-    qpus (tuple(<class cunqa.qpu.QPU>)): list of QPUs to drop. All QPUs that share a qraise will these will drop.
+        qpus (tuple(<class cunqa.qpu.QPU>)): list of QPUs to drop. All QPUs that share a qraise will these will drop.
     """
     
     # Building the terminal command to drop the specified families (using family names or QFamilies)
@@ -168,8 +185,7 @@ def nodeswithQPUs() -> "list[set]":
     Global function to know what nodes of the computer host virtual QPUs.
 
     Return:
-    ---------
-    List of the corresponding node names.
+        List of the corresponding node names.
     """
     try:
         with open(INFO_PATH, "r") as f:
@@ -246,13 +262,11 @@ def getQPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
     Global function to get the QPU objects corresponding to the virtual QPUs raised.
 
     Args:
-    --------
-    local (bool): option to return only the QPUs in the current node (True, default option) or in all nodes (False).
-    family (str): option to return only the QPUs from the selected family (group of QPUs allocated in the same qraise)
+        local (bool): option to return only the QPUs in the current node (True, default option) or in all nodes (False).
+        family (str): option to return only the QPUs from the selected family (group of QPUs allocated in the same qraise)
 
     Return:
-    ---------
-    List of QPU objects.
+        List of QPU objects.
     
     """
 

@@ -10,7 +10,7 @@
         "max_shots": 1000000,
         "description": "CunqaSimulator",
         "basis_gates": [
-            "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz"
+            "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "measure_and_send", "recv"
         ], 
         "custom_instructions": "",
         "gates": [],

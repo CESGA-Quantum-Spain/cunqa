@@ -1,6 +1,13 @@
+"""
+    Module that defines objects to describe characteristics of the virtual QPUs through the ``cunqa.backend.Backend`` class.
+"""
+
 from typing import  TypedDict
 
 class BackendData(TypedDict):
+    """
+        Class to gather the characteristics of a Backend.
+    """
     basis_gates: "list[str]"
     coupling_map: "list[list[int]]"
     custom_instructions: str

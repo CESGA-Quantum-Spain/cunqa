@@ -69,16 +69,18 @@ using namespace cunqa::comm;
 int main(int argc, char *argv[])
 {
     Client cliente{};
-    cliente.connect(argv[1], argv[2]);
+    if(argc == 3) {
+        cliente.connect(argv[1], argv[2]);
 
-    cliente.send_circuit(circuit_broken);
-    auto result1 = cliente.recv_results();
+        cliente.send_circuit(circuit_broken);
+        auto result1 = cliente.recv_results();
 
-    cliente.send_circuit(circuit_correct);
-    auto result2 = cliente.recv_results();
+        cliente.send_circuit(circuit_correct);
+        auto result2 = cliente.recv_results();
 
-    std::cout << result1 << "\n";
-    std::cout << result2 << "\n";
-
+        std::cout << result1 << "\n";
+        std::cout << result2 << "\n";
+    } else
+        std::cerr << "ERROR: Not introduced correct arguments.\n"; 
     return 0;
 }

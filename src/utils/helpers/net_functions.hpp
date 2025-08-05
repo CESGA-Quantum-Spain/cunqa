@@ -92,7 +92,7 @@ inline std::string get_global_IP_address()
     return ip;
 }
  
-inline std::string get_port() 
+inline std::string get_port(const bool comm = false) 
 {
     auto id = std::getenv("SLURM_LOCALID");
     auto ports = std::getenv("SLURM_STEP_RESV_PORTS");
@@ -101,46 +101,21 @@ inline std::string get_port()
         std::string ports_str(ports);
         size_t pos = ports_str.find('-');
         if (pos != std::string::npos) {
-            std::string base_port_str = ports_str.substr(0, pos);
-            int base_port = std::stoi(base_port_str);
+            if (comm) {
+                std::string base_port_str = ports_str.substr(pos + 1);
+                int base_port = std::stoi(base_port_str);
+                
+                return std::to_string(base_port - std::stoi(id));
+            } else {
+                std::string base_port_str = ports_str.substr(0, pos);
+                int base_port = std::stoi(base_port_str);
+                
+                return std::to_string(base_port + std::stoi(id));
+            }
             
-            return std::to_string(base_port + std::stoi(id));
         }
         throw std::runtime_error("Not a valid expression format of the ports.");
     }
     throw std::runtime_error("The required environment variables are not set (not in a SLURM job).");
     return std::string();
-}
-
-inline std::string get_comm_port() 
-{
-    auto id = std::getenv("SLURM_LOCALID");
-    std::string ports = std::getenv("SLURM_STEP_RESV_PORTS");
-    std::string port;
-    SPDLOG_LOGGER_DEBUG(logger, "SLURM_STEP_RESV_PORTS: {}", ports);
-
-    if(ports != "" && id != "")
-    {
-        size_t pos = ports.find('-');
-        if (pos != std::string::npos) 
-        {
-            std::string base_port_str = ports.substr(pos + 1);
-            int base_port = std::stoi(base_port_str);
-            
-            port = std::to_string(base_port - std::stoi(id));
-            
-        } else 
-        {
-            std::cerr << "Not a valid expression format of the ports.\n";
-            return "-1"s;
-        }
-    } else 
-    {
-        std::cerr << "The required environment variables are not set (not in a SLURM job).\n";
-        return "-1"s;
-    }
-
-    SPDLOG_LOGGER_DEBUG(logger, "Port selected: {}", port);
-
-    return port;
 }

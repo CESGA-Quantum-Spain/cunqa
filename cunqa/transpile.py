@@ -46,7 +46,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
 
         elif isinstance(circuit, CunqaCircuit):
 
-            if circuit.is_distributed:
+            if circuit.has_cc:
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
             else:
@@ -129,9 +129,11 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
         return qc_transpiled
     
     elif isinstance(circuit, dict):
-        return qc_to_json(qc_transpiled)
+        j_qc, _ = qc_to_json(qc_transpiled)
+        return j_qc
     
     elif isinstance(circuit, CunqaCircuit):
-        return CunqaCircuit(qc_transpiled.num_qubits, qc_transpiled.num_clbits).from_instructions(qc_to_json(qc_transpiled)["instructions"])
+        j_qc, _ = qc_to_json(qc_transpiled)
+        return CunqaCircuit(qc_transpiled.num_qubits, qc_transpiled.num_clbits).from_instructions(j_qc["instructions"])
 
     

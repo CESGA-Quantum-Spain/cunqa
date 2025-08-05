@@ -1,5 +1,5 @@
 """
-    Contains map-like callables for distribute circuits in virtual QPUS. Useful when working with evolutive optimizators.
+    Contains map-like callables to distribute circuits in virtual QPUS. Useful when working with evolutive optimizators.
 """
 from cunqa.logger import logger
 from cunqa.qjob import gather
@@ -48,15 +48,11 @@ def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['
     distributed_qjobs = []
     circuit_jsons = []
 
-    remote_controlled_gates = ["measure_and_send", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"]
+    remote_controlled_gates = ["measure_and_send", "recv", "qsend", "qrecv"]
     correspondence = {}
 
     #Check wether the circuits are valid and extract jsons
-    for circuit in circuits:
-        if (isinstance(circuit, CunqaCircuit) and not circuit.is_distributed):
-            logger.error(f"Circuits to run must be distributed.")
-            raise SystemExit # User's level
-        
+    for circuit in circuits:   
         if isinstance(circuit, CunqaCircuit):
             info_circuit_copy = copy.deepcopy(circuit.info) # To modify the info without modifying the attribute info of the circuit
             circuit_jsons.append(info_circuit_copy)
@@ -78,15 +74,16 @@ def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['
             correspondence[circuit["id"]] = qpu._id
         
 
-    #Check wether the QPUs are valid
-    if not all(qpu._family == qpus[0]._family for qpu in qpus):
+    #Check whether the QPUs are valid
+    # TODO: check only makes sense if we have selected mpi option at compilation time. For the moment it remains commented
+    """ if not all(qpu._family == qpus[0]._family for qpu in qpus):
         logger.debug(f"QPUs of different families were provided.")
-        if not all(re.match(r"^tcp://", qpu._comm_endpoint) for qpu in qpus):
+        if not all(re.match(r"^tcp://", qpu._endpoint) for qpu in qpus):
             names = set()
             for qpu in qpus:
                 names.add(qpu._family)
             logger.error(f"QPU objects provided are from different families ({list(names)}). For this version, classical communications beyond families are only supported with zmq communication type.")
-            raise SystemExit # User's level
+            raise SystemExit # User's level """
     
     logger.debug(f"Run arguments provided for simulation: {run_args}")
     
@@ -98,7 +95,8 @@ def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['
                 instr.pop("circuits")
         for i in range(len(circuit["sending_to"])):
             circuit["sending_to"][i] = correspondence[circuit["sending_to"][i]]
-    
+        circuit["id"] = correspondence[circuit["id"]]
+
     warn = False
     run_parameters = {}
     for k,v in run_args.items():
@@ -127,8 +125,7 @@ class QJobMapper:
         Initializes the QJobMapper class.
 
         Args:
-        ---------
-        qjobs (list[<class 'qjob.QJob'>]): list of QJobs to be mapped.
+            qjobs (list[<class 'qjob.QJob'>]): list of QJobs to be mapped.
 
         """
         self.qjobs = qjobs
@@ -139,14 +136,12 @@ class QJobMapper:
         Callable method to map the function to the given QJobs.
 
         Args:
-        ---------
-        func (func): function to be mapped to the QJobs. It must take as argument the an object <class 'qjob.Result'>.
+            func (func): function to be mapped to the QJobs. It must take as argument the an object <class 'qjob.Result'>.
 
-        population (list[list]): population of vectors to be mapped to the QJobs.
+            population (list[list]): population of vectors to be mapped to the QJobs.
 
         Return:
-        ---------
-        List of results of the function applied to the QJobs for the given population.
+            List of results of the function applied to the QJobs for the given population.
         """
         qjobs_ = []
         for i, params in enumerate(population):
@@ -176,16 +171,15 @@ class QPUCircuitMapper:
         Initializes the QPUCircuitMapper class.
 
         Args:
-        ---------
-        qpus (list[<class 'qpu.QPU'>]): list of QPU objects.
+            qpus (list[<class 'qpu.QPU'>]): list of QPU objects.
 
-        circuit (json dict, <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or QASM2 str): circuit to be run in the QPUs.
+            circuit (json dict, <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or QASM2 str): circuit to be run in the QPUs.
 
-        transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
+            transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.
 
-        initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.
+            initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.
 
-        **run_parameters : any other simulation instructions.
+            **run_parameters : any other simulation instructions.
 
         """
         self.qpus = qpus
@@ -208,14 +202,12 @@ class QPUCircuitMapper:
         Callable method to map the function to the QPUs.
 
         Args:
-        ---------
-        func (func): function to be mapped to the QPUs. It must take as argument the an object <class 'qjob.Result'>.
+            func (func): function to be mapped to the QPUs. It must take as argument the an object <class 'qjob.Result'>.
 
-        params (list[list]): population of vectors to be mapped to the circuits sent to the QPUs.
+            params (list[list]): population of vectors to be mapped to the circuits sent to the QPUs.
 
         Return:
-        ---------
-        List of the results of the function applied to the output of the circuits sent to the QPUs.
+            List of the results of the function applied to the output of the circuits sent to the QPUs.
         """
 
         qjobs = []
@@ -235,7 +227,7 @@ class QPUCircuitMapper:
             return [func(result) for result in results]
 
         
-        except  QiskitError as error:
+        except QiskitError as error:
             logger.error(f"Error while assigning parameters to QuantumCircuit, please check they have the correct size [{type(error).__name__}]: {error}.")
             raise SystemExit # User's level
         

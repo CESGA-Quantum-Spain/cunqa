@@ -15,7 +15,7 @@
 
 using namespace std::literals;
 
-struct MyArgs : public argparse::Args
+struct CunqaArgs : public argparse::Args
 {
     std::optional<std::vector<uint32_t>>& ids = arg("Slurm IDs of the QPUs to be dropped.").multi_argument();
     std::optional<std::string>& info_path     = kwarg("info_path", "PATH to the QPU information file.");
@@ -69,9 +69,13 @@ void removeAllJobs(std::string& id_str)
 
 int main(int argc, char* argv[]) 
 {
-    auto args = argparse::parse<MyArgs>(argc, argv);
-    std::string install_path = getenv("HOME");
-    setenv("SLURM_CONF", (install_path + "/slurm.conf").c_str(), 1); 
+    auto args = argparse::parse<CunqaArgs>(argc, argv);
+    std::string system = getenv("LMOD_SYSTEM_NAME");
+    if(system == "QMIO")
+        setenv("SLURM_CONF", "/var/spool/slurmd/conf-cache/slurm.conf", 1); 
+    else if (system == "FT3")
+        setenv("SLURM_CONF", "/etc/slurm/slurm.conf", 1); 
+    
     std::string id_str;
     std::string cmd;
 

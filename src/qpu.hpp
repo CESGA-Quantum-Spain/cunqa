@@ -9,7 +9,6 @@
 #include "comm/server.hpp"
 #include "backends/backend.hpp"
 #include "utils/json.hpp"
-#include "logger.hpp"
 
 using namespace std::string_literals;
 

@@ -46,7 +46,7 @@ struct Server::Impl {
             zmq::message_t message(result.begin(), result.end());
             message.set_routing_id(rid_queue_.front());
             rid_queue_.pop();
-
+            
             socket_.send(message, zmq::send_flags::none);
             LOGGER_DEBUG("Sent result: {}", result);
         } catch (const zmq::error_t& e) {

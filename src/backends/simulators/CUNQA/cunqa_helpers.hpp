@@ -11,7 +11,6 @@
 
 namespace cunqa {
 
-
 // Convert CunqaSim's counts to standard format, ie pass counts keys from decimal to binary and then reverse the bit string
 inline JSON convert_standard_results_cunqa(const std::unordered_map<int, int>& res, const int& num_qubits) 
 {

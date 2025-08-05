@@ -12,9 +12,18 @@
 
 namespace cunqa {
 
+std::string to_string(const QuantumTask& data)
+{
+    if (data.circuit.empty())
+        return "";
+    return "{\"id\": \"" + data.id + "\",\n\"config\": " + data.config.dump() + ",\n\"instructions\": " + data.circuit.dump() + "}\n"; 
+}
+
+QuantumTask::QuantumTask(const std::string& quantum_task) { update_circuit(quantum_task); }
+
 void QuantumTask::update_circuit(const std::string& quantum_task) 
 {
-    auto quantum_task_json = JSON::parse(quantum_task);
+    auto quantum_task_json = quantum_task == "" ? JSON() : JSON::parse(quantum_task);
     std::vector<std::string> no_communications = {};
 
     if (quantum_task_json.contains("instructions") && quantum_task_json.contains("config")) {
@@ -22,12 +31,10 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
         config = quantum_task_json.at("config").get<JSON>();
         sending_to = (quantum_task_json.contains("sending_to") ? quantum_task_json.at("sending_to").get<std::vector<std::string>>() : no_communications);
         is_dynamic = ((quantum_task_json.contains("is_dynamic")) ? quantum_task_json.at("is_dynamic").get<bool>() : false);
-        is_distributed = ((quantum_task_json.contains("is_distributed")) ? quantum_task_json.at("is_distributed").get<bool>() : false);
+        has_cc = ((quantum_task_json.contains("has_cc")) ? quantum_task_json.at("has_cc").get<bool>() : false);
+        id = quantum_task_json.at("id");
 
-        LOGGER_DEBUG("After quantum task keys");
-
-        if (is_distributed) {
-            LOGGER_DEBUG("is_distributed");
+        if (has_cc) {
             const char* STORE = std::getenv("STORE");
             std::string filepath = std::string(STORE) + "/.cunqa/communications.json";
             std::ifstream communications_file(filepath); 
@@ -35,7 +42,6 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
 
             JSON communications;
             communications_file >> communications;
-            LOGGER_DEBUG("qpus json well read");
 
             for (auto& instruction : circuit) {
                 std::string name = instruction.at("name").get<std::string>();
@@ -55,10 +61,8 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
             }
         }
 
-    } else if (quantum_task_json.contains("params")) {
+    } else if (quantum_task_json.contains("params"))
         update_params_(quantum_task_json.at("params"));
-    } else
-        throw std::runtime_error("Incorrect format of the circuit.");
 }
 
     
@@ -71,11 +75,7 @@ void QuantumTask::update_params_(const std::vector<double> params)
         int counter = 0;
         
         for (auto& instruction : circuit){
-
             std::string name = instruction.at("name");
-            
-            
-            // TODO: Look at the instructions constants and how to work with them
             switch(cunqa::constants::INSTRUCTIONS_MAP.at(name)){
                 case cunqa::constants::MEASURE:
                 case cunqa::constants::ID:

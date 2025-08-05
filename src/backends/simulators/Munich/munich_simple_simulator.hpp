@@ -17,6 +17,7 @@ public:
     ~MunichSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "MunichSimulator";}
+    
     JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;
 };
 

@@ -54,7 +54,7 @@ int ClassicalChannel::recv_measure(std::string& origin)
     return pimpl_->recv(origin);
 }
 
-void ClassicalChannel::set_classical_connections(std::vector<std::string>& qpus_id)
+void ClassicalChannel::connect(std::vector<std::string>& endpoints)
 {
     LOGGER_DEBUG("MPI does not need to set connections.");
 }
