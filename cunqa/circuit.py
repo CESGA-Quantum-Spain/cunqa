@@ -1,15 +1,15 @@
 """
     Holds Cunqa's custom circuit class and functions to translate its instructions into other formats for circuit definition.
 """
-from cunqa.logger import logger
-from cunqa.qutils import transitive_combinations
 import numpy as np
 import random
 import string
 import itertools
 import functools
+from collections import defaultdict
 from typing import Tuple, Union, Optional
 from qiskit import QuantumCircuit
+from cunqa.logger import logger
 
 import matplotlib.pyplot as plt #I use this for drawing circuits with LaTeX (quantikz)
 from matplotlib import rc
@@ -53,45 +53,36 @@ class CunqaCircuitError(Exception):
     """Exception for error during circuit desing in ``CunqaCircuit``."""
     pass
 
-class InstanceTracker:
-    """Decorator that records all created instances and allows any of them to access the other ones."""
-    def __init__(self, cls):
-        functools.update_wrapper(self, cls) # Ensures that the docstring of the wrapped class is shown and not that of the wrapper
-        self._cls = cls
-        self._instances = {}
+class InstanceTrackerMeta(type):
+    """Metaclass to track instances of CunqaCircuits and extract the connections between them."""
+    _instances = {}
+    _connected = None
+    _new_inst = False
 
-        self._connected = None
-        self._new_inst = False
-
-        # Override the __init__ method to track instance creation
-        self._original_init = cls.__init__
-        cls.__init__ = self._new_init
-
-    def _new_init(self, *args, **kwargs):
-        instance = object.__new__(self._cls)
-        self._original_init(instance, *args, **kwargs) # Call the original __init__ method
+    def __call__(cls, *args, **kwargs):
+        # Create the instance using the original __call__ method
+        instance = super().__call__(*args, **kwargs)
         
-        self._instances[instance._id] = instance # Store reference to instance on the key with its id
-        self._new_inst = True
+        # Store the instance if it has an _id attribute
+        if hasattr(instance, '_id'):
+            cls._instances[instance._id] = instance
+        
+        return instance
 
-    def access_other_instances(self):
-        return self._instances
+    def access_other_instances(cls):
+        return cls._instances
     
-    def connectivity(self):
-        if (self._connected is None or self._new_inst):
-            # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
-            first_connections = {frozenset({idd, sent}) for idd, circuit in self.access_other_instances().items() for sent in circuit.sending_to}
-            # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
-            self._connected = transitive_combinations(first_connections) 
-            self._new_inst = False
+    def get_connectivity(cls):
+            if (cls._connected is None or cls._new_inst):
+                # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
+                first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
+                # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
+                cls._connected = transitive_combinations(first_connections) 
+                cls._new_inst = False
 
-        return self._connected
+            return cls._connected
 
-    def __call__(self, *args, **kwargs):
-        return self._cls(*args, **kwargs)
-
-@InstanceTracker
-class CunqaCircuit:
+class CunqaCircuit(metaclass=InstanceTrackerMeta):
     # TODO: look for other alternatives for describing the documentation that do not requiere such long docstrings, maybe gatehring everything in another file and using decorators, as in ther APIs.
     """
     Class to define a quantum circuit for the ``cunqa`` api.
@@ -248,7 +239,7 @@ class CunqaCircuit:
         if id is None:
             self._id = "CunqaCircuit_" + _generate_id()
         elif isinstance(id, str):
-            other_circuits = self.access_other_instances()
+            other_circuits = self.__class__.access_other_instances()
             if id in other_circuits.keys():
                 logger.error(f"Id {id} was already used for another circuit.")
                 raise SystemExit
@@ -257,12 +248,14 @@ class CunqaCircuit:
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
             raise SystemExit
-        
+
         if num_clbits is None:
             self.classical_regs = {}
         
         elif isinstance(num_clbits, int):
             self.classical_regs = {'c0':[c for c in range(num_clbits)]}
+
+
 
     @property
     def info(self) -> dict:
@@ -478,7 +471,7 @@ class CunqaCircuit:
     # Horizontal concatenation methods
 
     def update_other_instances(self, instances_to_change, other_id, comb_id, displace_n = 0): # Change other instances that referenced any of the circuits to reference the combined circuit
-        other_instances = self.access_other_instances 
+        other_instances = self.__class__.access_other_instances() 
 
         if isinstance(instances_to_change, set): # This one should be used for the sum, where no displacement of the referenced qubits is necessary
             for circuit in instances_to_change: 
@@ -522,7 +515,7 @@ class CunqaCircuit:
 
             if isinstance(other_circuit, CunqaCircuit):
                 if not force_execution:
-                    if any([(self._id in path and other_circuit._id in path) for path in self.connectivity]):
+                    if any([(self._id in path and other_circuit._id in path) for path in self.__class__.get_connectivity()]):
                         logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
                         raise SystemExit
                     
@@ -548,7 +541,7 @@ class CunqaCircuit:
             for instruction in list(self_instr + other_instr):
                 summed_circuit._add_instruction(instruction)
 
-            self.update_other_instances(self, instances_to_change, other_id, sum_id)
+            self.update_other_instances(instances_to_change, other_id, sum_id)
             
             return summed_circuit
         
@@ -581,7 +574,7 @@ class CunqaCircuit:
                     summed_circuit._add_instruction(instruction)
 
                 instances_to_change = {instr["circuits"][0] for instr in self.instructions if instr["name"] in SUPPORTED_GATES_DISTRIBUTED}
-                self.update_other_instances(self, instances_to_change, left_id, sum_id) # Update other circuits that communicate with self to reference the summed_circuit
+                self.update_other_instances(instances_to_change, left_id, sum_id) # Update other circuits that communicate with self to reference the summed_circuit
 
                 return summed_circuit
         
@@ -608,7 +601,7 @@ class CunqaCircuit:
             instances_to_change = set()
             if isinstance(other_circuit, CunqaCircuit):
                 if not force_execution:
-                    if any([(self._id in connection and other_circuit._id in connection) for connection in self.connectivity]):
+                    if any([(self._id in connection and other_circuit._id in connection) for connection in self.__class__.get_connectivity()]):
                         logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever. If you're sure this won't happen try the syntax sum(circ_1, circ_2, force_execution = True).")
                         raise SystemExit
                     
@@ -631,7 +624,7 @@ class CunqaCircuit:
             if self._id in instances_to_change:
                 logger.error("The circuits to be summed contain distributed instructions that reference eachother.")
                 raise SystemExit
-            self.update_other_instances(self, instances_to_change, other_id, self._id)
+            self.update_other_instances(instances_to_change, other_id, self._id)
         
         else:
             logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
@@ -653,7 +646,7 @@ class CunqaCircuit:
         instances_to_change = set()
         if isinstance(other_circuit, CunqaCircuit):
             other_instr = other_circuit.instructions
-            other_id = other_circuit.id
+            other_id = other_circuit._id
             union_id = self._id + " | " + other_id
 
             instances_to_change.union({instr["circuits"][0] for instr in other_instr if instr["name"] in SUPPORTED_GATES_DISTRIBUTED})
@@ -702,8 +695,8 @@ class CunqaCircuit:
                     instances_to_change_and_displace[instrr["circuits"][0]] = ["control" if instrr["name"] == "measure_and_send" else "target"]
 
 
-        self.update_other_instances(self, instances_to_change, other_id, union_id) # Update other circuits that communicate with our input circuits to reference the union_circuit
-        self.update_other_instances(self, instances_to_change_and_displace, other_id, union_id, n)
+        self.update_other_instances(instances_to_change, other_id, union_id) # Update other circuits that communicate with our input circuits to reference the union_circuit
+        self.update_other_instances(instances_to_change_and_displace, other_id, union_id, n)
 
         return union_circuit
     
@@ -738,11 +731,12 @@ class CunqaCircuit:
                         instr["qubits"][0] = instr["qubits"][0] + n # The control comes from the displaced circuit
                 union_circuit._add_instruction(instr)
 
+
             instances_to_change_and_displace = {} # Here we will collect info on the circuits that talk to self to make them reference the union instead
             for instrr in self.instructions:
                 instrr["qubits"] = [qubit + m for qubit in instrr["qubits"]]
 
-                if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference the other_circuit and wether it controls or is a target
+                if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference other_circuit and wether it controls or is a target
                     if instrr["circuits"][0] == upper_id: # Susbtitute distr gate by local gates if it refences upper_circuit 
                         if instrr["name"] == "measure_and_send":
                             continue # These ones have been substituted earlier
@@ -759,7 +753,7 @@ class CunqaCircuit:
 
                 union_circuit._add_instruction(instrr)
 
-            self.update_other_instances(self, instances_to_change_and_displace, upper_id, union_id, n)
+            self.update_other_instances(instances_to_change_and_displace, upper_id, union_id, n)
 
             return union_circuit
                 
@@ -814,7 +808,7 @@ class CunqaCircuit:
                         instr["qubits"][0] = instr["qubits"][0] + n # The control comes from the displaced circuit
 
 
-        self.update_other_instances(self, instances_to_change_and_displace, other_id, self._id, n)
+        self.update_other_instances(instances_to_change_and_displace, other_id, self._id, n)
     
 
     # Methods to retrieve information from the circuit
@@ -1775,20 +1769,14 @@ class CunqaCircuit:
 
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
-        
-        
 
-    # TODO: check if simulators accept reset instruction as native
-    def reset(self, qubits: Union[list[int], int]):
-        if isinstance(qubits, list):
-            for q in qubits:
-                self.c_if("x", q, q)
-
-        elif isinstance(qubits, int):
-            self.c_if("x", qubits, qubits)
-
-        else:
-            logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
+    def save_state(self, pershot: bool = False):
+        self.instructions.append({
+            "name": "save_state",
+            "qubits": list(range(self.num_qubits)),
+            "snapshot_type": "list" if pershot else "single",
+            "label": "_method_"
+        })
 
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
@@ -2377,3 +2365,32 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
             if any(line.startswith(gate) for gate in parametric_gates):
                 return True
         return False
+
+
+
+########## PURELY MATHEMATICAL METHODS ####################
+
+def transitive_combinations(pairs: set) -> set:
+    # Step 1: Create a graph representation of the given pairs
+    graph = defaultdict(set)
+    for pair in pairs:
+        for node in pair:
+            graph[node].update(pair)
+
+    # Step 2: Perform a breadth-first search to find all transitive combinations
+    transitive_combinations = pairs.copy()
+
+    while True:
+        new_combinations = set()
+        for combo in transitive_combinations:
+            for node in combo:
+                for neighbor in graph[node]:
+                    if neighbor not in combo:
+                        new_combo = frozenset({*combo, neighbor})
+                        if new_combo not in transitive_combinations:
+                            new_combinations.add(new_combo)
+        if not new_combinations:
+            break
+        transitive_combinations.update(new_combinations)
+
+    return transitive_combinations

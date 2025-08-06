@@ -442,6 +442,8 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         int n_clbits = quantum_task.config.at("num_clbits");
         JSON circuit_json = aer_quantum_task.circuit;
 
+        LOGGER_DEBUG("Circuit in simulate: {}", circuit_json.dump());
+
         Circuit circuit(circuit_json);
         std::vector<std::shared_ptr<Circuit>> circuits;
         circuits.push_back(std::make_shared<Circuit>(circuit));

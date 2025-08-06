@@ -9,6 +9,7 @@ Created 15/07/2025
 import os, sys
 import math
 import subprocess
+import functools
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import  Union, Any, Optional
@@ -33,6 +34,7 @@ class CostFunction:
         self.choice_function = choose_function
 
         if choose_function == "rmse":
+            functools.update_wrapper(self, self.function)
             self.function = self.rmse
             self.deriv = self.rmse_deriv
 
@@ -105,6 +107,8 @@ class GradientMethod:
         else:
             logger.error(f"Chosen gradient method is not supported: {choose_method}.")
             raise GradientMethodError
+        
+        functools.update_wrapper(self, self.method)
 
     #################### GRADIENTS ####################
 

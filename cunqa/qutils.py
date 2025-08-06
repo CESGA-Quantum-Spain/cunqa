@@ -3,7 +3,6 @@ import os
 import sys
 import time
 from typing import Union, Optional
-from collections import defaultdict
 from subprocess import run
 from json import load
 import json
@@ -25,24 +24,8 @@ else:
 class QRaiseError(Exception):
     """Exception for errors during qraise slurm command"""
     pass
-
-def are_qpus_raised(family: Optional[str] = None) -> bool:
-    last_modification = os.stat(INFO_PATH).st_mtime 
-    while True:
-        if last_modification != os.stat(INFO_PATH).st_mtime: 
-            last_modification = os.stat(INFO_PATH).st_mtime
-            if family == None:
-                return True
-            else:
-                with open(INFO_PATH, "r") as qpus_json:
-                    data = json.load(qpus_json)
-                    for value in data.values():
-                        if value["family"] == family:
-                            return True
-                        
-    
-
-
+               
+               
 def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
@@ -316,31 +299,3 @@ def getQPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
         raise SystemExit
 
 
-
-
-########## PURELY MATHEMATICAL METHODS ####################
-
-def transitive_combinations(pairs: set) -> set:
-    # Step 1: Create a graph representation of the given pairs
-    graph = defaultdict(set)
-    for pair in pairs:
-        for node in pair:
-            graph[node].update(pair)
-
-    # Step 2: Perform a breadth-first search to find all transitive combinations
-    transitive_combinations = pairs.copy()
-
-    while True:
-        new_combinations = set()
-        for combo in transitive_combinations:
-            for node in combo:
-                for neighbor in graph[node]:
-                    if neighbor not in combo:
-                        new_combo = frozenset({*combo, neighbor})
-                        if new_combo not in transitive_combinations:
-                            new_combinations.add(new_combo)
-        if not new_combinations:
-            break
-        transitive_combinations.update(new_combinations)
-
-    return transitive_combinations
