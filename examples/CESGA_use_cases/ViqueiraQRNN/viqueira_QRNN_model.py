@@ -49,6 +49,9 @@ class ViqueiraQRNN:
         self.qpus=getQPUs(local=False) 
         self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit with parameters zero on all QPUs
 
+    def calc_observable(self, qjob, x, theta, observ):
+        pass
+
 
     def train(self, population: list[np.array], y_labels: list[np.array], theta_init: np.array = None, gradient_method: Optional[str] = "finite_differences", cost_func: Optional[str] = "rmse", learn_rate: float = 1e-3, epochs: int = 2000):
         """

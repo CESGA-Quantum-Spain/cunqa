@@ -1,5 +1,7 @@
 """Contains the Result class, which deals with the output of QJobs using any simulator."""
 from cunqa.logger import logger
+from typing import Union, Optional
+import numpy as np
 
 class ResultError(Exception):
     """Exception for error during job submission to QPUs."""
@@ -81,21 +83,63 @@ class Result:
         return counts
     
     @property
-    def density_matrix(self) -> object:
+    def statevector(self) -> Union[dict[np.array], np.array]:
         try:
-            if "results" in list(self._result.keys()): # aer
-                density_matrix = self._result["results"][0]["data"]["density_matrix"]
+            if ("results" in list(self._result.keys()) 
+                and "result_types" in self._result["results"][0]["metadata"] 
+                and "save_statevector" in self._result["results"][0]["metadata"]["result_types"].values()): # aer
+                    
+                    statevector = {} # All of this is because we can store multiple statevecs with labels different from "statevector"
+                    for k, v in self._result["results"][0]["metadata"]["result_types"].items():
+                        if v == "save_statevector":
+                            statevector[k] = np.array(self._result["results"][0]["data"][k]).view(np.complex128)
+
+                    if len(statevector) == 1:
+                        statevector = list(statevector.values())[0] # Extract the statevector if we only have one
+                
+
+            elif "statevector" in self._result: # Munich and Cunqasim
+                statevector = self._result["statevector"]
+                if isinstance(statevector, dict):
+                    for k, v in statevector.items():
+                        statevector[k] = np.array(v).view(np.complex128)
+                else:
+                    statevector = np.array(statevector).view(np.complex128)
 
             else:
-                logger.error(f"Density Matrix not found.")
+                logger.error(f"Statevector not found, try using circuit.save_state() at some point before executing.")
                 raise ResultError
 
         except Exception as error:
-            logger.error(f"Some error occured with density matrix [{type(error).__name__}]: {error}.")
+            logger.error(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
+            raise error
+        
+        return statevector
+
+    @property
+    def density_matrix(self) -> Union[dict[np.array], np.array]:
+        try:
+            if ("results" in list(self._result.keys()) 
+                and "result_types" in self._result["results"][0]["metadata"] 
+                and "save_density_matrix" in self._result["results"][0]["metadata"]["result_types"].values()): # aer
+                
+                density_matrix = {} # All of this is because we can store multiple densmats with labels different from "density_matrix"
+                for k, v in self._result["results"][0]["metadata"]["result_types"].items():
+                    if v == "save_density_matrix":
+                        density_matrix[k] = np.array(self._result["results"][0]["data"][k]).view(np.complex128)
+
+                if len(density_matrix) == 1:
+                    density_matrix = list(density_matrix.values())[0] # Extract the statevector if we only have one
+
+            else:
+                logger.error(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
+                raise ResultError
+
+        except Exception as error:
+            logger.error(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
             raise error
         
         return density_matrix
-
 
     @property
     def time_taken(self) -> str:
@@ -112,6 +156,92 @@ class Result:
         except Exception as error:
             logger.error(f"Some error occured with time taken [{type(error).__name__}]: {error}.")
             raise error
+        
+
+    def probabilities(self, per_qubit: bool = False, partial: list[int] = None, interface: bool = True) -> Union[dict[np.array], dict[ float], np.array]:
+        """
+        Extracts probabilities from result information. If we have statevector or density matrix 
+        exact probabilities are obtained, otherwise frequencies are calculated from counts.
+
+        Args:
+            per_qubit: if True probabilities of 0 or 1 on each individual qubit are returned
+                        instead of probabilities of each possible bitstring.
+            partial: list of qubits whose probabilities should be returned, determining the probability space. 
+                        Combinations need to be performed so their possible outcomes sum to probability 1.
+            interface: controls wether a dictionary with keys "0010" or "qubit_0" should be returned 
+                        or just a np.array with the probs in binary order or qubit order.
+        Returns:
+            probs (dict, np.array): probability information of the selected mode.
+        """
+        num_qubits = len( next(iter(self.counts.keys())) )
+        partial = list(range( num_qubits )) if partial == None else partial 
+
+        try:
+            there_is_statevec = False 
+            statevecs = self.statevector
+            print(statevecs)
+            there_is_statevec = True
+        except Exception as error:
+            pass
+
+        try:
+            there_is_densmat = False
+            densmats = self.density_matrix
+            there_is_densmat = True
+        except Exception as error:
+            pass
+
+        # Statevector
+        if there_is_statevec:
+            if isinstance(statevecs, dict):
+                probs={}
+                for k, statevec in statevecs.items():
+                    probs[k] = np.reshape(np.abs(statevec), np.shape(statevec)[0])
+
+            else:
+                probs = np.reshape(np.abs(statevecs), np.shape(statevec)[0])
+
+            if per_qubit:
+                probs = recombine_probs(probs, partial, interface, num_qubits)
+                probs = f"Probabilities: {probs}" if interface else probs
+
+            return probs
+
+        # Density matrix
+        elif there_is_densmat:
+            if isinstance(densmats, dict):
+                probs = {}
+                for k, densmat in densmats.items():
+                    probs[k] =  np.diagonal(densmat, axis1=0).real
+            else:
+                probs =  np.diagonal(densmats, axis1=0).real
+
+            if per_qubit:
+                probs = recombine_probs(probs, partial, interface, num_qubits)
+                probs = f"Probabilities: {probs}" if interface else probs
+            
+            return probs
+
+        # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
+        if not any([there_is_densmat, there_is_statevec]): 
+            if per_qubit:
+ 
+                probs = {str(i_qubit): np.array([0, 0]) for i_qubit in partial}
+
+                for bitstr, count in self.counts.items():
+                    for i_qubit in partial:
+                        probs[str(i_qubit)][bitstr[i_qubit]] += count # Notice that the order of qubits on the bitstring needs to got from 0 to num_qubits
+
+                for i_qubit in partial:
+                    probs[str(i_qubit)]/sum(probs[str(i_qubit)]) # Vectorized division to get frequencies
+
+            else:
+                probs = {}
+                shots = sum(self.counts.values())
+                for k, v in self.counts.items():
+                    probs[k] = v/shots
+
+            return probs
     
 
 def divide(string: str, lengths: "list[int]") -> str:
@@ -182,3 +312,64 @@ def convert_counts(counts: dict, registers: dict) -> dict:
         raise ResultError # I capture this error in QJob.result()
     
     return new_counts
+
+def recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None, list[int]], interface: bool, num_qubits: int):
+    """
+    Processes the probabilities per bitstring to obtain the probabilities per qubit. 
+
+    Args:
+        probs (np.array[float], dict[np.array[float]]): probabilities or list of probabilities per bitstring
+        partial (None, list[int]): list of qubits (their index) that determine the total probability space
+        interface (bool): determines wether we want an bare np.array or a dict with qubit_index as keys
+        num_qubits (int): number of qubits that determines the lenght of the bitstrings
+
+    Returns:
+        new_probs (np.array[float], dict[np.array[float]]): probabilities or list of probabilities per qubit
+    
+    """
+    
+
+    if interface:
+        new_probs = {}
+        if isinstance(probs, dict):
+            new_probs = {}
+
+            for k, probs_k in probs.items():
+                new_probs[k] = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
+                for base_ten_bitstring, prob in enumerate(probs_k):
+                    for i_qubit in partial:
+
+                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
+                        new_probs[k][str(i_qubit)][zero_one] += prob
+        else:
+            new_probs = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
+
+            for base_ten_bitstring, prob in enumerate(probs_k):
+                for i_qubit in partial:
+
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
+                    new_probs[str(i_qubit)][zero_one] += prob
+
+    else:
+        if isinstance(probs, dict):
+            new_probs = {}
+
+            for k, probs_k in probs.items():
+                new_probs[k] = np.zeros((len(partial), 2))
+                for base_ten_bitstring, prob in enumerate(probs_k):
+                    for i, i_qubit in enumerate(partial):
+
+                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
+                        new_probs[k][i, zero_one] += prob
+        else:
+            new_probs = np.zeros((len(partial), 2))
+
+            for base_ten_bitstring, prob in enumerate(probs_k):
+                for i, i_qubit in enumerate(partial):
+
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
+                    new_probs[i, zero_one] += prob
+
+    return new_probs
+
+

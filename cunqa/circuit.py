@@ -63,9 +63,8 @@ class InstanceTrackerMeta(type):
         # Create the instance using the original __call__ method
         instance = super().__call__(*args, **kwargs)
         
-        # Store the instance if it has an _id attribute
-        if hasattr(instance, '_id'):
-            cls._instances[instance._id] = instance
+        # Store the instance 
+        cls._instances[instance._id] = instance
         
         return instance
 
@@ -1770,12 +1769,12 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
 
-    def save_state(self, pershot: bool = False):
+    def save_state(self, pershot: bool = False, label: str = "_method_"):
         self.instructions.append({
             "name": "save_state",
             "qubits": list(range(self.num_qubits)),
             "snapshot_type": "list" if pershot else "single",
-            "label": "_method_"
+            "label": label
         })
 
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
