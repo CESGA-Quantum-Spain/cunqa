@@ -5,7 +5,6 @@ cunqa.circuit.CunqaCircuit
 
 .. autoclass:: CunqaCircuit
    :show-inheritance:
-   :exclude-base-classes: object
 
 
 

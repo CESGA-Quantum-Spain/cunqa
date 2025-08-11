@@ -5,7 +5,6 @@ cunqa.backend.Backend
 
 .. autoclass:: Backend
    :show-inheritance:
-   :exclude-base-classes: object
 
 
 

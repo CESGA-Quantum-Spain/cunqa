@@ -5,7 +5,6 @@ cunqa.mappers.QJobMapper
 
 .. autoclass:: QJobMapper
    :show-inheritance:
-   :exclude-base-classes: object
 
 
 
