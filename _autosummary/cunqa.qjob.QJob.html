@@ -191,63 +191,6 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.qjob.</span></span><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to handle jobs sent to the simulator.</p>
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10.0%" />
-<col style="width: 90.0%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
-<td><p>Synchronous method to obtain the result of the job.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.time_taken" title="cunqa.qjob.QJob.time_taken"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_taken</span></code></a></p></td>
-<td><p>Method to obtain the time that the job took.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10.0%" />
-<col style="width: 90.0%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="cunqa.qjob.QJob.submit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit</span></code></a></p></td>
-<td><p>Asynchronous method to submit a job to the corresponding QClient.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#id1" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a></p></td>
-<td><p>Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py property">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.result">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><span class="pre">Result</span></a></em><a class="headerlink" href="#cunqa.qjob.QJob.result" title="Link to this definition"></a></dt>
-<dd><p>Synchronous method to obtain the result of the job. Note that this call depends on the job being finished, therefore is blocking.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.time_taken">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_taken</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qjob.QJob.time_taken" title="Link to this definition"></a></dt>
-<dd><p>Method to obtain the time that the job took. It can also be obtained by <cite>QJob._result.time_taken</cite>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
-<span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
-<dd><p>Asynchronous method to submit a job to the corresponding QClient.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
-<span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
-<dd><p>Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – list of parameters to assign to the parametrized circuit.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <section id="attributes">
@@ -258,10 +201,10 @@
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></p></td>
 <td><p>Synchronous method to obtain the result of the job.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.time_taken" title="cunqa.qjob.QJob.time_taken"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_taken</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_taken</span></code></p></td>
 <td><p>Method to obtain the time that the job took.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">qclient</span></code></p></td>
@@ -273,14 +216,14 @@
 <section id="methods">
 <h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
 <dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
+<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
 <dd><p>Asynchronous method to submit a job to the corresponding QClient.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
+<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
 <dd><p>Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
