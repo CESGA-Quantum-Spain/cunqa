@@ -191,23 +191,6 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.mappers.</span></span><span class="sig-name descname"><span class="pre">QPUCircuitMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><span class="pre">QPU</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ansatz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to map the function <cite>qpu.QPU.run()</cite> to a list of QPUs.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="Link to this definition"></a></dt>
-<dd><p>Callable method to map the function to the QPUs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>func</em>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
-<li><p><strong>params</strong> (<em>list</em><em>[</em><em>list</em><em>]</em>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of the results of the function applied to the output of the circuits sent to the QPUs.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <section id="attributes">
@@ -231,9 +214,9 @@
 </tr>
 </tbody>
 </table>
-<section id="method-reference">
-<h3>Method reference<a class="headerlink" href="#method-reference" title="Link to this heading"></a></h3>
 </section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
 </section>
 </section>
 
