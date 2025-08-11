@@ -23,33 +23,6 @@ Attributes
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~QPU.__init__
-
-   ~QPU.run
-
-
-
-
-
-Attribute reference
-~~~~~~~~~~~~~~~~~~~
-
-
-.. autoattribute:: QPU.backend
-
-
-.. autoattribute:: QPU.id
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 

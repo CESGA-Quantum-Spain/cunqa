@@ -12,22 +12,6 @@ cunqa.backend.Backend
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~Backend.__init__
-
-   ~Backend.info
-
-
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 

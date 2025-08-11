@@ -29,40 +29,6 @@ Attributes
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~QPUCircuitMapper.__init__
-
-
-
-
-
-Attribute reference
-~~~~~~~~~~~~~~~~~~~
-
-
-.. autoattribute:: QPUCircuitMapper.qpus
-
-
-.. autoattribute:: QPUCircuitMapper.ansatz
-
-
-.. autoattribute:: QPUCircuitMapper.transpile
-
-
-.. autoattribute:: QPUCircuitMapper.initial_layout
-
-
-.. autoattribute:: QPUCircuitMapper.run_parameters
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 

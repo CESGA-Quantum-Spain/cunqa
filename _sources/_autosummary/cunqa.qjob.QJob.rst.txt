@@ -25,38 +25,6 @@ Attributes
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~QJob.__init__
-
-   ~QJob.submit
-
-   ~QJob.upgrade_parameters
-
-
-
-
-
-Attribute reference
-~~~~~~~~~~~~~~~~~~~
-
-
-.. autoattribute:: QJob.result
-
-
-.. autoattribute:: QJob.time_taken
-
-
-.. autoattribute:: QJob.qclient
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 

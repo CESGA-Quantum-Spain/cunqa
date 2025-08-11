@@ -27,37 +27,6 @@ Attributes
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~Result.__init__
-
-
-
-
-
-Attribute reference
-~~~~~~~~~~~~~~~~~~~
-
-
-.. autoattribute:: Result.counts
-
-
-.. autoattribute:: Result.density_matrix
-
-
-.. autoattribute:: Result.result
-
-
-.. autoattribute:: Result.time_taken
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 

@@ -21,28 +21,6 @@ Attributes
 
 
 
-Methods
--------
-
-.. autosummary::
-   :nosignatures:
-
-   ~QJobMapper.__init__
-
-
-
-
-
-Attribute reference
-~~~~~~~~~~~~~~~~~~~
-
-
-.. autoattribute:: QJobMapper.qjobs
-
-
-
-
-
 Method reference
 ~~~~~~~~~~~~~~~~
 
