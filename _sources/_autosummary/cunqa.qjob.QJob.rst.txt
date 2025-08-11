@@ -5,6 +5,7 @@ cunqa.qjob.QJob
 
 .. autoclass:: QJob
    :show-inheritance:
+   :exclude-base-classes: object
 
 
 

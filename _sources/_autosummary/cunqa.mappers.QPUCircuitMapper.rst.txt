@@ -5,6 +5,7 @@ cunqa.mappers.QPUCircuitMapper
 
 .. autoclass:: QPUCircuitMapper
    :show-inheritance:
+   :exclude-base-classes: object
 
 
 

@@ -5,6 +5,7 @@ cunqa.qpu.QPU
 
 .. autoclass:: QPU
    :show-inheritance:
+   :exclude-base-classes: object
 
 
 
