@@ -4,18 +4,49 @@ cunqa.mappers.QJobMapper
 .. currentmodule:: cunqa.mappers
 
 .. autoclass:: QJobMapper
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~QJobMapper.qjobs
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJobMapper.qjobs
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJobMapper.__init__
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: QJobMapper.qjobs
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: QJobMapper.__init__
+
+

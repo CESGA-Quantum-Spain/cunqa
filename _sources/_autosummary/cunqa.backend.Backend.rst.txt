@@ -4,11 +4,37 @@ cunqa.backend.Backend
 .. currentmodule:: cunqa.backend
 
 .. autoclass:: Backend
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~Backend.__init__
+
+   ~Backend.info
+
+
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: Backend.__init__
+
+
+.. automethod:: Backend.info
+
+

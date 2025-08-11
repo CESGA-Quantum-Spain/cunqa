@@ -4,27 +4,349 @@ cunqa.circuit.CunqaCircuit
 .. currentmodule:: cunqa.circuit
 
 .. autoclass:: CunqaCircuit
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~CunqaCircuit.info
-      ~CunqaCircuit.num_clbits
-      ~CunqaCircuit.num_qubits
-      ~CunqaCircuit.is_parametric
-      ~CunqaCircuit.has_cc
-      ~CunqaCircuit.is_dynamic
-      ~CunqaCircuit.instructions
-      ~CunqaCircuit.quantum_regs
-      ~CunqaCircuit.classical_regs
-      ~CunqaCircuit.sending_to
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~CunqaCircuit.info
+
+   ~CunqaCircuit.num_clbits
+
+   ~CunqaCircuit.num_qubits
+
+   ~CunqaCircuit.is_parametric
+
+   ~CunqaCircuit.has_cc
+
+   ~CunqaCircuit.is_dynamic
+
+   ~CunqaCircuit.instructions
+
+   ~CunqaCircuit.quantum_regs
+
+   ~CunqaCircuit.classical_regs
+
+   ~CunqaCircuit.sending_to
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~CunqaCircuit.__init__
+
+   ~CunqaCircuit.c_if
+
+   ~CunqaCircuit.ccx
+
+   ~CunqaCircuit.ccy
+
+   ~CunqaCircuit.ccz
+
+   ~CunqaCircuit.cp
+
+   ~CunqaCircuit.crx
+
+   ~CunqaCircuit.cry
+
+   ~CunqaCircuit.crz
+
+   ~CunqaCircuit.cswap
+
+   ~CunqaCircuit.csx
+
+   ~CunqaCircuit.cu
+
+   ~CunqaCircuit.cu1
+
+   ~CunqaCircuit.cu3
+
+   ~CunqaCircuit.cx
+
+   ~CunqaCircuit.cy
+
+   ~CunqaCircuit.cz
+
+   ~CunqaCircuit.ecr
+
+   ~CunqaCircuit.from_instructions
+
+   ~CunqaCircuit.h
+
+   ~CunqaCircuit.id
+
+   ~CunqaCircuit.measure
+
+   ~CunqaCircuit.measure_all
+
+   ~CunqaCircuit.measure_and_send
+
+   ~CunqaCircuit.p
+
+   ~CunqaCircuit.qrecv
+
+   ~CunqaCircuit.qsend
+
+   ~CunqaCircuit.r
+
+   ~CunqaCircuit.remote_c_if
+
+   ~CunqaCircuit.reset
+
+   ~CunqaCircuit.rx
+
+   ~CunqaCircuit.rxx
+
+   ~CunqaCircuit.ry
+
+   ~CunqaCircuit.ryy
+
+   ~CunqaCircuit.rz
+
+   ~CunqaCircuit.rzx
+
+   ~CunqaCircuit.rzz
+
+   ~CunqaCircuit.s
+
+   ~CunqaCircuit.sdg
+
+   ~CunqaCircuit.swap
+
+   ~CunqaCircuit.sx
+
+   ~CunqaCircuit.sxdg
+
+   ~CunqaCircuit.t
+
+   ~CunqaCircuit.tdg
+
+   ~CunqaCircuit.u
+
+   ~CunqaCircuit.u1
+
+   ~CunqaCircuit.u2
+
+   ~CunqaCircuit.u3
+
+   ~CunqaCircuit.unitary
+
+   ~CunqaCircuit.x
+
+   ~CunqaCircuit.y
+
+   ~CunqaCircuit.z
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: CunqaCircuit.info
+
+
+.. autoattribute:: CunqaCircuit.num_clbits
+
+
+.. autoattribute:: CunqaCircuit.num_qubits
+
+
+.. autoattribute:: CunqaCircuit.is_parametric
+
+
+.. autoattribute:: CunqaCircuit.has_cc
+
+
+.. autoattribute:: CunqaCircuit.is_dynamic
+
+
+.. autoattribute:: CunqaCircuit.instructions
+
+
+.. autoattribute:: CunqaCircuit.quantum_regs
+
+
+.. autoattribute:: CunqaCircuit.classical_regs
+
+
+.. autoattribute:: CunqaCircuit.sending_to
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: CunqaCircuit.__init__
+
+
+.. automethod:: CunqaCircuit.c_if
+
+
+.. automethod:: CunqaCircuit.ccx
+
+
+.. automethod:: CunqaCircuit.ccy
+
+
+.. automethod:: CunqaCircuit.ccz
+
+
+.. automethod:: CunqaCircuit.cp
+
+
+.. automethod:: CunqaCircuit.crx
+
+
+.. automethod:: CunqaCircuit.cry
+
+
+.. automethod:: CunqaCircuit.crz
+
+
+.. automethod:: CunqaCircuit.cswap
+
+
+.. automethod:: CunqaCircuit.csx
+
+
+.. automethod:: CunqaCircuit.cu
+
+
+.. automethod:: CunqaCircuit.cu1
+
+
+.. automethod:: CunqaCircuit.cu3
+
+
+.. automethod:: CunqaCircuit.cx
+
+
+.. automethod:: CunqaCircuit.cy
+
+
+.. automethod:: CunqaCircuit.cz
+
+
+.. automethod:: CunqaCircuit.ecr
+
+
+.. automethod:: CunqaCircuit.from_instructions
+
+
+.. automethod:: CunqaCircuit.h
+
+
+.. automethod:: CunqaCircuit.id
+
+
+.. automethod:: CunqaCircuit.measure
+
+
+.. automethod:: CunqaCircuit.measure_all
+
+
+.. automethod:: CunqaCircuit.measure_and_send
+
+
+.. automethod:: CunqaCircuit.p
+
+
+.. automethod:: CunqaCircuit.qrecv
+
+
+.. automethod:: CunqaCircuit.qsend
+
+
+.. automethod:: CunqaCircuit.r
+
+
+.. automethod:: CunqaCircuit.remote_c_if
+
+
+.. automethod:: CunqaCircuit.reset
+
+
+.. automethod:: CunqaCircuit.rx
+
+
+.. automethod:: CunqaCircuit.rxx
+
+
+.. automethod:: CunqaCircuit.ry
+
+
+.. automethod:: CunqaCircuit.ryy
+
+
+.. automethod:: CunqaCircuit.rz
+
+
+.. automethod:: CunqaCircuit.rzx
+
+
+.. automethod:: CunqaCircuit.rzz
+
+
+.. automethod:: CunqaCircuit.s
+
+
+.. automethod:: CunqaCircuit.sdg
+
+
+.. automethod:: CunqaCircuit.swap
+
+
+.. automethod:: CunqaCircuit.sx
+
+
+.. automethod:: CunqaCircuit.sxdg
+
+
+.. automethod:: CunqaCircuit.t
+
+
+.. automethod:: CunqaCircuit.tdg
+
+
+.. automethod:: CunqaCircuit.u
+
+
+.. automethod:: CunqaCircuit.u1
+
+
+.. automethod:: CunqaCircuit.u2
+
+
+.. automethod:: CunqaCircuit.u3
+
+
+.. automethod:: CunqaCircuit.unitary
+
+
+.. automethod:: CunqaCircuit.x
+
+
+.. automethod:: CunqaCircuit.y
+
+
+.. automethod:: CunqaCircuit.z
+
+

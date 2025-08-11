@@ -4,27 +4,149 @@ cunqa.backend.BackendData
 .. currentmodule:: cunqa.backend
 
 .. autoclass:: BackendData
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~BackendData.basis_gates
-      ~BackendData.coupling_map
-      ~BackendData.custom_instructions
-      ~BackendData.description
-      ~BackendData.gates
-      ~BackendData.n_qubits
-      ~BackendData.name
-      ~BackendData.noise_model
-      ~BackendData.simulator
-      ~BackendData.version
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~BackendData.basis_gates
+
+   ~BackendData.coupling_map
+
+   ~BackendData.custom_instructions
+
+   ~BackendData.description
+
+   ~BackendData.gates
+
+   ~BackendData.n_qubits
+
+   ~BackendData.name
+
+   ~BackendData.noise_model
+
+   ~BackendData.simulator
+
+   ~BackendData.version
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~BackendData.__init__
+
+   ~BackendData.clear
+
+   ~BackendData.copy
+
+   ~BackendData.fromkeys
+
+   ~BackendData.get
+
+   ~BackendData.items
+
+   ~BackendData.keys
+
+   ~BackendData.pop
+
+   ~BackendData.popitem
+
+   ~BackendData.setdefault
+
+   ~BackendData.update
+
+   ~BackendData.values
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: BackendData.basis_gates
+
+
+.. autoattribute:: BackendData.coupling_map
+
+
+.. autoattribute:: BackendData.custom_instructions
+
+
+.. autoattribute:: BackendData.description
+
+
+.. autoattribute:: BackendData.gates
+
+
+.. autoattribute:: BackendData.n_qubits
+
+
+.. autoattribute:: BackendData.name
+
+
+.. autoattribute:: BackendData.noise_model
+
+
+.. autoattribute:: BackendData.simulator
+
+
+.. autoattribute:: BackendData.version
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: BackendData.__init__
+
+
+.. automethod:: BackendData.clear
+
+
+.. automethod:: BackendData.copy
+
+
+.. automethod:: BackendData.fromkeys
+
+
+.. automethod:: BackendData.get
+
+
+.. automethod:: BackendData.items
+
+
+.. automethod:: BackendData.keys
+
+
+.. automethod:: BackendData.pop
+
+
+.. automethod:: BackendData.popitem
+
+
+.. automethod:: BackendData.setdefault
+
+
+.. automethod:: BackendData.update
+
+
+.. automethod:: BackendData.values
+
+

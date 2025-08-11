@@ -4,19 +4,59 @@ cunqa.qpu.QPU
 .. currentmodule:: cunqa.qpu
 
 .. autoclass:: QPU
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~QPU.backend
-      ~QPU.id
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QPU.backend
+
+   ~QPU.id
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QPU.__init__
+
+   ~QPU.run
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: QPU.backend
+
+
+.. autoattribute:: QPU.id
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: QPU.__init__
+
+
+.. automethod:: QPU.run
+
+

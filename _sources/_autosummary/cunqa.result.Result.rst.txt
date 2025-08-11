@@ -4,21 +4,64 @@ cunqa.result.Result
 .. currentmodule:: cunqa.result
 
 .. autoclass:: Result
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~Result.counts
-      ~Result.density_matrix
-      ~Result.result
-      ~Result.time_taken
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~Result.counts
+
+   ~Result.density_matrix
+
+   ~Result.result
+
+   ~Result.time_taken
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~Result.__init__
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: Result.counts
+
+
+.. autoattribute:: Result.density_matrix
+
+
+.. autoattribute:: Result.result
+
+
+.. autoattribute:: Result.time_taken
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: Result.__init__
+
+

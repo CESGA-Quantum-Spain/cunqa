@@ -4,22 +4,69 @@ cunqa.mappers.QPUCircuitMapper
 .. currentmodule:: cunqa.mappers
 
 .. autoclass:: QPUCircuitMapper
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~QPUCircuitMapper.qpus
-      ~QPUCircuitMapper.ansatz
-      ~QPUCircuitMapper.transpile
-      ~QPUCircuitMapper.initial_layout
-      ~QPUCircuitMapper.run_parameters
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QPUCircuitMapper.qpus
+
+   ~QPUCircuitMapper.ansatz
+
+   ~QPUCircuitMapper.transpile
+
+   ~QPUCircuitMapper.initial_layout
+
+   ~QPUCircuitMapper.run_parameters
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QPUCircuitMapper.__init__
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: QPUCircuitMapper.qpus
+
+
+.. autoattribute:: QPUCircuitMapper.ansatz
+
+
+.. autoattribute:: QPUCircuitMapper.transpile
+
+
+.. autoattribute:: QPUCircuitMapper.initial_layout
+
+
+.. autoattribute:: QPUCircuitMapper.run_parameters
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: QPUCircuitMapper.__init__
+
+

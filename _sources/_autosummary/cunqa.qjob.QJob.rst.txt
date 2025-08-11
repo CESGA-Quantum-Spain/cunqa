@@ -4,20 +4,69 @@ cunqa.qjob.QJob
 .. currentmodule:: cunqa.qjob
 
 .. autoclass:: QJob
-   :members:
    :show-inheritance:
    :inherited-members:
    :special-members: __call__, __add__, __mul__
 
-   
-   
-   .. rubric:: Attributes
-==========
 
-   .. autosummary::
-   
-      ~QJob.result
-      ~QJob.time_taken
-      ~QJob.qclient
-   
-   
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJob.result
+
+   ~QJob.time_taken
+
+   ~QJob.qclient
+
+
+
+
+Methods
+-------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJob.__init__
+
+   ~QJob.submit
+
+   ~QJob.upgrade_parameters
+
+
+
+
+
+Attribute reference
+~~~~~~~~~~~~~~~~~~~
+
+
+.. autoattribute:: QJob.result
+
+
+.. autoattribute:: QJob.time_taken
+
+
+.. autoattribute:: QJob.qclient
+
+
+
+
+
+Method reference
+~~~~~~~~~~~~~~~~
+
+
+.. automethod:: QJob.__init__
+
+
+.. automethod:: QJob.submit
+
+
+.. automethod:: QJob.upgrade_parameters
+
+
