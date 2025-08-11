@@ -17,20 +17,14 @@ Attributes
    :nosignatures:
 
    ~Result.counts
-
    ~Result.density_matrix
-
    ~Result.result
-
    ~Result.time_taken
-
 
 
 
 Method reference
 ~~~~~~~~~~~~~~~~
 
-
-.. automethod:: Result.__init__
 
 

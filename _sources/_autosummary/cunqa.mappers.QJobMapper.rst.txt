@@ -20,11 +20,8 @@ Attributes
 
 
 
-
 Method reference
 ~~~~~~~~~~~~~~~~
 
-
-.. automethod:: QJobMapper.__init__
 
 

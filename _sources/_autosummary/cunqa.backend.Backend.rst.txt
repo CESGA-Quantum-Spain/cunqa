@@ -16,9 +16,6 @@ Method reference
 ~~~~~~~~~~~~~~~~
 
 
-.. automethod:: Backend.__init__
-
 
 .. automethod:: Backend.info
-
 

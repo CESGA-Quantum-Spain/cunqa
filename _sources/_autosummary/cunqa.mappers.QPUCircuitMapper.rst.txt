@@ -17,22 +17,15 @@ Attributes
    :nosignatures:
 
    ~QPUCircuitMapper.qpus
-
    ~QPUCircuitMapper.ansatz
-
    ~QPUCircuitMapper.transpile
-
    ~QPUCircuitMapper.initial_layout
-
    ~QPUCircuitMapper.run_parameters
-
 
 
 
 Method reference
 ~~~~~~~~~~~~~~~~
 
-
-.. automethod:: QPUCircuitMapper.__init__
 
 

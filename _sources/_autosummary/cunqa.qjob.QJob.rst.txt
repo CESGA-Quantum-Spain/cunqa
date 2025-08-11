@@ -17,11 +17,8 @@ Attributes
    :nosignatures:
 
    ~QJob.result
-
    ~QJob.time_taken
-
    ~QJob.qclient
-
 
 
 
@@ -29,12 +26,8 @@ Method reference
 ~~~~~~~~~~~~~~~~
 
 
-.. automethod:: QJob.__init__
-
 
 .. automethod:: QJob.submit
 
-
 .. automethod:: QJob.upgrade_parameters
-
 

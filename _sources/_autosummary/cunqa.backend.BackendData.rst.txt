@@ -17,25 +17,15 @@ Attributes
    :nosignatures:
 
    ~BackendData.basis_gates
-
    ~BackendData.coupling_map
-
    ~BackendData.custom_instructions
-
    ~BackendData.description
-
    ~BackendData.gates
-
    ~BackendData.n_qubits
-
    ~BackendData.name
-
    ~BackendData.noise_model
-
    ~BackendData.simulator
-
    ~BackendData.version
-
 
 
 
@@ -43,39 +33,26 @@ Method reference
 ~~~~~~~~~~~~~~~~
 
 
-.. automethod:: BackendData.__init__
-
 
 .. automethod:: BackendData.clear
 
-
 .. automethod:: BackendData.copy
-
 
 .. automethod:: BackendData.fromkeys
 
-
 .. automethod:: BackendData.get
-
 
 .. automethod:: BackendData.items
 
-
 .. automethod:: BackendData.keys
-
 
 .. automethod:: BackendData.pop
 
-
 .. automethod:: BackendData.popitem
-
 
 .. automethod:: BackendData.setdefault
 
-
 .. automethod:: BackendData.update
 
-
 .. automethod:: BackendData.values
-
 
