@@ -246,8 +246,7 @@ def EMCZ3_evolver(nE: int, nM: int, theta: np.array, repeat_encode: int, repeat_
     
 # The next class is non-stateful to avoid messing with parallelization
 class CircuitQRNN:
-    # Later on we could accept another argument which determines the initial state of the Memory register
-    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, ansatz: int = 2):
+    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, ansatz: int = 2, init_state_mem: CunqaCircuit = None):
         """
         Class to manage a QRNN circuit. This circuit modifies a time series 
         to obtain another time series after executing. The default ansatz is the one from the 
@@ -281,6 +280,14 @@ class CircuitQRNN:
             add_ansatz = add_EMCZ_ansatz
         elif self.ansatz == 3:
             add_ansatz = add_EMCZ3_ansatz
+
+        # If we have an intial state for the memory register, add it here
+        if init_state_mem is not None:
+            if init_state_mem.num_qubits == self.nM:
+                self.circuit += (CunqaCircuit(nE) | init_state_mem )
+            else:
+                logger.error(f"Initial state for the memory register has {init_state_mem.num_qubits} while the memory register has {self.nM}.")
+                raise CircuitQRNNError
 
         # Build the circuit
         for time_step in range(nT):
