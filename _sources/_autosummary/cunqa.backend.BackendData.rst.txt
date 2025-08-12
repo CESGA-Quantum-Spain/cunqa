@@ -5,6 +5,8 @@ cunqa.backend.BackendData
 
 .. autoclass:: BackendData
    :show-inheritance:
+   :member-order: bysource
+   :special-members: __init__
 
 
 
@@ -26,31 +28,55 @@ Attributes
    ~BackendData.version
 
 
-
-Methods
+.. .. 
+.. .. Methods
 -------
 
-
-
-.. automethod:: BackendData.clear
-
-.. automethod:: BackendData.copy
-
-.. automethod:: BackendData.fromkeys
-
-.. automethod:: BackendData.get
-
-.. automethod:: BackendData.items
-
-.. automethod:: BackendData.keys
-
-.. automethod:: BackendData.pop
-
-.. automethod:: BackendData.popitem
-
-.. automethod:: BackendData.setdefault
-
-.. automethod:: BackendData.update
-
-.. automethod:: BackendData.values
-
+.. .. 
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.clear
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.copy
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.fromkeys
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.get
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.items
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.keys
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.pop
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.popitem
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.setdefault
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.update
+.. ..
+.. .. 
+.. ..
+.. .. automethod:: BackendData.values
+.. ..
+.. .. 
+.. .. 

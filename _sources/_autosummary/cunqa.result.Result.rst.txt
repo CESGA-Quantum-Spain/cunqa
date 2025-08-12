@@ -5,6 +5,8 @@ cunqa.result.Result
 
 .. autoclass:: Result
    :show-inheritance:
+   :member-order: bysource
+   :special-members: __init__
 
 
 
@@ -20,9 +22,11 @@ Attributes
    ~Result.time_taken
 
 
-
-Methods
+.. .. 
+.. .. Methods
 -------
 
-
-
+.. .. 
+.. ..
+.. .. 
+.. .. 
