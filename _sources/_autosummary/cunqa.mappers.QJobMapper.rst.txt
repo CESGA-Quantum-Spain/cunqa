@@ -5,8 +5,6 @@ cunqa.mappers.QJobMapper
 
 .. autoclass:: QJobMapper
    :show-inheritance:
-   :member-order: bysource
-   :special-members: __init__
 
 
 
@@ -19,11 +17,10 @@ Attributes
    ~QJobMapper.qjobs
 
 
-.. .. 
-.. .. Methods
+
+Methods
 -------
 
-.. .. 
-.. ..
-.. .. 
-.. .. 
+
+.. automethod:: QJobMapper.__init__
+

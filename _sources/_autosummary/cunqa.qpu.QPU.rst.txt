@@ -5,8 +5,6 @@ cunqa.qpu.QPU
 
 .. autoclass:: QPU
    :show-inheritance:
-   :member-order: bysource
-   :special-members: __init__
 
 
 
@@ -20,15 +18,12 @@ Attributes
    ~QPU.id
 
 
-.. .. 
-.. .. Methods
+
+Methods
 -------
 
-.. .. 
-.. ..
-.. .. 
-.. ..
-.. .. automethod:: QPU.run
-.. ..
-.. .. 
-.. .. 
+
+.. automethod:: QPU.__init__
+.. automethod:: QPU.run
+
+

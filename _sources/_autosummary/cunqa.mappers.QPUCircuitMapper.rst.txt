@@ -5,8 +5,6 @@ cunqa.mappers.QPUCircuitMapper
 
 .. autoclass:: QPUCircuitMapper
    :show-inheritance:
-   :member-order: bysource
-   :special-members: __init__
 
 
 
@@ -23,11 +21,10 @@ Attributes
    ~QPUCircuitMapper.run_parameters
 
 
-.. .. 
-.. .. Methods
+
+Methods
 -------
 
-.. .. 
-.. ..
-.. .. 
-.. .. 
+
+.. automethod:: QPUCircuitMapper.__init__
+

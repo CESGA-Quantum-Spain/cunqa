@@ -5,8 +5,6 @@ cunqa.qjob.QJob
 
 .. autoclass:: QJob
    :show-inheritance:
-   :member-order: bysource
-   :special-members: __init__
 
 
 
@@ -21,19 +19,14 @@ Attributes
    ~QJob.qclient
 
 
-.. .. 
-.. .. Methods
+
+Methods
 -------
 
-.. .. 
-.. ..
-.. .. 
-.. ..
-.. .. automethod:: QJob.submit
-.. ..
-.. .. 
-.. ..
-.. .. automethod:: QJob.upgrade_parameters
-.. ..
-.. .. 
-.. .. 
+
+.. automethod:: QJob.__init__
+.. automethod:: QJob.submit
+
+.. automethod:: QJob.upgrade_parameters
+
+

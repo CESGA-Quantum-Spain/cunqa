@@ -5,21 +5,16 @@ cunqa.backend.Backend
 
 .. autoclass:: Backend
    :show-inheritance:
-   :member-order: bysource
-   :special-members: __init__
 
 
 
 
-.. .. 
-.. .. Methods
+
+Methods
 -------
 
-.. .. 
-.. ..
-.. .. 
-.. ..
-.. .. automethod:: Backend.info
-.. ..
-.. .. 
-.. .. 
+
+.. automethod:: Backend.__init__
+.. automethod:: Backend.info
+
+
