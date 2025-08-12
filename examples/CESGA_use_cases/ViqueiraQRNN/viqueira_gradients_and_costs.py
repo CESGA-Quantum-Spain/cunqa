@@ -58,10 +58,10 @@ class CostFunction:
     
     #################### DERIVATIVES ####################
 
-    def rmse_deriv(self, prediction, y_true):
+    def rmse_deriv(self, prediction, y_true) -> np.array:
         rmse = self.rmse(prediction, y_true)
 
-        return 2*sum([prediction[i]-y_true[i] for i in range(len(y_true))])/(len(y_true)*2*rmse)
+        return 2*np.array([ prediction[i]-y_true[i] for i in range(len(y_true)) ])/(len(y_true)*2*rmse)
     
     #################### INTERFACE METHODS ####################
 
@@ -131,19 +131,21 @@ class GradientMethod:
         """
         n = len(theta_now)
         n_qjobs = len(qjobs)
-        gradient = [0.0 for _ in range(n)]
+        gradient = np.array([0.0 for _ in range(n)])
 
         # We will traverse the components of theta n_qjobs elements at a time
         # on a loop. First we go through the last n % n_qjobs objects and 
         # WE OPTIMIZE BY ADDING THE NON-PERTURBED CIRCUIT ON THIS BATCH (it will be our reference)
         final_start = n-(n % n_qjobs)
         final_results = gather(
-            [self.perturbed_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i, diff) for i in range(n % n_qjobs)] 
+            [perturbed_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i, diff) for i in range(n % n_qjobs)] 
             + [qjobs[-1].upgrade_parameters(circuit.parameters(time_series, theta_now))] 
             )
 
-        reference = final_results.pop().probabilities
-        final_deriv = [ (cost_func(reference, y_true) - cost_func(res.probabilities, y_true))/diff for res in final_results]
+        final_observables = [calc_observable(res, circuit.nE) for res in final_results]
+        reference = calc_observable(final_results.pop(), circuit.nE)
+        
+        final_deriv = [np.dot( cost_func.deriv(obs, y_true), (obs - reference)/diff )  for obs in final_observables]
         gradient[final_start:n] = final_deriv
         
         # We go through the components of theta n_qjobs at a time 
@@ -154,11 +156,13 @@ class GradientMethod:
             end = (i+1)*n_qjobs
 
             # Concurrent execution of circuits with small differences on one component
-            results = gather( [self.perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs] )
-            deriv = [ (cost_func(reference, y_true) - cost_func(res.probabilities, y_true))/diff for res in results]
+            results = gather( [perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs] )
+            observables = [[calc_observable(res, circuit.nE) for res in results]]
+
+            deriv = [ np.dot( cost_func.deriv(obs, y_true), (obs - reference)/diff ) for obs in observables]
             gradient[start:end] = deriv
 
-        return np.array(gradient)
+        return gradient
 
 
     def parameter_shift_rule(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction):
@@ -189,16 +193,25 @@ class GradientMethod:
             end = (i+1)*n_qjobs
 
             # Concurrent execution of circuits with the parameter shifted +-pi/2 on one component
-            results = gather([self.shifted_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob)) for qjob in qjobs])
-            deriv = [(cost_func(plus.probabilities, y_true) + cost_func(minus.probabilities, y_true))/2 for plus, minus in zip(results[0::2], results[1::2])]
+            results = gather([shifted_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob)) for qjob in qjobs])
+            observables = [calc_observable(res, circuit.nE) for res in results]
+
+            deriv = [
+                np.dot( (cost_func.deriv(plus, y_true) - cost_func.deriv(minus, y_true))/2, (plus - minus)/2 ) 
+                for plus, minus in zip(results[0::2], results[1::2])
+                ] # zip goes through even and odd elements together
 
             gradient[start:end] = deriv
         
         # Last remaining n % n_qjobs components
         final_start = n-(n % n_qjobs)
-        final_results = gather( [self.shifted_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i) for i in range(n % n_qjobs)] )
+        final_results = gather( [shifted_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i) for i in range(n % n_qjobs)] )
+        final_observables = [calc_observable(res, circuit.nE) for res in final_results]
 
-        final_deriv = [ (cost_func(plus.probabilities, y_true) + cost_func(minus.probabilities, y_true))/2 for plus, minus in zip(final_results[0::2], final_results[1::2])] # the zip goes through even and odd elements together
+        final_deriv = [ 
+            np.dot( (cost_func.deriv(plus, y_true) - cost_func.deriv(minus, y_true))/2, (plus - minus)/2 ) 
+            for plus, minus in zip(final_results[0::2], final_results[1::2])
+            ] 
         gradient[final_start:n] = final_deriv
 
         return np.array(gradient)
@@ -216,17 +229,25 @@ class GradientMethod:
     def __call__(self, *args, **kwds):
         return self.method(*args, **kwds)
 
-    #################### AUXILIARY METHODS FOR THE GRADIENTS ####################
+#################### AUXILIARY METHODS ####################
 
-    def perturbed_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
-        theta_aux = theta; theta_aux[index] += diff
-        return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
+def calc_observable(result, nE, observable = None) -> np.array:
+    # TODO: improve this method to a flexible one once we have an observable calculation pipeline
+    probs = result.probabilities(per_qubit = True, partial = list(range(nE)), interface = False)
+
+    return np.array([prob_qubit[0]-prob_qubit[1] for prob_qubit in probs]) # ad hoc calculation of <Z> observable
+
     
-    def shifted_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
-        theta_plus = theta; theta_plus[index] += np.pi/2
-        theta_minus = theta; theta_minus[index] -= np.pi/2
 
-        qjob_plus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_plus))
-        qjob_minus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_minus))
-        return qjob_plus, qjob_minus
+def perturbed_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
+    theta_aux = theta; theta_aux[index] += diff
+    return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
+
+def shifted_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
+    theta_plus = theta; theta_plus[index] += np.pi/2
+    theta_minus = theta; theta_minus[index] -= np.pi/2
+
+    qjob_plus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_plus))
+    qjob_minus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_minus))
+    return qjob_plus, qjob_minus
 

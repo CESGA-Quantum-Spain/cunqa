@@ -21,6 +21,7 @@ from viqueira_QRNN_circuit import CircuitQRNN
 from viqueira_gradients_and_costs import GradientMethod, CostFunction
 from cunqa.logger import logger
 from cunqa.qutils import getQPUs
+from cunqa.qjob import QJob
 
 
 class ViqueiraQRNN:
@@ -47,13 +48,29 @@ class ViqueiraQRNN:
         self.circuit = CircuitQRNN(nE, nM, nT, repeat_encode, repeat_evolution)
 
         self.qpus=getQPUs(local=False) 
-        self.qjobs = list(map(lambda x: self.circuit.run_on_QPU(x,shots=shots), self.qpus)) # Submits the circuit with parameters zero on all QPUs
+        # Submit the circuit with parameters zero on all QPUs
+        self.qjobs = [self.circuit.run_on_QPU(qpu, shots=shots, method="density_matrix") for qpu in self.qpus]
+    
 
-    def calc_observable(self, qjob, x, theta, observ):
-        pass
+    ########################## CIRCUIT CALCULATION METHODS #####################
 
+    def bind_parameters(self, qjob, x, theta) -> QJob:
+        return qjob.upgrade_parameters(self.circuit.parameters(x, theta))
 
-    def train(self, population: list[np.array], y_labels: list[np.array], theta_init: np.array = None, gradient_method: Optional[str] = "finite_differences", cost_func: Optional[str] = "rmse", learn_rate: float = 1e-3, epochs: int = 2000):
+    def calc_observable(self, qjob, observable = None) -> np.array:
+        # TODO: improve this method to a flexible one once we have an observable calculation pipeline
+        probs = qjob.result.probabilities(per_qubit = True, partial = list(range(self.nE)))
+
+        return np.array([prob_qubit[0]-prob_qubit[1] for prob_qubit in probs]) # ad hoc calculation of <Z> observable
+    
+    def evaluate_circ(self, qjob, x, theta) -> np.array:
+        job = self.bind_parameters(qjob, x, theta)
+        obs_result = self.calc_observable(job)
+        return obs_result
+
+    ########################## FIT, PREDICT AND VALIDATE MODEL #########################
+
+    def fit(self, population: list[np.array], y_labels: list[np.array], theta_init: np.array = None, learn_rate: float = 1e-3, epochs: int = 2000, gradient_method: Optional[str] = "finite_differences", cost_func: Optional[str] = "rmse"):
         """
         Method for training the theta parameters of the EMCZ recursive neural network. Uses the gradient method chosen by the user, parallelizing between 
         different QPUs using CUNQA.
@@ -82,13 +99,14 @@ class ViqueiraQRNN:
         with open(logfile, 'a') as f:
 
             for epoch in epochs:
+                # TODO; improve this best_loss initialization as it depends on the time series elements being on [0, 1]
                 best_loss = len(theta_init) * 100 # Unreasonably large number to initialize best_loss and inmediatly update it
                 for i, time_series in enumerate(population):
 
                     gradient = self.calc_gradient(circuit=self.circuit, qjobs=self.qjobs , time_series=time_series, theta_now=theta_aux,  y_true=y_labels[i], cost_func=self.calc_cost)
                     theta_aux += learn_rate * gradient
                     
-                    new_result = self.qjobs[randint(0, len(self.qjobs))].upgrade_parameters(self.circuit.parameters(time_series, theta_aux)).result.probabilities
+                    new_result = self.evaluate_circ(self.qjobs[randint(0, len(self.qjobs))], time_series, theta_aux)          
 
                     loss_i = self.calc_cost(new_result, y_labels[i])
                     if loss_i < best_loss:
@@ -101,9 +119,6 @@ class ViqueiraQRNN:
 
         self._trained = True   
         logger.debug(f"Optimal theta found: {self.theta}.")
-
-        
-    
 
 
     def predict(self, new_time_series: np.array) -> np.array:
@@ -120,7 +135,7 @@ class ViqueiraQRNN:
             logger.error("Model should be trained before trying to make predictions")
             raise SystemExit
         
-        return self.qjobs[randint(0, len(self.qjobs))].upgrade_parameters(self.circuit.parameters(new_time_series, self.theta)).result.probabilities
+        return self.evaluate_circ(self.qjobs[randint(0, len(self.qjobs))], new_time_series, self.theta)
 
 
 
@@ -132,6 +147,8 @@ class ViqueiraQRNN:
             new_time_series (np.array):
             y_new (np.array):
             cost_func (str):
+        Return:
+            (float): 
         """
         if not self._trained:
             logger.error("Model should be trained before trying to evaluate its predictions")

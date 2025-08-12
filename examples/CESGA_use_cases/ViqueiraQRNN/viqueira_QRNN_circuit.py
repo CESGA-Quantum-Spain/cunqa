@@ -26,12 +26,11 @@ class CircuitQRNNError(Exception):
     pass
 
 
-def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution:int , time_step: int):
+def EMCZ2_encoder(nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution: int, time_step: int) -> CunqaCircuit:
     """
-    Function that adds to a circuit the ansatz for the EMCZ QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
+    Creates the encoder block circuit from the EMCZ QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
 
     Args:
-        circuit (CunqaCircuit): circuit to which the ansatz will be added. Must have nE + nM qubits.
         nE (int): number of qubits for the Environment/Exchange register
         nM (int): number of qubits for the Memory register
         theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 2nE*R + 2(nE + nM)*L + nE.
@@ -42,6 +41,8 @@ def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta:
 
     """
     assert np.shape(x)[1] == nE, "Error: The data x should have nE columns." 
+
+    encoder = CunqaCircuit(nE)
 
     group1 = 2*nE*repeat_encode
     group2 = 2*(nE+nM)*repeat_evolution
@@ -65,46 +66,84 @@ def add_EMCZ_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta:
     # Encoding block
     for i in range(repeat_encode):
         for qubit in range(nE):
-            circuit.ry(x[time_step][qubit], qubit)
-            circuit.rx(orange[2*i*nE + 2*qubit], qubit)
-            circuit.rz(orange[2*i*nE + 2*qubit + 1], qubit)
+            encoder.ry(x[time_step][qubit], qubit)
+            encoder.rx(orange[2*i*nE + 2*qubit], qubit)
+            encoder.rz(orange[2*i*nE + 2*qubit + 1], qubit)
     
     # Non-theta dependent part of the encoding
     for qubit in range(nE):
-        circuit.ry(x[time_step][qubit], qubit)
+        encoder.ry(x[time_step][qubit], qubit)
+        
+def EMCZ2_evolver(nE: int, nM: int, theta: np.array, repeat_encode: int, repeat_evolution: int) -> CunqaCircuit:
+    """
+    Creates the evolution block circuit from the EMCZ QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
+
+    Args:
+        nE (int): number of qubits for the Environment/Exchange register
+        nM (int): number of qubits for the Memory register
+        theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 2nE*R + 2(nE + nM)*L + nE.
+        repeat_encode (int): number of times that the encoding block should be repeated.
+        repeat_evolution (int): number of times that the evolution block should be repeated.
+
+    Returns:
+        evolver (<class cunqa.CunqaCircuit>): (nE + nM)-qubit circuit implementing the evolution block of the EMCZ2 algorithm
+    """
+    encoder = CunqaCircuit(nE)
+
+    group1 = 2*nE*repeat_encode
+    group2 = 2*(nE+nM)*repeat_evolution
+    group3 = 1*nE
+    total_lenght = group1+group2+group3
+
+    # Check correct format of theta
+    if len(theta)==total_lenght:
+        pass
+    else:
+        logger.error(f"Theta must have lenght equal to {total_lenght} but a lenght {len(theta)} vector was provided.")
+        raise  CircuitQRNNError
+    
+    # Slice theta into the parameters that will be used for the encoding part (orange on the image),
+    # the evolution part (blue on the image) and the final evolution part (white on the image).
+    # Image, again: https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png
+    orange = theta[:group1]
+    blue = theta[group1:group1+group2]
+    white = theta[group1+group2:]
+
+    evolver = CunqaCircuit(nE+nM)
 
     # Evolution block
     for j in range(repeat_evolution):
         for qubit in range(nE+nM-1): # Last qubit missing
 
-            circuit.rx(blue[2*j*(nE+nM-1) + 2*qubit], qubit)
-            circuit.rz(blue[2*j*(nE+nM-1) + 2*qubit + 1], qubit)
-            circuit.cz(qubit, qubit + 1)
+            evolver.rx(blue[2*j*(nE+nM-1) + 2*qubit], qubit)
+            evolver.rz(blue[2*j*(nE+nM-1) + 2*qubit + 1], qubit)
+            evolver.cz(qubit, qubit + 1)
 
         # I separate the last iteration beacause it doesn't have a CZ with the next qubit
-        circuit.rx(blue[(2*j+1)*(nE+nM-1)], nE + nM - 1)
-        circuit.rz(blue[(2*j+1)*(nE+nM-1) + 1], nE + nM - 1)
+        evolver.rx(blue[(2*j+1)*(nE+nM-1)], nE + nM - 1)
+        evolver.rz(blue[(2*j+1)*(nE+nM-1) + 1], nE + nM - 1)
 
     # Final part of the evolution
     for qubit in range(nE):
-        circuit.rx(white[qubit], qubit)
-        
+        evolver.rx(white[qubit], qubit)
 
-def add_EMCZ3_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution:int , time_step: int):
+    return evolver
+
+def EMCZ3_encoder(nE: int, nM: int, x: np.array, theta: np.array, repeat_encode: int, repeat_evolution:int , time_step: int) -> CunqaCircuit:
     """
-    Function that adds to a circuit the ansatz for the EMCZ3 QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZme3.png for a picture.
+    Creates the encoder block circuit from the EMCZ3 QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
 
     Args:
-        circuit (CunqaCircuit): circuit to which the ansatz will be added. Must have nE + nM qubits.
         nE (int): number of qubits for the Environment/Exchange register
         nM (int): number of qubits for the Memory register
-        theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 3nE*R + 3(nE + nM)*L + 3nE.
+        theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 2nE*R + 2(nE + nM)*L + nE.
         x (numpy.array): Input data. Its shape must be (nT, nE), where this is the number of qubits on each register of the EMC QRNN circuit (function below).
         repeat_encode (int): number of times that the encoding block should be repeated.
         repeat_evolution (int): number of times that the evolution block should be repeated.
         time_step (int): indicates in which point of the time series we're on, ie the row of x that should be used.
 
     """
+    encoder = CunqaCircuit(nE)
     assert np.shape(x)[1] == nE, "Error: The data x should have nE columns." 
 
     group1 = 3*nE*repeat_encode
@@ -129,39 +168,79 @@ def add_EMCZ3_ansatz(circuit: CunqaCircuit, nE: int, nM: int, x: np.array, theta
     # Encoding block
     for i in range(repeat_encode):
         for qubit in range(nE):
-            circuit.ry(x[time_step][qubit], qubit)
-            circuit.rx(orange[3*i*nE + 3*qubit], qubit)
-            circuit.rz(orange[3*i*nE + 3*qubit + 1], qubit)
-            circuit.rx(orange[3*i*nE + 3*qubit + 2],qubit)
+            encoder.ry(x[time_step][qubit], qubit)
+            encoder.rx(orange[3*i*nE + 3*qubit], qubit)
+            encoder.rz(orange[3*i*nE + 3*qubit + 1], qubit)
+            encoder.rx(orange[3*i*nE + 3*qubit + 2],qubit)
     
     # Non-theta dependent part of the encoding
     for qubit in range(nE):
-        circuit.ry(x[time_step][qubit], qubit)
+        encoder.ry(x[time_step][qubit], qubit)
+
+    return encoder
+
+def EMCZ3_evolver(nE: int, nM: int, theta: np.array, repeat_encode: int, repeat_evolution:int) -> CunqaCircuit:
+    """
+    Creates the evolution block circuit from the EMCZ QRNN algorithm, see https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png for a picture.
+
+    Args:
+        nE (int): number of qubits for the Environment/Exchange register
+        nM (int): number of qubits for the Memory register
+        theta (numpy.array): Trainable parameters for encoding and evolution unitaries. Vector lenght: 2nE*R + 2(nE + nM)*L + nE.
+        repeat_encode (int): number of times that the encoding block should be repeated.
+        repeat_evolution (int): number of times that the evolution block should be repeated.
+
+    Returns:
+        evolver (<class cunqa.CunqaCircuit>): (nE + nM)-qubit circuit implementing the evolution block of the EMCZ2 algorithm
+    """
+    evolver = CunqaCircuit(nE+nM)
+    assert np.shape(x)[1] == nE, "Error: The data x should have nE columns." 
+
+    group1 = 3*nE*repeat_encode
+    group2 = 3*(nE+nM)*repeat_evolution
+    group3 = 3*nE
+    total_lenght = group1+group2+group3
+
+    # Check correct format of theta
+    if len(theta)==total_lenght:
+        pass
+    else:
+        logger.error(f"Theta must have lenght equal to {total_lenght} but a lenght {len(theta)} vector was provided.")
+        raise  CircuitQRNNError
+    
+    # Slice theta into the parameters that will be used for the encoding part (orange on the image),
+    # the evolution part (blue on the image) and the final evolution part (white on the image).
+    # Image, again: https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZme3.png
+    orange = theta[:group1]
+    blue = theta[group1:group1+group2]
+    white = theta[group1+group2:]
 
     # Evolution block
     for j in range(repeat_evolution):
         # E register part (CZ are performed)
         for qubit in range(nE): 
 
-            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
-            circuit.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
-            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
+            evolver.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
+            evolver.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
+            evolver.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
 
             for qubit_m in range(nM):
-                circuit.cz(qubit, nE + qubit_m)
+                evolver.cz(qubit, nE + qubit_m)
 
         # M register part (CZ are received)
         for qubit in range(nE): 
 
-            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
-            circuit.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
-            circuit.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
+            evolver.rx(blue[3*j*(nE+nM-1) + 3*qubit], qubit)
+            evolver.rz(blue[3*j*(nE+nM-1) + 3*qubit + 1], qubit)
+            evolver.rx(blue[3*j*(nE+nM-1) + 3*qubit + 2], qubit)
 
     # Final part of the evolution
     for qubit in range(nE):
-        circuit.rx(white[3*i*nE + 3*qubit], qubit)
-        circuit.rz(white[3*i*nE + 3*qubit + 1], qubit)
-        circuit.rx(white[3*i*nE + 3*qubit + 2], qubit)
+        evolver.rx(white[3*i*nE + 3*qubit], qubit)
+        evolver.rz(white[3*i*nE + 3*qubit + 1], qubit)
+        evolver.rx(white[3*i*nE + 3*qubit + 2], qubit)
+
+    return evolver   
 
     
     
@@ -212,7 +291,9 @@ class CircuitQRNN:
                 raise CircuitQRNNError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
-            self.circuit.reset([i for i in range(nE)]) # This instruction needs to be implemented hehe        
+            self.circuit.reset([i for i in range(nE)]) 
+
+        self.circuit.save_state()     
         
     def parameters(self, new_x: np.array, new_theta: np.array) -> list:
         """
