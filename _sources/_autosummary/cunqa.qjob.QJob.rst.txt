@@ -23,10 +23,23 @@ Attributes
 Methods
 -------
 
-
 .. automethod:: QJob.__init__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .. automethod:: QJob.submit
 
 .. automethod:: QJob.upgrade_parameters
-
 

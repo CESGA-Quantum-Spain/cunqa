@@ -22,8 +22,17 @@ Attributes
 Methods
 -------
 
-
 .. automethod:: QPU.__init__
-.. automethod:: QPU.run
 
+
+
+
+
+
+
+
+
+
+
+.. automethod:: QPU.run
 

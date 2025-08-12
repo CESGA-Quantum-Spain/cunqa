@@ -21,6 +21,11 @@ Attributes
 Methods
 -------
 
-
 .. automethod:: QJobMapper.__init__
+
+
+
+
+
+
 

@@ -13,8 +13,17 @@ cunqa.backend.Backend
 Methods
 -------
 
-
 .. automethod:: Backend.__init__
-.. automethod:: Backend.info
 
+
+
+
+
+
+
+
+
+
+
+.. automethod:: Backend.info
 
