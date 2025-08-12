@@ -196,16 +196,17 @@
 described below, but these will not suppor classical communications.</p>
 <p>If <cite>transpile</cite>, <cite>initial_layout</cite> or <cite>opt_level</cite> are passed as <a href="#id1"><span class="problematic" id="id2">**</span></a>run_args they will be ignored because for the initial version
 transpilation is not supported. The arguments provided will be the same for the all <cite>QJobs</cite> created.</p>
-<section id="args">
-<h2>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h2>
-<p>circuits (list[dict, CunqaCircuit]): circuits to be run.</p>
-<p>qpus (list[&lt;class ‘cunqa.qpu.QPU’&gt;]): QPU objects associated to the virtual QPUs in which the circuits want to be run.</p>
-<p><a href="#id3"><span class="problematic" id="id4">**</span></a>run_args: any other run arguments and parameters.</p>
-</section>
-<section id="return">
-<h2>Return:<a class="headerlink" href="#return" title="Link to this heading"></a></h2>
-<p>List of &lt;class <cite>cunqa.qjob.QJobs</cite>&gt; objects.</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuits</strong> (<em>list</em><em>[</em><em>dict</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em>]</em>) – circuits to be run.</p></li>
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><em>&lt;class 'cunqa.qpu.QPU'&gt;</em><em>]</em>) – QPU objects associated to the virtual QPUs in which the circuits want to be run.</p></li>
+<li><p><strong>run_args</strong> – any other run arguments and parameters.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Return:
+List of &lt;class <cite>cunqa.qjob.QJobs</cite>&gt; objects.</p>
 </dd></dl>
 
 </section>

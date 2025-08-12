@@ -186,7 +186,22 @@
              
   <section id="module-cunqa.mappers">
 <span id="cunqa-mappers"></span><h1>cunqa.mappers<a class="headerlink" href="#module-cunqa.mappers" title="Link to this heading"></a></h1>
-<p>Contains map-like callables to distribute circuits in virtual QPUS. Useful when working with evolutive optimizators.</p>
+<p>Contains map-like callables to distribute circuits in virtual QPUS, needed when communications among circuits are present.</p>
+<p>When having classical or quantum communications among circuits, :py:meth:~cunqa.qpu.QPU.run` is obsolete, circuits must be sent as an ensemble in order to ensure correct functioning of the communication protocols.</p>
+<p>So, once the virtual QPUs that allow the desired type of communications are raised and circuits have been defined using :py:class:~cunqa.circuit.CunqaCircuit`,
+they can be sent using the :py:meth:~run_distributed` function:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qjobs</span> <span class="o">=</span> <span class="n">run_distributed</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">],</span> <span class="n">qpus</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>

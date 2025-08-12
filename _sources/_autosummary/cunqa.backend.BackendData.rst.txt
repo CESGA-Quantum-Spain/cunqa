@@ -21,7 +21,7 @@ Attributes
    ~BackendData.gates
    ~BackendData.n_qubits
    ~BackendData.name
-   ~BackendData.noise_model
+   ~BackendData.noise_path
    ~BackendData.simulator
    ~BackendData.version
 
