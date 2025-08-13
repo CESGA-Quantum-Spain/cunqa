@@ -209,10 +209,17 @@ they can be sent using the <a class="reference internal" href="cunqa.mappers.run
 </section>
 <section id="mapping-circuits-to-virtual-qpus-in-optimization-problems">
 <h2>Mapping circuits to virtual QPUs in optimization problems<a class="headerlink" href="#mapping-circuits-to-virtual-qpus-in-optimization-problems" title="Link to this heading"></a></h2>
-<p><strong>Variational Quantum Algorithms</strong> <a href="#id2"><span class="problematic" id="id3"><span id="id1"></span>[#]_</span></a> require from numerous executions of parametric cirucits, while in each step of the optimization process new parameters are assigned to them.
+<p><strong>Variational Quantum Algorithms</strong> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> require from numerous executions of parametric cirucits, while in each step of the optimization process new parameters are assigned to them.
 This implies that, after parameters are updated, a new circuit must be created, transpiled and then sent to the quantum processor or simulator.</p>
-<p>References:
-.. [#] <a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arxiv</a></p>
+<section id="references">
+<h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arxiv</a> .</p>
+</aside>
+</aside>
+</section>
 </section>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
