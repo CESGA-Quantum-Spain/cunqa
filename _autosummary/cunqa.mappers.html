@@ -209,38 +209,50 @@ they can be sent using the <a class="reference internal" href="cunqa.mappers.run
 </section>
 <section id="mapping-circuits-to-virtual-qpus-in-optimization-problems">
 <h2>Mapping circuits to virtual QPUs in optimization problems<a class="headerlink" href="#mapping-circuits-to-virtual-qpus-in-optimization-problems" title="Link to this heading"></a></h2>
-<p><strong>Variational Quantum Algorithms</strong> <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> require from numerous executions of parametric cirucits, while in each step of the optimization process new parameters are assigned to them.
+<p><strong>Variational Quantum Algorithms</strong> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> require from numerous executions of parametric cirucits, while in each step of the optimization process new parameters are assigned to them.
 This implies that, after parameters are updated, a new circuit must be created, transpiled and then sent to the quantum processor or simulator.
-For simplifying this process, we have <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> and <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> classes. Both classes are thought to be used for Scipy optimizers <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> as the <code class="docutils literal notranslate"><span class="pre">workers</span></code> argument in global optimizers.</p>
+For simplifying this process, we have <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> and <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> classes. Both classes are thought to be used for Scipy optimizers <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> as the <code class="docutils literal notranslate"><span class="pre">workers</span></code> argument in global optimizers.</p>
 <p><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> takes a list of existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects and a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the virtual QPUs that we want to use.
 Then, the class can be called passing a set of parameters and a cost function.
 This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such parameters through the <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code> method.
-Then, gathers the results of the executions and returns the value of the cost function for each. Let’s see an example using Differential Evolution <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> optimzier:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qjobs</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ansatz</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">qjobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qjob</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">optimization_result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">workers</span> <span class="o">=</span> <span class="n">Mapper</span><span class="p">)</span>
+Then, gathers the results of the executions and returns the value of the cost function for each.
+Let’s see a simple example in which we want to measure the value of a cost function for different parameters in the same parametric circuit.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; ansatz = QuantumCircuit(5)
+&gt;&gt;&gt; ...
+&gt;&gt;&gt; initial_parameters_list = [···]
+&gt;&gt;&gt;
+&gt;&gt;&gt; def cost_function(counts):
+&gt;&gt;&gt;     ···
+&gt;&gt;&gt;     return cost_value
+&gt;&gt;&gt;
+&gt;&gt;&gt; qpus = getQPUs()
+&gt;&gt;&gt; qjobs = []
+&gt;&gt;&gt; for qpu, params in zip(qpus, parameters_list):
+&gt;&gt;&gt;     circuit = ansatz.assign_parameters(params)
+&gt;&gt;&gt;     qjob = qpu.run(circuit)
+&gt;&gt;&gt;     qjobs.append(qjob)
+&gt;&gt;&gt;
+&gt;&gt;&gt; Mapper = QJobMapper(qjobs)
+&gt;&gt;&gt;
+&gt;&gt;&gt; new_parameters_list = [···]
+&gt;&gt;&gt;
+&gt;&gt;&gt; cost_results = Mapper(new_parameters_list, cost_function)
 </pre></div>
 </div>
+<p>&lt;&lt;&lt; [2.0, 4.2, -5.5]</p>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arXiv</a> .</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html">scipy.optimize documentation</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
 <p>Differential Evolution initializes a population of inidividuals that evolute from generation to generation in order to collectively find the lowest value to a given cost function. This optimizer has shown great performance for VQAs [<a class="reference external" href="https://arxiv.org/abs/2303.12186">Reference</a>]. It is well implemented at Scipy by the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution">scipy.optimize.differential_evolution</a> function.</p>
 </aside>
 </aside>
