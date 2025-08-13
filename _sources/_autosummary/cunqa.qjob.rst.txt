@@ -9,7 +9,7 @@ cunqa.qjob
 
    
    
-   .. rubric:: Functions
+   Functions
 ---------
 
    .. autosummary::
@@ -22,7 +22,7 @@ cunqa.qjob
 
    
    
-   .. rubric:: Classes
+   Classes
 -------
 
    .. autosummary::
@@ -36,7 +36,7 @@ cunqa.qjob
 
    
    
-   .. rubric:: Exceptions
+   Exceptions
 ----------
 
    .. autosummary::

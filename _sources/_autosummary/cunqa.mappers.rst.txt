@@ -9,7 +9,7 @@ cunqa.mappers
 
    
    
-   .. rubric:: Functions
+   Functions
 ---------
 
    .. autosummary::
@@ -22,7 +22,7 @@ cunqa.mappers
 
    
    
-   .. rubric:: Classes
+   Classes
 -------
 
    .. autosummary::

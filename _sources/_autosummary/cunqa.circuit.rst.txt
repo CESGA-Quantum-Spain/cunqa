@@ -9,7 +9,7 @@ cunqa.circuit
 
    
    
-   .. rubric:: Functions
+   Functions
 ---------
 
    .. autosummary::
@@ -23,7 +23,7 @@ cunqa.circuit
 
    
    
-   .. rubric:: Classes
+   Classes
 -------
 
    .. autosummary::
@@ -37,7 +37,7 @@ cunqa.circuit
 
    
    
-   .. rubric:: Exceptions
+   Exceptions
 ----------
 
    .. autosummary::

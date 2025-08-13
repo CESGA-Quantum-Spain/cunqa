@@ -9,7 +9,7 @@ cunqa.qutils
 
    
    
-   .. rubric:: Functions
+   Functions
 ---------
 
    .. autosummary::
@@ -31,7 +31,7 @@ cunqa.qutils
 
    
    
-   .. rubric:: Exceptions
+   Exceptions
 ----------
 
    .. autosummary::

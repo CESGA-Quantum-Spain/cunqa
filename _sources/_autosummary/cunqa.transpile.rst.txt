@@ -9,7 +9,7 @@ cunqa.transpile
 
    
    
-   .. rubric:: Functions
+   Functions
 ---------
 
    .. autosummary::
@@ -26,7 +26,7 @@ cunqa.transpile
 
    
    
-   .. rubric:: Exceptions
+   Exceptions
 ----------
 
    .. autosummary::
