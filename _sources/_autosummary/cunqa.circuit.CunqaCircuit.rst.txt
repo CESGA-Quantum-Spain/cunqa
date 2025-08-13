@@ -242,6 +242,7 @@ Methods
 
 
 
+
 .. automethod:: CunqaCircuit.c_if
 
 .. automethod:: CunqaCircuit.ccx
