@@ -196,11 +196,11 @@
 Each circuit will be sent to each QPU in order, therefore both lists must be of the same size.</p>
 <p>Because the function is destined for the execution that require communications, only <code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code> or instruction sets are accepted.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">transpile</span></code>, <code class="docutils literal notranslate"><span class="pre">initial_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">opt_level</span></code> are passed as <code class="docutils literal notranslate"><span class="pre">**run_args</span></code> they will be ignored since for the current version
-transpilation is not supported. The arguments provided will be the same for the all <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects created.</p>
+transpilation is not supported when communications are present. The arguments provided will be the same for the all <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects created.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>circuits</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – circuits to be run.</p></li>
+<li><p><strong>circuits</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>dict</em><em>]</em><em>] or </em><em>list</em><em>[</em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em>]</em>) – circuits to be run.</p></li>
 <li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>]</em>) – QPU objects associated to the virtual QPUs in which the circuits want to be run.</p></li>
 <li><p><strong>run_args</strong> – any other run arguments and parameters.</p></li>
 </ul>
