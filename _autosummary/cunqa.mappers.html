@@ -216,30 +216,18 @@ For simplifying this process, we have <a class="reference internal" href="cunqa.
 Then, the class can be called passing a set of parameters and a cost function.
 This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such parameters through the <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code> method.
 Then, gathers the results of the executions and returns the value of the cost function for each.
-Let’s see a simple example in which we want to measure the value of a cost function for different parameters in the same parametric circuit.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; ansatz = QuantumCircuit(5)
-&gt;&gt;&gt; ...
-&gt;&gt;&gt; initial_parameters_list = [···]
-&gt;&gt;&gt;
-&gt;&gt;&gt; def cost_function(counts):
+Let’s see a simple example in which we want to update the parameters of a set of already sent circuits and obtain the value of a cost function for them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; def cost_function(counts):
 &gt;&gt;&gt;     ···
 &gt;&gt;&gt;     return cost_value
 &gt;&gt;&gt;
-&gt;&gt;&gt; qpus = getQPUs()
-&gt;&gt;&gt; qjobs = []
-&gt;&gt;&gt; for qpu, params in zip(qpus, parameters_list):
-&gt;&gt;&gt;     circuit = ansatz.assign_parameters(params)
-&gt;&gt;&gt;     qjob = qpu.run(circuit)
-&gt;&gt;&gt;     qjobs.append(qjob)
+&gt;&gt;&gt; Mapper = QJobMapper(qjobs) # passing existing qjobs
 &gt;&gt;&gt;
-&gt;&gt;&gt; Mapper = QJobMapper(qjobs)
-&gt;&gt;&gt;
-&gt;&gt;&gt; new_parameters_list = [···]
+&gt;&gt;&gt; new_parameters_list = [···] # defining new parameters for each qjob
 &gt;&gt;&gt;
 &gt;&gt;&gt; cost_results = Mapper(new_parameters_list, cost_function)
 </pre></div>
 </div>
-<p>&lt;&lt;&lt; [2.0, 4.2, -5.5]</p>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
