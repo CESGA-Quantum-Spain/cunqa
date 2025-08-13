@@ -214,20 +214,10 @@ This implies that, after parameters are updated, a new circuit must be created, 
 For simplifying this process, we have <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> and <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> classes. Both classes are thought to be used for Scipy optimizers <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> as the <code class="docutils literal notranslate"><span class="pre">workers</span></code> argument in global optimizers.</p>
 <p><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> takes a list of existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects and a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the virtual QPUs that we want to use.
 Then, the class can be called passing a set of parameters and a cost function.
-This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such parameters through the <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code> method.
-Then, gathers the results of the executions and returns the value of the cost function for each.
-Let’s see a simple example in which we want to update the parameters of a set of already sent circuits and obtain the value of a cost function for them:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; def cost_function(counts):
-&gt;&gt;&gt;     ···
-&gt;&gt;&gt;     return cost_value
-&gt;&gt;&gt;
-&gt;&gt;&gt; Mapper = QJobMapper(qjobs) # passing existing qjobs
-&gt;&gt;&gt;
-&gt;&gt;&gt; new_parameters_list = [···] # defining new parameters for each qjob
-&gt;&gt;&gt;
-&gt;&gt;&gt; cost_results = Mapper(new_parameters_list, cost_function)
-</pre></div>
-</div>
+This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such parameters through the <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> method.
+Then, gathers the results of the executions and returns the value of the cost function for each.</p>
+<p>On the other hand, <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> is instanciated with a circuit and instructions for its execution, toguether with a list of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects.
+The difference with <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> is that here the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> is mapped to each QPU, passing it the circuit with the given parameters.</p>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
