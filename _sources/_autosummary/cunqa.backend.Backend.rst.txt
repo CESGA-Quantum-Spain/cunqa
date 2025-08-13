@@ -25,6 +25,5 @@ Methods
 
 
 
-
 .. automethod:: Backend.info
 
