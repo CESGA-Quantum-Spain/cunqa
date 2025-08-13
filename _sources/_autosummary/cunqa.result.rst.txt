@@ -10,6 +10,7 @@ cunqa.result
    
    
    .. rubric:: Functions
+---------
 
    .. autosummary::
       :toctree:
@@ -23,6 +24,7 @@ cunqa.result
    
    
    .. rubric:: Classes
+-------
 
    .. autosummary::
       :toctree:
@@ -36,6 +38,7 @@ cunqa.result
    
    
    .. rubric:: Exceptions
+----------
 
    .. autosummary::
       :toctree:

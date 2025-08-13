@@ -10,6 +10,7 @@ cunqa.mappers
    
    
    .. rubric:: Functions
+---------
 
    .. autosummary::
       :toctree:
@@ -22,6 +23,7 @@ cunqa.mappers
    
    
    .. rubric:: Classes
+-------
 
    .. autosummary::
       :toctree:
