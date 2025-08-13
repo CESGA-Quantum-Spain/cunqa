@@ -9,10 +9,12 @@ cunqa.qjob
 
    
    
-   Functions
----------
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
+      :toctree:
       :nosignatures:
    
       gather
@@ -21,10 +23,12 @@ cunqa.qjob
 
    
    
-   Classes
--------
+   .. raw:: html
+
+      <h2> Classes </h2>
 
    .. autosummary::
+      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    
@@ -34,8 +38,9 @@ cunqa.qjob
 
    
    
-   Exceptions
-----------
+   .. raw:: html
+
+      <h2> Exceptions </h2>
 
    .. autosummary::
       :toctree:

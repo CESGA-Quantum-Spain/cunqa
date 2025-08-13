@@ -1,0 +1,31 @@
+cunqa.mappers.QJobMapper
+========================
+
+.. currentmodule:: cunqa.mappers
+
+.. autoclass:: QJobMapper
+   :show-inheritance:
+
+
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJobMapper.qjobs
+
+
+
+Methods
+-------
+
+.. automethod:: QJobMapper.__init__
+
+
+
+
+
+
+

@@ -1,0 +1,45 @@
+cunqa.qjob.QJob
+===============
+
+.. currentmodule:: cunqa.qjob
+
+.. autoclass:: QJob
+   :show-inheritance:
+
+
+
+Attributes
+----------
+
+.. autosummary::
+   :nosignatures:
+
+   ~QJob.result
+   ~QJob.time_taken
+   ~QJob.qclient
+
+
+
+Methods
+-------
+
+.. automethod:: QJob.__init__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. automethod:: QJob.submit
+
+.. automethod:: QJob.upgrade_parameters
+

@@ -9,10 +9,12 @@ cunqa.qutils
 
    
    
-   Functions
----------
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
+      :toctree:
       :nosignatures:
    
       are_qpus_raised
@@ -30,8 +32,9 @@ cunqa.qutils
 
    
    
-   Exceptions
-----------
+   .. raw:: html
+
+      <h2> Exceptions </h2>
 
    .. autosummary::
       :toctree:

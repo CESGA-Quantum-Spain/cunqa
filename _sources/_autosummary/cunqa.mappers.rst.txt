@@ -9,10 +9,12 @@ cunqa.mappers
 
    
    
-   Functions
----------
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
+      :toctree:
       :nosignatures:
    
       run_distributed
@@ -21,10 +23,12 @@ cunqa.mappers
 
    
    
-   Classes
--------
+   .. raw:: html
+
+      <h2> Classes </h2>
 
    .. autosummary::
+      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

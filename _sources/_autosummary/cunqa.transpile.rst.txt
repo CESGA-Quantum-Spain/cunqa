@@ -9,10 +9,12 @@ cunqa.transpile
 
    
    
-   Functions
----------
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
+      :toctree:
       :nosignatures:
    
       transpiler
@@ -25,8 +27,9 @@ cunqa.transpile
 
    
    
-   Exceptions
-----------
+   .. raw:: html
+
+      <h2> Exceptions </h2>
 
    .. autosummary::
       :toctree:
