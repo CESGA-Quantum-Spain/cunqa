@@ -215,7 +215,19 @@ For simplifying this process, we have <a class="reference internal" href="cunqa.
 <p><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> takes a list of existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects and a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the virtual QPUs that we want to use.
 Then, the class can be called passing a set of parameters and a cost function.
 This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such parameters through the <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code> method.
-Then, gathers the results of the executions and returns the value of the cost function for each. Let’s see an example using Differential Evolution <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> optimzier.</p>
+Then, gathers the results of the executions and returns the value of the cost function for each. Let’s see an example using Differential Evolution <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> optimzier:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ansatz</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ansatz</span><span class="o">.</span><span class="n">assign_parameters</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qjobs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ansatz</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">qjobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qjob</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optimization_result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">workers</span> <span class="o">=</span> <span class="n">Mapper</span><span class="p">)</span>
+</pre></div>
+</div>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
