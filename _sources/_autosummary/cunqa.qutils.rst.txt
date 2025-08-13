@@ -13,7 +13,6 @@ cunqa.qutils
 ---------
 
    .. autosummary::
-      :toctree:
       :nosignatures:
    
       are_qpus_raised

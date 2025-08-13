@@ -17,7 +17,6 @@ cunqa.backend
 -------
 
    .. autosummary::
-      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

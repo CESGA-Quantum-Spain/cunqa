@@ -13,7 +13,6 @@ cunqa.circuit
 ---------
 
    .. autosummary::
-      :toctree:
       :nosignatures:
    
       from_json_to_qc
@@ -27,7 +26,6 @@ cunqa.circuit
 -------
 
    .. autosummary::
-      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

@@ -13,7 +13,6 @@ cunqa.mappers
 ---------
 
    .. autosummary::
-      :toctree:
       :nosignatures:
    
       run_distributed
@@ -26,7 +25,6 @@ cunqa.mappers
 -------
 
    .. autosummary::
-      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

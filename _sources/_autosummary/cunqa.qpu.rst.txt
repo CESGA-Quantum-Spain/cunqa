@@ -17,7 +17,6 @@ cunqa.qpu
 -------
 
    .. autosummary::
-      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

@@ -13,7 +13,6 @@ cunqa.result
 ---------
 
    .. autosummary::
-      :toctree:
       :nosignatures:
    
       convert_counts
@@ -27,7 +26,6 @@ cunqa.result
 -------
 
    .. autosummary::
-      :toctree:
       :template: custom-class-template.rst
       :nosignatures:
    

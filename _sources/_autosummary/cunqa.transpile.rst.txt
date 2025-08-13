@@ -13,7 +13,6 @@ cunqa.transpile
 ---------
 
    .. autosummary::
-      :toctree:
       :nosignatures:
    
       transpiler
