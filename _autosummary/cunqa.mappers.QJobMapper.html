@@ -231,21 +231,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>func</em>) – function to be passed to the results of the jobs.</p></li>
-<li><p><strong>Mainly</strong></p></li>
+<li><p><strong>func</strong> (<em>func</em>) – function to be passed to the results of the jobs. Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value. For example, the function can evaluate the expected value of an observable from the output of the circuit.</p></li>
+<li><p><strong>population</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>int</em><em> or </em><em>float</em><em>]</em><em>]</em>) – list of vectors to be mapped to the jobs. Each set of parameters will be assigned to each py:class:<cite>~cunqa.qjob.QJob</cite> object, so the list must be of the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qjobs</span></code>.</p></li>
 </ul>
 </dd>
-</dl>
-<p>:param this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value.:
-:param For example:
-:param the function can evaluate the expected value of an observable from the output of the circuit.:
-:param population: list of vectors to be mapped to the jobs.
-:type population: list[list[int or float]]
-:param Each set of parameters will be assigned to each py:class:<cite>~cunqa.qjob.QJob</cite> object:
-:param so the list must be of the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qjobs</span></code>.:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of outputs of the function applied to the results of each job for the given population.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of outputs of the function applied to the results of each job for the given population.</p>
 </dd>
 </dl>
 </dd></dl>
