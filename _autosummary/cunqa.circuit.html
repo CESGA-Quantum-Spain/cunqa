@@ -198,7 +198,8 @@
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cunqacirc</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instruction_set</span> <span class="o">=</span> <span class="n">qc_to_json</span><span class="p">(</span><span class="n">qc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_json</span> <span class="o">=</span> <span class="n">qc_to_json</span><span class="p">(</span><span class="n">qc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instruction_set</span> <span class="o">=</span> <span class="n">circuit_json</span><span class="p">[</span><span class="s2">&quot;instructions&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cunqacirc</span><span class="o">.</span><span class="n">from_instructions</span><span class="p">(</span><span class="n">instruction_set</span><span class="p">)</span>
 </pre></div>
 </div>
