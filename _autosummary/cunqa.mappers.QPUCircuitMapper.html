@@ -209,16 +209,16 @@
 <td><p><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> ibjects linked to the virtual QPUs to wich the circuit is mapped.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ansatz</span></code></p></td>
-<td><p>Circuit to which parameters are assigned at <a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="cunqa.mappers.QPUCircuitMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QPUCircuitMapper.__call__()</span></code></a>.</p></td>
+<td><p>Circuit to which parameters are assigned at the <a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="cunqa.mappers.QPUCircuitMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QPUCircuitMapper.__call__()</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpile</span></code></p></td>
-<td><p></p></td>
+<td><p>Weather transpilation is wanted to be done before sending each circuit.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_layout</span></code></p></td>
-<td><p></p></td>
+<td><p>Transpilation information, qubits of the backend to which the qubits of the circuit are mapped.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_parameters</span></code></p></td>
-<td><p></p></td>
+<td><p>Any other run instructions needed for the simulation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -232,8 +232,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qpus</strong> (<em>list</em><em>[</em><em>&lt;class 'qpu.QPU'&gt;</em><em>]</em>) – list of QPU objects.</p></li>
-<li><p><strong>circuit</strong> (<em>json dict</em><em>, </em><em>&lt;class 'qiskit.circuit.quantumcircuit.QuantumCircuit'&gt;</em><em> or </em><em>QASM2 str</em>) – circuit to be run in the QPUs.</p></li>
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>]</em>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
+<li><p><strong>circuit</strong> (<em>dict</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em> or </em><em>QuantumCirucit</em>) – circuit to be run in the QPUs.</p></li>
 <li><p><strong>transpile</strong> (<em>bool</em>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
 <li><p><strong>initial_layout</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
