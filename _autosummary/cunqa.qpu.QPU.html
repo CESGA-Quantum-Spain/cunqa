@@ -219,14 +219,15 @@
 <dt class="sig sig-object py" id="cunqa.qpu.QPU.__init__">
 <span class="sig-prename descclassname"><span class="pre">QPU.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.QPU.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initializes the QPU class.</p>
-<dl>
-<dt>Args:</dt><dd><p>id (int): Id assigned to the qpu, simply a int from 0 to n_qpus-1.</p>
-<dl class="simple">
-<dt>qclient (&lt;class ‘python.qclient.QClient’&gt;): object that holds the information to communicate with the server</dt><dd><p>endpoint for a given QPU.</p>
-</dd>
-</dl>
-<p>backend (&lt;class ‘backend.Backend’&gt;): object that provides information about the QPU backend.</p>
-<p>endpoint (str): String refering to the endpoint of the server to which the QPU corresponds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) – Id assigned to the qpu, simply a int from 0 to n_qpus-1.</p></li>
+<li><p><strong>qclient</strong> (<em>&lt;class 'python.qclient.QClient'&gt;</em>) – object that holds the information to communicate with the server
+endpoint for a given QPU.</p></li>
+<li><p><strong>backend</strong> (<em>&lt;class 'backend.Backend'&gt;</em>) – object that provides information about the QPU backend.</p></li>
+<li><p><strong>endpoint</strong> (<em>str</em>) – String refering to the endpoint of the server to which the QPU corresponds.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -239,14 +240,18 @@
 can occur, for example if the QPU has a noise model with error associated to specific gates, if the circuit is not transpiled errors might not appear.</p>
 <p>If <cite>transpile</cite> is False and <cite>initial_layout</cite> is provided, it will be ignored.</p>
 <p>Possible instructions to add as <cite>**run_parameters</cite> can be: shots, method, parameter_binds, meas_level, …</p>
-<dl>
-<dt>Args:</dt><dd><p>circuit (json dict or &lt;class ‘qiskit.circuit.CunqaCircuit’&gt;): circuit to be run in the QPU.</p>
-<p>transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p>
-<p>initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.</p>
-<p>opt_level (int): optimization level for transpilation, default set to 1.</p>
-<p><a href="#id1"><span class="problematic" id="id2">**</span></a>run_parameters : any other simulation instructions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>json dict</em><em> or </em><em>&lt;class 'qiskit.circuit.CunqaCircuit'&gt;</em>) – circuit to be run in the QPU.</p></li>
+<li><p><strong>transpile</strong> (<em>bool</em>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
+<li><p><strong>initial_layout</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
+<li><p><strong>opt_level</strong> (<em>int</em>) – optimization level for transpilation, default set to 1.</p></li>
+<li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>&lt;class ‘QJob’&gt; object.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>&lt;class ‘QJob’&gt; object.</p>
 </dd>
 </dl>
 </dd></dl>
