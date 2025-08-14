@@ -196,7 +196,7 @@
 <dd><p>Function to send circuits to serveral virtual QPUs allowing classical or quantum communications among them.
 Each circuit will be sent to each QPU in order, therefore both lists must be of the same size.</p>
 <p>Because the function is destined for the execution that require communications, only <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> or instruction sets are accepted.</p>
-<p>If <em>transpile</em>, <em>initial_layout</em> or <em>opt_level</em> are passed as * <a href="#id1"><span class="problematic" id="id2">**</span></a>run_args* they will be ignored since for the current version
+<p>If <em>transpile</em>, <em>initial_layout</em> or <em>opt_level</em> are passed as <em>run_args</em> they will be ignored since for the current version
 transpilation is not supported when communications are present. The arguments provided will be the same for the all <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects created.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -207,7 +207,7 @@ transpilation is not supported when communications are present. The arguments pr
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
+<dd class="field-even"><p>List of QJob objects.</p>
 </dd>
 </dl>
 </dd></dl>
