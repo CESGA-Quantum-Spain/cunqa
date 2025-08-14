@@ -224,16 +224,16 @@ This sending operations require that the virtual QPUs to which the circuits are 
 <section id="creating-your-first-cunqacircuit">
 <h2>Creating your first CunqaCircuit<a class="headerlink" href="#creating-your-first-cunqacircuit" title="Link to this heading"></a></h2>
 <p>Start by instantiating the class providing the desired number of qubits:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then, gates can be added through the mentioned methods. Let’s add a Hadamard gate and CNOT gates to create a Bell state:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># adding hadamard to qubit 0</span>
-<span class="hll"><span class="linenos">2</span><span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-</span></pre></div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># adding hadamard to qubit 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
 </div>
 <p>Finally, qubits are measured by:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Once the circuit is ready, it is ready to be sent to a QPU by the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
@@ -259,24 +259,24 @@ This sending operations require that the virtual QPUs to which the circuits are 
 <h2>Classical communications among circuits<a class="headerlink" href="#classical-communications-among-circuits" title="Link to this heading"></a></h2>
 <p>The strong part of CunqaCircuit is that it allows to define communication directives between circuits.
 We can define the sending of a classical bit from one circuit to another by:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="linenos">2</span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="linenos">3</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="linenos">4</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">circuit_2</span><span class="p">)</span> <span class="c1"># qubit 0 is measured and the outcome is sent to circuit_2</span>
-<span class="linenos">5</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">circuit_1</span><span class="p">)</span> <span class="c1"># the outcome is recived to perform a classicaly controlled operation</span>
-<span class="linenos">6</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
-<span class="linenos">7</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">circuit_2</span><span class="p">)</span> <span class="c1"># qubit 0 is measured and the outcome is sent to circuit_2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">circuit_1</span><span class="p">)</span> <span class="c1"># the outcome is recived to perform a classicaly controlled operation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Then, circuits can be sent to QPUs that support classical communications using the <a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed" title="cunqa.mappers.run_distributed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cunqa.mappers.run_distributed()</span></code></a> function.</p>
 <p>Circuits can also be referend to through their <em>id</em> string. When a CunqaCircuit is created, by default a random <em>id</em> is assigned, but it can also be personalized:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
-<span class="linenos">2</span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
-<span class="linenos">3</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="linenos">4</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span> <span class="c1"># qubit 0 is measured and the outcome is sent to circuit_2</span>
-<span class="linenos">5</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="c1"># the outcome is recived to perform a classicaly controlled operation</span>
-<span class="linenos">6</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
-<span class="linenos">7</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span> <span class="c1"># qubit 0 is measured and the outcome is sent to circuit_2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="c1"># the outcome is recived to perform a classicaly controlled operation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -284,16 +284,16 @@ We can define the sending of a classical bit from one circuit to another by:</p>
 <h2>Sending qubits between circuits<a class="headerlink" href="#sending-qubits-between-circuits" title="Link to this heading"></a></h2>
 <p>When quantum communications among the QPUs utilized are available, a qubit from one circuit can be sent to another.
 In this scheme, generally an acilla qubit would be neccesary to perform the communication. Let’s see an example for the creation of a Bell pair remotely:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
-<span class="linenos"> 2</span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="linenos"> 5</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">qsend</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="c1"># sending qubit 1 to circuit with id &quot;2&quot;</span>
-<span class="linenos"> 6</span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">qrecv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span> <span class="c1"># reciving qubit from circuit with id &quot;1&quot; and assigning it to qubit 0</span>
-<span class="linenos"> 9</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="linenos">10</span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">qsend</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="c1"># sending qubit 1 to circuit with id &quot;2&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">qrecv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span> <span class="c1"># reciving qubit from circuit with id &quot;1&quot; and assigning it to qubit 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit_2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>It is important to note that the qubit used for the communication, the one send, after the operation it is reset, so in a general basis it wouldn’t need to be measured.
