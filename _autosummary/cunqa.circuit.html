@@ -80,7 +80,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.circuit</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#references">References:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#building-circuits">Building circuits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
@@ -190,6 +190,8 @@
   <section id="module-cunqa.circuit">
 <span id="cunqa-circuit"></span><h1>cunqa.circuit<a class="headerlink" href="#module-cunqa.circuit" title="Link to this heading"></a></h1>
 <p>Holds Cunqa’s custom circuit class and functions to translate its instructions into other formats for circuit definition.</p>
+<section id="building-circuits">
+<h2>Building circuits<a class="headerlink" href="#building-circuits" title="Link to this heading"></a></h2>
 <p>Users can define a circuit using <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> to then send it to the virtual QPUs. Nevertheless, for the case in which no communications are needed among the circuits sent, other formats are allowed.</p>
 <p>This module also provides global functions that translate form <code class="docutils literal notranslate"><span class="pre">qiskit.circuit.QuantumCircuit</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to a instructions json (<a class="reference internal" href="cunqa.circuit.qc_to_json.html#cunqa.circuit.qc_to_json" title="cunqa.circuit.qc_to_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qc_to_json()</span></code></a>) and the other way around (<a class="reference internal" href="cunqa.circuit.from_json_to_qc.html#cunqa.circuit.from_json_to_qc" title="cunqa.circuit.from_json_to_qc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_json_to_qc()</span></code></a>).</p>
 <p>For example, if a user wants to transform a <code class="docutils literal notranslate"><span class="pre">qiskit.circuit.QuantumCircuit</span></code> into a <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, one can obtain the instructions and then add them to the <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> object:</p>
@@ -201,8 +203,7 @@
 </pre></div>
 </div>
 <p>Be aware that some instructions might not be supported for <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, for the list of supported instructions check its documentation.</p>
-<section id="references">
-<h2>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p class="rubric">References</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
