@@ -229,8 +229,8 @@ This sending operations require that the virtual QPUs to which the circuits are 
 </div>
 <p>Then, gates can be added through the mentioned methods. Let’s add a Hadamard gate and CNOT gates to create a Bell state:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># adding hadamard to qubit 0</span>
-<span class="linenos">2</span><span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
+<span class="hll"><span class="linenos">2</span><span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</span></pre></div>
 </div>
 <p>Finally, qubits are measured by:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
