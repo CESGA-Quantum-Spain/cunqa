@@ -28,6 +28,10 @@ Methods
 .. automethod:: QPUCircuitMapper.__init__
 
 
+.. automethod:: QPUCircuitMapper.__call__
+
+
+
 
 
 
