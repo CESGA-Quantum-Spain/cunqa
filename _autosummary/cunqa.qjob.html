@@ -190,6 +190,8 @@
   <section id="module-cunqa.qjob">
 <span id="cunqa-qjob"></span><h1>cunqa.qjob<a class="headerlink" href="#module-cunqa.qjob" title="Link to this heading"></a></h1>
 <p>Contains objects that define and manage quantum emulation jobs.</p>
+<p>The core of this module is the class <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>. These objects are created when a quantum job
+is sent to a virtual QPU, as a return of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.</p>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
@@ -219,7 +221,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.qjob.QJobError.html#cunqa.qjob.QJobError" title="cunqa.qjob.QJobError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QJobError</span></code></a></p></td>
-<td><p>Exception for error during job submission to QPUs.</p></td>
+<td><p>Exception for error during job submission to virtual QPUs.</p></td>
 </tr>
 </tbody>
 </table>
