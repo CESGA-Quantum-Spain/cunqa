@@ -271,7 +271,11 @@ Its implementation for optimization problems is shown at the <a class="reference
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.__call__">
 <span class="sig-prename descclassname"><span class="pre">QPUCircuitMapper.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="Link to this definition"></a></dt>
-<dd><p>Callable method to map the function to the QPUs.</p>
+<dd><p>Callable method to map the function <em>func</em> to the results of the circuits sent to the given QPUs after assigning them <em>population</em>.
+Regarding the <em>population</em>, each set of parameters will be assigned to each circuit, so the list must
+have size (<em>N,p</em>), being <em>N</em> the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qpus</span></code> and <em>p</em> the number of parameters in the circuit.
+Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value.
+For example, the function can evaluate the expected value of an observable from the output of the circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
