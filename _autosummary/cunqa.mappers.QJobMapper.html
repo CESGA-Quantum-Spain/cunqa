@@ -197,9 +197,7 @@
 <p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p>
 <p>The core of the class is on its <a class="reference internal" href="#cunqa.mappers.QJobMapper.__call__" title="cunqa.mappers.QJobMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method, to which parameters that the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> takes are passed toguether with a cost function, so that a the value for this cost for each initial <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is returned.</p>
 <p>An example is shown below, once we have a list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects as <em>qjobs</em>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; # defining the parameters set accordingly to the number of parameters
-&gt;&gt;&gt; # of the circuit and the number of QJobs in the list.
-&gt;&gt;&gt; new_parameters = [···]
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; new_parameters = [···]
 &gt;&gt;&gt;
 &gt;&gt;&gt; # defining the cost function passed to the result of each QJob
 &gt;&gt;&gt; def cost_function(result):
