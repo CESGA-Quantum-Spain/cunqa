@@ -88,7 +88,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.mappers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#sending-circuits-with-classical-or-quantum-communications">Sending circuits with classical or quantum communications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
@@ -190,8 +190,8 @@
   <section id="module-cunqa.mappers">
 <span id="cunqa-mappers"></span><h1>cunqa.mappers<a class="headerlink" href="#module-cunqa.mappers" title="Link to this heading"></a></h1>
 <p>Contains map-like callables to distribute circuits in virtual QPUS, needed when communications among circuits are present.</p>
-<section id="sending-circuits-with-classical-or-quantum-communications">
-<h2>Sending circuits with classical or quantum communications<a class="headerlink" href="#sending-circuits-with-classical-or-quantum-communications" title="Link to this heading"></a></h2>
+<section id="submitting-circuits-with-classical-or-quantum-communications">
+<h2>Submitting circuits with classical or quantum communications<a class="headerlink" href="#submitting-circuits-with-classical-or-quantum-communications" title="Link to this heading"></a></h2>
 <p>When having classical or quantum communications among circuits, method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a> is obsolete, circuits must be sent as an ensemble in order to ensure correct functioning of the communication protocols.</p>
 <p>So, once the virtual QPUs that allow the desired type of communications are raised and circuits have been defined using <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>,
 they can be sent using the <a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed" title="cunqa.mappers.run_distributed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_distributed()</span></code></a> function:</p>
@@ -264,7 +264,7 @@ The difference with <a class="reference internal" href="cunqa.mappers.QJobMapper
 <td><p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></p></td>
-<td><p>Class to map the function <cite>qpu.QPU.run()</cite> to a list of QPUs.</p></td>
+<td><p>Class to map the function <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> to a list of QPUs.</p></td>
 </tr>
 </tbody>
 </table>

@@ -88,7 +88,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#sending-circuits-with-classical-or-quantum-communications">Sending circuits with classical or quantum communications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.mappers.QJobMapper</a></li>
@@ -195,6 +195,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.mappers.</span></span><span class="sig-name descname"><span class="pre">QJobMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p>
+<p>The core of the class is on its <code class="docutils literal notranslate"><span class="pre">__call__</span></code> method, to which parameters that the function <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> takes are passed toguether with a cost function, so that a the value for this cost for each initial <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is returned.</p>
 </dd></dl>
 
 <section id="attributes">
