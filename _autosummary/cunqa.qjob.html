@@ -96,6 +96,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qjob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#handling-qjobs">Handling QJobs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html">cunqa.qjob.gather</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html">cunqa.qjob.QJob</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a></li>
@@ -192,6 +193,14 @@
 <p>Contains objects that define and manage quantum emulation jobs.</p>
 <p>The core of this module is the class <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>. These objects are created when a quantum job
 is sent to a virtual QPU, as a return of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.</p>
+<section id="handling-qjobs">
+<h2>Handling QJobs<a class="headerlink" href="#handling-qjobs" title="Link to this heading"></a></h2>
+<p>When sending a circuit to a virtual QPU by:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the output is a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object. This allows us to handle information about the simulation and its outcome.</p>
+</section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
