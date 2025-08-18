@@ -197,9 +197,11 @@ is sent to a virtual QPU, as a return of the <a class="reference internal" href=
 <h2>Handling QJobs<a class="headerlink" href="#handling-qjobs" title="Link to this heading"></a></h2>
 <p>When sending a circuit to a virtual QPU by:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+<span class="go">    &lt;cunqa.qjob.QJob object at XXXXXXXX&gt;</span>
 </pre></div>
 </div>
-<p>the output is a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object. This allows us to handle information about the simulation and its outcome.</p>
+<p>the output is a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object. Once it is created, the circuit is being simulated at the virtual QPU.
+<a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is the bridge between sending a circuit with instructions and recieving the results.</p>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
