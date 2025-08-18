@@ -194,13 +194,10 @@
 <dt class="sig sig-object py" id="cunqa.mappers.QJobMapper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.mappers.</span></span><span class="sig-name descname"><span class="pre">QJobMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<blockquote>
-<div><p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p>
+<p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p>
 <p>The core of the class is on its <a class="reference internal" href="#cunqa.mappers.QJobMapper.__call__" title="cunqa.mappers.QJobMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method, to which parameters that the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> takes are passed toguether with a cost function, so that a the value for this cost for each initial <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is returned.</p>
 <p>An example is shown below, once we have a list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects as <em>qjobs</em>:</p>
-</div></blockquote>
-<dl>
-<dt>#    &gt;&gt;&gt; mapper = QJobMapper(qjobs)</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; # defining the parameters set accordingly to the number of parameters
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; # defining the parameters set accordingly to the number of parameters
 &gt;&gt;&gt; # of the circuit and the number of QJobs in the list.
 &gt;&gt;&gt; new_parameters = [···]
 &gt;&gt;&gt;
@@ -215,8 +212,6 @@
 </div>
 <p>We intuitively see how convinient this class can be for optimization algorithms: one has a parametric circuit to which updated sets of parameters can be sent
 obtaining the value of the cost back. Examples applied to optimizations are shown at the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <section id="attributes">
