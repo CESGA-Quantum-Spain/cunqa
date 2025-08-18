@@ -359,8 +359,9 @@ def recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None,
                 for base_ten_bitstring, prob in enumerate(probs_k):
                     for i, i_qubit in enumerate(partial):
 
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
-                        new_probs[k][i, zero_one] += prob
+                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
+                        new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
+                                                          # is determined by the zero or one on the bitstring
         else:
             new_probs = np.zeros((len(partial), 2))
 

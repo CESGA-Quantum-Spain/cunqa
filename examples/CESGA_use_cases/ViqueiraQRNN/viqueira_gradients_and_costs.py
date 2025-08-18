@@ -76,9 +76,6 @@ class CostFunction:
 
 
 
- 
-
-
 class GradientMethodError(Exception):
     """Exception for signaling errors during gradient calculations."""
     pass
@@ -198,7 +195,7 @@ class GradientMethod:
 
             deriv = [
                 np.dot( (cost_func.deriv(plus, y_true) - cost_func.deriv(minus, y_true))/2, (plus - minus)/2 ) 
-                for plus, minus in zip(results[0::2], results[1::2])
+                for plus, minus in zip(observables[0::2], observables[1::2])
                 ] # zip goes through even and odd elements together
 
             gradient[start:end] = deriv
@@ -210,7 +207,7 @@ class GradientMethod:
 
         final_deriv = [ 
             np.dot( (cost_func.deriv(plus, y_true) - cost_func.deriv(minus, y_true))/2, (plus - minus)/2 ) 
-            for plus, minus in zip(final_results[0::2], final_results[1::2])
+            for plus, minus in zip(final_observables[0::2], final_observables[1::2])
             ] 
         gradient[final_start:n] = final_deriv
 

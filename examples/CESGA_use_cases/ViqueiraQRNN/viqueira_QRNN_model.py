@@ -99,8 +99,7 @@ class ViqueiraQRNN:
         with open(logfile, 'a') as f:
 
             for epoch in epochs:
-                # TODO; improve this best_loss initialization as it depends on the time series elements being on [0, 1]
-                best_loss = len(theta_init) * 100 # Unreasonably large number to initialize best_loss and inmediatly update it
+                best_loss = float("Infinity") # Best loss will be inmediatly updated without writing a special case for n=0
                 for i, time_series in enumerate(population):
 
                     gradient = self.calc_gradient(circuit=self.circuit, qjobs=self.qjobs , time_series=time_series, theta_now=theta_aux,  y_true=y_labels[i], cost_func=self.calc_cost)
