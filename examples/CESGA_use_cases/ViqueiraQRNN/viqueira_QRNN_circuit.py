@@ -39,7 +39,7 @@ class CircuitQRNN:
             nT (int): number of time steps of the time series
             repeat_encode (int): number of times that the encoding block should be repeated in the circuit
             repeat_evolution (int): number of times that the evolution block should be repeated in the circuit
-            ansatz (int): specify wether to use the model with U_2 = R_x R_z or the one with U_3 = R_x R_z R_x
+            ansatz (int): AnsatzQRNN instance to apply on each time step
             init_state_mem (<class CunqaCircuit>): initial state for the memory register
             
         Return:
@@ -55,16 +55,20 @@ class CircuitQRNN:
 
 
         # Determine which ansatz to use on the circuit
-        if self.ansatz == EMCZ2:
+        if ansatz == EMCZ2:
             self.ansatz_object = EMCZ2(nE, nM, repeat_encode, repeat_evolution)
             self.ansatz = self.ansatz_object._get_full_circuit()
 
-        elif self.ansatz == EMCZ3:
+        elif (ansatz == "EMCZ3" or ansatz == EMCZ3):
             self.ansatz_object = EMCZ3(nE, nM, repeat_encode, repeat_evolution)
             self.ansatz = self.ansatz_object._get_full_circuit()
 
         else:
-            self.ansatz_object = ansatz(nE, nM, repeat_encode, repeat_evolution)
+            if not all([ansatz.nE == self.nE, ansatz.nM == self.nM, ansatz._repeat_encode == self._repeat_encode, ansatz._repeat_evolution == self._repeat_evolution]):
+                logger.error(f"Provided ansatz has incorrect dimensions, nE: {ansatz.nE} vs {self.nE} (ansatz vs circuit), nM: {ansatz.nM} vs {self.nM}, repeat_encode: {ansatz._repeat_encode} vs {self._repeat_encode} and repeat_evolution: {ansatz._repeat_evolution} vs {self._repeat_evolution}.")
+                raise CircuitQRNNError
+            
+            self.ansatz_object = ansatz
             self.ansatz = self.ansatz_object._get_full_circuit()
 
 
