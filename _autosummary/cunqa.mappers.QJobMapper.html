@@ -238,7 +238,7 @@ obtaining the value of the cost back. Examples applied to optimizations are show
 <dd><p>Class constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">strip</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f8ddca370f0&gt;</span></code>) – list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects to be mapped.</p>
+<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[QJob]</span></code>) – list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects to be mapped.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -254,8 +254,8 @@ For example, the function can evaluate the expected value of an observable from 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">strip</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f8ddca21df0&gt;</span></code>) – function to be passed to the results of the jobs.</p></li>
-<li><p><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">strip</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f8ddcada300&gt;</span></code>) – list of vectors to be mapped to the jobs.</p></li>
+<li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">func</span></code>) – function to be passed to the results of the jobs.</p></li>
+<li><p><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[list[int</span> <span class="pre">or</span> <span class="pre">float]]</span></code>) – list of vectors to be mapped to the jobs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
