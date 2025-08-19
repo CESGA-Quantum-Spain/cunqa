@@ -258,10 +258,10 @@ Its implementation for optimization problems is shown at the <a class="reference
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>]</em>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
-<li><p><strong>circuit</strong> (<em>dict</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em> or </em><em>QuantumCirucit</em>) – circuit to be run in the QPUs.</p></li>
-<li><p><strong>transpile</strong> (<em>bool</em>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
-<li><p><strong>initial_layout</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
+<li><p><strong>qpus</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[QPU]</span></code>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
+<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict,</span> <span class="pre">CunqaCircuit</span> <span class="pre">or</span> <span class="pre">QuantumCirucit</span></code>) – circuit to be run in the QPUs.</p></li>
+<li><p><strong>transpile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
+<li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
 </ul>
 </dd>
@@ -279,8 +279,8 @@ For example, the function can evaluate the expected value of an observable from 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>func</em>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
-<li><p><strong>params</strong> (<em>list</em><em>[</em><em>list</em><em>]</em>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
+<li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">func</span></code>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
+<li><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[list]</span></code>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
