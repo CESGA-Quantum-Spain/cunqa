@@ -258,10 +258,10 @@ Its implementation for optimization problems is shown at the <a class="reference
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qpus</strong> (<cite>list[</cite><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU`</span></code>]`) – list of objects linked to the virtual QPUs intended to be used.</p></li>
+<li><p><strong>qpus</strong> (<cite>list[</cite> <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> <cite>]</cite>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
 <li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict,</span> <span class="pre">CunqaCircuit</span> <span class="pre">or</span> <span class="pre">QuantumCirucit</span></code>) – circuit to be run in the QPUs.</p></li>
 <li><p><strong>transpile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
-<li><p><strong>initial_layout</strong> (<cite>list[</cite><code class="xref py py-class docutils literal notranslate"><span class="pre">int`</span></code>]`) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
+<li><p><strong>initial_layout</strong> (<cite>list[</cite> <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> <cite>]</cite>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
 </ul>
 </dd>
@@ -280,7 +280,7 @@ For example, the function can evaluate the expected value of an observable from 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">func</span></code>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
-<li><p><strong>params</strong> (<cite>list[</cite><code class="xref py py-class docutils literal notranslate"><span class="pre">list`</span></code>]`) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
+<li><p><strong>params</strong> (<cite>list[</cite> <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> <cite>]</cite>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
