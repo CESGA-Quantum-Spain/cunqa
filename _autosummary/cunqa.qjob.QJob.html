@@ -230,14 +230,15 @@ For further information, check <a class="reference internal" href="cunqa.qpu.QPU
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>At this point, <em>circuit</em> is asumed to be translated into the native gates of the <em>backend</em>.
-Otherwise, simulation will fail and an error will be returned as the result.</p>
+Otherwise, simulation will fail and an error will be returned as the result.
+For further details, checkout <a class="reference internal" href="../generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transpile</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>) – client linked to the server that listens at the virtual QPU.</p></li>
 <li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – gathers necessary information about the simulator.</p></li>
-<li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumCircuit</span></code>) – circuit to be run.</p></li>
+<li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit;</span> <span class="pre">dict;</span> <span class="pre">~cunqa.circuit.CunqaCircuit</span></code>) – circuit to be run.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
 </ul>
 </dd>
