@@ -255,12 +255,15 @@ Its implementation for optimization problems is shown at the <a class="reference
 <dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.__init__">
 <span class="sig-prename descclassname"><span class="pre">QPUCircuitMapper.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><span class="pre">QPU</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.__init__" title="Link to this definition"></a></dt>
 <dd><p>Class constructor.</p>
-<dl>
-<dt>Args:</dt><dd><p>qpus (list[QPU]): list of objects linked to the virtual QPUs intended to be used.</p>
-<p>circuit (dict, CunqaCircuit or QuantumCirucit): circuit to be run in the QPUs.</p>
-<p>transpile (bool): if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p>
-<p>initial_layout (list[int]): Initial position of virtual qubits on physical qubits for transpilation.</p>
-<p><a href="#id1"><span class="problematic" id="id2">**</span></a>run_parameters : any other simulation instructions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>]</em>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
+<li><p><strong>circuit</strong> (<em>dict</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em> or </em><em>QuantumCirucit</em>) – circuit to be run in the QPUs.</p></li>
+<li><p><strong>transpile</strong> (<em>bool</em>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
+<li><p><strong>initial_layout</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
+<li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -273,11 +276,15 @@ Regarding the <em>population</em>, each set of parameters will be assigned to ea
 have size (<em>N,p</em>), being <em>N</em> the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qpus</span></code> and <em>p</em> the number of parameters in the circuit.
 Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value.
 For example, the function can evaluate the expected value of an observable from the output of the circuit.</p>
-<dl>
-<dt>Args:</dt><dd><p>func (func): function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p>
-<p>params (list[list]): population of vectors to be mapped to the circuits sent to the QPUs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>func</em>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
+<li><p><strong>params</strong> (<em>list</em><em>[</em><em>list</em><em>]</em>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>List of the results of the function applied to the output of the circuits sent to the QPUs.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of the results of the function applied to the output of the circuits sent to the QPUs.</p>
 </dd>
 </dl>
 </dd></dl>

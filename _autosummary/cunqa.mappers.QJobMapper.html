@@ -236,8 +236,9 @@ obtaining the value of the cost back. Examples applied to optimizations are show
 <dt class="sig sig-object py" id="cunqa.mappers.QJobMapper.__init__">
 <span class="sig-prename descclassname"><span class="pre">QJobMapper.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper.__init__" title="Link to this definition"></a></dt>
 <dd><p>Class constructor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>qjobs (list[QJob]): list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects to be mapped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qjobs</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><em>QJob</em></a><em>]</em>) – list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects to be mapped.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -250,11 +251,15 @@ Regarding the <em>population</em>, each set of parameters will be assigned to ea
 have size (<em>N,p</em>), being <em>N</em> the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qjobs</span></code> and <em>p</em> the number of parameters in the circuit.
 Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value.
 For example, the function can evaluate the expected value of an observable from the output of the circuit.</p>
-<dl>
-<dt>Args:</dt><dd><p>func (func): function to be passed to the results of the jobs.</p>
-<p>population (list[list[int or float]]): list of vectors to be mapped to the jobs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>func</em>) – function to be passed to the results of the jobs.</p></li>
+<li><p><strong>population</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>int</em><em> or </em><em>float</em><em>]</em><em>]</em>) – list of vectors to be mapped to the jobs.</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>List of outputs of the function applied to the results of each job for the given population.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of outputs of the function applied to the results of each job for the given population.</p>
 </dd>
 </dl>
 </dd></dl>

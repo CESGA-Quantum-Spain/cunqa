@@ -194,11 +194,15 @@
 <dt class="sig sig-object py" id="cunqa.qutils.getQPUs">
 <span class="sig-prename descclassname"><span class="pre">cunqa.qutils.</span></span><span class="sig-name descname"><span class="pre">getQPUs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><span class="pre">QPU</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.qutils.getQPUs" title="Link to this definition"></a></dt>
 <dd><p>Global function to get the QPU objects corresponding to the virtual QPUs raised.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>local (bool): option to return only the QPUs in the current node (True, default option) or in all nodes (False).
-family (str): option to return only the QPUs from the selected family (group of QPUs allocated in the same qraise)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local</strong> (<em>bool</em>) – option to return only the QPUs in the current node (True, default option) or in all nodes (False).</p></li>
+<li><p><strong>family</strong> (<em>str</em>) – option to return only the QPUs from the selected family (group of QPUs allocated in the same qraise)</p></li>
+</ul>
 </dd>
-<dt>Return:</dt><dd><p>List of QPU objects.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of QPU objects.</p>
 </dd>
 </dl>
 </dd></dl>
