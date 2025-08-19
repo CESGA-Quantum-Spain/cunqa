@@ -233,14 +233,11 @@ For further information, check <a class="reference internal" href="cunqa.qpu.QPU
 Otherwise, simulation will fail and an error will be returned as the result.
 For further details, checkout <a class="reference internal" href="../generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transpile</span></code></a>.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qclient</strong> (<em>QClient</em>) – client linked to the server that listens at the virtual QPU.</p></li>
-<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><em>Backend</em></a>) – gathers necessary information about the simulator.</p></li>
-<li><p><strong>circ</strong> (<em>qiskit.QuantumCircuit</em><em> | </em><em>dict</em><em> | </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – circuit to be run.</p></li>
-<li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qclient (QClient): client linked to the server that listens at the virtual QPU.</p>
+<p>backend (~cunqa.backend.Backend): gathers necessary information about the simulator.</p>
+<p>circ (qiskit.QuantumCircuit | dict | ~cunqa.circuit.CunqaCircuit): circuit to be run.</p>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a>run_parameters : any other simulation instructions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -255,9 +252,8 @@ For further details, checkout <a class="reference internal" href="../generated/c
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
 <dd><p>Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – list of parameters to assign to the parametrized circuit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>parameters (list[float]): list of parameters to assign to the parametrized circuit.</p>
 </dd>
 </dl>
 </dd></dl>

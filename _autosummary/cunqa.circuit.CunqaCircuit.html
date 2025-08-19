@@ -349,13 +349,10 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clbits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.__init__" title="Link to this definition"></a></dt>
 <dd><p>Class constructor to create a CunqaCirucit. Only the <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code> argument is mandatory, also <code class="docutils literal notranslate"><span class="pre">num_clbits</span></code> can be provided if there is intention to incorporate intermediate measurements.
 If no <code class="docutils literal notranslate"><span class="pre">id</span></code> is provided, one is generated randomly, then it can be accessed through the class attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">_id</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_qubits</strong> (<em>int</em>) – Number of qubits of the circuit.</p></li>
-<li><p><strong>num_clbits</strong> (<em>int</em>) – Numeber of classical bits for the circuit. A classical register is initially added.</p></li>
-<li><p><strong>id</strong> (<em>str</em>) – Label for identifying the circuit. This id is then used for refering to the circuit in classical and quantum communications methods.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>num_qubits (int): Number of qubits of the circuit.</p>
+<p>num_clbits (int): Numeber of classical bits for the circuit. A classical register is initially added.</p>
+<p>id (str): Label for identifying the circuit. This id is then used for refering to the circuit in classical and quantum communications methods.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -367,15 +364,12 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <p>For parametric gates, only one-parameter gates are supported, therefore only one parameter must be passed.</p>
 <p>The gates supported by the method are the following: h, x, y, z, rx, ry, rz, cx, cy, cz, unitary.</p>
 <p>To implement the conditioned uniraty gate, the corresponding matrix should be passed by the <cite>matrix</cite> argument.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
-<li><p><strong>control_qubit</strong> (<em>int</em>) – control qubit whose classical measurement will control the execution of the gate.</p></li>
-<li><p><strong>target_qubit</strong> (<em>list</em><em>[</em><em>int</em><em>]</em><em>, </em><em>int</em>) – list of qubits or qubit to which the gate is intended to be applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the case parametric gate is provided.</p></li>
-<li><p><strong>matrix</strong> (<em>list</em><em> or </em><em>numpy.ndarray</em>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>gate (str): gate to be applied. Has to be supported by CunqaCircuit.</p>
+<p>control_qubit (int): control qubit whose classical measurement will control the execution of the gate.</p>
+<p>target_qubit (list[int], int): list of qubits or qubit to which the gate is intended to be applied.</p>
+<p>param (float or int): parameter for the case parametric gate is provided.</p>
+<p>matrix (list or numpy.ndarray): unitary operator in matrix form to be applied to the given qubits.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -384,9 +378,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ccx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ccx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ccx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ccx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -395,9 +388,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ccy">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ccy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ccy" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ccy gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -406,9 +398,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ccz">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ccz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ccz" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ccz gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -417,12 +408,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cp">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cp" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cp gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,12 +419,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.crx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">crx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.crx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply crx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -445,12 +430,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cry">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cry" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cry gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -459,12 +441,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.crz">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">crz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.crz" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply crz gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -473,9 +452,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cswap">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cswap" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cswap gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -484,9 +462,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.csx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">csx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.csx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply csx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -495,15 +472,12 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cu">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cu" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cu gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>gamma</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+lam (float): angle.
+gamma (float): angle.
+qubits (int or list[int]): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -512,12 +486,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cu1">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cu1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cu1" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cu1 gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -526,14 +497,11 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cu3">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cu3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cu3" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cu3 gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+lam (float): angle.
+qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -542,9 +510,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -553,9 +520,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cy">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cy" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cy gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -564,9 +530,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.cz">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">cz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.cz" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply cz gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -575,9 +540,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ecr">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ecr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ecr" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ecr gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -587,9 +551,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">from_instructions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="Link to this definition"></a></dt>
 <dd><p>Class method to add operations to the circuit from a list of dict-type instructions.</p>
 <p>Each instruction must have as mandatory keys <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;qubits&quot;</span></code>, while other keys are accepted: <code class="docutils literal notranslate"><span class="pre">&quot;clbits&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;params&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;circuits&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;remote_conditional_reg&quot;</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>instructions</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – list gathering all the each instruction as a dict.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>instructions (list[dict]): list gathering all the each instruction as a dict.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -598,9 +561,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.h">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.h" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply h gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -609,9 +571,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.id">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.id" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply id gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -620,12 +581,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.measure">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">measure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clbits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.measure" title="Link to this definition"></a></dt>
 <dd><p>Class method to add a measurement of a qubit or a list of qubits and to register that measurement in the given classical bits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>int</em>) – qubits to measure.</p></li>
-<li><p><strong>clbits</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>int</em>) – clasical bits where the measurement will be registered.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubits (list[int] or int): qubits to measure.</p>
+<p>clbits (list[int] or int): clasical bits where the measurement will be registered.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -640,26 +598,20 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.measure_and_send">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">measure_and_send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.measure_and_send" title="Link to this definition"></a></dt>
 <dd><p>Class method to measure and send a bit from the current circuit to a remote one.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be measured and sent.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em> or </em><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit to which the result of the measurement is sent.</p></li>
-</ul>
-</dd>
-</dl>
+<p>Args:</p>
+<blockquote>
+<div><p>qubit (int): qubit to be measured and sent.</p>
+<p>target_circuit (str or CunqaCircuit): id of the circuit or circuit to which the result of the measurement is sent.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.p">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.p" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply p gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
+<p>param (float or int): parameter for the parametric gate.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -668,12 +620,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.qrecv">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">qrecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qrecv" title="Link to this definition"></a></dt>
 <dd><p>Class method to send a qubit from the current circuit to a remote one.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – ancilla to which the received qubit is assigned.</p></li>
-<li><p><strong>control_circuit</strong> (<em>str</em><em> or </em><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit from which the qubit is received.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): ancilla to which the received qubit is assigned.</p>
+<p>control_circuit (str or CunqaCircuit): id of the circuit from which the qubit is received.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -682,12 +631,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.qsend">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">qsend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.qsend" title="Link to this definition"></a></dt>
 <dd><p>Class method to send a qubit from the current circuit to another one.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be sent.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em> or </em><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit to which the qubit is sent.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit to be sent.</p>
+<p>target_circuit (str or CunqaCircuit): id of the circuit or circuit to which the qubit is sent.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -696,13 +642,10 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.r">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.r" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply r gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -713,14 +656,11 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dd><p>Class method to apply a distributed instruction as a gate condioned by a non local classical measurement from a remote circuit and applied locally.</p>
 <p>The gates supported by the method are the following: h, x, y, z, rx, ry, rz, cx, cy, cz, unitary.</p>
 <p>To implement the conditioned uniraty gate, the corresponding matrix should be passed by the <cite>param</cite> argument.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
-<li><p><strong>target_qubits</strong> (<em>int</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubit or qubits to which the gate is conditionally applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter in case the gate provided is parametric.</p></li>
-<li><p><strong>control_circuit</strong> (<em>str</em><em> or </em><a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit from which the condition is sent.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>gate (str): gate to be applied. Has to be supported by CunqaCircuit.</p>
+<p>target_qubits (int, list[int]): qubit or qubits to which the gate is conditionally applied.</p>
+<p>param (float or int): parameter in case the gate provided is parametric.</p>
+<p>control_circuit (str or CunqaCircuit): id of the circuit or circuit from which the condition is sent.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -729,9 +669,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.reset">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.reset" title="Link to this definition"></a></dt>
 <dd><p>Class method to add reset instruction to a qubit or list of qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits to which the reset operation is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (int): qubits to which the reset operation is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -740,12 +679,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.rx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">rx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.rx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply rx gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
+<p>param (float or int): parameter for the parametric gate.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -754,12 +690,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.rxx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">rxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.rxx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply rxx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -768,12 +701,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ry">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ry" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ry gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
+<p>param (float or int): parameter for the parametric gate.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -782,12 +712,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.ryy">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">ryy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.ryy" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply ryy gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -796,12 +723,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.rz">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">rz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.rz" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply rz gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
+<p>param (float or int): parameter for the parametric gate.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -810,12 +734,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.rzx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">rzx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.rzx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply rzx gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -824,12 +745,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.rzz">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">rzz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.rzz" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply rzz gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param (float or int): parameter for the parametric gate.
+qubits (int): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -838,9 +756,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.s">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.s" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply s gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -849,9 +766,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.sdg">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">sdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.sdg" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply sdg gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -860,9 +776,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.swap">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">swap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.swap" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply swap gate to the given qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubits (list[int]): qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -871,9 +786,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.sx">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">sx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.sx" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply sx gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -882,9 +796,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.sxdg">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">sxdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.sxdg" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply sxdg gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -893,9 +806,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.t">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.t" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply t gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -904,9 +816,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.tdg">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">tdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.tdg" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply tdg gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -915,14 +826,11 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.u">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.u" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply u gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+lam (float): angle.
+qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -931,12 +839,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.u1">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">u1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.u1" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply u1 gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
+<p>param (float or int): parameter for the parametric gate.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -945,13 +850,10 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.u2">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">u2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.u2" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply u2 gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -960,14 +862,11 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.u3">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">u3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.u3" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply u3 gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): angle.
+phi (float): angle.
+lam (float): angle.
+qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -976,12 +875,9 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.unitary">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">unitary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.unitary" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply a unitary gate created from an unitary matrix provided.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>matrix</strong> (<em>list</em><em> or </em><em>numpy.ndarray</em>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>matrix (list or numpy.ndarray): unitary operator in matrix form to be applied to the given qubits.</p>
+<p>qubits (int): qubits to which the unitary operator will be applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -990,9 +886,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.x">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.x" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply x gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1001,9 +896,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.y">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.y" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply y gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1012,9 +906,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.z">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.z" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply z gate to the given qubit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>qubit (int): qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
