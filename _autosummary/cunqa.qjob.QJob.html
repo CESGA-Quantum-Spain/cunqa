@@ -234,8 +234,8 @@ For further information, check <a class="reference internal" href="cunqa.qpu.QPU
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>QPU</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code>) – QPU object that represents the virtual QPU to which the job is going to be sent.</p></li>
-<li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code>) – circuit to be run.</p></li>
+<li><p><strong>QPU</strong> (<a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">cunqa.qpu.QPU</span></code></a>) – QPU object that represents the virtual QPU to which the job is going to be sent.</p></li>
+<li><p><strong>circ</strong> (<a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">cunqa.circuit.CunqaCircuit</span></code></a>) – circuit to be run.</p></li>
 <li><p><strong>transpile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
 <li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p></li>
 <li><p><strong>opt_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optimization level for transpilation, default set to 1.</p></li>
