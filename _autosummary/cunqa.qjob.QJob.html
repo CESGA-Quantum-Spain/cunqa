@@ -247,6 +247,18 @@ For further details, checkout <a class="reference internal" href="../generated/c
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
+<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
+<dd><p>Asynchronous method to submit a job to the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Differently from <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">result()</span></code></a>, this is a non-blocking call.
+Once a job is summited, there is no wait, the python program continues at the same time that
+the corresponding server recieves and simualtes the circuit.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.result">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.result" title="Link to this definition"></a></dt>
 <dd><p>Result of the job.
@@ -262,8 +274,8 @@ The result is not sent from the server to the <code class="xref py py-class docu
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd><p>Asynchronous method to submit a job to the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
