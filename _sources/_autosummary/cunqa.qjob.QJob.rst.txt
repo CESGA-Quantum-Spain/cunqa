@@ -28,7 +28,7 @@ Methods
 
 
 
-..automethod:: QJob.result
+.. automethod:: QJob.result
 
 
 

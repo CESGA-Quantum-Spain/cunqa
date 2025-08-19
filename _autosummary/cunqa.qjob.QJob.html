@@ -207,7 +207,7 @@ The quantum job not only contains the circuit to be simulated, but also simulati
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
 <td><p>Result of the job.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_taken</span></code></p></td>
@@ -245,7 +245,12 @@ For further details, checkout <a class="reference internal" href="../generated/c
 </dl>
 </dd></dl>
 
-<p>..automethod:: QJob.result</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.result">
+<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.result" title="Link to this definition"></a></dt>
+<dd><p>Result of the job. If no error occured during simulation, a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object is retured. Otherwise, <a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultError</span></code></a> will be raised.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
