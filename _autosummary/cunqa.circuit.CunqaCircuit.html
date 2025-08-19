@@ -373,8 +373,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <li><p><strong>gate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
 <li><p><strong>control_qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – control qubit whose classical measurement will control the execution of the gate.</p></li>
 <li><p><strong>target_qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int],</span> <span class="pre">int</span></code>) – list of qubits or qubit to which the gate is intended to be applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the case parametric gate is provided.</p></li>
-<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span> <span class="pre">or</span> <span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the case parametric gate is provided.</p></li>
+<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
 </ul>
 </dd>
 </dl>
@@ -420,7 +420,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
@@ -434,7 +434,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
@@ -448,7 +448,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
@@ -462,7 +462,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
@@ -502,7 +502,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – angle.</p></li>
 <li><p><strong>lam</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – angle.</p></li>
 <li><p><strong>gamma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – angle.</p></li>
-<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span> <span class="pre">or</span> <span class="pre">list[int]</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | list[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -515,7 +515,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
@@ -623,8 +623,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span> <span class="pre">or</span> <span class="pre">int</span></code>) – qubits to measure.</p></li>
-<li><p><strong>clbits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span> <span class="pre">or</span> <span class="pre">int</span></code>) – clasical bits where the measurement will be registered.</p></li>
+<li><p><strong>qubits</strong> (list[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits to measure.</p></li>
+<li><p><strong>clbits</strong> (list[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – clasical bits where the measurement will be registered.</p></li>
 </ul>
 </dd>
 </dl>
@@ -644,7 +644,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit to be measured and sent.</p></li>
-<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">CunqaCircuit</span></code>) – id of the circuit or circuit to which the result of the measurement is sent.</p></li>
+<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit to which the result of the measurement is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -658,7 +658,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 </ul>
 </dd>
 </dl>
@@ -672,7 +672,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ancilla to which the received qubit is assigned.</p></li>
-<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">CunqaCircuit</span></code>) – id of the circuit from which the qubit is received.</p></li>
+<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit from which the qubit is received.</p></li>
 </ul>
 </dd>
 </dl>
@@ -686,7 +686,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit to be sent.</p></li>
-<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">CunqaCircuit</span></code>) – id of the circuit or circuit to which the qubit is sent.</p></li>
+<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit to which the qubit is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -718,8 +718,8 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
 <li><p><strong>target_qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int,</span> <span class="pre">list[int]</span></code>) – qubit or qubits to which the gate is conditionally applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter in case the gate provided is parametric.</p></li>
-<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">CunqaCircuit</span></code>) – id of the circuit or circuit from which the condition is sent.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter in case the gate provided is parametric.</p></li>
+<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit from which the condition is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -744,7 +744,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 </ul>
 </dd>
 </dl>
@@ -757,7 +757,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
@@ -772,7 +772,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 </ul>
 </dd>
 </dl>
@@ -785,7 +785,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
@@ -800,7 +800,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 </ul>
 </dd>
 </dl>
@@ -813,7 +813,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
@@ -827,7 +827,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
@@ -935,7 +935,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
 </ul>
 </dd>
 </dl>
@@ -979,7 +979,7 @@ If no <code class="docutils literal notranslate"><span class="pre">id</span></co
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span> <span class="pre">or</span> <span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
+<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
 <li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits to which the unitary operator will be applied.</p></li>
 </ul>
 </dd>
