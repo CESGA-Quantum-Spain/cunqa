@@ -236,9 +236,9 @@ For further details, checkout <a class="reference internal" href="../generated/c
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>) – client linked to the server that listens at the virtual QPU.</p></li>
-<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – gathers necessary information about the simulator.</p></li>
-<li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span> <span class="pre">|</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">~cunqa.circuit.CunqaCircuit</span></code>) – circuit to be run.</p></li>
+<li><p><strong>qclient</strong> (<em>QClient</em>) – client linked to the server that listens at the virtual QPU.</p></li>
+<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><em>Backend</em></a>) – gathers necessary information about the simulator.</p></li>
+<li><p><strong>circ</strong> (<em>qiskit.QuantumCircuit</em><em> | </em><em>dict</em><em> | </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a>) – circuit to be run.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
 </ul>
 </dd>
@@ -257,7 +257,7 @@ For further details, checkout <a class="reference internal" href="../generated/c
 <dd><p>Asynchronous method to upgrade the parameters in a previously submitted parametric circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[float]</span></code>) – list of parameters to assign to the parametrized circuit.</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – list of parameters to assign to the parametrized circuit.</p>
 </dd>
 </dl>
 </dd></dl>
