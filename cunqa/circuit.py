@@ -456,7 +456,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             while new_name in self.classical_regs:
                 new_name = new_name + "_" + str(i); i += 1
 
-            logger.warning(f"{name} for classcial register in use, renaaming to {new_name}.")
+            logger.warning(f"{name} for classical register in use, renaming to {new_name}.")
         
         else:
             new_name = name
@@ -535,7 +535,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             self_instr = self.instructions
             instances_to_change.union({instr["circuits"][0] for instr in self_instr if instr["name"] in SUPPORTED_GATES_DISTRIBUTED})
 
-            summed_circuit = CunqaCircuit(n, n, id = sum_id) 
+            cl_n=self.num_clbits; cl_m=other_circuit.num_clbits
+            summed_circuit = CunqaCircuit(n, max(cl_n,cl_m), id = sum_id) 
 
             for instruction in list(self_instr + other_instr):
                 summed_circuit._add_instruction(instruction)
@@ -566,7 +567,9 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             elif isinstance(left_circuit, QuantumCircuit):
                 left_id = "qc"
                 sum_id = left_id + " + " + self._id
-                summed_circuit = CunqaCircuit(n, n, id = sum_id)
+
+                cl_n=self.num_clbits; cl_m=left_circuit.num_clbits
+                summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id)
                 left_instr = qc_to_json(left_circuit)['instructions']
                 
                 for instruction in list(left_instr + self.instructions):
@@ -596,6 +599,9 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
 
         n = self.num_qubits
         if  n == other_circuit.num_qubits:
+            cl_m = other_circuit.num_clbits
+            if cl_m > self.num_clbits:
+                self._add_cl_register(name=other_id, number_clbits=cl_m-self.num_clbits)
 
             instances_to_change = set()
             if isinstance(other_circuit, CunqaCircuit):
@@ -626,7 +632,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             self.update_other_instances(instances_to_change, other_id, self._id)
         
         else:
-            logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
+            logger.error(f"Only possible to sum circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
         
 
@@ -660,7 +666,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             raise SystemExit
         
         n=self.num_qubits; m=other_circuit.num_qubits
-        union_circuit = CunqaCircuit(n+m,n+m, id = union_id)
+        cl_n=self.num_clbits; cl_m=other_circuit.num_clbits
+        union_circuit = CunqaCircuit(n+m,cl_n+cl_m, id = union_id)
 
         for instr in self.instructions:
             # If we find distributed gates referencing self, substitute by a local gate
@@ -676,6 +683,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         instances_to_change_and_displace = {}
         for instrr in other_instr:
             instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]] # displace the qubits of the instructions and then add it to union_circuit
+            instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr
             union_circuit._add_instruction(instrr)
 
             if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference the other_circuit and wether it controls or is a target
@@ -718,7 +726,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             union_id = self._id + " | " + upper_id
 
             n=self.num_qubits; m=upper_circuit.num_qubits
-            union_circuit = CunqaCircuit(n+m,n+m, id = union_id)
+            cl_n=self.num_clbits; cl_m=upper_circuit.num_clbits
+            union_circuit = CunqaCircuit(n+m,cl_n+cl_m, id = union_id)
 
             for instr in upper_instr:
                 # If we find distributed gates referencing self, substitute by a local gate
@@ -734,6 +743,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             instances_to_change_and_displace = {} # Here we will collect info on the circuits that talk to self to make them reference the union instead
             for instrr in self.instructions:
                 instrr["qubits"] = [qubit + m for qubit in instrr["qubits"]]
+                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr=instrr
 
                 if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference other_circuit and wether it controls or is a target
                     if instrr["circuits"][0] == upper_id: # Susbtitute distr gate by local gates if it refences upper_circuit 
@@ -775,11 +785,16 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
             raise SystemExit
         
-        n=self.num_qubits;     need_to_modify_self = False
+        
+
+        n=self.num_qubits;   need_to_modify_self = False
+        m=other_circuit.num_qubits; cl_m=other_circuit.num_clbits
+        self._add_q_register(name=other_id, number_qubits=m); self._add_cl_register(name=other_id, number_clbits=cl_m)
+
         instances_to_change_and_displace = {} # Here we will collect info on the circuits that talk to other_circuit to make them reference self instead
         for instrr in other_instr:
             instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]]
-            self._add_instruction(instrr)
+            instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr=instrr
 
             if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Whenever I find a distributed gate extract info of the circuits that need to be updated
                 if instrr["circuits"][0] == self._id: # Susbtitute distr gate by local gates if it refences upper_circuit 
@@ -796,6 +811,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                     instances_to_change_and_displace[instrr["circuits"][0]].append("control" if instrr["name"] == "measure_and_send" else "target")
                 else:
                     instances_to_change_and_displace[instrr["circuits"][0]] = ["control" if instrr["name"] == "measure_and_send" else "target"]
+
+            self._add_instruction(instrr)
         
         if need_to_modify_self:
             for instr in self.instructions:
