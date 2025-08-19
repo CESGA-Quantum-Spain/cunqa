@@ -96,7 +96,6 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.html#handling-qjobs">Handling QJobs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html">cunqa.qjob.gather</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.qjob.QJob</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a></li>
@@ -226,19 +225,14 @@ The quantum job not only contains the circuit to be simulated, but also simulati
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.__init__">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initializes the QJob class.</p>
-<p>It is important to note that  if <cite>transpilation</cite> is set <code class="docutils literal notranslate"><span class="pre">False</span></code>, we asume user has already done the transpilation, otherwise some errors during the simulation
-can occur, for example if the QPU has a noise model with error associated to specific gates, if the circuit is not transpiled errors might not appear.</p>
-<p>If <cite>transpile</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> and <cite>initial_layout</cite> and/or <cite>opt_level</cite> are provided, they will be ignored.</p>
 <p>Possible instructions to add as <cite>**run_parameters</cite> can be: <em>shots</em>, <em>method</em>, <em>parameter_binds</em>, <em>meas_level</em>, …
 For further information, check <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>QPU</strong> (<a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a>) – QPU object that represents the virtual QPU to which the job is going to be sent.</p></li>
+<li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>) – client linked to the server that listens at the virtual QPU.</p></li>
+<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – gathers necessary information about the simulator.</p></li>
 <li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit,</span> <span class="pre">dict</span></code>) – circuit to be run.</p></li>
-<li><p><strong>transpile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
-<li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p></li>
-<li><p><strong>opt_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optimization level for transpilation, default set to 1.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
 </ul>
 </dd>
