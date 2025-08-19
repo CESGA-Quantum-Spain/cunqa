@@ -6,6 +6,6 @@ div.admonition.note {
 
 /* Cambiar color del título dentro de la nota */
 div.admonition.note > .admonition-title {
-    color: #0050b3;
+    color: #6e00b3;
     font-weight: bold;
 }
