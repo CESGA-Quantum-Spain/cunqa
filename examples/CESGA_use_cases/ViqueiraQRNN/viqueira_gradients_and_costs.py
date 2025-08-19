@@ -230,7 +230,8 @@ class GradientMethod:
 
 def calc_observable(result, nE, observable = None) -> np.array:
     # TODO: improve this method to a flexible one once we have an observable calculation pipeline
-    probs = result.probabilities(per_qubit = True, partial = list(range(nE)), interface = False)
+    probs_dict = result.probabilities(per_qubit = True, partial = list(range(nE)), interface = False)
+    probs = np.concatenate(tuple([prob for prob in probs_dict.values()]))
 
     return np.array([prob_qubit[0]-prob_qubit[1] for prob_qubit in probs]) # ad hoc calculation of <Z> observable
 

@@ -179,7 +179,6 @@ class Result:
         try:
             there_is_statevec = False 
             statevecs = self.statevector
-            print(statevecs)
             there_is_statevec = True
         except Exception as error:
             pass
@@ -325,23 +324,21 @@ def recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None,
 
     Returns:
         new_probs (np.array[float], dict[np.array[float]]): probabilities or list of probabilities per qubit
-    
     """
-    
-
     if interface:
         new_probs = {}
-        if isinstance(probs, dict):
+        if isinstance(probs, dict): # Case where we have multiple sets of probs
             new_probs = {}
 
             for k, probs_k in probs.items():
                 new_probs[k] = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
-                for base_ten_bitstring, prob in enumerate(probs_k):
+                for base_ten_bitstring, prob in enumerate(probs_k): # Enumerate to extract the corresponding bitstring (in base 10)
                     for i_qubit in partial:
 
                         zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
                         new_probs[k][str(i_qubit)][zero_one] += prob
-        else:
+
+        else: # single set of probs to recombine
             new_probs = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
 
             for base_ten_bitstring, prob in enumerate(probs_k):

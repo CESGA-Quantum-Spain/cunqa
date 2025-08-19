@@ -95,9 +95,9 @@ class CircuitQRNN:
                 raise CircuitQRNNError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
+            self.circuit.save_state(label=f"{time_step}") 
             self.circuit.reset([i for i in range(nE)]) 
-
-        self.circuit.save_state()     
+    
         
     def parameters(self, new_x: np.array, new_theta: np.array) -> list[Union[float, int]]:
         """
