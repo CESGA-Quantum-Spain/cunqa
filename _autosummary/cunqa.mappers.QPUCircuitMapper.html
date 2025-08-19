@@ -197,7 +197,7 @@
 <p>Class to map the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> to a list of QPUs.</p>
 <p>The class is initialized with a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects associated to the virtual QPUs that are intended to work with, toguether
 with the circuit and the simulation instructions needed for its execution.</p>
-<p>Then, its <code class="xref py py-meth docutils literal notranslate"><span class="pre">QPUCircuitMapper()</span></code> method takes a set of parameters as <em>population</em> to assing to the circuit.
+<p>Then, its <code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code> method takes a set of parameters as <em>population</em> to assing to the circuit.
 Each assembled circuit is sent to each virtual QPU with the instructions provided on the instatiation of the mapper.
 The method returns the value for the provided function <em>func</em> for the result of each simulation.</p>
 <p>Its use is pretty similar to <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, but not needing to create the <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects ahead:</p>
@@ -258,8 +258,8 @@ Its implementation for optimization problems is shown at the <a class="reference
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qpus</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
-<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict,</span> <span class="pre">CunqaCircuit</span> <span class="pre">or</span> <span class="pre">QuantumCirucit</span></code>) – circuit to be run in the QPUs.</p></li>
+<li><p><strong>qpus</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – list of objects linked to the virtual QPUs intended to be used.</p></li>
+<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCirucit</span></code>) – circuit to be run in the QPUs.</p></li>
 <li><p><strong>transpile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True, transpilation will be done with respect to the backend of the given QPU. Default is set to False.</p></li>
 <li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Initial position of virtual qubits on physical qubits for transpilation.</p></li>
 <li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
@@ -280,7 +280,7 @@ For example, the function can evaluate the expected value of an observable from 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">func</span></code>) – function to be mapped to the QPUs. It must take as argument the an object &lt;class ‘qjob.Result’&gt;.</p></li>
-<li><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[list]</span></code>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
+<li><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[list[float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int]]</span></code>) – population of vectors to be mapped to the circuits sent to the QPUs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
