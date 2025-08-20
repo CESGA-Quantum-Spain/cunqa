@@ -203,12 +203,12 @@ The quantum job not only contains the circuit to be simulated, but also simulati
 <p>One would want to sabe the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> resulting from sending a circuit in a variable.
 Let`s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">time_taken</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">&lt;cunqa.result.Result object at XXXXXXXX&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_taken</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">time_taken</span><span class="p">)</span>
+<span class="go">0.876</span>
 </pre></div>
 </div>
 </section>
