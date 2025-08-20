@@ -198,9 +198,7 @@
 <p>Class to handle jobs sent to virtual QPUs.</p>
 <p>A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.
 The quantum job not only contains the circuit to be simulated, but also simulation instructions and information of the virtual QPU to which the job is sent.</p>
-<section id="hadling-qjobs">
-<h2>Hadling QJobs<a class="headerlink" href="#hadling-qjobs" title="Link to this heading"></a></h2>
-<p>One would want to sabe the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> resulting from sending a circuit in a variable.
+<p>One would want to save the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> resulting from sending a circuit in a variable.
 Let`s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
@@ -211,8 +209,10 @@ Let`s say we want to send a circuit to a QPU and get the result and the time tak
 <span class="go">0.876</span>
 </pre></div>
 </div>
-<p>Note that the <cite>time_taken</cite> is in seconds. More instructions on obtaining data from <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>
+<p>Note that the <cite>time_taken</cite> is expressed in seconds. More instructions on obtaining data from <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>
 objects can be found on its documentation.</p>
+<section id="handling-qjobs-sent-to-the-same-qpu">
+<h2>Handling QJobs sent to the same QPU<a class="headerlink" href="#handling-qjobs-sent-to-the-same-qpu" title="Link to this heading"></a></h2>
 <p>Let’s say we are sending two different jobs to the same QPU.
 Because of how the client-server comunication is built, we must be careful and call for the results in the same order in which the jobs where submited.
 The correct workflow would be:</p>
@@ -221,6 +221,13 @@ The correct workflow would be:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result_1</span> <span class="o">=</span> <span class="n">qjob_1</span><span class="o">.</span><span class="n">result</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result_2</span> <span class="o">=</span> <span class="n">qjob_2</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
+</div>
+<p>This is because the server follows the rule FIFO (_First in first <a href="#id1"><span class="problematic" id="id2">out_</span></a>), if we want to recieve the second result,
+the first one has to be out.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In the case in which the order is not respected, everything would work, but results will not correspond
+to the job. A mixup would happen.</p>
 </div>
 </section>
 <section id="upgrading-parameters-from-qjobs">
