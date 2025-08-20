@@ -214,7 +214,7 @@ objects can be found on its documentation.</p>
 <section id="handling-qjobs-sent-to-the-same-qpu">
 <h2>Handling QJobs sent to the same QPU<a class="headerlink" href="#handling-qjobs-sent-to-the-same-qpu" title="Link to this heading"></a></h2>
 <p>Let’s say we are sending two different jobs to the same QPU.
-This would not result on a paralelization, each QPU can only execute one simulation at the time.
+This would not result on a parallelization, each QPU can only execute one simulation at the time.
 When a virtual QPU recieves a job while simulating one, it would wait in line untill the earlier finishes.
 Because of how the client-server comunication is built, we must be careful and call for the results in the same order in which the jobs where submited.
 The correct workflow would be:</p>
@@ -230,6 +230,14 @@ the first one has to be out.</p>
 <p class="admonition-title">Warning</p>
 <p>In the case in which the order is not respected, everything would work, but results will not correspond
 to the job. A mixup would happen.</p>
+</div>
+</section>
+<section id="handling-qjobs-sent-to-different-qpus">
+<h2>Handling QJobs sent to different QPUs<a class="headerlink" href="#handling-qjobs-sent-to-different-qpus" title="Link to this heading"></a></h2>
+<p>Here we can have parallelization sin we are working with more than one virtual QPU.
+Let’s send two circuits to two different QPUs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt;</span>
+</pre></div>
 </div>
 </section>
 <section id="upgrading-parameters-from-qjobs">
@@ -262,7 +270,7 @@ to the job. A mixup would happen.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.__init__">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes the :py:class:~`QJob` class.</p>
+<dd><p>Initializes the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> class.</p>
 <p>Possible instructions to add as <cite>**run_parameters</cite> can be: <em>shots</em>, <em>method</em>, <em>parameter_binds</em>, <em>meas_level</em>, …
 For further information, check <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.</p>
 <div class="admonition warning">
