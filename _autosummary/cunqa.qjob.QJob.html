@@ -214,6 +214,8 @@ objects can be found on its documentation.</p>
 <section id="handling-qjobs-sent-to-the-same-qpu">
 <h2>Handling QJobs sent to the same QPU<a class="headerlink" href="#handling-qjobs-sent-to-the-same-qpu" title="Link to this heading"></a></h2>
 <p>Let’s say we are sending two different jobs to the same QPU.
+This would not result on a paralelization, each QPU can only execute one simulation at the time.
+When a virtual QPU recieves a job while simulating one, it would wait in line untill the earlier finishes.
 Because of how the client-server comunication is built, we must be careful and call for the results in the same order in which the jobs where submited.
 The correct workflow would be:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob_1</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit_1</span><span class="p">)</span>
@@ -222,7 +224,7 @@ The correct workflow would be:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result_2</span> <span class="o">=</span> <span class="n">qjob_2</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
-<p>This is because the server follows the rule FIFO (_First in first <a href="#id1"><span class="problematic" id="id2">out_</span></a>), if we want to recieve the second result,
+<p>This is because the server follows the rule FIFO (<em>First in first out</em>), if we want to recieve the second result,
 the first one has to be out.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
