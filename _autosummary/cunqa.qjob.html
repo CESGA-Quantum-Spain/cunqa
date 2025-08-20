@@ -198,7 +198,11 @@ is sent to a virtual QPU, as a return of the <a class="reference internal" href=
 </pre></div>
 </div>
 <p>Once it is created, the circuit is being simulated at the virtual QPU.
-<a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is the bridge between sending a circuit with instructions and recieving the results.</p>
+<a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is the bridge between sending a circuit with instructions and recieving the results.
+Because of this, usually one wants to save this output in a variable:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+</pre></div>
+</div>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
