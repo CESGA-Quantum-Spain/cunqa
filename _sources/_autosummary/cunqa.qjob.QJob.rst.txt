@@ -28,7 +28,6 @@ Methods
 
 
 
-.. automethod:: QJob.submit
 .. automethod:: QJob.result
 
 
