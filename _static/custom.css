@@ -8,9 +8,6 @@ div.admonition.note {
 div.admonition.note > .admonition-title {
     background-color: #b97cda;
     color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    padding: 0.3em 0.6em;
-    border-radius: 5px;
+    font-weight: bold
 }
 
