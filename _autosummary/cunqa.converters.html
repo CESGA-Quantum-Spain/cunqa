@@ -208,6 +208,11 @@
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> <strong>↔</strong> <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> <strong>:</strong> <a class="reference internal" href="cunqa.converters.qc_to_json.html#cunqa.converters.qc_to_json" title="cunqa.converters.qc_to_json"><code class="xref py py-func docutils literal notranslate"><span class="pre">qc_to_json()</span></code></a>, <a class="reference internal" href="cunqa.converters.json_to_qc.html#cunqa.converters.json_to_qc" title="cunqa.converters.json_to_qc"><code class="xref py py-func docutils literal notranslate"><span class="pre">json_to_qc()</span></code></a>.</p></li>
 </ul>
 </div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is not possible to convert circuits with classical or quantum communications instructions into <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>
+since these are not supported by this format. It one tries, an error will raise.</p>
+</div>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
@@ -221,7 +226,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html#cunqa.converters.cunqac_to_qc" title="cunqa.converters.cunqac_to_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqac_to_qc</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Converts a <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> into a <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cunqa.converters.json_to_cunqac.html#cunqa.converters.json_to_cunqac" title="cunqa.converters.json_to_cunqac"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json_to_cunqac</span></code></a></p></td>
 <td><p>Converts a json <code class="xref py py-type docutils literal notranslate"><span class="pre">dict</span></code> circuit into a <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>.</p></td>
