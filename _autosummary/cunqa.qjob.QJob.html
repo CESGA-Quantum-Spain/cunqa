@@ -272,7 +272,7 @@ parameters are updated on each iteration (in general).</p>
 it to the QPU. Nevertheless, since the next circuit will have the same data but for the value of the parameters in the gates, a lot of information
 is repeated, so <a class="reference internal" href="cunqa.html#module-cunqa" title="cunqa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code></a> has a more efficient and simple way to handle this cases: a method to send to the QPU a list with the new parameters
 to be assigned to the circuit, <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>.</p>
-<p>Let’s see a simple example: creating a parametric circuit and uptading its parametes:</p>
+<p>Let’s see a simple example: creating a parametric circuit and uptading its parameters:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># building the parametric circuit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -293,7 +293,7 @@ some stoping criteria is fulfilled.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Before sending the circuit or upgrading its parameters, the result of the prior job must be called. It can be done manually, so that we can
-save it and obtain its information, or it can be done automatically as in the example avobe, but be aware that once the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>
+save it and obtain its information, or it can be done automatically as in the example above, but be aware that once the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>
 method is called, this result is discarded.</p>
 </div>
 <section id="references">
@@ -384,8 +384,12 @@ the corresponding server recieves and simualtes the circuit.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
 <span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
-<dd><p>Method to upgrade the parameters in a previously submitted parametric circuit.
-By this call, firstly the result is called from the server and afterwards the new parameters are sent.</p>
+<dd><p>Method to upgrade the parameters in a previously submitted job of parametric circuit.
+By this call, first it is checked weather if the prior simulation’s result was called. If not, it calls it but does not store it, then
+sends the new set of parameters to the server to be reasigned to the circuit and to simulate it.</p>
+<p>This method can be used on a loop, always being careful if we want to save the intermediate results.</p>
+<p>Examples of usage are shown above and on the <cite>Examples Gallery &lt;https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html&gt;_.
+Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper</cite>, checkout its documentation for a extensive description.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int]</span></code>) – list of parameters to assign to the parametrized circuit.</p>
