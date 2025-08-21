@@ -9,7 +9,6 @@
   <title>cunqa.mappers &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -25,7 +24,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="cunqa.mappers.run_distributed" href="cunqa.mappers.run_distributed.html" />
-    <link rel="prev" title="cunqa.circuit.CunqaCircuitError" href="cunqa.circuit.CunqaCircuitError.html" /> 
+    <link rel="prev" title="cunqa.converters.qc_to_json" href="cunqa.converters.qc_to_json.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -81,16 +80,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
+</ul>
+</li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.mappers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -191,16 +195,14 @@
   <section id="module-cunqa.mappers">
 <span id="cunqa-mappers"></span><h1>cunqa.mappers<a class="headerlink" href="#module-cunqa.mappers" title="Link to this heading"></a></h1>
 <p>Contains map-like callables to distribute circuits in virtual QPUS, needed when communications among circuits are present.</p>
-<section id="submitting-circuits-with-classical-or-quantum-communications">
-<h2>Submitting circuits with classical or quantum communications<a class="headerlink" href="#submitting-circuits-with-classical-or-quantum-communications" title="Link to this heading"></a></h2>
-<p>When having classical or quantum communications among circuits, method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a> is obsolete, circuits must be sent as an ensemble in order to ensure correct functioning of the communication protocols.</p>
-<p>So, once the virtual QPUs that allow the desired type of communications are raised and circuits have been defined using <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>,
-they can be sent using the <a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed" title="cunqa.mappers.run_distributed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_distributed()</span></code></a> function:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+<p>When having classical or quantum communications among circuits, :py:meth:~cunqa.qpu.QPU.run` is obsolete, circuits must be sent as an ensemble in order to ensure correct functioning of the communication protocols.</p>
+<p>So, once the virtual QPUs that allow the desired type of communications are raised and circuits have been defined using :py:class:~cunqa.circuit.CunqaCircuit`,
+they can be sent using the :py:meth:~run_distributed` function:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">measure_and_send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span><span class="o">.</span><span class="n">remote_c_if</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt;</span>
@@ -208,64 +210,30 @@ they can be sent using the <a class="reference internal" href="cunqa.mappers.run
 <span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="mapping-circuits-to-virtual-qpus-in-optimization-problems">
-<h2>Mapping circuits to virtual QPUs in optimization problems<a class="headerlink" href="#mapping-circuits-to-virtual-qpus-in-optimization-problems" title="Link to this heading"></a></h2>
-<p><strong>Variational Quantum Algorithms</strong> <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> require from numerous executions of parametric cirucits, while in each step of the optimization process new parameters are assigned to them.
-This implies that, after parameters are updated, a new circuit must be created, transpiled and then sent to the quantum processor or simulator.
-For simplifying this process, we have <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> and <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> classes. Both classes are thought to be used for Scipy optimizers <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> as the <em>workers</em> argument in global optimizers.</p>
-<section id="qjobmapper">
-<h3>QJobMapper<a class="headerlink" href="#qjobmapper" title="Link to this heading"></a></h3>
-<p><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> takes a list of existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects, then, the class can be called passing a set of <strong>parameters</strong> and a <strong>cost function</strong>.
-This callable updates the each existing <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such <strong>parameters</strong> through the <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> method.
-Then, it gathers the results of the executions and returns the <strong>value of the cost function</strong> for each.</p>
-</section>
-<section id="qpucircuitmapper">
-<h3>QPUCircuitMapper<a class="headerlink" href="#qpucircuitmapper" title="Link to this heading"></a></h3>
-<p>On the other hand, <a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> is instanciated with a circuit and instructions for its execution, toguether with a list of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects.
-The difference with <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> is that here the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> is mapped to each QPU, passing it the circuit with the given parameters assigned so that for this case several <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects are created.</p>
-<p>Examples utilizing both classes can be found in the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>. These examples focus on optimization of VQAs, using a global optimizer called Differential Evolution <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
-<section id="references">
-<h4>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h4>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arXiv</a> .</p>
-</aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html">scipy.optimize documentation</a>.</p>
-</aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
-<p>Differential Evolution initializes a population of inidividuals that evolute from generation to generation in order to collectively find the lowest value to a given cost function. This optimizer has shown great performance for VQAs [<a class="reference external" href="https://arxiv.org/abs/2303.12186">Reference</a>]. It is well implemented at Scipy by the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution">scipy.optimize.differential_evolution</a> function.</p>
-</aside>
-</aside>
-</section>
-</section>
-</section>
-<h2> Functions </h2><table class="autosummary longtable docutils align-default">
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed" title="cunqa.mappers.run_distributed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_distributed</span></code></a></p></td>
-<td><p>Function to send circuits to serveral virtual QPUs allowing classical or quantum communications among them.</p></td>
+<td><p>Method to send circuits to serveral QPUs allowing classical communications among them.</p></td>
 </tr>
 </tbody>
 </table>
-<h2> Classes </h2><table class="autosummary longtable docutils align-default">
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QJobMapper</span></code></a></p></td>
-<td><p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p></td>
+<td><p>Class to map the method <cite>QJob.upgrade_parameters</cite> to a list of QJobs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></p></td>
-<td><p>Class to map the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> to a list of QPUs.</p></td>
+<td><p>Class to map the function <cite>qpu.QPU.run()</cite> to a list of QPUs.</p></td>
 </tr>
 </tbody>
 </table>
@@ -275,7 +243,7 @@ The difference with <a class="reference internal" href="cunqa.mappers.QJobMapper
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.circuit.CunqaCircuitError.html" class="btn btn-neutral float-left" title="cunqa.circuit.CunqaCircuitError" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.converters.qc_to_json.html" class="btn btn-neutral float-left" title="cunqa.converters.qc_to_json" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cunqa.mappers.run_distributed.html" class="btn btn-neutral float-right" title="cunqa.mappers.run_distributed" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

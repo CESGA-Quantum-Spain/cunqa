@@ -9,7 +9,6 @@
   <title>cunqa.mappers.run_distributed &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -81,16 +80,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
+</ul>
+</li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -194,27 +198,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.mappers.run_distributed">
 <span class="sig-prename descclassname"><span class="pre">cunqa.mappers.</span></span><span class="sig-name descname"><span class="pre">run_distributed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><span class="pre">QPU</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.run_distributed" title="Link to this definition"></a></dt>
-<dd><p>Function to send circuits to serveral virtual QPUs allowing classical or quantum communications among them.
-Each circuit will be sent to each QPU in order, therefore both lists must be of the same size.</p>
-<p>Because the function is destined for executions that require communications, only <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> or instruction sets are accepted.
-The arguments provided will be the same for all <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects created.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If <em>transpile</em>, <em>initial_layout</em> or <em>opt_level</em> are passed as <em>run_args</em> they will be ignored since for the current version
-transpilation is not supported when communications are present.</p>
-</div>
+<dd><p>Method to send circuits to serveral QPUs allowing classical communications among them.</p>
+<p>Each circuit will be sent to the given QPUs in order, therefore both lists must be of the same size.</p>
+<p>For a more advanced and personalized mapping see &lt;class ‘cunqa.mappers.QJobMapper’&gt; and &lt;class ‘cunqa.mappers.QPUCircuitMapper’&gt;
+described below, but these will not suppor classical communications.</p>
+<p>If <cite>transpile</cite>, <cite>initial_layout</cite> or <cite>opt_level</cite> are passed as <a href="#id1"><span class="problematic" id="id2">**</span></a>run_args they will be ignored because for the initial version
+transpilation is not supported. The arguments provided will be the same for the all <cite>QJobs</cite> created.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>circuits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict]</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – circuits to be run.</p></li>
-<li><p><strong>qpus</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – QPU objects associated to the virtual QPUs in which the circuits want to be run.</p></li>
+<li><p><strong>circuits</strong> (<em>list</em><em>[</em><em>dict</em><em>, </em><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><em>CunqaCircuit</em></a><em>]</em>) – circuits to be run.</p></li>
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><em>&lt;class 'cunqa.qpu.QPU'&gt;</em><em>]</em>) – QPU objects associated to the virtual QPUs in which the circuits want to be run.</p></li>
 <li><p><strong>run_args</strong> – any other run arguments and parameters.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
-</dd>
 </dl>
+<p>Return:
+List of &lt;class <cite>cunqa.qjob.QJobs</cite>&gt; objects.</p>
 </dd></dl>
 
 </section>

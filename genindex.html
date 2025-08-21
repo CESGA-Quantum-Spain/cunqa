@@ -8,7 +8,6 @@
   <title>Index &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -78,16 +77,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.circuit.html">cunqa.circuit</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.converters.html">cunqa.converters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.mappers.html">cunqa.mappers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -196,6 +200,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -214,12 +219,6 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper.__call__">__call__() (cunqa.mappers.QJobMapper method)</a>
-
-      <ul>
-        <li><a href="_autosummary/cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper.__call__">(cunqa.mappers.QPUCircuitMapper method)</a>
-</li>
-      </ul></li>
       <li><a href="_autosummary/cunqa.backend.Backend.html#cunqa.backend.Backend.__init__">__init__() (cunqa.backend.Backend method)</a>
 
       <ul>
@@ -274,6 +273,8 @@
 </li>
       <li><a href="_autosummary/cunqa.backend.BackendData.html#cunqa.backend.BackendData.clear">clear() (cunqa.backend.BackendData method)</a>
 </li>
+      <li><a href="_autosummary/cunqa.converters.convert.html#cunqa.converters.convert">convert() (in module cunqa.converters)</a>
+</li>
       <li><a href="_autosummary/cunqa.result.convert_counts.html#cunqa.result.convert_counts">convert_counts() (in module cunqa.result)</a>
 </li>
       <li><a href="_autosummary/cunqa.backend.BackendData.html#cunqa.backend.BackendData.copy">copy() (cunqa.backend.BackendData method)</a>
@@ -310,13 +311,20 @@
         <li><a href="_autosummary/cunqa.backend.html#module-cunqa.backend">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cunqa.circuit
 
       <ul>
         <li><a href="_autosummary/cunqa.circuit.html#module-cunqa.circuit">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    cunqa.converters
+
+      <ul>
+        <li><a href="_autosummary/cunqa.converters.html#module-cunqa.converters">module</a>
 </li>
       </ul></li>
       <li>
@@ -361,6 +369,10 @@
         <li><a href="_autosummary/cunqa.transpile.html#module-cunqa.transpile">module</a>, <a href="generated/cunqa.transpile.html#module-cunqa.transpile">[1]</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/cunqa.converters.cunqac_to_json.html#cunqa.converters.cunqac_to_json">cunqac_to_json() (in module cunqa.converters)</a>
+</li>
+      <li><a href="_autosummary/cunqa.converters.cunqac_to_qc.html#cunqa.converters.cunqac_to_qc">cunqac_to_qc() (in module cunqa.converters)</a>
+</li>
       <li><a href="_autosummary/cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit">CunqaCircuit (class in cunqa.circuit)</a>
 </li>
       <li><a href="_autosummary/cunqa.circuit.CunqaCircuitError.html#cunqa.circuit.CunqaCircuitError">CunqaCircuitError</a>
@@ -397,8 +409,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/cunqa.circuit.from_json_to_qc.html#cunqa.circuit.from_json_to_qc">from_json_to_qc() (in module cunqa.circuit)</a>
-</li>
       <li><a href="_autosummary/cunqa.backend.BackendData.html#cunqa.backend.BackendData.fromkeys">fromkeys() (cunqa.backend.BackendData method)</a>
 </li>
   </ul></td>
@@ -442,6 +452,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/cunqa.converters.json_to_cunqac.html#cunqa.converters.json_to_cunqac">json_to_cunqac() (in module cunqa.converters)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/cunqa.converters.json_to_qc.html#cunqa.converters.json_to_qc">json_to_qc() (in module cunqa.converters)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -468,6 +490,8 @@
         <li><a href="_autosummary/cunqa.backend.html#module-cunqa.backend">cunqa.backend</a>
 </li>
         <li><a href="_autosummary/cunqa.circuit.html#module-cunqa.circuit">cunqa.circuit</a>
+</li>
+        <li><a href="_autosummary/cunqa.converters.html#module-cunqa.converters">cunqa.converters</a>
 </li>
         <li><a href="_autosummary/cunqa.mappers.html#module-cunqa.mappers">cunqa.mappers</a>
 </li>
@@ -510,7 +534,9 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/cunqa.circuit.qc_to_json.html#cunqa.circuit.qc_to_json">qc_to_json() (in module cunqa.circuit)</a>
+      <li><a href="_autosummary/cunqa.converters.qc_to_cunqac.html#cunqa.converters.qc_to_cunqac">qc_to_cunqac() (in module cunqa.converters)</a>
+</li>
+      <li><a href="_autosummary/cunqa.converters.qc_to_json.html#cunqa.converters.qc_to_json">qc_to_json() (in module cunqa.converters)</a>
 </li>
       <li><a href="_autosummary/cunqa.qutils.qdrop.html#cunqa.qutils.qdrop">qdrop() (in module cunqa.qutils)</a>
 </li>
@@ -548,16 +574,14 @@
 </li>
       <li><a href="_autosummary/cunqa.result.Result.html#cunqa.result.Result">Result (class in cunqa.result)</a>
 </li>
-      <li><a href="_autosummary/cunqa.qjob.QJob.html#cunqa.qjob.QJob.result">result() (cunqa.qjob.QJob method)</a>
-</li>
       <li><a href="_autosummary/cunqa.result.ResultError.html#cunqa.result.ResultError">ResultError</a>
 </li>
       <li><a href="_autosummary/cunqa.qpu.QPU.html#cunqa.qpu.QPU.run">run() (cunqa.qpu.QPU method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed">run_distributed() (in module cunqa.mappers)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rx">rx() (cunqa.circuit.CunqaCircuit method)</a>
 </li>
       <li><a href="_autosummary/cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rxx">rxx() (cunqa.circuit.CunqaCircuit method)</a>

@@ -9,24 +9,11 @@ cunqa.circuit
 
    
    
-   .. raw:: html
-
-      <h2> Functions </h2>
-
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-   
-      from_json_to_qc
-      qc_to_json
-   
    
 
    
    
-   .. raw:: html
-
-      <h2> Classes </h2>
+   .. rubric:: Classes
 
    .. autosummary::
       :toctree:
@@ -39,9 +26,7 @@ cunqa.circuit
 
    
    
-   .. raw:: html
-
-      <h2> Exceptions </h2>
+   .. rubric:: Exceptions
 
    .. autosummary::
       :toctree:

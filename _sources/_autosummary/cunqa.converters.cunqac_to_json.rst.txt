@@ -1,0 +1,6 @@
+cunqa.converters.cunqac\_to\_json
+=================================
+
+.. currentmodule:: cunqa.converters
+
+.. autofunction:: cunqac_to_json

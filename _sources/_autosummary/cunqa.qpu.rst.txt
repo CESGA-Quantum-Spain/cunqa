@@ -13,9 +13,7 @@ cunqa.qpu
 
    
    
-   .. raw:: html
-
-      <h2> Classes </h2>
+   .. rubric:: Classes
 
    .. autosummary::
       :toctree:

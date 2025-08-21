@@ -9,9 +9,7 @@ cunqa.result
 
    
    
-   .. raw:: html
-
-      <h2> Functions </h2>
+   .. rubric:: Functions
 
    .. autosummary::
       :toctree:
@@ -24,9 +22,7 @@ cunqa.result
 
    
    
-   .. raw:: html
-
-      <h2> Classes </h2>
+   .. rubric:: Classes
 
    .. autosummary::
       :toctree:
@@ -39,9 +35,7 @@ cunqa.result
 
    
    
-   .. raw:: html
-
-      <h2> Exceptions </h2>
+   .. rubric:: Exceptions
 
    .. autosummary::
       :toctree:

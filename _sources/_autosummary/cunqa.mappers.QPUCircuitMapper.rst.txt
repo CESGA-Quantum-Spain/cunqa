@@ -15,7 +15,7 @@ Attributes
    :nosignatures:
 
    ~QPUCircuitMapper.qpus
-   ~QPUCircuitMapper.circuit
+   ~QPUCircuitMapper.ansatz
    ~QPUCircuitMapper.transpile
    ~QPUCircuitMapper.initial_layout
    ~QPUCircuitMapper.run_parameters
@@ -26,12 +26,6 @@ Methods
 -------
 
 .. automethod:: QPUCircuitMapper.__init__
-
-
-.. automethod:: QPUCircuitMapper.__call__
-
-
-
 
 
 

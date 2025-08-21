@@ -6,10 +6,9 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cunqa.circuit.qc_to_json &mdash; CUNQA  documentation</title>
+  <title>cunqa.converters &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -24,8 +23,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cunqa.circuit.CunqaCircuit" href="cunqa.circuit.CunqaCircuit.html" />
-    <link rel="prev" title="cunqa.circuit.from_json_to_qc" href="cunqa.circuit.from_json_to_qc.html" /> 
+    <link rel="next" title="cunqa.converters.convert" href="cunqa.converters.convert.html" />
+    <link rel="prev" title="cunqa.circuit.CunqaCircuitError" href="cunqa.circuit.CunqaCircuitError.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -80,17 +79,22 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.circuit.qc_to_json</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.converters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -178,10 +182,9 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../cunqa.html">CUNQA Package</a></li>
           <li class="breadcrumb-item"><a href="cunqa.html">cunqa</a></li>
-          <li class="breadcrumb-item"><a href="cunqa.circuit.html">cunqa.circuit</a></li>
-      <li class="breadcrumb-item active">cunqa.circuit.qc_to_json</li>
+      <li class="breadcrumb-item active">cunqa.converters</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/cunqa.circuit.qc_to_json.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/cunqa.converters.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -189,30 +192,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-circuit-qc-to-json">
-<h1>cunqa.circuit.qc_to_json<a class="headerlink" href="#cunqa-circuit-qc-to-json" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="cunqa.circuit.qc_to_json">
-<span class="sig-prename descclassname"><span class="pre">cunqa.circuit.</span></span><span class="sig-name descname"><span class="pre">qc_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qiskit.QuantumCircuit</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.circuit.qc_to_json" title="Link to this definition"></a></dt>
-<dd><p>Transforms a <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> to json dict.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>) – circuit to transform to json.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Json dict with the circuit information.</p>
-</dd>
-</dl>
-</dd></dl>
-
+  <section id="module-cunqa.converters">
+<span id="cunqa-converters"></span><h1>cunqa.converters<a class="headerlink" href="#module-cunqa.converters" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.converters.convert.html#cunqa.converters.convert" title="cunqa.converters.convert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.converters.cunqac_to_json.html#cunqa.converters.cunqac_to_json" title="cunqa.converters.cunqac_to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqac_to_json</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html#cunqa.converters.cunqac_to_qc" title="cunqa.converters.cunqac_to_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqac_to_qc</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.converters.json_to_cunqac.html#cunqa.converters.json_to_cunqac" title="cunqa.converters.json_to_cunqac"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json_to_cunqac</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.converters.json_to_qc.html#cunqa.converters.json_to_qc" title="cunqa.converters.json_to_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json_to_qc</span></code></a></p></td>
+<td><p>Function to transform a circuit in json dict format to <a class="reference external" href="https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit">qiskit.circuit.QuantumCircuit</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html#cunqa.converters.qc_to_cunqac" title="cunqa.converters.qc_to_cunqac"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qc_to_cunqac</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.converters.qc_to_json.html#cunqa.converters.qc_to_json" title="cunqa.converters.qc_to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qc_to_json</span></code></a></p></td>
+<td><p>Transforms a <code class="docutils literal notranslate"><span class="pre">qiskit.circuit.QuantumCircuit</span></code> to json dict.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.circuit.from_json_to_qc.html" class="btn btn-neutral float-left" title="cunqa.circuit.from_json_to_qc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.circuit.CunqaCircuit.html" class="btn btn-neutral float-right" title="cunqa.circuit.CunqaCircuit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.circuit.CunqaCircuitError.html" class="btn btn-neutral float-left" title="cunqa.circuit.CunqaCircuitError" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.converters.convert.html" class="btn btn-neutral float-right" title="cunqa.converters.convert" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

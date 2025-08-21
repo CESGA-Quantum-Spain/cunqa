@@ -34,9 +34,5 @@ Methods
 
 
 
-
-
-
-
 .. automethod:: QPU.run
 
