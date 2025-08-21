@@ -390,6 +390,14 @@ sends the new set of parameters to the server to be reasigned to the circuit and
 <p>This method can be used on a loop, always being careful if we want to save the intermediate results.</p>
 <p>Examples of usage are shown above and on the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html">Examples Gallery</a>.
 Also, this method is used by the class <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, checkout its documentation for a extensive description.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In the current version, parameters will be assigned to <strong>ALL</strong> parametric gates in the circuit. This means that if we want to make
+some parameters fixed, it is on our responsibility to pass them correctly and in the correct order in the list.
+If the number of parameters is less than the number of parametric gates in the circuit, an error will occur at the virtual QPU, on
+the other hand, if more parameters are provided, there will only be used up to the number of parametric gates.</p>
+<p>Also, only rx, ry and rz gates are supported for this functionality, that is, they are the only gates considered <em>parametric</em> for this functionality.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int]</span></code>) – list of parameters to assign to the parametrized circuit.</p>
