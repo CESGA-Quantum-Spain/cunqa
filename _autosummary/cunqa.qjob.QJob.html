@@ -229,7 +229,7 @@ the first one has to be out.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>In the case in which the order is not respected, everything would work, but results will not correspond
-to the job. A mixup would happen.</p>
+to the job. A mix up would happen.</p>
 </div>
 </section>
 <section id="handling-qjobs-sent-to-different-qpus">
@@ -244,7 +244,7 @@ Let’s send two circuits to two different QPUs:</p>
 </div>
 <p>This way, when we send the first job, then inmediatly the sencond one is sent, because <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> does not wait
 for the simulation to finish. This way, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
-since jobs are managed by different <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> objects, there can be no mixup.</p>
+since jobs are managed by different <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> objects, there can be no mix up.</p>
 <p>In fact, the function <a class="reference internal" href="cunqa.qjob.gather.html#cunqa.qjob.gather" title="cunqa.qjob.gather"><code class="xref py py-func docutils literal notranslate"><span class="pre">gather()</span></code></a> is designed for recieving a list of qjobs and return the results; therefore, let’s say
 we have a list of circuits that we want to submit to a group of QPUs:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjobs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -254,7 +254,9 @@ we have a list of circuits that we want to submit to a group of QPUs:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this workflow,</p>
+<p>In this workflow, all circuits are sent to each QPU an simulated at the same time. Then, when calling for the results, the program is blocked
+waiting for all of them to finish. Other examples of classical parallelization of quantum simulation taks can be found at the
+<a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html">Examples Gellery</a>.</p>
 </section>
 <section id="upgrading-parameters-from-qjobs">
 <h2>Upgrading parameters from QJobs<a class="headerlink" href="#upgrading-parameters-from-qjobs" title="Link to this heading"></a></h2>
