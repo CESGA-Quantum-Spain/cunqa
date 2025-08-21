@@ -28,6 +28,12 @@ Methods
 
 
 
+.. automethod:: QJob.result
+
+
+
+
+
 
 
 

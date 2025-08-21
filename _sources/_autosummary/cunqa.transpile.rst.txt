@@ -9,7 +9,9 @@ cunqa.transpile
 
    
    
-   .. rubric:: Functions
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
       :toctree:
@@ -25,7 +27,9 @@ cunqa.transpile
 
    
    
-   .. rubric:: Exceptions
+   .. raw:: html
+
+      <h2> Exceptions </h2>
 
    .. autosummary::
       :toctree:

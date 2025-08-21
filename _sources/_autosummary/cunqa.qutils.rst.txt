@@ -9,7 +9,9 @@ cunqa.qutils
 
    
    
-   .. rubric:: Functions
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
       :toctree:
@@ -30,7 +32,9 @@ cunqa.qutils
 
    
    
-   .. rubric:: Exceptions
+   .. raw:: html
+
+      <h2> Exceptions </h2>
 
    .. autosummary::
       :toctree:

@@ -13,7 +13,9 @@ cunqa.backend
 
    
    
-   .. rubric:: Classes
+   .. raw:: html
+
+      <h2> Classes </h2>
 
    .. autosummary::
       :toctree:

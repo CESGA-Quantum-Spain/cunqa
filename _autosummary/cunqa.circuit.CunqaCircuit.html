@@ -9,6 +9,7 @@
   <title>cunqa.circuit.CunqaCircuit &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -24,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="cunqa.circuit.CunqaCircuitError" href="cunqa.circuit.CunqaCircuitError.html" />
-    <link rel="prev" title="cunqa.circuit" href="cunqa.circuit.html" /> 
+    <link rel="prev" title="cunqa.circuit.qc_to_json" href="cunqa.circuit.qc_to_json.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -80,21 +81,16 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -199,9 +195,9 @@
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.circuit.</span></span><span class="sig-name descname"><span class="pre">CunqaCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clbits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to define a quantum circuit for the <code class="docutils literal notranslate"><span class="pre">cunqa</span></code> api.</p>
+<p>Class to define a quantum circuit for the <a class="reference internal" href="cunqa.html#module-cunqa" title="cunqa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code></a> api.</p>
 <p>This class serves as a tool for the user to describe not only simple circuits, but also to describe classical and quantum operations between circuits.
-On its initialization, it takes as mandatory the number of qubits for the circuit (<em>num_qubits</em>), also number of classical bits (<em>num_clbits</em>) and a personalized id (<em>id</em>), which by default would be randomly generated.
+On its initialization, it takes as mandatory the number of qubits for the circuit <em>num_qubits</em>), also number of classical bits (<em>num_clbits</em>) and a personalized id (<em>id</em>), which by default would be randomly generated.
 Once the object is created, class methods canbe used to add instructions to the circuit such as single-qubit and two-qubits gates, measurements, conditional operations,… but also operations that allow to send measurement outcomes or qubits to other circuits.
 This sending operations require that the virtual QPUs to which the circuits are sent support classical or quantum communications with the desired connectivity.</p>
 <section id="supported-operations">
@@ -241,7 +237,24 @@ This sending operations require that the virtual QPUs to which the circuits are 
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Once the circuit is ready, it is ready to be sent to a QPU by the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">cunqa.qpu.run()</span></code>.</p>
+<p>Once the circuit is ready, it is ready to be sent to a QPU by the method <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
+<p>Other methods to manupulate the class are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="cunqa.circuit.CunqaCircuit.from_instructions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_instructions()</span></code></a></p></td>
+<td><p>Class method to add operations to the circuit from a list of dict-type instructions.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="classical-communications-among-circuits">
 <h2>Classical communications among circuits<a class="headerlink" href="#classical-communications-among-circuits" title="Link to this heading"></a></h2>
@@ -335,7 +348,18 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.__init__">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clbits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.__init__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Class constructor to create a CunqaCirucit. Only the <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code> argument is mandatory, also <code class="docutils literal notranslate"><span class="pre">num_clbits</span></code> can be provided if there is intention to incorporate intermediate measurements.
+If no <code class="docutils literal notranslate"><span class="pre">id</span></code> is provided, one is generated randomly, then it can be accessed through the class attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">_id</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of qubits of the circuit.</p></li>
+<li><p><strong>num_clbits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Numeber of classical bits for the circuit. A classical register is initially added.</p></li>
+<li><p><strong>id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Label for identifying the circuit. This id is then used for refering to the circuit in classical and quantum communications methods.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.c_if">
@@ -347,11 +371,11 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
-<li><p><strong>control_qubit</strong> (<em>int</em>) – control qubit whose classical measurement will control the execution of the gate.</p></li>
-<li><p><strong>target_qubit</strong> (<em>list</em><em>[</em><em>int</em><em>]</em><em>, </em><em>int</em>) – list of qubits or qubit to which the gate is intended to be applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the case parametric gate is provided.</p></li>
-<li><p><strong>matrix</strong> (<em>list</em><em> or </em><em>&lt;class 'numpy.ndarray'&gt;</em>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
+<li><p><strong>gate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
+<li><p><strong>control_qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – control qubit whose classical measurement will control the execution of the gate.</p></li>
+<li><p><strong>target_qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – list of qubits or qubit to which the gate is intended to be applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the case parametric gate is provided.</p></li>
+<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
 </ul>
 </dd>
 </dl>
@@ -363,7 +387,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply ccx gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -374,7 +398,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply ccy gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -385,7 +409,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply ccz gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -397,8 +421,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -411,8 +435,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -425,8 +449,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -439,8 +463,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -452,7 +476,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply cswap gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -463,7 +487,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply csx gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -475,11 +499,11 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>gamma</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>lam</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>gamma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -492,8 +516,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -506,10 +530,10 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>lam</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -521,7 +545,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply cx gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -532,7 +556,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply cy gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -543,7 +567,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply cz gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied, first one will be control qubit and second one target qubit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -554,19 +578,19 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply ecr gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.CunqaCircuit.from_instructions">
-<span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">from_instructions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">from_instructions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.CunqaCircuit.from_instructions" title="Link to this definition"></a></dt>
 <dd><p>Class method to add operations to the circuit from a list of dict-type instructions.</p>
-<p>Each instruction must have as mandatory keys “name” and “qubits”, while other keys are accepted: “clbits”, “params”, “circuits” or “remote_conditional_reg”.</p>
+<p>Each instruction must have as mandatory keys <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;qubits&quot;</span></code>, while other keys are accepted: <code class="docutils literal notranslate"><span class="pre">&quot;clbits&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;params&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;circuits&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;remote_conditional_reg&quot;</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>isntructions</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – list gathering all the each instruction as a dict.</p>
+<dd class="field-odd"><p><strong>instructions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict]</span></code>) – list gathering all the each instruction as a dict.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -577,7 +601,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply h gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -588,7 +612,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply id gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -600,8 +624,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>int</em>) – qubits to measure.</p></li>
-<li><p><strong>clbits</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>int</em>) – clasical bits where the measurement will be registered.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – qubits to measure.</p></li>
+<li><p><strong>clbits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – clasical bits where the measurement will be registered.</p></li>
 </ul>
 </dd>
 </dl>
@@ -620,8 +644,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be measured and sent.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em>, </em><em>&lt;class 'cunqa.circuit.CunqaCircuit'&gt;</em>) – id of the circuit or circuit to which the result of the measurement is sent.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit to be measured and sent.</p></li>
+<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit to which the result of the measurement is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -634,8 +658,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -648,8 +672,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – ancilla to which the received qubit is assigned.</p></li>
-<li><p><strong>control_circuit</strong> (<em>str</em><em>, </em><em>&lt;class 'cunqa.circuit.CunqaCircuit'&gt;</em>) – id of the circuit from which the qubit is received.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ancilla to which the received qubit is assigned.</p></li>
+<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit from which the qubit is received.</p></li>
 </ul>
 </dd>
 </dl>
@@ -662,8 +686,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be sent.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em>, </em><em>&lt;class 'cunqa.circuit.CunqaCircuit'&gt;</em>) – id of the circuit or circuit to which the qubit is sent.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit to be sent.</p></li>
+<li><p><strong>target_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit to which the qubit is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -676,9 +700,9 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -693,10 +717,10 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gate</strong> (<em>str</em>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
-<li><p><strong>target_qubits</strong> (<em>int</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubit or qubits to which the gate is conditionally applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter in case the gate provided is parametric.</p></li>
-<li><p><strong>control_circuit</strong> (<em>str</em><em>, </em><em>&lt;class 'cunqa.circuit.CunqaCircuit'&gt;</em>) – id of the circuit or circuit from which the condition is sent.</p></li>
+<li><p><strong>gate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – gate to be applied. Has to be supported by CunqaCircuit.</p></li>
+<li><p><strong>target_qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – qubit or qubits to which the gate is conditionally applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter in case the gate provided is parametric.</p></li>
+<li><p><strong>control_circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <a class="reference internal" href="#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – id of the circuit or circuit from which the condition is sent.</p></li>
 </ul>
 </dd>
 </dl>
@@ -708,7 +732,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to add reset instruction to a qubit or list of qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>int</em>) – qubits to which the reset operation is applied.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits to which the reset operation is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -720,8 +744,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -734,8 +758,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -748,8 +772,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -762,8 +786,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -776,8 +800,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -790,8 +814,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -804,8 +828,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -817,7 +841,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply s gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -828,7 +852,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply sdg gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -839,7 +863,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply swap gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – qubits in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -850,7 +874,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply sx gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -861,7 +885,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply sxdg gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -872,7 +896,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply t gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -883,7 +907,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply tdg gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -895,10 +919,10 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>lam</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -911,8 +935,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
-<li><p><strong>param</strong> (<em>float</em><em> or </em><em>int</em>) – parameter for the parametric gate.</p></li>
+<li><p><strong>param</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – parameter for the parametric gate.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -925,9 +949,9 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -940,10 +964,10 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – angle.</p></li>
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+<li><p><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>phi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>lam</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – angle.</p></li>
+<li><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -956,8 +980,8 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>matrix</strong> (<em>list</em><em> or </em><em>&lt;class 'numpy.ndarray'&gt;</em>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – unitary operator in matrix form to be applied to the given qubits.</p></li>
+<li><p><strong>qubits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubits to which the unitary operator will be applied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -969,7 +993,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply x gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -980,7 +1004,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply y gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -991,7 +1015,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
 <dd><p>Class method to apply z gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+<dd class="field-odd"><p><strong>qubit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – qubit in which the gate is applied.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1003,7 +1027,7 @@ If we want to send more qubits afer, we can use it since it is reset to zero.</p
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.circuit.html" class="btn btn-neutral float-left" title="cunqa.circuit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.circuit.qc_to_json.html" class="btn btn-neutral float-left" title="cunqa.circuit.qc_to_json" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cunqa.circuit.CunqaCircuitError.html" class="btn btn-neutral float-right" title="cunqa.circuit.CunqaCircuitError" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

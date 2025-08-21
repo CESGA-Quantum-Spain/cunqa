@@ -9,7 +9,9 @@ cunqa.mappers
 
    
    
-   .. rubric:: Functions
+   .. raw:: html
+
+      <h2> Functions </h2>
 
    .. autosummary::
       :toctree:
@@ -21,7 +23,9 @@ cunqa.mappers
 
    
    
-   .. rubric:: Classes
+   .. raw:: html
+
+      <h2> Classes </h2>
 
    .. autosummary::
       :toctree:

@@ -1,0 +1,12 @@
+/* Cambiar color de los bloques .. note:: */
+div.admonition.note {
+    background-color: #f4e6ff;   /* azul clarito */
+}
+
+/* Cambiar color del título dentro de la nota */
+div.admonition.note > .admonition-title {
+    background-color: #b97cda;
+    color: white;
+    font-weight: bold
+}
+

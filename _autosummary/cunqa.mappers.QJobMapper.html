@@ -9,6 +9,7 @@
   <title>cunqa.mappers.QJobMapper &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -80,21 +81,16 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.from_json_to_qc.html">cunqa.circuit.from_json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
-</ul>
-</li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.mappers.QJobMapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
@@ -199,7 +195,26 @@
 <dt class="sig sig-object py" id="cunqa.mappers.QJobMapper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.mappers.</span></span><span class="sig-name descname"><span class="pre">QJobMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to map the method <cite>QJob.upgrade_parameters</cite> to a list of QJobs.</p>
+<p>Class to map the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> to a set of jobs sent to virtual QPUs.</p>
+<p>The core of the class is on its <a class="reference internal" href="#cunqa.mappers.QJobMapper.__call__" title="cunqa.mappers.QJobMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method, to which parameters that the method <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a> takes are passed toguether with a cost function, so that a the value for this cost for each initial <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is returned.</p>
+<p>An example is shown below, once we have a list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects as <em>qjobs</em>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># defining the parameters set accordingly to the number of parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># of the circuit and the number of QJobs in the list.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># defining the cost function passed to the result of each QJob</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">cost_value</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cost_values</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">new_parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We intuitively see how convinient this class can be for optimization algorithms: one has a parametric circuit to which updated sets of parameters can be sent
+obtaining the value of the cost back. Examples applied to optimizations are shown at the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>.</p>
 </dd></dl>
 
 <section id="attributes">
@@ -211,7 +226,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">qjobs</span></code></p></td>
-<td><p></p></td>
+<td><p>List of jobs that are mapped.</p></td>
 </tr>
 </tbody>
 </table>
@@ -221,10 +236,31 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.mappers.QJobMapper.__init__">
 <span class="sig-prename descclassname"><span class="pre">QJobMapper.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes the QJobMapper class.</p>
+<dd><p>Class constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qjobs</strong> (<em>list</em><em>[</em><em>&lt;class 'qjob.QJob'&gt;</em><em>]</em>) – list of QJobs to be mapped.</p>
+<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – list of <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects to be mapped.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.mappers.QJobMapper.__call__">
+<span class="sig-prename descclassname"><span class="pre">QJobMapper.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper.__call__" title="Link to this definition"></a></dt>
+<dd><p>Callable method to map the function <em>func</em> to the results of assigning <em>population</em> to the given jobs.
+Regarding the <em>population</em>, each set of parameters will be assigned to each <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object, so the list must
+have size (<em>N,p</em>), being <em>N</em> the lenght of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qjobs</span></code> and <em>p</em> the number of parameters in the circuit.
+Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object and to return a value.
+For example, the function can evaluate the expected value of an observable from the output of the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">callable</span></code>) – function to be passed to the results of the jobs.</p></li>
+<li><p><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[list[int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">float]]</span></code>) – list of vectors to be mapped to the jobs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of outputs of the function applied to the results of each job for the given population.</p>
 </dd>
 </dl>
 </dd></dl>

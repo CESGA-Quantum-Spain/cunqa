@@ -24,6 +24,12 @@ Methods
 .. automethod:: QJobMapper.__init__
 
 
+.. automethod:: QJobMapper.__call__
+
+
+
+
+
 
 
 

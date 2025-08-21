@@ -21,6 +21,10 @@
 
 
 
+.. raw:: html
+
+   <h2> Modules </h2>
+
 .. autosummary::
    :toctree:
    :template: custom-module-template.rst
@@ -28,7 +32,6 @@
 
    backend
    circuit
-   converters
    mappers
    qjob
    qpu
