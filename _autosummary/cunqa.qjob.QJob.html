@@ -288,6 +288,14 @@ to be assigned to the circuit, <a class="reference internal" href="#cunqa.qjob.Q
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
+<p>From this simple workflow, we can build loops that update parameters according to some rules, or by a optimizator, and upgrade the circuit until
+some stoping criteria is fulfilled.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Before sending the circuit or upgrading its parameters, the result of the prior job must be called. It can be done manually, so that we can
+save it and obtain its information, or it can be done automatically as in the example avobe, but be aware that once the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>
+method is called, this result is discarded.</p>
+</div>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
