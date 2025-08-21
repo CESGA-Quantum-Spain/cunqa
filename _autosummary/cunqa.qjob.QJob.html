@@ -273,13 +273,17 @@ it to the QPU. Nevertheless, since the next circuit will have the same data but 
 is repeated, so <a class="reference internal" href="cunqa.html#module-cunqa" title="cunqa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code></a> has a more efficient and simple way to handle this cases: a method to send to the QPU a list with the new parameters
 to be assigned to the circuit, <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>.</p>
 <p>Let’s see a simple example: creating a parametric circuit and uptading its parametes:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># building the parametric circuit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">rx</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sending the circuit to a virtual QPU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># defining the new set of parameters</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># upgrading the parameters of the job</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">(</span><span class="n">new_parameters</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
