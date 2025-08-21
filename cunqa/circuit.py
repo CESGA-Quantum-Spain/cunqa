@@ -683,7 +683,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         instances_to_change_and_displace = {}
         for instrr in other_instr:
             instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]] # displace the qubits of the instructions and then add it to union_circuit
-            instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr
+            if "clbits" in instrr:
+                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]]
             union_circuit._add_instruction(instrr)
 
             if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference the other_circuit and wether it controls or is a target
@@ -743,7 +744,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             instances_to_change_and_displace = {} # Here we will collect info on the circuits that talk to self to make them reference the union instead
             for instrr in self.instructions:
                 instrr["qubits"] = [qubit + m for qubit in instrr["qubits"]]
-                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr=instrr
+                if "clbits" in instrr:
+                    instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] 
 
                 if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Gather info on the circuits that reference other_circuit and wether it controls or is a target
                     if instrr["circuits"][0] == upper_id: # Susbtitute distr gate by local gates if it refences upper_circuit 
@@ -787,14 +789,15 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         
         
 
-        n=self.num_qubits;   need_to_modify_self = False
+        n=self.num_qubits; cl_n=self.num_clbits; need_to_modify_self = False
         m=other_circuit.num_qubits; cl_m=other_circuit.num_clbits
         self._add_q_register(name=other_id, number_qubits=m); self._add_cl_register(name=other_id, number_clbits=cl_m)
 
         instances_to_change_and_displace = {} # Here we will collect info on the circuits that talk to other_circuit to make them reference self instead
         for instrr in other_instr:
             instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]]
-            instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]] if "clbits" in instrr else instrr=instrr
+            if "clbits" in instrr:
+                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]]
 
             if instrr["name"] in SUPPORTED_GATES_DISTRIBUTED: # Whenever I find a distributed gate extract info of the circuits that need to be updated
                 if instrr["circuits"][0] == self._id: # Susbtitute distr gate by local gates if it refences upper_circuit 

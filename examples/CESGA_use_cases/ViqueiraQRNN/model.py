@@ -17,8 +17,8 @@ from random import randint
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from viqueira_QRNN_circuit import CircuitQRNN
-from viqueira_gradients_and_costs import GradientMethod, CostFunction
+from ViqueiraQRNN.circuit import CircuitQRNN
+from ViqueiraQRNN.gradients_and_costs import GradientMethod, CostFunction
 from cunqa.logger import logger
 from cunqa.qutils import getQPUs
 from cunqa.qjob import QJob
@@ -90,7 +90,7 @@ class ViqueiraQRNN:
 
         if theta_init == None:
             np.random.seed(18)
-            theta_aux = 2.*np.pi * np.random.random(2*self.nE*self.repeat_encode + 2(self.nE + self.nM)*self.repeat_evolution + self.nE)
+            theta_aux = 2.*np.pi * np.random.random(2*self.nE*self.repeat_encode + 2*(self.nE + self.nM)*self.repeat_evolution + self.nE)
         else:
             theta_aux = theta_init
 

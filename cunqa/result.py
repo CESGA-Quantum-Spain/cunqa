@@ -371,3 +371,24 @@ def recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None,
     return new_probs
 
 
+def recombine_bistring_probs(probs: Union[dict[np.array], np.array], partial: list[int], num_qubits: int):
+
+    if isinstance(probs, dict):
+        short_bitstring_probs = {} 
+        for k, probs_k in probs.items():
+
+            short_bitstring_probs[k] = {format(bitstring_ten, f"0{num_qubits}b"): 0.0 for  bitstring_ten in range(2**num_qubits)}
+            for base_ten_bitstring, prob in enumerate(probs_k):
+
+                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                short_bitstring_probs[k][shortened_bitstring] += prob
+
+    elif isinstance(probs, np.array):        
+
+        short_bitstring_probs = {format(bitstring_ten, f"0{num_qubits}b"): 0.0 for bitstring_ten in range(2**num_qubits)}
+        for base_ten_bitstring, prob in enumerate(probs):
+
+            shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+            short_bitstring_probs[shortened_bitstring] += prob
+
+    return short_bitstring_probs

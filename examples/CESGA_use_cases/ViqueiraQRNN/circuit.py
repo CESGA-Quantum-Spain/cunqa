@@ -16,7 +16,7 @@ from typing import  Union, Any, Optional
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.circuit import CunqaCircuit, _is_parametric
-from viqueira_QRNN_ansatz import AnsatzQRNN, EMCZ2, EMCZ3
+from ViqueiraQRNN.ansatz import AnsatzQRNN, EMCZ2, EMCZ3
 from cunqa.logger import logger
 from cunqa.qpu import QPU
 from cunqa.qjob import QJob
@@ -95,7 +95,7 @@ class CircuitQRNN:
                 raise CircuitQRNNError
 
             self.circuit.measure([i for i in range(nE)], [time_step*nE + i for i in range(nE)])
-            self.circuit.save_state(label=f"{time_step}") 
+            self.circuit.save_state(label=f"State_{time_step}") 
             self.circuit.reset([i for i in range(nE)]) 
     
         

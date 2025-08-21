@@ -17,9 +17,7 @@ from typing import  Union, Any, Optional
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.circuit import CunqaCircuit
-from viqueira_QRNN_circuit import CircuitQRNN
-from viqueira_QRNN_model import ViqueiraQRNN
+from ViqueiraQRNN.circuit import CircuitQRNN
 from cunqa.logger import logger
 from cunqa.qjob import QJob, gather
 

@@ -37,29 +37,38 @@ def parametric_wrapper(cls_inst):
     
     # Go through class methods, extract the ones for parametric gates and add abstract parameter functionality
     for name, method in cls_inst.__dict__.items():
-        if (callable(method) and _is_parametric( {"instructions":[{"name": name}]} )):
+        if callable(method):
+            try:
+                signature = inspect.signature(method)
+                inputs = list(signature.parameters.keys()) 
 
-            # Create a wrapper for each parametric method
-            def remembering_wrapper(parametric_method):
-                @functools.wraps(parametric_method)
-                def wrapper(*args, label: str = "NoName", **kwargs):
+                if (("qubit" in inputs or "qubits" in inputs) and _is_parametric( {"instructions":[{"name": name}]})):
+                    # Create a wrapper for each parametric method
+                    def remembering_wrapper(parametric_method):
+                        def wrapper(*args, label: str = "NoName", **kwargs):
 
-                    cls_inst.param_instructions.append(label) # save the name of the parameter
+                            cls_inst.param_instructions.append(label) # save the name of the parameter
 
-                    # Ensure all necessary parameter keys are provided and if not, put zeros on them
-                    new_args = {}
-                    signature = inspect.signature(method)
-                    inputs = list(signature.parameters.keys()) 
-                    how_many_inputs = len(inputs)
-                    if not how_many_inputs == len(args)+len(kwargs): 
-                        for arg in inputs.remove(1,-1): # remove self and qubits
-                            new_args[arg]=0.
+                            # Ensure all necessary parameter keys are provided and if not, put zeros on them
+                            missing_args = {}
+                            if not len(inputs) == len(args)+len(kwargs): 
+                                inputs.remove("self")
+                                if "qubit" in inputs:
+                                    inputs.remove("qubit")
+                                else:
+                                    inputs.remove("qubits")
+                                for arg in inputs.remove(1,-1): # remove self and qubits
+                                    missing_args[arg]=float("Infinity")
 
-                    return parametric_method(*args, **new_args, **kwargs)
-                return wrapper
-            
-            # Replace the method with the wrapped version
-            setattr(cls_inst, name, remembering_wrapper(method))
+                            return parametric_method(*args, **missing_args, **kwargs)
+                        return wrapper
+                    
+                    # Replace the method with the wrapped version
+                    setattr(cls_inst, name, remembering_wrapper(method))
+                
+            except Exception as error:
+                logger.error(f"Error while inspecting method arguments and creating wrapper.")
+                raise SystemExit
 
     # Extend the "from_instructions" method to ensure abstract parameters work with any input method
     def extended_from_instructions(self, instructions):
@@ -235,7 +244,7 @@ class AnsatzQRNN:
         
             self._final_evolution = circuit  
 
-    def _get_full_circuit(self):
+    def get_full_circuit(self):
         """
         Combines all blocks (appropriately repeated) to generate the full ansatz.
 
@@ -271,10 +280,10 @@ class AnsatzQRNN:
         """
         if hasattr(self, "full_circ"):
             if recompile:
-                self._get_full_circuit
+                self.get_full_circuit()
             return self.full_circ.order_parameters(params)
         else:
-            self._get_full_circuit
+            self.get_full_circuit()
             return self.full_circ.order_parameters(params)
             
         
@@ -283,7 +292,7 @@ class AnsatzQRNN:
         
 #################### DEFINITION OF OUR MAIN ANSATZES ####################
 
-def EMZC2(nE, nM, repeat_encode, repeat_evolution):
+def EMCZ2(nE, nM, repeat_encode, repeat_evolution):
     """
     Creates the ansatz for the EMCZ2 QRNN algorithm. A picture of the ansatz form: https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZladder2p1.png
     """
@@ -316,7 +325,7 @@ def EMZC2(nE, nM, repeat_encode, repeat_evolution):
 
 
 
-def EMZC3(nE, nM, repeat_encode, repeat_evolution):
+def EMCZ3(nE, nM, repeat_encode, repeat_evolution):
     """
     Creates the ansatz for the EMCZ2 QRNN algorithm. A picture of the ansatz form: https://github.com/jdani98/qutims/blob/release/0.2/.images/quantum_ansatz_CZme3.png
     """
