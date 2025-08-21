@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cunqa.circuit.from_json_to_qc &mdash; CUNQA  documentation</title>
+  <title>cunqa.converters.cunqac_to_qc &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
@@ -24,8 +24,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cunqa.circuit.qc_to_json" href="cunqa.circuit.qc_to_json.html" />
-    <link rel="prev" title="cunqa.circuit" href="cunqa.circuit.html" /> 
+    <link rel="next" title="cunqa.converters.json_to_cunqac" href="cunqa.converters.json_to_cunqac.html" />
+    <link rel="prev" title="cunqa.converters.cunqac_to_json" href="cunqa.converters.cunqac_to_json.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -80,12 +80,20 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.circuit.from_json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.qc_to_json.html">cunqa.circuit.qc_to_json</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.converters.cunqac_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -178,10 +186,10 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../cunqa.html">CUNQA Package</a></li>
           <li class="breadcrumb-item"><a href="cunqa.html">cunqa</a></li>
-          <li class="breadcrumb-item"><a href="cunqa.circuit.html">cunqa.circuit</a></li>
-      <li class="breadcrumb-item active">cunqa.circuit.from_json_to_qc</li>
+          <li class="breadcrumb-item"><a href="cunqa.converters.html">cunqa.converters</a></li>
+      <li class="breadcrumb-item active">cunqa.converters.cunqac_to_qc</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/cunqa.circuit.from_json_to_qc.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/cunqa.converters.cunqac_to_qc.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -189,21 +197,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-circuit-from-json-to-qc">
-<h1>cunqa.circuit.from_json_to_qc<a class="headerlink" href="#cunqa-circuit-from-json-to-qc" title="Link to this heading"></a></h1>
+  <section id="cunqa-converters-cunqac-to-qc">
+<h1>cunqa.converters.cunqac_to_qc<a class="headerlink" href="#cunqa-converters-cunqac-to-qc" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="cunqa.circuit.from_json_to_qc">
-<span class="sig-prename descclassname"><span class="pre">cunqa.circuit.</span></span><span class="sig-name descname"><span class="pre">from_json_to_qc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qiskit.QuantumCircuit</span></span></span><a class="headerlink" href="#cunqa.circuit.from_json_to_qc" title="Link to this definition"></a></dt>
-<dd><p>Function to transform a circuit in json dict format to <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>circuit_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – circuit instructions to be transformed.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> with the given instructions.</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="cunqa.converters.cunqac_to_qc">
+<span class="sig-prename descclassname"><span class="pre">cunqa.converters.</span></span><span class="sig-name descname"><span class="pre">cunqac_to_qc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cunqac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qiskit.QuantumCircuit</span></span></span><a class="headerlink" href="#cunqa.converters.cunqac_to_qc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -211,8 +210,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.circuit.html" class="btn btn-neutral float-left" title="cunqa.circuit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.circuit.qc_to_json.html" class="btn btn-neutral float-right" title="cunqa.circuit.qc_to_json" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.converters.cunqac_to_json.html" class="btn btn-neutral float-left" title="cunqa.converters.cunqac_to_json" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.converters.json_to_cunqac.html" class="btn btn-neutral float-right" title="cunqa.converters.json_to_cunqac" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

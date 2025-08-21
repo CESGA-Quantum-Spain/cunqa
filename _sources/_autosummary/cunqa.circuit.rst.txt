@@ -9,17 +9,6 @@ cunqa.circuit
 
    
    
-   .. raw:: html
-
-      <h2> Functions </h2>
-
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-   
-      from_json_to_qc
-      qc_to_json
-   
    
 
    
