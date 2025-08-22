@@ -82,6 +82,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
@@ -202,7 +203,7 @@
 <p>A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.
 The quantum job not only contains the circuit to be simulated, but also simulation instructions and information of the virtual QPU to which the job is sent.</p>
 <p>One would want to save the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> resulting from sending a circuit in a variable.
-Let`s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:</p>
+Let’s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -246,7 +247,7 @@ Let’s send two circuits to two different QPUs:</p>
 </pre></div>
 </div>
 <p>This way, when we send the first job, then inmediatly the sencond one is sent, because <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> does not wait
-for the simulation to finish. This way, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
+for the simulation to finish. In this manner, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
 since jobs are managed by different <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> objects, there can be no mix up.</p>
 <p>In fact, the function <a class="reference internal" href="cunqa.qjob.gather.html#cunqa.qjob.gather" title="cunqa.qjob.gather"><code class="xref py py-func docutils literal notranslate"><span class="pre">gather()</span></code></a> is designed for recieving a list of qjobs and return the results; therefore, let’s say
 we have a list of circuits that we want to submit to a group of QPUs:</p>
@@ -399,7 +400,7 @@ Also, this method is used by the class <a class="reference internal" href="cunqa
 some parameters fixed, it is on our responsibility to pass them correctly and in the correct order in the list.
 If the number of parameters is less than the number of parametric gates in the circuit, an error will occur at the virtual QPU, on
 the other hand, if more parameters are provided, there will only be used up to the number of parametric gates.</p>
-<p>Also, only rx, ry and rz gates are supported for this functionality, that is, they are the only gates considered <em>parametric</em> for this functionality.</p>
+<p>Also, only <em>rx</em>, <em>ry</em> and <em>rz</em> gates are supported for this functionality, that is, they are the only gates considered <em>parametric</em> for this functionality.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

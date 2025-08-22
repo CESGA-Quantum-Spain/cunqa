@@ -82,6 +82,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
@@ -196,14 +197,25 @@
 <h1>cunqa.qjob.gather<a class="headerlink" href="#cunqa-qjob-gather" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.qjob.gather">
-<span class="sig-prename descclassname"><span class="pre">cunqa.qjob.</span></span><span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><span class="pre">Result</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><span class="pre">Result</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.qjob.gather" title="Link to this definition"></a></dt>
-<dd><p>Function to get result of several QJob objects, it also takes one QJob object.</p>
+<span class="sig-prename descclassname"><span class="pre">cunqa.qjob.</span></span><span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><span class="pre">Result</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.qjob.gather" title="Link to this definition"></a></dt>
+<dd><p>Function to get the results of several <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
+<p>Once the jobs are running:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a blocking call, results will be called sequentialy in . Since they are being run simultaneously,
+even if the first one on the list takes the longest, when it finishes the rest would have been done, so
+just the small overhead from calling them will be added.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Since this is mainly a for loop, the order must be respected when submiting jobs to the same virtual QPU.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">QJob</span> <span class="pre">objects</span> <span class="pre">or</span> <span class="pre">QJob</span> <span class="pre">object</span></code>)</p>
+<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – list of objects to get the result from.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Result or list of results.</p>
+<dd class="field-even"><p>List of <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> objects.</p>
 </dd>
 </dl>
 </dd></dl>
