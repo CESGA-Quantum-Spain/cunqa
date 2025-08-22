@@ -1,0 +1,6 @@
+cunqa.converters.convert
+========================
+
+.. currentmodule:: cunqa.converters
+
+.. autofunction:: convert
