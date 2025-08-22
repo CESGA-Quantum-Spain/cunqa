@@ -300,25 +300,25 @@ def EMCZ2(nE, nM, repeat_encode, repeat_evolution):
 
     # Define encoding
     for qubit in range(nE):
-            emcz2.encoder.ry(qubit, label = "x")
-            emcz2.encoder.rx(qubit, label = "theta")
-            emcz2.encoder.rz(qubit, label = "theta")
+            emcz2.encoder.ry(param = "x", qubit = qubit)
+            emcz2.encoder.rx(param = "theta", qubit = qubit)
+            emcz2.encoder.rz(param = "theta", qubit = qubit)
 
     for qubit in range(nE):
-        emcz2.final_encoding.ry(qubit, label = "x")
+        emcz2.final_encoding.ry(param = "x", qubit = qubit)
 
     # Define evolution
     for qubit in range(nE+nM-1): # Last qubit missing
 
-        emcz2.evolver.rx(qubit, label = "theta")
-        emcz2.evolver.rz(qubit, label = "theta")
+        emcz2.evolver.rx(param = "theta", qubit = qubit)
+        emcz2.evolver.rz(param = "theta", qubit = qubit)
         emcz2.evolver.cz(qubit, qubit + 1)
          
-    emcz2.evolver.rx(nE + nM - 1, label = "theta") # I separate the last iteration beacause it doesn't have a CZ with the next qubit
-    emcz2.evolver.rz(nE + nM - 1, label = "theta")
+    emcz2.evolver.rx(param = "theta", qubit = nE + nM - 1) # I separate the last iteration beacause it doesn't have a CZ with the next qubit
+    emcz2.evolver.rz(param = "theta", qubit = nE + nM - 1)
 
     for qubit in range(nE):
-        emcz2.final_evolution.rx(qubit, label = "theta")
+        emcz2.final_evolution.rx(param = "theta", qubit = qubit)
 
     return emcz2
 
@@ -333,21 +333,21 @@ def EMCZ3(nE, nM, repeat_encode, repeat_evolution):
 
     # Define encoding
     for qubit in range(nE):
-            emcz3.encoder.ry(qubit, label = "x")
-            emcz3.encoder.rx(qubit, label = "theta")
-            emcz3.encoder.rz(qubit, label = "theta")
-            emcz3.encoder.rx(qubit, label = "theta")
+            emcz3.encoder.ry(param = "x", qubit = qubit)
+            emcz3.encoder.rx(param = "theta", qubit = qubit)
+            emcz3.encoder.rz(param = "theta", qubit = qubit)
+            emcz3.encoder.rx(param = "theta", qubit = qubit)
 
     for qubit in range(nE):
-        emcz3.final_encoding.ry(qubit, label = "x")
+        emcz3.final_encoding.ry(param = "x", qubit = qubit)
 
     # Define evolution
     # E register part (CZ are performed)
     for qubit in range(nE): 
 
-        emcz3.evolver.rx(qubit, label = "theta")
-        emcz3.evolver.rz(qubit, label = "theta")
-        emcz3.evolver.rx(qubit, label = "theta")
+        emcz3.evolver.rx(param = "theta", qubit = qubit)
+        emcz3.evolver.rz(param = "theta", qubit = qubit)
+        emcz3.evolver.rx(param = "theta", qubit = qubit)
 
         for qubit_m in range(nM):
             emcz3.evolver.cz(qubit, nE + qubit_m)
@@ -355,13 +355,13 @@ def EMCZ3(nE, nM, repeat_encode, repeat_evolution):
     # M register part (CZ are received)
     for qubit in range(nM): 
 
-        emcz3.evolver.rx(qubit, label = "theta")
-        emcz3.evolver.rz(qubit, label = "theta")
-        emcz3.evolver.rx(qubit, label = "theta")
+        emcz3.evolver.rx(param = "theta", qubit = qubit)
+        emcz3.evolver.rz(param = "theta", qubit = qubit)
+        emcz3.evolver.rx(param = "theta", qubit = qubit)
 
     for qubit in range(nE):
-        emcz3.final_evolution.rx(qubit, label = "theta")
-        emcz3.final_evolution.rz(qubit, label = "theta")
-        emcz3.final_evolution.rx(qubit, label = "theta")
+        emcz3.final_evolution.rx(param = "theta", qubit = qubit)
+        emcz3.final_evolution.rz(param = "theta", qubit = qubit)
+        emcz3.final_evolution.rx(param = "theta", qubit = qubit)
 
     return emcz3
