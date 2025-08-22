@@ -1,6 +1,0 @@
-cunqa.converters.cunqac\_to\_qc
-===============================
-
-.. currentmodule:: cunqa.converters
-
-.. autofunction:: cunqac_to_qc
