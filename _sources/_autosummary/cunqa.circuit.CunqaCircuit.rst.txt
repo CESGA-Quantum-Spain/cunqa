@@ -19,11 +19,14 @@ Attributes
    ~CunqaCircuit.num_qubits
    ~CunqaCircuit.is_parametric
    ~CunqaCircuit.has_cc
+   ~CunqaCircuit.has_qc
    ~CunqaCircuit.is_dynamic
    ~CunqaCircuit.instructions
    ~CunqaCircuit.quantum_regs
    ~CunqaCircuit.classical_regs
    ~CunqaCircuit.sending_to
+   ~CunqaCircuit.current_params
+   ~CunqaCircuit.param_labels
 
 
 
@@ -245,6 +248,12 @@ Methods
 
 
 
+
+
+
+
+
+.. automethod:: CunqaCircuit.assign_parameters
 
 .. automethod:: CunqaCircuit.c_if
 

@@ -82,19 +82,13 @@
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.circuit</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#building-circuits">Building circuits</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_json.html">cunqa.converters.cunqac_to_json</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.cunqac_to_qc.html">cunqa.converters.cunqac_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_cunqac.html">cunqa.converters.json_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.json_to_qc.html">cunqa.converters.json_to_qc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_cunqac.html">cunqa.converters.qc_to_cunqac</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.qc_to_json.html">cunqa.converters.qc_to_json</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -215,17 +209,6 @@
 </pre></div>
 </div>
 <p>Be aware that some instructions might not be supported for <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, for the list of supported instructions check its documentation.</p>
-</section>
-<section id="circuits-by-json-dict-format">
-<h2>Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format<a class="headerlink" href="#circuits-by-json-dict-format" title="Link to this heading"></a></h2>
-<p>A low level way of representing a circuit is by a json <code class="docutils literal notranslate"><span class="pre">dict</span></code> with specefic fields that geather the information
-needed by the simulator in order to run the circuit.</p>
-<p>This structe is presented below:</p>
-<p>On the other hand, instructions have some mandatory and optional keys:</p>
-<p>For classical and quantum communications among circuits, we do not recomend working at such low level format, users rather
-describe this operations through the <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> class. If curious, you can always
-create the <code class="xref py py-class docutils literal notranslate"><span class="pre">Circuit</span></code> and obtain its intructions by its attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">instructions</span></code>,
-or you can convert it to the json <cite>dict</cite> format by the <a class="reference internal" href="cunqa.converters.convert.html#cunqa.converters.convert" title="cunqa.converters.convert"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert()</span></code></a> function.</p>
 <section id="references">
 <h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
