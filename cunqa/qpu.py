@@ -95,6 +95,7 @@ class QPU:
         Return:
             <class 'QJob'> object.
         """
+
         # Disallow execution of distributed circuits
         if inspect.stack()[1].function != "run_distributed": # Checks if the run() is called from run_distributed()
             if isinstance(circuit, CunqaCircuit):
@@ -106,8 +107,6 @@ class QPU:
                     logger.error("Distributed circuits can't run using QPU.run(), try run_distributed() instead.")
                     raise SystemExit
 
-
-
         # Handle connection to QClient
         if not self._connected:
             ip, port = self._endpoint
@@ -116,6 +115,7 @@ class QPU:
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
             self._connected = True
 
+        # Transpilation if requested
         if transpile:
             try:
                 logger.debug(f"About to transpile: {circuit}")

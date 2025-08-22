@@ -2,7 +2,8 @@
     Holds our wrapper for the qiskit transpiler.
 """
 from cunqa.backend import Backend
-from cunqa.circuit import from_json_to_qc, qc_to_json, CunqaCircuit
+from cunqa.circuit import CunqaCircuit
+from cunqa.converters import convert
 from cunqa.logger import logger
 
 from qiskit import QuantumCircuit
@@ -21,7 +22,7 @@ class TranspileError(Exception):
 
 def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
     """
-    Function to transpile a circuit according to a given backend. Cirtcuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.
+    Function to transpile a circuit according to a given backend. Circuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.
 
     Args:
     -----------
@@ -50,14 +51,14 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
             else:
-                qc = from_json_to_qc(circuit.info)
+                qc = convert(circuit.info, "QuantumCircuit")
 
         elif isinstance(circuit, dict):
             if initial_layout is not None and len(initial_layout) != circuit['num_qubits']:
                 logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
                 raise SystemExit # User's level
             else:
-                qc = from_json_to_qc(circuit)
+                qc = convert(circuit, "QuantumCircuit")
     
         elif isinstance(circuit, str):
             qc = QuantumCircuit.from_qasm_str(circuit)
@@ -129,11 +130,9 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
         return qc_transpiled
     
     elif isinstance(circuit, dict):
-        j_qc, _ = qc_to_json(qc_transpiled)
-        return j_qc
+        return convert(qc_transpiled, "json")
     
     elif isinstance(circuit, CunqaCircuit):
-        j_qc, _ = qc_to_json(qc_transpiled)
-        return CunqaCircuit(qc_transpiled.num_qubits, qc_transpiled.num_clbits).from_instructions(j_qc["instructions"])
+        return convert(qc_transpiled, "CunqaCircuit")
 
     
