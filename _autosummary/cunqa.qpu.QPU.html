@@ -9,7 +9,7 @@
   <title>cunqa.qpu.QPU &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1544bbb8" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -107,9 +107,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#virtual-qpus">Virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#interacting-with-virtual-qpus">Interacting with virtual QPUs</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.qpu.QPU</a></li>
 </ul>
 </li>
@@ -203,8 +201,8 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.qpu.</span></span><span class="sig-name descname"><span class="pre">QPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.QPU" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to represent a virtual QPU deployed for user interaction.</p>
-<p>This class contains the neccesary data for connecting to the virtual QPU’s server in order to communicate circuits and results in both ways.
-This communication is stablished trough the <code class="xref py py-attr docutils literal notranslate"><span class="pre">QPU.qclient</span></code>.</p>
+<p>This class contains the neccesary data for connecting to the QPU’s server in order to communicate circuits and results in both ways.
+This communication is trough the <code class="xref py py-attr docutils literal notranslate"><span class="pre">QPU.qclient</span></code>.</p>
 </dd></dl>
 
 <section id="attributes">
@@ -216,10 +214,10 @@ This communication is stablished trough the <code class="xref py py-attr docutil
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">backend</span></code></p></td>
-<td><p>Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device.</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></p></td>
-<td><p>Id string assigned to the object.</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -229,14 +227,15 @@ This communication is stablished trough the <code class="xref py py-attr docutil
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qpu.QPU.__init__">
 <span class="sig-prename descclassname"><span class="pre">QPU.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.QPU.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes the <a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class.</p>
+<dd><p>Initializes the QPU class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – id string assigned to the object.</p></li>
-<li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>) – object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.</p></li>
-<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device.</p></li>
-<li><p><strong>endpoint</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – string refering to the endpoint of the corresponding virtual QPU.</p></li>
+<li><p><strong>id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Id assigned to the qpu, simply a int from 0 to n_qpus-1.</p></li>
+<li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;class</span> <span class="pre">'python.qclient.QClient'&gt;</span></code>) – object that holds the information to communicate with the server
+endpoint for a given QPU.</p></li>
+<li><p><strong>backend</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;class</span> <span class="pre">'backend.Backend'&gt;</span></code>) – object that provides information about the QPU backend.</p></li>
+<li><p><strong>endpoint</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String refering to the endpoint of the server to which the QPU corresponds.</p></li>
 </ul>
 </dd>
 </dl>

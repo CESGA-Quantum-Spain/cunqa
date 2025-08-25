@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1544bbb8" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
       <link rel="stylesheet" type="text/css" href="../_static/table.css?v=9571698f" />
       <link rel="stylesheet" type="text/css" href="../_static/hide_bases_object.js?v=4ef80c51" />
 
@@ -110,9 +110,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/cunqa.qpu.html">cunqa.qpu</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../_autosummary/cunqa.qpu.html#virtual-qpus">Virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/cunqa.qpu.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../_autosummary/cunqa.qpu.html#interacting-with-virtual-qpus">Interacting with virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/cunqa.qpu.QPU.html">cunqa.qpu.QPU</a></li>
 </ul>
 </li>
@@ -220,9 +218,9 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 
-<span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
@@ -239,7 +237,7 @@ QPU 1, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
 QPU 2, backend: SimpleSimulator, simulator: SimpleMunich, version: 0.0.1.
 </pre></div></div>
 </div>
-<p>The method <code class="docutils literal notranslate"><span class="pre">getQPUs()</span></code> accesses the information of the raised QPus and instanciates one <code class="docutils literal notranslate"><span class="pre">qpu.QPU</span></code> object for each, returning a list. If you are working with <code class="docutils literal notranslate"><span class="pre">jupyter</span> <span class="pre">notebook</span></code> we recomend to instanciate this method just once.</p>
+<p>The method <code class="docutils literal notranslate"><span class="pre">get_QPUs()</span></code> accesses the information of the raised QPus and instanciates one <code class="docutils literal notranslate"><span class="pre">qpu.QPU</span></code> object for each, returning a list. If you are working with <code class="docutils literal notranslate"><span class="pre">jupyter</span> <span class="pre">notebook</span></code> we recomend to instanciate this method just once.</p>
 <p>About the <code class="docutils literal notranslate"><span class="pre">qpu.QPU</span></code> objects:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">QPU.id</span></code>: identificator of the virtual QPU, they will be asigned from 0 to n-1.</p></li>
