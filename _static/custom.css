@@ -10,3 +10,6 @@ div.admonition.note > .admonition-title {
     font-weight: bold
 }
 
+.rst-content .image {
+    margin-bottom: 1.2em;
+}
