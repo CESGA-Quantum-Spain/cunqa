@@ -1,0 +1,6 @@
+cunqa.qutils.get\_QPUs
+======================
+
+.. currentmodule:: cunqa.qutils
+
+.. autofunction:: get_QPUs

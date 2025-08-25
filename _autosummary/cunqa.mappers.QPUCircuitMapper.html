@@ -113,7 +113,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.html">cunqa.qutils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.are_qpus_raised.html">cunqa.qutils.are_qpus_raised</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.getQPUs.html">cunqa.qutils.getQPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.infoQPUs.html">cunqa.qutils.infoQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.nodeswithQPUs.html">cunqa.qutils.nodeswithQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a></li>
@@ -207,7 +207,7 @@ with the circuit and the simulation instructions needed for its execution.</p>
 Each assembled circuit is sent to each virtual QPU with the instructions provided on the instatiation of the mapper.
 The method returns the value for the provided function <em>func</em> for the result of each simulation.</p>
 <p>Its use is pretty similar to <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, but not needing to create the <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects ahead:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># creating the mapper with the pre-defined parametric circuit and other simulation instructions.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mapper</span> <span class="o">=</span> <span class="n">QPUCircuitMapper</span><span class="p">(</span><span class="n">qpus</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>

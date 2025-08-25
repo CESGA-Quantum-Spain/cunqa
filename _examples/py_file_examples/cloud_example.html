@@ -113,7 +113,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cunqa.qutils.html">cunqa.qutils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.are_qpus_raised.html">cunqa.qutils.are_qpus_raised</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.getQPUs.html">cunqa.qutils.getQPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.infoQPUs.html">cunqa.qutils.infoQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.nodeswithQPUs.html">cunqa.qutils.nodeswithQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a></li>
@@ -199,7 +199,7 @@
 <span class="linenos"> 3</span><span class="c1"># path to access c++ files</span>
 <span class="linenos"> 4</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
 <span class="linenos"> 5</span>
-<span class="linenos"> 6</span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+<span class="linenos"> 6</span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 <span class="linenos"> 7</span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span>
@@ -208,7 +208,7 @@
 <span class="linenos">12</span><span class="c1"># example: local = False. This allows to look for</span>
 <span class="linenos">13</span><span class="c1"># QPUs out of the node where the work is executing.</span>
 <span class="linenos">14</span><span class="c1"># --------------------------------------------------</span>
-<span class="linenos">15</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos">15</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span>
 <span class="linenos">18</span><span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>

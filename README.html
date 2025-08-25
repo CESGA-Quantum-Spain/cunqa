@@ -111,7 +111,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.qutils.html">cunqa.qutils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.are_qpus_raised.html">cunqa.qutils.are_qpus_raised</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.getQPUs.html">cunqa.qutils.getQPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.infoQPUs.html">cunqa.qutils.infoQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.nodeswithQPUs.html">cunqa.qutils.nodeswithQPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a></li>
@@ -416,7 +416,7 @@ The “noise” key must be filled with a json with noise instructions supported
 </div></blockquote>
 <blockquote>
 <div><p>❗ <strong>Important:</strong>
-Several <code class="docutils literal notranslate"><span class="pre">qraise</span></code> commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The <code class="docutils literal notranslate"><span class="pre">getQPUs()</span></code> method presented in the section below will collect all the raised QPUs.</p>
+Several <code class="docutils literal notranslate"><span class="pre">qraise</span></code> commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The <code class="docutils literal notranslate"><span class="pre">get_QPUs()</span></code> method presented in the section below will collect all the raised QPUs.</p>
 </div></blockquote>
 </section>
 <section id="python-program-example">
@@ -444,9 +444,9 @@ To execute the following python example it is needed  to load the <a class="refe
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">INSTALL_PATH</span><span class="p">)</span>
 
 <span class="c1"># Let&#39;s get the raised QPUs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">getQPUs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 
-<span class="n">qpus</span>  <span class="o">=</span> <span class="n">getQPUs</span><span class="p">()</span> <span class="c1"># List of raised QPUs</span>
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">()</span> <span class="c1"># List of raised QPUs</span>
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, name: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">simulator</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 

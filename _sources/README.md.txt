@@ -197,7 +197,7 @@ The personalized backend has to be a *json* file with the following structure:
 > The "noise" key must be filled with a json with noise instructions supported by the chosen simulator.
 
 > ❗ **Important:**
-> Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `getQPUs()` method presented in the section below will collect all the raised QPUs.
+> Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `get_QPUs()` method presented in the section below will collect all the raised QPUs.
 
 ### 2. Python Program Example
 Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow.
@@ -227,9 +227,9 @@ INSTALL_PATH = os.getenv("INSTALL_PATH")
 sys.path.insert(0, INSTALL_PATH)
 
 # Let's get the raised QPUs
-from cunqa.qutils import getQPUs
+from cunqa.qutils import get_QPUs
 
-qpus  = getQPUs() # List of raised QPUs
+qpus  = get_QPUs() # List of raised QPUs
 for q in qpus:
     print(f"QPU {q.id}, name: {q.backend.name}, backend: {q.backend.simulator}, version: {q.backend.version}.")
 

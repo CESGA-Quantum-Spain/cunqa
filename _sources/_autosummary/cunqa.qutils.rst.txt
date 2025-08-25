@@ -18,7 +18,7 @@ cunqa.qutils
       :nosignatures:
    
       are_qpus_raised
-      getQPUs
+      get_QPUs
       infoQPUs
       nodeswithQPUs
       qdrop
