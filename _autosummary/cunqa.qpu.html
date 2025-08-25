@@ -210,13 +210,12 @@ Through these objects we are able to send circuits and recieve results from simu
 </ul>
 </dd>
 </dl>
-<a class="reference external image-reference" href="none"><img alt="../_images/virtualqpuequal.png" class="align-center" src="../_images/virtualqpuequal.png" style="width: 400px; height: 200px;" />
-</a>
+<p>In order to stablish communication with the server, in the python API <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects are created, each one of them associated with a virtual QPU.</p>
 </section>
 <section id="connecting-to-virtual-qpus">
 <h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
 <p>The submodule <a class="reference internal" href="cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">qutils</span></code></a> gathers functions for obtaining information about the virtual QPUs available;
-among them, the <a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a> function returns a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects with the desired filetering:</p>
+among them, the <a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a> function returns a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects with the desired filtering:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_QPUs</span><span class="p">()</span>
 <span class="go">[&lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;]</span>
