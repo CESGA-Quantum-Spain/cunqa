@@ -201,13 +201,15 @@ Each one has its <code class="xref py py-class docutils literal notranslate"><sp
 Through these objects we are able to send circuits and recieve results from simulations.</p>
 <section id="connecting-to-virtual-qpus">
 <h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
-<p>The submodule <a class="reference internal" href="cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">qutils</span></code></a> gather functions for obtaining information about the virtual QPUs available;
+<p>The submodule <a class="reference internal" href="cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">qutils</span></code></a> gathers functions for obtaining information about the virtual QPUs available;
 among them, the <a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a> function returns a list of <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects with the desired filetering:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_QPUs</span><span class="p">()</span>
 <span class="go">[&lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;]</span>
 </pre></div>
 </div>
+<p>When each <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> is instanciated, the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> is created.
+This <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> is a C++ object that is intended to connect to the server of a virtual QPU in order to stablish communication in both ways.</p>
 </section>
 <h2> Classes </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
