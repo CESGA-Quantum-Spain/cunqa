@@ -32,9 +32,9 @@
     }
    ],
    "source": [
-    "from cunqa import get_QPUs\n",
+    "from cunqa import getQPUs\n",
     "\n",
-    "qpus  = get_QPUs(local=False)\n",
+    "qpus  = getQPUs(local=False)\n",
     "\n",
     "for q in qpus:\n",
     "    print(f\"QPU {q.id}, backend: {q.backend.name}, simulator: {q.backend.simulator}, version: {q.backend.version}.\")\n"
