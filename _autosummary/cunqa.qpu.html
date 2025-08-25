@@ -107,6 +107,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qpu</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html">cunqa.qpu.QPU</a></li>
 </ul>
 </li>
@@ -198,6 +199,11 @@
 <p>These <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects are the python representation of the virtual QPUs deployed.
 Each one has its <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> object that communicates with the server of the corresponding virtual QPU.
 Through these objects we are able to send circuits and recieve results from simulations.</p>
+<section id="connecting-to-virtual-qpus">
+<h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
+<p>The submodule <a class="reference internal" href="cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">qutils</span></code></a> gather functions for obtaining information about the virtual QPUs available;
+among them, the <code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code> function</p>
+</section>
 <h2> Classes </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
