@@ -13,3 +13,7 @@ div.admonition.note > .admonition-title {
 .rst-content .image {
     margin-bottom: 4.2em;
 }
+
+.rst-content img {
+    margin-bottom: 10em;  /* aumenta la separación */
+}
