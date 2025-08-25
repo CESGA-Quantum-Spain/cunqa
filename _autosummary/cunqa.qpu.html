@@ -233,7 +233,9 @@ Other properties and information gathered in the <a class="reference internal" h
 </section>
 <section id="interacting-with-virtual-qpus">
 <h2>Interacting with virtual QPUs<a class="headerlink" href="#interacting-with-virtual-qpus" title="Link to this heading"></a></h2>
-<p>Once we have the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects created, we can start interacting with them.</p>
+<p>Once we have the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects created, we can start interacting with them.
+The most important method of the class is <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QPU.run()</span></code></a>, which allows to send a circuit to the virtual QPU for its simulation,
+returning a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object associated to the quantum task:</p>
 </section>
 <h2> Classes </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
