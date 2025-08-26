@@ -210,6 +210,7 @@ virtual QPUs already deployed:</p>
 <span class="go">[&lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;]</span>
 </pre></div>
 </div>
+<p>The function allows to filter by <cite>family</cite> name or by choosen the virtual QPUs available at the <cite>local</cite> node.</p>
 <p>When each <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> is instanciated, the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> is created.
 Nevertheless, it is not until the first job is submited that the client actually connects to the correspoding server.
 Other properties and information gathered in the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class are shown on its documentation.</p>
@@ -228,8 +229,8 @@ One must provide the neccesary information, analogous to the <code class="docuti
 <span class="go">&#39;&lt;job id&gt;&#39;</span>
 </pre></div>
 </div>
-<p>The function <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> returns a string specifying the id of the <a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM</a> job
-that deploys the QPUs.</p>
+<p>The function <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> returns a string specifying the id of the <a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM</a>
+job that deploys the QPUs.</p>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
