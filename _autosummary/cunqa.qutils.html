@@ -116,6 +116,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qutils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#q-raising-and-q-dropping-at-pyhton">Q-raising and Q-dropping at pyhton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#obtaining-information-about-virtual-qpus">Obtaining information about virtual QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html">cunqa.qutils.are_QPUs_raised</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.info_QPUs.html">cunqa.qutils.info_QPUs</a></li>
@@ -247,6 +248,35 @@ This is because SLURM jobs can only be submmited from login nodes, but not from 
 <p>Even if we did not raise the virtual QPUs by the <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> function, we can still use <a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop()</span></code></a> to cancel them.
 In the same way, if we raise virtual QPUs by the python function, we can still drop them by terminal commands.</p>
 </div>
+</section>
+<section id="obtaining-information-about-virtual-qpus">
+<h2>Obtaining information about virtual QPUs<a class="headerlink" href="#obtaining-information-about-virtual-qpus" title="Link to this heading"></a></h2>
+<p>In some cases we might be interested on checking availability of virtual QPUs or getting information about them, but before creating
+the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects.</p>
+<ul>
+<li><p>To check if certain virtual QPUs are raised, <a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html#cunqa.qutils.are_QPUs_raised" title="cunqa.qutils.are_QPUs_raised"><code class="xref py py-func docutils literal notranslate"><span class="pre">are_QPUs_raised()</span></code></a> should be used:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">are_QPUs_raised</span><span class="p">(</span><span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;my_family_of_QPUs&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</li>
+<li><p>In order to know what nodes have available virtual QPUs deployed:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes_with_QPUs</span><span class="p">()</span>
+<span class="go">[&#39;c7-3&#39;, &#39;c7-4&#39;]</span>
+</pre></div>
+</div>
+</li>
+<li><p>For obtaining information about QPUs in the local node or in other nodes:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">info_QPUs</span><span class="p">(</span><span class="n">local</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go">[{&#39;QPU&#39;:&#39;&lt;id&gt;&#39;,</span>
+<span class="go">  &#39;node&#39;:&#39;&lt;node name&gt;&#39;,</span>
+<span class="go">  &#39;family&#39;:&#39;&lt;family name&gt;&#39;,</span>
+<span class="go">  &#39;backend&#39;:{···}</span>
+<span class="go">  }]</span>
+</pre></div>
+</div>
+</li>
+</ul>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
