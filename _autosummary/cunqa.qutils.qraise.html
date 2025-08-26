@@ -202,21 +202,25 @@
 <dt class="sig sig-object py" id="cunqa.qutils.qraise">
 <span class="sig-prename descclassname"><span class="pre">cunqa.qutils.</span></span><span class="sig-name descname"><span class="pre">qraise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classical_comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantum_comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fakeqmio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cloud</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mem_per_qpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpus_per_node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="headerlink" href="#cunqa.qutils.qraise" title="Link to this definition"></a></dt>
 <dd><p>Raises a virtual QPU and returns the job id associated to its <a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM</a> job.</p>
-<dl>
-<dt>Args</dt><dd><p>n (int): number of QPUs to be raised.
-t (str, format: ‘D-HH:MM:SS’): maximun time that the classical resources will be reserved for the QPU.</p>
-<p>fakeqmio (bool): if True the raised QPUs will have the fakeqmio backend.
-classical_comm (bool): if True the raised QPUs are communicated classically.
-quantum_comm (bool): if True the raised QPUs have quantum communications.
-simulator (str): name of the desired simulator to use. Default is AerSimulator.
-family (str): name to identify the group of QPUs raised on the specific call of the function.
-mode (str): infrastructure type for the raised QPUs:  “hpc” or “cloud”. First one associates QPUs to different nodes.
-cores (str):  number of cores for the SLURM job.
-mem_per_qpu (str): memory to allocate for each QPU, format to use is  “xG”.
-n_nodes (str): number of nodes for the SLURM job.
-node_list (str): option to select specifically on which nodes the simulation job should run.
-qpus_per_node (str): sets the number of QPUs that should be raised on each requested node.
-backend (str): path to a file containing backend information.</p>
+<p>This function allows to raise QPUs from the python API, what can also be done at terminal by <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of QPUs to be raised.</p></li>
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – maximun time that the classical resources will be reserved for the QPU. Format: ‘D-HH:MM:SS’.</p></li>
+<li><p><strong>fakeqmio</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True the raised QPUs will have the fakeqmio backend.</p></li>
+<li><p><strong>classical_comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True the raised QPUs are communicated classically.</p></li>
+<li><p><strong>quantum_comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True the raised QPUs have quantum communications.</p></li>
+<li><p><strong>simulator</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the desired simulator to use. Default is AerSimulator.</p></li>
+<li><p><strong>family</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name to identify the group of QPUs raised on the specific call of the function.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – infrastructure type for the raised QPUs:  “hpc” or “cloud”. First one associates QPUs to different nodes.</p></li>
+<li><p><strong>cores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – number of cores for the SLURM job.</p></li>
+<li><p><strong>mem_per_qpu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – memory to allocate for each QPU, format to use is  “xG”.</p></li>
+<li><p><strong>n_nodes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – number of nodes for the SLURM job.</p></li>
+<li><p><strong>node_list</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – option to select specifically on which nodes the simulation job should run.</p></li>
+<li><p><strong>qpus_per_node</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – sets the number of QPUs that should be raised on each requested node.</p></li>
+<li><p><strong>backend</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to a file containing backend information.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
