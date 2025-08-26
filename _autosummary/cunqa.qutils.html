@@ -203,7 +203,8 @@
 <section id="connecting-to-virtual-qpus">
 <h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
 <p>The most important function of the submodule, and one of the most important of <a class="reference internal" href="cunqa.html#module-cunqa" title="cunqa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code></a> is the <a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a>
-function, since it creates the objects that allow sending circuits to virtual QPUs and receiving the results of the simulations</p>
+function, since it creates the objects that allow sending circuits and receiving the results of the simulations from the
+virtual QPUs already deployed:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_QPUs</span><span class="p">()</span>
 <span class="go">[&lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;]</span>
