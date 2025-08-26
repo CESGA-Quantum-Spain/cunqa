@@ -231,6 +231,11 @@ One must provide the neccesary information, analogous to the <code class="docuti
 </div>
 <p>The function <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> returns a string specifying the id of the <a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM</a>
 job that deploys the QPUs.</p>
+<p>Once we are finished with our work, we should drop the virtual QPUs in order to release classical resources.
+Knowing the <cite>job id</cite> or the <cite>family</cite> name of the group of virtual QPUs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qdrop</span><span class="p">(</span><span class="s1">&#39;&lt;job id&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
