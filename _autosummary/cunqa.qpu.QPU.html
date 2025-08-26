@@ -265,6 +265,15 @@ This communication is stablished trough the <code class="xref py py-attr docutil
 <dd class="field-even"><p>A <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object related to the job sent.</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <cite>transpile</cite> is set <code class="docutils literal notranslate"><span class="pre">False</span></code> and transpilation instructions (<cite>initial_layout</cite>, <cite>opt_level</cite>) are provided, they will be ignored.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Transpilation is the process of translating circuit instructions into the native gates of the destined backend accordingly to the topology of its qubits.
+If this is not done, the simulatior receives the instructions but associates no error, so simulation outcome will not be correct.</p>
+</div>
 </dd></dl>
 
 </section>
