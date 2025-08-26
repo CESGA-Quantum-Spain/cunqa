@@ -217,7 +217,6 @@ Through these objects we are able to send circuits and recieve results from simu
 Each object will have a <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> C++ object through which the communication with the classical resoruces is performed.</p>
 <a class="reference internal image-reference" href="../_images/client-server-comm.png"><img alt="../_images/client-server-comm.png" class="align-center" src="../_images/client-server-comm.png" style="width: 150px; height: 300px;" />
 </a>
-<p>&lt;BLANKLINE&gt;</p>
 </section>
 <section id="connecting-to-virtual-qpus">
 <h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
@@ -240,6 +239,7 @@ returning a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+<span class="go">&lt;cunqa.qjob.QJob object at XXXX&gt;</span>
 </pre></div>
 </div>
 <p>This method takes several arguments for specifications of the simulation such as <code class="docutils literal notranslate"><span class="pre">shots</span></code> or <code class="docutils literal notranslate"><span class="pre">transpilation</span></code>.
