@@ -200,10 +200,11 @@
 <h1>cunqa.qutils.qdrop<a class="headerlink" href="#cunqa-qutils-qdrop" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.qutils.qdrop">
-<span class="sig-prename descclassname"><span class="pre">cunqa.qutils.</span></span><span class="sig-name descname"><span class="pre">qdrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">families</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qutils.qdrop" title="Link to this definition"></a></dt>
-<dd><p>Drops the QPU families corresponding to the the entered QPU objects. By default, all raised QPUs will be dropped.</p>
+<span class="sig-prename descclassname"><span class="pre">cunqa.qutils.</span></span><span class="sig-name descname"><span class="pre">qdrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">families</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qutils.qdrop" title="Link to this definition"></a></dt>
+<dd><p>Drops the virtual QPU families corresponding to the the input family names.
+If no families are provided, all virtual QPUs deployed by the user will be dropped.</p>
 <dl class="simple">
-<dt>Args</dt><dd><p>qpus (tuple(&lt;class cunqa.qpu.QPU&gt;)): list of QPUs to drop. All QPUs that share a qraise will these will drop.</p>
+<dt>Args</dt><dd><p>families (str): family names of the groups of virtual QPUs to be dropped.</p>
 </dd>
 </dl>
 </dd></dl>
