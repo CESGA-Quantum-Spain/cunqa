@@ -201,7 +201,17 @@
 <p>Holds functions to manage and get infomation about the virtual QPUs displayed by the user.</p>
 <section id="q-raising-and-q-dropping-at-pyhton">
 <h2>Q-raising and Q-dropping at pyhton<a class="headerlink" href="#q-raising-and-q-dropping-at-pyhton" title="Link to this heading"></a></h2>
-<p>This submodule allows to raise and drop virtual QPUs, with no need to work in the command line.</p>
+<p>This submodule allows to raise and drop virtual QPUs, with no need to work in the command line.
+One must provide the neccesary information, analogous to the command <code class="docutils literal notranslate"><span class="pre">qraise</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qraise</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="c1"># MANDATORY, number of QPUs to be raised</span>
+<span class="go">           t = &quot;2:00:00&quot;, # MANDATORY, maximum time until they are automatically dropped</span>
+<span class="go">           classical_comm = True, # allow classical communications</span>
+<span class="go">           simulator = &quot;Aer&quot;, # choosing Aer simulator</span>
+<span class="go">           cloud = True, # allowing cloud mode, QPUs can be accessed from any node</span>
+<span class="go">           family = &quot;my_family_of_QPUs&quot; # assigning a name to the group of QPUs</span>
+<span class="go">           )</span>
+</pre></div>
+</div>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
