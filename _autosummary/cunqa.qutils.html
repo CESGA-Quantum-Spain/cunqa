@@ -236,6 +236,17 @@ Knowing the <cite>job id</cite> or the <cite>family</cite> name of the group of 
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qdrop</span><span class="p">(</span><span class="s1">&#39;&lt;job id&gt;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>If no argument is passed to <a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop()</span></code></a>, all QPUs deployed by the user are dropped.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> function can only be used when the python program is being run at a login node, otherwise an error will be raised.
+This is because SLURM jobs can only be submmited from login nodes, but not from compute sessions or running jobs.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even if we did not raise the virtual QPUs by the <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> function, we can still use <a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop()</span></code></a> to cancel them.
+In the same way, if we raise virtual QPUs by the python function, we can still drop them by terminal commands.</p>
+</div>
 </section>
 <h2> Functions </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
