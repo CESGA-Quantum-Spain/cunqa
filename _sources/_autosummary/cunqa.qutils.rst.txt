@@ -19,8 +19,8 @@ cunqa.qutils
    
       are_QPUs_raised
       get_QPUs
-      infoQPUs
-      nodeswithQPUs
+      info_QPUs
+      nodes_with_QPUs
       qdrop
       qraise
    
