@@ -10,3 +10,13 @@ div.admonition.note > .admonition-title {
     font-weight: bold
 }
 
+/* Para todos los contenedores de imágenes de .. image:: */
+.rst-content p.image {
+    margin-bottom: 1.5em !important;  /* espacio extra debajo */
+    display: block;
+}
+
+/* Si usas .. figure:: en vez de .. image:: */
+.rst-content .figure {
+    margin-bottom: 1.5em !important;
+}
