@@ -205,6 +205,13 @@ to manage them.</p>
 <span class="go">&lt;cunqa.result.Result object at XXXX&gt;</span>
 </pre></div>
 </div>
+<p>This object has two main attributes for out interest: the counts distribution from the simulation and the time that the simulation took:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="go">{&#39;000&#39;:34, &#39;111&#39;:66}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+</pre></div>
+</div>
 <h2> Classes </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
@@ -223,7 +230,7 @@ to manage them.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResultError</span></code></a></p></td>
-<td><p>Exception for error during job submission to QPUs.</p></td>
+<td><p>Exception for error received from a simulation.</p></td>
 </tr>
 </tbody>
 </table>
