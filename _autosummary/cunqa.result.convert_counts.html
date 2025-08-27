@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cunqa.qjob.gather &mdash; CUNQA  documentation</title>
+  <title>cunqa.result.convert_counts &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=4ade6078" />
@@ -24,8 +24,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cunqa.qjob.QJob" href="cunqa.qjob.QJob.html" />
-    <link rel="prev" title="cunqa.qjob" href="cunqa.qjob.html" /> 
+    <link rel="next" title="cunqa.result.divide" href="cunqa.result.divide.html" />
+    <link rel="prev" title="cunqa.result" href="cunqa.result.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -100,8 +100,8 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.qjob.gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html">cunqa.qjob.gather</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html">cunqa.qjob.QJob</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a></li>
 </ul>
@@ -121,8 +121,8 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.QRaiseError.html">cunqa.qutils.QRaiseError</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.result.convert_counts.html">cunqa.result.convert_counts</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cunqa.result.html">cunqa.result</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.result.convert_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.result.divide.html">cunqa.result.divide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.result.Result.html">cunqa.result.Result</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.result.ResultError.html">cunqa.result.ResultError</a></li>
@@ -183,10 +183,10 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../cunqa.html">CUNQA Package</a></li>
           <li class="breadcrumb-item"><a href="cunqa.html">cunqa</a></li>
-          <li class="breadcrumb-item"><a href="cunqa.qjob.html">cunqa.qjob</a></li>
-      <li class="breadcrumb-item active">cunqa.qjob.gather</li>
+          <li class="breadcrumb-item"><a href="cunqa.result.html">cunqa.result</a></li>
+      <li class="breadcrumb-item active">cunqa.result.convert_counts</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/cunqa.qjob.gather.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/cunqa.result.convert_counts.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -194,31 +194,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-qjob-gather">
-<h1>cunqa.qjob.gather<a class="headerlink" href="#cunqa-qjob-gather" title="Link to this heading"></a></h1>
+  <section id="cunqa-result-convert-counts">
+<h1>cunqa.result.convert_counts<a class="headerlink" href="#cunqa-result-convert-counts" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="cunqa.qjob.gather">
-<span class="sig-prename descclassname"><span class="pre">cunqa.qjob.</span></span><span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><span class="pre">QJob</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><span class="pre">Result</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.qjob.gather" title="Link to this definition"></a></dt>
-<dd><p>Function to get the results of several <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
-<p>Once the jobs are running:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This is a blocking call, results will be called sequentialy in . Since they are being run simultaneously,
-even if the first one on the list takes the longest, when it finishes the rest would have been done, so
-just the small overhead from calling them will be added.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Since this is mainly a for loop, the order must be respected when submiting jobs to the same virtual QPU.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>qjobs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[</span></code><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a><code class="xref py py-class docutils literal notranslate"><span class="pre">]</span></code>) – list of objects to get the result from.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> objects.</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="cunqa.result.convert_counts">
+<span class="sig-prename descclassname"><span class="pre">cunqa.result.</span></span><span class="sig-name descname"><span class="pre">convert_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#cunqa.result.convert_counts" title="Link to this definition"></a></dt>
+<dd><p>Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the division of the bit strings.</p>
+<section id="args">
+<h2>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h2>
+<p>counts (dict): dictionary of counts to apply the conversion.</p>
+<p>registers (dict): dictionary of classical registers.</p>
+</section>
+<section id="return">
+<h2>Return:<a class="headerlink" href="#return" title="Link to this heading"></a></h2>
+<p>Counts dictionary with keys as binary string correctly separated with spaces accordingly to the classical registers.</p>
+</section>
 </dd></dl>
 
 </section>
@@ -227,8 +217,8 @@ just the small overhead from calling them will be added.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.qjob.html" class="btn btn-neutral float-left" title="cunqa.qjob" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.qjob.QJob.html" class="btn btn-neutral float-right" title="cunqa.qjob.QJob" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.result.html" class="btn btn-neutral float-left" title="cunqa.result" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.result.divide.html" class="btn btn-neutral float-right" title="cunqa.result.divide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -15,7 +15,6 @@ Attributes
    :nosignatures:
 
    ~Result.counts
-   ~Result.density_matrix
    ~Result.result
    ~Result.time_taken
 
