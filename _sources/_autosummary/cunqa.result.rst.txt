@@ -9,17 +9,6 @@ cunqa.result
 
    
    
-   .. raw:: html
-
-      <h2> Functions </h2>
-
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-   
-      convert_counts
-      divide
-   
    
 
    
