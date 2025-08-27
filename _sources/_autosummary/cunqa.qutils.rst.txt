@@ -17,10 +17,10 @@ cunqa.qutils
       :toctree:
       :nosignatures:
    
-      are_QPUs_raised
+      are_qpus_raised
       get_QPUs
-      info_QPUs
-      nodes_with_QPUs
+      infoQPUs
+      nodeswithQPUs
       qdrop
       qraise
    
