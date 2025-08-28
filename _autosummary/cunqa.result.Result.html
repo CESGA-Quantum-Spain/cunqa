@@ -207,10 +207,14 @@
 <p>It has two main attributes:</p>
 <ul>
 <li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.counts</span></code> : returns the distribution of counts from the sampling of the simulation.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<blockquote>
+<div><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
 <span class="go">{&#39;000&#39;:34, &#39;111&#39;:66}</span>
 </pre></div>
 </div>
+<p>If the circuit sent has more than one classical register, bit strings corresponding to each one of them will be separated
+by blank spaces in the order they were added.</p>
+</div></blockquote>
 </li>
 <li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.time_taken</span></code> : the time that the simulation took.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
@@ -222,11 +226,6 @@
 <p>Nevertheless, depending on the simulator used, more output data is provided. For checking all the information from the simulation as a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, one can
 access the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.result</span></code>.</p>
 <p>If an error occurs at the simulation, an exception will be raised at the pyhton program, <a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ResultError</span></code></a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If the circuit sent has more than one classical register, bit strings corresponding to each one of them will be separated
-by blank spaces in the order they were added.</p>
-</div>
 </dd></dl>
 
 <section id="attributes">
