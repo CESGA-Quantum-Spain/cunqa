@@ -202,14 +202,18 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.transpile.transpiler">
 <span class="sig-prename descclassname"><span class="pre">cunqa.transpile.</span></span><span class="sig-name descname"><span class="pre">transpiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.transpile.transpiler" title="Link to this definition"></a></dt>
-<dd><p>Function to transpile a circuit according to a given backend. Circuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.</p>
-<section id="args">
-<h2>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h2>
-<p>circuit (dict, &lt;class ‘qiskit.circuit.quantumcircuit.QuantumCircuit’&gt; or QASM2 str): circuit to be transpiled.</p>
-<p>backend (&lt;class ‘backend.Backend’&gt;): backend which transpilation will be done respect to.</p>
-<p>opt_level (int): optimization level for creating the <cite>qiskit.transpiler.passmanager.StagedPassManager</cite>. Default set to 1.</p>
-<p>initial_layout (list[int]): initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p>
-</section>
+<dd><p>Function to transpile a circuit according to a given <a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>.
+Circuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> | <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – circuit to be transpiled.</p></li>
+<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – backend which transpilation will be done respect to.</p></li>
+<li><p><strong>opt_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optimization level for creating the <cite>qiskit.transpiler.passmanager.StagedPassManager</cite>. Default set to 1.</p></li>
+<li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
