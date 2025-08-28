@@ -204,8 +204,10 @@
 <span class="sig-prename descclassname"><span class="pre">cunqa.transpile.</span></span><span class="sig-name descname"><span class="pre">transpiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.transpile.transpiler" title="Link to this definition"></a></dt>
 <dd><p>Function to transpile a circuit according to a given <a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>.
 The circuit is returned in the same format as it was originaly.</p>
-<p>Transpilation instructions are <cite>opt_level</cite>, goes from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">3</span></code> and the higher the more optimal is the transpilation, default is <code class="docutils literal notranslate"><span class="pre">1</span></code>; <cite>initial_layout</cite>
-specifies the set of &lt;&lt;real&gt;&gt; qubits to which the quantum registers of the circuit are assigned.</p>
+<p>Transpilation instructions are <cite>opt_level</cite>, which defines how optimal is the transpilation, default is <code class="docutils literal notranslate"><span class="pre">1</span></code>; <cite>initial_layout</cite>
+specifies the set of &lt;&lt;real&gt;&gt; qubits to which the quantum registers of the circuit are assigned.
+These instructions are associated to the <a class="reference external" href="https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.transpiler.StagedPassManager">qiskit.transpiler.passmanager.StagedPassManager</a>,
+since it is used in the process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
