@@ -4,4 +4,5 @@
    :template: custom-module-template.rst
    :recursive:
 
-   cunqa
+   CUNQA python API
+   ================
