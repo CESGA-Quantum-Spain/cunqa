@@ -222,6 +222,11 @@
 <p>Nevertheless, depending on the simulator used, more output data is provided. For checking all the information from the simulation as a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, one can
 access the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.result</span></code>.</p>
 <p>If an error occurs at the simulation, an exception will be raised at the pyhton program, <a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ResultError</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the circuit sent has more than one classical register, bit strings corresponding to each one of them will be separated
+by blank spaces in the order they were added.</p>
+</div>
 </dd></dl>
 
 <section id="attributes">
@@ -250,11 +255,14 @@ access the attribute <code class="xref py py-attr docutils literal notranslate">
 <dt class="sig sig-object py" id="cunqa.result.Result.__init__">
 <span class="sig-prename descclassname"><span class="pre">Result.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circ_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.result.Result.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initializes the Result class.</p>
-<section id="args">
-<h3>Args:<a class="headerlink" href="#args" title="Link to this heading"></a></h3>
-<p>result (dict): dictionary given as the result of the simulation.</p>
-<p>registers (dict): in case the circuit has more than one classical register, dictionary for the lengths of the classical registers must be provided.</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – dictionary given as the output of the simulation.</p></li>
+<li><p><strong>registers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – dictionary specifying the classical registers defined for the circuit. This is neccessary for the correct formating of the counts bit strings.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
