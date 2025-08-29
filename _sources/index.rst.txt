@@ -18,10 +18,13 @@ Welcome to CUNQA's documentation!
 
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
    getting_started
+
+.. toctree::
+   :maxdepth: 1
 
    cunqa
 
