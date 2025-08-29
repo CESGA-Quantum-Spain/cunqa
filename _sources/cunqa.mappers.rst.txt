@@ -1,0 +1,47 @@
+﻿cunqa.mappers
+=============
+
+.. automodule:: cunqa.mappers
+
+   
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Functions </h2>
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+      :recursive:
+   
+      run_distributed
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Classes </h2>
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+      :recursive:
+   
+      QJobMapper
+      QPUCircuitMapper
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,8 +1,24 @@
-CUNQA Package
-===================
+CUNQA module
+================
 .. autosummary::
-   :toctree: _autosummary
+   :toctree:
    :template: custom-module-template.rst
    :recursive:
+   
+   cunqa.backend
 
-   cunqa
+   cunqa.circuit
+
+   cunqa.converters
+
+   cunqa.mappers
+
+   cunqa.qjob
+
+   cunqa.qpu
+
+   cunqa.qutils
+
+   cunqa.result
+
+   cunqa.transpile
