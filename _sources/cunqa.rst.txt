@@ -5,7 +5,7 @@ CUNQA python API
    :template: custom-module-template.rst
    :recursive:
    
-   cunqa.backend
+   backend
 
    cunqa.circuit
 

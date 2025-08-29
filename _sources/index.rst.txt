@@ -23,9 +23,6 @@ Welcome to CUNQA's documentation!
 
    getting_started
 
-.. toctree::
-   :maxdepth: 1
-
    cunqa
-
+   
    examples_gallery
