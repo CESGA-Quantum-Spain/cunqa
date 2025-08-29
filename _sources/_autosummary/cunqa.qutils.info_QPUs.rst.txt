@@ -1,0 +1,6 @@
+cunqa.qutils.info\_QPUs
+=======================
+
+.. currentmodule:: cunqa.qutils
+
+.. autofunction:: info_QPUs

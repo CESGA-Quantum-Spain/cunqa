@@ -4,30 +4,21 @@ CUNQA module
    :toctree: _autosummary
    :template: custom-module-template.rst
    :recursive:
-
-.. rubric:: backend
+   
    ~cunqa.backend
 
-.. rubric:: circuit
-   cunqa.circuit
+   ~cunqa.circuit
 
-.. rubric:: converters
-   cunqa.converters
+   ~cunqa.converters
 
-.. rubric:: mappers
-   cunqa.mappers
+   ~cunqa.mappers
 
-.. rubric:: qjob
-   cunqa.qjob
+   ~cunqa.qjob
 
-.. rubric:: qpu
-   cunqa.qpu
+   ~cunqa.qpu
 
-.. rubric:: qutils
-   cunqa.qutils
+   ~cunqa.qutils
 
-.. rubric:: result
-   cunqa.result
+   ~cunqa.result
 
-.. rubric:: transpile
-   cunqa.transpile
+   ~cunqa.transpile
