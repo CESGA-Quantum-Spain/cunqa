@@ -11,7 +11,7 @@ cunqa.backend.Backend
 
 
 Methods
--------
+~~~~~~~
 
 .. automethod:: Backend.__init__
 

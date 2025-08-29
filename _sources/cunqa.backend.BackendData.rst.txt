@@ -9,7 +9,7 @@ cunqa.backend.BackendData
 
 
 Attributes
-----------
+~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -28,7 +28,7 @@ Attributes
 
 
 Methods
--------
+~~~~~~~
 
 .. automethod:: BackendData.__init__
 
