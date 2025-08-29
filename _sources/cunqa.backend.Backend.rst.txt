@@ -1,4 +1,5 @@
 cunqa.backend.Backend
+=====================
 
 .. currentmodule:: cunqa.backend
 
@@ -12,6 +13,7 @@ cunqa.backend.Backend
 Methods
 
 .. automethod:: Backend.__init__
+   :template: custom-method-template.rst
 
 
 
@@ -28,4 +30,5 @@ Methods
 
 
 .. automethod:: Backend.info
+   :template: custom-method-template.rst
 

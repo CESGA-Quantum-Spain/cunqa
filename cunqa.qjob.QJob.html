@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Handling QJobs sent to the same QPU &mdash; CUNQA  documentation</title>
+  <title>cunqa.qjob.QJob &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1544bbb8" />
@@ -77,22 +77,14 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="cunqa.html">CUNQA module</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend.__init__"><code class="docutils literal notranslate"><span class="pre">Backend.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend.info"><code class="docutils literal notranslate"><span class="pre">Backend.info()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html"><code class="docutils literal notranslate"><span class="pre">BackendData</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.__init__"><code class="docutils literal notranslate"><span class="pre">BackendData.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.clear"><code class="docutils literal notranslate"><span class="pre">BackendData.clear()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.copy"><code class="docutils literal notranslate"><span class="pre">BackendData.copy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.fromkeys"><code class="docutils literal notranslate"><span class="pre">BackendData.fromkeys()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.get"><code class="docutils literal notranslate"><span class="pre">BackendData.get()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.items"><code class="docutils literal notranslate"><span class="pre">BackendData.items()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.keys"><code class="docutils literal notranslate"><span class="pre">BackendData.keys()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.pop"><code class="docutils literal notranslate"><span class="pre">BackendData.pop()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.popitem"><code class="docutils literal notranslate"><span class="pre">BackendData.popitem()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.setdefault"><code class="docutils literal notranslate"><span class="pre">BackendData.setdefault()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.update"><code class="docutils literal notranslate"><span class="pre">BackendData.update()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.values"><code class="docutils literal notranslate"><span class="pre">BackendData.values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html">cunqa.backend.Backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData"><code class="docutils literal notranslate"><span class="pre">BackendData</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
@@ -101,60 +93,10 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#references">References:</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.__init__"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.assign_parameters"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.assign_parameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.c_if"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.c_if()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ccx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ccx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ccy"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ccy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ccz"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ccz()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cp"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cp()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.crx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.crx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cry"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cry()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.crz"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.crz()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cswap"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cswap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.csx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.csx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cu"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cu()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cu1"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cu1()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cu3"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cu3()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cy"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.cz"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.cz()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ecr"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ecr()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.from_instructions"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.from_instructions()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.h"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.h()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.id"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.id()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.measure"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.measure()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.measure_all"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.measure_all()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.measure_and_send"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.measure_and_send()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.p"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.p()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.qrecv"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.qrecv()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.qsend"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.qsend()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.r"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.r()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.remote_c_if"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.remote_c_if()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.reset"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.reset()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.rx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rxx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.rxx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ry"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ry()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.ryy"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.ryy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rz"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.rz()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rzx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.rzx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.rzz"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.rzz()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.s"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.s()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.sdg"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.sdg()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.swap"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.swap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.sx"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.sx()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.sxdg"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.sxdg()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.t"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.t()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.tdg"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.tdg()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.u"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.u()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.u1"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.u1()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.u2"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.u2()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.u3"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.u3()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.unitary"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.unitary()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.x"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.x()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.y"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.y()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit.z"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit.z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html#cunqa.circuit.CunqaCircuitError"><code class="docutils literal notranslate"><span class="pre">CunqaCircuitError</span></code></a></li>
 </ul>
@@ -183,12 +125,14 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed"><code class="docutils literal notranslate"><span class="pre">run_distributed()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QJobMapper.html"><code class="docutils literal notranslate"><span class="pre">QJobMapper</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper.__init__"><code class="docutils literal notranslate"><span class="pre">QJobMapper.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper.__call__"><code class="docutils literal notranslate"><span class="pre">QJobMapper.__call__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper.__init__"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper.__call__"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper.__call__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper"><code class="docutils literal notranslate"><span class="pre">QJobMapper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul class="current">
@@ -196,11 +140,10 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html#cunqa.qjob.gather"><code class="docutils literal notranslate"><span class="pre">gather()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">QJob</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cunqa.qjob.QJob.__init__"><code class="docutils literal notranslate"><span class="pre">QJob.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cunqa.qjob.QJob.result"><code class="docutils literal notranslate"><span class="pre">QJob.result()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cunqa.qjob.QJob.submit"><code class="docutils literal notranslate"><span class="pre">QJob.submit()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters"><code class="docutils literal notranslate"><span class="pre">QJob.upgrade_parameters()</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qjob.QJob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.QJob"><code class="docutils literal notranslate"><span class="pre">QJob</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html#cunqa.qjob.QJobError"><code class="docutils literal notranslate"><span class="pre">QJobError</span></code></a></li>
 </ul>
@@ -211,9 +154,10 @@
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#virtual-qpus">Virtual QPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#interacting-with-virtual-qpus">Interacting with virtual QPUs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.QPU.html"><code class="docutils literal notranslate"><span class="pre">QPU</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.__init__"><code class="docutils literal notranslate"><span class="pre">QPU.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run"><code class="docutils literal notranslate"><span class="pre">QPU.run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.QPU.html">cunqa.qpu.QPU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU"><code class="docutils literal notranslate"><span class="pre">QPU</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.qutils.html">cunqa.qutils</a><ul>
@@ -251,8 +195,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.result.html">cunqa.result</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.result.Result.html"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result.__init__"><code class="docutils literal notranslate"><span class="pre">Result.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.Result.html">cunqa.result.Result</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.result.ResultError.html">cunqa.result.ResultError</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError"><code class="docutils literal notranslate"><span class="pre">ResultError</span></code></a></li>
 </ul>
@@ -320,7 +266,7 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="cunqa.html">CUNQA module</a></li>
           <li class="breadcrumb-item"><a href="cunqa.qjob.html">cunqa.qjob</a></li>
-      <li class="breadcrumb-item active">Handling QJobs sent to the same QPU</li>
+      <li class="breadcrumb-item active">cunqa.qjob.QJob</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cunqa.qjob.QJob.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -330,13 +276,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>cunqa.qjob.QJob</p>
+  <section id="cunqa-qjob-qjob">
+<h1>cunqa.qjob.QJob<a class="headerlink" href="#cunqa-qjob-qjob" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.qjob.</span></span><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to handle jobs sent to virtual QPUs.</p>
-<p>A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output of the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.
+<p>A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output of the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code> method.
 The quantum job not only contains the circuit to be simulated, but also simulation instructions and information of the virtual QPU to which the job is sent.</p>
 <p>One would want to save the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> resulting from sending a circuit in a variable.
 Let’s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:</p>
@@ -352,7 +299,7 @@ Let’s say we want to send a circuit to a QPU and get the result and the time t
 <p>Note that the <cite>time_taken</cite> is expressed in seconds. More instructions on obtaining data from <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>
 objects can be found on its documentation.</p>
 <section id="handling-qjobs-sent-to-the-same-qpu">
-<h1>Handling QJobs sent to the same QPU<a class="headerlink" href="#handling-qjobs-sent-to-the-same-qpu" title="Link to this heading"></a></h1>
+<h2>Handling QJobs sent to the same QPU<a class="headerlink" href="#handling-qjobs-sent-to-the-same-qpu" title="Link to this heading"></a></h2>
 <p>Let’s say we are sending two different jobs to the same QPU.
 This would not result on a parallelization, each QPU can only execute one simulation at the time.
 When a virtual QPU recieves a job while simulating one, it would wait in line untill the earlier finishes.
@@ -373,7 +320,7 @@ to the job. A mix up would happen.</p>
 </div>
 </section>
 <section id="handling-qjobs-sent-to-different-qpus">
-<h1>Handling QJobs sent to different QPUs<a class="headerlink" href="#handling-qjobs-sent-to-different-qpus" title="Link to this heading"></a></h1>
+<h2>Handling QJobs sent to different QPUs<a class="headerlink" href="#handling-qjobs-sent-to-different-qpus" title="Link to this heading"></a></h2>
 <p>Here we can have parallelization since we are working with more than one virtual QPU.
 Let’s send two circuits to two different QPUs:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob_1</span> <span class="o">=</span> <span class="n">qpu_1</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit_1</span><span class="p">)</span>
@@ -382,7 +329,7 @@ Let’s send two circuits to two different QPUs:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result_2</span> <span class="o">=</span> <span class="n">qjob_2</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
-<p>This way, when we send the first job, then inmediatly the sencond one is sent, because <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> does not wait
+<p>This way, when we send the first job, then inmediatly the sencond one is sent, because <code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code> does not wait
 for the simulation to finish. In this manner, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
 since jobs are managed by different <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> objects, there can be no mix up.</p>
 <p>In fact, the function <a class="reference internal" href="cunqa.qjob.gather.html#cunqa.qjob.gather" title="cunqa.qjob.gather"><code class="xref py py-func docutils literal notranslate"><span class="pre">gather()</span></code></a> is designed for recieving a list of qjobs and return the results; therefore, let’s say
@@ -404,14 +351,14 @@ be perserved in the list provided.</p>
 </div>
 </section>
 <section id="upgrading-parameters-from-qjobs">
-<h1>Upgrading parameters from QJobs<a class="headerlink" href="#upgrading-parameters-from-qjobs" title="Link to this heading"></a></h1>
+<h2>Upgrading parameters from QJobs<a class="headerlink" href="#upgrading-parameters-from-qjobs" title="Link to this heading"></a></h2>
 <p>In some ocassion, especially working with variational quantum algorithms (VQAs) <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, they need of changing the parameters of the gates in a circuit
 arises. These parameters are optimzied in order to get the circuit to output a result that minimizes a problem. In this minimization process,
 parameters are updated on each iteration (in general).</p>
 <p>Our first thought can be to update the parameters, build a new circuit with them and send
 it to the QPU. Nevertheless, since the next circuit will have the same data but for the value of the parameters in the gates, a lot of information
 is repeated, so <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> has a more efficient and simple way to handle this cases: a method to send to the QPU a list with the new parameters
-to be assigned to the circuit, <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>.</p>
+to be assigned to the circuit, <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code>.</p>
 <p>Let’s see a simple example: creating a parametric circuit and uptading its parameters:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># building the parametric circuit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -433,11 +380,11 @@ some stoping criteria is fulfilled.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Before sending the circuit or upgrading its parameters, the result of the prior job must be called. It can be done manually, so that we can
-save it and obtain its information, or it can be done automatically as in the example above, but be aware that once the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code></a>
+save it and obtain its information, or it can be done automatically as in the example above, but be aware that once the <code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters()</span></code>
 method is called, this result is discarded.</p>
 </div>
 <section id="references">
-<h2>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
@@ -455,7 +402,7 @@ method is called, this result is discarded.</p>
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></p></td>
 <td><p>Result of the job.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_taken</span></code></p></td>
@@ -467,81 +414,7 @@ method is called, this result is discarded.</p>
 </tbody>
 </table>
 <p>Methods</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.__init__">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cunqa.qclient.QClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><span class="pre">Backend</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><span class="pre">CunqaCircuit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">qiskit.QuantumCircuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> class.</p>
-<p>Possible instructions to add as <cite>**run_parameters</cite> can be: <em>shots</em>, <em>method</em>, <em>parameter_binds</em>, <em>meas_level</em>, …
-For further information, check <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run" title="cunqa.qpu.QPU.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>At this point, <em>circuit</em> is asumed to be translated into the native gates of the <em>backend</em>.
-Otherwise, simulation will fail and an error will be returned as the result.
-For further details, checkout <a class="reference internal" href="generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transpile</span></code></a>.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qclient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>) – client linked to the server that listens at the virtual QPU.</p></li>
-<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – gathers necessary information about the simulator.</p></li>
-<li><p><strong>circ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – circuit to be run.</p></li>
-<li><p><strong>**run_parameters</strong> – any other simulation instructions.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.result">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.result" title="Link to this definition"></a></dt>
-<dd><p>Result of the job.
-If no error occured during simulation, a <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object is retured.
-Otherwise, <a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultError</span></code></a> will be raised.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Since to obtain the result the simulation has to be finished, this method is a blocking call,
-which means that the program will be blocked until the <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> has recieved from
-the corresponding server the outcome of the job.
-The result is not sent from the server to the <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> until this method is called.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
-<dd><p>Asynchronous method to submit a job to the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Differently from <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">result()</span></code></a>, this is a non-blocking call.
-Once a job is summited, there is no wait, the python program continues at the same time that
-the corresponding server recieves and simualtes the circuit.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
-<span class="sig-prename descclassname"><span class="pre">QJob.</span></span><span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
-<dd><p>Method to upgrade the parameters in a previously submitted job of parametric circuit.
-By this call, first it is checked weather if the prior simulation’s result was called. If not, it calls it but does not store it, then
-sends the new set of parameters to the server to be reasigned to the circuit and to simulate it.</p>
-<p>This method can be used on a loop, always being careful if we want to save the intermediate results.</p>
-<p>Examples of usage are shown above and on the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html">Examples Gallery</a>.
-Also, this method is used by the class <a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, checkout its documentation for a extensive description.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>In the current version, parameters will be assigned to <strong>ALL</strong> parametric gates in the circuit. This means that if we want to make
-some parameters fixed, it is on our responsibility to pass them correctly and in the correct order in the list.
-If the number of parameters is less than the number of parametric gates in the circuit, an error will occur at the virtual QPU, on
-the other hand, if more parameters are provided, there will only be used up to the number of parametric gates.</p>
-<p>Also, only <em>rx</em>, <em>ry</em> and <em>rz</em> gates are supported for this functionality, that is, they are the only gates considered <em>parametric</em> for this functionality.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int]</span></code>) – list of parameters to assign to the parametrized circuit.</p>
-</dd>
-</dl>
-</dd></dl>
-
+</section>
 
 
            </div>

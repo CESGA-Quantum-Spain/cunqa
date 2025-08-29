@@ -1,4 +1,5 @@
 cunqa.circuit.CunqaCircuit
+==========================
 
 .. currentmodule:: cunqa.circuit
 
@@ -31,6 +32,7 @@ Attributes
 Methods
 
 .. automethod:: CunqaCircuit.__init__
+   :template: custom-method-template.rst
 
 
 
@@ -251,106 +253,158 @@ Methods
 
 
 .. automethod:: CunqaCircuit.assign_parameters
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.c_if
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ccx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ccy
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ccz
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cp
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.crx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cry
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.crz
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cswap
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.csx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cu
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cu1
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cu3
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cy
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.cz
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ecr
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.from_instructions
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.h
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.id
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.measure
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.measure_all
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.measure_and_send
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.p
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.qrecv
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.qsend
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.r
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.remote_c_if
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.reset
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.rx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.rxx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ry
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.ryy
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.rz
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.rzx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.rzz
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.s
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.sdg
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.swap
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.sx
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.sxdg
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.t
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.tdg
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.u
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.u1
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.u2
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.u3
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.unitary
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.x
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.y
+   :template: custom-method-template.rst
 
 .. automethod:: CunqaCircuit.z
+   :template: custom-method-template.rst
 

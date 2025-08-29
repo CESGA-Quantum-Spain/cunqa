@@ -1,4 +1,5 @@
 cunqa.qjob.QJob
+===============
 
 .. currentmodule:: cunqa.qjob
 
@@ -21,11 +22,13 @@ Attributes
 Methods
 
 .. automethod:: QJob.__init__
+   :template: custom-method-template.rst
 
 
 
 
 .. automethod:: QJob.result
+   :template: custom-method-template.rst
 
 
 
@@ -43,6 +46,8 @@ Methods
 
 
 .. automethod:: QJob.submit
+   :template: custom-method-template.rst
 
 .. automethod:: QJob.upgrade_parameters
+   :template: custom-method-template.rst
 

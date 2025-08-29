@@ -1,4 +1,5 @@
 cunqa.mappers.QPUCircuitMapper
+==============================
 
 .. currentmodule:: cunqa.mappers
 
@@ -23,9 +24,11 @@ Attributes
 Methods
 
 .. automethod:: QPUCircuitMapper.__init__
+   :template: custom-method-template.rst
 
 
 .. automethod:: QPUCircuitMapper.__call__
+   :template: custom-method-template.rst
 
 
 
