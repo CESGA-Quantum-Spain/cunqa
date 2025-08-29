@@ -23,9 +23,7 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples gallery" href="examples_gallery.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -73,9 +71,6 @@
 </li>
 </ul>
 </li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CUNQA module</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples_gallery.html">Examples gallery</a><ul>
@@ -134,15 +129,47 @@
              
   <section id="cunqa-module">
 <h1>CUNQA module<a class="headerlink" href="#cunqa-module" title="Link to this heading"></a></h1>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.backend.html#module-cunqa.backend" title="cunqa.backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backend</span></code></a></p></td>
+<td><p>Cointains the class <a class="reference internal" href="_autosummary/cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> which serves as a description of the characteristics of the virtual QPUs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circuit</span></code></a></p></td>
+<td><p>Holds Cunqa's custom circuit class and functions to translate its instructions into other formats for circuit definition.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.converters.html#module-cunqa.converters" title="cunqa.converters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">converters</span></code></a></p></td>
+<td><p>Holds functions for converting circuits into the different formats: <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>, <a class="reference internal" href="_autosummary/cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> and json <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mappers</span></code></a></p></td>
+<td><p>Contains map-like callables to distribute circuits in virtual QPUS, needed when communications among circuits are present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qjob</span></code></a></p></td>
+<td><p>Contains objects that define and manage quantum emulation jobs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qpu</span></code></a></p></td>
+<td><p>Contains the description of the <a class="reference internal" href="_autosummary/cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qutils</span></code></a></p></td>
+<td><p>Holds functions to manage and get infomation about the virtual QPUs displayed by the user.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
+<td><p>Contains the <a class="reference internal" href="_autosummary/cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> class, which gathers the information about the output of a simulations, also other functions to manage them.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpile</span></code></a></p></td>
+<td><p>Holds the <a class="reference internal" href="_autosummary/cunqa.transpile.transpiler.html#cunqa.transpile.transpiler" title="cunqa.transpile.transpiler"><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code></a> function that translates circuit instructions into native instructions that a certain virtual QPU understands.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="examples_gallery.html" class="btn btn-neutral float-right" title="Examples gallery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 
