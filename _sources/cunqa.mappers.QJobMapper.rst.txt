@@ -1,6 +1,3 @@
-cunqa.mappers.QJobMapper
-========================
-
 .. currentmodule:: cunqa.mappers
 
 .. autoclass:: QJobMapper

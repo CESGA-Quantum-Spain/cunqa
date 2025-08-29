@@ -1,6 +1,3 @@
-cunqa.result.Result
-===================
-
 .. currentmodule:: cunqa.result
 
 .. autoclass:: Result

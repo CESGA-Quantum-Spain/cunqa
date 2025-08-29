@@ -1,6 +1,3 @@
-cunqa.qpu.QPU
-=============
-
 .. currentmodule:: cunqa.qpu
 
 .. autoclass:: QPU

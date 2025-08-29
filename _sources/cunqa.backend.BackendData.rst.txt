@@ -1,6 +1,3 @@
-cunqa.backend.BackendData
-=========================
-
 .. currentmodule:: cunqa.backend
 
 .. autoclass:: BackendData
