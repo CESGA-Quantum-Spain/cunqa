@@ -9,7 +9,6 @@ cunqa.mappers.QJobMapper
 
 
 Attributes
-~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -19,7 +18,6 @@ Attributes
 
 
 Methods
-~~~~~~~
 
 .. automethod:: QJobMapper.__init__
 

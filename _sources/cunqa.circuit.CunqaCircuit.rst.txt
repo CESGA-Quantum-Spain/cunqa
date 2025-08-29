@@ -9,7 +9,6 @@ cunqa.circuit.CunqaCircuit
 
 
 Attributes
-~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -31,7 +30,6 @@ Attributes
 
 
 Methods
-~~~~~~~
 
 .. automethod:: CunqaCircuit.__init__
 

@@ -9,7 +9,6 @@ cunqa.qjob.QJob
 
 
 Attributes
-~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -21,7 +20,6 @@ Attributes
 
 
 Methods
-~~~~~~~
 
 .. automethod:: QJob.__init__
 

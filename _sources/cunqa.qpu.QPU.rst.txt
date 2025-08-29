@@ -9,7 +9,6 @@ cunqa.qpu.QPU
 
 
 Attributes
-~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -20,7 +19,6 @@ Attributes
 
 
 Methods
-~~~~~~~
 
 .. automethod:: QPU.__init__
 
