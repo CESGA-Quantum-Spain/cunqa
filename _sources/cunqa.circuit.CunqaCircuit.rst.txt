@@ -1,5 +1,4 @@
 cunqa.circuit.CunqaCircuit
-==========================
 
 .. currentmodule:: cunqa.circuit
 

@@ -1,5 +1,4 @@
 cunqa.result.Result
-===================
 
 .. currentmodule:: cunqa.result
 

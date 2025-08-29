@@ -1,5 +1,4 @@
 cunqa.qpu.QPU
-=============
 
 .. currentmodule:: cunqa.qpu
 

@@ -1,5 +1,4 @@
 cunqa.backend.BackendData
-=========================
 
 .. currentmodule:: cunqa.backend
 

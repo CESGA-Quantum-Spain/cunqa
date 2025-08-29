@@ -1,5 +1,4 @@
 cunqa.mappers.QJobMapper
-========================
 
 .. currentmodule:: cunqa.mappers
 
