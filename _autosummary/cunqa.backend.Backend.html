@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cunqa.qutils.nodes_with_QPUs &mdash; CUNQA  documentation</title>
+  <title>cunqa.backend.Backend &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1544bbb8" />
@@ -24,8 +24,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cunqa.qutils.qdrop" href="cunqa.qutils.qdrop.html" />
-    <link rel="prev" title="cunqa.qutils.info_QPUs" href="cunqa.qutils.info_QPUs.html" /> 
+    <link rel="next" title="cunqa.backend.BackendData" href="cunqa.backend.BackendData.html" />
+    <link rel="prev" title="cunqa.backend" href="cunqa.backend.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -74,10 +74,10 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../cunqa.html"><code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html">cunqa.backend.Backend</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html#methods">Methods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.backend.Backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#methods">Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a><ul>
@@ -171,7 +171,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="reference internal" href="cunqa.qutils.html">cunqa.qutils</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cunqa.qutils.html">cunqa.qutils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.html#q-raising-and-q-dropping-at-pyhton">Q-raising and Q-dropping at pyhton</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.html#obtaining-information-about-virtual-qpus">Obtaining information about virtual QPUs</a></li>
@@ -187,8 +187,8 @@
 <li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.info_QPUs.html#cunqa.qutils.info_QPUs"><code class="docutils literal notranslate"><span class="pre">info_QPUs()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qutils.nodes_with_QPUs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#cunqa.qutils.nodes_with_QPUs"><code class="docutils literal notranslate"><span class="pre">nodes_with_QPUs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html">cunqa.qutils.nodes_with_QPUs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html#cunqa.qutils.nodes_with_QPUs"><code class="docutils literal notranslate"><span class="pre">nodes_with_QPUs()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a><ul>
@@ -276,10 +276,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../cunqa.html"><code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module</a></li>
-          <li class="breadcrumb-item"><a href="cunqa.qutils.html">cunqa.qutils</a></li>
-      <li class="breadcrumb-item active">cunqa.qutils.nodes_with_QPUs</li>
+          <li class="breadcrumb-item"><a href="cunqa.backend.html">cunqa.backend</a></li>
+      <li class="breadcrumb-item active">cunqa.backend.Backend</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/cunqa.qutils.nodes_with_QPUs.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/cunqa.backend.Backend.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -287,27 +287,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-qutils-nodes-with-qpus">
-<h1>cunqa.qutils.nodes_with_QPUs<a class="headerlink" href="#cunqa-qutils-nodes-with-qpus" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="cunqa.qutils.nodes_with_QPUs">
-<span class="sig-prename descclassname"><span class="pre">cunqa.qutils.</span></span><span class="sig-name descname"><span class="pre">nodes_with_QPUs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cunqa.qutils.nodes_with_QPUs" title="Link to this definition"></a></dt>
-<dd><p>Provides information about the nodes in which virtual QPUs are available.</p>
+  <section id="cunqa-backend-backend">
+<h1>cunqa.backend.Backend<a class="headerlink" href="#cunqa-backend-backend" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.backend.Backend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cunqa.backend.</span></span><span class="sig-name descname"><span class="pre">Backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData" title="cunqa.backend.BackendData"><span class="pre">BackendData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.backend.Backend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to define backend information of a virtual QPU.</p>
+</dd></dl>
+
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.backend.Backend.__init__">
+<span class="sig-prename descclassname"><span class="pre">Backend.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData" title="cunqa.backend.BackendData"><span class="pre">BackendData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.backend.Backend.__init__" title="Link to this definition"></a></dt>
+<dd><p>Class constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of the corresponding node names.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>backend_dict</strong> (<a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData" title="cunqa.backend.BackendData"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendData</span></code></a>) – object that contains all the needed information about the backend.</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.backend.Backend.info">
+<span class="sig-prename descclassname"><span class="pre">Backend.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.backend.Backend.info" title="Link to this definition"></a></dt>
+<dd><p>Prints a dictionary with the backend configuration.</p>
+</dd></dl>
+
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.qutils.info_QPUs.html" class="btn btn-neutral float-left" title="cunqa.qutils.info_QPUs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.qutils.qdrop.html" class="btn btn-neutral float-right" title="cunqa.qutils.qdrop" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.backend.html" class="btn btn-neutral float-left" title="cunqa.backend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.backend.BackendData.html" class="btn btn-neutral float-right" title="cunqa.backend.BackendData" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

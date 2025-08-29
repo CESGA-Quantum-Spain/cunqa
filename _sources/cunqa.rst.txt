@@ -1,11 +1,11 @@
-CUNQA python API
+``cunqa`` module
 ================
 .. autosummary::
    :toctree: _autosummary
    :template: custom-module-template.rst
    :recursive:
    
-   backend
+   ~cunqa.backend
 
    cunqa.circuit
 

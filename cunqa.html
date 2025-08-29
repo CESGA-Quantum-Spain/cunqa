@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CUNQA python API &mdash; CUNQA  documentation</title>
+  <title>cunqa module &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1544bbb8" />
@@ -24,7 +24,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cunqa.circuit" href="_autosummary/cunqa.circuit.html" />
+    <link rel="next" title="cunqa.backend" href="_autosummary/cunqa.backend.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" /> 
 </head>
 
@@ -73,7 +73,21 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CUNQA python API</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/cunqa.backend.html">cunqa.backend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.backend.Backend.html">cunqa.backend.Backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.backend.Backend.html#cunqa.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.backend.Backend.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.backend.BackendData.html">cunqa.backend.BackendData</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.backend.BackendData.html#cunqa.backend.BackendData"><code class="docutils literal notranslate"><span class="pre">BackendData</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.backend.BackendData.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/cunqa.backend.BackendData.html#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="_autosummary/cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.circuit.html#building-circuits">Building circuits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a><ul>
@@ -261,7 +275,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">CUNQA python API</li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cunqa.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -271,36 +285,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-python-api">
-<h1>CUNQA python API<a class="headerlink" href="#cunqa-python-api" title="Link to this heading"></a></h1>
+  <section id="cunqa-module">
+<h1><code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module<a class="headerlink" href="#cunqa-module" title="Link to this heading"></a></h1>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.circuit</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.backend.html#module-cunqa.backend" title="cunqa.backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backend</span></code></a></p></td>
+<td><p>Cointains the class <a class="reference internal" href="_autosummary/cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> which serves as a description of the characteristics of the virtual QPUs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.circuit</span></code></a></p></td>
 <td><p>Holds Cunqa's custom circuit class and functions to translate its instructions into other formats for circuit definition.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.converters.html#module-cunqa.converters" title="cunqa.converters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.converters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.converters.html#module-cunqa.converters" title="cunqa.converters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.converters</span></code></a></p></td>
 <td><p>Holds functions for converting circuits into the different formats: <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>, <a class="reference internal" href="_autosummary/cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> and json <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.mappers</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.mappers</span></code></a></p></td>
 <td><p>Contains map-like callables to distribute circuits in virtual QPUS, needed when communications among circuits are present.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a></p></td>
 <td><p>Contains objects that define and manage quantum emulation jobs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a></p></td>
 <td><p>Contains the description of the <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qutils</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.qutils.html#module-cunqa.qutils" title="cunqa.qutils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.qutils</span></code></a></p></td>
 <td><p>Holds functions to manage and get infomation about the virtual QPUs displayed by the user.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.result</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.result</span></code></a></p></td>
 <td><p>Contains the <code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code> class, which gathers the information about the output of a simulations, also other functions to manage them.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.transpile</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/cunqa.transpile.html#module-cunqa.transpile" title="cunqa.transpile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cunqa.transpile</span></code></a></p></td>
 <td><p>Holds the <code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code> function that translates circuit instructions into native instructions that a certain virtual QPU understands.</p></td>
 </tr>
 </tbody>
@@ -312,7 +329,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="_autosummary/cunqa.circuit.html" class="btn btn-neutral float-right" title="cunqa.circuit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="_autosummary/cunqa.backend.html" class="btn btn-neutral float-right" title="cunqa.backend" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
