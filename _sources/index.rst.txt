@@ -25,7 +25,7 @@ Welcome to CUNQA's documentation!
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
    cunqa
 
