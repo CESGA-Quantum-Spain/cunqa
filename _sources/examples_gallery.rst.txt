@@ -1,5 +1,5 @@
 Examples gallery
-================
+====================================
 Click on the following thumbnails to peruse some jupyter notebooks showing how to use **CUNQA**. On other examples you can find simple examples of the **CUNQA** workflow.
 
 .. nbgallery::
