@@ -24,8 +24,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cunqa.result" href="cunqa.result.html" />
-    <link rel="prev" title="cunqa.qpu" href="cunqa.qpu.html" /> 
+    <link rel="next" title="cunqa.qutils.are_QPUs_raised" href="cunqa.qutils.are_QPUs_raised.html" />
+    <link rel="prev" title="cunqa.qpu.QPU" href="cunqa.qpu.QPU.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -76,15 +76,161 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="cunqa.html">CUNQA module</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">cunqa.qutils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.transpile.html">cunqa.transpile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.Backend.html">cunqa.backend.Backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html#cunqa.backend.BackendData"><code class="docutils literal notranslate"><span class="pre">BackendData</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#references">References:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit"><code class="docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html#cunqa.circuit.CunqaCircuitError"><code class="docutils literal notranslate"><span class="pre">CunqaCircuitError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html#cunqa.converters.convert"><code class="docutils literal notranslate"><span class="pre">convert()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.ConvertersError.html#cunqa.converters.ConvertersError"><code class="docutils literal notranslate"><span class="pre">ConvertersError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#qjobmapper">QJobMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#qpucircuitmapper">QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed"><code class="docutils literal notranslate"><span class="pre">run_distributed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper"><code class="docutils literal notranslate"><span class="pre">QJobMapper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.gather.html">cunqa.qjob.gather</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html#cunqa.qjob.gather"><code class="docutils literal notranslate"><span class="pre">gather()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.QJob.html">cunqa.qjob.QJob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob"><code class="docutils literal notranslate"><span class="pre">QJob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html#cunqa.qjob.QJobError"><code class="docutils literal notranslate"><span class="pre">QJobError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#virtual-qpus">Virtual QPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html#interacting-with-virtual-qpus">Interacting with virtual QPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.QPU.html">cunqa.qpu.QPU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU"><code class="docutils literal notranslate"><span class="pre">QPU</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">cunqa.qutils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#q-raising-and-q-dropping-at-pyhton">Q-raising and Q-dropping at pyhton</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#obtaining-information-about-virtual-qpus">Obtaining information about virtual QPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html">cunqa.qutils.are_QPUs_raised</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html#cunqa.qutils.are_QPUs_raised"><code class="docutils literal notranslate"><span class="pre">are_QPUs_raised()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs"><code class="docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.info_QPUs.html">cunqa.qutils.info_QPUs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.info_QPUs.html#cunqa.qutils.info_QPUs"><code class="docutils literal notranslate"><span class="pre">info_QPUs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html">cunqa.qutils.nodes_with_QPUs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html#cunqa.qutils.nodes_with_QPUs"><code class="docutils literal notranslate"><span class="pre">nodes_with_QPUs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop"><code class="docutils literal notranslate"><span class="pre">qdrop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.qraise.html">cunqa.qutils.qraise</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise"><code class="docutils literal notranslate"><span class="pre">qraise()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.QRaiseError.html">cunqa.qutils.QRaiseError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.QRaiseError.html#cunqa.qutils.QRaiseError"><code class="docutils literal notranslate"><span class="pre">QRaiseError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.result.html">cunqa.result</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.Result.html">cunqa.result.Result</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.Result.html#attributes">Attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.Result.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.ResultError.html">cunqa.result.ResultError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError"><code class="docutils literal notranslate"><span class="pre">ResultError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.transpile.html">cunqa.transpile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.transpile.transpiler.html">cunqa.transpile.transpiler</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.transpile.transpiler.html#cunqa.transpile.transpiler"><code class="docutils literal notranslate"><span class="pre">transpiler()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.transpile.TranspileError.html">cunqa.transpile.TranspileError</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.transpile.TranspileError.html#cunqa.transpile.TranspileError"><code class="docutils literal notranslate"><span class="pre">TranspileError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -144,16 +290,131 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-qutils">
-<h1>cunqa.qutils<a class="headerlink" href="#cunqa-qutils" title="Link to this heading"></a></h1>
+  <section id="module-cunqa.qutils">
+<span id="cunqa-qutils"></span><h1>cunqa.qutils<a class="headerlink" href="#module-cunqa.qutils" title="Link to this heading"></a></h1>
+<p>Holds functions to manage and get infomation about the virtual QPUs displayed by the user.</p>
+<section id="connecting-to-virtual-qpus">
+<h2>Connecting to virtual QPUs<a class="headerlink" href="#connecting-to-virtual-qpus" title="Link to this heading"></a></h2>
+<p>The most important function of the submodule, and one of the most important of <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> is the <a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs()</span></code></a>
+function, since it creates the objects that allow sending circuits and receiving the results of the simulations from the
+virtual QPUs already deployed:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_QPUs</span><span class="p">()</span>
+<span class="go">[&lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;, &lt;cunqa.qpu.QPU object at XXXX&gt;]</span>
+</pre></div>
+</div>
+<p>The function allows to filter by <cite>family</cite> name or by choosing the virtual QPUs available at the <cite>local</cite> node.</p>
+<p>When each <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> is instanciated, the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> is created.
+Nevertheless, it is not until the first job is submited that the client actually connects to the correspoding server.
+Other properties and information gathered in the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class are shown on its documentation.</p>
+</section>
+<section id="q-raising-and-q-dropping-at-pyhton">
+<h2>Q-raising and Q-dropping at pyhton<a class="headerlink" href="#q-raising-and-q-dropping-at-pyhton" title="Link to this heading"></a></h2>
+<p>This submodule allows to raise and drop virtual QPUs, with no need to work in the command line.
+One must provide the neccesary information, analogous to the <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qraise</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="c1"># MANDATORY, number of QPUs to be raised</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;2:00:00&quot;</span><span class="p">,</span> <span class="c1"># MANDATORY, maximum time until they are automatically dropped</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">classical_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># allow classical communications</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="c1"># choosing Aer simulator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">cloud</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># allowing cloud mode, QPUs can be accessed from any node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">family</span> <span class="o">=</span> <span class="s2">&quot;my_family_of_QPUs&quot;</span> <span class="c1"># assigning a name to the group of QPUs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="p">)</span>
+<span class="go">&#39;&lt;job id&gt;&#39;</span>
+</pre></div>
+</div>
+<p>The function <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> returns a string specifying the id of the <a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM</a>
+job that deploys the QPUs.</p>
+<p>Once we are finished with our work, we should drop the virtual QPUs in order to release classical resources.
+Knowing the <cite>job id</cite> or the <cite>family</cite> name of the group of virtual QPUs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qdrop</span><span class="p">(</span><span class="s1">&#39;&lt;job id&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If no argument is passed to <a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop()</span></code></a>, all QPUs deployed by the user are dropped.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> function can only be used when the python program is being run at a login node, otherwise an error will be raised.
+This is because SLURM jobs can only be submmited from login nodes, but not from compute sessions or running jobs.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even if we did not raise the virtual QPUs by the <a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise()</span></code></a> function, we can still use <a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop()</span></code></a> to cancel them.
+In the same way, if we raise virtual QPUs by the python function, we can still drop them by terminal commands.</p>
+</div>
+</section>
+<section id="obtaining-information-about-virtual-qpus">
+<h2>Obtaining information about virtual QPUs<a class="headerlink" href="#obtaining-information-about-virtual-qpus" title="Link to this heading"></a></h2>
+<p>In some cases we might be interested on checking availability of virtual QPUs or getting information about them, but before creating
+the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects.</p>
+<ul>
+<li><p>To check if certain virtual QPUs are raised, <a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html#cunqa.qutils.are_QPUs_raised" title="cunqa.qutils.are_QPUs_raised"><code class="xref py py-func docutils literal notranslate"><span class="pre">are_QPUs_raised()</span></code></a> should be used:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">are_QPUs_raised</span><span class="p">(</span><span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;my_family_of_QPUs&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</li>
+<li><p>In order to know what nodes have available virtual QPUs deployed:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes_with_QPUs</span><span class="p">()</span>
+<span class="go">[&#39;c7-3&#39;, &#39;c7-4&#39;]</span>
+</pre></div>
+</div>
+</li>
+<li><p>For obtaining information about QPUs in the local node or in other nodes:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">info_QPUs</span><span class="p">(</span><span class="n">local</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go">[{&#39;QPU&#39;:&#39;&lt;id&gt;&#39;,</span>
+<span class="go">  &#39;node&#39;:&#39;&lt;node name&gt;&#39;,</span>
+<span class="go">  &#39;family&#39;:&#39;&lt;family name&gt;&#39;,</span>
+<span class="go">  &#39;backend&#39;:{···}</span>
+<span class="go">  }]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<h2> Functions </h2><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html#cunqa.qutils.are_QPUs_raised" title="cunqa.qutils.are_QPUs_raised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">are_QPUs_raised</span></code></a></p></td>
+<td><p>Checks availability of QPUs, filtering by <cite>family</cite> if desired.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.qutils.get_QPUs.html#cunqa.qutils.get_QPUs" title="cunqa.qutils.get_QPUs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_QPUs</span></code></a></p></td>
+<td><p>Returns <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the virtual QPUs raised by the user.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.qutils.info_QPUs.html#cunqa.qutils.info_QPUs" title="cunqa.qutils.info_QPUs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info_QPUs</span></code></a></p></td>
+<td><p>Provides information about the virtual QPUs available either in the local node, an specific node or globally.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html#cunqa.qutils.nodes_with_QPUs" title="cunqa.qutils.nodes_with_QPUs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nodes_with_QPUs</span></code></a></p></td>
+<td><p>Provides information about the nodes in which virtual QPUs are available.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.qutils.qdrop.html#cunqa.qutils.qdrop" title="cunqa.qutils.qdrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qdrop</span></code></a></p></td>
+<td><p>Drops the virtual QPU families corresponding to the the input family names.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.qutils.qraise.html#cunqa.qutils.qraise" title="cunqa.qutils.qraise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qraise</span></code></a></p></td>
+<td><p>Raises virtual QPUs and returns the job id associated to its SLURM job.</p></td>
+</tr>
+</tbody>
+</table>
+<h2> Exceptions </h2><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.qutils.QRaiseError.html#cunqa.qutils.QRaiseError" title="cunqa.qutils.QRaiseError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QRaiseError</span></code></a></p></td>
+<td><p>Exception for errors during qraise slurm command.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cunqa.qpu.html" class="btn btn-neutral float-left" title="cunqa.qpu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.result.html" class="btn btn-neutral float-right" title="cunqa.result" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.qpu.QPU.html" class="btn btn-neutral float-left" title="cunqa.qpu.QPU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.qutils.are_QPUs_raised.html" class="btn btn-neutral float-right" title="cunqa.qutils.are_QPUs_raised" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

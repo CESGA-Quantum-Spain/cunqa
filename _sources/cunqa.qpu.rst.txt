@@ -2,7 +2,6 @@
 =========
 
 .. automodule:: cunqa.qpu
-   :recursive:
 
    
    

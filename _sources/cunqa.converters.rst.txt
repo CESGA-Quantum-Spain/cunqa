@@ -2,7 +2,6 @@
 ================
 
 .. automodule:: cunqa.converters
-   :recursive:
 
    
    
