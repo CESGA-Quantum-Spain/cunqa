@@ -1,4 +1,4 @@
-``cunqa`` module
+CUNQA module
 ================
 .. autosummary::
    :toctree: _autosummary
