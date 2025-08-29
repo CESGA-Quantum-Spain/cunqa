@@ -1,6 +1,0 @@
-cunqa.transpile.TranspileError
-==============================
-
-.. currentmodule:: cunqa.transpile
-
-.. autoexception:: TranspileError

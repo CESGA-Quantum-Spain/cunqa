@@ -1,6 +1,0 @@
-cunqa.mappers.run\_distributed
-==============================
-
-.. currentmodule:: cunqa.mappers
-
-.. autofunction:: run_distributed
