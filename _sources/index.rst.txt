@@ -26,9 +26,11 @@ Welcome to CUNQA's documentation!
 
 .. toctree::
    :maxdepth: 3
+
    cunqa
 
 
 .. toctree::
    :maxdepth: 2
+   
    examples_gallery
