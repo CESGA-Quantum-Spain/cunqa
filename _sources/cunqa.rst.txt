@@ -2,6 +2,7 @@ CUNQA module
 ================
 .. autosummary::
    :toctree: _autosummary
+   :maxdepth: 2
    :template: custom-module-template.rst
    :recursive:
    
