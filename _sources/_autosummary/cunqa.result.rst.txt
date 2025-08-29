@@ -1,4 +1,4 @@
-cunqa.result
+﻿cunqa.result
 ============
 
 .. automodule:: cunqa.result

@@ -1,4 +1,4 @@
-cunqa.qjob
+﻿cunqa.qjob
 ==========
 
 .. automodule:: cunqa.qjob

@@ -1,4 +1,4 @@
-cunqa.qutils
+﻿cunqa.qutils
 ============
 
 .. automodule:: cunqa.qutils

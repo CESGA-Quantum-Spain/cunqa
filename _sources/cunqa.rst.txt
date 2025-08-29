@@ -2,23 +2,23 @@ CUNQA module
 ================
 .. autosummary::
    :toctree: _autosummary
-   :template: cunqa-module-template.rst
+   :template: custom-module-template.rst
    :recursive:
    
-   .. automodule:: {{ fullname }}
+   cunqa.backend
 
-   {% block modules %}
-   {% if modules %}
-   .. raw:: html
+   cunqa.circuit
 
-      <h2> {{ _('Modules') }} </h2>
+   cunqa.converters
 
-   .. autosummary::
-      :toctree:
-      :template: custom-module-template.rst
-      :recursive:
-   {% for item in modules %}
-      {{ item }}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
+   cunqa.mappers
+
+   cunqa.qjob
+
+   cunqa.qpu
+
+   cunqa.qutils
+
+   cunqa.result
+
+   cunqa.transpile
