@@ -1,3 +1,5 @@
+cunqa.circuit.CunqaCircuit
+
 .. currentmodule:: cunqa.circuit
 
 .. autoclass:: CunqaCircuit

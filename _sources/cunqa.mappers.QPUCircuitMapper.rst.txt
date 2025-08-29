@@ -1,3 +1,5 @@
+cunqa.mappers.QPUCircuitMapper
+
 .. currentmodule:: cunqa.mappers
 
 .. autoclass:: QPUCircuitMapper

@@ -1,3 +1,5 @@
+cunqa.qjob.QJob
+
 .. currentmodule:: cunqa.qjob
 
 .. autoclass:: QJob
