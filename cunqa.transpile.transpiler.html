@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Module Index &mdash; CUNQA  documentation</title>
+  <title>cunqa.transpile.transpiler &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1544bbb8" />
@@ -22,10 +23,7 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
- 
-
-
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -122,8 +120,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Python Module Index</li>
+      <li class="breadcrumb-item active">cunqa.transpile.transpiler</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cunqa.transpile.transpiler.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -131,69 +130,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
+  <section id="cunqa-transpile-transpiler">
+<h1>cunqa.transpile.transpiler<a class="headerlink" href="#cunqa-transpile-transpiler" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.transpile.transpiler">
+<span class="sig-prename descclassname"><span class="pre">cunqa.transpile.</span></span><span class="sig-name descname"><span class="pre">transpiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.transpile.transpiler" title="Link to this definition"></a></dt>
+<dd><p>Function to transpile a circuit according to a given <a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>.
+The circuit is returned in the same format as it was originaly.</p>
+<p>Transpilation instructions are <cite>opt_level</cite>, which defines how optimal is the transpilation, default is <code class="docutils literal notranslate"><span class="pre">1</span></code>; <cite>initial_layout</cite>
+specifies the set of “real” qubits to which the quantum registers of the circuit are assigned.
+These instructions are associated to the <a class="reference external" href="https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.transpiler.StagedPassManager">qiskit.transpiler.passmanager.StagedPassManager</a>,
+since it is used in the process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> | <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – circuit to be transpiled.</p></li>
+<li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – backend which transpilation will be done respect to.</p></li>
+<li><p><strong>opt_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optimization level for creating the <cite>qiskit.transpiler.passmanager.StagedPassManager</cite>. Default set to 1.</p></li>
+<li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-c"><strong>c</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-c"><td></td><td>
-       <strong>c</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <code class="xref">cunqa</code></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.backend.html#module-cunqa.backend"><code class="xref">cunqa.backend</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.circuit.html#module-cunqa.circuit"><code class="xref">cunqa.circuit</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.converters.html#module-cunqa.converters"><code class="xref">cunqa.converters</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.mappers.html#module-cunqa.mappers"><code class="xref">cunqa.mappers</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qjob.html#module-cunqa.qjob"><code class="xref">cunqa.qjob</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qpu.html#module-cunqa.qpu"><code class="xref">cunqa.qpu</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qutils.html#module-cunqa.qutils"><code class="xref">cunqa.qutils</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.result.html#module-cunqa.result"><code class="xref">cunqa.result</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="generated/cunqa.transpile.html#module-cunqa.transpile"><code class="xref">cunqa.transpile</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+</section>
 
 
            </div>

@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Module Index &mdash; CUNQA  documentation</title>
+  <title>cunqa.result &mdash; CUNQA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1544bbb8" />
@@ -22,10 +23,7 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
- 
-
-
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -122,8 +120,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Python Module Index</li>
+      <li class="breadcrumb-item active">cunqa.result</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cunqa.result.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -131,69 +130,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-c"><strong>c</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-c"><td></td><td>
-       <strong>c</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <code class="xref">cunqa</code></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.backend.html#module-cunqa.backend"><code class="xref">cunqa.backend</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.circuit.html#module-cunqa.circuit"><code class="xref">cunqa.circuit</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.converters.html#module-cunqa.converters"><code class="xref">cunqa.converters</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.mappers.html#module-cunqa.mappers"><code class="xref">cunqa.mappers</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qjob.html#module-cunqa.qjob"><code class="xref">cunqa.qjob</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qpu.html#module-cunqa.qpu"><code class="xref">cunqa.qpu</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.qutils.html#module-cunqa.qutils"><code class="xref">cunqa.qutils</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="cunqa.result.html#module-cunqa.result"><code class="xref">cunqa.result</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="generated/cunqa.transpile.html#module-cunqa.transpile"><code class="xref">cunqa.transpile</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <section id="module-cunqa.result">
+<span id="cunqa-result"></span><h1>cunqa.result<a class="headerlink" href="#module-cunqa.result" title="Link to this heading"></a></h1>
+<p>Contains the <a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> class, which gathers the information about the output of a simulations, also other functions
+to manage them.</p>
+<p>Once we have submmited a <a class="reference internal" href="cunqa.qjob.QJob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>, for obtaining its results we call for its propperty <code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="go">&lt;cunqa.result.Result object at XXXX&gt;</span>
+</pre></div>
+</div>
+<p>This object has two main attributes for out interest: the counts distribution from the simulation and the time that the simulation took in seconds:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="go">{&#39;000&#39;:34, &#39;111&#39;:66}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="go">0.056</span>
+</pre></div>
+</div>
+<h2> Classes </h2><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.result.Result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Result</span></code></a></p></td>
+<td><p>Class to describe the result of a simulation.</p></td>
+</tr>
+</tbody>
+</table>
+<h2> Exceptions </h2><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.result.ResultError.html#cunqa.result.ResultError" title="cunqa.result.ResultError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResultError</span></code></a></p></td>
+<td><p>Exception for error received from a simulation.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 
 
            </div>
