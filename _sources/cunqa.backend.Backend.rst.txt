@@ -1,0 +1,33 @@
+cunqa.backend.Backend
+=====================
+
+.. currentmodule:: cunqa.backend
+
+.. autoclass:: Backend
+   :show-inheritance:
+
+
+
+
+
+Methods
+~~~~~~~
+
+.. automethod:: Backend.__init__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. automethod:: Backend.info
+
