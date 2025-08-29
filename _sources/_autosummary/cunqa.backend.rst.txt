@@ -1,4 +1,4 @@
-﻿cunqa.backend
+cunqa.backend
 =============
 
 .. automodule:: cunqa.backend

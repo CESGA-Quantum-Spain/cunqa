@@ -23,7 +23,9 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cunqa.result.ResultError" href="cunqa.result.ResultError.html" />
+    <link rel="prev" title="cunqa.result" href="cunqa.result.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -67,6 +69,75 @@
 <li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qraise-command">1. <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../getting_started.html#python-program-example">2. Python Program Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../getting_started.html#qdrop-command">3. <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cunqa.html">CUNQA module</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cunqa.html">cunqa</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.backend.html">cunqa.backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.Backend.html">cunqa.backend.Backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#submitting-circuits-with-classical-or-quantum-communications">Submitting circuits with classical or quantum communications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.html#mapping-circuits-to-virtual-qpus-in-optimization-problems">Mapping circuits to virtual QPUs in optimization problems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.run_distributed.html">cunqa.mappers.run_distributed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QJobMapper.html">cunqa.mappers.QJobMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.mappers.QPUCircuitMapper.html">cunqa.mappers.QPUCircuitMapper</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.gather.html">cunqa.qjob.gather</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJob.html">cunqa.qjob.QJob</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qjob.QJobError.html">cunqa.qjob.QJobError</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#virtual-qpus">Virtual QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.html#interacting-with-virtual-qpus">Interacting with virtual QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qpu.QPU.html">cunqa.qpu.QPU</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qutils.html">cunqa.qutils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.html#connecting-to-virtual-qpus">Connecting to virtual QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.html#q-raising-and-q-dropping-at-pyhton">Q-raising and Q-dropping at pyhton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.html#obtaining-information-about-virtual-qpus">Obtaining information about virtual QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.are_QPUs_raised.html">cunqa.qutils.are_QPUs_raised</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.get_QPUs.html">cunqa.qutils.get_QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.info_QPUs.html">cunqa.qutils.info_QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.nodes_with_QPUs.html">cunqa.qutils.nodes_with_QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.qdrop.html">cunqa.qutils.qdrop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.qraise.html">cunqa.qutils.qraise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.qutils.QRaiseError.html">cunqa.qutils.QRaiseError</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="cunqa.result.html">cunqa.result</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cunqa.result.Result</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.result.ResultError.html">cunqa.result.ResultError</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.transpile.html">cunqa.transpile</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.transpile.transpiler.html">cunqa.transpile.transpiler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cunqa.transpile.TranspileError.html">cunqa.transpile.TranspileError</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -117,6 +188,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cunqa.html">CUNQA module</a></li>
+          <li class="breadcrumb-item"><a href="cunqa.html">cunqa</a></li>
+          <li class="breadcrumb-item"><a href="cunqa.result.html">cunqa.result</a></li>
       <li class="breadcrumb-item active">cunqa.result.Result</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/_autosummary/cunqa.result.Result.rst.txt" rel="nofollow"> View page source</a>
@@ -208,7 +282,10 @@ access the attribute <code class="xref py py-attr docutils literal notranslate">
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cunqa.result.html" class="btn btn-neutral float-left" title="cunqa.result" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.result.ResultError.html" class="btn btn-neutral float-right" title="cunqa.result.ResultError" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

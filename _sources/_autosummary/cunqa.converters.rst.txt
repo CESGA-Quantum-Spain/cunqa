@@ -1,4 +1,4 @@
-﻿cunqa.converters
+cunqa.converters
 ================
 
 .. automodule:: cunqa.converters

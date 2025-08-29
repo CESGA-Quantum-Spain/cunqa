@@ -27,31 +27,7 @@ Welcome to CUNQA's documentation!
 .. toctree::
    :maxdepth: 1
 
-   CUNQA module
-   ================
-   .. autosummary::
-      :toctree: _autosummary
-      :template: custom-module-template.rst
-      :recursive:
-      
-      ~cunqa.backend
-
-      ~cunqa.circuit
-
-      ~cunqa.converters
-
-      ~cunqa.mappers
-
-      ~cunqa.qjob
-
-      ~cunqa.qpu
-
-      ~cunqa.qutils
-
-      ~cunqa.result
-
-      ~cunqa.transpile
-   
+   cunqa
 
 
 .. toctree::

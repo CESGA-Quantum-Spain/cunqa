@@ -1,4 +1,4 @@
-﻿cunqa.transpile
+cunqa.transpile
 ===============
 
 .. automodule:: cunqa.transpile
