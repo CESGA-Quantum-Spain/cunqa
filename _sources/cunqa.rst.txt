@@ -3,6 +3,7 @@ CUNQA module
 .. autosummary::
    :toctree:
    :template: custom-module-template.rst
+   :recursive:
    
    cunqa.backend
 
