@@ -9,6 +9,7 @@ cunqa.result.Result
 
 
 Attributes
+~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -20,9 +21,9 @@ Attributes
 
 
 Methods
+~~~~~~~
 
 .. automethod:: Result.__init__
-   :template: custom-method-template.rst
 
 
 

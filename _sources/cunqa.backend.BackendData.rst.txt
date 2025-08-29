@@ -9,6 +9,7 @@ cunqa.backend.BackendData
 
 
 Attributes
+~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -27,9 +28,9 @@ Attributes
 
 
 Methods
+~~~~~~~
 
 .. automethod:: BackendData.__init__
-   :template: custom-method-template.rst
 
 
 
@@ -86,35 +87,24 @@ Methods
 
 
 .. automethod:: BackendData.clear
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.copy
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.fromkeys
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.get
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.items
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.keys
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.pop
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.popitem
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.setdefault
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.update
-   :template: custom-method-template.rst
 
 .. automethod:: BackendData.values
-   :template: custom-method-template.rst
 

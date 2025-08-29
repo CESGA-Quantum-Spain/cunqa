@@ -9,6 +9,7 @@ cunqa.qpu.QPU
 
 
 Attributes
+~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -19,9 +20,9 @@ Attributes
 
 
 Methods
+~~~~~~~
 
 .. automethod:: QPU.__init__
-   :template: custom-method-template.rst
 
 
 
@@ -38,5 +39,4 @@ Methods
 
 
 .. automethod:: QPU.run
-   :template: custom-method-template.rst
 

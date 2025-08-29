@@ -9,6 +9,7 @@ cunqa.mappers.QPUCircuitMapper
 
 
 Attributes
+~~~~~~~~~~
 
 .. autosummary::
    :nosignatures:
@@ -22,13 +23,12 @@ Attributes
 
 
 Methods
+~~~~~~~
 
 .. automethod:: QPUCircuitMapper.__init__
-   :template: custom-method-template.rst
 
 
 .. automethod:: QPUCircuitMapper.__call__
-   :template: custom-method-template.rst
 
 
 
