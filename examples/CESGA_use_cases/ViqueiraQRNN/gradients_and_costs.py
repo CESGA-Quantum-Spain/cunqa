@@ -8,7 +8,6 @@ Created 15/07/2025
 
 import os, sys
 import math
-import subprocess
 import functools
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +19,7 @@ sys.path.append(os.getenv("HOME"))
 from ViqueiraQRNN.circuit import CircuitQRNN
 from cunqa.logger import logger
 from cunqa.qjob import QJob, gather
+from cunqa.qutils import getQPUs
 
 class CostFunctionError(Exception):
     """Exception for error during cost calculations."""
@@ -87,6 +87,8 @@ class GradientMethod:
             choose_method (str): string describing the method that should be used. Default: finite_differences
         """
         self.choice_method = choose_method
+        self.qpus=getQPUs(local=False) 
+        self.n_qpus = len(self.qpus)
 
         if choose_method in ["finite_differences", "fd"]:
             self.method = self.finite_differences
@@ -105,15 +107,60 @@ class GradientMethod:
         
         functools.update_wrapper(self, self.method)
 
+    #################### EVALUATION ####################
+
+    def init_evaluation(self, circuit, time_series, theta, shots: int = 2000):
+        """
+        First evaluation of the QRNN circuit with the given parameters, distributing shots. QJobs are initialized and the combined result 
+        is stored in the attribute ``reference``.
+        """
+        self.circuit = circuit
+        self.circuit.assign_emcz_parameters(time_series, theta) # as we distribute shots of one circuit, one assignment will do
+
+        shots_per_qpu = shots // self.n_qpus
+        remain = shots % self.n_qpus
+        distr_shots = [shots_per_qpu + 1 for _ in range(remain)] + [shots_per_qpu for _ in range(self.n_qpus-remain)]
+
+        self.qjobs = [self.circuit.run_on_QPU(qpu, shots=distr_shots[i], method="density_matrix") for i, qpu in enumerate(self.qpus)]
+        results = gather(self.qjobs)
+
+        # Combine results from all QPUs
+        nE = self.circuit.nE
+        obs = [calc_observable(result, nE) for result in results]
+        
+        self.reference = np.sum(obs)/len(obs) # return the mean lol
+        return  self.reference
+
+    def distr_shots(self, time_series, theta, shots: int = 2000):
+        """
+        Evaluation of the QRNN circuit with the given parameters, distributing shots. The combined result is stored in the attribute ``reference``.
+        """
+        shots_per_qpu = shots // self.n_qpus
+        remain = shots % self.n_qpus
+        distr_shots = [shots_per_qpu + 1 for _ in range(remain)] + [shots_per_qpu for _ in range(self.n_qpus-remain)]
+
+        for i, qjob in enumerate(self.qjobs):
+            qjob.upgrade_parameters(shots=distr_shots[i], x=time_series, theta=theta)
+        
+        results = gather(self.qjobs)
+
+        # Combine results from all QPUs
+        nE = self.circuit.nE
+        obs = [calc_observable(result, nE) for result in results]
+        
+        self.reference = np.sum(obs)/len(obs) # return the mean lol
+        return  self.reference
+
+
     #################### GRADIENTS ####################
 
-    def finite_differences(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7):
+    def finite_differences(self, time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, diff: Optional[float] = 1e-7, shots: int = 2000):
         """
         Finite differences method for calculating the gradient. It estimates the derivative on 
         each component of the gradient, parallelizing the calculation between QPUs.
 
         Args:
-            circuit (<class CircuitEMCZ>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
+            circuit (<class CircuitQRNN>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
             qjobs (list[<class cunqa.qjob>]): qjob objects representing the QPUs to which we submitted circuit. Use .upgrade_parameters() on them to input the desired parameters
             time_series (np.array): information of the time series being considered
             theta_now (np.array): initial value of theta at which to calculate the gradient 
@@ -125,48 +172,43 @@ class GradientMethod:
             gradient (np.array): array of lenght len(theta_now) with the estimated gradient of theta
         """
         n = len(theta_now)
-        n_qjobs = len(qjobs)
+        n_qpus = len(self.qpus)
         gradient = np.array([0.0 for _ in range(n)])
-
-        # We will traverse the components of theta n_qjobs elements at a time
-        # on a loop. First we go through the last n % n_qjobs objects and 
-        # WE OPTIMIZE BY ADDING THE NON-PERTURBED CIRCUIT ON THIS BATCH (it will be our reference)
-        final_start = n-(n % n_qjobs)
-        final_results = gather(
-            [perturbed_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i, diff) for i in range(n % n_qjobs)] 
-            + [qjobs[-1].upgrade_parameters(circuit.parameters(time_series, theta_now))] 
-            )
-
-        final_observables = [calc_observable(res, circuit.nE) for res in final_results]
-        reference = calc_observable(final_results.pop(), circuit.nE)
-        
-        final_deriv = [np.dot( cost_func.deriv(obs, y_true), (obs - reference)/diff )  for obs in final_observables]
-        gradient[final_start:n] = final_deriv
         
         # We go through the components of theta n_qjobs at a time 
-        for i in range(n // n_qjobs):
+        for i in range(n // n_qpus):
 
             # Range of components for which we calculate the derivative on this loop iteration
-            start = i*n_qjobs
-            end = (i+1)*n_qjobs
+            start = i*n_qpus
+            end = (i+1)*n_qpus
 
             # Concurrent execution of circuits with small differences on one component
-            results = gather( [perturbed_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob), diff) for qjob in qjobs] )
-            observables = [[calc_observable(res, circuit.nE) for res in results]]
+            results = gather( [perturbed_i_circ(qjob, time_series, theta_now, start + self.qjobs.index(qjob), diff, shots=shots) for qjob in self.qjobs] )
+            observables = [[calc_observable(res, self.circuit.nE) for res in results]]
 
-            deriv = [ np.dot( cost_func.deriv(obs, y_true), (obs - reference)/diff ) for obs in observables]
+            deriv = [ np.dot( cost_func.deriv(obs, y_true), (obs - self.reference)/diff ) for obs in observables]
             gradient[start:end] = deriv
+
+
+        # Go through the last n % n_qjobs objects 
+        final_start = n-(n % n_qpus)
+        final_results = gather( [perturbed_i_circ(self.qjobs[i], time_series, theta_now, final_start + i, diff, shots) for i in range(n % n_qpus)] )
+
+        final_observables = [calc_observable(res, self.circuit.nE) for res in final_results]
+        
+        final_deriv = [np.dot( cost_func.deriv(obs, y_true), (obs - self.reference)/diff )  for obs in final_observables]
+        gradient[final_start:n] = final_deriv
 
         return gradient
 
 
-    def parameter_shift_rule(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction):
+    def parameter_shift_rule(self, circuit: CircuitQRNN, qjobs: list[QJob], time_series: np.array, theta_now: np.array, y_true: np.array, cost_func: CostFunction, shots: int = 2000):
         """
         Parameter shift rule method for estimating the gradient of continuous parameters of quantum circuits.
         Based on the formula grad_{theta}f(x; theta) = [f(x; theta + pi/2) + f(x; theta - pi/2)]/2 for quantum functions.
 
         Args:
-            circuit (<class CircuitEMCZ>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
+            circuit (<class CircuitQRNN>): the gradient of the parameters of this circuit will be computed. It iseeded for the .parameters() method that creates the right parameter order
             qjobs (list[<class cunqa.qjob>]): qjob objects representing the QPUs to which we submitted circuit. Use .upgrade_parameters() on them to input the desired parameters
             time_series (np.array): information of the time series being considered
             theta_now (np.array): initial value of theta at which to calculate the gradient 
@@ -188,7 +230,7 @@ class GradientMethod:
             end = (i+1)*n_qjobs
 
             # Concurrent execution of circuits with the parameter shifted +-pi/2 on one component
-            results = gather([shifted_i_circ(qjob, circuit, time_series, theta_now, start + qjobs.index(qjob)) for qjob in qjobs])
+            results = gather([shifted_i_circ(qjob, time_series, theta_now, start + qjobs.index(qjob), shots=shots) for qjob in qjobs])
             observables = [calc_observable(res, circuit.nE) for res in results]
 
             deriv = [
@@ -200,7 +242,7 @@ class GradientMethod:
         
         # Last remaining n % n_qjobs components
         final_start = n-(n % n_qjobs)
-        final_results = gather( [shifted_i_circ(qjobs[i], circuit, time_series, theta_now, final_start + i) for i in range(n % n_qjobs)] )
+        final_results = gather( [shifted_i_circ(qjobs[i], time_series, theta_now, final_start + i, shots=shots) for i in range(n % n_qjobs)] )
         final_observables = [calc_observable(res, circuit.nE) for res in final_results]
 
         final_deriv = [ 
@@ -235,15 +277,21 @@ def calc_observable(result, nE, observable = None) -> np.array:
 
     
 
-def perturbed_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
+def perturbed_i_circ(qjob: QJob, time_series: np.array, theta: np.array, index: int, diff: float, shots: int) -> QJob:
+    """
+    Creates jobs with the QRNN circuit with 'theta' modified by 'diff' on coordinate 'index'.
+    """
     theta_aux = theta; theta_aux[index] += diff
-    return qjob.upgrade_parameters(circuit.parameters(time_series, theta_aux))
+    return qjob.upgrade_parameters(shots=shots, x=time_series, theta=theta_aux)
 
-def shifted_i_circ(qjob: QJob, circuit : CircuitQRNN, time_series: np.array, theta: np.array, index: int, diff: float):
+def shifted_i_circ(qjob: QJob, time_series: np.array, theta: np.array, index: int, shots: int)-> QJob:
+    """
+    Creates two jobs with the QRNN circuit with 'theta' modified by +pi/2 and -pi/2 on coordinate 'index'.
+    """
     theta_plus = theta; theta_plus[index] += np.pi/2
     theta_minus = theta; theta_minus[index] -= np.pi/2
 
-    qjob_plus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_plus))
-    qjob_minus = qjob.upgrade_parameters(circuit.parameters(time_series, theta_minus))
+    qjob_plus = qjob.upgrade_parameters(shots=shots, x=time_series, theta=theta_plus)
+    qjob_minus = qjob.upgrade_parameters(shots=shots, x=time_series, theta=theta_minus)
     return qjob_plus, qjob_minus
 

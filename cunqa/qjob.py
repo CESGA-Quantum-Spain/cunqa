@@ -283,7 +283,7 @@ class QJob:
                 logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
                 raise QJobError # I capture the error in QPU.run() when creating the job
             
-    def upgrade_parameters(self, parameters: list[Union[float, int]] = [], **marked_params: dict[str, Union[list[Union[float. int]], float, int]]) -> None:
+    def upgrade_parameters(self, parameters: list[Union[float, int]] = None, shots: int = None, **marked_params: dict[str, Union[list[Union[float, int]], float, int]]) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
         By this call, first it is checked weather if the prior simulation's result was called. If not, it calls it but does not store it, then
@@ -306,7 +306,7 @@ class QJob:
             parameters (list[float | int]): list of parameters to assign to the parametrized circuit.
             marked_params (dict[list, float, int]): used to indicate the value that should be given to the marked Parameters
         """
-        if not hasattr(self, "_param_instructions"):
+        if not hasattr(self, "current_params"):
             logger.error(f"Trying to upgrade parameters of a non-parametric circuit.")
             raise SystemExit
 
@@ -317,16 +317,21 @@ class QJob:
             # Process entries ############
             if len(marked_params)>0:
                 try:
-                    if len(parameters)>0:
-                        marked_params["no_name"] = parameters
+                    if parameters is not None:
+                        logger.warning("Additional labelled parameters were given, parameter list will be ignored. If you really desire to change the fixed parameters include them under the name no_name")
+                    #     marked_params["no_name"] = parameters
 
                     pre_message = self._current_params 
                     for index, label in enumerate(self._param_instructions):
                         if label in marked_params:
                             if isinstance(marked_params[label], (int, float)):
                                 pre_message[index] = marked_params[label]
+                                self._current_params[index] = marked_params[label]
+
                             elif isinstance(marked_params[label], list):
-                                pre_message[index] = marked_params[label].pop(0) # This is not too fast
+                                next_value = marked_params[label].pop(0) # This is not too fast
+                                pre_message[index] = next_value
+                                self._current_params[index] = next_value
 
                     if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
                         logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}.")
@@ -335,7 +340,7 @@ class QJob:
                     logger.error(f"Error while substituting the marked parameters, check that the correct number of parameters was given. Error: {error}")
                     raise SystemExit
                 
-            elif len(parameters)>0:
+            elif parameters is not None:
                 if all(isinstance(param, (int, float)) for param in parameters):  # Check if all elements are real numbers
                     premessage = parameters
                     
@@ -351,9 +356,12 @@ class QJob:
             logger.error(f"Invalid parameter type, list was expected but {type(parameters)} was given. [{TypeError.__name__}].")
             raise SystemExit # User's level            
         
+        if shots is None:
+            shots = self._execution_config["config"]["shots"]
+
         # Format message and send parameters to C++ ###########
         try:
-            message = """{{"params":{} }}""".format(premessage).replace("'", '"')
+            message = """{{"params":{}, "shots": {} }}""".format(premessage, shots).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
 
         except Exception as error:

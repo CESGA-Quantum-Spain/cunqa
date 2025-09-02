@@ -15,7 +15,7 @@ from typing import  Union, Any, Optional
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.circuit import CunqaCircuit, _is_parametric
+from cunqa.circuit import CunqaCircuit
 from ViqueiraQRNN.ansatz import AnsatzQRNN, EMCZ2, EMCZ3
 from cunqa.logger import logger
 from cunqa.qpu import QPU
@@ -27,7 +27,7 @@ class CircuitQRNNError(Exception):
     pass
 
 class CircuitQRNN:
-    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, ansatz: AnsatzQRNN = EMCZ2, init_state_mem: CunqaCircuit = None):
+    def __init__(self, nE: int, nM: int, nT: int, repeat_encode: int, repeat_evolution: int, ansatz: AnsatzQRNN, init_state_mem: CunqaCircuit = None):
         """
         Class to manage a QRNN circuit. This circuit modifies a time series 
         to obtain another time series after executing. The default ansatz is the one from the 
@@ -57,11 +57,11 @@ class CircuitQRNN:
         # Determine which ansatz to use on the circuit
         if ansatz == EMCZ2:
             self.ansatz_object = EMCZ2(nE, nM, repeat_encode, repeat_evolution)
-            self.ansatz = self.ansatz_object._get_full_circuit()
+            self.ansatz = self.ansatz_object.get_full_circuit()
 
         elif (ansatz == "EMCZ3" or ansatz == EMCZ3):
             self.ansatz_object = EMCZ3(nE, nM, repeat_encode, repeat_evolution)
-            self.ansatz = self.ansatz_object._get_full_circuit()
+            self.ansatz = self.ansatz_object.get_full_circuit()
 
         else:
             if not all([ansatz.nE == self.nE, ansatz.nM == self.nM, ansatz._repeat_encode == self._repeat_encode, ansatz._repeat_evolution == self._repeat_evolution]):
@@ -69,7 +69,7 @@ class CircuitQRNN:
                 raise CircuitQRNNError
             
             self.ansatz_object = ansatz
-            self.ansatz = self.ansatz_object._get_full_circuit()
+            self.ansatz = self.ansatz_object.get_full_circuit()
 
 
         # If we have an intial state for the memory register, add it here
@@ -99,7 +99,7 @@ class CircuitQRNN:
             self.circuit.reset([i for i in range(nE)]) 
     
         
-    def parameters(self, new_x: np.array, new_theta: np.array) -> list[Union[float, int]]:
+    def assign_emcz_parameters(self, new_x: np.array, new_theta: np.array) -> list[Union[float, int]]:
         """
         Method for combining the data from the time series and the theta parameters to update the circuit.
 
@@ -120,13 +120,13 @@ class CircuitQRNN:
         
         all_params = []
         for t in self.nT:
-            all_params += self.ansatz.total_order_params(x=new_x[t, :], theta=new_theta)
+            all_params += self.ansatz_object.total_order_params(repeat=["x"], x=new_x[t, :], theta=new_theta)
 
-        return all_params
+        self.circuit.assign_parameters(all_params)
 
         
 
-    def run_on_QPU(self, QPU: QPU, **run_parameters: Any) -> QJob:
+    def run_on_QPU(self, qpu: QPU, **run_parameters: Any) -> QJob:
         """
         Method for running the EMC circuit on a selected QPU. 
 
@@ -138,7 +138,7 @@ class CircuitQRNN:
             (class cunqa.QJob): object with the quantum simulation job. Results can be obtained doing QJob.result
         """
         try:
-            qjob = QPU.run(self, **run_parameters)
+            qjob = qpu.run(self.circuit, **run_parameters)
 
         except Exception as e:
             logger.error(f"Error while running the EMCZ circuit on a QPU:\n {e}")

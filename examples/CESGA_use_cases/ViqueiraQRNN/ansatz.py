@@ -17,147 +17,55 @@ from typing import  Union, Any, Optional
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.circuit import CunqaCircuit, _is_parametric
+from cunqa.circuit import CunqaCircuit
 from cunqa.logger import logger
 
 class AnsatzQRNNError(Exception):
     """Exception for error during QRNN ansatz creation."""
     pass
 
-# The following wrapper for CunqaCircuit is not as elegant as i would like. I'll maybe integrate this functionality on cunqa to avoid it
-def parametric_wrapper(cls_inst):
+
+
+def order_parameters(self, **args):
     """
-    Class decorator to provide abstract Parameter functionality for parametric gates.
-    It records the order of parametric gates, marks which of the entries where abstract parameters to be filled - which are identified with
-    the parameter = "name_str" keyword argument - , fills those positions with 0. placeholders, and gives the correct order to feed to
-    qjob.upgrade_parameters in order to correctly bind the values to the parameter.
+    Method to order new parameter values to assign to a circuit. Needed to easily handle the parameter input on the repeated encoder and evolver
+    without having to manually repeat the values to assign.
+
+    Args:
+        marked_params (dict[list | float | int]): dict with keys the labels of the variable parameters and associated values 
+        the new parameters to assign to them. The values are entered with the syntax theta_1 = 3.14, theta_2 = [2, 7], theta_3 = 9
     """
-    # Store the input parameters in order, wether they are concrete values or abstract parameters
-    cls_inst.param_instructions = []
-    
-    # Go through class methods, extract the ones for parametric gates and add abstract parameter functionality
-    for name, method in cls_inst.__dict__.items():
-        if callable(method):
-            try:
-                signature = inspect.signature(method)
-                inputs = list(signature.parameters.keys()) 
+    ordered_params = self.current_params # Copy current params and only modify the given ones
+    labels = self.param_labels
 
-                if (("qubit" in inputs or "qubits" in inputs) and _is_parametric( {"instructions":[{"name": name}]})):
-                    # Create a wrapper for each parametric method
-                    def remembering_wrapper(parametric_method):
-                        def wrapper(*args, label: str = "NoName", **kwargs):
-
-                            cls_inst.param_instructions.append(label) # save the name of the parameter
-
-                            # Ensure all necessary parameter keys are provided and if not, put zeros on them
-                            missing_args = {}
-                            if not len(inputs) == len(args)+len(kwargs): 
-                                inputs.remove("self")
-                                if "qubit" in inputs:
-                                    inputs.remove("qubit")
-                                else:
-                                    inputs.remove("qubits")
-                                for arg in inputs.remove(1,-1): # remove self and qubits
-                                    missing_args[arg]=float("Infinity")
-
-                            return parametric_method(*args, **missing_args, **kwargs)
-                        return wrapper
-                    
-                    # Replace the method with the wrapped version
-                    setattr(cls_inst, name, remembering_wrapper(method))
-                
-            except Exception as error:
-                logger.error(f"Error while inspecting method arguments and creating wrapper.")
+    for index, label in enumerate(labels):
+        if label in args:
+            if isinstance(args[label], (int, float)):
+                ordered_params[index]=args[label]
+            elif isinstance(args[label], list):
+                ordered_params[index]=args[label].pop(0)
+            else:
+                logger.error(f"Parameters must be list[int, float], int or float but {type(args[label])} was given.")
                 raise SystemExit
-
-    # Extend the "from_instructions" method to ensure abstract parameters work with any input method
-    def extended_from_instructions(self, instructions):
-        single_param = ['u1', 'p', 'rx', 'ry', 'rz', 'rxx', 'ryy', 'rzz', 'rzx', 'crx', 'cry', 'crz', 'cp', 'cu1']
-        two_params = ['u2', 'r']
-        three_params = ['u', 'u3', 'cu3']
-        four_params = ['cu']
-
-        for instruction in instructions:
-
-            if _is_parametric(instruction):
-                if "label" in instruction:
-                    # Add zero parameters as placeholders to later apply upgrade_parameters
-                    if instruction["name"] in  single_param: # one param
-                        cls_inst.param_instructions.append(instruction["label"])
-                        if not "param" in instruction:
-                            instruction["param"] = 0.
-
-                    if instruction["name"] in two_params: # two params: theta, phi
-                        cls_inst.param_instructions + [instruction["label"], instruction["label"]]
-                        if not "theta" in instruction:
-                            instruction["theta"] = 0.
-                        if not "phi" in instruction:
-                            instruction["phi"] = 0.
-
-                    if instruction["name"] in three_params: # three params: theta, phi, lam
-                        cls_inst.param_instructions + [instruction["label"], instruction["label"], instruction["label"]]
-                        if not "theta" in instruction:
-                            instruction["theta"] = 0.
-                        if not "phi" in instruction:
-                            instruction["phi"] = 0.
-                        if not "lam" in instruction:
-                            instruction["lam"] = 0.
-
-                    if instruction["name"] in four_params: # four params: theta, phi, lam, gamma
-                        cls_inst.param_instructions + [instruction["label"], instruction["label"], instruction["label"], instruction["label"]]
-                        if not "theta" in instruction:
-                            instruction["theta"] = 0.
-                        if not "phi" in instruction:
-                            instruction["phi"] = 0.
-                        if not "lam" in instruction:
-                            instruction["lam"] = 0.
-                        if not "gamma" in instruction:
-                            instruction["gamma"] = 0.
-
-                    del instruction["label"]
-
-                else: # Record non-abstract parameters to preserve their values when upgrading the abstract ones
-                    if instruction["name"] in single_param:
-                        cls_inst.param_instructions + [instruction["param"]]
-                    if instruction["name"] in two_params:
-                        cls_inst.param_instructions + [instruction["theta"], instruction["phi"]]
-                    if instruction["name"] in three_params:
-                        cls_inst.param_instructions + [instruction["theta"], instruction["phi"], instruction["lam"]]
-                    if instruction["name"] in four_params:
-                        cls_inst.param_instructions + [instruction["theta"], instruction["phi"], instruction["lam"], instruction["gamma"]]
                 
-            self._add_instruction(instruction)
-        return self
-     
-    # Create methods to extract information about the parameters and obtain their correct order
-    def order_parameters(self, **args: dict[Union[int, float]]):
-        ordered_params = self.param_instructions
-        for arg, value in args.items():
-            for index, name in enumerate(self.param_instructions):
-                ordered_params[index] = value[index] if arg == name else ordered_params[index]
-        
-        return ordered_params
+    if not all([len(value)==0 for value in args.values() if isinstance(value, list)]):
+            logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[k for k, v in args.items() if isinstance(v, list) and len(v)!=0]}. \n Use circuit.param_info to obtain the names and numbers of the variable parameters.")
     
-    def lenght_parameters(self, *args):
-        parameters = self.param_instructions
-        lenghts = {arg: 0 for arg in args}
+    return ordered_params
 
-        for param in parameters:
-            if param in lenghts:
-                lenghts[param] += 1
-
-        return lenghts
-
-    # Assign new methods to the wrapped class
-    cls_inst.order_parameters = order_parameters
-    cls_inst.lenght_parameters = lenght_parameters
-    cls_inst.from_instructions = extended_from_instructions
-    
-    return cls_inst
+CunqaCircuit.order_parameters = order_parameters
 
 
 
 class AnsatzQRNN:
+    """
+    Class to define ansatzes with the QRNN structure. Conceptually these ansatzes are divided into the Encoding and the Evolution part. 
+    In our implementation both of these blocks are divided in two parts ''encoder + final_encoding'' and ''evolver + final_evolution''. 
+    The reason is that the ''encoder'' and the ''evolver'' will be repeated 'repeat_encode' and 'repeat_evolution' times, respectively, 
+    without having to write it out explicitly.
+
+    The full circuit can then be obtained using :py:meth:`ViqueiraQRNN.ansatz.get_full_circuit`.
+    """
     def __init__(self, nE, nM, repeat_encode, repeat_evolution, name="ansatz"):
 
         self.nE = nE
@@ -165,10 +73,10 @@ class AnsatzQRNN:
         self._repeat_encode = repeat_encode
         self._repeat_evolution = repeat_evolution
 
-        self._encoder = parametric_wrapper(CunqaCircuit)(nE)
-        self._final_encoding = parametric_wrapper(CunqaCircuit)(nE)
-        self._evolver = parametric_wrapper(CunqaCircuit)(nE + nM)
-        self._final_evolution = parametric_wrapper(CunqaCircuit)(nE)
+        self._encoder = CunqaCircuit(nE)
+        self._final_encoding = CunqaCircuit(nE)
+        self._evolver = CunqaCircuit(nE + nM)
+        self._final_evolution = CunqaCircuit(nE)
 
         self.name = name
 
@@ -194,12 +102,6 @@ class AnsatzQRNN:
             logger.error(f"The provided encoder doesn't match the number of qubits of the Exchange/Environment register: provided has {circuit.num_qubits}, which is different from {self.nE}.")
             raise AnsatzQRNNError
         else:
-            try:
-                circuit.param_instructions
-            except:
-                logger.error(f"The encoder provided doesn't support the abstract parameter functionalities. Try creating it through the Ansatz QRNN class.")
-                raise AnsatzQRNNError
-        
             self._encoder = circuit
 
     @final_encoding.setter
@@ -208,12 +110,6 @@ class AnsatzQRNN:
             logger.error(f"The provided final_encoding doesn't match the number of qubits of the Exchange/Environment register: provided has {circuit.num_qubits}, which is different from {self.nE}.")
             raise AnsatzQRNNError
         else:
-            try:
-                circuit.param_instructions
-            except:
-                logger.error(f"The final_encoding provided doesn't support the abstract parameter functionalities. Try creating it through the Ansatz QRNN class.")
-                raise AnsatzQRNNError
-        
             self._final_encoding = circuit
 
     @evolver.setter
@@ -221,13 +117,7 @@ class AnsatzQRNN:
         if not (circuit.num_qubits == (self.nE + self.nM)):
             logger.error(f"The provided evolver doesn't match the number of qubits of the ansatz: provided has {circuit.num_qubits}, which is different from {self.nE + self.nM}.")
             raise AnsatzQRNNError
-        else:
-            try:
-                circuit.param_instructions
-            except:
-                logger.error(f"The evolver provided doesn't support the abstract parameter functionalities. Try creating it through the Ansatz QRNN class.")
-                raise AnsatzQRNNError
-        
+        else:       
             self._evolver = circuit  
 
     @final_evolution.setter
@@ -236,12 +126,6 @@ class AnsatzQRNN:
             logger.error(f"The provided final_evolution doesn't match the number of qubits of the Exchange/Environment register: provided has {circuit.num_qubits}, which is different from {self.nE}.")
             raise AnsatzQRNNError
         else:
-            try:
-                circuit.param_instructions
-            except:
-                logger.error(f"The final_evolution provided doesn't support the abstract parameter functionalities. Try creating it through the Ansatz QRNN class.")
-                raise AnsatzQRNNError
-        
             self._final_evolution = circuit  
 
     def get_full_circuit(self):
@@ -249,9 +133,9 @@ class AnsatzQRNN:
         Combines all blocks (appropriately repeated) to generate the full ansatz.
 
         Returns:
-            self.full_circuit ( parametric_wrapper(CunqaCircuit) ): circuit (with abstract parameter functionalities) describing the whole ansatz.
+            self.full_circuit (CunqaCircuit): (nE+nM)-qubit circuit describing the whole ansatz.
         """
-        self.full_circ = parametric_wrapper(CunqaCircuit)(self.nE + self.nM)
+        self.full_circ = CunqaCircuit(self.nE + self.nM)
 
         for _ in range(self._repeat_encode):
             self.full_circ.from_instructions(self._encoder.instructions)
@@ -264,30 +148,83 @@ class AnsatzQRNN:
         self.full_circ.from_instructions(self._final_evolution.instructions)
 
         return self.full_circ
-
-    def total_order_params(self, recompile = False, **params: dict[str, Union[int, float, list[Union[int, float]]]]) -> list[Union[int, float]]:
+    
+    def total_order_params(self, repeat: list[str] = [], **args):
         """
-        Finds the occurences of the parameters on the full circuit and returns the input values on the
-        appropriate order so that upgrade_parameters places the values on the correct gates.
+        Order the given parameters follwoing the way they appear on the circuit.
 
         Args:
-            recompile (bool): lets the function know if the full circuit should be calculated again
-            **params (dict): any parameters to be input, using keyword arguments with the format
-                             label1 = value1, label2 = [value2_a, value2_b]
+            repeat (list[str]): list of names of parameters that stay the same on all the repeated encoding and evolution blocks
+            args (dict[float | int | list[float | int]]): name of the parameter with the associated new values to order
 
-        Return:
-            (list[float, int]): ordered values to be placed on the parametric gates
+        Returns:
+            total_ordered_params (list): the full list of ordered parameters
         """
-        if hasattr(self, "full_circ"):
-            if recompile:
-                self.get_full_circuit()
-            return self.full_circ.order_parameters(params)
-        else:
-            self.get_full_circuit()
-            return self.full_circ.order_parameters(params)
-            
+        # Need to know how to distribute the arguments between the encoding, 
+        # final_encoding, evolution and final_evolution blocks
+        len_encoder  = self.encoder.param_info(args.keys())
+        len_fencoder = self.final_encoding.param_info(args.keys())
+        len_evolver  = self.evolver.param_info(args.keys())
+        len_fevolver = self.final_evolution.param_info(args.keys())
+        args_encoder = {}
+        args_fencode = {}
+        args_evolver = {}
+        args_fevolve = {}
+
+        for arg, value in args.items():
+            if isinstance(value, list):
+                if arg in repeat:
+
+                    arg_lenght_circ = len_encoder[arg] + len_fencoder[arg] + len_evolver[arg] + len_fevolver[arg]
+                    if (isinstance(value, list) and not (arg_lenght_circ == len(value))):
+                        logger.error(f"Mismatch between number of values for parameter {arg}: {len(value)} values were provided, but the circuit has {arg_lenght_circ} values.")
+                        raise AnsatzQRNNError
+                    
+                    args_encoder[arg] =    self._repeat_encode * value[ : len_encoder[arg]  ]
+                    args_fencode[arg] =                          value[ : len_fencoder[arg] ]
+                    args_evolver[arg] = self._repeat_evolution * value[ : len_evolver[arg]  ]
+                    args_fevolve[arg] =                          value[ : len_fevolver[arg] ]
+
+                else:
+                    arg_lenght_circ = (len_encoder[arg] * self._repeat_encode) + len_fencoder[arg] + (len_evolver[arg] * self._repeat_evolution) + len_fevolver[arg]
+                    if not (arg_lenght_circ == len(value)):
+                        logger.error(f"Mismatch between number of values for parameter {arg}: {len(value)} values were provided, but the circuit has {arg_lenght_circ} values.")
+                        raise AnsatzQRNNError
+                    
+                    args_encoder[arg] = value[                                                                                                            : (len_encoder[arg] * self._repeat_encode) ]
+                    args_fencode[arg] = value[(len_encoder[arg] * self._repeat_encode)                                                                    : (len_encoder[arg] * self._repeat_encode) + len_fencoder[arg] ]
+                    args_evolver[arg] = value[(len_encoder[arg] * self._repeat_encode) + len_fencoder[arg]                                                : (len_encoder[arg] * self._repeat_encode) + len_fencoder[arg] + (len_evolver[arg] * self._repeat_evolution) ]
+                    args_fevolve[arg] = value[(len_encoder[arg] * self._repeat_encode) + len_fencoder[arg] + (len_evolver[arg] * self._repeat_evolution)  : ]
+
+            elif isinstance(value, (float, int)):
+                if len_encoder[arg]!=0:
+                    args_encoder[arg] = [value] * len_encoder[arg] * self._repeat_encode     
+                if len_fencoder[arg]!=0:
+                    args_fencode[arg] = [value] * len_fencoder[arg]                         
+                if len_evolver[arg]!=0: 
+                    args_evolver[arg] = [value] * len_evolver[arg] * self._repeat_evolution 
+                if len_fevolver[arg]!=0:
+                    args_fevolve[arg] = [value] * len_fevolver[arg]                         
+
+
+        # Order correctly 
+        total_ordered_params = []
+        for i in range(self._repeat_encode):
+            window = {arg: value[i*len_encoder[arg] : (i+1)*len_encoder[arg]] for arg, value in args_encoder.items()}
+            total_ordered_params += self.encoder.order_parameters(window) 
+
+        total_ordered_params += self.final_encoding.order_parameters(args_fencode) 
+
+        for i in range(self._repeat_evolution):
+            window = {arg: value[i*len_evolver[arg] : (i+1)*len_evolver[arg]] for arg, value in args_evolver.items()}
+            total_ordered_params += self.evolver.order_parameters(window)
+
+        total_ordered_params += self.final_evolution.order_parameters(args_fevolve)
+
+        return total_ordered_params
         
 
+                
 
         
 #################### DEFINITION OF OUR MAIN ANSATZES ####################
@@ -304,19 +241,20 @@ def EMCZ2(nE, nM, repeat_encode, repeat_evolution):
             emcz2.encoder.rx(param = "theta", qubit = qubit)
             emcz2.encoder.rz(param = "theta", qubit = qubit)
 
+    # Final encoding
     for qubit in range(nE):
         emcz2.final_encoding.ry(param = "x", qubit = qubit)
 
     # Define evolution
-    for qubit in range(nE+nM-1): # Last qubit missing
+    for qubit in range(nE+nM): 
 
         emcz2.evolver.rx(param = "theta", qubit = qubit)
         emcz2.evolver.rz(param = "theta", qubit = qubit)
-        emcz2.evolver.cz(qubit, qubit + 1)
-         
-    emcz2.evolver.rx(param = "theta", qubit = nE + nM - 1) # I separate the last iteration beacause it doesn't have a CZ with the next qubit
-    emcz2.evolver.rz(param = "theta", qubit = nE + nM - 1)
 
+    for qubit in range(nE+nM-1):
+        emcz2.evolver.cz(qubit, qubit + 1)
+
+    # Final encoding
     for qubit in range(nE):
         emcz2.final_evolution.rx(param = "theta", qubit = qubit)
 
@@ -338,27 +276,23 @@ def EMCZ3(nE, nM, repeat_encode, repeat_evolution):
             emcz3.encoder.rz(param = "theta", qubit = qubit)
             emcz3.encoder.rx(param = "theta", qubit = qubit)
 
+    # Final encoding
     for qubit in range(nE):
         emcz3.final_encoding.ry(param = "x", qubit = qubit)
 
     # Define evolution
     # E register part (CZ are performed)
-    for qubit in range(nE): 
-
+    for qubit in range(nE+nM): 
         emcz3.evolver.rx(param = "theta", qubit = qubit)
         emcz3.evolver.rz(param = "theta", qubit = qubit)
         emcz3.evolver.rx(param = "theta", qubit = qubit)
 
+    for qubit in range(nE):
         for qubit_m in range(nM):
             emcz3.evolver.cz(qubit, nE + qubit_m)
+            
 
-    # M register part (CZ are received)
-    for qubit in range(nM): 
-
-        emcz3.evolver.rx(param = "theta", qubit = qubit)
-        emcz3.evolver.rz(param = "theta", qubit = qubit)
-        emcz3.evolver.rx(param = "theta", qubit = qubit)
-
+    # Final evolution
     for qubit in range(nE):
         emcz3.final_evolution.rx(param = "theta", qubit = qubit)
         emcz3.final_evolution.rz(param = "theta", qubit = qubit)

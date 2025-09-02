@@ -87,7 +87,6 @@ def qc_to_json(qc : 'QuantumCircuit') -> dict:
         Json dict with the circuit information.
     """
 
-    is_dynamic = False
     # Check validity of the provided quantum circuit
     if isinstance(qc, dict):
         logger.warning(f"Circuit provided is already a dict.")
