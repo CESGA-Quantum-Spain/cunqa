@@ -51,19 +51,19 @@ class ViqueiraQRNN:
 
     ########################## CIRCUIT CALCULATION METHODS #####################
 
-    def bind_parameters(self, qjob: QJob, x: np.array, theta: np.array) -> QJob:
-        return qjob.upgrade_parameters(x=x, theta=theta)
+    # def bind_parameters(self, qjob: QJob, x: np.array, theta: np.array) -> QJob:
+    #     return qjob.upgrade_parameters(x=x, theta=theta)
 
-    def calc_observable(self, qjob, observable = None) -> np.array:
-        # TODO: improve this method to a flexible one once we have an observable calculation pipeline
-        probs = qjob.result.probabilities(per_qubit = True, partial = list(range(self.nE)))
+    # def calc_observable(self, qjob, observable = None) -> np.array:
+    #     # TODO: improve this method to a flexible one once we have an observable calculation pipeline
+    #     probs = qjob.result.probabilities(per_qubit = True, partial = list(range(self.nE)))
 
-        return np.array([prob_qubit[0]-prob_qubit[1] for prob_qubit in probs]) # ad hoc calculation of <Z> observable
+    #     return np.array([prob_qubit[0]-prob_qubit[1] for prob_qubit in probs]) # ad hoc calculation of <Z> observable
     
-    def evaluate_circ(self, qjob, x, theta) -> np.array:
-        job = self.bind_parameters(qjob, x, theta)
-        obs_result = self.calc_observable(job)
-        return obs_result
+    # def evaluate_circ(self, qjob, x, theta) -> np.array:
+    #     job = self.bind_parameters(qjob, x, theta)
+    #     obs_result = self.calc_observable(job)
+    #     return obs_result
 
     ########################## FIT, PREDICT AND VALIDATE MODEL #########################
 
@@ -132,7 +132,7 @@ class ViqueiraQRNN:
             logger.error("Model should be trained before trying to make predictions")
             raise SystemExit
         
-        return self.evaluate_circ(self.calc_gradient.qjobs[randint(0, len(self.self.calc_gradient.qjobs))], new_time_series, self.theta)
+        return self.calc_gradient.distr_shots(new_time_series, self.theta)
 
 
 
@@ -159,7 +159,7 @@ class ViqueiraQRNN:
                 logger.error("Lenght of the lists of time series and labels do not match")
                 raise SystemExit
             
-            return [cost_func(self.predict(new_population[i]), y_new[i]) for i in range(len(y_new))]
+            return [cost_func(self.predict(new_population[i]), y_new[i]) for i in range(len(y_new))] # TODO: Parallelize this 
         
         elif (isinstance(new_population, np.array) and isinstance(y_new, np.array)): # Here the arrays should be of shape (nT,nE) and (nT), mayeb add checks later
             return cost_func(self.predict(new_population), y_new)
