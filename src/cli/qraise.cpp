@@ -163,6 +163,35 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
     sbatchFile << run_command;
 }
 
+void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
+{
+    std::string home = std::getenv("HOME");
+    std::string cunqa_path = home + "/cunqa/";
+
+    sbatchFile << "#!/bin/bash\n";
+    sbatchFile << "#SBATCH --job-name=qraise \n";
+    sbatchFile << "#SBATCH --partition qpu \n";
+    sbatchFile << "#SBATCH --ntasks=" << 1 << "\n";
+
+    if (check_time_format(args.time))
+        sbatchFile << "#SBATCH --time=" << args.time << "\n";
+    else {
+        LOGGER_ERROR("Time format is incorrect, must be: xx:xx:xx.");
+        return;
+    }
+
+    sbatchFile << "#SBATCH --output=qraise_%j\n";
+
+    sbatchFile << "\n";
+
+    write_env_variables(sbatchFile);
+
+    sbatchFile << "\n\n";
+
+    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio $INFO_PATH $COMM_PATH";
+
+}
+
 }
 
 
@@ -171,24 +200,28 @@ int main(int argc, char* argv[])
     auto args = argparse::parse<CunqaArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
     const char* store = std::getenv("STORE");
     std::string info_path = std::string(store) + "/.cunqa/qpus.json";
+    std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
 
-    // Setting and checking mode and family name, respectively
-    std::string mode = args.cloud ? "cloud" : "hpc";
-    std::string family = args.family_name;
-    if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
-        LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
-        std::system("rm qraise_sbatch_tmp.sbatch");
-        return -1;
+    if (args.qmio) {
+        write_qmio_sbatch(sbatchFile, args);
+        sbatchFile.close();
+    } else {
+        // Setting and checking mode and family name, respectively
+        std::string mode = args.cloud ? "cloud" : "hpc";
+        std::string family = args.family_name;
+        if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
+            LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
+            std::system("rm qraise_sbatch_tmp.sbatch");
+            return -1;
+        }
+
+        // Writing the sbatch file
+        write_sbatch_header(sbatchFile, args);
+        write_env_variables(sbatchFile);
+        write_run_command(sbatchFile, args, mode);
+        sbatchFile.close();
     }
 
-    // Writing the sbatch file
-    std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
-    write_sbatch_header(sbatchFile, args);
-    write_env_variables(sbatchFile);
-    write_run_command(sbatchFile, args, mode);
-    sbatchFile.close();
-
-    
     // Executing and deleting the file
     std::system("sbatch qraise_sbatch_tmp.sbatch");
     std::system("rm qraise_sbatch_tmp.sbatch");

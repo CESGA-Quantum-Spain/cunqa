@@ -44,4 +44,10 @@ target_link_libraries(qinfo PRIVATE json logger_client)
 target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
+# SETUP_QMIO executable
+add_executable(setup_qmio setup_qmio.cpp)
+target_link_libraries(setup_qmio PRIVATE json logger_qpu)
+target_include_directories(setup_qmio PRIVATE "${CMAKE_SOURCE_DIR}/src")
+install(TARGETS setup_qmio DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
 
