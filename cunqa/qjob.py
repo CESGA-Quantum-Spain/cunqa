@@ -34,7 +34,7 @@ from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert, _registers_dict
+from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
