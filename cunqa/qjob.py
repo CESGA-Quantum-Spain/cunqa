@@ -306,66 +306,71 @@ class QJob:
             parameters (list[float | int]): list of parameters to assign to the parametrized circuit.
             marked_params (dict[list, float, int]): used to indicate the value that should be given to the marked Parameters
         """
-        if not hasattr(self, "current_params"):
+        if not hasattr(self, "_current_params"):
             logger.error(f"Trying to upgrade parameters of a non-parametric circuit.")
             raise SystemExit
 
         if self._result is None:
             self._future.get()
 
-        if isinstance(parameters, list):    
-            # Process entries ############
-            if len(marked_params)>0:
-                try:
-                    if parameters is not None:
-                        logger.warning("Additional labelled parameters were given, parameter list will be ignored. If you really desire to change the fixed parameters include them under the name no_name")
-                    #     marked_params["no_name"] = parameters
+           
+        # Process entries ############
+        if len(marked_params)>0:
+            try:
+                if parameters is not None:
+                    logger.warning("Additional labelled parameters were given, parameter list will be ignored. If you really desire to change the fixed parameters include them under the argument no_name")
 
-                    pre_message = self._current_params 
-                    for index, label in enumerate(self._param_instructions):
-                        if label in marked_params:
-                            if isinstance(marked_params[label], (int, float)):
-                                pre_message[index] = marked_params[label]
-                                self._current_params[index] = marked_params[label]
+                premessage = self._current_params 
+                for index, label in enumerate(self._param_labels):
+                    if label in marked_params:
+                        if isinstance(marked_params[label], (int, float)):
+                            premessage[index] = marked_params[label]
+                            self._current_params[index] = marked_params[label]
 
-                            elif isinstance(marked_params[label], list):
-                                next_value = marked_params[label].pop(0) # This is not too fast
-                                pre_message[index] = next_value
-                                self._current_params[index] = next_value
+                        elif isinstance(marked_params[label], list):
+                            next_value = marked_params[label].pop(0) # This is not too fast
+                            if not isinstance(next_value, (int, float)):
+                                logger.error(f"Parameters must be int of float, but a {type(next_value)} was given on the list for label {label}.")
+                                raise SystemExit
+                            
+                            premessage[index] = next_value
+                            self._current_params[index] = next_value
 
-                    if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
-                        logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}.")
+                if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
+                    logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}.")
 
-                except Exception as error:
-                    logger.error(f"Error while substituting the marked parameters, check that the correct number of parameters was given. Error: {error}")
-                    raise SystemExit
-                
-            elif parameters is not None:
+            except Exception as error:
+                logger.error(f"Error while substituting the marked parameters, check that the correct number of parameters was given. Error: {error}")
+                raise SystemExit
+            
+        elif parameters is not None:
+            if isinstance(parameters, list): 
                 if all(isinstance(param, (int, float)) for param in parameters):  # Check if all elements are real numbers
                     premessage = parameters
                     
                 else:
                     logger.error(f"Parameters must be real numbers or integers [{ValueError.__name__}].")
                     raise SystemExit # User's level
-                
             else:
-                logger.error(f"Error: no input for upgrade_parameters.")
-                raise SystemExit
-                    
+                logger.error(f"Invalid parameter type, list was expected but {type(parameters)} was given. [{TypeError.__name__}].")
+                raise SystemExit # User's level 
+            
         else:
-            logger.error(f"Invalid parameter type, list was expected but {type(parameters)} was given. [{TypeError.__name__}].")
-            raise SystemExit # User's level            
+            logger.error(f"Error: no input for upgrade_parameters.")
+            raise SystemExit
+                    
+                   
         
         if shots is None:
-            shots = self._execution_config["config"]["shots"]
+            shots = json.loads(self._execution_config)["config"]["shots"]
 
-        # Format message and send parameters to C++ ###########
+        ########### Format message and send parameters to C++ ###########
         try:
             message = """{{"params":{}, "shots": {} }}""".format(premessage, shots).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
 
         except Exception as error:
-            logger.error(f"Some error occured when sending the new parameters to circuit {self._circuit_id} [{type(error).__name__}].")
+            logger.error(f"Some error occured when sending the new parameters to circuit {self._circuit_id} [{error}].")
             raise SystemExit # User's level
 
         self._updated = False # We indicate that new results will come, in order to call server
@@ -487,7 +492,8 @@ class QJob:
                 "method":"statevector", 
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
-                "seed": 123123}
+                "seed": 123123
+                }
 
             if (run_parameters == None) or (len(run_parameters) == 0):
                 logger.debug("No run parameters provided, default were set.")

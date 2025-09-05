@@ -1424,14 +1424,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             param_index = 0
             for instruction in self.instructions:
                 if (("params" in instruction) and (not instruction["name"] in {"unitary", "c_if_unitary", "remote_c_if_unitary"}) and (len(instruction["params"]) != 0)):
-                    for i, param in enumerate(instruction["params"]):
-                        if isinstance(param, str) and param in marked_params:
+                    for i in range(len(instruction["params"])):
+                        param = self.param_labels[param_index + i]
+
+                        if param in marked_params:
                             if isinstance(marked_params[param], (int, float)):
                                 instruction["params"][i] = marked_params[param]
                                 self.current_params[param_index + i] = marked_params[param] # update the saved current values, too
 
                             elif isinstance(marked_params[param], list):
                                 next_value = marked_params[param].pop(0)
+                                if not isinstance(next_value, (int, float)):
+                                    logger.error(f"Parameters inside the list must be int or float but {type(next_value)} was given.")
+                                    raise SystemExit
+                                
                                 instruction["params"][i] = next_value
                                 self.current_params[param_index + i] = next_value # update the saved current values, too
 
@@ -1446,7 +1452,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             raise SystemExit
         
         if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
-            logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}. \n Use circuit.param_info to obtain the names and numbers of the variable parameters.")
+            logger.warning(f"Some of the given parameters list were not exhausted, check name or lenght of at least the following keys: {[key for key, value in marked_params.items() if (isinstance(value, list) and len(value)!=0)]}. \n Use circuit.param_info to obtain the names and numbers of the variable parameters.")
 
 
 
