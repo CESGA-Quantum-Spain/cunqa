@@ -93,7 +93,7 @@ class QPU:
 
     """
     _id: int #: Id string assigned to the object.
-    _qclient: 'QClient'  #: Object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.
+    _qclient: Union['QClient', 'zmq.Context']  #: Object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.
     _backend: 'Backend' #: Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device.
     _family: str #: Name of the family to which the corresponding virtual QPU belongs.
     _endpoint: "tuple[str, int]" #: String refering to the endpoint of the corresponding virtual QPU.

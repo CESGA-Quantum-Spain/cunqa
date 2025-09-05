@@ -28,6 +28,7 @@
 
 from typing import  Union, Any
 import json, pickle
+import zmq
 from typing import  Optional, Union, Any
 from qiskit import QuantumCircuit
 from qiskit.qasm2.exceptions import QASM2Error
@@ -163,7 +164,7 @@ class QJob:
 
     """
     _backend: 'Backend' 
-    qclient: 'QClient' #: Client linked to the server that listens at the virtual QPU.
+    _qclient: Union['QClient', 'zmq.Context'] #: Client linked to the server that listens at the virtual QPU.
     _updated: bool
     _future: 'FutureWrapper' 
     _result: Optional['Result']
@@ -173,7 +174,7 @@ class QJob:
     _has_cc:bool
     _has_qc:bool
 
-    def __init__(self, real_qpu: bool, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
+    def __init__(self, real_qpu: bool, qclient: Union['QClient', 'zmq.Context'], backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
         """
         Initializes the :py:class:`QJob` class.
 
@@ -198,7 +199,7 @@ class QJob:
         """
 
         self._backend: 'Backend' = backend
-        self._qclient: 'QClient' = qclient
+        self._qclient: Union['QClient', 'zmq.Context'] = qclient
         self._updated: bool = False
         self._future: 'FutureWrapper' = None
         self._result: Optional['Result'] = None

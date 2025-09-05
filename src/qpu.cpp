@@ -68,6 +68,8 @@ void QPU::recv_data_()
 {   
     while (true) {
         LOGGER_DEBUG("Waiting...");
+        LOGGER_DEBUG("IP: {}", this->server->ip);
+        LOGGER_DEBUG("PORT: {}", this->server->port);
         try {
             auto message = server->recv_data();
             LOGGER_DEBUG("Message received: {}", message);
