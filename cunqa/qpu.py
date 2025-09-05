@@ -61,6 +61,7 @@
 import os
 from typing import  Union, Any, Optional
 import inspect
+import zmq 
 
 from qiskit import QuantumCircuit
 
@@ -97,8 +98,9 @@ class QPU:
     _family: str #: Name of the family to which the corresponding virtual QPU belongs.
     _endpoint: "tuple[str, int]" #: String refering to the endpoint of the corresponding virtual QPU.
     _connected: bool #: Weather if the :py:class:`QClient` is already connected.
+    _real_qpu: bool #: If this QPU is associated to a real QPU device
     
-    def __init__(self, id: int, qclient: 'QClient', backend: Backend, family: str, endpoint: "tuple[str, int]"):
+    def __init__(self, id: int, qclient: Union['QClient', 'zmq.Context'], backend: Backend, family: str, endpoint: "tuple[str, int]", real_qpu = False):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -123,6 +125,7 @@ class QPU:
         self._family = family
         self._endpoint = endpoint
         self._connected = False
+        self._real_qpu = real_qpu
         
         logger.debug(f"Object for QPU {id} created correctly.")
 
@@ -182,10 +185,13 @@ class QPU:
         # Handle connection to QClient
         if not self._connected:
             ip, port = self._endpoint
-            self._qclient.connect(ip, port)
+            if self._real_qpu:
+                intermediary_endpoint = f"tcp://{ip}:{port}"
+                self._qclient.connect(intermediary_endpoint)
+            else:
+                self._qclient.connect(ip, port)
             self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
-            self._connected = True
 
         # Transpilation if requested
         if transpile:
@@ -198,7 +204,7 @@ class QPU:
                 raise TranspileError # I capture the error in QPU.run() when creating the job
 
         try:
-            qjob = QJob(self._qclient, self._backend, circuit, **run_parameters)
+            qjob = QJob(self._real_qpu, self._qclient, self._backend, circuit, **run_parameters)
             qjob.submit()
             logger.debug(f"Qjob submitted to QPU {self._id}.")
         except Exception as error:

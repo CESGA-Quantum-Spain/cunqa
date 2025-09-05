@@ -67,8 +67,10 @@ void QPU::compute_result_()
 void QPU::recv_data_() 
 {   
     while (true) {
+        LOGGER_DEBUG("Waiting...");
         try {
             auto message = server->recv_data();
+            LOGGER_DEBUG("Message received: {}", message);
                 {
                 std::lock_guard<std::mutex> lock(queue_mutex_);
                 if (message.compare("CLOSE"s) == 0) {

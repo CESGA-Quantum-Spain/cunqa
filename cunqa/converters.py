@@ -180,7 +180,7 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         raise ConvertersError
     
 
-def _qc_to_qasm(qc : 'QuantumCircuit', version = "3.0") -> str:
+def _qc_to_qasm(qc : 'QuantumCircuit', version = "2.0") -> str:
     
     try:
         if (version == "2.0"):
