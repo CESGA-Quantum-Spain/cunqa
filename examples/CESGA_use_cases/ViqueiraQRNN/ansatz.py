@@ -162,7 +162,7 @@ class AnsatzQRNN:
         """
         # Need to know how to distribute the arguments between the encoding, 
         # final_encoding, evolution and final_evolution blocks
-        len_encoder  = self.encoder.param_info(args.keys())
+        len_encoder  = self.encoder.param_info(args.keys()) # Problema: si encoder no tiene un parametro luego falla el sacar su longitud (debería ser 0)
         len_fencoder = self.final_encoding.param_info(args.keys())
         len_evolver  = self.evolver.param_info(args.keys())
         len_fevolver = self.final_evolution.param_info(args.keys())

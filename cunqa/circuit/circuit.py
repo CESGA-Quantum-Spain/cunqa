@@ -286,7 +286,11 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         Information about the main class attributes given as a dictinary.
         """
-        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to}
+        info = {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
+        if self.is_parametric:
+            info += {"param_labels": self.param_labels,"current_params": self.current_params}
+
+        return info
 
     @property
     def num_qubits(self) -> int:

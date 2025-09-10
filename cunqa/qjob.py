@@ -397,6 +397,10 @@ class QJob:
                     self._is_dynamic = False
                     self._has_cc = False
 
+                if "param_labels" in circuit and "current_params" in circuit:
+                    self._param_labels = circuit["param_labels"]
+                    self._current_params = circuit["current_params"]
+
                 logger.debug("Translation to dict not necessary...")
 
                 # might explode for handmade dicts not design for ditributed execution

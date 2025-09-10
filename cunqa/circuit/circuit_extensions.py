@@ -182,6 +182,8 @@ def cunqa_dunder_methods(cls):
         else:
             logger.error(f"Only possible to sum circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
+
+        return self
             
 
 
@@ -378,6 +380,8 @@ def cunqa_dunder_methods(cls):
 
 
         self.update_other_instances(instances_to_change_and_displace, other_id, self._id, n)
+
+        return self
         
 
     # Methods to retrieve information from the circuit
