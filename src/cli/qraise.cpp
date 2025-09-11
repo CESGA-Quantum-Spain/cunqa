@@ -172,6 +172,7 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
     sbatchFile << "#SBATCH --job-name=qraise \n";
     sbatchFile << "#SBATCH --partition qpu \n";
     sbatchFile << "#SBATCH --ntasks=" << 1 << "\n";
+    sbatchFile << "#SBATCH --mem-per-cpu=4G\n";
 
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
@@ -188,7 +189,7 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     sbatchFile << "\n\n";
 
-    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio $INFO_PATH $COMM_PATH";
+    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio";
 
 }
 

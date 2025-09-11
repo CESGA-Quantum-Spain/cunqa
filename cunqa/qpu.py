@@ -60,8 +60,7 @@
 
 import os
 from typing import  Union, Any, Optional
-import inspect
-import zmq 
+import inspect 
 
 from qiskit import QuantumCircuit
 
@@ -93,14 +92,14 @@ class QPU:
 
     """
     _id: int #: Id string assigned to the object.
-    _qclient: Union['QClient', 'zmq.Context']  #: Object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.
+    _qclient: Union['QClient', None]  #: Object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.
     _backend: 'Backend' #: Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device.
     _family: str #: Name of the family to which the corresponding virtual QPU belongs.
     _endpoint: "tuple[str, int]" #: String refering to the endpoint of the corresponding virtual QPU.
     _connected: bool #: Weather if the :py:class:`QClient` is already connected.
     _real_qpu: bool #: If this QPU is associated to a real QPU device
     
-    def __init__(self, id: int, qclient: Union['QClient', 'zmq.Context'], backend: Backend, family: str, endpoint: "tuple[str, int]", real_qpu = False):
+    def __init__(self, id: int, qclient: Union['QClient', None], backend: Backend, family: str, endpoint: "tuple[str, int]", real_qpu : bool = False):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -185,11 +184,7 @@ class QPU:
         # Handle connection to QClient
         if not self._connected:
             ip, port = self._endpoint
-            if self._real_qpu:
-                intermediary_endpoint = f"tcp://{ip}:{port}"
-                self._qclient.connect(intermediary_endpoint)
-            else:
-                self._qclient.connect(ip, port)
+            self._qclient.connect(ip, port)
             self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
 

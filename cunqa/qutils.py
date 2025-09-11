@@ -78,7 +78,6 @@
 import os
 import sys
 import time
-import zmq
 from typing import Union, Optional
 from subprocess import run
 from json import load
@@ -417,13 +416,14 @@ def get_QPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
         endpoint = (info["net"]["ip"], info["net"]["port"])
         if "real_qpu" in info:
             logger.debug("Real QPU found")
-            client_context = zmq.Context()
-            client = client_context.socket(zmq.DEALER) 
-            qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint, real_qpu = True))
+            real_qpu = True
         else:
             logger.debug("Virtual QPU found")
-            client = QClient()
-            qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint))
+            real_qpu = False
+
+        client = QClient()
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), family = info["family"], endpoint = endpoint, real_qpu = real_qpu))
+
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus

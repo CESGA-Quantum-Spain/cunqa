@@ -30,7 +30,6 @@ struct Server::Impl {
             zmq::message_t message;
             auto size = socket_.recv(message, zmq::recv_flags::none);
             std::string data(static_cast<char*>(message.data()), size.value());
-            LOGGER_DEBUG("Received data: {}", data);
             
             rid_queue_.push(message.routing_id());
             return data;

@@ -1,4 +1,4 @@
-import zmq
+#import zmq
 import os, sys
 import random
 import json, pickle
@@ -10,7 +10,7 @@ sys.path.append(os.getenv("HOME"))
 
 from cunqa.logger import logger
 
-def deploy_intermediary_server():
+""" def deploy_intermediary_server():
     ZMQ_SERVER = os.getenv('ZMQ_SERVER') 
 
     if len(sys.argv) > 1:
@@ -25,8 +25,6 @@ def deploy_intermediary_server():
     intermediary_context = zmq.Context()
     intermediary_server = intermediary_context.socket(zmq.ROUTER)  
     intermediary_server.bind(intermediary_endpoint)
-
-    #inter_server.connect(ZMQ_SERVER)
 
     waiting = True
     while waiting:
@@ -55,7 +53,7 @@ def deploy_intermediary_server():
     qpu_context.term()
 
     intermediary_server.close()
-    intermediary_context.term()
+    intermediary_context.term() """
     
 def _optimization_options_builder(
     optimization: int, optimization_backend: str = "Tket"
@@ -199,5 +197,5 @@ def _config_builder(
     return config_str
 
 
-if __name__ == "__main__":
-    deploy_intermediary_server()
+""" if __name__ == "__main__":
+    deploy_intermediary_server() """

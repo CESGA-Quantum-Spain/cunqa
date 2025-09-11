@@ -28,7 +28,6 @@
 
 from typing import  Union, Any
 import json, pickle
-import zmq
 from typing import  Optional, Union, Any
 from qiskit import QuantumCircuit
 from qiskit.qasm2.exceptions import QASM2Error
@@ -164,17 +163,18 @@ class QJob:
 
     """
     _backend: 'Backend' 
-    _qclient: Union['QClient', 'zmq.Context'] #: Client linked to the server that listens at the virtual QPU.
+    _qclient: 'QClient' #: Client linked to the server that listens at the virtual QPU.
     _updated: bool
     _future: 'FutureWrapper' 
     _result: Optional['Result']
     _circuit_id: str 
     _sending_to: "list[str]"
     _is_dynamic: bool
-    _has_cc:bool
-    _has_qc:bool
+    _has_cc: bool
+    _has_qc: bool
+    _real_qpu: bool
 
-    def __init__(self, real_qpu: bool, qclient: Union['QClient', 'zmq.Context'], backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
+    def __init__(self, real_qpu: bool, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
         """
         Initializes the :py:class:`QJob` class.
 
@@ -199,7 +199,7 @@ class QJob:
         """
 
         self._backend: 'Backend' = backend
-        self._qclient: Union['QClient', 'zmq.Context'] = qclient
+        self._qclient: 'QClient' = qclient
         self._updated: bool = False
         self._future: 'FutureWrapper' = None
         self._result: Optional['Result'] = None
@@ -224,41 +224,28 @@ class QJob:
             The result is not sent from the server to the :py:class:`QClient` until this method is called.
 
         """
-        if self._real_qpu:
-            try:
-                serialized_result = self._qclient.recv()
-                logger.debug("Result received from QPU")
-                deserialized_result = pickle.loads(serialized_result)
-                res = json.loads(json.dumps(deserialized_result))
-                logger.debug(f"Deserialized result {res}")
-                self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
-                self._updated = True
-            except Exception as error:
-                    logger.error(f"Error while reading the results {error}")
-                    raise SystemExit # User's level
-        else:
-            try:
-                if self._future is not None and self._future.valid():
-                    if self._result is not None:
-                        if not self._updated: # if the result was already obtained, we only call the server if an update was done
-                            res = self._future.get()
-                            self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
-                            self._updated = True
-                        else:
-                            pass
-                    else:
+        try:
+            if self._future is not None and self._future.valid():
+                if self._result is not None:
+                    if not self._updated: # if the result was already obtained, we only call the server if an update was done
                         res = self._future.get()
-                        logger.debug(f"RES: {res}")
-                        self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
+                        self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
                         self._updated = True
+                    else:
+                        pass
                 else:
-                    logger.debug(f"self._future is None or non-valid, None is returned.")
-            except Exception as error:
-                    logger.error(f"Error while reading the results {error}")
-                    raise SystemExit # User's level
-            
-            if self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
-                logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
+                    res = self._future.get()
+                    logger.debug(f"RES: {res}")
+                    self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
+                    self._updated = True
+            else:
+                logger.debug(f"self._future is None or non-valid, None is returned.")
+        except Exception as error:
+                logger.error(f"Error while reading the results {error}")
+                raise SystemExit # User's level
+        
+        if not self._real_qpu and self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
+            logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
 
         return self._result
 
@@ -292,8 +279,9 @@ class QJob:
             the corresponding server recieves and simualtes the circuit.
         """
         if self._real_qpu:
-            data_to_send = (self._circuit, self._execution_config)
-            self._qclient.send_pyobj(data_to_send)
+            formated_circuit = "\\n".join(self._circuit.splitlines())
+            data_to_send = Rf"""('{formated_circuit}', '{self._execution_config}')"""
+            self._qclient.send_circuit(data_to_send)
         else:
             if self._future is not None:
                 logger.warning("QJob has already been submitted.")

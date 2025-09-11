@@ -19,7 +19,7 @@ circuit.cx(0,1)
 circuit.measure_all()
 
 qjob = qmio.run(circuit, shots = 100)
-counts = qjob.result.counts
+""" counts = qjob.result.counts
 time = qjob.time_taken
 
-print(f"Result: \n{counts}\n Time taken: {time} s.")
+print(f"Result: \n{counts}\n Time taken: {time} s.") """

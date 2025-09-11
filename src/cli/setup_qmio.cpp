@@ -4,7 +4,10 @@
 #include <fstream>
 #include <string>
 #include <random>
+#include <queue>
+#include "zmq.hpp"
 
+#include "comm/server.hpp"
 #include "utils/helpers/net_functions.hpp"
 #include "utils/json.hpp"
 #include "logger.hpp"
@@ -12,6 +15,11 @@
 using namespace cunqa;
 
 namespace {
+
+const auto store = getenv("STORE");
+const std::string filepath = store + "/.cunqa/qpus.json"s;
+const std::string QPU_ENDPOINT = getenv("ZMQ_SERVER");
+
 
 struct QMIOConfig {
     std::string name = "QMIOBackend";
@@ -39,66 +47,129 @@ struct QMIOConfig {
     
 };
 
-int generate_random_port() {
-    // Define the range for the random number (49152 to 65535)
-    const int min_port = 49152;
-    const int max_port = 65535;
 
-    // Create a random device to seed the generator
-    std::random_device rd;
+class Intermediary {
 
-    // Use a Mersenne Twister engine seeded with the random device
-    std::mt19937 gen(rd());
+public:
+    Intermediary() : server(std::make_unique<comm::Server>("cloud")), socket_{context_, zmq::socket_type::req}
+    {}
 
-    // Create a uniform integer distribution for the specified range
-    std::uniform_int_distribution<> distrib(min_port, max_port);
+    ~Intermediary() 
+    {
+        socket_.close();
+    }
 
-    // Generate and return the random number
-    return distrib(gen);
-}
+    void turn_ON()
+    {
+        QMIOConfig qmio_config;
+        JSON qmio_config_json = qmio_config;
+
+        JSON qpu_info = {
+            {"real_qpu", "qmio"},
+            {"backend", qmio_config_json},
+            {"net", {
+                {"ip", server->ip},
+                {"port", server->port},
+                {"nodename", "qmio_node"},
+                {"mode", "cloud"}
+            }},
+            {"family", "real_qmio"}
+        };
+        write_on_file(qpu_info, filepath);
+
+        socket_.connect(QPU_ENDPOINT);
+
+        std::thread listen([this](){this->recv_data_();});
+        std::thread compute([this](){this->send_to_QPU_();});
+
+        listen.join();
+        compute.join();
+    }
+
+private:
+
+    std::unique_ptr<comm::Server> server;
+    zmq::context_t context_;
+    zmq::socket_t socket_;
+    std::queue<std::string> message_queue_;
+    std::condition_variable queue_condition_;
+    std::mutex queue_mutex_;
+
+    void recv_data_()
+    {
+        while (true) {
+            try {
+                LOGGER_DEBUG("Waiting to recv from outside...");
+                auto message = server->recv_data();
+                    {
+                    std::lock_guard<std::mutex> lock(queue_mutex_);
+                    if (message.compare("CLOSE"s) == 0) {
+                        server->accept();
+                        continue;
+                    }
+                    else
+                        message_queue_.push(message);
+                }
+                queue_condition_.notify_one();
+            } catch (const std::exception& e) {
+                LOGGER_INFO("There has happened an error receiving the circuit, the server keeps on iterating.");
+                LOGGER_ERROR("Official message of the error: {}", e.what());
+            }
+        }
+    }
+
+    void send_to_QPU_()
+    {
+        while (true) 
+        {
+            LOGGER_DEBUG("Sending to QPU...");
+            std::unique_lock<std::mutex> lock(queue_mutex_);
+            queue_condition_.wait(lock, [this] { return !message_queue_.empty(); });
+
+            while (!message_queue_.empty()) 
+            {
+                try {
+                    std::string message = message_queue_.front();
+                    message_queue_.pop();
+                    lock.unlock();
+                    
+                    
+                    const std::string header = "\x04\x00\x00\x00\x00\x00\x00\x00\x01";
+                    zmq::message_t header_message(header.data(), header.size());
+                    socket_.send(header_message, zmq::send_flags::sndmore);
+
+                    zmq::message_t message_to_qpu(message.data(), message.size());
+                    socket_.send(message_to_qpu, zmq::send_flags::none);
+                    LOGGER_DEBUG("SENT");
+                    zmq::message_t message_from_qpu;
+                    auto result = socket_.recv(message_from_qpu, zmq::recv_flags::none);
+                    LOGGER_DEBUG("RECEIVED");
+                    std::string result_str(static_cast<char*>(message_from_qpu.data()), message_from_qpu.size());
+                    LOGGER_DEBUG("Result on intermediary: {}", result_str);
+                    server->send_result(result_str);
+
+                } catch(const comm::ServerException& e) {
+                    LOGGER_ERROR("There has happened an error with the intermediary server with the QPU.");
+                    LOGGER_ERROR("Message of the error: {}", e.what());
+                } catch(const std::exception& e) {
+                    LOGGER_ERROR("There has happened an error sending the result, the server keeps on iterating.");
+                    LOGGER_ERROR("Message of the error: {}", e.what());
+                    server->send_result("{\"ERROR\":\""s + std::string(e.what()) + "\"}"s);
+                }
+                lock.lock();
+            }
+        }
+    }
+};
 
 }
 
 
 int main(int argc, char *argv[]) {
 
-    LOGGER_DEBUG("Deploying Real QPU");
-    std::string info_path;
-    std::string comm_path;
-    if (argc == 3) {
-        info_path = argv[1]; 
-        comm_path = argv[2];
-    } else {
-        LOGGER_ERROR("Passing incorrect number of arguments.");
-        return EXIT_FAILURE;
-    }
-
-    std::string ip = get_global_IP_address();
-    int port = generate_random_port();
-    QMIOConfig qmio_config;
-    JSON config = qmio_config;
-
-    JSON qpu_info = {
-        {"real_qpu", "qmio"},
-        {"backend", config},
-        {"net", {
-            {"ip", ip},
-            {"port", port},
-            {"nodename", "qmio_node"},
-            {"mode", "cloud"}
-        }},
-        {"family", "real_qmio"}
-    };
-
-    std::string endpoint = "tcp://" + ip + ":" + std::to_string(port);
-
-    write_on_file(qpu_info, info_path);
-
-    std::string home = std::getenv("HOME");
-    std::string cunqa_path = home + "/cunqa";
-    std::string command = "python -u " + cunqa_path + "/qmio_helpers.py " + endpoint;
-
-    std::system(command.c_str());
+    LOGGER_DEBUG("Inside setup_qmio");
+    Intermediary intermediary;
+    intermediary.turn_ON();
     
     return 0;
 }
