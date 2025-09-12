@@ -1,59 +1,16 @@
 #import zmq
 import os, sys
 import random
-import json, pickle
+import json, pickle, base64
 import time
 
 from typing import Optional
 
-sys.path.append(os.getenv("HOME"))
+HOME = os.getenv("HOME")
+STORE = os.getenv("STORE")
+sys.path.append(HOME)
 
 from cunqa.logger import logger
-
-""" def deploy_intermediary_server():
-    ZMQ_SERVER = os.getenv('ZMQ_SERVER') 
-
-    if len(sys.argv) > 1:
-        intermediary_endpoint = sys.argv[1]
-    else:
-        logger.error("Intermediary endpoint not provided.")
-
-    qpu_context = zmq.Context()
-    qpu_client = qpu_context.socket(zmq.REQ)  
-    qpu_client.connect(ZMQ_SERVER)
-
-    intermediary_context = zmq.Context()
-    intermediary_server = intermediary_context.socket(zmq.ROUTER)  
-    intermediary_server.bind(intermediary_endpoint)
-
-    waiting = True
-    while waiting:
-        logger.debug("Waiting for a circuit to be executed in the QPU...")
-        message = intermediary_server.recv_multipart() # circuit = (instructions, config)
-        logger.debug("Circuit received for the intermediary server on the QPU node")
-        client_address, serialized_circuit = message
-        circuit = pickle.loads(serialized_circuit)
-        start_time = time.perf_counter()
-        qpu_client.send_pyobj(circuit)
-        logger.debug("Circuit sent to QPU. Waiting for results...")
-        result = qpu_client.recv_pyobj()
-        end_time = time.perf_counter()
-        execution_time = end_time - start_time
-        logger.debug(f"Result: {result}")
-        counts = json.loads(json.dumps(result))["results"]["reg_measure"]
-        final_result = {
-            "counts":counts,
-            "time_taken":execution_time
-        }
-        serialized_result = pickle.dumps(final_result)
-        intermediary_server.send_multipart([client_address, serialized_result])
-
-    logger.debug("Everything was OK. Closing sockets...")
-    qpu_client.close()
-    qpu_context.term()
-
-    intermediary_server.close()
-    intermediary_context.term() """
     
 def _optimization_options_builder(
     optimization: int, optimization_backend: str = "Tket"
@@ -196,6 +153,47 @@ def _config_builder(
     end = time.time_ns()
     return config_str
 
+def make_json_serializable(obj):
+    if isinstance(obj, bytes):
+        return {"__bytes__": base64.b64encode(obj).decode('ascii')}
+    elif isinstance(obj, dict):
+        return {k: make_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [make_json_serializable(v) for v in obj]
+    else:
+        return obj
 
-""" if __name__ == "__main__":
-    deploy_intermediary_server() """
+def seriaize_and_write(deserialized_circuit_filepath, serialized_results_filepath):
+    with open(serialized_results_filepath, 'rb') as f:
+        message = f.read()
+
+    serialized_message = pickle.dumps(message)
+
+    with open(serialized_results_filepath, 'wb') as f:
+        f.write(serialized_message)
+
+
+def deserialize_and_write(serialized_results_filepath, deserialized_results_filepath):
+    with open(serialized_results_filepath, 'rb') as sf:
+        results = pickle.load(sf)
+
+    print(results)
+
+    with open(deserialized_results_filepath, 'w') as df:
+        df.write(json.dumps(results))
+
+if __name__ == "__main__":
+    deserialized_circuit_filepath = STORE + "/.cunqa/deserialized_circuit.bin"
+    serialized_circuit_filepath = STORE + "/.cunqa/serialized_circuit.bin"
+    serialized_results_filepath = STORE + "/.cunqa/serialized_results.bin"
+    deserialized_results_filepath = STORE + "/.cunqa/deserialized_results.bin"
+
+    ser_or_deser = sys.argv[1]
+    logger.info(f"Serialize or not?: {ser_or_deser}")
+    if ser_or_deser == "serialize":
+        seriaize_and_write(deserialized_circuit_filepath, serialized_results_filepath)
+    elif ser_or_deser == "deserialize":
+        deserialize_and_write(serialized_results_filepath, deserialized_results_filepath)
+    
+    
+    

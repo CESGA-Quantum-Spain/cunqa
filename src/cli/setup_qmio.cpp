@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -17,9 +18,10 @@ using namespace cunqa;
 namespace {
 
 const auto store = getenv("STORE");
+const std::string HOME = getenv("HOME");
 const std::string filepath = store + "/.cunqa/qpus.json"s;
-const std::string QPU_ENDPOINT = getenv("ZMQ_SERVER");
-
+//const std::string QPU_ENDPOINT = getenv("ZMQ_SERVER");
+const std::string QPU_ENDPOINT = "tcp://10.5.7.14:8181";
 
 struct QMIOConfig {
     std::string name = "QMIOBackend";
@@ -123,6 +125,14 @@ private:
         while (true) 
         {
             LOGGER_DEBUG("Sending to QPU...");
+            std::string command = "python "s + HOME + "/cunqa/qmio_helpers.py "s;
+            std::string serialized_command;
+            std::string deserialized_command;
+            std::string file_with_deserialized_circuit = store + "/.cunqa/deserialized_circuit.bin"s;
+            std::string file_with_serialized_circuit = store + "/.cunqa/serialized_circuit.bin"s;
+            std::string file_with_serialized_result = store + "/.cunqa/serialized_results.bin"s;
+            std::string file_with_deserialized_result = store + "/.cunqa/deserialized_results.bin"s;
+            int command_status;
             std::unique_lock<std::mutex> lock(queue_mutex_);
             queue_condition_.wait(lock, [this] { return !message_queue_.empty(); });
 
@@ -132,19 +142,50 @@ private:
                     std::string message = message_queue_.front();
                     message_queue_.pop();
                     lock.unlock();
-                    
-                    
-                    const std::string header = "\x04\x00\x00\x00\x00\x00\x00\x00\x01";
-                    zmq::message_t header_message(header.data(), header.size());
-                    socket_.send(header_message, zmq::send_flags::sndmore);
 
-                    zmq::message_t message_to_qpu(message.data(), message.size());
-                    socket_.send(message_to_qpu, zmq::send_flags::none);
+                    std::ofstream sermessage_outfile(file_with_deserialized_circuit, std::ios::binary);
+
+                    // Write the string bytes directly
+                    sermessage_outfile.write(message.data(), data.size());
+                    sermessage_outfile.close();
+                    
+                    serialized_command = command + R"('serialize')";
+                    LOGGER_DEBUG("Serialize command: {}", serialized_command);
+                    command_status = std::system(serialized_command.c_str());
+
+                    LOGGER_DEBUG("File with serialized circuit: {}", file_with_serialized_circuit);
+
+                    std::ifstream file(file_with_serialized_circuit, std::ios::binary | std::ios::ate);
+
+                    std::streamsize size = file.tellg();
+                    file.seekg(0, std::ios::beg);
+                    std::vector<char> buffer(size);
+                    file.read(buffer.data(), size);
+
+                    zmq::message_t serialized_circuit(buffer.size());
+                    memcpy(serialized_circuit.data(), buffer.data(), buffer.size());
+
+                    socket_.send(serialized_circuit, zmq::send_flags::none);
                     LOGGER_DEBUG("SENT");
+
                     zmq::message_t message_from_qpu;
                     auto result = socket_.recv(message_from_qpu, zmq::recv_flags::none);
                     LOGGER_DEBUG("RECEIVED");
-                    std::string result_str(static_cast<char*>(message_from_qpu.data()), message_from_qpu.size());
+
+                    std::ofstream outfile(file_with_serialized_result, std::ios::binary);
+                    outfile.write(static_cast<char*>(message_from_qpu.data()), message_from_qpu.size());
+                    outfile.close();
+
+                    deserialized_command = command + R"('deserialize' )";
+                    LOGGER_DEBUG("Deserialize command: {}", deserialized_command);
+                    command_status = std::system(deserialized_command.c_str());
+
+                    std::ifstream infile(file_with_deserialized_result);
+                    std::ostringstream res;
+                    res << infile.rdbuf();  
+
+                    std::string result_str = res.str();
+
                     LOGGER_DEBUG("Result on intermediary: {}", result_str);
                     server->send_result(result_str);
 
@@ -160,9 +201,10 @@ private:
             }
         }
     }
+
 };
 
-}
+} // End namespace
 
 
 int main(int argc, char *argv[]) {

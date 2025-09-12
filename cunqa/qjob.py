@@ -280,7 +280,7 @@ class QJob:
         """
         if self._real_qpu:
             formated_circuit = "\\n".join(self._circuit.splitlines())
-            data_to_send = Rf"""('{formated_circuit}', '{self._execution_config}')"""
+            data_to_send = f"'(\"{formated_circuit}\", \"{self._execution_config}\")'"
             self._qclient.send_circuit(data_to_send)
         else:
             if self._future is not None:
