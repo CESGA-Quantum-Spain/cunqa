@@ -635,8 +635,6 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 
 JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
-	throw std::runtime_error("MaestroSimulatorAdapter::simulate() is not implemented yet.");
-
     std::map<std::string, std::size_t> meas_counter;
 
     // This is for distinguising classical and quantum communications
