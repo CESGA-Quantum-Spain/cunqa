@@ -1,15 +1,3 @@
-/*******************************************************
-
-Copyright (C) 2023 2639731 ONTARIO INC. <joe.diadamo.dryrock@gmail.com>
-
-The files in this repository make up the Codebase.
-
-All files in this Codebase are owned by 2639731 ONTARIO INC..
-
-Any files within this Codebase can not be copied and/or distributed without the express permission of 2639731 ONTARIO INC.
-
-*******************************************************/
-
 /**
  * @file Library.h
  * @version 1.0
@@ -18,7 +6,7 @@ Any files within this Codebase can not be copied and/or distributed without the 
  *
  * The library class.
  *
- * Used to dynamically load a library on linux.
+ * Used to dynamically load a library on linux or windows.
  */
 
 #pragma once
