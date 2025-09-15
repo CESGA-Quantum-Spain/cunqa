@@ -1333,7 +1333,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.sending_to.append(target_circuit_id)
     
 
-    def remote_c_if(self, gate: str, qubits: Union[int, "list[int]"], param: Optional[float], control_circuit: Union[str, 'CunqaCircuit'], matrix: Optional["list[list[list[complex]]]"] = None) -> None:
+    def remote_c_if(self, gate: str, qubits: Union[int, "list[int]"], control_circuit: Union[str, 'CunqaCircuit'], param: Optional[float] = None, matrix: Optional["list[list[list[complex]]]"] = None) -> None:
         """
         Class method to apply a distributed instruction as a gate condioned by a non local classical measurement from a remote circuit and applied locally.
 
