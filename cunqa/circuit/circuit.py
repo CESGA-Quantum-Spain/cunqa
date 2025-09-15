@@ -1275,10 +1275,10 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
 
         if isinstance(qubits, list):
             for q in qubits:
-                self.c_if("x", q, q)
+                self.instructions.append({'name': 'c_if_x', 'qubits': [q, q], 'conditional_reg': [q], 'params': []})
 
         elif isinstance(qubits, int):
-            self.c_if("x", qubits, qubits)
+            self.instructions.append({'name': 'c_if_x', 'qubits': [qubits, qubits], 'conditional_reg': [qubits], 'params': []})
 
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
