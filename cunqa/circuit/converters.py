@@ -19,7 +19,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, Parameter, ParameterExpression
 import qiskit._accelerate.circuit # Handles Symbolic expressions for ParameterExpressions
 
-SymbolExpr = qiskit._accelerate.circuit.ParameterExpression
+#SymbolExpr = qiskit._accelerate.circuit.ParameterExpression
 
 from typing import Tuple, Union, Optional
 
