@@ -20,8 +20,7 @@ class Parameter(Symbol):
     def __init__(self, name, **assumptions):
         super().__init__(name, **assumptions)
 
-    def substitute(self):
-        pass
+    # Use .subs(param, value) to substitute the variable parameter for the value in the symbolic expression
 
     ####### MODIFY THE EXPRESSION #######
     def sin(self):
@@ -63,42 +62,7 @@ class Parameter(Symbol):
         """Sign of a Parameter"""
         return sympy.sign(self)
 
-    # ####### DUNDER METHODS
-    # def __add__(self, other):
-    #     pass
-
-    # def __radd__(self, other):
-    #     pass
-
-    # def __sub__(self, other):
-    #     pass
-
-    # def __rsub__(self, other):
-    #     pass
-
-    # def __mul__(self, other):
-    #     pass
-
-    # def __pos__(self):
-    #     pass
-
-    # def __neg__(self):
-    #     pass
-
-    # def __rmul__(self, other):
-    #     pass
-
-    # def __truediv__(self, other):
-    #     pass
-
-    # def __rtruediv__(self, other):
-    #     pass
-
-    # def __pow__(self, other):
-    #     pass
-
-    # def __rpow__(self, other):
-    #     pass
+    # Dunder methods already implemented on the parent class
     
     
 class Number:
