@@ -83,7 +83,7 @@ class Parameter(sympy.Symbol):
                 # Applies the sympy function instead
                 return numpy_to_sympy_map[ufunc.__name__](*inputs)
             
-            elif ufunc.__name__!= "log10":
+            elif ufunc.__name__== "log10":
                 return sympy.log(self, 10)
             
             else:
