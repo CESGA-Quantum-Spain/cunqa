@@ -25,6 +25,7 @@ int check_memory_specs(const int& mem_per_qpu, const int& cores_per_qpu)
 {
     int mem_per_cpu = mem_per_qpu/cores_per_qpu;
     auto system_var = std::getenv("LMOD_SYSTEM_NAME");
+    if (system_var == nullptr) system_var = "QMIO";
     if ((std::string(system_var) == "QMIO" && mem_per_cpu > 15)) {
         return 1;
     } else if ((std::string(system_var) == "FT3" && mem_per_cpu > 4)){
@@ -68,7 +69,7 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
 
 bool check_simulator_name(const std::string& sim_name)
 {
-    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer") {  // Add new valid simulators to the check here
+    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer" || sim_name == "Maestro") {  // Add new valid simulators to the check here
         return true;
     } else {
         return false;
