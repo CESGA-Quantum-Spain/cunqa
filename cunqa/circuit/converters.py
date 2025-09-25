@@ -24,6 +24,7 @@ import qiskit._accelerate.circuit # Handles Symbolic expressions for ParameterEx
 from typing import Tuple, Union, Optional
 
 from cunqa.circuit.circuit import CunqaCircuit
+from cunqa.circuit.parameter import Variable 
 from cunqa.logger import logger
 
 
@@ -139,18 +140,17 @@ def qc_to_json(qc : 'QuantumCircuit') -> dict:
                 for i, param in enumerate(params):
                     if isinstance(param, Parameter):
 
-                        label = str(param._symbol_expr)
-                        json_data["current_params"].append( label )
-                        json_data["param_labels"].append( label )
-                        params[i]= label
+                        new_param = Variable(str(param._symbol_expr))
+                        json_data["current_params"].append( new_param )
+                        json_data["param_labels"].append( new_param )
+                        params[i]= new_param
 
                     elif isinstance(param, ParameterExpression):
 
-                        labels = tuple(str(name) for name in param._names.keys())
-                        json_data["current_params"].append( labels )
-                        json_data["param_labels"].append( labels )
-                        # TODO: add a third list with (lambda) functions to be applied to each parameter before updating?
-                        params[i]= labels
+                        expr = sympy.sympify(sympy.parsing.sympy_parser.parse_expr(str(param)))
+                        json_data["current_params"].append( expr )
+                        json_data["param_labels"].append( expr )
+                        params[i]= expr
 
                     else:
                         json_data["current_params"].append( param )
@@ -163,13 +163,13 @@ def qc_to_json(qc : 'QuantumCircuit') -> dict:
                     json_data["is_dynamic"] = True
                     json_data["instructions"].append({"name":instruction.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":instruction.params,
+                                                "params":params,
                                                 "conditional_reg":[instruction.operation._condition[0]._index]
                                                 })
                 else:
                     json_data["instructions"].append({"name":instruction.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":instruction.params
+                                                "params":params
                                                 })
             else:
                 clreg_name = [r._register.name for r in instruction.clbits]
@@ -237,6 +237,8 @@ def json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
     """
     cunqac = CunqaCircuit(circuit_dict["num_qubits"], circuit_dict["num_clbits"], circuit_dict["id"])
     cunqac.from_instructions(circuit_dict["instructions"])
+    if "param_labels" in circuit_dict:
+        cunqac.param_labels = circuit_dict["param_labels"]
 
     return cunqac
 
@@ -291,11 +293,14 @@ def json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     
                     if "param_labels" in circuit:
                         for i in range(len(params)):
-                            label = circuit["param_labels"][param_counter + i]
-                            if label != "no_name":
-                                params[i] = Parameter(label)
 
-                    # TODO: should we keep current_params? how to return them?
+                            param_obj = circuit["param_labels"][param_counter + i]
+                            if get_module(param_obj) == "sympy":
+                                params[i] = ParameterExpression({Parameter(str(sym)): sym for sym in param_obj.free_symbols}, param_obj)
+
+                            elif isinstance(param_obj, Variable):
+                                params[i] = Parameter(str(param_obj))
+
                     param_counter += len(params)
 
                 else:
@@ -433,3 +438,7 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
             if any(line.startswith(gate) for gate in parametric_gates):
                 return True
         return False
+
+def get_module(obj):
+    """ Returns the root module that the passed object is from."""
+    return obj.__module__.split('.')[0]

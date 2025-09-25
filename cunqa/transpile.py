@@ -51,6 +51,8 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
             else:
+                current_params = circuit.current_params
+                param_labels = circuit.param_labels
                 qc = convert(circuit.info, "QuantumCircuit")
 
         elif isinstance(circuit, dict):
@@ -58,6 +60,9 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
                 logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
                 raise SystemExit # User's level
             else:
+                if "current_params" in circuit and "param_labels" in circuits:
+                    current_params = circuit["current_params"]
+                    param_labels = circuit["param_labels"]
                 qc = convert(circuit, "QuantumCircuit")
     
         elif isinstance(circuit, str):
@@ -130,9 +135,21 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
         return qc_transpiled
     
     elif isinstance(circuit, dict):
-        return convert(qc_transpiled, "json")
+        cunqa_transpiled = convert(qc_transpiled, "CunqaCircuit")
+        # TODO: add back the current params (in progress right here)
+        subs_dict = {}
+        for value, param in zip(current_params, param_labels):
+            if isinstance(param, Variable):
+                subs_dict[param] = value
+            if get_module(param) == "sympy":
+                pass
+        
+        json_transpiled = convert(cunqa_transpiled, "json")
+        return json_transpiled
     
     elif isinstance(circuit, CunqaCircuit):
-        return convert(qc_transpiled, "CunqaCircuit")
+        cunqa_transpiled = convert(qc_transpiled, "CunqaCircuit")
+        # TODO: add back the current params
+        return cunqa_transpiled
 
     
