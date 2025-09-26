@@ -63,8 +63,9 @@
 import numpy as np
 import random
 import string
-from typing import Union, Optional
 from qiskit import QuantumCircuit
+from collections import defaultdict
+from typing import Union, Optional, Tuple
 
 from cunqa.logger import logger
 
@@ -92,25 +93,50 @@ def _generate_id(size: int = 4) -> str:
 
 
 
-SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "qsend", "qrecv"]
-SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz"]
+SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz", "remote_c_if_ecr"]
+SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr", "remote_c_if_unitary","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz"]
 SUPPORTED_GATES_3Q = [ "ccx","ccy", "ccz","cswap"]
 SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz"]
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
 SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
-SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz"]
-SUPPORTED_GATES_DISTRIBUTED = ["d_c_if_unitary", "d_c_if_h", "d_c_if_x","d_c_if_y","d_c_if_z","d_c_if_rx","d_c_if_ry","d_c_if_rz","d_c_if_cx","d_c_if_cy","d_c_if_cz", "d_c_if_ecr"]
-all_gates = set(SUPPORTED_GATES_1Q)
-all_gates.update(SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q + SUPPORTED_GATES_PARAMETRIC_1 + SUPPORTED_GATES_PARAMETRIC_2 + SUPPORTED_GATES_PARAMETRIC_3 + SUPPORTED_GATES_PARAMETRIC_4 + SUPPORTED_GATES_CONDITIONAL + SUPPORTED_GATES_DISTRIBUTED)
-
 SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
+SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "remote_c_if_unitary", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"]
+SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "distr_unitary", "distr_h", "distr_x", "distr_y", "distr_z", "distr_rx", "distr_ry", "distr_rz", "distr_cx","distr_cy","distr_cz","distr_ecr"]
 
 class CunqaCircuitError(Exception):
     """Exception for error during circuit desing at :py:class:`~cunqa.circuit.CunqaCircuit`."""
     pass
 
-class CunqaCircuit:
+class InstanceTrackerMeta(type):
+    """Metaclass to track instances of CunqaCircuits and extract the connections between them."""
+    _instances = {}
+    _connected = None
+    _new_inst = False
+
+    def __call__(cls, *args, **kwargs):
+        # Create the instance using the original __call__ method
+        instance = super().__call__(*args, **kwargs)
+        
+        # Store the instance 
+        cls._instances[instance._id] = instance
+        
+        return instance
+
+    def access_other_instances(cls):
+        return cls._instances
+    
+    def get_connectivity(cls):
+            if (cls._connected is None or cls._new_inst):
+                # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
+                first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
+                # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
+                cls._connected = transitive_combinations(first_connections) 
+                cls._new_inst = False
+
+            return cls._connected
+
+class CunqaCircuit(metaclass=InstanceTrackerMeta):
     # TODO: look for other alternatives for describing the documentation that do not requiere such long docstrings, maybe gatehring everything in another file and using decorators, as in ther APIs.
     """
     Class to define a quantum circuit for the :py:mod:`~cunqa` api.
@@ -271,20 +297,20 @@ class CunqaCircuit:
             logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
             raise SystemExit
         
+        self.is_parametric = False 
+
         if id is None:
             self._id = "CunqaCircuit_" + _generate_id()
         elif isinstance(id, str):
-            self._id = id
+            other_circuits = self.__class__.access_other_instances()
+            if id in other_circuits.keys():
+                logger.error(f"Id {id} was already used for another circuit.")
+                raise SystemExit
+            else:
+                self._id = id
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
-            raise SystemExit 
-        
-        self.is_parametric = False
-
-
-        self.instructions = []
-
-        self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
+            raise SystemExit
 
         if num_clbits is None:
             self.classical_regs = {}
@@ -292,12 +318,18 @@ class CunqaCircuit:
         elif isinstance(num_clbits, int):
             self.classical_regs = {'c0':[c for c in range(num_clbits)]}
 
+
+
     @property
     def info(self) -> dict:
         """
         Information about the main class attributes given as a dictinary.
         """
-        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to}
+        info = {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
+        if self.is_parametric:
+            info += {"param_labels": self.param_labels,"current_params": self.current_params}
+
+        return info
 
     @property
     def num_qubits(self) -> int:
@@ -312,6 +344,24 @@ class CunqaCircuit:
         Number of classical bits of the circuit.
         """
         return len(_flatten([[c for c in cr] for cr in self.classical_regs.values()]))
+
+    @property
+    def layers(self):
+        layer_dict = {f"{i}": [] for i in range(self.num_qubits)} 
+        self.last_active_layer = [0 for _ in range(self.num_qubits)]
+
+        for i, instr in enumerate(self.instructions):
+            if instr["name"] in SUPPORTED_GATES_1Q:
+                self.last_active_layer[instr["qubits"][0]]+=1
+                layer_dict[str(instr["qubits"][0])].append([self.last_active_layer[instr["qubits"][0]], i, instr["name"]])
+
+            elif instr["name"] in SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q:
+                max_layer_qubit = max([self.last_active_layer[j] for j in instr["qubits"]])
+                for j in instr["qubits"]:
+                    self.last_active_layer[j] = max_layer_qubit + 1
+                    layer_dict[str(j)].append([self.last_active_layer[j], i, instr["name"]])
+
+        return layer_dict
 
 
     def from_instructions(self, instructions: list[dict]):
@@ -505,7 +555,7 @@ class CunqaCircuit:
             while new_name in self.classical_regs:
                 new_name = new_name + "_" + str(i); i += 1
 
-            logger.warning(f"{name} for classcial register in use, renaaming to {new_name}.")
+            logger.warning(f"{name} for classical register in use, renaming to {new_name}.")
         
         else:
             new_name = name
@@ -513,7 +563,7 @@ class CunqaCircuit:
         self.classical_regs[new_name] = [(self.num_clbits + i) for i in range(number_clbits)]
 
         return new_name
-    
+
     
     # =============== INSTRUCTIONS ===============
     
@@ -1255,7 +1305,7 @@ class CunqaCircuit:
     # TODO: check if simulators accept reset instruction as native
     def reset(self, *qubits: int):
         """
-        Class method to add reset instruction to a qubit or list of qubits.
+        Class method to add reset to zero instruction to a qubit or list of qubits (use after measure).
 
         Args:
             qubits (int): qubits to which the reset operation is applied.
@@ -1264,13 +1314,21 @@ class CunqaCircuit:
 
         if isinstance(qubits, list):
             for q in qubits:
-                self.c_if("x", q, q)
+                self.instructions.append({'name': 'c_if_x', 'qubits': [q, q], 'conditional_reg': [q], 'params': []})
 
         elif isinstance(qubits, int):
-            self.c_if("x", qubits, qubits)
+            self.instructions.append({'name': 'c_if_x', 'qubits': [qubits, qubits], 'conditional_reg': [qubits], 'params': []})
 
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
+
+    def save_state(self, pershot: bool = False, label: str = "_method_"):
+        self.instructions.append({
+            "name": "save_state",
+            "qubits": list(range(self.num_qubits)),
+            "snapshot_type": "list" if pershot else "single",
+            "label": label
+        })
 
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
@@ -1298,7 +1356,7 @@ class CunqaCircuit:
             target_circuit_id = target_circuit
 
         elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit._id
+            target_circuit_id = target_circuit.id
         else:
             logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
             raise SystemExit
@@ -1312,73 +1370,6 @@ class CunqaCircuit:
 
 
         self.sending_to.append(target_circuit_id)
-    
-    def qsend(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
-        """
-        Class method to send a qubit from the current circuit to another one.
-        
-        Args:
-            qubit (int): qubit to be sent.
-
-            target_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is sent.
-        """
-        self.has_qc = True
-        self.is_dynamic = True
-        
-        if isinstance(qubit, int):
-            list_control_qubit = [qubit]
-        else:
-            logger.error(f"control qubit must be int, but {type(qubit)} was provided [TypeError].")
-            raise SystemExit
-        
-        if isinstance(target_circuit, str):
-            target_circuit_id = target_circuit
-
-        elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit._id
-        else:
-            logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
-            raise SystemExit
-        
-
-        self._add_instruction({
-            "name": "qsend",
-            "qubits": list_control_qubit,
-            "circuits": [target_circuit_id]
-        })
-
-    def qrecv(self, qubit: int, control_circuit: Union[str, 'CunqaCircuit']) -> None:
-        """
-        Class method to send a qubit from the current circuit to a remote one.
-        
-        Args:
-            qubit (int): ancilla to which the received qubit is assigned.
-
-            control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
-        """
-        self.has_qc = True
-        self.is_dynamic = True
-        
-        if isinstance(qubit, int):
-            qubits = [qubit]
-        else:
-            logger.error(f"control qubit must be int, but {type(qubit)} was provided [TypeError].")
-            raise SystemExit
-        
-        if isinstance(control_circuit, str):
-            control_circuit_id = control_circuit
-
-        elif isinstance(control_circuit, CunqaCircuit):
-            control_circuit_id = control_circuit._id
-        else:
-            logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
-            raise SystemExit
-        
-        self._add_instruction({
-            "name": "qrecv",
-            "qubits": qubits,
-            "circuits": [control_circuit_id]
-        })
 
     def remote_c_if(self, gate: str, qubits: Union[int, "list[int]"], param: Optional[float], control_circuit: Union[str, 'CunqaCircuit'], matrix: Optional["list[list[list[complex]]]"] = None) -> None:
         """
@@ -1423,7 +1414,7 @@ class CunqaCircuit:
             control_circuit = control_circuit
 
         elif isinstance(control_circuit, CunqaCircuit):
-            control_circuit = control_circuit._id
+            control_circuit = control_circuit.id
         else:
             logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
             raise SystemExit
@@ -1463,79 +1454,151 @@ class CunqaCircuit:
             "params":params,
         })
 
-    def assign_parameters(self, **marked_params):
-        """
-        Plugs values into the intructions of parametric gates marked with a parameter name.
+                
+    def qsend(self, control_qubit: Optional[int] = None, target_circuit: Optional[Union[str, 'CunqaCircuit']] = None) -> None:
+            """
+            Class method to send a qubit from the current circuit to a remote one.
+            
+            Args:
+            -------
 
-        Args:
-          marked_parameters (dict): values for each set of marked parameters
+            control_qubit (int): control qubit from self.
+
+            target_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit to which we will send the gate or the circuit itself.
+
+            """
+
+            self.is_distributed = True
+
+            if isinstance(control_qubit, int):
+                list_control_qubit = [control_qubit]
+            else:
+                logger.error(f"control qubit must be int, but {type(control_qubit)} was provided [TypeError].")
+                raise SystemExit
+
+            if target_circuit is None:
+                logger.error("target_circuit not provided.")
+                raise SystemExit
+            
+            elif isinstance(target_circuit, str):
+                target_circuit_id = target_circuit
+
+            elif isinstance(target_circuit, CunqaCircuit):
+                target_circuit_id = target_circuit.id
+            else:
+                logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
+                raise SystemExit
+            
+
+            self._add_instruction({
+                "name": "qsend",
+                "qubits": _flatten([list_control_qubit]),
+                "circuits": [target_circuit_id]
+            })
+
+            self.sending_to.append(target_circuit_id)
+
+    def qrecv(self, gate: str, target_qubits: Union[int, "list[int]"], param: float, control_circuit: Optional[Union[str, 'CunqaCircuit']] = None)-> None:
         """
-        try:
-            for instruction in self.instructions:
-                if (("params" in instruction) and (not instruction["name"] in {"unitary", "c_if_unitary", "remote_c_if_unitary"}) and (len(instruction["params"]) != 0)):
-                    for i, param in enumerate(instruction["params"]):
-                        if isinstance(param, str) and param in marked_params:
-                            if isinstance(marked_params[param], (int, float)):
-                                instruction["params"][i] = marked_params[param]
-                            elif isinstance(marked_params[param], list):
-                                instruction["params"][i] = marked_params[param].pop(0)
-                            else:
-                                logger.error(f"Parameters must be list[int, float], int or float but {type(marked_params[param])} was given.")
-                                raise SystemExit
-                                
-        except Exception as error:
-            logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error}")
+        Class method to apply a distributed instruction as a gate controlled by a non-local qubit (from a remote circuit).
+        
+        Args:
+        -------
+        gate (str): gate to be applied. Has to be supported by CunqaCircuit.
+
+        target_qubits (int): target qubits from self.
+
+        param (float or int): parameter in case the gate provided is parametric.
+
+        control_circuit (str, <class 'cunqa.circuit.CunqaCircuit'>): id of the circuit (or circuit itself) from which we will receive a qubit.       
+        """
+
+        self.is_distributed = True
+
+        if isinstance(gate, str):
+            name = "distr_" + gate
+        else:
+            logger.error(f"gate specification must be str, but {type(gate)} was provided [TypeError].")
             raise SystemExit
         
-        if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
-            logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}.")
+        if isinstance(target_qubits, int):
+            target_qubits = [target_qubits]
+        elif isinstance(target_qubits, list):
+            pass
+        else:
+            logger.error(f"target qubits must be int ot list, but {type(target_qubits)} was provided [TypeError].")
+            raise SystemExit
+        
+        if param is not None:
+            params = [param]
+        else:
+            params = []
+
+        if control_circuit is None:
+            logger.error("target_circuit not provided.")
+            raise SystemExit
+        
+        elif isinstance(control_circuit, str):
+            control_circuit = control_circuit
+
+        elif isinstance(control_circuit, CunqaCircuit):
+            control_circuit = control_circuit.id
+        else:
+            logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
+            raise SystemExit
+        
+        if name in SUPPORTED_GATES_DISTRIBUTED:
+
+            self._add_instruction({
+                "name": name,
+                "qubits": _flatten([target_qubits]),
+                "params":params,
+                "circuits": [control_circuit]
+            })
+        else:
+            logger.error(f"Gate {name} is not supported for quantum communications.")
+            raise SystemExit
+            # TODO: maybe in the future this can be check at the begining for a more efficient processing
 
 
-                
-def _flatten(lists: "list[list]"):
+
+
+
+#################################################################################
+#################### PURELY UTILITARIAN/MATHEMATICAL METHODS ####################
+#################################################################################
+
+def _flatten(lists: list[list]):
     """
     Takes the elements of the lists supplied and creates a single list gathering all of them.
-
-    Args:
-        lists (list[list]): list of the lists which elements are wanted to be gathered.
     """
     return [element for sublist in lists for element in sublist]
+   
 
-
-def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bool:
+def transitive_combinations(pairs: set) -> set:
     """
-    Function to determine weather a cirucit has gates that accept parameters, not necesarily parametric :py:class:`qiskit.QuantumCircuit`.
-    For example, a circuit that is composed by hadamard and cnot gates is not a parametric circuit; but if a circuit has any of the gates defined in `parametric_gates` we
-    consider it a parametric circuit for our purposes.
-
-    Args:
-        circuit (qiskit.QuantumCircuit | dict | str): the circuit from which we want to find out if it's parametric.
-
-    Return:
-        True if the circuit is considered parametric, False if it's not.
+    Method used to find deep connectivity between circuits from first order connections. Used on CunqaCircuit's metaclass.
     """
-    parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
-    if isinstance(circuit, QuantumCircuit):
-        for instruction in circuit.data:
-            if instruction.operation.name in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, dict):
-        for instruction in circuit['instructions']:
-            if instruction['name'] in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, list):
-        for instruction in circuit:
-            if instruction['name'] in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, CunqaCircuit):
-        return circuit.is_parametric
-    elif isinstance(circuit, str):
-        lines = circuit.splitlines()
-        for line in lines:
-            line = line.strip()
-            if any(line.startswith(gate) for gate in parametric_gates):
-                return True
-        return False
+    # Step 1: Create a graph representation of the given pairs
+    graph = defaultdict(set)
+    for pair in pairs:
+        for node in pair:
+            graph[node].update(pair)
+
+    # Step 2: Perform a breadth-first search to find all transitive combinations
+    transitive_combinations = pairs.copy()
+
+    while True:
+        new_combinations = set()
+        for combo in transitive_combinations:
+            for node in combo:
+                for neighbor in graph[node]:
+                    if neighbor not in combo:
+                        new_combo = frozenset({*combo, neighbor})
+                        if new_combo not in transitive_combinations:
+                            new_combinations.add(new_combo)
+        if not new_combinations:
+            break
+        transitive_combinations.update(new_combinations)
+
+    return transitive_combinations

@@ -10,13 +10,13 @@
 
 
 from qiskit import QuantumCircuit
-from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit
+from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, Parameter, ParameterExpression
 from qiskit.qasm2 import dumps as dumps2
 from qiskit.qasm3 import dumps as dumps3
 
 from typing import Tuple, Union, Optional
 
-from cunqa.circuit import CunqaCircuit, _is_parametric
+from cunqa.circuit.circuit import CunqaCircuit
 from cunqa.logger import logger
 
 class ConvertersError(Exception):
@@ -134,6 +134,10 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "quantum_registers":quantum_registers,
             "classical_registers":classical_registers
         }
+        if _is_parametric(qc):
+            json_data["current_params"] = []
+            json_data["param_labels"] = []
+
         for instruction in qc.data:
             qreg = [r._register.name for r in instruction.qubits]
             qubit = [q._index for q in instruction.qubits]
@@ -149,6 +153,30 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
                                                 "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
                                                 })
             elif instruction.name != "measure":
+                # Process instructions to avoid unhandled Parameters 
+                params = instruction.params
+                for i, param in enumerate(params):
+                    if isinstance(param, Parameter):
+
+                        label = str(param._symbol_expr)
+                        json_data["current_params"].append( label )
+                        json_data["param_labels"].append( label )
+                        params[i]= label
+
+                    elif isinstance(param, ParameterExpression):
+
+                        labels = tuple(str(name) for name in param._names.keys())
+                        json_data["current_params"].append( labels )
+                        json_data["param_labels"].append( labels )
+                        # TODO: add a third list with (lambda) functions to be applied to each parameter before updating?
+                        params[i]= labels
+
+                    else:
+                        json_data["current_params"].append( param )
+                        json_data["param_labels"].append( "no_name" )
+                        # No modification on params needed
+
+
 
                 if (instruction.operation._condition != None):
                     json_data["is_dynamic"] = True
@@ -198,6 +226,27 @@ def _qc_to_qasm(qc : 'QuantumCircuit', version = "3.0") -> str:
     
 
 def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
+    """
+    Args:
+        qc (qiskit.QuantumCircuit): object that defines the quantum circuit.
+    Returns:
+        The corresponding :py:class:`~cunqa.circuit.CunqaCircuit` with the propper instructions and characteristics.
+    """
+    return json_to_cunqac(qc_to_json(qc))
+
+def cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
+    """
+    Converts a :py:class:`~cunqa.circuit.CunqaCircuit` into a json :py:type:`dict` circuit.
+
+    Args:
+        cunqac (~cunqa.circuit.CunqaCircuit): object that defines the quantum circuit.
+
+    Returns:
+        The corresponding json :py:type:`dict` circuit with the propper instructions and characteristics.
+    """
+    return cunqac.info
+
+def cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     """
     Converts a :py:class:`~cunqa.circuit.CunqaCircuit` into a :py:class:`qiskit.QuantumCircuit`.
 
@@ -266,11 +315,21 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                 bits.append(i)
             qc.add_register(ClassicalRegister(len(lista), cr))
 
-
+        param_counter = 0
         for instruction in instructions:
             if instruction['name'] != 'measure':
                 if 'params' in instruction:
                     params = instruction['params']
+                    
+                    if "param_labels" in circuit:
+                        for i in range(len(params)):
+                            label = circuit["param_labels"][param_counter + i]
+                            if label != "no_name":
+                                params[i] = Parameter(label)
+
+                    # TODO: should we keep current_params? how to return them?
+                    param_counter += len(params)
+
                 else:
                     params = []
                 inst = CircuitInstruction( 

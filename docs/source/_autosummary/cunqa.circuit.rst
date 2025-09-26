@@ -1,0 +1,52 @@
+cunqa.circuit
+=============
+
+.. automodule:: cunqa.circuit
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      flatten
+      from_json_to_qc
+      generate_id
+      is_parametric
+      qc_to_json
+      registers_dict
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+   
+      CunqaCircuit
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+      :toctree:
+   
+      CunqaCircuitError
+   
+   
+
+
+

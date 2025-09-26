@@ -34,7 +34,7 @@ from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert, _registers_dict
+from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
@@ -453,7 +453,8 @@ class QJob:
                 "method":"statevector", 
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
-                "seed": 123123}
+                "seed": 123123
+                }
 
             if (run_parameters == None) or (len(run_parameters) == 0):
                 logger.debug("No run parameters provided, default were set.")

@@ -100,30 +100,8 @@ else:
 class QRaiseError(Exception):
     """Exception for errors during qraise slurm command."""
     pass
-
-def are_QPUs_raised(family: Optional[str] = None) -> bool:
-    """
-    Checks availability of QPUs, filtering by `family` if desired.
-
-    Args:
-        family (str): name of the family of the QPUs whose availability is checked.
-    
-    Returns:
-        ``True`` if those are deployed, ``False`` if not.
-    """
-    last_modification = os.stat(INFO_PATH).st_mtime 
-    while True:
-        if last_modification != os.stat(INFO_PATH).st_mtime: 
-            last_modification = os.stat(INFO_PATH).st_mtime
-            if family == None:
-                return True
-            else:
-                with open(INFO_PATH, "r") as qpus_json:
-                    data = json.load(qpus_json)
-                    for value in data.values():
-                        if value["family"] == family:
-                            return True
-                        
+               
+               
 def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
@@ -422,3 +400,5 @@ def get_QPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
     else:
         logger.error(f"No QPUs where found with the characteristics provided: local={local}, family_name={family}.")
         raise SystemExit
+
+

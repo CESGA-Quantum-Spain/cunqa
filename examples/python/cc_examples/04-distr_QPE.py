@@ -1,5 +1,6 @@
 import os, sys
 import math
+import math
 import numpy as np
 import time
 import statistics as st
@@ -13,6 +14,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
+def print_results(result_list, angle):
 def print_results(result_list, angle):
     counts_list = []
     for result in result_list:
