@@ -15,7 +15,6 @@ from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
 def print_results(result_list, angle):
-def print_results(result_list, angle):
     counts_list = []
     for result in result_list:
         counts_list.append(result.counts)

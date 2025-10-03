@@ -108,7 +108,7 @@ Bob.measure(2,2)
 
 circs = [Alice, Bob]
 distr_jobs = run_distributed(circs, qpus, shots=1) # create the jobs to store the circuits for upgrade_parameters,
-                                                           # but the results of this first submission will be discarded.
+                                                   # but the results of this first submission will be discarded.
 
 ########## Circuit combination for successful circuit cutting ##########
 shots = 1024

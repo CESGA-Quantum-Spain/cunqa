@@ -62,11 +62,11 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
         }
 
     } else if (quantum_task_json.contains("params"))
-        update_params_(quantum_task_json.at("params"), quantum_task_json.at("shots"));
+        update_params_(quantum_task_json.at("params"));
 }
 
     
-void QuantumTask::update_params_(const std::vector<double> params, const int& new_shots)
+void QuantumTask::update_params_(const std::vector<double> params)
 {
     if (circuit.empty()) 
         throw std::runtime_error("Circuit not sent before updating parameters.");
@@ -110,8 +110,6 @@ void QuantumTask::update_params_(const std::vector<double> params, const int& ne
             }
         }
 
-        config.at("shots") = new_shots;
-        
     } catch (const std::exception& e){
         LOGGER_ERROR("Error updating parameters. (check correct size).");
         throw std::runtime_error("Error updating parameters:" + std::string(e.what())); 

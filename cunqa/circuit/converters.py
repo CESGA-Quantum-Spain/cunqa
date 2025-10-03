@@ -92,7 +92,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
         
         return converted_circuit
     except Exception as error:
-            logger.error(f" Unable to convert circuit to {convert_to} [{type(error).__name__}].")
+            logger.error(f" Unable to convert circuit to {convert_to} [{type(error).__name__}].\n {error}")
             raise SystemExit
 
 
@@ -232,7 +232,7 @@ def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     Returns:
         The corresponding :py:class:`~cunqa.circuit.CunqaCircuit` with the propper instructions and characteristics.
     """
-    return json_to_cunqac(qc_to_json(qc))
+    return _json_to_qc(cunqac_to_json(cunqac))
 
 def cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
     """
@@ -422,6 +422,44 @@ def _qasm_to_json(circuit_qasm : str) -> dict:
     return _qc_to_json(_qasm_to_qc(circuit_qasm))
 
     
+def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bool:
+    """
+    Function to determine weather a cirucit has gates that accept parameters, not necesarily parametric :py:class:`qiskit.QuantumCircuit`.
+    For example, a circuit that is composed by hadamard and cnot gates is not a parametric circuit; but if a circuit has any of the gates defined in `parametric_gates` we
+    consider it a parametric circuit for our purposes.
+
+    Args:
+        circuit (qiskit.QuantumCircuit | dict | str): the circuit from which we want to find out if it's parametric.
+
+    Return:
+        True if the circuit is considered parametric, False if it's not.
+    """
+    parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
+    if isinstance(circuit, QuantumCircuit):
+        for instruction in circuit.data:
+            if instruction.operation.name in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, dict):
+        for instruction in circuit['instructions']:
+            if instruction['name'] in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, list):
+        for instruction in circuit:
+            if instruction['name'] in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, CunqaCircuit):
+        return circuit.is_parametric
+    elif isinstance(circuit, str):
+        lines = circuit.splitlines()
+        for line in lines:
+            line = line.strip()
+            if any(line.startswith(gate) for gate in parametric_gates):
+                return True
+        return False
+
 def _registers_dict(qc: 'QuantumCircuit') -> "list[dict]":
     """
     Returns a list of two dicts corresponding to the classical and quantum registers of the circuit supplied.
