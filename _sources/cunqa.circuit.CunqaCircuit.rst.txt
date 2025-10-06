@@ -253,6 +253,14 @@ Methods
 
 
 
+
+
+
+
+
+
+
+
 .. automethod:: CunqaCircuit.assign_parameters
 
 .. automethod:: CunqaCircuit.c_if
@@ -289,6 +297,8 @@ Methods
 
 .. automethod:: CunqaCircuit.ecr
 
+.. automethod:: CunqaCircuit.expose
+
 .. automethod:: CunqaCircuit.from_instructions
 
 .. automethod:: CunqaCircuit.h
@@ -300,6 +310,8 @@ Methods
 .. automethod:: CunqaCircuit.measure_all
 
 .. automethod:: CunqaCircuit.measure_and_send
+
+.. automethod:: CunqaCircuit.multicontrol
 
 .. automethod:: CunqaCircuit.p
 

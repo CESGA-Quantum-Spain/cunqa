@@ -18,7 +18,6 @@
       :nosignatures:
       :recursive:
    
-      are_QPUs_raised
       get_QPUs
       info_QPUs
       nodes_with_QPUs
