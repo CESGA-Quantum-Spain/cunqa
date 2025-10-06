@@ -16,6 +16,7 @@ Attributes
 
    ~QPU.backend
    ~QPU.id
+   ~QPU.name
 
 
 
