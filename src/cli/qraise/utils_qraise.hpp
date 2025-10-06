@@ -25,6 +25,7 @@ bool check_mem_format(const int& mem)
 int get_mem_per_core()
 {
     auto system_var = std::getenv("LMOD_SYSTEM_NAME");
+    if (system_var == nullptr) system_var = "QMIO";
     if (std::string(system_var) == "QMIO") {
         return 15;
     } else if ((std::string(system_var) == "FT3")){
@@ -69,7 +70,7 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
 
 bool check_simulator_name(const std::string& sim_name)
 {
-    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer") {  // Add new valid simulators to the check here
+    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer" || sim_name == "Maestro") {  // Add new valid simulators to the check here
         return true;
     } else {
         return false;

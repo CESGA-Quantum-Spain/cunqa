@@ -1,4 +1,4 @@
-#include "aer_qc_simulator.hpp"
+#include "maestro_qc_simulator.hpp"
 
 #include <string>
 #include <cstdlib>
@@ -8,16 +8,14 @@
 namespace cunqa {
 namespace sim {
 
-AerQCSimulator::AerQCSimulator()
+MaestroQCSimulator::MaestroQCSimulator()
 { 
     classical_channel.publish();
     auto executor_endpoint = classical_channel.recv_info("executor");
-    std::string id_ = "executor";
-    classical_channel.connect(executor_endpoint, id_);
-    write_executor_endpoint(executor_endpoint); 
+    classical_channel.connect(executor_endpoint, "executor");
 };
 
-AerQCSimulator::AerQCSimulator(const std::string& group_id)
+MaestroQCSimulator::MaestroQCSimulator(const std::string& group_id)
 {
     classical_channel.publish(group_id);
     auto executor_endpoint = classical_channel.recv_info("executor");
@@ -26,7 +24,8 @@ AerQCSimulator::AerQCSimulator(const std::string& group_id)
     write_executor_endpoint(executor_endpoint, group_id);
 };
 
-JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
+
+JSON MaestroQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
     auto circuit = to_string(quantum_task);
     classical_channel.send_info(circuit, "executor");
@@ -37,7 +36,7 @@ JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const Qu
     return JSON();
 }
 
-void AerQCSimulator::write_executor_endpoint(const std::string endpoint, const std::string& group_id)
+void MaestroQCSimulator::write_executor_endpoint(const std::string endpoint, const std::string& group_id)
 {
     const std::string store = getenv("STORE");
     const std::string filename = store + "/.cunqa/communications.json";
