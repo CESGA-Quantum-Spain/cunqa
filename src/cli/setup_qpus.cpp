@@ -125,9 +125,9 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
                                    
 
     LOGGER_DEBUG("Command: {}", command);
-    
+
     if (SYSTEM_NAME == "QMIO") {
-        std::system(("ml load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
+        std::system(("ml load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.11.9 2> /dev/null\n"s + command).c_str());
     } else if (SYSTEM_NAME == "FT3") {
         std::system(("ml load cesga/2022 gcc/system qiskit/1.2.4 2> /dev/null\n"s + command).c_str());
     } else if (SYSTEM_NAME == "MY_CLUSTER") {

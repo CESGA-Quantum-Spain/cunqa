@@ -27,7 +27,7 @@ qc.measure_all()
 qjobs = []
 for _ in range(1):
     for qpu in qpus: 
-        qjobs.append(qpu.run(qc, transpile=False, shots = 100))
+        qjobs.append(qpu.run(qc, transpile=True, shots = 100))
 
 results = gather(qjobs)
 
