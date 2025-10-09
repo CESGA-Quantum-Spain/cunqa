@@ -514,7 +514,7 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
         JSON run_config_json(quantum_task.config);
 
         SimpleSimulator simulator;
-        if (simulator.Init("maestro.so"))
+        if (simulator.Init("/mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/maestro.so"))
         {
 			unsigned long int simulatorHandle = simulator.CreateSimpleSimulator(n_qbits);
             if (simulatorHandle == 0)
