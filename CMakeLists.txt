@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 project(CUNQA VERSION 0.0.1 LANGUAGES CXX)
 
+
 message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE CONFIGURATION TYPE: ${CMAKE_CONFIGURATION_TYPES}")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -33,6 +34,15 @@ set(CMAKE_INSTALL_BINDIR "bin")
 set(PYBIND_PATH "$ENV{EBROOTPYBIND11}/lib64/python3.9/site-packages/pybind11")
 set(pybind11_DIR "$ENV{EBROOTPYBIND11}/lib64/python3.9/site-packages/pybind11/share/cmake/pybind11")
 
+# System name to identify cluster
+set(SYSTEM_NAME $ENV{LMOD_SYSTEM_NAME})
+if(NOT SYSTEM_NAME OR NOT (SYSTEM_NAME STREQUAL "QMIO" OR SYSTEM_NAME STREQUAL "FT3"))
+    set(SYSTEM_NAME "MY_CLUSTER")
+endif()
+message(STATUS "SYSTEM NAME: ${SYSTEM_NAME}")
+add_compile_definitions(SYSTEM_NAME="${SYSTEM_NAME}")
+
+
 #if("$ENV{LMOD_SYSTEM_NAME}" STREQUAL "QMIO")
 #    set(PYBIND_PATH "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.12.0-python-3.9.9/lib64/python3.9/site-packages/pybind11")
 #    set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.12.0-python-3.9.9/lib64/python3.9/site-packages/pybind11/share/cmake/pybind11")
@@ -56,9 +66,18 @@ find_package(LAPACK REQUIRED)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${Python_INCLUDE_DIRS}" "${MPI_INCLUDE_PATH}")
 
+# To link OpenMP with Aer:
+add_library(AerCPP INTERFACE)
+target_include_directories(AerCPP INTERFACE "{CMAKE_CURRENT_SOURCE_DIR}/src/third-party/#aer-cpp")
+if(OpenMP_FOUND)
+  target_link_libraries(AerCPP INTERFACE OpenMP::OpenMP_CXX)
+  message(STATUS "Linked OpenMP to aer-cpp")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(cunqa)
 add_subdirectory(examples)
+
 
 # uninstall target
 if(NOT TARGET uninstall)

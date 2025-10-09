@@ -3,6 +3,7 @@
 #include <stack>
 #include <chrono>
 #include <functional>
+#include <cstdlib>
 
 #include "aer_simulator_adapter.hpp"
 
@@ -360,11 +361,16 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
 JSON AerSimulatorAdapter::simulate(const Backend* backend)
 {
     try {
+
+        /* int result = std::system("python /mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/examples/aer_bench.py"); */
+
         auto quantum_task = qc.quantum_tasks[0];
 
         auto aer_quantum_task = quantum_task_to_AER(quantum_task);
         int n_clbits = quantum_task.config.at("num_clbits");
         JSON circuit_json = aer_quantum_task.circuit;
+
+        //LOGGER_DEBUG("Circuit: {}", circuit_json.dump());
 
         Circuit circuit(circuit_json);
         std::vector<std::shared_ptr<Circuit>> circuits;
@@ -374,11 +380,16 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         run_config_json["seed_simulator"] = quantum_task.config.at("seed");
         Config aer_config(run_config_json);
 
+        LOGGER_DEBUG("Circiut: {}", circuit_json.dump());
+
         Noise::NoiseModel noise_model(backend->config.at("noise_model"));
 
         Result result = controller_execute<Controller>(circuits, noise_model, aer_config);
 
         JSON result_json = result.to_json();
+
+        LOGGER_DEBUG("Result: {}", result_json.dump());
+
         convert_standard_results_Aer(result_json, n_clbits);
 
         return result_json;
@@ -400,7 +411,8 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
     AER::AerState* state = new AER::AerState();
-    state->configure("method", method);
+    std::string sim_method = (method == "automatic") ? "statevector" : method;
+    state->configure("method", sim_method);
     state->configure("device", "CPU");
     state->configure("precision", "double");
     state->configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));

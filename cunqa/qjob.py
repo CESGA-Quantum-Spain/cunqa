@@ -450,7 +450,8 @@ class QJob:
             # config dict
             run_config = {
                 "shots": 1024, 
-                "method":"statevector", 
+                "method":"automatic", 
+                "avoid_parallelization": False,
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
                 "seed": 123123}

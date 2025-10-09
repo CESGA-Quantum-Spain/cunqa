@@ -182,7 +182,7 @@ ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake
 * **Standard way**
 ```console
 cmake -B build/ 
-cmake --build build/
+cmake --build build/ --parallel $(nproc)
 cmake --install build/
 ```
 
@@ -268,7 +268,7 @@ The personalized backend has to be a *json* file with the following structure:
 > Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `get_QPUs()` method presented in the section below will collect all the raised QPUs.
 
 ### 2. Python Program Example
-Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow.
+Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow to run a circuit on a single QPU.
 
 > [!WARNING]
 > To execute the following python example it is needed  to load the [Qiskit](https://github.com/Qiskit/qiskit) module:
@@ -296,7 +296,7 @@ sys.path.append(os.getenv("HOME"))
 # Let's get the raised QPUs
 from cunqa.qutils import get_QPUs
 
-qpus  = get_QPUs() # List of raised QPUs
+qpus  = get_QPUs(local=False) # List of all raised QPUs
 for q in qpus:
     print(f"QPU {q.id}, name: {q.backend.name}, backend: {q.backend.simulator}, version: {q.backend.version}.")
 
@@ -312,12 +312,11 @@ qc.measure_all()
 # Time to run
 qpu0 = qpus[0] # Select one of the raise QPUs
 
-job = qpu0.run(qc, transpile = True, shots = 1000)
+job = qpu0.run(qc, transpile = True, shots = 1000) # Run the transpiled circuit
+result = job.result # Get the result of the execution
+counts = result.counts # Get the counts
 
-result = job.result() # Get the result of the execution
-
-counts = result.get_counts() 
-print(f"Counts: {counts}" )
+print(f"Counts: {counts}" ) # {'00':546, '11':454}
 ```
 
 > [!NOTE] 

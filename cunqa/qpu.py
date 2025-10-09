@@ -196,7 +196,7 @@ class QPU:
         # Transpilation if requested
         if transpile:
             try:
-                logger.debug(f"About to transpile: {circuit}")
+                #logger.debug(f"About to transpile: {circuit}")
                 circuit = transpiler(circuit, self._backend, initial_layout = initial_layout, opt_level = opt_level)
                 logger.debug("Transpilation done.")
             except Exception as error:

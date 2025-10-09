@@ -4,6 +4,7 @@
 #include <regex>
 #include <fstream>
 #include <cmath>
+#include <cstdio> // For popen, pclose
 
 #include "utils/json.hpp"
 #include "logger.hpp"
@@ -22,14 +23,15 @@ bool check_mem_format(const int& mem)
     return std::regex_match(mem_str, format);
 }
 
-int get_mem_per_core()
+int get_default_mem_per_core()
 {
-    auto system_var = std::getenv("LMOD_SYSTEM_NAME");
-    if (system_var == nullptr) system_var = "QMIO";
-    if (std::string(system_var) == "QMIO") {
+    
+    if (SYSTEM_NAME == "QMIO") {
         return 15;
-    } else if ((std::string(system_var) == "FT3")){
+    } else if (SYSTEM_NAME == "FT3"){
         return 4;
+    } else if (SYSTEM_NAME == "MY_CLUSTER") {
+        return 2; // To be changed to the specific cluster
     }
     return 0;
 }

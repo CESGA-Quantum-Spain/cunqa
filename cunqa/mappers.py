@@ -65,7 +65,7 @@ from qiskit.qasm2 import QASM2Error
 import numpy as np
 from typing import  Optional, Union, Any
 
-import re
+import time
 import copy
 
 
@@ -319,6 +319,7 @@ class QPUCircuitMapper:
         qjobs = []
 
         try:
+            tick = time.time()
             for i, params in enumerate(population):
                 qpu = self.qpus[i % len(self.qpus)]
                 circuit_assembled = self.circuit.assign_parameters(params)
@@ -329,6 +330,11 @@ class QPUCircuitMapper:
             
             logger.debug(f"About to gather {len(qjobs)} results ...")
             results = gather(qjobs)
+            tack = time.time()
+            median = sum([res.time_taken for res in results])/len(results)
+
+            print("Mean simulation time: ", median)
+            print("Total distribution and gathering time: ", tack-tick)
 
             return [func(result) for result in results]
 

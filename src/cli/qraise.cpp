@@ -75,8 +75,8 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
         }
     }
 
-    if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > get_mem_per_core())) {
-        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu. (Max mem-per-cpu: QMIO = 16, FT3 = 4)");
+    if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > get_default_mem_per_core())) {
+        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
         return;
     }
 
@@ -87,15 +87,14 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
             LOGGER_ERROR("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
             return;
         } else if (!args.mem_per_qpu.has_value()) {
-            int mem_per_core = get_mem_per_core();
+            int mem_per_core = get_default_mem_per_core();
             sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
-        }
-        
+        } 
     } else {
         if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
             sbatchFile << "#SBATCH --mem=" << args.mem_per_qpu.value() * args.n_qpus + args.n_qpus << "G\n";
         } else {
-            int mem_per_core = get_mem_per_core();
+            int mem_per_core = get_default_mem_per_core();
             sbatchFile << "#SBATCH --mem=" << mem_per_core * args.cores_per_qpu * args.n_qpus + args.n_qpus << "G\n";
         }
     }

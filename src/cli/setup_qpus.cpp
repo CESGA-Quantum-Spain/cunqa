@@ -36,14 +36,17 @@ JSON convert_to_backend(const JSON& backend_paths)
 {
     JSON qpu_properties;
     if (backend_paths.size() == 1) {
-        std::ifstream f(backend_paths.begin().value()); // try-catch?
+        auto it = backend_paths.begin();
+        std::string path = it.value().get<std::string>();
+        std::ifstream f(path); // try-catch?
         qpu_properties = JSON::parse(f);
     } else if (backend_paths.size() > 1) {
         std::string str_local_id = std::getenv("SLURM_LOCALID");
         int local_id = std::stoi(str_local_id);
         auto qpu = backend_paths.begin();
         std::advance(qpu, local_id);
-        std::ifstream f(qpu.value()); // try-catch?
+        std::string path = qpu.value().get<std::string>();
+        std::ifstream f(path); // try-catch?
         qpu_properties = JSON::parse(f);
     } else {
         LOGGER_ERROR("No backends provided");
@@ -122,7 +125,18 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
                                    
 
     LOGGER_DEBUG("Command: {}", command);
-    std::system(("ml load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
+    
+    if (SYSTEM_NAME == "QMIO") {
+        std::system(("ml load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.9.9 2> /dev/null\n"s + command).c_str());
+    } else if (SYSTEM_NAME == "FT3") {
+        std::system(("ml load cesga/2022 gcc/system qiskit/1.2.4 2> /dev/null\n"s + command).c_str());
+    } else if (SYSTEM_NAME == "MY_CLUSTER") {
+        std::system(("ml load NEEDED_MODULES 2> /dev/null\n"s + command).c_str());
+    } else {
+        LOGGER_ERROR("SYSTEM_NAME MACRO is not defined.");
+        throw;
+    }
+
     try {
         // Try to open the generated noisy backend file to check if it exists and is readable
         std::ifstream infile(std::getenv("STORE") + std::string("/.cunqa/tmp_noisy_backend_") + std::getenv("SLURM_JOB_ID") + ".json");
@@ -146,6 +160,8 @@ int main(int argc, char *argv[])
 
     if (family == "default")
         family = std::getenv("SLURM_JOB_ID");
+
+    LOGGER_DEBUG("OMP_NUM_THREADS: {}", std::getenv("OMP_NUM_THREADS"));
 
     auto back_path_json = (argc == 7 ? JSON::parse(std::string(argv[6]))
                                      : JSON());

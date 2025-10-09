@@ -6,6 +6,7 @@ target_include_directories(aer_simple_simulator PRIVATE "${CMAKE_SOURCE_DIR}/src
                                                  "${PYBIND_PATH}/include")
 target_link_libraries(aer_simple_simulator PUBLIC json 
                                            PRIVATE logger_qpu aer_adapters)
+target_link_libraries(aer_simple_simulator PRIVATE AerCPP)
 
 # Classical communications simulator
 add_library(aer_cc_simulator "${CMAKE_CURRENT_SOURCE_DIR}/aer_cc_simulator.cpp")
@@ -13,6 +14,7 @@ target_include_directories(aer_cc_simulator PRIVATE "${CMAKE_SOURCE_DIR}/src/thi
                                                  "${PYBIND_PATH}/include")
 target_link_libraries(aer_cc_simulator PUBLIC json 
                                        PRIVATE logger_qpu aer_adapters)
+target_link_libraries(aer_cc_simulator PRIVATE AerCPP)
 
 # Quantum communications simulator
 add_library(aer_qc_simulator "${CMAKE_CURRENT_SOURCE_DIR}/aer_qc_simulator.cpp")

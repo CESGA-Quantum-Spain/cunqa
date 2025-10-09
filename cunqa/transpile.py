@@ -41,7 +41,7 @@ class TranspileError(Exception):
     """Exception for error during the transpilation of a circuit to a given :py:class:`~cunqa.backend.Backend`. """
     pass
 
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
+def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = 81):
     """
     Function to transpile a circuit according to a given :py:class:`~cunqa.backend.Backend`.
     The circuit is returned in the same format as it was originally.
@@ -133,7 +133,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
 
         backend_configuration = BackendConfiguration(**args)
         target =  convert_to_target(backend_configuration)
-        pm = generate_preset_pass_manager(optimization_level = opt_level, target = target, initial_layout = initial_layout)
+        pm = generate_preset_pass_manager(optimization_level = opt_level, target = target, initial_layout = initial_layout, seed_transpiler = seed)
         qc_transpiled = pm.run(qc)
     
     except KeyError as error:

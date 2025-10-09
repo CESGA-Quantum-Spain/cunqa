@@ -132,7 +132,9 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "num_qubits":sum([q.size for q in qc.qregs]),
             "num_clbits": sum([c.size for c in qc.cregs]),
             "quantum_registers":quantum_registers,
-            "classical_registers":classical_registers
+            "classical_registers":classical_registers,
+            "has_cc":False,
+            "has_qc":False,
         }
         for instruction in qc.data:
             qreg = [r._register.name for r in instruction.qubits]
@@ -241,9 +243,14 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
         :py:class:`qiskit.QuantumCircuit` with the given instructions.
     """
 
-    if circuit_dict["has_cc"] or circuit_dict["has_qc"]:
-        logger.error(f"Cannot convert to QuantumCircuit a circuit with communications [{TypeError.__name__}].")
-        raise ConvertersError
+    if "has_cc" in circuit_dict:
+        if circuit_dict["has_cc"]:
+            logger.error(f"Cannot convert to QuantumCircuit a circuit with classsical communications [{TypeError.__name__}].")
+            raise ConvertersError
+    elif "has_qc" in circuit_dict:
+        if circuit_dict["has_qc"]:
+            logger.error(f"Cannot convert to QuantumCircuit a circuit with quantum communications [{TypeError.__name__}].")
+            raise ConvertersError
 
     #Extract key information from the json
     try:
@@ -257,7 +264,6 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
         
     # Proceed with translation
     try:
-    
         qc = QuantumCircuit(num_qubits)
 
         bits = []
@@ -265,7 +271,6 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
             for i in lista: 
                 bits.append(i)
             qc.add_register(ClassicalRegister(len(lista), cr))
-
 
         for instruction in instructions:
             if instruction['name'] != 'measure':
