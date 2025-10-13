@@ -86,13 +86,12 @@ circ1_v2, circ2_v2 = circ_sum.vert_split(1)
 print(f"Vertical division at layer 1 (layers are 0-indexed) of circuit {circ_sum._id}\n")
 print(f"Instructions of the first piece are {circ1_v2.instructions} ")
 print(f"Instructions of the second piece are {circ2_v2.instructions} \n")
-print(f"We note that vertical circuit division is the inverse of the sum. We get circ1 and circ2 back")
+print(f"We note that vertical circuit division is NOT the inverse of the sum. This is because our layer calculation pushes instructions to the left to fill lower layers before proceeding to the higher ones.")
 print("\n") 
 # Problema las layers tiran las instructions hacia la izquierda con lo que no está asegurado casi nunca que sean inversas :(
 
 circ1_v3, circ2_v3 = circ_union.hor_split(2)
-print(f"Horizontal division after qubit 2 (qubits are 0-indexed) of circuit {circ_sum._id}\n")
+print(f"Horizontal division after qubit 1 (qubits are 0-indexed) of circuit {circ_sum._id}\n")
 print(f"Instructions of the first piece are {circ1_v3.instructions}")
 print(f"Instructions of the second piece are {circ2_v3.instructions} \n")
-print(f"We note that horizontal circuit division is the inverse of the union. We get circ3 and circ4 back")
-# Problem with handling the displacement of certain gate qubits depending on where the gate falls w respect to the cut
+print(f"We note that horizontal circuit division is the inverse of the union. We get circ1 and circ2 back")

@@ -3,7 +3,7 @@ Holds dunder methods for the class CunqaCircuit and other functions to extract i
 """
 from typing import Union, Optional, Tuple
 import copy
-from operator 
+import operator 
 
 from cunqa.logger import logger
 from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRIBUTED, SUPPORTED_GATES_1Q
@@ -19,18 +19,6 @@ class HorizontalDivisionError(Exception):
 
 def cunqa_dunder_methods(cls):
 
-    # # =============== MAKE CUNQACIRCUITS HASHABLE ================
-    # def __hash__(self):
-    #     # Must return an integer
-    #     # Should be consistent with __eq__
-    #     return hash((tuple(self.instructions), self._id))
-    
-    # def __eq__(self, other):
-    #     """ Determines when two CunqaCircuits are considered equal. Used in sets of circuits or on dictionary keys."""
-    #     if isinstance(other, CunqaCircuit):
-    #         return (self.instructions == other.instructions and self._id == other._id)
-    #     return False
-
     # ================ CIRCUIT MODIFICATION METHODS ==============
 
     def _update_other_instances(self, instances_to_change, other_id, comb_id, displace_n = 0, up_to_instr = 0, instr_name = "expose"): 
@@ -39,7 +27,9 @@ def cunqa_dunder_methods(cls):
         self or other, the circuits involved on the operation, to reference the combined circuit instead.
         
         Args:
-            instances_to_change (set): set with the ids of the circuits referencing self or other, to change the reference to the combined circuit.
+            instances_to_change (set or dict): set with the ids of the circuits referencing self or other, to change the reference to the combined circuit.
+                                              or dict with keys the ids of the circuits to change with values a list of names to put on each instruction in 
+                                              their place in order, eg [up_id, down_id]
             other_id (str): id of the second circuit in the operation
             comb_id (str): id to substitute in on the instructions of circuits referencing the operands
             displace_n (int): specifies the number of qubits of the upper circuit on a union of circuits. It will displace the qubits of the lower circuit by
@@ -78,12 +68,12 @@ def cunqa_dunder_methods(cls):
                                 if  i > up_to_instr: # if we have substituted up_to_instr instructions we stop
                                     break
 
-        elif isinstance(instance_to_change, dict):
-            for circ, name_list in instance_to_change:
+        elif isinstance(instances_to_change, dict):
+            for circ, name_list in instances_to_change.items():
                 instance = other_instances[circ]
 
                 for instr in instance.instructions:
-                    if "circuits" in instr:
+                    if ("circuits" in instr and instr["circuits"][0] == self._id):
                         instr["circuits"] = name_list.pop(0)
 
             
@@ -313,6 +303,9 @@ def cunqa_dunder_methods(cls):
 
                     union_circuit._add_instruction(instr2)
                     continue
+
+                elif instr["name"] == "qsend":
+                    pass
 
                 else: # ["qsend", "qrecv", "expose", "rcontrol"]
                     # TODO: support these
@@ -573,7 +566,7 @@ def cunqa_dunder_methods(cls):
 
         upper_circuit = CunqaCircuit(n, cl_n, id = up_id)          
         lower_circuit = CunqaCircuit(rest, cl_n, id = down_id)      
-        self.circs_comm = {circuit: [] for circuit in self.access_other_instances()}
+        self.circs_comm = {}
 
         # Add instructions to the two pieces according to their position
         iterator_instructions = iter(copy.deepcopy(self.instructions))
@@ -595,17 +588,17 @@ def cunqa_dunder_methods(cls):
         self.layers
         return max(self.last_active_layer)
 
-    def param_info(self):
-        """
-        Provides information about variable parametric gates: their labels and multiplicity.
+    # def param_info(self):
+    #     """
+    #     Provides information about variable parametric gates: their labels and multiplicity.
 
-        Returns:
-            lenghts (dict[int]): dictionary with keys the names of the parameters of the circuit and the number of times they appear as values.
-        """
-        labels = self.param_labels
-        lenghts = {param: labels.count(param) for param in set(labels)}
+    #     Returns:
+    #         lenghts (dict[int]): dictionary with keys the names of the parameters of the circuit and the number of times they appear as values.
+    #     """
+    #     labels = self.param_labels
+    #     lenghts = {param: labels.count(param) for param in set(labels)}
 
-        return lenghts
+    #     return lenghts
 
     def index(self, gate, multiple = False):
         """
@@ -690,8 +683,8 @@ def cunqa_dunder_methods(cls):
             received (bool): determines wether 'divide_instr' is being called from within (True), in a received case or from 'hor_split' (False).
             recv_remain (int): determines the lenght of instr["instructions"] in the "rcontrol" case to handle recurrence and avoid an infinte loop. 
         """
-        qubits_up        = [q for q in instr["qubits"][0] if q < n+1]
-        qubits_down      = [q - (n+1) for q in instr["qubits"][0] if q > n]
+        qubits_up        = [q for q in instr["qubits"] if q < n+1]
+        qubits_down      = [q - (n+1) for q in instr["qubits"] if q > n]
         conditional_up   = [q for q in instr["conditional_reg"] if q < n+1]         if ("conditional_reg" in instr) else []
         conditional_down = [q - (n+1) for q in instr["conditional_reg"] if q > n ]  if ("conditional_reg" in instr) else []
 
@@ -716,12 +709,20 @@ def cunqa_dunder_methods(cls):
             elif self.rcontrol_up:
                 upper_circuit._add_instruction(instr) # recv
                 upper_circuit._add_instruction(*self.rcontrol_up)
-                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
 
             elif self.rcontrol_down:
                 lower_circuit._add_instruction(instr) # recv
                 lower_circuit._add_instruction(*self.rcontrol_down)
-                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
             
             del self.rcontrol_up
             del self.rcontrol_down
@@ -747,12 +748,20 @@ def cunqa_dunder_methods(cls):
             elif self.rcontrol_up:
                 instr["instructions"] = self.rcontrol_up
                 upper_circuit._add_instruction(instr) # rcontrol
-                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
 
             elif self.rcontrol_down:
                 instr["instructions"] = self.rcontrol_down
                 lower_circuit._add_instruction(instr) # rcontrol
-                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
 
             # TODO: modify other instances to point to the correct one
             
@@ -769,7 +778,10 @@ def cunqa_dunder_methods(cls):
                 instr["conditional_reg"] = conditional_down
 
             if "circuits" in instr:
-                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
 
             if received:
                 self.rcontrol_down.append(instr)
@@ -783,7 +795,10 @@ def cunqa_dunder_methods(cls):
 
         elif (len(qubits_down) == 0 and len(conditional_down) == 0):
             if "circuits" in instr:
-                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                if instr["circuits"][0] in self.circ_comm:
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                else:
+                    self.self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
 
             if received:
                 self.rcontrol_up.append(instr)
