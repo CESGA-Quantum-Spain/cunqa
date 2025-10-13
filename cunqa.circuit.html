@@ -202,6 +202,17 @@ Be aware that some instructions might not be supported for <a class="reference i
 <p>A low level way of representing a circuit is by a json <code class="docutils literal notranslate"><span class="pre">dict</span></code> with specefic fields that gather the information
 needed by the simulator in order to run the circuit.</p>
 <p>This structe is presented below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="c1"># circuit identificator</span>
+ <span class="s2">&quot;is_parametric&quot;</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="c1"># weather if the circuit has parametric instructions that can be updated</span>
+ <span class="s2">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="c1"># weather if the circuit has intermediate measurements and/or classically conditioned operations</span>
+ <span class="s2">&quot;instructions&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="c1"># list of instructions of the circuit in dict format</span>
+ <span class="s2">&quot;num_qubits&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="c1"># number of qubits of the circuit</span>
+ <span class="s2">&quot;num_clbits&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="c1"># number of classical bits of the circuit</span>
+ <span class="s2">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="c1"># dict specifying the grouping of the qubits in registers</span>
+ <span class="s2">&quot;classical_registers&quot;</span><span class="p">:</span><span class="nb">dict</span> <span class="c1"># dict specifying the grouping of the classical bits in registers</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
 <p>On the other hand, instructions have some mandatory and optional keys:</p>
 <p>For classical and quantum communications among circuits, we do not recomend working at such low level format, users rather
 describe this operations through the <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> class. If curious, you can always
