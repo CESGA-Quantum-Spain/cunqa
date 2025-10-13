@@ -94,13 +94,12 @@ def _generate_id(size: int = 4) -> str:
 
 
 SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "qsend", "qrecv","expose"]
-SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr"]
-SUPPORTED_GATES_3Q = [ "ccx","ccy", "ccz","cswap"]
-SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz"]
+SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr"]
+SUPPORTED_GATES_3Q = ["ccx","ccy", "ccz","cswap"]
+SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1"]
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
 SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
-SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
 SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "recv"]
 SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "qrecv", "expose", "rcontrol"]
 
@@ -795,14 +794,30 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
 
     def ccy(self, *qubits: int) -> None:
         """
-        Class method to apply ccy gate to the given qubits.
+        Class method to apply ccy gate to the given qubits. Gate is decomposed asfollows as it is not commonly supported by simulators.
+        q_0: ──────────────■─────────────
+                           │             
+        q_1: ──────────────■─────────────
+             ┌──────────┐┌─┴─┐┌─────────┐
+        q_2: ┤ Rz(-π/2) ├┤ X ├┤ Rz(π/2) ├
+             └──────────┘└───┘└─────────┘
 
         Args:
             qubits (int): qubits in which the gate is applied, first two will be control qubits and the following one will be target qubit.
         """
         self._add_instruction({
-            "name":"ccy",
+            "name":"rz",
+            "qubits":[qubits[-1]],
+            "params":[-np.pi/2]
+        })
+        self._add_instruction({
+            "name":"ccx",
             "qubits":[*qubits]
+        })
+        self._add_instruction({
+            "name":"rz",
+            "qubits":[qubits[-1]],
+            "params":[np.pi/2]
         })
 
     def ccz(self, *qubits: int) -> None:

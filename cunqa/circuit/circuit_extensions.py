@@ -3,6 +3,7 @@ Holds dunder methods for the class CunqaCircuit and other functions to extract i
 """
 from typing import Union, Optional, Tuple
 import copy
+from operator 
 
 from cunqa.logger import logger
 from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRIBUTED, SUPPORTED_GATES_1Q
@@ -18,9 +19,21 @@ class HorizontalDivisionError(Exception):
 
 def cunqa_dunder_methods(cls):
 
+    # # =============== MAKE CUNQACIRCUITS HASHABLE ================
+    # def __hash__(self):
+    #     # Must return an integer
+    #     # Should be consistent with __eq__
+    #     return hash((tuple(self.instructions), self._id))
+    
+    # def __eq__(self, other):
+    #     """ Determines when two CunqaCircuits are considered equal. Used in sets of circuits or on dictionary keys."""
+    #     if isinstance(other, CunqaCircuit):
+    #         return (self.instructions == other.instructions and self._id == other._id)
+    #     return False
+
     # ================ CIRCUIT MODIFICATION METHODS ==============
 
-    def _update_other_instances(self, instances_to_change, other_id, comb_id, displace_n = 0): 
+    def _update_other_instances(self, instances_to_change, other_id, comb_id, displace_n = 0, up_to_instr = 0, instr_name = "expose"): 
         """ 
         Private method called from the __add__ and __or__ methods and its variations. It modifies the instructions of any other CunqaCircuit instance that references
         self or other, the circuits involved on the operation, to reference the combined circuit instead.
@@ -31,27 +44,50 @@ def cunqa_dunder_methods(cls):
             comb_id (str): id to substitute in on the instructions of circuits referencing the operands
             displace_n (int): specifies the number of qubits of the upper circuit on a union of circuits. It will displace the qubits of the lower circuit by
                               this amount when necessary.
+            up_to_instr (int): stops the substitution after having modified up_to_instr communication instructions 
+            instr_name (str): admits the options "expose" or "measure_and_send"
         """
         other_instances = self.__class__.access_other_instances() 
 
-        for circuit in instances_to_change: 
-            instance = other_instances[circuit]
+        if isinstance(instances_to_change, set):
+            for circuit in instances_to_change: 
+                instance = other_instances[circuit]
 
-            if displace_n != 0:
-                for instr in (iterator_instrs := iter(instance.instructions)):
-                    if ("circuits" in instr and instr["circuits"][0] == other_id): # Notice here we only check for other_id to not displace those of self
-                        instr["circuits"] = [comb_id]
+                if displace_n != 0:
+                    for instr in (iterator_instrs := iter(instance.instructions)):
+                        if ("circuits" in instr and instr["circuits"][0] == other_id): # Notice here we only check for other_id to not displace those of self
+                            instr["circuits"] = [comb_id]
 
-                        if instr["name"] == "recv":
-                            instr["remote_conditional_reg"][0] += displace_n
-                            instr2 = next(iterator_instrs)
-                            instr2["remote_conditional_reg"] += displace_n
-                
-            else:
+                            if instr["name"] == "recv":
+                                instr["remote_conditional_reg"][0] += displace_n
+                                instr2 = next(iterator_instrs)
+                                instr2["remote_conditional_reg"] += displace_n
+                    
+                else:
+                    if up_to_instr != 0:
+                        for instr in instance.instructions:
+                            if ("circuits" in instr and instr["circuits"][0] in [self._id, other_id]):
+                                instr["circuits"] = [comb_id]
+
+                    else:
+                        i = 0 # Count how many instructions we substitute
+                        for instr in instance.instructions:
+                            if ("circuits" in instr and instr["circuits"][0] in [self._id, other_id]):
+                                instr["circuits"] = [comb_id]
+                                i += 1
+                                if  i > up_to_instr: # if we have substituted up_to_instr instructions we stop
+                                    break
+
+        elif isinstance(instance_to_change, dict):
+            for circ, name_list in instance_to_change:
+                instance = other_instances[circ]
+
                 for instr in instance.instructions:
-                    if ("circuits" in instr and instr["circuits"][0] in [self._id, other_id]):
-                        instr["circuits"] = [comb_id]
-    
+                    if "circuits" in instr:
+                        instr["circuits"] = name_list.pop(0)
+
+            
+
 
     ######################## SUM ########################
 
@@ -282,7 +318,7 @@ def cunqa_dunder_methods(cls):
                     # TODO: support these
                     pass
 
-                circs_comm_self.append(instr["circuits"][0])
+                circs_comm_self.add(instr["circuits"][0])
 
             union_circuit._add_instruction(instr)
 
@@ -320,7 +356,7 @@ def cunqa_dunder_methods(cls):
                         # TODO: support these
                         pass
                     
-                circs_comm_other.append(instrr["circuits"][0])
+                circs_comm_other.add(instrr["circuits"][0])
             
             union_circuit._add_instruction(instrr)
 
@@ -371,7 +407,7 @@ def cunqa_dunder_methods(cls):
 
                 if 'circuits' in instrr: # Gather info on the circuits that reference upper_circuit and wether it controls or is a target
 
-                    circs_comm_self.append(instrr["circuits"][0])
+                    circs_comm_self.add(instrr["circuits"][0])
 
                 union_circuit._add_instruction(instrr)
 
@@ -445,7 +481,7 @@ def cunqa_dunder_methods(cls):
                         # TODO: support these
                         pass
 
-                circs_comm_other.append(instrr["circuits"][0])
+                circs_comm_other.add(instrr["circuits"][0])
                 
             self._add_instruction(instrr)
         
@@ -501,123 +537,53 @@ def cunqa_dunder_methods(cls):
         left_circuit = CunqaCircuit(n_qubits, n_clbits, id=left_id)
         right_circuit = CunqaCircuit(n_qubits, n_clbits, id=right_id)
 
-        left_instrs = []; right_instrs = []
-        for qubit_instrs in self.layers.values():
-            for instr in qubit_instrs:
-                if instr[0] > position:
-                    right_instrs.append(self.instructions[instr[1]])
-                else:
-                    left_instrs.append(self.instructions[instr[1]])
+        left_instrs = []; circs_comm_left = set()    # circs_comm_left serves to update circuits that communicate with self to point to left 
+        right_instrs = []; circs_comm_right = set()
 
-        left_circuit.from_instructions(left_instrs)
-        right_circuit.from_instructions(right_instrs)
+        num_left_comms = 0 # Tracks how many distributed instructions need to happen on the left
+        for qubit_layer_info in self.layers.values(): # Go qubit by qubit
+            for layer in qubit_layer_info:
+
+                instr = self.instructions[layer[1]]
+                if layer[0] > position:
+
+                    right_instrs.append(instr)
+                    if "circuits" in instr:
+                        circs_comm_right.add(instr["circuits"])
+
+                else:
+                    left_instrs.append(instr)
+                    if "circuits" in instr:
+                        circs_comm_left.add(instr["circuits"])
+                        num_left_comms += 1
+
+        left_circuit.from_instructions(left_instrs);      self._update_other_instances(circs_comm_left, self._id, left_id, displace_n=0, up_to_instr = num_left_comms) 
+        right_circuit.from_instructions(right_instrs);    self._update_other_instances(circs_comm_right, self._id, right_circuit)
 
         return left_circuit, right_circuit
 
+
     def hor_split(self, n: int) -> Tuple["CunqaCircuit", "CunqaCircuit"]:
         """Divides a circuit horizontally in two, separating the first n qubits from the last num_qubits-n qubits. """
-        rest = self.num_qubits - n - 1
-        cl_n = self.num_clbits
-        # TODO: maybe handle cl_bits more gracefully (will be complex and annoying)
+        rest = self.num_qubits - n 
+        cl_n = self.num_clbits # TODO: maybe handle cl_bits more gracefully 
         
         up_id = self._id + f" up_{n}"
         down_id = self._id + f" down_{rest}"
 
-        upper_circuit = CunqaCircuit(n + 1, cl_n, id=up_id)
-        lower_circuit = CunqaCircuit(rest, cl_n, id=down_id)
+        upper_circuit = CunqaCircuit(n, cl_n, id = up_id)          
+        lower_circuit = CunqaCircuit(rest, cl_n, id = down_id)      
+        self.circs_comm = {circuit: [] for circuit in self.access_other_instances()}
 
         # Add instructions to the two pieces according to their position
-        for instr in copy.deepcopy(self.instructions):
-            # ONE QUBIT GATES
-            if instr["name"] in SUPPORTED_GATES_1Q:
-                if instr["qubits"][0] > n:
-                    instr["qubits"][0] -= (n+1) # Note that due to 0-indexing the number of qubits of the upper_circuit will be n+1 
-                    lower_circuit._add_instruction(instr)
-                else:
-                    upper_circuit._add_instruction(instr)
+        iterator_instructions = iter(copy.deepcopy(self.instructions))
+        for instr in iterator_instructions:
+            self.divide_instr(instr, upper_circuit, lower_circuit, n, iterator_instructions)
 
-            # MORE THAN ONE QUBIT, ALL IN ONE SIDE   
-            elif all([q > n for q in instr["qubits"]]):
-                instr["qubits"] = [q - n - 1 for q in instr["qubits"]]
-                lower_circuit._add_instruction(instr)
-
-            elif all(q < n+1 for q in instr["qubits"]):
-                upper_circuit._add_instruction(instr)
-
-            # MORE THAN ONE QUBIT, PARTITIONED. Gates here need to be made distributed (classical)
-            else: 
-            # TODO: consider case where more than one qubit fall on both sides
-                if instr["name"] == "swap":
-                    up_qubit, down_qubit = (instr["qubits"][0], instr["qubits"][1]- n - 1) if instr["qubits"][0] > n else (instr["qubits"][1],  instr["qubits"][0] - n - 1)
-                    # Swap decomposes as three cnots, make them telegate
-                    with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
-                        lower_circuit.cx(rcontrol, down_qubit)
-
-                    with lower_circuit.expose(down_qubit, upper_circuit) as rcontrol:
-                        upper_circuit.cx(rcontrol, up_qubit)
-
-                    with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
-                        lower_circuit.cx(rcontrol, down_qubit)
-
-                elif instr["name"] == "cswap":
-                
-                elif instr["name"] == ["unitary"]:
-                    logger.error(f"It is not a priori clear how to divide the provided instruction: {instr}")
-                    raise SystemExit
-
-                elif instr["name"] == "save_state":
-                    upper_circuit.save_state()
-                    lower_circuit.save_state()
-
-                elif instr["name"] == "rzz":
-                    if instr["qubits"][0] < instr["qubits"][1]:
-
-                    else:
-                    up_param, donw_param = (instr["params"], -instr["params"]) if qb[0] < qb[1] else (-instr["params"], instr["params"])
-                    upper_circuit.rz()
-                    lower_circuit.rz()
-
-                elif instr["name"] == "rxx":
-
-                elif instr["name"] == "ryy":
-
-                elif instr["name"] == "rzx":
-
-                elif instr["name"] == "ecr":
-
-                elif instr["name"] == "cu":
-
-                elif instr["name"] == "cu1":
-
-                elif instr["name"] ==  "cu3":
-
-
-                # if instr["qubits"][0] > n: # Down sends to up
-                #     # TODO: some qubits need to be displaced back by n
-                #     down_instrs.append({
-                #         "name": "measure_and_send",
-                #         "qubits": _flatten(instr["qubits"]),
-                #         "circuits": [up_id]
-                #     })
-                #     up_instrs.append({
-                #         "name": instr["name"],
-                #         "qubits": _flatten(instr["qubits"][1:]),
-                #         "params": instr["params"],
-                #         "circuits": [down_id]
-                #     })
-
-                # else:                      # Up sends to down
-                #     up_instrs.append({
-                #         "name": "measure_and_send",
-                #         "qubits": _flatten(instr["qubits"]),
-                #         "circuits": [down_id]
-                #     })
-                #     down_instrs.append({
-                #         "name": instr["name"],
-                #         "qubits": _flatten(instr["qubits"][1:]),
-                #         "params": instr["params"],
-                #         "circuits": [up_id]
-                #     })
+        self._update_other_instances(self.circs_comm, self._id, "")   
+         
+        # Clean up instance attributes that shouldn't bloat the instance beyond this method
+        del self.circs_comm          
 
         return upper_circuit, lower_circuit
 
@@ -705,58 +671,272 @@ def cunqa_dunder_methods(cls):
             raise SystemExit
 
         return False
-        
-    ######### TODO: change getitem and setitem to work with layers
 
-    def __getitem__(self, indexes):
-        """
-        Returns the gates on the positions given by the input indexes. Overloads the "[ ]" operator. The circuit is interpreted as a list of instructions on a certain order.
+    ####################### FUNCTION FOR HOR_SPLIT ########################
 
-        Args
-            indexes (int, list[int]): positions to be queried. The circuit is 0-indexed, as usual.
-        Returns
-            gates (dict, list[dict]): objects found on the input indexes of the circuit. 
+    def divide_instr(self, instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int, iterator_instructions: 'list_iterator', received: bool = False, recv_remain: int = 0):
         """
-        if isinstance(indexes, list):
-            gates = []
-            for index in indexes:
-                if isinstance(index, int):
-                    gates.append(self.instructions[index])
-                else:
-                    logger.error(f"Indexes must be ints, but a {type(index)} was provided [{TypeError.__name__}].")
-                    raise SystemExit
-            return gates
-        
-        elif isinstance(indexes, int):
-            return self.instructions[indexes]
-        
-        else:
-            logger.error(f"Indexes must be list[int] or int, but {type(indexes)} was provided [{TypeError.__name__}].")
-            raise SystemExit
+        Method to divide an instruction between the upper and lower circuits in hor_split. If given the instructions "recv" or "rcontrol" it calls itself on the next value
+        of the iterator or on the first element of instr["instructions"], respectively. This recurrence makes it less readable. Additionally, only instructions that fall 
+        squarely on one side are supported on "recv" and "rcontrol" as otherwise they would need a mix of classical and quantum communications or multicontrolled communications
+        with control qubits on different circuits.
 
-    def __setitem__(self, indexes, gate_seq):
+        Args:
+            instr (dict): the dictionary describing the instruction to divide
+            upper_circuit (CunqaCircuit):
+            lower_circuit (CunqaCircuit):
+            n (int): the number of qubits of the upper_circuit (maybe return the divided instructions and remove the circuits from the arguments)
+            iterator_instructions (list_iterator): iterator from the list of instructions. Allows the "recv" case to access the next instruction
+            received (bool): determines wether 'divide_instr' is being called from within (True), in a received case or from 'hor_split' (False).
+            recv_remain (int): determines the lenght of instr["instructions"] in the "rcontrol" case to handle recurrence and avoid an infinte loop. 
         """
-        Assigns a new gates to the positions given by the input indexes. Called by the "=" operator on commands like "cunqa_circuit[3] = {"name":"x", "qubits":[0]}".
+        qubits_up        = [q for q in instr["qubits"][0] if q < n+1]
+        qubits_down      = [q - (n+1) for q in instr["qubits"][0] if q > n]
+        conditional_up   = [q for q in instr["conditional_reg"] if q < n+1]         if ("conditional_reg" in instr) else []
+        conditional_down = [q - (n+1) for q in instr["conditional_reg"] if q > n ]  if ("conditional_reg" in instr) else []
 
-        Args
-            indexes (int, list[int]): positions of the circuit to be modified.
-            gate_seq (dict, list(dict)): gates to be assigned in order on the input positions.
-        """
-        if (isinstance(indexes, list) and isinstance(gate_seq, list)):
-            if len(indexes) == len(gate_seq):
-                for index, gate in zip(indexes, gate_seq):
-                    self._check_instruction(gate)
-                    self.instructions[index] = gate
-            else:
-                logger.error(f"The indexes and gate_seq lists must have equal lenght [{ValueError.__name__}]")
+        if received and not hasattr(self, rcontrol_up) and not hasattr(self, rcontrol_down):
+            self.rcontrol_up = []    # Here we will save the divided received instructions on the corresponding side
+            self.rcontrol_down = []
+
+        # ZERO QUBITS: RECV, RCONTROL. We need to check next instruction or the key "instructions"
+        if instr["name"] == "recv":
+            instr2 = next(iterator_instructions)
+            divide_instr(instr2, upper_circuit, lower_circuit, n, iterator_instructions, received = True, recv_remain = 0)
+
+            if self.rcontrol_up and self.rcontrol_down:
+                logger.error(f"Dividing instruction {instr} would require mixing classical and quantum communications, which is not supported.")
                 raise SystemExit
-        elif (isinstance(indexes, int) and isinstance(gate_seq, dict)):
-            self._check_instruction(gate_seq)
-            self.instructions[indexes] = gate_seq
-        else:
-            logger.error(f"Both the indexes and gate_seq should be lists, or an int and a dict respectively. Instead a {type(indexes)} indexes and a {type(gate_seq)} gate_seq was provided [{TypeError.__name__}]")
+                # upper_circuit._add_instruction(instr);               lower_circuit._add_instruction(instr)                # recv
+                # upper_circuit._add_instruction(*self.rcontrol_up);   lower_circuit._add_instruction(*self.rcontrol_down)
+
+                # TODO: call the function adding another send on the origin circuit 
+                # For that we will need to track classical comm instructions processed (for instance with self.num_recv)
+
+            elif self.rcontrol_up:
+                upper_circuit._add_instruction(instr) # recv
+                upper_circuit._add_instruction(*self.rcontrol_up)
+                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+
+            elif self.rcontrol_down:
+                lower_circuit._add_instruction(instr) # recv
+                lower_circuit._add_instruction(*self.rcontrol_down)
+                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+            
+            del self.rcontrol_up
+            del self.rcontrol_down
+
+        elif instr["name"] == "rcontrol":
+            total_recv = len(instr["instructions"])
+            iter_rcontrol = iter(copy.deepcopy(instr["instructions"]))
+            instrr = next(iter_rcontrol)
+            
+            divide_instr(instrr, upper_circuit, lower_circuit, n, iter_rcontrol, received = True, recv_remain = total_recv)
+            
+            if self.rcontrol_up and self.rcontrol_down:
+                logger.error(f"Dividing instruction {instr} would require quantum communications between 3 circuits, which is not supported (yet?).")
+                raise SystemExit
+                # instr_copy = copy.deepcopy(instr)
+                # instr["instructions"] = self.rcontrol_up
+                # instr_copy["instructions"] = self.rcontrol_down
+                # upper_circuit._add_instruction(instr);    lower_circuit._add_instruction(instr_copy) # rcontrol
+                
+                # TODO: call the function adding another send on the origin circuit 
+                # For that we will need to track exposes to self on the other circuit processed
+
+            elif self.rcontrol_up:
+                instr["instructions"] = self.rcontrol_up
+                upper_circuit._add_instruction(instr) # rcontrol
+                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+
+            elif self.rcontrol_down:
+                instr["instructions"] = self.rcontrol_down
+                lower_circuit._add_instruction(instr) # rcontrol
+                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+
+            # TODO: modify other instances to point to the correct one
+            
+            del self.rcontrol_up
+            del self.rcontrol_down
+
+                 
+
+        # NO DIVISION CASE
+        # Note: "expose", "measure_and_send", "qsend", "qrecv", all SUPPORTED_GATES_1Q fall here
+        elif (len(qubits_up) == 0 and len(conditional_up) == 0): 
+            instr["qubits"] = qubits_down
+            if "conditional_reg" in instr: 
+                instr["conditional_reg"] = conditional_down
+
+            if "circuits" in instr:
+                self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+
+            if received:
+                self.rcontrol_down.append(instr)
+
+                if recv_remain > 0:
+                    next_rcontrol_instr = next(iterator_instructions)
+                    divide_instr(next_rcontrol_instr, upper_circuit, lower_circuit, n, iterator_instructions, received = True, recv_remain = total_recv - 1)
+                return
+
+            lower_circuit._add_instruction(instr)            
+
+        elif (len(qubits_down) == 0 and len(conditional_down) == 0):
+            if "circuits" in instr:
+                self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+
+            if received:
+                self.rcontrol_up.append(instr)
+
+                if recv_remain > 0:
+                    next_rcontrol_instr = next(iterator_instructions)
+                    divide_instr(next_rcontrol_instr, upper_circuit, lower_circuit, n, iterator_instructions, received = True, recv_remain = total_recv - 1)
+                return
+
+            upper_circuit._add_instruction(instr)
+
+        elif received:
+            # If we arrive here it means that the gate will need quantum communication between 3 circuits or a mix of quantum and classical comms
+            self.rcontrol_up = ["Error"]; self.rcontrol_down = ["Error"] # An error will be raised as both are non-empty
+            return
+
+        # ONLY CLASSICAL COMMUNICATION DIVISION
+        elif (len(qubits_up) == 0 and len(conditional_up) != 0 ):
+            conditional_reg = conditional_up[0]
+
+            upper_circuit.measure_and_send(qubit=conditional_reg, target_circuit=lower_circuit)
+            lower_circuit._add_instruction({
+                "name": "recv",
+                "qubits":[],
+                "remote_conditional_reg":conditional_reg,
+                "circuits": [upper_circuit._id]
+            })
+            instr["remote_conditional_reg"] = [conditional_reg]
+            lower_circuit._add_instruction(instr)
+
+
+        elif (len(qubits_down) == 0 and len(conditional_down) != 0 ):
+            conditional_reg = conditional_down[0]
+
+            lower_circuit.measure_and_send(qubit=conditional_reg, target_circuit=upper_circuit)
+            upper_circuit._add_instruction({
+                "name": "recv",
+                "qubits":[],
+                "remote_conditional_reg":conditional_reg,
+                "circuits": [lower_circuit._id]
+            })
+            instr["remote_conditional_reg"] = [conditional_reg]
+            upper_circuit._add_instruction(instr)
+
+        # QUANTUM COMMUNICATION DIVISION 
+        # NOTE: Difficult to maintain (any other gate need to be entered manually)
+
+        elif "conditional_reg" in instr: # Bad luck :(
+            logger.error(f"Error: cannot divide instruction {instr} as it would require quantum and classical communications at the same time.")
             raise SystemExit
 
+        elif instr["name"] == "save_state":
+            upper_circuit.save_state()
+            lower_circuit.save_state() 
+
+        # 2Qubit gates 
+        elif instr["name"] == "swap":
+            """ Swap decomposition:
+                         ┌───┐
+            q_0:    ──■──┤ X ├──■──
+                    ┌─┴─┐└─┬─┘┌─┴─┐
+            q_1:    ┤ X ├──■──┤ X ├
+                    └───┘     └───┘
+            """
+            up_qubit, down_qubit = (instr["qubits"][0], instr["qubits"][1]- n - 1) if instr["qubits"][0] > n else (instr["qubits"][1],  instr["qubits"][0] - n - 1)
+            
+            with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
+                lower_circuit.cx(rcontrol, down_qubit)
+
+            with lower_circuit.expose(down_qubit, upper_circuit) as rcontrol:
+                upper_circuit.cx(rcontrol, up_qubit)
+
+            with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
+                lower_circuit.cx(rcontrol, down_qubit)
+
+        elif instr["name"] in ["cu", "cu1", "cu3", "cx", "cy", "cz", "csx", "cp", "crx", "cry", "crz"]:
+
+            name_to_method = {
+                "cu":  CunqaCircuit.cu,  "cu1": CunqaCircuit.cu1, "cu3": CunqaCircuit.cu3, 
+                "cx":  CunqaCircuit.cx,  "cy":  CunqaCircuit.cy,  "cz":  CunqaCircuit.cz, 
+                "crx": CunqaCircuit.crx, "cry": CunqaCircuit.cry, "crz": CunqaCircuit.crz,
+                "csx": CunqaCircuit.csx, "cp":  CunqaCircuit.cp}
+            if instr["qubits"][0] < instr["qubits"][1]:
+
+                qubit_up = instr["qubits"][0]
+                qubit_down = instr["qubits"][1] - n - 1
+                method = name_to_method[instr["name"]]
+                    
+                with upper_circuit.expose(qubit_up, lower_circuit) as rcontrol:
+                    method(lower_circuit, *instr["params"], qubit_down)
+            else:
+                qubit_up = instr["qubits"][1]
+                qubit_down = instr["qubits"][0] - n - 1
+                    
+                with lower_circuit.expose(qubit_down, upper_circuit) as rcontrol:
+                    method(upper_circuit, *instr["params"], qubit_up)  
+
+        elif instr["name"] in ["rzz", "ryy", "rxx", "rzx"]:
+            """ Rzz gate decomposition:         Ryy gate decomposition:       Rxx gate decomposition:                     Rzx gate decomposition:
+                                                   ┌───┐            ┌───┐        ┌─────────┐            ┌──────────┐
+            qubit1: ──■─────────────────■──     1: ┤ H ├─■──────────┤ H ├     1: ┤ Rx(π/2) ├─■──────────┤ Rx(-π/2) ├       1: ──────■───────────────
+                    ┌─┴─┐┌───────────┐┌─┴─┐        ├───┤ │ZZ(param) ├───┤        ├─────────┤ │ZZ(param) ├──────────┤          ┌───┐ │ZZ(param) ┌───┐
+            qubit2: ┤ X ├┤ Rz(param) ├┤ X ├     2: ┤ H ├─■──────────┤ H ├     2: ┤ Rx(π/2) ├─■──────────┤ Rx(-π/2) ├       2: ┤ H ├─■──────────┤ H ├
+                    └───┘└───────────┘└───┘        └───┘            └───┘        └─────────┘            └──────────┘          └───┘            └───┘
+
+            """
+            distr_rzz_rxx_ryy_rzx(instr, upper_circuit, lower_circuit, n) 
+
+        elif instr["name"] == "ecr":
+            """ ECR gate decomposition:
+                global phase: 7π/4
+                     ┌───┐      ┌───┐
+                q_0: ┤ S ├───■──┤ X ├
+                     ├───┴┐┌─┴─┐└───┘
+                q_1: ┤ √X ├┤ X ├─────
+                     └────┘└───┘     
+            """
+            if instr["qubits"][0] < instr["qubits"][1]:
+                qubit_up = instr["qubits"][0]
+                qubit_down = instr["qubits"][1] - n - 1
+                    
+                with upper_circuit.expose(qubit_up, lower_circuit) as rcontrol:
+                    upper_circuit.s(qubit_up)
+                    lower_circuit.sx(qubit_down)
+                    lower_circuit.cx(rcontrol, qubit_down)
+                    upper_circuit.x(qubit_up)
+            else:
+                qubit_up = instr["qubits"][1]
+                qubit_down = instr["qubits"][0] - n - 1
+
+                with lower_circuit.expose(qubit_down, upper_circuit) as rcontrol:
+                    lower_circuit.s(qubit_down)
+                    upper_circuit.sx(qubit_up)
+                    upper_circuit.cx(rcontrol, qubit_up)
+                    lower_circuit.x(qubit_down)      
+
+        # 3Qubit Gates
+        elif instr["name"] in ["ccx", "ccz", "cswap"]:
+            """ The restrictions of telegate + the possibility of two controls falling on the same circuit
+                force us to use the CCX decomposition:        Cswap decomp. using ccx:     CCZ decomp. using ccx:
+                q_0: ────────■─────────────────■────■───      q_0: ───────■───────         q_0: ───────■───────
+                           ┌─┴─┐┌─────┐      ┌─┴─┐  │              ┌───┐  │  ┌───┐                     │       
+                q_1: ──■───┤ X ├┤ Sdg ├──■───┤ X ├──┼───      q_1: ┤ X ├──■──┤ X ├         q_1: ───────■───────
+                     ┌─┴──┐├───┤└─────┘┌─┴──┐├───┤┌─┴──┐           └─┬─┘┌─┴─┐└─┬─┘              ┌───┐┌─┴─┐┌───┐
+                q_2: ┤ Sx ├┤ Z ├───────┤ Sx ├┤ Z ├┤ Sx ├      q_2: ──■──┤ X ├──■──         q_2: ┤ H ├┤ X ├┤ H ├
+                     └────┘└───┘       └────┘└───┘└────┘                └───┘                   └───┘└───┘└───┘
+            """    
+            distr_ccx_ccz_cswap(instr, upper_circuit, lower_circuit, n)
+
+        else: # Note that "unitary" falls here (also multicontrolled gates)
+            logger.error(f"It is not a priori clear how to divide the provided instruction: {instr}")
+            raise SystemExit 
+            
 
     ######################## DRAWING THE CIRCUIT ########################
 
@@ -799,6 +979,7 @@ def cunqa_dunder_methods(cls):
 
     # Update other instances method
     setattr(cls, '_update_other_instances', _update_other_instances)
+    setattr(cls, 'divide_instr', divide_instr)
 
     # Addition methods
     setattr(cls, '__add__', __add__)
@@ -823,12 +1004,217 @@ def cunqa_dunder_methods(cls):
     setattr(cls, 'param_info', param_info)
     setattr(cls, 'index', index)
     setattr(cls, '__contains__', __contains__)
-    setattr(cls, '__getitem__', __getitem__)
-    setattr(cls, '__setitem__', __setitem__)
 
     # Drawing method
     setattr(cls, 'draw', draw)
 
     return cls
+
+############################### HELPERS FOR HOR_SPLIT ###########
+
+def distr_rzz_rxx_ryy_rzx(instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int) -> None:
+    """
+    Performs either a rzz, or rxx, or ryy, or rzx gate distributed between two circuits. 
+    The rzz gate decomposition is                                       
+                                        q_1: ──■─────────────────■──         
+                                             ┌─┴─┐┌───────────┐┌─┴─┐         
+                                        q_2: ┤ X ├┤ Rz(param) ├┤ X ├         
+                                             └───┘└───────────┘└───┘    
+
+    Rxx:                               Ryy:                                    Rzx:                 
+         ┌───┐            ┌───┐        ┌─────────┐            ┌──────────┐
+      1: ┤ H ├─■──────────┤ H ├     1: ┤ Rx(π/2) ├─■──────────┤ Rx(-π/2) ├       1: ──────■───────────────
+         ├───┤ │ZZ(param) ├───┤        ├─────────┤ │ZZ(param) ├──────────┤          ┌───┐ │ZZ(param) ┌───┐
+      2: ┤ H ├─■──────────┤ H ├     2: ┤ Rx(π/2) ├─■──────────┤ Rx(-π/2) ├       2: ┤ H ├─■──────────┤ H ├
+         └───┘            └───┘        └─────────┘            └──────────┘          └───┘            └───┘
+    Args:
+        instr (dict): the instruction to divide 
+        upper_circuit (CunqaCircuit): circuit with the first n qubits of the original circuit
+        lower_circuit (CunqaCircuit): circuit with the last num_qubits - n qubits of the original circuit
+        n (int): number of qubits of the upper_circuit
+    """
+    if instr["qubits"][0] < instr["qubits"][1]:
+        qubit_1 = instr["qubits"][0];             circ1 = upper_circuit
+        qubit_2 = instr["qubits"][1] - n - 1;     circ2 = lower_circuit
+
+    else:
+        qubit_1 = instr["qubits"][1];             circ1 = lower_circuit
+        qubit_2 = instr["qubits"][0] - n - 1;     circ2 = upper_circuit
+
+    if instr["name"] == "ryy":
+        circ1.rx(np.pi/2, qubit_1)
+        circ2.rx(np.pi/2, qubit_2)
+    elif intr["name"] == "rxx":
+        circ1.h(qubit_1)
+        circ2.h(qubit_2)
+    elif instr["name"] == "rzx":
+        circ2.h(qubit2)
+
+    ############## Body of rzz ##################
+    with circ1.expose(qubit1, circ2) as rcontrol:
+        circ2.cx(rcontrol, qubit2)
+        circ2.rz(*instr["params"], qubit2)
+        circ2.cx(rcontrol, qubit2)
+    ############## End of rzz ##################
+
+    if instr["name"] == "ryy":
+        circ1.rx(np.pi/2, qubit_1)
+        circ2.rx(np.pi/2, qubit_2)
+    elif intr["name"] == "rxx":
+        circ1.h(qubit_1)
+        circ2.h(qubit_2)
+    elif instr["name"] == "rzx":
+        circ2.h(qubit2)
+
+def distr_ccx_ccz_cswap(instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int) -> None:
+    """
+    Performs a either a Toffoli (ccx), or ccz, or cswap gate distributed between two circuits. 
+
+    Cswap decomp. using ccx:     CCZ decomp. using ccx:
+    q_0: ───────■───────         q_0: ───────■───────
+         ┌───┐  │  ┌───┐                     │       
+    q_1: ┤ X ├──■──┤ X ├         q_1: ───────■───────
+         └─┬─┘┌─┴─┐└─┬─┘              ┌───┐┌─┴─┐┌───┐
+    q_2: ──■──┤ X ├──■──         q_2: ┤ H ├┤ X ├┤ H ├
+              └───┘                   └───┘└───┘└───┘
+
+    Args:
+        instr (dict): the instruction to divide 
+        upper_circuit (CunqaCircuit): circuit with the first n qubits of the original circuit
+        lower_circuit (CunqaCircuit): circuit with the last num_qubits - n qubits of the original circuit
+        n (int): number of qubits of the upper_circuit
+    """
+    # Process instruction to decide the case
+    circ1, circ2, less_than_or_greater_equal = (upper_circuit, lower_circuit, operator.lt) if instr["qubits"][0] < n+1 else (lower_circuit, upper_circuit, operator.ge)
+    qubits1 = {}; qubits2 = {}
+    for i, q in enumerate(instr["qubits"]):
+
+        if less_than_or_greater_equal(q, n+1): # Apply the corresponding comparation q < n+1 or q >= n+1 depending on which circuit is circ1
+            qubits1[str(i+1)] = q
+        else:
+            qubits2[str(i+1)] = q - n - 1
+
+    if ("1" in qubits1 and ("2" in qubits2 and "3" in qubits2)):
+        """ First qubit in circ1, second and third qubits in circ2, 
+        corresponds to the partition of the decomposition of CCX given by:
+        1:   ────────■─────────────────■────■───
+                     │                 │    │   
+        -------------│-----------------│----│-------   
+                   ┌─┴─┐┌─────┐      ┌─┴─┐  │               CCX
+        2:   ──■───┤ X ├┤ Sdg ├──■───┤ X ├──┼───
+             ┌─┴──┐├───┤└─────┘┌─┴──┐├───┤┌─┴──┐
+        3:   ┤ Sx ├┤ Z ├───────┤ Sx ├┤ Z ├┤ Sx ├
+             └────┘└───┘       └────┘└───┘└────┘
+         """
+        q1 = qubits1["1"]
+        q2 = qubits2["2"]; q3 = qubits2["3"]
+
+        if instr["name"] == "ccz":
+            circ2.h(q3)
+        elif instr["name"] == "cswap":
+            circ2.cx(q3, q2)
+
+        ############# Body of ccx ##############
+        with circ1.expose(q1, circ2) as rcontrol: 
+            circ2.csx(q2, q3)
+            circ2.cx(rcontrol, q2)
+            circ2.z(q3)
+            circ2.sdg(q2)
+            circ2.csx(q2, q3)
+            circ2.cx(rcontrol, q2)
+            circ2.z(q3)
+            circ2.csx(rcontrol, q3)  
+        ############### ccx ends ################          
+
+        if instr["name"] == "ccz":
+            circ2.h(q3)
+        elif instr["name"] == "cswap":
+            circ2.cx(q3, q2)
+
+    elif (("1" in qubits1 and "2" in qubits1) and "3" in qubits2):
+        """ First and second qubit in circ1, third qubit in circ2, corresponds to the partition of the decomposition of ccx given by:
+        1:   ────────■─────────────────■────■───
+                   ┌─┴─┐┌─────┐      ┌─┴─┐  │   
+        2:   ──■───┤ X ├┤ Sdg ├──■───┤ X ├──┼───
+               │   └───┘└─────┘  │   └───┘  │                   CCX
+        -------│-----------------│----------│--------
+             ┌─┴──┐┌───┐       ┌─┴──┐┌───┐┌─┴──┐
+        3:   ┤ Sx ├┤ Z ├───────┤ Sx ├┤ Z ├┤ Sx ├
+             └────┘└───┘       └────┘└───┘└────┘
+        """
+        q1 = qubits1["1"]; q2 = qubits1["2"]
+        q3 = qubits2["3"]
+
+        if instr["name"] == "ccz":
+            circ2.h(q3)
+        elif instr["name"] == "cswap":
+            with circ2.expose(q3, circ1) as rcontrol:
+                circ1.cx(rcontrol, q2)
+
+        ############# Body of ccx ##############
+        with circ1.expose(q2, circ2) as rcontrol:       
+            circ2.csx(rcontrol, q3);  circ1.cx(q1, q2)
+            circ2.z(q3);              circ1.sdg(q2)
+            circ2.csx(rcontrol, q3);  circ1.cx(q1, q2)
+            circ2.z(q3)
+
+        with circ1.expose(q1, circ2) as rcontrol:
+            circ2.csx(rcontrol, q3)
+        ############### ccx ends ################
+
+        if instr["name"] == "ccz":
+            circ2.h(q3)
+        elif instr["name"] == "cswap":
+            with circ2.expose(q3, circ1) as rcontrol:
+                circ1.cx(rcontrol, q2)
+
+    elif (("1" in qubits1 and "3" in qubits1) and "2" in qubits2):
+        """ First and third qubits in circ1, second qubit in circ2, corresponds to the partition of the decomposition of ccx given by:
+        1:   ────────■─────────────────■─────────■───
+             ┌────┐  │   ┌───┐ ┌────┐  │  ┌───┐┌─┴──┐
+        3:   ┤ Sx ├──┼───┤ Z ├─┤ Sx ├──┼──┤ Z ├┤ Sx ├
+             └─┬──┘  │   └───┘ └─┬──┘  │  └───┘└────┘                   CCX
+               │     │           │     │
+        -------│-----│-----------│-----│----------------
+               │   ┌─┴─┐┌─────┐  │   ┌─┴─┐
+        2:   ──■───┤ X ├┤ Sdg ├──■───┤ X ├───────────
+                   └───┘└─────┘      └───┘           
+        """
+        q1 = qubits1["1"]; q3 = qubits1["3"]
+        q2 = qubits2["2"]
+
+        if instr["name"] == "ccz":
+            circ1.h(q3)
+        elif instr["name"] == "cswap":
+            with circ1.expose(q3, circ2) as rcontrol:
+                circ2.cx(rcontrol, q2)
+
+        ############# Body of ccx ##############
+        with circ2.expose(q2, circ1) as rcontrol:
+            circ1.csx(rcontrol, q3)
+        with circ1.expose(q1, circ2) as rcontrol:
+            circ2.cx(rcontrol, q2)
+
+        circ1.z(q3); circ2.sdg(q2)
+        with circ2.expose(q2, circ1) as rcontrol:
+            circ1.csx(rcontrol, q3)
+        with circ1.expose(q1, circ2) as rcontrol:
+            circ2.cx(rcontrol, q2)
+        
+        circ1.z(q3)
+        circ1.csx(q1, q3)
+        ############### ccx ends ################
+
+        if instr["name"] == "ccz":
+            circ1.h(q3)
+        elif instr["name"] == "cswap":
+            with circ1.expose(q3, circ2) as rcontrol:
+                circ2.cx(rcontrol, q2)
+
+    else:
+        # Any other valid configuration is complementary to these ones
+        logger.error(f"Too many qubits were sent to distr_ccx: {len(circ_and_qubits1) + len(circ_and_qubits2) - 2}")
+        raise IndexError
+
 
 
