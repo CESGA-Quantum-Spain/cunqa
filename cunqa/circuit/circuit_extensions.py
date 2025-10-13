@@ -7,7 +7,7 @@ import operator
 
 from cunqa.logger import logger
 from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRIBUTED, SUPPORTED_GATES_1Q
-from cunqa.circuit.converters import _qc_to_json
+from cunqa.circuit.converters import convert
 
 from qiskit import QuantumCircuit
 import matplotlib.pyplot as plt #I use this for drawing circuits with LaTeX (quantikz)
@@ -97,6 +97,8 @@ def cunqa_dunder_methods(cls):
         
         if (n := self.num_qubits) == other_circuit.num_qubits:        
             circs_comm_summands = set() # If our circuits have distributed gates, as the id changes, we will need to update it on the other circuits that communicate with this one
+            self_instr = self.instructions
+            circs_comm_summands.union({instr["circuits"][0] for instr in self_instr if "circuits" in instr})
 
             if isinstance(other_circuit, CunqaCircuit):
                 if not force_execution:
@@ -109,33 +111,29 @@ def cunqa_dunder_methods(cls):
                 circs_comm_summands.union({instr["circuits"][0] for instr in other_instr if "circuits" in instr})   
 
             elif isinstance(other_circuit, QuantumCircuit):
-                other_instr = qc_to_json(other_circuit)['instructions']
+                other_instr = convert(other_circuit, "dict")['instructions']
                 other_id = "qc"
                 
             else:
                 logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
                 raise SystemExit
-            
-            self_instr = self.instructions
-            circs_comm_summands.union({instr["circuits"][0] for instr in self_instr if "circuits" in instr})
 
-            cl_n = self.num_clbits
-            cl_m = other_circuit.num_clbits
+            cl_n = self.num_clbits; cl_m = other_circuit.num_clbits
             sum_id = self._id + " + " + other_id
             summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id) 
 
             summed_circuit.quantum_regs = self.quantum_regs     # The registers of the first circuit are kept
-            summed_circuit.classical_regs = self.classical_regs
+            summed_circuit.classical_regs = self.classical_regs; 
 
             for instruction in list(self_instr + other_instr):
                 summed_circuit._add_instruction(instruction)
 
-            self._update_other_instances(circs_comm_summands, other_id, sum_id)
+            self._update_other_instances(circs_comm_summands, other_id, sum_id) # Update instances that communicated with the summands to point to the sum
             
             return summed_circuit
         
         else:
-            logger.error(f"First version only accepts summing circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
+            logger.error(f"Only circuits with the same number of qubits can be summed. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
 
     def __radd__(self, left_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
@@ -166,7 +164,7 @@ def cunqa_dunder_methods(cls):
                 summed_circuit.quantum_regs = self.quantum_regs     # The registers of the CunqaCircuit are kept (can be changed later)
                 summed_circuit.classical_regs = self.classical_regs   
 
-                left_instr = qc_to_json(left_circuit)['instructions']
+                left_instr = convert(left_circuit, "dict")['instructions']
                 
                 for instruction in list(left_instr + self.instructions):
                     summed_circuit._add_instruction(instruction)
@@ -212,7 +210,7 @@ def cunqa_dunder_methods(cls):
                 circs_comm_summands.union({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
 
             elif isinstance(other_circuit, QuantumCircuit):
-                other_instr = qc_to_json(other_circuit)['instructions']
+                other_instr = convert(other_circuit, "dict")['instructions']
                 other_id = "qc" # Avoids an error on _update_other_instances execution
                 
             else:
@@ -275,7 +273,7 @@ def cunqa_dunder_methods(cls):
             other_id = other_circuit._id
 
         elif isinstance(other_circuit, QuantumCircuit):
-            other_instr = qc_to_json(other_circuit)['instructions']
+            other_instr = convert(other_circuit, "dict")['instructions']
             other_id = "qc" 
                 
         else:
@@ -373,7 +371,7 @@ def cunqa_dunder_methods(cls):
             return upper_circuit.__or__(self)
 
         elif isinstance(upper_circuit, QuantumCircuit):
-            upper_instr = qc_to_json(upper_circuit)['instructions']
+            upper_instr = convert(upper_circuit, "dict")['instructions']
             upper_id ="qc"
             union_id = self._id + " | " + upper_id
 
@@ -429,7 +427,7 @@ def cunqa_dunder_methods(cls):
             other_id = other_circuit._id
 
         elif isinstance(other_circuit, QuantumCircuit):
-            other_instr = qc_to_json(other_circuit)['instructions']
+            other_instr = convert(other_circuit, "dict")['instructions']
             other_id = "qc"
                 
         else:
