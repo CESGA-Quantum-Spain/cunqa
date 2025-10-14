@@ -14,6 +14,8 @@ std::string get_noise_model_run_command(const CunqaArgs& args, const std::string
     std::string subcommand;
     std::string noise_properties_path;
     std::string noise_properties;
+    std::string backend_path;
+    
     int thermal_relaxation;
     int readout_error;
     int gate_error;
@@ -24,12 +26,14 @@ std::string get_noise_model_run_command(const CunqaArgs& args, const std::string
     gate_error = args.no_gate_error ? 0 : 1;
     fakeqmio = args.fakeqmio.has_value() ? 1 : 0;
     noise_properties_path = args.fakeqmio.has_value() ? std::any_cast<std::string>(args.fakeqmio.value()) : std::any_cast<std::string>(args.noise_properties.value());
+    backend_path = args.backend.empty() ? "default" : args.backend;
 
     noise_properties = R"({"noise_properties_path":")" + noise_properties_path
                + R"(","thermal_relaxation":")" +  std::to_string(thermal_relaxation)
                + R"(","readout_error":")" +  std::to_string(readout_error)
                + R"(","gate_error":")" +  std::to_string(gate_error)
-               + R"(","fakeqmio":")" +  std::to_string(fakeqmio)+ R"("})" ;
+               + R"(","fakeqmio":")" +  std::to_string(fakeqmio)
+               + R"(","backend_path":")" + backend_path + R"("})";
 
     subcommand = mode + " no_comm " + std::any_cast<std::string>(args.family_name) + " Aer \'" + noise_properties + "\'" + "\n";
     run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH " + subcommand;

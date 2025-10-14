@@ -164,7 +164,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --resv-ports=2 --exclusive --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH cloud cc " + cc_qpu + " " + simulator + " \'" + qpus_path + "\'";
 
         written_qpus.push_back(cc_qpu);
-        n_cc_qpus++;    
+        n_cc_qpus++;
     }
 
     //-----------------------------------------------------

@@ -36,41 +36,56 @@ args = parser.parse_args()
 
 
 # validating json schema for noise_properties (mandatory)
-with open(schema_noise_properties, "r") as file:
-    schema_noise_properties = json.load(file)
+
+if args.backend_path is not None:
+    if args.backend_path != "default":
+        #TODO: validate backend_json with respect to schema_backend
+        with open(schema_backend, "r") as file:
+            schema_backend = json.load(file)
+
+        with open(args.backend_path, "r") as file:
+            backend_json = json.load(file)
+    else:
+        logger.error("Default backend can not be built if noise properties are not specified.")
+        raise SystemExit
 
 
-if args.noise_properties_path == "last_calibrations":
 
-    # fakeqmio with default calibrations
 
-    jsonpath = "/opt/cesga/qmio/hpc/calibrations"
-    files = jsonpath + "/????_??_??__??_??_??.json"
-    files = glob.glob(files)
-    calibration_file=max(files, key=os.path.getctime)
 
-    with open(calibration_file, "r") as file:
-        noise_properties_json = json.load(file)
+if args.noise_properties_path is not None:
+    if args.noise_properties_path == "last_calibrations":
+        jsonpath = "/opt/cesga/qmio/hpc/calibrations"
+        files = jsonpath + "/????_??_??__??_??_??.json"
+        files = glob.glob(files)
+        calibration_file=max(files, key=os.path.getctime)
+
+        with open(calibration_file, "r") as file:
+            noise_properties_json = json.load(file)
+    else:
+        #TODO: validate noise_properties_json with respect to schema_noise_properties
+        with open(schema_noise_properties, "r") as file:
+            schema_noise_properties = json.load(file)
+
+        with open(args.noise_properties_path, "r") as file:
+            noise_properties_json = json.load(file)
+
+elif args.backend_path is not None:
+
+    if args.backend_path != "default":
+        #TODO: validate backend_json with respect to schema_backend
+        with open(schema_backend, "r") as file:
+            schema_backend = json.load(file)
+
+        with open(args.backend_path, "r") as file:
+            backend_json = json.load(file)
+    else:
+        logger.error("Default backend can not be built if noise properties are not specified.")
+        raise SystemExit
+
 else:
-
-    # personalized noise model or fakeqmio with non default calibrations
-
-    with open(args.noise_properties_path, "r") as file:
-        noise_properties_json = json.load(file)
-
-#TODO: validate noise_properties_json with respect to schema_noise_properties
-
-# validating json schema for backend (optional)
-
-if args.backend_path != "default":
-
-    with open(schema_backend, "r") as file:
-        schema_backend = json.load(file)
-
-    with open(args.backend_path, "r") as file:
-        backend_json = json.load(file)
-
-    #TODO: validate backend_json with respect to schema_backend
+    logger.error("No backend nor noise properties information was provided, therefore noise instructions are none.")
+    raise SystemExit
 
 
 thermal_relaxation, readout_error, gate_error = True, False, False

@@ -32,6 +32,63 @@ using namespace cunqa::sim;
 
 namespace {
 
+std::string transform_noise_properties(const JSON& qubits_json, const std::string& output_path)
+{
+    JSON output_json;
+    if (qubits_json.contains("single_qubits")) {
+        output_json["Qubits"] = {};
+        output_json["Q1Gates"] = {};
+        output_json["Q2Gates(RB)"] = {};
+        int i = 0;
+        for (auto it = qubits_json["single_qubits"].begin(); it != qubits_json["single_qubits"].end(); ++it) {
+            const auto& qubit_info = it.value();
+            output_json["Qubits"]["q[" + std::to_string(i) + "]"] = {{"T1 (s)", qubit_info["t1"]},
+                                                                        {"T2 (s)", qubit_info["t2"]},
+                                                                        {"Drive Frequency (Hz)", qubit_info["drive_frequency"]},
+                                                                        {"Measuring frequency (Hz)", qubit_info["measuring_frequency"]},
+                                                                        {"Readout duration (s)", qubit_info["readout_duration"]},
+                                                                        {"Readout fidelity (RB)", qubit_info["readout_fidelity"]}
+                                                                    };
+            output_json["Q1Gates"][it.key()] = {};
+            for (auto gate_it = qubit_info["gates"].begin(); gate_it != qubit_info["gates"].end(); ++gate_it) {
+                const std::string& gate_name = gate_it.key();
+                const auto& gate_info = gate_it.value();
+                output_json["Q1Gates"]["q[" + std::to_string(i) + "]"][gate_name] = {{"Gate duration (s)", gate_info["gate_duration"]},
+                                                                                        {"Fidelity(RB)", gate_info["fidelity"]}
+                                                                                    };
+            }
+            i++;
+        }
+
+        for (auto it = qubits_json["pared_qubits"].begin(); it != qubits_json["pared_qubits"].end(); ++it) {
+            const auto& qubit_info = it.value();
+            const std::string& key = it.key();
+            int n, m;
+            sscanf(key.c_str(), "q%d-q%d>", &n, &m);
+            std::string new_key = std::to_string(n) + "-" + std::to_string(m);
+
+            auto& q2gates = output_json["Q2Gates(RB)"][new_key];
+            for (const auto& gate_it : qubit_info["gates"].items()) {
+                const std::string& gate_name = gate_it.key();
+                const auto& gate_info = gate_it.value();
+                q2gates[gate_name] = {
+                    {"Duration (s)", gate_info["gate_duration"]},
+                    {"Fidelity(RB)", gate_info["fidelity"]}
+                };
+            } 
+        }
+    }
+    std::ofstream outfile(output_path);
+    if (!outfile.is_open()) {
+        LOGGER_ERROR("Cannot open output file: {}", output_path);
+        throw std::runtime_error("Output file open failed");
+    }
+    outfile << output_json.dump(4);
+    outfile.close();
+    return output_path;
+}
+
+
 JSON convert_to_backend(const JSON& backend_paths)
 {
     JSON qpu_properties;
@@ -53,19 +110,27 @@ JSON convert_to_backend(const JSON& backend_paths)
         throw;
     }
 
-    //TODO: complete the noise part
+    if ((qpu_properties.contains("single_qubits") && !qpu_properties.at("single_qubits").empty()) ||
+        (qpu_properties.contains("paired_qubits") && !qpu_properties.at("paired_qubits").empty())) {
+        std::string noise_properties_path = std::getenv("STORE") + std::string("/.cunqa/tmp_noise_properties_") + std::getenv("SLURM_JOB_ID") + ".json";
+        transform_noise_properties(qpu_properties, noise_properties_path);
+
+    } else {
+        std::string noise_properties_path = ""
+    }
+
     JSON backend;
     backend = {
         {"name", qpu_properties.at("name")}, 
         {"version", ""},
         {"description", "QPU from infrastructure"},
-        {"n_qubits", qpu_properties.at("n_qubits")}, 
+        {"n_qubits", qpu_properties.at("n_qubits")},
         {"coupling_map", qpu_properties.at("coupling_map")},
         {"basis_gates", qpu_properties.at("basis_gates")}, 
         {"custom_instructions", ""}, // What's this?
         {"gates", JSON::array()}, // gates vs basis_gates?
         {"noise_model", JSON()},
-        {"noise_properties", JSON()},
+        {"noise_properties", noise_properties_path},
         {"noise_path", ""}
     };
     
@@ -86,8 +151,6 @@ std::string get_qpu_name(const JSON& backend_paths)
     } 
 
     return qpu_name;
-}
-
 }
 
 template<typename Simulator, typename Config, typename BackendType>
@@ -140,6 +203,8 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
     return "";
 }
 
+}
+
 int main(int argc, char *argv[])
 {
     std::string info_path(argv[1]);
@@ -153,6 +218,16 @@ int main(int argc, char *argv[])
 
     auto back_path_json = (argc == 7 ? JSON::parse(std::string(argv[6]))
                                      : JSON());
+
+    if (back_path_json.contains("backend_from_infrastructure")) {
+         auto backend_paths = back_path_json.at("backend_from_infrastructure").get<JSON>();
+        convert_to_backend(backend_paths);
+
+    }
+
+    // back_path_json = {"informacion del backend y las noise_properties!!!!"} ---> si recivo algún tipo de indicio de ruido traduzco a lo
+    // que me deberia haber dado el get_noise_model_run_command
+
 
     JSON backend_json;
     std::string name = family + "_" + std::getenv("SLURM_PROCID");
