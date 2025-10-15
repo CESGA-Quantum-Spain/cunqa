@@ -358,11 +358,19 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                 self.last_active_layer[instr["qubits"][0]]+=1
                 layer_dict[str(instr["qubits"][0])].append([self.last_active_layer[instr["qubits"][0]], i, instr["name"]])
 
-            elif instr["name"] in SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q:
+            elif "conditional_reg" in instr:
+                max_layer_qubit = max([self.last_active_layer[j] for j in set(instr["qubits"] + instr["conditonal_reg"])])
+                for j in instr["qubits"]:
+                    self.last_active_layer[j] = max_layer_qubit + 1
+                    layer_dict[str(j)].append([self.last_active_layer[j], i, instr["name"]])
+
+            elif len(instr["qubits"]) > 1:
                 max_layer_qubit = max([self.last_active_layer[j] for j in instr["qubits"]])
                 for j in instr["qubits"]:
                     self.last_active_layer[j] = max_layer_qubit + 1
                     layer_dict[str(j)].append([self.last_active_layer[j], i, instr["name"]])
+
+            # TODO: support the ever problematic rcontrol and recv (they have zero qubits)
 
         return layer_dict
 

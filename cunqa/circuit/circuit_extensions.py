@@ -256,104 +256,46 @@ def cunqa_dunder_methods(cls):
 
     ######################## UNION ########################
 
-    def __or__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
+    def __or__(self, lower_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
         """
         Overloading the "|" operator to perform vertical concatenation. This means that taking the union of two CunqaCircuits with n and m qubits
         will return a circuit with n + m qubits where the operations of the first circuit are applied to the first n and those of the second circuit
         will be applied to the last m. Not a commutative operation.
 
         Args
-            other_circuit (<class.cunqa.circuit.CunqaCircuit>, <class.qiskit.QuantumCircuit>): circuit to be vertically concatenated next to self.
+            lower_circuit (<class.cunqa.circuit.CunqaCircuit>, <class.qiskit.QuantumCircuit>): circuit to be vertically concatenated next to self.
         Returns
             union_circuit (<class.cunqa.circuit.CunqaCircuit>): circuit with both input circuits one above the other.
         """
+        if isinstance(lower_circuit, CunqaCircuit):
+            down_instr = lower_circuit.instructions
+            down_id = lower_circuit._id
 
-        if isinstance(other_circuit, CunqaCircuit):
-            other_instr = other_circuit.instructions
-            other_id = other_circuit._id
-
-        elif isinstance(other_circuit, QuantumCircuit):
-            other_instr = convert(other_circuit, "dict")['instructions']
-            other_id = "qc" 
+        elif isinstance(lower_circuit, QuantumCircuit):
+            down_instr = convert(lower_circuit, "dict")['instructions']
+            down_id = "qiskit_c" 
                 
         else:
-            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(lower_circuit)} was provided.[{NotImplemented.__name__}].")
             raise SystemExit
         
-        n    = self.num_qubits;           m = other_circuit.num_qubits
-        cl_n = self.num_clbits;        cl_m = other_circuit.num_clbits
-        union_id = self._id + " | " + other_id
+        n    = self.num_qubits;           m = lower_circuit.num_qubits
+        cl_n = self.num_clbits;        cl_m = lower_circuit.num_clbits
+        union_id = self._id + " | " + down_id
         union_circuit = CunqaCircuit(n + m, cl_n + cl_m, id = union_id)
 
-        # Traverse input circuits instructions to change distributed gates between them for local gates and record circuits that communicate with them to modify the reference to point to the union circuit
-        circs_comm_self = set() 
-        for instr in (iter_self_instructions := iter(copy.deepcopy(self.instructions))):
-            # If we find distributed gates referencing self, substitute by a local gate
-            if ("circuits" in instr and instr["circuits"][0] == other_id): 
-                if instr["name"] == "measure_and_send":
-                    continue # These ones will be substituted later
+        iter_self_instr = iter(copy.deepcopy(self.instructions))
+        iter_down_instr = iter(copy.deepcopy(down_instr))
 
-                elif instr["name"] == "recv":
-                    instr2 = next(iter_self_instructions) # This retrieves the next gate and skips the recv
-                    print(instr2)
-                    instr2["conditional_reg"] = instr2["remote_conditional_reg"] + n
-                    del instr2["remote_conditional_reg"]
+        # Go through instructions of both circuits, add n to the qubits of the lower_circuit and transform distributed operations between self and lower_circuit to be local
+        try: 
+            self.process_instrs(union_circuit, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
+            self.process_instrs(union_circuit, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
 
-                    union_circuit._add_instruction(instr2)
-                    continue
-
-                elif instr["name"] == "qsend":
-                    pass
-
-                else: # ["qsend", "qrecv", "expose", "rcontrol"]
-                    # TODO: support these
-                    pass
-
-                circs_comm_self.add(instr["circuits"][0])
-
-            union_circuit._add_instruction(instr)
-
-
-        circs_comm_other = set()
-        for instrr in (iter_other_instr := iter(copy.deepcopy(other_instr))):
-
-            instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]] # displace the qubits of the instructions and then add it to union_circuit
-            if "clbits" in instrr:
-                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]]
-
-            if "conditional_reg" in instrr:
-                instrr["conditional_reg"][0] += cl_m
-
-            if "registers" in instrr:
-                instrr["registers"] = [qubit + m for qubit in instrr["registers"]]
-
-            if "circuits" in instrr: # Gather info on the circuits that reference the other_circuit and wether it controls or is a target
-
-                if instrr["circuits"][0] == self._id: # Susbtitute distr gate by local gates if communicates with upper_circuit 
-                    if instrr["name"] == "measure_and_send":
-                        continue # These ones have been substituted earlier
-
-                    elif instrr["name"] == "recv":
-                        instr2 = next(iter_other_instr) # This retrieves the next gate and skips the recv
-                        
-                        instr2["qubits"] = [q + n for q in instr2["qubits"]] 
-                        instr2["conditional_reg"] = instr2["remote_conditional_reg"]
-                        del instr2["remote_conditional_reg"]
-
-                        union_circuit._add_instruction(instr2)
-                        continue
-
-                    else: # ["qsend", "qrecv", "expose", "rcontrol"]
-                        # TODO: support these
-                        pass
-                    
-                circs_comm_other.add(instrr["circuits"][0])
-            
-            union_circuit._add_instruction(instrr)
-
-        # Update other circuits that communicate with our input circuits to reference the union_circuit
-        self._update_other_instances(circs_comm_self, self._id, union_id) 
-        self._update_other_instances(circs_comm_other, other_id, union_id, n)
+        except error as e:
+            logger.error(f"Error found while processing instructions for union: \n {e}")
+            del self.qubits_telegate; del self.qubits_teledata
+            raise SystemExit
 
         return union_circuit
         
@@ -372,7 +314,7 @@ def cunqa_dunder_methods(cls):
 
         elif isinstance(upper_circuit, QuantumCircuit):
             upper_instr = convert(upper_circuit, "dict")['instructions']
-            upper_id ="qc"
+            upper_id ="qiskit_c"
             union_id = self._id + " | " + upper_id
 
             n    = self.num_qubits;          m = upper_circuit.num_qubits
@@ -412,90 +354,46 @@ def cunqa_dunder_methods(cls):
         
             
         
-    def __ior__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit]):
+    def __ior__(self, lower_circuit: Union['CunqaCircuit', QuantumCircuit]):
         """
         Overloading the "|=" operator to perform vertical concatenation. This means adding the qubits and their instructions from 
-        other_circuit to self. No return as the modifications are performed locally on self.
+        lower_circuit to self. No return as the modifications are performed locally on self.
 
         Args
             upper_circuit (<class.cunqa.circuit.CunqaCircuit>, <class.qiskit.QuantumCircuit>): circuit to be vertically concatenated below self.
         Returns
             union_circuit (<class.cunqa.circuit.CunqaCircuit>): circuit with both input circuits one above the other. 
         """
-        if isinstance(other_circuit, CunqaCircuit):
-            other_instr = other_circuit.instructions
-            other_id = other_circuit._id
+        if isinstance(lower_circuit, CunqaCircuit):
+            down_instr = lower_circuit.instructions
+            down_id = lower_circuit._id
 
-        elif isinstance(other_circuit, QuantumCircuit):
-            other_instr = convert(other_circuit, "dict")['instructions']
-            other_id = "qc"
+        elif isinstance(lower_circuit, QuantumCircuit):
+            down_instr = convert(lower_circuit, "dict")['instructions']
+            down_id = "qiskit_c"
                 
         else:
-            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(lower_circuit)} was provided.[{NotImplemented.__name__}].")
             raise SystemExit
 
         n = self.num_qubits;             cl_n = self.num_clbits;             need_to_modify_self = False
-        m = other_circuit.num_qubits;    cl_m = other_circuit.num_clbits
+        m = lower_circuit.num_qubits;    cl_m = lower_circuit.num_clbits
 
-        self._add_q_register(name = other_id, number_qubits = m)
-        self._add_cl_register(name = other_id, number_clbits = cl_m)
+        self._add_q_register(name = down_id, number_qubits = m)
+        self._add_cl_register(name = down_id, number_clbits = cl_m)
 
-        circs_comm_other = set() # Here we will collect info on the circuits that talk to other_circuit to make them reference self instead
-        for instrr in (iter_other_instr := iter(copy.deepcopy(other_instr))):
+        iter_self_instr = iter(copy.deepcopy(self.instructions))
+        iter_down_instr = iter(copy.deepcopy(down_instr))
 
-            instrr["qubits"] = [qubit + n for qubit in instrr["qubits"]]
-            if "clbits" in instrr:
-                instrr["clbits"] = [clbit + cl_n for clbit in instrr["clbits"]]
+        # Go through instructions of both circuits, add n to the qubits of the lower_circuit and transform distributed operations between self and lower_circuit to be local
+        try: 
+            self.process_instrs(union_circuit, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
+            self.process_instrs(union_circuit, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
 
-            if "conditional_reg" in instrr:
-                instrr["conditional_reg"][0] += cl_m
-
-            if "registers" in instrr:
-                instrr["registers"] = [qubit + m for qubit in instrr["registers"]]
-
-            if "circuits" in instrr: # Treat distributed gates
-                if instrr["circuits"][0] == self._id: # Susbtitute distr gate by local gates if it refences upper_circuit 
-                    need_to_modify_self = True
-                    if instrr["name"] == "measure_and_send":
-                        continue # These ones will be substituted later
-
-                    elif instrr["name"] == "recv":
-                        instr2 = next(iter_other_instr) # This retrieves the next gate and skips the recv
-                        instr2["qubits"] = [q + n for q in instr2["qubits"]] 
-                        instr2["conditional_reg"] = instr2["remote_conditional_reg"]
-                        del instr2["remote_conditional_reg"]
-
-                        self._add_instruction(instr2)
-                        continue
-
-                    else: # ["qsend", "qrecv", "expose", "rcontrol"]
-                        # TODO: support these
-                        pass
-
-                circs_comm_other.add(instrr["circuits"][0])
-                
-            self._add_instruction(instrr)
-        
-        if need_to_modify_self:
-            for instr in (iter_self_instructions := iter(self.instructions)):
-                if ("circuits" in instr and instr["circuits"][0] == other_id):
-                    if instr["name"] in ["measure_and_send", "expose"]:
-                        self.instructions.pop(instr) # Eliminate if from self, it has been substituted by a local gate earlier
-
-                    elif instr["name"] == "recv":
-                        instr2 = next(iter_other_instr) # This retrieves the next gate and skips the recv
-                        instr2["conditional_reg"] = instr2["remote_conditional_reg"]
-                        del instr2["remote_conditional_reg"]
-
-                        self._add_instruction(instr2)
-                        continue
-                    
-                    else: # ["qsend", "qrecv", "expose", "rcontrol"]
-                        # TODO: support these
-                        pass
-
-
-        self._update_other_instances(circs_comm_other, other_id, self._id, n)
+        except error as e:
+            logger.error(f"Error found while processing instructions for union: \n {e}")
+            del self.qubits_telegate; del self.qubits_teledata
+            raise SystemExit
 
         return self
         
@@ -663,7 +561,185 @@ def cunqa_dunder_methods(cls):
 
         return False
 
-    ####################### FUNCTION FOR HOR_SPLIT ########################
+    ####################### FUNCTIONS FOR __OR__ AND HOR_SPLIT ########################
+
+    def process_instrs(self, union_circuit: CunqaCircuit, iter_this_instr: 'list_iterator', iter_other_instr: 'list_iterator', this_id: str, other_id: str, n: int, cl_n: int, m: int, cl_m: int, displace: bool):
+        """
+        Function that goes through `iter_this_instr` processing its instructions and adding them to `union_circuit`. If a quantum communication (between self and other) 
+        is found, we need to go through `iter_other_instr` until we can retrieve the second half of the quantum communication information to susbtitute it fo a local gate.
+        We use recurrence for this, calling `process_instrs` on (iter_other_instr, iter_this_instr). To unify both cases, we have the argument `displace` which indicates
+        wether we're in the up or down (False or True) side of the union.
+
+        Args:
+            union_circuit (CunqaCircuit): Circuit to house the union of the other circuits
+            iter_this_instr (list_iterator): we should receive `iter(copy.deepcopy(circuit.instructions)))` of the desired `circuit` to traverse
+            iter_other_instr (list_iterator): iterator analogous to `iter_this_instr` but from the other circuit of the union,
+                                              where we can search for the second half of any internal quantum communication.
+            this_id (str): id of the circuit being traversed
+            other_id (str): id of the other piece of the union
+            n    (int): number of qubits of the upper circuit
+            cl_n (int): number of cl_bits of the upper circuit
+            m    (int): number of qubits of the down circuit
+            cl_m (int): number of qubits of the down circuit
+            displace (bool): determines wether we're looping through the instructions of the lower_circuit (True) or of the upper_circuit (False)
+        """
+        if displace:            
+            self.circs_comm_down = set() if not hasattr(self, circs_comm_down) else self.circs_comm_down
+        else:
+            self.circs_comm_up = set() if not hasattr(self, circs_comm_up) else self.circs_comm_up
+
+        # LOOP THROUGH INSTRUCTIONS!
+        for i, instr in enumerate(iter_this_instr):
+            if displace:
+                instr["qubits"] = [qubit + n for qubit in instr["qubits"]] 
+                if "clbits" in instr :
+                    instr["clbits"] = [clbit + cl_n for clbit in instr["clbits"]] 
+
+                if "conditional_reg" in instr:
+                    instr["conditional_reg"][0] += cl_m 
+
+                if "registers" in instr:
+                    instr["registers"] = [qubit + m for qubit in instr["registers"]] 
+
+            if "circuits" in instr:
+                # COMMUNICATION BETWEEN PIECES NEEDS TO CHANGE TO LOCAL GATES IN UNION
+                if instr["circuits"][0] == other_id:
+                    # CLASSICAL COMMUNICATIONS
+                    if instr["name"] == "measure_and_send":
+                        if (union_circuit == self and not displace): # __ior__ case
+                            self.instructions.pop(instr)
+                        continue # Nothing to do, all info is in "recv"
+
+                    elif instr["name"] == "recv":
+                        instr2 = next(iter_this_instr) # This retrieves the next gate and skips the recv
+                        
+                        instr2["qubits"] = [q + n for q in instr2["qubits"]] 
+                        instr2["conditional_reg"] = instr2["remote_conditional_reg"] + n if not displace else instr2["remote_conditional_reg"]
+                        del instr2["remote_conditional_reg"]
+
+                        if (union_circuit == self and not displace): # __ior__ case
+                            self.instructions.pop(i)
+                        else:
+                            union_circuit._add_instruction(instr2)
+                        continue
+
+                    #QUANTUM COMMUNICATIONS
+                    elif instr["name"] in ["qsend", "qrecv"]:  
+
+                        if len(self.qubits_teledata) == 1:
+                            if instr["name"] == "qsend":
+                                self.qubits_teledata = instr["qubits"] +  self.qubits_teledata
+
+                            else: # qrecv
+                                self.qubits_teledata += instr["qubits"]
+
+                            if (union_circuit == self and not displace): # __ior__ annoyance
+                                self.instructions.pop(i)
+                                self.instructions.insert(i, {"name":"swap", "qubits":self.qubits_teledata})
+                                self.instructions.insert(i+1, {"name":"measure","qubits":[self.qubits_teledata[0]],"clbits":[self.qubits_teledata[0]],"clreg":[]})
+                                self.instructions.insert(i+2, {"name":"x","qubits":[self.qubits_teledata[0]], "conditional_reg":[self.qubits_teledata[0]]})
+                                
+                            else:
+                                union_circuit.swap(*self.qubits_teledata)
+                                union_circuit.reset(self.qubits_teledata[0])
+                            self.qubits_teledata = []
+                            return
+
+                        elif len(self.qubits_teledata) == 0:
+                            if (union_circuit == self and not displace): # __ior__ case
+                                self.instructions.pop(i)
+
+                            self.qubits_teledata.append(instr["qubits"][0])
+                            self.process_instrs(union_circuit, iter_other_instr, iter_this_instr, other_id, this_id, n, cl_n, m, cl_m, not displace) # Swap will be added inside this call
+                            continue
+
+                        else:
+                            logger.error(f"Error: an unsupported number of qubits appeared on self.qubits_teledata: {len(self.qubits_teledata)}.")
+                            raise RuntimeError
+
+                    elif instr["name"] == "expose":
+                        if len(self.qubits_telegate) == 0:
+                            if (union_circuit == self and not displace): # __ior__ case
+                                self.instructions.pop(i)
+
+                            self.qubits_telegate = instr["qubits"] 
+                            self.process_instrs(union_circuit, iter_other_instr, iter_this_instr, other_id, this_id, n, cl_n, m, cl_m, not displace)
+                            continue
+
+                        elif "please return rcontrol qubit" in self.qubits_telegate:
+                            if (union_circuit == self and not displace): # __ior__ case
+                                self.instructions.pop(i)
+
+                            self.qubits_telegate = instr["qubits"]
+                            return
+
+                        else:
+                            logger.error(f"Wrong order of communications found in up_process_instrs.")
+                            raise RuntimeError
+                            
+                    elif instr["name"] == "rcontrol":
+                        if len(self.qubits_telegate) == 1:
+                            local_control = self.qubits_telegate[0]
+                            telegates = instr["instructions"]
+
+                            if (union_circuit == self and not displace): # __ior__ case
+                                self.instructions.pop(i)
+                                for j, telegate in enumerate(telegates):
+                                    telegate["qubits"] = [local_control if q == -1 else q for q in telegate["qubits"]] # Substitute remote control for a local one
+                                    self.instructions.insert(i+j, telegate)
+
+                            else:
+                                for telegate in telegates:
+                                    telegate["qubits"] = [local_control if q == -1 else q for q in telegate["qubits"]] # Substitute remote control for a local one
+                                    union_circuit._add_instruction(telegate)
+                            
+                            self.qubits_telegate = []
+                            return
+
+                        elif len(self.qubits_telegate) == 0:
+                            self.qubits_telegate = ["please return rcontrol qubit"]
+                            self.process_instrs(union_circuit, iter_other_instr, iter_this_instr, other_id, this_id, n, cl_n, m, cl_m, not displace) 
+                            # this call will return having added the rcontrol qubit to self.qubits_telegate
+
+                            if not len(self.qubits_telegate) == 1:
+                                logger.error(f"Telegate communication not found on down_process_instrs.")
+                                raise RuntimeError 
+
+                        local_control = self.qubits_telegate[0]
+                        telegates = instr["instructions"]
+
+                        if (union_circuit == self and not displace): # __ior__ case
+                            self.instructions.pop(i)
+                            for j, telegate in enumerate(telegates):
+                                telegate["qubits"] = [local_control if q == -1 else q for q in telegate["qubits"]] # Substitute remote control for a local one
+                                self.instructions.insert(i+j, telegate)
+
+                        else:
+                            for telegate in telegates:
+                                telegate["qubits"] = [local_control if q == -1 else q for q in telegate["qubits"]] # Substitute remote control for a local one
+                                union_circuit._add_instruction(telegate)
+                        
+                        self.qubits_telegate = []
+                        continue
+
+                # Record the circuits that communicate with the pieces to change them if their are not eachother
+                if (displace and union_circuit != self):
+                    self.circs_comm_down.add(instrr["circuits"][0])
+
+                elif (not displace and union_circuit != self):
+                    self.circs_comm_up.add(instrr["circuits"][0])
+        
+        if (displace and union_circuit != self):
+            self._update_other_instances(self.circs_comm_down, this_id , union_circuit._id, n)
+            del self.circs_comm_down # This point is only reached if the iterator finishes, so all instructions are accounted for
+
+        elif (not displace and union_circuit != self):
+            self._update_other_instances(self.circs_comm_up, this_id, union_circuit._id)
+            del self.circs_comm_up  
+        
+        del self.qubits_telegate # All possible communications with the second circuit have been processed, and these resources can be freed
+        del self.qubits_teledata
+
 
     def divide_instr(self, instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int, iterator_instructions: 'list_iterator', received: bool = False, recv_remain: int = 0):
         """
@@ -992,6 +1068,7 @@ def cunqa_dunder_methods(cls):
 
     # Update other instances method
     setattr(cls, '_update_other_instances', _update_other_instances)
+    setattr(cls, 'process_instrs', process_instrs)
     setattr(cls, 'divide_instr', divide_instr)
 
     # Addition methods
