@@ -4,6 +4,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
 include(FetchContent)
 
+# SPDLOG options to build
 set(SPDLOG_SYSTEM_INCLUDES OFF   CACHE BOOL "Disable libsodium"      FORCE)
 set(SPDLOG_BUILD_SHARED ON       CACHE BOOL "Disable CPACK"          FORCE)
 set(SPDLOG_BUILD_PIC ON          CACHE BOOL "Disable performance tool" FORCE)
@@ -13,12 +14,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 install(TARGETS spdlog DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")
-
-FetchContent_Declare(
-  mqt-ddsim
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mqt-ddsim
-)
-FetchContent_MakeAvailable(mqt-ddsim)
 
 
 # ZMQ options to build
@@ -37,11 +32,59 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(libzmq)
 
 
+# MQT-DDSIM options to build
+FetchContent_Declare(
+  mqt-ddsim
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mqt-ddsim
+)
+FetchContent_MakeAvailable(mqt-ddsim)
+
+
+# CUNQASIMULATOR options to build
 FetchContent_Declare(
   cunqasimulator
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cunqasimulator
 )
 FetchContent_MakeAvailable(cunqasimulator)
+
+
+# MAESTRO options to build
+find_package(Eigen3 3.4 REQUIRED)
+if(TARGET Eigen3::Eigen)
+    get_target_property(
+        EIGEN_INCLUDE_PATH 
+        Eigen3::Eigen 
+        INTERFACE_INCLUDE_DIRECTORIES
+    )
+
+    set(EIGEN3_INCLUDE_DIR "${EIGEN_INCLUDE_PATH}/nlohmann") 
+    message(STATUS "Eigen3 include dir extracted from target: ${EIGEN3_INCLUDE_DIR}")
+else()
+    message(FATAL_ERROR "Eigen3 was not found, or the target Eigen3::Eigen is missing.")
+endif()
+
+if(TARGET nlohmann_json::nlohmann_json)
+    get_target_property(
+        JSON_INCLUDE_PATH 
+        nlohmann_json::nlohmann_json 
+        INTERFACE_INCLUDE_DIRECTORIES
+    )
+    set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}") 
+
+    message(STATUS "nlohmann/json include dir extracted from target: ${JSON_INCLUDE_DIR}")
+else()
+    message(FATAL_ERROR "nlohmann/json was found, but the modern target nlohmann_json::nlohmann_json is missing.")
+endif()
+
+set(QCSIM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/QCSim/QCSim)
+set(AER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qiskit-aer/src)
+
+FetchContent_Declare(
+    maestro
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro
+)
+install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")
+
 
 # TODO: Change this to non global
 message(STATUS "ZMQ BINARY DIR: ${libzmq_BINARY_DIR}")

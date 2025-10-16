@@ -30,9 +30,6 @@ message(STATUS "Install location will be: ${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib64")
 set(CMAKE_INSTALL_BINDIR "bin")
 
-# Load pybind11 depending on the environment
-set(PYBIND_PATH "$ENV{EBROOTPYBIND11}/lib64/python3.9/site-packages/pybind11")
-set(pybind11_DIR "$ENV{EBROOTPYBIND11}/lib64/python3.9/site-packages/pybind11/share/cmake/pybind11")
 
 # System name to identify cluster
 set(SYSTEM_NAME $ENV{LMOD_SYSTEM_NAME})
@@ -42,23 +39,14 @@ endif()
 message(STATUS "SYSTEM NAME: ${SYSTEM_NAME}")
 add_compile_definitions(SYSTEM_NAME="${SYSTEM_NAME}")
 
-
-#if("$ENV{LMOD_SYSTEM_NAME}" STREQUAL "QMIO")
-#    set(PYBIND_PATH "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.12.0-python-3.9.9/lib64/python3.9/site-packages/pybind11")
-#    set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.12.0-python-3.9.9/lib64/python3.9/site-packages/pybind11/share/cmake/pybind11")
-#else("$ENV{LMOD_SYSTEM_NAME}" STREQUAL "FT3")
-#    set(PYBIND_PATH "/opt/cesga/2022/software/Compiler/gcccore/system/pybind11/2.12.0/lib64/python3.9/site-packages/pybind11")
-#    set(pybind11_DIR "/opt/cesga/2022/software/Compiler/gcccore/system/pybind11/2.12.0/lib64/python3.9/site-packages/pybind11/share/cmake/pybind11")    
-#endif()
-
 if(${SYSTEM_NAME} STREQUAL "QMIO")
-  set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.13.6-python-3.11.9/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
+  set(pybind11_DIR "$ENV{EBROOTPYBIND11}/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
   find_package(Python 3.11.9 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.13 REQUIRED)
   find_package(nlohmann_json 3.7.3 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
-  set(pybind11_DIR "/opt/cesga/2022/software/Core/pybind11/2.12.0-python-3.10.8/lib64/python3.10/site-packages/pybind11/share/cmake/pybind11/")
+  set(pybind11_DIR "ENV{EBROOTPYBIND11}/lib64/python3.10/site-packages/pybind11/share/cmake/pybind11/")
   find_package(Python 3.10.8 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
   find_package(nlohmann_json 3.7.3 REQUIRED)
