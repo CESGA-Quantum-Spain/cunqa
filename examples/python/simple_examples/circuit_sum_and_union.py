@@ -71,7 +71,7 @@ print(f"Instructions of the union of the circuits are {circ_union2.instructions}
 
 # Another option to union multiple circuits on a row is union()
 big_union = CunqaCircuit.union((list2_circuits := [circ1, circ5, circ2]))
-print(f"Use of CunqaCircuit.union, to union {list2_circuits}")
+print(f"Use of CunqaCircuit.union, to union {[circ._id for circ in list2_circuits]}")
 print(f"Instructions of the big union are:\n {big_union.instructions} \n")
 
 
