@@ -1,5 +1,5 @@
 """
-    Holds Cunqa's custom circuit class and functions to translate its instructions into other formats for circuit definition.
+    Holds Cunqa's custom circuit class for circuit definition.
 
     Building circuits
     =================
@@ -58,16 +58,16 @@ def _generate_id(size: int = 4) -> str:
 
 
 
-SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz", "remote_c_if_ecr"]
-SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr", "remote_c_if_unitary","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz"]
+SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send"]
+SUPPORTED_GATES_2Q = ["swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "crx", "cry", "crz", "ecr", "c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz", "c_if_ecr"]
 SUPPORTED_GATES_3Q = [ "ccx","ccy", "ccz","cswap"]
 SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz", "rzx","cp", "crx", "cry", "crz", "cu1","c_if_rx","c_if_ry","c_if_rz"]
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
 SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
 SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
-SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "remote_c_if_unitary", "remote_c_if_h", "remote_c_if_x","remote_c_if_y","remote_c_if_z","remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"]
-SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "distr_unitary", "distr_h", "distr_x", "distr_y", "distr_z", "distr_rx", "distr_ry", "distr_rz", "distr_cx","distr_cy","distr_cz","distr_ecr"]
+SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "recv"]
+SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "qrecv", "expose", "rcontrol"]
 
 class CunqaCircuitError(Exception):
     """Exception for error during circuit desing at :py:class:`~cunqa.circuit.CunqaCircuit`."""
@@ -80,6 +80,9 @@ class InstanceTrackerMeta(type):
     _new_inst = False
 
     def __call__(cls, *args, **kwargs):
+        """
+        Extends type.__call__(), which creates the object and calls the __init__ method of the class that uses this MetaClass, to store the created instance.
+        """
         # Create the instance using the original __call__ method
         instance = super().__call__(*args, **kwargs)
         
@@ -89,20 +92,27 @@ class InstanceTrackerMeta(type):
         return instance
 
     def access_other_instances(cls):
+        """ Returns a dictionary with all the CunqaCircuit instances created. Keys are circuit ids while the values are the circuit objects."""
         return cls._instances
     
     def get_connectivity(cls):
+        """ 
+        Method to obtain the connectivity of circuit instances where two circuits are connected if they have distributed instructions referencing eachother.
+
+        Returns:
+            _connected (set): contains frozen sets with paths that connect circuit instances. If two circuits belong to an element in _connected, they are connected.
+        """
             if (cls._connected is None or cls._new_inst):
                 # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
                 first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
-                # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
+                # adds (a, b, c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
                 cls._connected = transitive_combinations(first_connections) 
                 cls._new_inst = False
 
             return cls._connected
 
 class CunqaCircuit(metaclass=InstanceTrackerMeta):
-    # TODO: look for other alternatives for describing the documentation that do not requiere such long docstrings, maybe gatehring everything in another file and using decorators, as in ther APIs.
+    # TODO: look for other alternatives for describing the documentation that do not requiere such long docstrings, maybe gathering everything in another file and using decorators, as in ther APIs.
     """
     Class to define a quantum circuit for the :py:mod:`~cunqa` api.
 
@@ -225,8 +235,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
     quantum_regs: dict  #: Dictionary of quantum registers as ``{"name": [assigned qubits]}``.
     classical_regs: dict #: Dictionary of classical registers of the circuit as ``{"name": [assigned clbits]}``.
     sending_to: "list[str]" #: List of circuit ids to which the current circuit is sending measurement outcomes or qubits. 
-    current_params: "list[Union[int, float]]" #: List of the parameters that the circuit currently has
-    param_labels: "list[str]" #: List of labels assigned to parametric gates to be able to update them separately and conveniently. Same lenght as current_params
+    current_params: "list[Union[int, float]]" #: Ordered list of the parameters that the circuit currently has
+    param_expressions: "list[str]" #: List of expressions for variable parameters assigned to parametric gates. Same lenght as current_params
 
 
     def __init__(self, num_qubits: int, num_clbits: Optional[int] = None, id: Optional[str] = None):
@@ -251,7 +261,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.classical_regs = {}
         self.sending_to = []
 
-        self.param_labels = []
+        self.param_expressions = []
         self.current_params = []
 
         if not isinstance(num_qubits, int):
@@ -288,7 +298,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         info = {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
         if self.is_parametric:
-            info += {"param_labels": self.param_labels,"current_params": self.current_params}
+            info += {"param_expressions": self.param_expressions,"current_params": self.current_params}
 
         return info
 
@@ -466,7 +476,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         raise TypeError
                     
                     self.current_params += instruction["params"]
-                    self.param_labels += [p if isinstance(p, str) else "no_name" for p in instruction["params"]]
+                    self.param_expressions += [p if isinstance(p, str) else "no_name" for p in instruction["params"]]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")
@@ -1264,15 +1274,14 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             # TODO: maybe in the future this can be check at the begining for a more efficient processing 
 
     # TODO: check if simulators accept reset instruction as native
-    def reset(self, *qubits: int):
+    def reset(self, *qubits: int) -> None:
         """
-        Class method to add reset to zero instruction to a qubit or list of qubits (use after measure).
+        Method to reset to zero one or multiple qubits, separated by commas (use after measure).
 
         Args:
             qubits (int): qubits to which the reset operation is applied.
         
         """
-
         if isinstance(qubits, list):
             for q in qubits:
                 self.instructions.append({'name': 'c_if_x', 'qubits': [q, q], 'conditional_reg': [q], 'params': []})
@@ -1283,7 +1292,18 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
 
-    def save_state(self, pershot: bool = False, label: str = "_method_"):
+    # TODO: create specific methods as save_statevector etc, supported by AER for several simulation methods aside from statevector
+    def save_state(self, pershot: bool = False, label: str = "_method_") -> None:
+        """
+        Method to store the current state of the simulation at the time that the instruction is applied. The state will then appear on the results. 
+        The format of the state saved depends on the simulation method selected on the options of QPU.run, where the default is `statevector`. 
+
+        Args:
+            pershot (bool): determines wether the state should be saved on each shot or if the average state should be returned
+            label (str): the saved state will appear in the result under the key with name the selected `label`. If nothing is selected,
+                         the deafult label is the name of the simulation method, e.g. "density_matrix". Two saved states must have 
+                         different labels
+        """
         self.instructions.append({
             "name": "save_state",
             "qubits": list(range(self.num_qubits)),
@@ -1429,7 +1449,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             for instruction in self.instructions:
                 if (("params" in instruction) and (not instruction["name"] in {"unitary", "c_if_unitary", "remote_c_if_unitary"}) and (len(instruction["params"]) != 0)):
                     for i in range(len(instruction["params"])):
-                        param = self.param_labels[param_index + i]
+                        param = self.param_expressions[param_index + i]
 
                         if param in marked_params:
                             if isinstance(marked_params[param], (int, float)):

@@ -321,7 +321,7 @@ class QJob:
                     logger.warning("Additional labelled parameters were given, parameter list will be ignored. If you really desire to change the fixed parameters include them under the argument no_name")
 
                 premessage = self._current_params 
-                for index, label in enumerate(self._param_labels):
+                for index, label in enumerate(self._param_expressions):
                     if label in marked_params:
                         if isinstance(marked_params[label], (int, float)):
                             premessage[index] = marked_params[label]
@@ -397,8 +397,8 @@ class QJob:
                     self._is_dynamic = False
                     self._has_cc = False
 
-                if "param_labels" in circuit and "current_params" in circuit:
-                    self._param_labels = circuit["param_labels"]
+                if "param_expressions" in circuit and "current_params" in circuit:
+                    self._param_expressions = circuit["param_expressions"]
                     self._current_params = circuit["current_params"]
 
                 logger.debug("Translation to dict not necessary...")
@@ -421,7 +421,7 @@ class QJob:
                 self._has_cc = circuit.has_cc
 
                 if circuit.is_parametric:
-                    self._param_labels = circuit.param_labels
+                    self._param_expressions = circuit.param_expressions
                     self._current_params = circuit.current_params
                 
                 logger.debug("Translating to dict from CunqaCircuit...")
