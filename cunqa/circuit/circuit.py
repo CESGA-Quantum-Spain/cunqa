@@ -57,6 +57,10 @@ def _generate_id(size: int = 4) -> str:
     chars = string.ascii_letters + string.digits
     return ''.join(random.choices(chars, k=size))
 
+def get_module(obj):
+    """ Returns the root module that the passed object is from."""
+    return obj.__module__.split('.')[0]
+
 
 
 SUPPORTED_GATES_1Q = ["id","x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg", "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "measure_and_send"]
@@ -403,11 +407,11 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                 elif (instruction["name"] == "recv"):
                     gate_qubits = 0
 
-                elif any([instruction["name"] == u for u in ["unitary", "c_if_unitary", "remote_c_if_unitary"]]) and ("params" in instruction):
+                elif instruction["name"] in ["unitary", "c_if_unitary", "remote_c_if_unitary"] and "params" in instruction:
                     # in previous method, format of the matrix is checked, a list must be passed with the correct length given the number of qubits
                     gate_qubits = int(np.log2(len(instruction["params"][0])))
                     if not instruction["name"] == "unitary":
-                        gate_qubits += 1 # adding the control qubit
+                        gate_qubits += 1 # adding the control qubit 
 
                 elif (instruction["name"] in instructions_with_clbits) and ({"qubits", "clbits"}.issubset(instruction)):
                     gate_qubits = 1
@@ -472,12 +476,12 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         logger.error(f"instruction {instruction['name']} is not parametric, therefore does not accept params.")
                         raise ValueError
                     
-                    if not all([(isinstance(p,float) or isinstance(p,int) or isinstance(p, Variable)) for p in instruction["params"]]):
+                    if not all([(isinstance(p,float) or isinstance(p,int) or isinstance(p,Variable) or get_module(p) == "sympy") for p in instruction["params"]]):
                         logger.error(f"Instruction params must be int, float or str (for labels), but {type(instruction['params'])} was provided.")
                         raise TypeError
                     
                     self.current_params += instruction["params"]
-                    self.param_expressions += [p if isinstance(p, str) else "no_name" for p in instruction["params"]]
+                    self.param_expressions += [p if (isinstance(p, Variable) or get_module(p) == "sympy") else "no_name" for p in instruction["params"]]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")
@@ -1448,6 +1452,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         try:
             param_index = 0
             for instruction in self.instructions:
+
                 if (("params" in instruction) and (not instruction["name"] in {"unitary", "c_if_unitary", "remote_c_if_unitary"}) and (len(instruction["params"]) != 0)):
                     for i in range(len(instruction["params"])):
                         param = self.param_expressions[param_index + i]

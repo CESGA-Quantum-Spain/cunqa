@@ -23,8 +23,10 @@ enum INSTRUCTIONS {
     R,
     U,
     U1,
+    U3,
     CU,
     CU1,
+    CU3,
     SWAP,
     CX,
     CY,
@@ -59,6 +61,7 @@ enum INSTRUCTIONS {
     C_IF_CP,
     C_IF_CU,
     C_IF_CU1,
+    C_IF_CU3,
     C_IF_ECR,
     C_IF_SWAP,
     C_IF_RXX,
@@ -100,9 +103,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // ONE GATE THREE PARAM
     {"u", U},
-
-    // ONE GATE FOUR PARAM
-    {"cu", CU},
+    {"u3", U3},
 
     // TWO GATE NO PARAM
     {"swap", SWAP},
@@ -121,6 +122,10 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rzx", RZX},
     {"cp", CP},
     {"cu1", CU1},
+
+    // TWO GATE THREE PARAM
+    {"cu", CU},
+    {"cu3", CU3},
 
     // THREE GATE NO PARAM
     {"cecr", CECR},
@@ -143,6 +148,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"c_if_cp", C_IF_CP},
     {"c_if_cu", C_IF_CU},
     {"c_if_cu1", C_IF_CU1},
+    {"c_if_cu3", C_IF_CU3},
     {"c_if_ecr", C_IF_ECR},
     {"c_if_swap", C_IF_SWAP},
     {"c_if_rxx", C_IF_RXX},

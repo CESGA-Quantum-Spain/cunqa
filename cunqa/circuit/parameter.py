@@ -28,6 +28,7 @@ class Parameter(sympy.Symbol):
         return result.evalf()  
 
     # Dunder methods already implemented on the parent class
+    # In particular, as sympy defines __hash__ and __eq__, sympy objects and therefore cunqa.Variable objects can be used as keys of a dict
     
     
 class Number:
