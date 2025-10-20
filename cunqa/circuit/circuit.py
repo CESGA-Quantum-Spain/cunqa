@@ -33,6 +33,7 @@ from collections import defaultdict
 from typing import Union, Optional, Tuple
 
 from cunqa.logger import logger
+from cunqa.circuit.parameter import Variable
 
 def _generate_id(size: int = 4) -> str:
     """Returns a random alphanumeric identifier.
@@ -471,7 +472,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         logger.error(f"instruction {instruction['name']} is not parametric, therefore does not accept params.")
                         raise ValueError
                     
-                    if not all([(isinstance(p,float) or isinstance(p,int) or isinstance(p, str)) for p in instruction["params"]]):
+                    if not all([(isinstance(p,float) or isinstance(p,int) or isinstance(p, Variable)) for p in instruction["params"]]):
                         logger.error(f"Instruction params must be int, float or str (for labels), but {type(instruction['params'])} was provided.")
                         raise TypeError
                     
