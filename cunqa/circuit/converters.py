@@ -139,22 +139,24 @@ def qc_to_json(qc : 'QuantumCircuit') -> dict:
                 for i, param in enumerate(params):
                     if isinstance(param, Parameter):
 
-                        label = str(param._symbol_expr)
-                        json_data["current_params"].append( label )
-                        json_data["param_labels"].append( label )
-                        params[i]= label
+                        var = Variable(str(param))
+                        json_data["current_params"].append(var)
+                        json_data["param_expressions"]["sympy_exprs"].append(var)
+                        json_data["param_expressions"]["lambda_funcs"].append(lambda x: x)
+                        params[i]= var
 
                     elif isinstance(param, ParameterExpression):
 
-                        labels = tuple(str(name) for name in param._names.keys())
-                        json_data["current_params"].append( labels )
-                        json_data["param_labels"].append( labels )
-                        # TODO: add a third list with (lambda) functions to be applied to each parameter before updating?
-                        params[i]= labels
+                        expr = sympy.sympify(sympy.parsing.sympy_parser.parse_expr(str(param)))
+                        json_data["current_params"].append(labels)
+                        json_data["param_expressions"]["sympy_exprs"].append(expr)
+                        json_data["param_expressions"]["lambda_funcs"].append(sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy'))
+                        params[i]= expr
 
                     else:
-                        json_data["current_params"].append( param )
-                        json_data["param_labels"].append( "no_name" )
+                        json_data["current_params"].append(param)
+                        json_data["param_expressions"]["sympy_exprs"].append(None)
+                        json_data["param_expressions"]["lambda_funcs"].append(None)
                         # No modification on params needed
 
 
@@ -291,11 +293,16 @@ def json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     
                     if "param_labels" in circuit:
                         for i in range(len(params)):
-                            label = circuit["param_labels"][param_counter + i]
-                            if label != "no_name":
-                                params[i] = Parameter(label)
+                            expr = circuit["param_expressions"]["sympy_exprs"][param_counter + i]
+                            if expr is None:
+                                continue
 
-                    # TODO: should we keep current_params? how to return them?
+                            elif isinstance(expr, Variable):
+                                params[i] = Parameter(str(expr))
+
+                            elif get_module(expr) is "sympy":
+                                params[i] = ParameterExpression({Parameter(str(sym)): sym for sym in expr.free_symbols}, expr)
+
                     param_counter += len(params)
 
                 else:

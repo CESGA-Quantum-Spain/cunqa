@@ -113,7 +113,6 @@ class QPU:
             self._qclient.connect(ip, port)
             self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
-            self._connected = True
 
         # Transpilation if requested
         if transpile:

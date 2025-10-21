@@ -20,7 +20,7 @@ class TranspileError(Exception):
     """Exception for error during the transpilation of a circuit to a given Backend. """
     pass
 
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
+def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit', 'QASM2 str']:
     """
     Function to transpile a circuit according to a given backend. Circuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.
 
@@ -51,6 +51,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
             else:
+                current_params = circuit.current_params
                 qc = convert(circuit.info, "QuantumCircuit")
 
         elif isinstance(circuit, dict):
@@ -133,6 +134,15 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None):
         return convert(qc_transpiled, "json")
     
     elif isinstance(circuit, CunqaCircuit):
-        return convert(qc_transpiled, "CunqaCircuit")
+        cunqac_transpiled = convert(qc_transpiled, "CunqaCircuit")
+        cunqac_transpiled._id = circuit._id + "_transpiled"
+        
+        assign_dict={}
+        for expr in current_params:
+            if isinstance(expr, dict):
+                assign_dict.update(expr)
+        cunqac_transpiled.assign_parameters(assign_dict)
+
+        return cunqac_transpiled
 
     

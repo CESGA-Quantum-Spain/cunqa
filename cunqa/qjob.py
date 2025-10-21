@@ -283,7 +283,7 @@ class QJob:
                 logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
                 raise QJobError # I capture the error in QPU.run() when creating the job
             
-    def upgrade_parameters(self, parameters: list[Union[float, int]] = None, shots: int = None, **marked_params: dict[str, Union[list[Union[float, int]], float, int]]) -> None:
+    def upgrade_parameters(self, parameters: Union[dict, list[Union[float, int]]], shots: int = None) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
         By this call, first it is checked weather if the prior simulation's result was called. If not, it calls it but does not store it, then
@@ -312,55 +312,35 @@ class QJob:
 
         if self._result is None:
             self._future.get()
-
-           
-        # Process entries ############
-        if len(marked_params)>0:
-            try:
-                if parameters is not None:
-                    logger.warning("Additional labelled parameters were given, parameter list will be ignored. If you really desire to change the fixed parameters include them under the argument no_name")
-
-                premessage = self._current_params 
-                for index, label in enumerate(self._param_expressions):
-                    if label in marked_params:
-                        if isinstance(marked_params[label], (int, float)):
-                            premessage[index] = marked_params[label]
-                            self._current_params[index] = marked_params[label]
-
-                        elif isinstance(marked_params[label], list):
-                            next_value = marked_params[label].pop(0) # This is not too fast
-                            if not isinstance(next_value, (int, float)):
-                                logger.error(f"Parameters must be int of float, but a {type(next_value)} was given on the list for label {label}.")
-                                raise SystemExit
-                            
-                            premessage[index] = next_value
-                            self._current_params[index] = next_value
-
-                if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
-                    logger.warning(f"Some of the given parameters were not used, check name or lenght of the following keys: {[value for value in marked_params.values() if len(value)!=0]}.")
-
-            except Exception as error:
-                logger.error(f"Error while substituting the marked parameters, check that the correct number of parameters was given. Error: {error}")
+            
+        ############ Process entries ############
+        if isinstance(parameters, dict):
+            if not all([isinstance((witness:= v), (int, float)) for v in parameters.values()]):
+                logger.error(f"All parameters must be int or float but {type(witness)} was given.")
                 raise SystemExit
-            
-        elif parameters is not None:
-            if isinstance(parameters, list): 
-                if all(isinstance(param, (int, float)) for param in parameters):  # Check if all elements are real numbers
-                    premessage = parameters
+            try:
+                self._current_params = [
+                        {**d, **{k: parameters[k] for k in parameters if k in d}} 
+                        for d in self._current_params
+                    ]
+
+                premessage = [
+                        self._param_expressions["lambda_funcs"][i](*tuple(p.values())) 
+                        if isinstance(p, dict) else p 
+                        for i, p in enumerate(copy_current)
+                    ]
                     
-                else:
-                    logger.error(f"Parameters must be real numbers or integers [{ValueError.__name__}].")
-                    raise SystemExit # User's level
-            else:
-                logger.error(f"Invalid parameter type, list was expected but {type(parameters)} was given. [{TypeError.__name__}].")
-                raise SystemExit # User's level 
-            
+            except Exception as error:
+                logger.error(f"Error while upgrading parameters, check that the correct number of parameters was given.\n Error: {error}")
+                raise SystemExit
+
+        elif isinstance(parameters, list):
+            premessage = parameters
+
         else:
-            logger.error(f"Error: no input for upgrade_parameters.")
-            raise SystemExit
-                    
-                   
+            logger.error(f"Parameters must be dict or list, but {type(parameters)} was provided.")  
         
+
         if shots is None:
             shots = json.loads(self._execution_config)["config"]["shots"]
 

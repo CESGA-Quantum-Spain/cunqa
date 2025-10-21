@@ -86,10 +86,12 @@ class InstanceTrackerMeta(type):
 
     def __call__(cls, *args, **kwargs):
         """
-        Extends type.__call__(), which creates the object and calls the __init__ method of the class that uses this MetaClass, to store the created instance.
+        Extends type.__call__(), which calls __new__ and __init__, creating and initiallizing the instance.
+        Our extension stores any newly created instance in a dictionary.
         """
         # Create the instance using the original __call__ method
         instance = super().__call__(*args, **kwargs)
+        cls._new_inst = True
         
         # Store the instance 
         cls._instances[instance._id] = instance
@@ -266,7 +268,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.classical_regs = {}
         self.sending_to = []
 
-        self.param_expressions = []
+        self.param_expressions = {"sympy_exprs": [], "lambda_funcs": []}
         self.current_params = []
 
         if not isinstance(num_qubits, int):
@@ -480,8 +482,9 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         logger.error(f"Instruction params must be int, float or str (for labels), but {type(instruction['params'])} was provided.")
                         raise TypeError
                     
-                    self.current_params += instruction["params"]
-                    self.param_expressions += [p if (isinstance(p, Variable) or get_module(p) == "sympy") else "no_name" for p in instruction["params"]]
+                    self.current_params += [{symbol: None for symbol in p.free_symbols} if (isinstance(p, Variable) or get_module(p) == "sympy") else p for p in instruction["params"]]
+                    self.param_expressions["sympy_exprs"] += (new_exprs := [p if (isinstance(p, Variable) or get_module(p) == "sympy") else None for p in instruction["params"]])
+                    self.param_expressions["lambda_funcs"] += [sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy') if expr is not None else None for expr in new_exprs]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")
@@ -1441,48 +1444,45 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "params":params,
         })
 
-    def assign_parameters(self, **marked_params):
+    def assign_parameters(self, **given_params) -> None:
         """
-        Plugs values into the intructions of parametric gates marked with a parameter name.
+        Assigns values to the variable parameters on the circuit. Intended for use before the first execution.
 
         Args:
-            marked_params (dict[list | float | int]): dict with keys the labels of the variable parameters 
+            given_params (dict[float | int]): dict with keys the labels of the variable parameters 
             and associated values the new parameters to assign to them. The values are entered with the syntax theta_1 = 3.14, theta_2 = [2, 7], theta_3 = 9
         """
+        if not self.is_parametric:
+            logger.warning(f"Circuit {self._id} is not parametric, no parameters can be assigned.")
+            return # TODO: consider wether an error should be raised instead
+
+        if not all([isinstance(v, (int, float)) for v in given_params.values()]):
+            logger.error(f"Parameters must be list[int, float], int or float but {type(given_params[param])} was given.")
+            raise SystemExit
+
+        param_index = 0
         try:
-            param_index = 0
             for instruction in self.instructions:
-
                 if (("params" in instruction) and (not instruction["name"] in {"unitary", "c_if_unitary", "remote_c_if_unitary"}) and (len(instruction["params"]) != 0)):
+                    
                     for i in range(len(instruction["params"])):
-                        param = self.param_expressions[param_index + i]
+                        expr_func = self.param_expressions["lambda_funcs"][param_index + i]
+                        if expr_func is None:
+                            continue
+                        expr_current = self.current_params[param_index + i]
 
-                        if param in marked_params:
-                            if isinstance(marked_params[param], (int, float)):
-                                instruction["params"][i] = marked_params[param]
-                                self.current_params[param_index + i] = marked_params[param] # update the saved current values, too
+                        # Update the current parameters for this expression
+                        updated_expr_current = {**expr_current, **{k: given_params[k] for k in given_params if k in expr_current}}
+                        self.current_params[param_index + i] = updated_expr_current
 
-                            elif isinstance(marked_params[param], list):
-                                next_value = marked_params[param].pop(0)
-                                if not isinstance(next_value, (int, float)):
-                                    logger.error(f"Parameters inside the list must be int or float but {type(next_value)} was given.")
-                                    raise SystemExit
-                                
-                                instruction["params"][i] = next_value
-                                self.current_params[param_index + i] = next_value # update the saved current values, too
+                        # Evaluate parametric expression and plug it as the new paremeter
+                        instruction["params"][i] = expr_func(*tuple(updated_expr_current.values()))
 
-                            else:
-                                logger.error(f"Parameters must be list[int, float], int or float but {type(marked_params[param])} was given.")
-                                raise SystemExit
-                        
                     param_index += len(instruction["params"])
                                 
         except Exception as error:
             logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error}")
             raise SystemExit
-        
-        if not all([len(value)==0 for value in marked_params.values() if isinstance(value, list)]):
-            logger.warning(f"Some of the given parameters list were not exhausted, check name or lenght of at least the following keys: {[key for key, value in marked_params.items() if (isinstance(value, list) and len(value)!=0)]}. \n Use circuit.param_info to obtain the names and numbers of the variable parameters.")
 
 
 
