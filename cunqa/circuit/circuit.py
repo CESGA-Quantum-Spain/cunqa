@@ -305,7 +305,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         info = {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
         if self.is_parametric:
-            info += {"param_expressions": self.param_expressions,"current_params": self.current_params}
+            info |= {"param_expressions": self.param_expressions,"current_params": self.current_params}
 
         return info
 
@@ -484,7 +484,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                     
                     self.current_params += [{symbol: None for symbol in p.free_symbols} if (isinstance(p, Variable) or get_module(p) == "sympy") else p for p in instruction["params"]]
                     self.param_expressions["sympy_exprs"] += (new_exprs := [p if (isinstance(p, Variable) or get_module(p) == "sympy") else None for p in instruction["params"]])
-                    self.param_expressions["lambda_funcs"] += [sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy') if expr is not None else None for expr in new_exprs]
+                    self.param_expressions["lambda_funcs"] += [sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy') if get_module(expr) == "sympy" else expr for expr in new_exprs]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")

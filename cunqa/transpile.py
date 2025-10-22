@@ -114,7 +114,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union[
         qc_transpiled = pm.run(qc)
     
     except KeyError as error:
-        logger.error(f"Error in cofiguration of the backend, some keys are missing [{type(error).__name__}].")
+        logger.error(f"Error in cofiguration of the backend, some keys are missing [{error}].")
         raise SystemExit # User's level
     
     except TranspilerError as error:
