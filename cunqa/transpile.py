@@ -22,11 +22,12 @@ class TranspileError(Exception):
 
 def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit', 'QASM2 str']:
     """
-    Function to transpile a circuit according to a given backend. Circuit must be qiskit QuantumCircuit, dict or QASM2 string. If QASM2 string is provided, function will also return circuit in QASM2.
+    Function to transpile a circuit according to a given backend. Circuit must be qiskitCunqaCircuit, QuantumCircuit,
+    dict or QASM2 string. The function will return a circuit in the format provided.
 
     Args:
     -----------
-    circuit (dict, <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or QASM2 str): circuit to be transpiled. 
+    circuit (CunqaCircuit, dict, <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or QASM2 str): circuit to be transpiled. 
 
     backend (<class 'backend.Backend'>): backend which transpilation will be done respect to.
 
@@ -42,24 +43,23 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union[
             if initial_layout is not None and len(initial_layout) != circuit.num_qubits:
                 logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
                 raise SystemExit # User's level
-            else:
-                qc = circuit
+            
+            qc = circuit
 
         elif isinstance(circuit, CunqaCircuit):
-
             if circuit.has_cc:
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
-            else:
-                current_params = circuit.current_params
-                qc = convert(circuit.info, "QuantumCircuit")
+            
+            current_params = circuit.current_params
+            qc = convert(circuit.info, "QuantumCircuit")
 
         elif isinstance(circuit, dict):
             if initial_layout is not None and len(initial_layout) != circuit['num_qubits']:
                 logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
                 raise SystemExit # User's level
-            else:
-                qc = convert(circuit, "QuantumCircuit")
+            
+            qc = convert(circuit, "QuantumCircuit")
     
         elif isinstance(circuit, str):
             qc = QuantumCircuit.from_qasm_str(circuit)

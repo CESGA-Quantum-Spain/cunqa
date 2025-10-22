@@ -9,38 +9,30 @@ import symengine.lib.symengine_wrapper as se
 # SymPy can use SymEngine as a backend
 sympy.use_symengine = True
 
-class ParameterError(Exception):
-    """ Class for signaling errors with the Parameter class."""
-    pass
+class Variable(sympy.Symbol):
+    """
+    Object that signals to a parametric gate that its value can vary. Variables can be summed, multiplied by 
+    other variables or numbers, exponentiated, divided, etc to create parametric expressions. To apply functions
+    to variables please use those of the `sympy` module, e.g. `sin_a = sympy.sin(Variable('a'))`. 
 
-class Parameter(sympy.Symbol):
-    """ """
+    .. note::
+        The some available `sympy` functions are 
+        "sin", "cos", "tan", "exp", "log", "log10", "sqrt", "abs", "arcsin", "arccos", "arctan", "sinh", 
+        "cosh", "tanh", "arcsinh", "arccosh", "arctanh", "deg2rad", "rad2deg", "floor", "round", "gamma",
+        "factorial".
+    """
     def __new__(cls, name, **assumptions):
         # Primary instance creation
         # Ensures unique symbol instances
         return sympy.Symbol.__new__(cls, name, **assumptions)
 
     def subs(self, param, value):
-        """ Use .subs(param, value) to substitute the variable parameter for the value in the symbolic expression"""
-        # All well and good but once a function like sin is applied to a parameter, it no longer is a 
-        # cunqa Parameter and substituting will return a sympy type number, 
+        """ Use .subs(param, value) to substitute the variable parameter for the value in the symbolic expression""" 
         result = super().subs(self, param, value)
-        return result.evalf()  
+        return float(result.evalf())
 
     # Dunder methods already implemented on the parent class
-    # In particular, as sympy defines __hash__ and __eq__, sympy objects and therefore cunqa.Variable objects can be used as keys of a dict
+    # In particular, as sympy defines __hash__ and __eq__, so 
+    # sympy objects and therefore cunqa.Variable objects can be used as keys of a dict
     
-    
-class Number:
-    """ """
-    def __init__(self, value: Union[int, float]):
-        if isinstance(value, int):
-            self.number = sympy.Integer(value)
-        elif isinstance(value, float):
-            self.number = sympy.Float(value)
-        elif isinstance(value, complex):
-            self.number = sympy.Float(value.real()) + sympy.Float(value.imag())*sympy.I
-        else:
-            logger.error(f"Value of an unsupported type was given: {type(value)}.")
-            raise SystemExit
     

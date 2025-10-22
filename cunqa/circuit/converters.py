@@ -24,6 +24,7 @@ import qiskit._accelerate.circuit # Handles Symbolic expressions for ParameterEx
 from typing import Tuple, Union, Optional
 
 from cunqa.circuit.circuit import CunqaCircuit
+from cunqa.circuit.parameter import Variable
 from cunqa.logger import logger
 
 
@@ -44,32 +45,42 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
         if convert_to == "QuantumCircuit":
             logger.warning("Provided circuit was already a QuantumCircuit")
             converted_circuit = circuit
+
         elif convert_to == "CunqaCircuit":
             converted_circuit = qc_to_cunqac(circuit)
+
         elif convert_to == "json":
             converted_circuit = qc_to_json(circuit)
+
         else:
             logger.error(f"Unable to convert circuit to {convert_to}")
             converted_circuit = circuit
     elif isinstance(circuit, CunqaCircuit):
         if convert_to == "QuantumCircuit":
             converted_circuit = cunqac_to_qc(circuit)
+
         elif convert_to == "CunqaCircuit":
             logger.warning("Provided circuit was already a CunqaCircuit")
             converted_circuit = circuit
+
         elif convert_to == "json":
             converted_circuit = cunqac_to_json(circuit)
+
         else:
             logger.error(f"Unable to convert circuit to {convert_to}")
             converted_circuit = circuit
+
     elif isinstance(circuit, dict):
         if convert_to == "QuantumCircuit":
             converted_circuit = json_to_qc(circuit)
+
         elif convert_to == "CunqaCircuit":
             converted_circuit = json_to_cunqac(circuit)
+
         elif convert_to == "json":
             logger.warning("Provided circuit was already a CunqaCircuit")
             converted_circuit = circuit
+            
         else:
             logger.error(f"Unable to convert circuit to {convert_to}")
             converted_circuit = circuit
@@ -440,3 +451,7 @@ def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bo
             if any(line.startswith(gate) for gate in parametric_gates):
                 return True
         return False
+
+def get_module(obj):
+    """ Returns the root module that the passed object is from."""
+    return obj.__module__.split('.')[0]

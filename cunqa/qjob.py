@@ -221,20 +221,22 @@ class QJob:
 
         """
         try:
-            if self._future is not None and self._future.valid():
-                if self._result is not None:
-                    if not self._updated: # if the result was already obtained, we only call the server if an update was done
-                        res = self._future.get()
-                        self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
-                        self._updated = True
-                    else:
-                        pass
-                else:
-                    res = self._future.get()
-                    self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
-                    self._updated = True
-            else:
+            if self._future is None or not self._future.valid():
                 logger.debug(f"self._future is None or non-valid, None is returned.")
+                return
+
+            if self._result is not None:
+                if not self._updated: # if the result was already obtained, we only call the server if an update was done
+                    res = self._future.get()
+                    self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
+                    self._updated = True
+                else:
+                    pass
+            else:
+                res = self._future.get()
+                self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
+                self._updated = True
+                
         except Exception as error:
                 logger.error(f"Error while reading the results {error}")
                 raise SystemExit # User's level
@@ -250,19 +252,22 @@ class QJob:
         Time that the job took.
         """
 
-        if self._future is not None and self._future.valid():
-            if self._result is not None:
-                try:
-                    return self._result.time_taken
-                except AttributeError:
-                    logger.warning("Time taken not available.")
-                    return ""
-            else:
-                logger.error(f"QJob not finished [{QJobError.__name__}].")
-                raise SystemExit # User's level
-        else:
+        if self._future is None or not self._future.valid():
             logger.error(f"No QJob submited [{QJobError.__name__}].")
             raise SystemExit # User's level
+
+        if self._result is None:
+            logger.error(f"QJob not finished [{QJobError.__name__}].")
+            raise SystemExit # User's level
+
+        try:
+            return self._result.time_taken
+        except AttributeError:
+            logger.warning("Time taken not available.")
+            return ""
+        
+            
+            
 
     def submit(self) -> None:
         """
@@ -275,36 +280,41 @@ class QJob:
         """
         if self._future is not None:
             logger.warning("QJob has already been submitted.")
-        else:
-            try:
-                self._future = self._qclient.send_circuit(self._execution_config)
-                logger.debug("Circuit was sent.")
-            except Exception as error:
-                logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
-                raise QJobError # I capture the error in QPU.run() when creating the job
+            return
+        
+        try:
+            self._future = self._qclient.send_circuit(self._execution_config)
+            logger.debug("Circuit was sent.")
+        except Exception as error:
+            logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
+            raise QJobError # I capture the error in QPU.run() when creating the job
             
-    def upgrade_parameters(self, parameters: Union[dict, list[Union[float, int]]], shots: int = None) -> None:
+    def upgrade_parameters(self, parameters: Union[dict[Union[float, int]], list[Union[float, int]]], shots: int = None) -> None:
         """
-        Method to upgrade the parameters in a previously submitted job of parametric circuit.
-        By this call, first it is checked weather if the prior simulation's result was called. If not, it calls it but does not store it, then
-        sends the new set of parameters to the server to be reasigned to the circuit and to simulate it.
-
-        This method can be used on a loop, always being careful if we want to save the intermediate results.
+        Method to upgrade the parameters in a previously submitted parametric circuit job.
+        The function checks wether the previous result was retrieved or not. If it wasn't the method 
+        retrieves and discards it, so the next result is that of the updated parameters. Then 
+        the new set of parameters is sent to the server to be reasigned to the circuit for simulation.
 
         Examples of usage are shown above and on the `Examples Gallery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, checkout its documentation for a extensive description.
+        More information can be found on the codumentation of :py:class:`~cunqa.mappers.QJobMapper`, which uses extensively :py:meth:`~cunqa.qjob.QJob.upgrade_parameters`.
 
         .. warning::
-            In the current version, parameters will be assigned to **ALL** parametric gates in the circuit. This means that if we want to make
-            some parameters fixed, it is on our responsibility to pass them correctly and in the correct order in the list.
-            If the number of parameters is less than the number of parametric gates in the circuit, an error will occur at the virtual QPU, on
-            the other hand, if more parameters are provided, there will only be used up to the number of parametric gates.
+            There are two possible inputs for this method. First a list with new values for **ALL** parametric gates of the circuit
+            given in the order that the gates were performed. If the number of parameters is less than the number of parametric 
+            gates in the circuit, an error will occur at the virtual QPU, on the other hand, if more parameters are provided, 
+            they will be used only up to the number of parametric gates.
+
+            The other option is to provide a dictionary with keys the Variable parameters of the circuit that we wish to
+            update with its corresponding new value. Any Variable not updated will retain its previous value. If Variables
+            not present in the circuit are passed they are ignored.
             
-            Also, only rx, ry and rz gates are supported for this functionality, that is, they are the only gates considered *parametric* for this functionality.
 
         Args:
-            parameters (list[float | int]): list of parameters to assign to the parametrized circuit.
-            marked_params (dict[list, float, int]): used to indicate the value that should be given to the marked Parameters
+            parameters (dict | list): either a list of ordered parameters to assign to the parametrized circuit or
+                                      a dictionary with keys the Variables to update and the corresponding new values.
+            shots (int): int determining the new number of shots if it needs to be updated.
+           
         """
         if not hasattr(self, "_current_params"):
             logger.error(f"Trying to upgrade parameters of a non-parametric circuit.")
@@ -327,7 +337,7 @@ class QJob:
                 premessage = [
                         self._param_expressions["lambda_funcs"][i](*tuple(p.values())) 
                         if isinstance(p, dict) else p 
-                        for i, p in enumerate(copy_current)
+                        for i, p in enumerate(self._current_params)
                     ]
                     
             except Exception as error:
@@ -339,6 +349,7 @@ class QJob:
 
         else:
             logger.error(f"Parameters must be dict or list, but {type(parameters)} was provided.")  
+            raise SystemExit
         
 
         if shots is None:
@@ -523,11 +534,11 @@ def gather(qjobs: Union[QJob, "list['QJob']"]) -> Union[Result, "list['Result']"
             Result or list of results.
     """
     if isinstance(qjobs, list):
-        if all([isinstance(q, QJob) for q in qjobs]):
-            return [q.result for q in qjobs]
-        else:
+        if not all([isinstance(q, QJob) for q in qjobs]):
             logger.error(f"Objects of the list must be <class 'qjob.QJob'> [{TypeError.__name__}].")
             raise SystemExit # User's level
+        
+        return [q.result for q in qjobs]
             
     elif isinstance(qjobs, QJob):
         return qjobs.result

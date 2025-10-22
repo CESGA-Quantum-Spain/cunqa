@@ -1444,13 +1444,14 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "params":params,
         })
 
-    def assign_parameters(self, **given_params) -> None:
+    def assign_parameters(self, given_params) -> None:
         """
-        Assigns values to the variable parameters on the circuit. Intended for use before the first execution.
+        Assigns values to the Variable parameters on the circuit. Intended for use before the first execution
+        as the simulation will fail without concrete values in the Variable parameters.
 
         Args:
-            given_params (dict[float | int]): dict with keys the labels of the variable parameters 
-            and associated values the new parameters to assign to them. The values are entered with the syntax theta_1 = 3.14, theta_2 = [2, 7], theta_3 = 9
+            given_params (dict[float | int]): dict with keys each Variable parameter with the int or float to
+            bound to it as associated value.
         """
         if not self.is_parametric:
             logger.warning(f"Circuit {self._id} is not parametric, no parameters can be assigned.")
