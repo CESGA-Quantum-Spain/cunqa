@@ -96,48 +96,49 @@ def cunqa_dunder_methods(cls):
         if other_circuit == 0:
             return copy.deepcopy(self)  
         
-        if (n := self.num_qubits) == other_circuit.num_qubits:        
-            circs_comm_summands = set() # If our circuits have distributed gates, as the id changes, we will need to update it on the other circuits that communicate with this one
-            self_instr = self.instructions
-            circs_comm_summands.update({instr["circuits"][0] for instr in self_instr if "circuits" in instr})
-
-            if isinstance(other_circuit, CunqaCircuit):
-                if not force_execution:
-                    if any([(self._id in path and other_circuit._id in path) for path in self.__class__.get_connectivity()]):
-                        logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
-                        raise SystemExit
-                    
-                other_instr = other_circuit.instructions
-                other_id = other_circuit._id  
-                circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
-
-            elif isinstance(other_circuit, QuantumCircuit):
-                other_instr = convert(other_circuit, "dict")['instructions']
-                other_id = "qc"
-                
-            else:
-                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
-                raise SystemExit
-
-            cl_n = self.num_clbits; cl_m = other_circuit.num_clbits
-            sum_id = self._id + " + " + other_id
-            summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id) 
-
-            summed_circuit.quantum_regs = self.quantum_regs     # The registers of the first circuit are kept
-            summed_circuit.classical_regs = self.classical_regs; 
-
-            for instruction in list(self_instr + other_instr):
-                summed_circuit._add_instruction(instruction)
-
-            # Ahora mismo le falta updatear los que apuntan a self
-            self._update_other_instances(circs_comm_summands, other_id, sum_id) # Update instances that communicated with the summands to point to the sum
-            self._update_other_instances(circs_comm_summands, self._id, sum_id) # May be unefficient 
-            
-            return summed_circuit
-        
-        else:
+        if (n := self.num_qubits) != other_circuit.num_qubits:  
             logger.error(f"Only circuits with the same number of qubits can be summed. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
+
+        circs_comm_summands = set() # If our circuits have distributed gates, as the id changes, we will need to update it on the other circuits that communicate with this one
+        self_instr = self.instructions
+        circs_comm_summands.update({instr["circuits"][0] for instr in self_instr if "circuits" in instr})
+
+        if isinstance(other_circuit, CunqaCircuit):
+            if not force_execution:
+                if any([(self._id in path and other_circuit._id in path) for path in self.__class__.get_connectivity()]):
+                    logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
+                    raise SystemExit
+                
+            other_instr = other_circuit.instructions
+            other_id = other_circuit._id  
+            circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
+
+        elif isinstance(other_circuit, QuantumCircuit):
+            other_instr = convert(other_circuit, "dict")['instructions']
+            other_id = "qc"
+            
+        else:
+            logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+
+        cl_n = self.num_clbits; cl_m = other_circuit.num_clbits
+        sum_id = self._id + " + " + other_id
+        summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id) 
+
+        summed_circuit.quantum_regs = self.quantum_regs     # The registers of the first circuit are kept
+        summed_circuit.classical_regs = self.classical_regs; 
+
+        for instruction in list(self_instr + other_instr):
+            summed_circuit._add_instruction(instruction)
+
+        # Ahora mismo le falta updatear los que apuntan a self
+        self._update_other_instances(circs_comm_summands, other_id, sum_id) # Update instances that communicated with the summands to point to the sum
+        self._update_other_instances(circs_comm_summands, self._id, sum_id) # May be unefficient 
+        
+        return summed_circuit
+
+            
 
     def __radd__(self, left_circuit: Union['CunqaCircuit', QuantumCircuit])-> 'CunqaCircuit':
         """
@@ -153,37 +154,38 @@ def cunqa_dunder_methods(cls):
             return copy.deepcopy(self)
 
         
-        if  (n := self.num_qubits) == left_circuit.num_qubits:
-            if isinstance(left_circuit, CunqaCircuit):
-                return left_circuit.__add__(self)
-
-            elif isinstance(left_circuit, QuantumCircuit):
-                left_id = "qc"
-                sum_id = left_id + " + " + self._id
-
-                cl_n=self.num_clbits; cl_m=left_circuit.num_clbits
-                summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id)
-
-                summed_circuit.quantum_regs = self.quantum_regs     # The registers of the CunqaCircuit are kept (can be changed later)
-                summed_circuit.classical_regs = self.classical_regs   
-
-                left_instr = convert(left_circuit, "dict")['instructions']
-                
-                for instruction in list(left_instr + self.instructions):
-                    summed_circuit._add_instruction(instruction)
-
-                circs_comm_self = {instr["circuits"][0] for instr in self.instructions if "circuits" in instr}
-                self._update_other_instances(circs_comm_self, left_id, sum_id) # Update other circuits that communicate with self to reference the summed_circuit
-
-                return summed_circuit
-        
-            else:
-                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(left_circuit)} was provided.[{NotImplemented.__name__}].")
-                raise SystemExit
-                    
-        else:
+        if  (n := self.num_qubits) != left_circuit.num_qubits:
             logger.error(f"Only possible to sum circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
+
+        if isinstance(left_circuit, CunqaCircuit):
+            return left_circuit.__add__(self)
+
+        elif isinstance(left_circuit, QuantumCircuit):
+            left_id = "qc"
+            sum_id = left_id + " + " + self._id
+
+            cl_n=self.num_clbits; cl_m=left_circuit.num_clbits
+            summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id)
+
+            summed_circuit.quantum_regs = self.quantum_regs     # The registers of the CunqaCircuit are kept (can be changed later)
+            summed_circuit.classical_regs = self.classical_regs   
+
+            left_instr = convert(left_circuit, "dict")['instructions']
+            
+            for instruction in list(left_instr + self.instructions):
+                summed_circuit._add_instruction(instruction)
+
+            circs_comm_self = {instr["circuits"][0] for instr in self.instructions if "circuits" in instr}
+            self._update_other_instances(circs_comm_self, left_id, sum_id) # Update other circuits that communicate with self to reference the summed_circuit
+
+            return summed_circuit
+    
+        else:
+            logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(left_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+                    
+            
 
     def __iadd__(self, other_circuit: Union['CunqaCircuit', QuantumCircuit], force_execution = False):
         """
@@ -196,42 +198,41 @@ def cunqa_dunder_methods(cls):
         if other_circuit == 0:
             return self
 
-        if  self.num_qubits == other_circuit.num_qubits:
-            if (cl_m := other_circuit.num_clbits) > self.num_clbits:
-
-                self._add_cl_register(name = other_id, number_clbits = cl_m - self.num_clbits)
-
-            circs_comm_summands = set()
-            if isinstance(other_circuit, CunqaCircuit):
-                if not force_execution:
-                    if any([(self._id in connection and other_circuit._id in connection) for connection in self.__class__.get_connectivity()]):
-                        logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
-                        raise SystemExit
-                    
-                other_instr = other_circuit.instructions
-                other_id = other_circuit._id
-                circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
-
-            elif isinstance(other_circuit, QuantumCircuit):
-                other_instr = convert(other_circuit, "dict")['instructions']
-                other_id = "qc" # Avoids an error on _update_other_instances execution
-                
-            else:
-                logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
-                raise SystemExit
-            
-            
-            for instruction in list(other_instr):
-                self._add_instruction(instruction)
-
-            if self._id in circs_comm_summands:
-                logger.error("The circuits to be summed contain distributed instructions that reference eachother.")
-                raise SystemExit
-            self._update_other_instances(circs_comm_summands, other_id, self._id)
-        
-        else:
+        if  self.num_qubits != other_circuit.num_qubits:
             logger.error(f"Only possible to sum circuits with the same number of qubits. Try vertically concatenating (using | ) with an empty circuit to fill the missing qubits {[NotImplemented.__name__]}.")
             raise SystemExit
+
+        if (cl_m := other_circuit.num_clbits) > self.num_clbits:
+
+            self._add_cl_register(name = other_id, number_clbits = cl_m - self.num_clbits)
+
+        circs_comm_summands = set()
+        if isinstance(other_circuit, CunqaCircuit):
+            if not force_execution:
+                if any([(self._id in connection and other_circuit._id in connection) for connection in self.__class__.get_connectivity()]):
+                    logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
+                    raise SystemExit
+                
+            other_instr = other_circuit.instructions
+            other_id = other_circuit._id
+            circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
+
+        elif isinstance(other_circuit, QuantumCircuit):
+            other_instr = convert(other_circuit, "dict")['instructions']
+            other_id = "qc" # Avoids an error on _update_other_instances execution
+            
+        else:
+            logger.error(f"CunqaCircuits can only be summed with other CunqaCircuits or QuantumCircuits, but {type(other_circuit)} was provided.[{NotImplemented.__name__}].")
+            raise SystemExit
+        
+        
+        for instruction in list(other_instr):
+            self._add_instruction(instruction)
+
+        if self._id in circs_comm_summands:
+            logger.error("The circuits to be summed contain distributed instructions that reference eachother.")
+            raise SystemExit
+        self._update_other_instances(circs_comm_summands, other_id, self._id)
 
         return self
             
