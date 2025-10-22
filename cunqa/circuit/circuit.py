@@ -25,7 +25,7 @@
     .. [#] `qiskit.QuantumCircuit <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit>`_ documentation.
 
 """
-
+import sympy
 import numpy as np
 import random
 import string
@@ -109,14 +109,14 @@ class InstanceTrackerMeta(type):
         Returns:
             _connected (set): contains frozen sets with paths that connect circuit instances. If two circuits belong to an element in _connected, they are connected.
         """
-            if (cls._connected is None or cls._new_inst):
-                # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
-                first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
-                # adds (a, b, c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
-                cls._connected = transitive_combinations(first_connections) 
-                cls._new_inst = False
+        if (cls._connected is None or cls._new_inst):
+            # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
+            first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
+            # adds (a, b, c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
+            cls._connected = transitive_combinations(first_connections) 
+            cls._new_inst = False
 
-            return cls._connected
+        return cls._connected
 
 class CunqaCircuit(metaclass=InstanceTrackerMeta):
     # TODO: look for other alternatives for describing the documentation that do not requiere such long docstrings, maybe gathering everything in another file and using decorators, as in ther APIs.

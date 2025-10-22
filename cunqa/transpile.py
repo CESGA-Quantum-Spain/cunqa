@@ -15,12 +15,14 @@ from qiskit.providers.backend_compat import convert_to_target
 from qiskit.transpiler.exceptions import TranspilerError
 from qiskit.qasm2 import dumps
 
+from typing import Union
+
 
 class TranspileError(Exception):
     """Exception for error during the transpilation of a circuit to a given Backend. """
     pass
 
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit', 'QASM2 str']:
+def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit', 'QASM2str']:
     """
     Function to transpile a circuit according to a given backend. Circuit must be qiskitCunqaCircuit, QuantumCircuit,
     dict or QASM2 string. The function will return a circuit in the format provided.
