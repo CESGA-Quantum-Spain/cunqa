@@ -8,7 +8,7 @@ from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, cloud = True)
+family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
 
 circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
 circuit2 = CunqaCircuit(1, id = "circuit2")
@@ -21,7 +21,7 @@ circuit2.qrecv(0, "circuit1")
 circuit1.measure_all()
 circuit2.measure_all()
 
-qpus = get_QPUs(local=False)
+qpus = get_QPUs(on_node=False)
 
 qjobs = run_distributed([circuit1, circuit2], qpus, shots = 100)
 

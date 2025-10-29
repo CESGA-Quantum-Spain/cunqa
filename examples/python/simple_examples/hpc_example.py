@@ -8,8 +8,8 @@ from cunqa.circuit import CunqaCircuit
 
 
 # --------------------------------------------------
-# Key difference between cloud and HPC
-# example: local = True. By default it is the case.
+# Key difference between co-located and HPC
+# example: on_node = True. By default it is the case.
 # This allows to look for QPUs out of the node where 
 # the work is executing.
 # --------------------------------------------------

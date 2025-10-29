@@ -88,7 +88,7 @@ for theta in [2**(-10), 1/np.pi]:
 
     print("Circuit created!")
 
-    QPUs = get_QPUs(local = False, family=f"QPE-{num_qpus}")
+    QPUs = get_QPUs(on_node = False, family=f"QPE-{num_qpus}")
 
     print("QPUs: ", QPUs)
 

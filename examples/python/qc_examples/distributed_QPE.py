@@ -54,7 +54,7 @@ def dist_QPE_rz_circuits(n_ancilla_qubits, angle_to_compute):
 
 def run_distributed_QPE(circuits, qpus_name, shots, seed = 1234):
 
-    qpus_QPE  = get_QPUs(local = False, family = qpus_name)
+    qpus_QPE  = get_QPUs(on_node = False, family = qpus_name)
     algorithm_starts = time.time()
     distr_jobs = run_distributed(circuits, qpus_QPE, shots=shots, seed=seed)
     
@@ -80,7 +80,7 @@ def get_estimated_angle(results):
 
 
 def deploy_qpus(n_qpus, cores_per_qpu, mem_per_qpu, simulator = "Aer"):
-    family = qraise(n_qpus, "10:00:00", simulator=simulator, quantum_comm = True, cloud = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
+    family = qraise(n_qpus, "10:00:00", simulator=simulator, quantum_comm = True, co_located = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
     return family
 
 

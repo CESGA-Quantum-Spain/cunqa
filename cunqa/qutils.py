@@ -26,7 +26,7 @@
         >>> ...    t = "2:00:00", # MANDATORY, maximum time until they are automatically dropped
         >>> ...    classical_comm = True, # allow classical communications
         >>> ...    simulator = "Aer", # choosing Aer simulator
-        >>> ...    cloud = True, # allowing cloud mode, QPUs can be accessed from any node
+        >>> ...    co_located = True, # allowing co-located mode, QPUs can be accessed from any node
         >>> ...    family = "my_family_of_QPUs" # assigning a name to the group of QPUs
         >>> ...    )
         '<job id>'
@@ -68,7 +68,7 @@
 
     - For obtaining information about QPUs in the local node or in other nodes:
 
-        >>> info_QPUs(local = True)
+        >>> info_QPUs(on_node = True)
         [{'QPU':'<id>',
           'node':'<node name>',
           'family':'<family name>',
@@ -109,7 +109,7 @@ def qraise(n, t, *,
            backend = None, 
            fakeqmio = False, 
            family = None, 
-           cloud = True, 
+           co_located = True, 
            cores = None, 
            mem_per_qpu = None, 
            n_nodes = None, 
@@ -137,7 +137,7 @@ def qraise(n, t, *,
 
         family (str): name to identify the group of virtual QPUs raised.
 
-        cloud (bool): if ``True``, `cloud` mode is set, otherwise `hpc` mode is set. In `hpc` mode, virtual QPUs can only be accessed from the node in which they are deployed. In `cloud` mode, they can be accessed from other nodes.
+        co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In `hpc` mode, virtual QPUs can only be accessed from the node in which they are deployed. In `co-located` mode, they can be accessed from other nodes.
 
         cores (str):  number of cores per virtual QPU, the total for the SLURM job will be `n*cores`.
 
@@ -179,8 +179,8 @@ def qraise(n, t, *,
             command = command + f" --simulator={str(simulator)}"
         if family is not None:
             command = command + f" --family={str(family)}"
-        if cloud:
-            command = command + " --cloud"
+        if co_located:
+            command = command + " --co-located"
         if cores is not None:
             command = command + f" --cores={str(cores)}"
         if mem_per_qpu is not None:
@@ -285,14 +285,14 @@ def nodes_with_QPUs() -> "list[str]":
         logger.error(f"Some exception occurred [{type(error).__name__}].")
         raise SystemExit # User's level
 
-def info_QPUs(local: bool = True, node_name: Optional[str] = None) -> "list[dict]":
+def info_QPUs(on_node: bool = True, node_name: Optional[str] = None) -> "list[dict]":
     """
     Provides information about the virtual QPUs available either in the local node, an specific node or globally.
 
-    If `local` is ``True`` and `node_name` provided is different from the local node, only information at local node will be displayed.
+    If `on_node` is ``True`` and `node_name` provided is different from the local node, only information at local node will be displayed.
     
     Args:
-        local (bool): if ``True`` information at local node is displayed, else all information is displayed.
+        on_node (bool): if ``True`` information at local node is displayed, else all information is displayed.
 
         node_name (str): filters the displayed information by an specific node.
 
@@ -312,7 +312,7 @@ def info_QPUs(local: bool = True, node_name: Optional[str] = None) -> "list[dict
             targets = [{qpu_id:info} for qpu_id,info in qpus_json.items() if (info["net"].get("node_name") == node_name ) ]
         
         else:
-            if local:
+            if on_node:
                 local_node = os.getenv("SLURMD_NODENAME")
                 if local_node != None:
                     logger.debug(f"User at node {local_node}.")
@@ -346,12 +346,12 @@ def info_QPUs(local: bool = True, node_name: Optional[str] = None) -> "list[dict
         logger.error(f"Some exception occurred [{type(error).__name__}].")
         raise error # User's level
 
-def get_QPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
+def get_QPUs(on_node: bool = True, family: Optional[str] = None) -> "list['QPU']":
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the virtual QPUs raised by the user.
 
     Args:
-        local (bool): if ``True``, filters by the virtual QPUs available at the local node.
+        on_node (bool): if ``True``, filters by the virtual QPUs available at the local node.
         family (str): filters virtual QPUs by their family name.
 
     Return:
@@ -379,16 +379,16 @@ def get_QPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
         logger.debug(f"User at node {local_node}.")
     else:
         logger.debug(f"User at a login node.")
-    if local:
+    if on_node:
         if family is not None:
             targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node) and (info.get("family") == family)}
         else:
             targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node)}
     else:
         if family is not None:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if ((info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "cloud")) and (info.get("family") == family)}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if ((info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")) and (info.get("family") == family)}
         else:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "cloud")}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")}
     
     # create QPU objects from the dictionary information + return them on a list
     qpus = []
@@ -401,5 +401,5 @@ def get_QPUs(local: bool = True, family: Optional[str] = None) -> "list['QPU']":
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
     else:
-        logger.error(f"No QPUs where found with the characteristics provided: local={local}, family_name={family}.")
+        logger.error(f"No QPUs where found with the characteristics provided: on_node={on_node}, family_name={family}.")
         raise SystemExit

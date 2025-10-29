@@ -14,7 +14,7 @@ mem=$(($cores_per_qpu * 15))
 
 for ((n=1; n<=repetitions; n++)); do
 
-    qraise -n $n -t 20:00:00 -c $cores_per_qpu --mem-per-qpu=${mem}G --cloud  --family_name=$mode-$n
+    qraise -n $n -t 20:00:00 -c $cores_per_qpu --mem-per-qpu=${mem}G --co-located  --family_name=$mode-$n
 
     sleep 15
 

@@ -29,7 +29,7 @@ struct CunqaArgs : public argparse::Args
 
     std::string& family_name             = kwarg("fam,family_name", "Name that identifies which QPUs were raised together.").set_default("default");
     //bool& hpc                          = flag("hpc", "Default HPC mode. The user can connect with the local node QPUs.");
-    bool& cloud                          = flag("cloud", "CLOUD mode. The user can connect with any deployed QPU.");
+    bool& co_located                          = flag("co-located", "co-located mode. The user can connect with any deployed QPU.");
     bool& cc                             = flag("classical_comm", "Enable classical communications.");
     bool& qc                             = flag("quantum_comm", "Enable quantum communications.");
     std::optional<std::string>& infrastructure = kwarg("infrastructure", "Path to a infrastructure of QPUs.");

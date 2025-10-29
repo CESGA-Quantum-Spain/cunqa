@@ -2,6 +2,7 @@
 #include <fstream>
 #include <regex>
 #include <any>
+#include <filesystem> //debug
 
 #include <iostream>
 #include <cstdlib>
@@ -171,7 +172,7 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
 }
 
 }
-
+namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) 
 {
@@ -180,13 +181,16 @@ int main(int argc, char* argv[])
     std::string info_path = std::string(store) + "/.cunqa/qpus.json";
 
     if (args.infrastructure.has_value()) {
-            LOGGER_DEBUG("Raising infrastructure");
+            LOGGER_DEBUG("Raising infrastructure with path: {}", args.infrastructure.value());
+            fs::path current_dir = fs::current_path();
+            LOGGER_DEBUG("Current dir: {}", current_dir.string());
+
             std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
             write_sbatch_file_from_infrastructure(sbatchFile, args);
             sbatchFile.close();
     } else {
         // Setting and checking mode and family name, respectively
-        std::string mode = args.cloud ? "cloud" : "hpc";
+        std::string mode = args.co_located ? "co_located" : "hpc";
         std::string family = args.family_name;
         if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
             LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
