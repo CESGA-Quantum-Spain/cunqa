@@ -1,3 +1,9 @@
+"""
+Code implementing the Iterative Quantum Phase Estimation (iQPE) algorithm with classical communications. To understand the algorithm without communications check:
+    - Original paper (here referred to as Iterative Phase Estimation Algorithm): https://arxiv.org/abs/quant-ph/0610214
+    - TalentQ explanation (in spanish): https://talentq-es.github.io/Fault-Tolerant-Algorithms/docs/Part_01_Fault-tolerant_Algorithms/Chapter_01_01_IPE_portada_myst.html
+"""
+
 import os, sys
 import math
 import numpy as np
