@@ -200,11 +200,11 @@
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="c1"># --------------------------------------------------</span>
-<span class="linenos">11</span><span class="c1"># Key difference between cloud and HPC</span>
-<span class="linenos">12</span><span class="c1"># example: local = False. This allows to look for</span>
+<span class="linenos">11</span><span class="c1"># Key difference between co-located and HPC</span>
+<span class="linenos">12</span><span class="c1"># example: on_node = False. This allows to look for</span>
 <span class="linenos">13</span><span class="c1"># QPUs out of the node where the work is executing.</span>
 <span class="linenos">14</span><span class="c1"># --------------------------------------------------</span>
-<span class="linenos">15</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos">15</span><span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">on_node</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span>
 <span class="linenos">18</span><span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>

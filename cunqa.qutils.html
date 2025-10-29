@@ -214,7 +214,7 @@ One must provide the neccesary information, analogous to the <code class="docuti
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;2:00:00&quot;</span><span class="p">,</span> <span class="c1"># MANDATORY, maximum time until they are automatically dropped</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">classical_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># allow classical communications</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="c1"># choosing Aer simulator</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">cloud</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># allowing cloud mode, QPUs can be accessed from any node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># allowing co-located mode, QPUs can be accessed from any node</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="n">family</span> <span class="o">=</span> <span class="s2">&quot;my_family_of_QPUs&quot;</span> <span class="c1"># assigning a name to the group of QPUs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>    <span class="p">)</span>
 <span class="go">&#39;&lt;job id&gt;&#39;</span>
@@ -257,7 +257,7 @@ the <a class="reference internal" href="cunqa.qpu.QPU.html#cunqa.qpu.QPU" title=
 </div>
 </li>
 <li><p>For obtaining information about QPUs in the local node or in other nodes:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">info_QPUs</span><span class="p">(</span><span class="n">local</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">info_QPUs</span><span class="p">(</span><span class="n">on_node</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <span class="go">[{&#39;QPU&#39;:&#39;&lt;id&gt;&#39;,</span>
 <span class="go">  &#39;node&#39;:&#39;&lt;node name&gt;&#39;,</span>
 <span class="go">  &#39;family&#39;:&#39;&lt;family name&gt;&#39;,</span>
