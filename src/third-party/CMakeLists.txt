@@ -49,7 +49,7 @@ FetchContent_MakeAvailable(cunqasimulator)
 
 
 # MAESTRO options to build
-find_package(Eigen3 3.4 REQUIRED)
+find_package(Eigen3 5.0.0 REQUIRED)
 if(TARGET Eigen3::Eigen)
     get_target_property(
         EIGEN_INCLUDE_PATH 
@@ -57,10 +57,10 @@ if(TARGET Eigen3::Eigen)
         INTERFACE_INCLUDE_DIRECTORIES
     )
 
-    set(EIGEN3_INCLUDE_DIR "${EIGEN_INCLUDE_PATH}/nlohmann") 
-    message(STATUS "Eigen3 include dir extracted from target: ${EIGEN3_INCLUDE_DIR}")
+    set(EIGEN5_INCLUDE_DIR "${EIGEN_INCLUDE_PATH}/nlohmann") 
+    message(STATUS "Eigen include dir extracted from target: ${EIGEN5_INCLUDE_DIR}")
 else()
-    message(FATAL_ERROR "Eigen3 was not found, or the target Eigen3::Eigen is missing.")
+    message(FATAL_ERROR "Eigen was not found, or the target Eigen3::Eigen is missing.")
 endif()
 
 if(TARGET nlohmann_json::nlohmann_json)
@@ -83,6 +83,7 @@ FetchContent_Declare(
     maestro
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro
 )
+FetchContent_MakeAvailable(maestro)
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")
 
 

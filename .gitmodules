@@ -22,3 +22,9 @@
 [submodule "cunqasimulator"]
 	path = src/third-party/cunqasimulator
 	url = git@github.com:CESGA-Quantum-Spain/cunqasimulator.git
+[submodule "QCSim"]
+	path = src/third-party/QCSim
+	url = git@github.com:aromanro/QCSim.git
+[submodule "maestro-qiskit-aer"]
+	path = src/third-party/maestro-qiskit-aer
+	url = git@github.com:InvictusWingsSRL/qiskit-aer.git

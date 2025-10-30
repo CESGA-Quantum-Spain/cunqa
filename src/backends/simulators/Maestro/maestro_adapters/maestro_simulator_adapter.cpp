@@ -505,6 +505,9 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
 
 JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Maestro usual simulation");
+    const char* HOME = std::getenv("HOME");
+    std::string libmaestro_path = std::string(HOME) + "/lib64/libmaestro.so";
     try {
         auto quantum_task = qc.quantum_tasks[0];
 
@@ -514,7 +517,7 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
         JSON run_config_json(quantum_task.config);
 
         SimpleSimulator simulator;
-        if (simulator.Init("/mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/libmaestro.so"))
+        if (simulator.Init(libmaestro_path.c_str()))
         {
 			unsigned long int simulatorHandle = simulator.CreateSimpleSimulator(n_qbits);
             if (simulatorHandle == 0)
@@ -604,11 +607,20 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
                 }
             }
 
+            auto start = std::chrono::high_resolution_clock::now();
 			char* result = simulator.SimpleExecute(circuit_json.dump().c_str(), run_config_json.dump().c_str());
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<float> duration = end - start;
+            float time_taken = duration.count();
+
             if (result)
             {
-                JSON result_json = JSON::parse(result);
+                JSON counts_json = JSON::parse(result);
                 simulator.FreeResult(result);
+
+                JSON result_json = {
+                {"counts", counts_json.at("counts").get<JSON>()},
+                {"time_taken", time_taken} };
 
 				return result_json;
             }
@@ -635,6 +647,9 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 
 JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
+    LOGGER_DEBUG("Maestro dynamic simulation");
+    const char* HOME = std::getenv("HOME");
+    std::string libmaestro_path = std::string(HOME) + "/lib64/libmaestro.so";
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
@@ -648,7 +663,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         n_qubits += 2;
 
     Simulator simulator;
-    if (simulator.Init("maestro.so"))
+    if (simulator.Init(libmaestro_path.c_str()))
     {
         std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
         // is qcsim or gpu specified?

@@ -12,15 +12,13 @@ family = qraise(2, "00:10:00", simulator = "Maestro", cloud = True)
 
 qpus  = get_QPUs(local = False, family = family)
 
-qc = CunqaCircuit(10)
-qc.h(7)
+qc = CunqaCircuit(2)
 qc.h(0)
 qc.cx(0, 1)
-qc.swap(7, 2)
 qc.measure_all()
 
 qpu = qpus[0]
-qjob = qpu.run(qc, transpile = True, shots = 100)# non-blocking call
+qjob = qpu.run(qc, transpile = True, shots = 100) # non-blocking call
 
 counts = qjob.result.counts
 time = qjob.time_taken

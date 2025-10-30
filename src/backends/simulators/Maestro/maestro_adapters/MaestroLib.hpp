@@ -50,7 +50,7 @@ public:
 					CheckFunction((void*)fCreateSimulator, __LINE__);
 					fGetSimulator = (void* (*)(unsigned long int))GetFunction("GetSimulator");
 					CheckFunction((void*)fGetSimulator, __LINE__);
-					fDestroySimulator = (void (*)(unsigned long int))GetFunction("fDestroySimulator");
+					fDestroySimulator = (void (*)(unsigned long int))GetFunction("DestroySimulator");
 					CheckFunction((void*)fDestroySimulator, __LINE__);
 
 					fInitializeSimulator = (int (*)(void*))GetFunction("InitializeSimulator");
@@ -183,7 +183,7 @@ public:
 	{
 		if (!func)
 		{
-			std::cout << "GpuLibrary: Unable to load function, line #: " << std::to_string(line);
+			std::cout << "MaestroLib: Unable to load function, line #: " << std::to_string(line);
 			const char* dlsym_error = dlerror();
 			if (dlsym_error)
 				std::cout << ", error: " << dlsym_error;
