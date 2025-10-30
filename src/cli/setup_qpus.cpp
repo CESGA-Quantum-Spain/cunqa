@@ -4,6 +4,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 #include "qpu.hpp"
 #include "backends/simple_backend.hpp"
@@ -41,7 +44,7 @@ JSON convert_to_backend(const JSON& backend_paths)
         std::ifstream f(path); // try-catch?
         qpu_properties = JSON::parse(f);
     } else if (backend_paths.size() > 1) {
-        std::string str_local_id = std::getenv("SLURM_LOCALID");
+        std::string str_local_id = std::getenv("SLURM_PROCID");
         int local_id = std::stoi(str_local_id);
         auto qpu = backend_paths.begin();
         std::advance(qpu, local_id);
@@ -78,7 +81,7 @@ std::string get_qpu_name(const JSON& backend_paths)
     if (backend_paths.size() == 1) {
         qpu_name = backend_paths.begin().key();
     } else {
-        std::string str_local_id = std::getenv("SLURM_LOCALID");
+        std::string str_local_id = std::getenv("SLURM_PROCID");
         int local_id = std::stoi(str_local_id);
         auto qpu = backend_paths.begin();
         std::advance(qpu, local_id);
@@ -137,17 +140,7 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
         throw;
     }
 
-    try {
-        // Try to open the generated noisy backend file to check if it exists and is readable
-        std::ifstream infile(std::getenv("STORE") + std::string("/.cunqa/tmp_noisy_backend_") + std::getenv("SLURM_JOB_ID") + ".json");
-        if (!infile.good()) {
-            throw std::runtime_error("Failed to open noise model JSON file.");
-        }
-    } catch (const std::exception& e) {
-        LOGGER_ERROR("Exception in generate_noise_instructions: {}", e.what());
-        throw;
-    }
-    return std::getenv("STORE") + "/.cunqa/tmp_noisy_backend_"s + std::getenv("SLURM_JOB_ID") + ".json"s;
+    return "";
 }
 
 int main(int argc, char *argv[])
@@ -161,15 +154,28 @@ int main(int argc, char *argv[])
     if (family == "default")
         family = std::getenv("SLURM_JOB_ID");
 
-    LOGGER_DEBUG("OMP_NUM_THREADS: {}", std::getenv("OMP_NUM_THREADS"));
-
     auto back_path_json = (argc == 7 ? JSON::parse(std::string(argv[6]))
                                      : JSON());
 
     JSON backend_json;
-    std::string name = family + "_" + std::getenv("SLURM_LOCALID");
+    std::string name = family + "_" + std::getenv("SLURM_PROCID");
     if (back_path_json.contains("noise_properties_path")) {
-        std::ifstream f(generate_noise_instructions(back_path_json, family));
+        std::string fpath = std::getenv("STORE") + std::string("/.cunqa/tmp_noisy_backend_") + std::getenv("SLURM_JOB_ID") + ".json";
+
+        if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
+            generate_noise_instructions(back_path_json, family);
+            LOGGER_DEBUG("Correctly created tmp noise intructions file.");
+        } else {
+            int fd = open(fpath.c_str(), O_RDONLY);
+            while (fd == -1 || flock(fd, LOCK_SH) != 0) {
+                if (fd != -1) close(fd);
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                fd = open(fpath.c_str(), O_RDONLY);
+            }
+            close(fd);
+        }
+
+        std::ifstream f(fpath);
         backend_json = JSON::parse(f);
     } else if (back_path_json.contains("backend_path")) {
         std::ifstream f(back_path_json.at("backend_path").get<std::string>());

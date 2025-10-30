@@ -1,57 +1,47 @@
 """
-    Holds Cunqa's custom circuit class and functions to translate its instructions into other formats for circuit definition.
+    Holds CUNQA's custom circuit class and functions to translate its instructions into other formats for circuit definition.
 
     Building circuits
     =================
 
-    Users can define a circuit using :py:class:`~CunqaCircuit` to then send it to the virtual QPUs. Nevertheless, for the case in which no communications are needed among the circuits sent, other formats are allowed.
-
-    This module also provides global functions that translate form :py:class:`qiskit.QuantumCircuit` [#]_ to a instructions json (:py:meth:`~qc_to_json`) and the other way around (:py:meth:`~from_json_to_qc`).
-
-    For example, if a user wants to transform a :py:class:`qiskit.QuantumCircuit` into a :py:class:`~CunqaCircuit`, one can obtain the instructions and then add them to the :py:class:`~CunqaCircuit` object:
-
-    >>> qc = QuantumCircuit(4)
-    >>> ...
-    >>> circuit_json = qc_to_json(qc)
-    >>> instruction_set = circuit_json["instructions"]
-    >>> num_qubits = circuit_json["num_qubits"]
-    >>> cunqacirc = CunqaCircuit(num_qubits)
-    >>> cunqacirc.from_instructions(instruction_set)
-
+    Users can define a circuit using :py:class:`~CunqaCircuit` to then send it to the virtual QPUs.
+    Nevertheless, for the case in which no communications are needed among the circuits sent,  :py:class:`qiskit.QuantumCircuit` [#]_ is also allowed.
     Be aware that some instructions might not be supported for :py:class:`~CunqaCircuit`, for the list of supported instructions check its documentation.
+    Module py:mod:`cunqa.converters` contains functions to transform between circuit formats.
 
-    
     Circuits by json ``dict`` format
     ================================
 
-    A low level way of representing a circuit is by a json ``dict`` with specefic fields that geather the information
+    A low level way of representing a circuit is by a json ``dict`` with specefic fields that gather the information
     needed by the simulator in order to run the circuit.
 
     This structe is presented below:
 
-    .. codeblock:: python
-        {"id":str, # circuit identificator
-         "is_parametric":bool, # weather if the circuit has parametric instructions that can be updated
-         "is_dynamic":bool, # weather if the circuit has intermediate measurements and/or classically conditioned operations
-         "instructions":list[dict], # list of instructions of the circuit in dict format
-         "num_qubitst":int, # number of qubits of the circuit
-         "num_clbits":int, # number of classical bits of the circuit
-         "quantum_registers":dict, # dict specifying the grouping of the qubits in registers
-         "classical_registers":dict # dict specifying the grouping of the classical bits in registers
+    .. code-block:: python
+
+       {"id":str, # circuit identificator
+        "is_parametric":bool, # weather if the circuit has parametric instructions that can be updated
+        "is_dynamic":bool, # weather if the circuit has intermediate measurements or conditioned operations
+        "instructions":list[dict], # list of instructions of the circuit in dict format
+        "num_qubits":int, # number of qubits of the circuit
+        "num_clbits":int, # number of classical bits of the circuit
+        "quantum_registers":dict, # dict specifying the grouping of the qubits in registers
+        "classical_registers":dict # dict specifying the grouping of the classical bits in registers
         }
 
     On the other hand, instructions have some mandatory and optional keys:
 
-    .. codeblock:: python
+    .. code-block:: python
+
         {"name":str, # MANDATORY, name of the instruction, has to be accepted by the simulator
          "qubits":list[int], # MANDATORY, qubits on which the instruction acts
-         "params":list[int|float] | list[list[...[int|float]]], # OPTIONAL, only required for parametric gates and for \'unitary\' instruction, which accepts a metrix of the desired dimension limmited by the number of qubits in which it acts.
+         "params":list[int|float] | list[list[[int|float]]], # OPTIONAL, only required for parametric gates and for \'unitary\' instruction.
          "clbits":list[int], # OPTINAL, any classical bits used in the instruction
         }
 
     For classical and quantum communications among circuits, we do not recomend working at such low level format, users rather
     describe this operations through the :py:class:`~cunqa.circuit.CunqaCircuit` class. If curious, you can always
-    create the :py:class:`~cunqa.circuit.Circuit` and obtain its intructions by its attribute :py:attr:`~cunqa.circuit.CunqaCircuit.instructions`,
+    create the :py:class:`~cunqa.circuit.CunqaCircuit` and obtain its intructions by its attribute :py:attr:`~cunqa.circuit.CunqaCircuit.instructions`,
     or you can convert it to the json `dict` format by the :py:func:`~cunqa.converters.convert` function.
 
     References:
@@ -1633,9 +1623,9 @@ class ControlContext:
         """Class constructor.
         
             Args:
-                control_circuit (`~cunqa.circuit.CunqaCircuit`): circuit which qubit is exposed.
+                control_circuit (~cunqa.circuit.CunqaCircuit): circuit which qubit is exposed.
             
-                target_circuit (`~cunqa.circuit.CunqaCircuit`): circuit in which the instructions are implemented.
+                target_circuit (~cunqa.circuit.CunqaCircuit): circuit in which the instructions are implemented.
         """
         if isinstance(control_circuit, CunqaCircuit) and isinstance(target_circuit, CunqaCircuit):
             self.control_circuit = control_circuit

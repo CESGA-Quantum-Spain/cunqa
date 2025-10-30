@@ -32,6 +32,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
 
         Args:
             circuit (qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit | dict): circuit to be transformed.
+            convert_to (str): especification of target format, can be ``"QuantumCircuit``, ``"CunqaCircuit"`` or ``"dict"``.
         
         Returns:
             The circuit in the desired format accordingly to *convert_to*.

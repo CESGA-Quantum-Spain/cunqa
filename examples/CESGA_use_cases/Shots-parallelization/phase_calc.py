@@ -34,7 +34,7 @@ def calc_phase(counts):
 
     
 
-directory = "/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/api-simulator/examples/CESGA_use_cases/Shots-parallelization/results_QPE/"
+directory = "./results_QPE/"
 
 num_qpus_list1 = []
 counts_list1 = []
@@ -66,5 +66,5 @@ thetas2 = [calc_phase(count) for count in counts_list2]
 
 result = {"theta1":sorted(zip(num_qpus_list1, thetas1)), "theta2":sorted(zip(num_qpus_list2, thetas2))}
 
-with open(f"/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/api-simulator/examples/CESGA_use_cases/Shots-parallelization/results_QPE/thetas.json", "w") as f:
+with open(f"./results_QPE/thetas.json", "w") as f:
     json.dump(result, f, indent=2)

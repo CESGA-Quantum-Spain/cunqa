@@ -85,7 +85,7 @@ qc_param = {
 }
 
 
-qpus = get_QPUs(local=False)
+qpus = get_QPUs(on_node=False)
 
 print("QPUs disponibles:")
 for q in qpus:

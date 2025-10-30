@@ -12,9 +12,9 @@ from cunqa.logger import logger
 
 import argparse
 import json
-from jsonschema import validate, ValidationError
 
 from qiskit_aer.noise import NoiseModel
+import fcntl
 
 schema_noise_properties = os.getenv("STORE") + "/.cunqa/json_schema/calibrations_schema.json"
 schema_backend = os.getenv("STORE") + "/.cunqa/json_schema/backend_schema.json"
@@ -58,14 +58,7 @@ else:
     with open(args.noise_properties_path, "r") as file:
         noise_properties_json = json.load(file)
 
-try:
-    validate(instance=noise_properties_json, schema=schema_noise_properties)
-    logger.debug("noise_properties json is valid!")
-
-except ValidationError as error:
-    logger.error(f"Error validating noise_properties json [{type(error).__name__}:{error.message}]")
-    raise SystemExit
-
+#TODO: validate noise_properties_json with respect to schema_noise_properties
 
 # validating json schema for backend (optional)
 
@@ -77,14 +70,7 @@ if args.backend_path != "default":
     with open(args.backend_path, "r") as file:
         backend_json = json.load(file)
 
-    try:
-        validate(instance=backend_json, schema=schema_backend)
-        logger.debug("backend json is valid!")
-
-    except ValidationError as error:
-        logger.error(f"Error validating backend json [{type(error).__name__}:{error.message}]")
-        raise SystemExit
-
+    #TODO: validate backend_json with respect to schema_backend
 
 
 thermal_relaxation, readout_error, gate_error = True, False, False
@@ -179,4 +165,8 @@ logger.debug(f"Created noisy backend: {description}")
 os.makedirs(os.path.dirname(tmp_file), exist_ok=True)
 
 with open(tmp_file, 'w') as file:
+    fcntl.flock(file.fileno(), fcntl.LOCK_EX)
     json.dump(backend_json, file)
+    file.flush()
+    os.fsync(file.fileno())
+    fcntl.flock(file.fileno(), fcntl.LOCK_UN)

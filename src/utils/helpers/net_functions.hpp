@@ -94,7 +94,7 @@ inline std::string get_global_IP_address()
  
 inline std::string get_port(const bool comm = false) 
 {
-    auto id = std::getenv("SLURM_LOCALID");
+    auto id = std::getenv("SLURM_PROCID");
     auto ports = std::getenv("SLURM_STEP_RESV_PORTS");
 
     if(ports && id) {

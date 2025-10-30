@@ -11,9 +11,9 @@ from cunqa.circuit import CunqaCircuit
 from qiskit import QuantumCircuit
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator = "Aer",  cloud = True)
+family = qraise(2, "00:10:00", simulator = "Aer",  co_located = True)
 
-qpus  = get_QPUs(local = False, family = family)
+qpus  = get_QPUs(on_node = False, family = family)
 
 """ qc = CunqaCircuit(2, 2)
 qc.h(0)

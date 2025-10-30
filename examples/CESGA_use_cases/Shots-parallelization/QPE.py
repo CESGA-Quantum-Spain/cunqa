@@ -88,7 +88,7 @@ for theta in [2**(-10), 1/np.pi]:
 
     print("Circuit created!")
 
-    QPUs = get_QPUs(local = False, family=f"QPE-{num_qpus}")
+    QPUs = get_QPUs(on_node = False, family=f"QPE-{num_qpus}")
 
     print("QPUs: ", QPUs)
 
@@ -142,6 +142,8 @@ for theta in [2**(-10), 1/np.pi]:
     })
 
 result = {"theta1":result[0], "theta2":result[1]}
-print(result)
-with open(f"/mnt/netapp1/Store_CESGA/home/cesga/mlosada/api/api-simulator/examples/CESGA_use_cases/Shots-parallelization/results_QPE/QPE{n}_{num_qpus}QPUs.json", "w") as f:
+
+os.makedirs("./results_QPE", exist_ok=True)
+
+with open(f"./results_QPE/QPE{n}_{num_qpus}QPUs.json", "w") as f:
     json.dump(result, f, indent=2)

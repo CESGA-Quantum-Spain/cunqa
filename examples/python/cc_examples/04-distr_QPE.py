@@ -1,3 +1,9 @@
+"""
+Code implementing the Iterative Quantum Phase Estimation (iQPE) algorithm with classical communications. To understand the algorithm without communications check:
+    - Original paper (here referred to as Iterative Phase Estimation Algorithm): https://arxiv.org/abs/quant-ph/0610214
+    - TalentQ explanation (in spanish): https://talentq-es.github.io/Fault-Tolerant-Algorithms/docs/Part_01_Fault-tolerant_Algorithms/Chapter_01_01_IPE_portada_myst.html
+"""
+
 import os, sys
 import math
 import numpy as np
@@ -144,13 +150,13 @@ def QPE_rzxrz_circuits(angle, n_qpus):
 
 
 def deploy_qpus(n_qpus, cores_per_qpu, mem_per_qpu, simulator = "Aer"):
-    family = qraise(n_qpus, "03:00:00", simulator=simulator, classical_comm=True, cloud = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
+    family = qraise(n_qpus, "03:00:00", simulator=simulator, classical_comm=True, co_located = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
     return family
 
 
 def run_iterative_QPE(circuits, qpus_name, shots, seed = 1234):
 
-    qpus_QPE  = get_QPUs(local = False, family = qpus_name)
+    qpus_QPE  = get_QPUs(on_node = False, family = qpus_name)
     algorithm_starts = time.time()
     distr_jobs = run_distributed(list(circuits.values()), qpus_QPE, shots=shots, seed=seed)
     
