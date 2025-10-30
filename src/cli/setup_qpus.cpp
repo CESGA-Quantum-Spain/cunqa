@@ -226,8 +226,8 @@ int main(int argc, char *argv[])
                     turn_ON_QPU<MunichCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Maestro"):
-                    LOGGER_DEBUG("QPU going to turn on with MaestroSimpleSimulator.");
-                    turn_ON_QPU<MaestroSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
+                    LOGGER_DEBUG("QPU going to turn on with MaestroCCSimulator.");
+                    turn_ON_QPU<MaestroCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
@@ -250,8 +250,8 @@ int main(int argc, char *argv[])
                     turn_ON_QPU<MunichQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Maestro"):
-                    LOGGER_DEBUG("QPU going to turn on with MaestroSimpleSimulator.");
-                    turn_ON_QPU<MaestroSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
+                    LOGGER_DEBUG("QPU going to turn on with MaestroQCSimulator.");
+                    turn_ON_QPU<MaestroQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");

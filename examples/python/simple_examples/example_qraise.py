@@ -8,7 +8,7 @@ from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator = "Maestro", cloud = True)
+family = qraise(2, "00:10:00", simulator = "Maestro", co_located = True)
 
 qpus  = get_QPUs(on_node = False, family = family)
 
