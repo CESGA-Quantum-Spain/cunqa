@@ -311,7 +311,6 @@ Paralelizing-obs/
 aer-cpp-0-15-1/
 maestro/
 maestro-latest/
-QCSim/
 qiskit-aer/
 launch_tests.sh
 
