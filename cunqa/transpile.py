@@ -122,7 +122,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None) -> Union[
         raise SystemExit
     
     except Exception as error:
-        logger.error(f"Some error occurred with configuration of the backend, please check that the formats are correct [{type(error).__name__}].")
+        logger.error(f"Some error occurred with configuration of the backend, please check that the formats are correct [{type(error).__name__}] {error}.")
         raise SystemExit # User's level
 
     # converting to input format and returning

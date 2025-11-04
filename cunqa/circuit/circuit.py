@@ -59,6 +59,8 @@ def _generate_id(size: int = 4) -> str:
 
 def get_module(obj):
     """ Returns the root module that the passed object is from."""
+    if not hasattr(obj, '__module__'):
+        return
     return obj.__module__.split('.')[0]
 
 
@@ -482,9 +484,19 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         logger.error(f"Instruction params must be int, float or str (for labels), but {type(instruction['params'])} was provided.")
                         raise TypeError
                     
-                    self.current_params += [{symbol: None for symbol in p.free_symbols} if (isinstance(p, Variable) or get_module(p) == "sympy") else p for p in instruction["params"]]
+                    self.current_params += [
+                        {symbol: None for symbol in p.free_symbols} if get_module(p) == "sympy" 
+                        else {p: None} if isinstance(p, Variable) 
+                        else p 
+                        for p in instruction["params"]
+                        ]
                     self.param_expressions["sympy_exprs"] += (new_exprs := [p if (isinstance(p, Variable) or get_module(p) == "sympy") else None for p in instruction["params"]])
-                    self.param_expressions["lambda_funcs"] += [sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy') if get_module(expr) == "sympy" else expr for expr in new_exprs]
+                    self.param_expressions["lambda_funcs"] += [
+                        sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy') if get_module(expr) == "sympy"
+                        else (lambda x: x) if isinstance(expr, Variable) 
+                        else expr
+                        for expr in new_exprs
+                        ]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")
@@ -1458,7 +1470,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             return # TODO: consider wether an error should be raised instead
 
         if not all([isinstance(v, (int, float)) for v in given_params.values()]):
-            logger.error(f"Parameters must be list[int, float], int or float but {type(given_params[param])} was given.")
+            logger.error(f"Parameters must be list[int, float], int or float but {type(given_params[v])} was given.")
             raise SystemExit
 
         param_index = 0
@@ -1472,13 +1484,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                             continue
                         expr_current = self.current_params[param_index + i]
 
-                        # Update the current parameters for this expression
+                        # Update the current parameters for this expression                                         
                         updated_expr_current = {**expr_current, **{k: given_params[k] for k in given_params if k in expr_current}}
-                        self.current_params[param_index + i] = updated_expr_current
+
+                        #Current_params will contain Symbols if it comes from the conversion of a ParameterExpression. They need to be replaced by Variables
+                        symbols_in_current = [symbol  for symbol in expr_current.keys() if isinstance(symbol, sympy.Symbol) and Variable(str(symbol)) in given_params]
+                        for symbol in symbols_in_current:
+                            del updated_expr_current[symbol]
+                        updated_expr_current |= {Variable(str(symbol)): given_params[Variable(str(symbol))] for symbol in symbols_in_current}
+
+                        self.current_params[param_index + i] = updated_expr_current 
 
                         # Evaluate parametric expression and plug it as the new paremeter
-                        instruction["params"][i] = expr_func(*tuple(updated_expr_current.values()))
-
+                        instruction["params"][i] = expr_func(*tuple(updated_expr_current.values())) 
+                    
                     param_index += len(instruction["params"])
                                 
         except Exception as error:

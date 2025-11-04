@@ -331,12 +331,15 @@ class QJob:
             try:
                 self._current_params = [
                         {**d, **{k: parameters[k] for k in parameters if k in d}} 
+                        if isinstance(d, dict) 
+                        else d
                         for d in self._current_params
                     ]
-
+                
                 premessage = [
                         self._param_expressions["lambda_funcs"][i](*tuple(p.values())) 
-                        if isinstance(p, dict) else p 
+                        if isinstance(p, dict) 
+                        else p 
                         for i, p in enumerate(self._current_params)
                     ]
                     
@@ -484,7 +487,7 @@ class QJob:
             # config dict
             run_config = {
                 "shots": 1024, 
-                "method":"statevector", 
+                "method":"statevector", # Mandatory key for simulation, if a method is provided it will be overwritten in 11 lines. 
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
                 "seed": 123123
@@ -500,6 +503,7 @@ class QJob:
                 logger.warning("Error when reading `run_parameters`, default were set.")
             
             logger.debug("Before exec_config")
+            
             exec_config = {
                 "id": self._circuit_id,
                 "config": run_config, 
@@ -508,17 +512,18 @@ class QJob:
                 "is_dynamic": self._is_dynamic,
                 "has_cc": self._has_cc
             }
+            
             self._execution_config = json.dumps(exec_config)
 
             logger.debug("QJob created.")
             logger.debug(self._execution_config)
 
         except KeyError as error:
-            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}].")
+            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions'\n [{type(error).__name__}] {error}.")
             raise QJobError # I capture the error in QPU.run() when creating the job
         
         except Exception as error:
-            logger.error(f"Some error occured when generating configuration for the simulation [{type(error).__name__}].")
+            logger.error(f"Some error occured when generating configuration for the simulation:\n[{type(error).__name__}] {error}.")
             raise QJobError # I capture the error in QPU.run() when creating the job
         
 
