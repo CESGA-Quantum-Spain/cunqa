@@ -178,7 +178,7 @@ def qraise(n, t, *,
         if simulator is not None:
             command = command + f" --simulator={str(simulator)}"
         if family is not None:
-            command = command + f" --family={str(family)}"
+            command = command + f" --family_name={str(family)}"
         if co_located:
             command = command + " --co-located"
         if cores is not None:
@@ -346,7 +346,7 @@ def info_QPUs(on_node: bool = True, node_name: Optional[str] = None) -> "list[di
         logger.error(f"Some exception occurred [{type(error).__name__}].")
         raise error # User's level
 
-def get_QPUs(on_node: bool = True, family: Optional[str] = None) -> "list['QPU']":
+def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -> "list['QPU']":
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the virtual QPUs raised by the user.
 
@@ -358,6 +358,8 @@ def get_QPUs(on_node: bool = True, family: Optional[str] = None) -> "list['QPU']
         List of :py:class:`~cunqa.qpu.QPU` objects.
     
     """
+
+    if isinstance(family, tuple): family = family[0]
 
     # access raised QPUs information on qpu.json file
     try:
