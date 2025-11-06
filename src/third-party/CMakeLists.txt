@@ -52,13 +52,13 @@ FetchContent_MakeAvailable(cunqasimulator)
 find_package(Eigen3 5.0.0 REQUIRED)
 if(TARGET Eigen3::Eigen)
     get_target_property(
-        EIGEN_INCLUDE_PATH 
+        EIGEN5_INCLUDE_PATH 
         Eigen3::Eigen 
         INTERFACE_INCLUDE_DIRECTORIES
     )
 
-    set(EIGEN_INCLUDE_PATH "${EIGEN_INCLUDE_PATH}") 
-    message(STATUS "Eigen include dir extracted from target: ${EIGEN_INCLUDE_PATH}")
+    set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+    message(STATUS "Eigen include dir extracted from target: ${EIGEN5_INCLUDE_DIR}")
 else()
     message(FATAL_ERROR "Eigen was not found, or the target Eigen3::Eigen is missing.")
 endif()
@@ -69,19 +69,19 @@ if(TARGET nlohmann_json::nlohmann_json)
         nlohmann_json::nlohmann_json 
         INTERFACE_INCLUDE_DIRECTORIES
     )
-    set(JSON_INCLUDE_PATH "${JSON_INCLUDE_PATH}") 
+    set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}") 
 
     message(STATUS "nlohmann/json include dir extracted from target: ${JSON_INCLUDE_PATH}")
 else()
     message(FATAL_ERROR "nlohmann/json was found, but the modern target nlohmann_json::nlohmann_json is missing.")
 endif()
 
-set(QCSIM_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/QCSim/QCSim)
-set(AER_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/maestro-qiskit-aer/src)
+set(QCSIM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/QCSim/QCSim)
+set(AER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro-qiskit-aer/src)
 
 FetchContent_Declare(
     maestro
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro-latest
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro
 )
 FetchContent_MakeAvailable(maestro)
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")

@@ -28,4 +28,6 @@
 [submodule "maestro-qiskit-aer"]
 	path = src/third-party/maestro-qiskit-aer
 	url = git@github.com:InvictusWingsSRL/qiskit-aer.git
-
+[submodule "maestro"]
+	path = src/third-party/maestro
+	url = git@github.com:QoroQuantum/maestro.git
