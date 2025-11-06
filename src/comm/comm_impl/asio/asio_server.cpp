@@ -54,14 +54,6 @@ struct Server::Impl {
                 LOGGER_ERROR("Error receiving data: {}", e.what());
                 throw; // rethrow unexpected errors
             }
-            /* if (e.code() == as::error::eof) {
-                LOGGER_DEBUG("Client disconnected, closing conection.");
-                socket_->close(); 
-                return std::string("CLOSE");
-            } else {
-                LOGGER_ERROR("Error receiving the circuit.");
-                throw;
-            } */
         }
 
         return std::string();
