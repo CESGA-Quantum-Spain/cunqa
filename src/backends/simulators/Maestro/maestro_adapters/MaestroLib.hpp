@@ -23,7 +23,7 @@ public:
 	{
 		if (Utils::Library::Init(libName))
 		{
-			fGetMaestroObject = (void* (*)())GetFunction("GetMaestroObject");
+			fGetMaestroObject = (void* (*)())GetFunction("GetMaestroObjectWithMute");
 			CheckFunction((void*)fGetMaestroObject, __LINE__);
 			if (fGetMaestroObject)
 			{
