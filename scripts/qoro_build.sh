@@ -10,6 +10,8 @@ cmake -B build/
 cmake --build build/ --parallel $(nproc)
 cmake --install build/
 
-echo "Success. Try: python examples/python/simple_examples/example_qraise.py"
+echo "Success. Try: 
+1) Open a new shell and load the modules above 
+2) Run: python examples/python/simple_examples/example_qraise.py"
 
 
