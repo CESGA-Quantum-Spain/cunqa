@@ -1,12 +1,13 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <unordered_map>
 
 #include "comm/server.hpp"
 #include "logger.hpp"
 #include "utils/helpers/net_functions.hpp"
 #include "utils/constants.hpp"
-#include "classical_channel/classical_channel_helpers.hpp"
 
 namespace as = boost::asio;
 using namespace std::string_literals;
@@ -18,21 +19,31 @@ namespace comm {
 struct Server::Impl {
     as::io_context io_context_;
     tcp::acceptor acceptor_;
-    tcp::socket socket_;
+    std::unordered_map<std::string, std::shared_ptr<tcp::socket>> connected_clients;
+    //tcp::socket socket_;
 
     Impl(const std::string& ip, const std::string& port) :
         acceptor_{io_context_, tcp::endpoint{as::ip::address::from_string(ip), 
                             static_cast<unsigned short>(stoul(port))}},
         socket_{acceptor_.get_executor()}
-    { }
+    {
+        std::thread accept_connections([this](){this->accept();});
+    }
 
     void accept()
     {
-        acceptor_.accept(socket_);
+        while(True) {
+            auto socket_ = std::make_shared<tcp::socket>(io_context_);
+            acceptor_.accept(*socket_);
+            auto tcp_endpoint = *socket_.remote_endpoint();
+            std::string endpoint = tcp_endpoint.address().to_string() + ":" + tcp_endpoint.port();
+            connected_clients[endpoint] = socket_;
+        }
+        
     }
 
     std::string recv() 
-    { 
+    {
         try {
             uint32_t data_length_network;
             as::read(socket_, as::buffer(&data_length_network, sizeof(data_length_network)));
@@ -44,10 +55,10 @@ struct Server::Impl {
         } catch (const boost::system::system_error& e) {
             if (e.code() == as::error::eof) {
                 LOGGER_DEBUG("Client disconnected, closing conection.");
-                socket_.close(); 
+                socket_->close(); 
                 return std::string("CLOSE");
             } else {
-                LOGGER_ERROR()"Error receiving the circuit.");
+                LOGGER_ERROR("Error receiving the circuit.");
                 throw;
             }
         }

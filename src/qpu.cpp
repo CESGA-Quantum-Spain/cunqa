@@ -73,7 +73,6 @@ void QPU::recv_data_()
                 {
                 std::lock_guard<std::mutex> lock(queue_mutex_);
                 if (message.compare("CLOSE"s) == 0) {
-                    server->accept();
                     continue;
                 }
                 else
