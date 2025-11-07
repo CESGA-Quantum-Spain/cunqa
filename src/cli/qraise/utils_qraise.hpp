@@ -25,15 +25,15 @@ bool check_mem_format(const int& mem)
 
 int get_default_mem_per_core()
 {
-    
-    if (SYSTEM_NAME == "QMIO") {
-        return 15;
-    } else if (SYSTEM_NAME == "FT3"){
-        return 4;
-    } else if (SYSTEM_NAME == "MY_CLUSTER") {
-        return 2; // To be changed to the specific cluster
-    }
-    return 0;
+    auto system_var = std::getenv("LMOD_SYSTEM_NAME");
+    if (std::getenv("LMOD_SYSTEM_NAME") != nullptr) {
+        if (std::string(system_var) == "QMIO") {
+            return 15;
+        } else if ((std::string(system_var) == "FT3")){
+            return 4;
+        }
+    } 
+    return 2;
 }
 
 

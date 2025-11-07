@@ -2,7 +2,7 @@ import os, sys
 import numpy as np
 
 # path to access c++ files
-sys.path.append(os.getenv("HOME"))
+sys.path.append(os.getenv("HOME") + "/.local")
 
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
@@ -40,6 +40,7 @@ for _ in range(1):
     for qpu in qpus: 
         qjobs.append(qpu.run(qc, transpile=True, shots = 100))
 
+print("Vamos a esperar por los resultados")
 results = gather(qjobs)
 
 for result in results:

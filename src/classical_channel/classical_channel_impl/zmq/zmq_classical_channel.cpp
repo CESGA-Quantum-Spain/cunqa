@@ -37,6 +37,7 @@ struct ClassicalChannel::Impl
         //Server part
         zmq::socket_t qpu_server_socket_(zmq_context, zmq::socket_type::router);
         qpu_server_socket_.bind(zmq_endpoint);
+
         zmq_comm_server = std::move(qpu_server_socket_);
     }
 

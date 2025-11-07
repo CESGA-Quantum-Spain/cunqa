@@ -14,10 +14,10 @@ install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 # QDROP executable
 include(${CMAKE_SOURCE_DIR}/cmake/FindSLURM.cmake)
 
-add_executable(qdrop qdrop.cpp)
-target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
-target_link_libraries(qdrop PRIVATE logger_client SLURM::SLURM json)
-install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
+#add_executable(qdrop qdrop.cpp)
+#target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse" "${CMAKE_SOURCE_DIR}/src/third-party/slurm")
+#target_link_libraries(qdrop PRIVATE logger_client SLURM::SLURM json)
+#install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
 file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
@@ -41,7 +41,16 @@ install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 # QINFO executable
 add_executable(qinfo qinfo.cpp)
 target_link_libraries(qinfo PRIVATE json logger_client)
-target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse" "${CMAKE_SOURCE_DIR}/src/third-party/slurm")
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
+add_executable(jq jq.cpp)
+target_link_libraries(jq PRIVATE nlohmann_json::nlohmann_json)
+install(TARGETS jq DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+
+add_executable(qdrop prueba_qdrop.cpp)
+target_link_libraries(qdrop PRIVATE json)
+target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 

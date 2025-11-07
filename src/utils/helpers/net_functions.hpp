@@ -55,7 +55,7 @@ inline std::string get_IP_address(const std::string& mode)
 
     char ip[INET6_ADDRSTRLEN];
     for (ifa = interfaces; ifa != nullptr; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr == nullptr || std::string(ifa->ifa_name) != "ib0") continue;
+        if (ifa->ifa_addr == nullptr || std::string(ifa->ifa_name) != "eno1np0") continue;
         int family = ifa->ifa_addr->sa_family;
         if (family == AF_INET) {
             void *addr;
@@ -79,7 +79,7 @@ inline std::string get_global_IP_address()
 
     char ip[INET6_ADDRSTRLEN];
     for (ifa = interfaces; ifa != nullptr; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr == nullptr || std::string(ifa->ifa_name) != "ib0") continue;
+        if (ifa->ifa_addr == nullptr || std::string(ifa->ifa_name) != "eno1np0") continue;
         int family = ifa->ifa_addr->sa_family;
         if (family == AF_INET) {
             void *addr;
@@ -97,7 +97,10 @@ inline std::string get_port(const bool comm = false)
     auto id = std::getenv("SLURM_PROCID");
     auto ports = std::getenv("SLURM_STEP_RESV_PORTS");
 
-    if(ports && id) {
+    if(!ports) {
+        return "*"s;
+    }
+    if(id) {
         std::string ports_str(ports);
         size_t pos = ports_str.find('-');
         if (pos != std::string::npos) {

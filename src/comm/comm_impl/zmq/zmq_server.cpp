@@ -17,6 +17,10 @@ struct Server::Impl {
     {
         try {
             socket_.bind("tcp://" + ip + ":" + port);
+            /* char endpoint[256];
+            size_t sz = sizeof(endpoint);
+            zmq_getsockopt(socket_, ZMQ_LAST_ENDPOINT, endpoint, &sz);
+            LOGGER_DEBUG("Resultado del binding {}", endpoint); */
             LOGGER_DEBUG("Server bound to {}:{}.", ip, port);
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error binding to endpoint {}: {}.", ip + ":" + port, e.what());

@@ -52,3 +52,19 @@ set(ZMQ_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libzmq/include"
 
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
 
+set(JSON_VERSION
+    3.11.3
+    CACHE STRING "nlohmann_json version")
+set(JSON_URL https://github.com/nlohmann/json/releases/download/v${JSON_VERSION}/json.tar.xz)
+cmake_dependent_option(JSON_Install "Install nlohmann_json library" ON "MQT_CORE_INSTALL" OFF)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(nlohmann_json URL ${JSON_URL} FIND_PACKAGE_ARGS ${JSON_VERSION})
+  FetchContent_MakeAvailable(nlohmann_json)
+else()
+  find_package(nlohmann_json ${JSON_VERSION} QUIET)
+  if(NOT nlohmann_json_FOUND)
+    message(STATUS "Found nlohmann_json")
+    FetchContent_Declare(nlohmann_json URL ${JSON_URL})
+    FetchContent_MakeAvailable(nlohmann_json)
+  endif()
+endif()
