@@ -29,6 +29,8 @@ void QPU::turn_ON()
     JSON qpu_config = *this;
     write_on_file(qpu_config, filepath, family_);
 
+    //LOGGER_DEBUG("QPU info written");
+
     listen.join();
     compute.join();
 }
