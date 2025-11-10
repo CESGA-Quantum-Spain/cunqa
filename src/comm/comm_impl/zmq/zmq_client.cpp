@@ -58,6 +58,16 @@ struct Client::Impl {
         return std::string("{}");
     }
 
+    void disconnect(const std::string& endpoint)
+    {
+        if (endpoint != "") {
+            socket_.disconnect(endpoint);
+        } else {
+            socket_.close();
+            socket_ = zmq::socket_t(context_, zmq::socket_type::client);
+        }
+    }
+
     zmq::context_t context_;
     zmq::socket_t socket_;
 };
@@ -87,6 +97,10 @@ FutureWrapper<Client> Client::send_parameters(const std::string& parameters)
 
 std::string Client::recv_results() {
     return pimpl_->recv();
+}
+
+void Client::disconnect(const std::string& endpoint) {
+    pimpl_->disconnect(endpoint);
 }
 
 } // End of comm namespace
