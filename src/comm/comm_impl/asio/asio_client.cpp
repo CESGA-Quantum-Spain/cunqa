@@ -82,6 +82,12 @@ struct Client::Impl {
 
         return std::string("{}");
     }
+
+    void disconnect()
+    {
+        socket_.close(); // Only a unique server per client
+        socket_ = tcp::socket(socket_.get_executor());
+    }
 };
 
 Client::Client() :
@@ -108,6 +114,10 @@ FutureWrapper<Client> Client::send_parameters(const std::string& parameters)
 
 std::string Client::recv_results() {
     return pimpl_->recv();
+}
+
+void Client::disconnect(const std::string& endpoint) {
+    pimpl_->disconnect();
 }
 
 } // End of comm namespace

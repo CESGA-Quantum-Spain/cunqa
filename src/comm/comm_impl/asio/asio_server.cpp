@@ -28,9 +28,6 @@ struct Server::Impl {
         auto ep = acceptor_.local_endpoint();
         auto port = ep.port();
         asio_endpoint = ip + ":" + std::to_string(port);  
-        LOGGER_DEBUG("QPU {} in endpoint {}", socket_.is_open(), asio_endpoint);
-
-
     }
 
     void accept()
@@ -39,7 +36,7 @@ struct Server::Impl {
     }
 
     std::string recv() 
-    { 
+    {
         try {
             uint32_t data_length_network;
             as::read(socket_, as::buffer(&data_length_network, sizeof(data_length_network)));
@@ -49,10 +46,15 @@ struct Server::Impl {
             as::read(socket_, as::buffer(&data[0], data_length));
             return data;
         } catch (const boost::system::system_error& e) {
-            if (e.code() == as::error::eof) {
-                LOGGER_DEBUG("Client disconnected, closing conection.");
+            if (e.code() == boost::asio::error::eof) {
+                // Client closed the connection cleanly
+                LOGGER_DEBUG("Client disconnected gracefully.");
                 socket_.close(); 
-                return std::string("CLOSE");
+                return "CLOSE";
+            } else if (e.code() == boost::asio::error::connection_reset) {
+                LOGGER_ERROR("Client connection reset (forcible close).");
+                socket_.close(); 
+                return "CLOSE";
             } else {
                 LOGGER_ERROR("Error receiving the circuit.");
                 throw;
