@@ -40,8 +40,8 @@ for _ in range(1):
     for qpu in qpus: 
         qjobs.append(qpu.run(qc, transpile=True, shots = 100))
 
-print("Vamos a esperar por los resultados")
+print("Waiting for the results...")
 results = gather(qjobs)
 
 for result in results:
-    print("Resultado: ", result.counts)
+    print("Result: ", result.counts)

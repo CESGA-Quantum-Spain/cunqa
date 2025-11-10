@@ -83,6 +83,7 @@ void QPU::recv_data_()
         } catch (const std::exception& e) {
             LOGGER_INFO("There has happened an error receiving the circuit, the server keeps on iterating.");
             LOGGER_ERROR("Official message of the error: {}", e.what());
+            throw;
         }
     }
 }

@@ -16,17 +16,16 @@ using nlohmann::json;
 int main(int argc, char* argv[]) {
     try {
         if (argc != 3) {
-            std::cerr << "Uso: " << argv[0] << " <job_id> <info_path>\n";
+            std::cerr << "Error, two arguments have to be provided: " << argv[0] << " <job_id> <info_path>\n";
             return 1;
         }
 
         const std::string job_id = argv[1];
         const fs::path info_path = argv[2];
 
-        // Leer JSON de info_path
         std::ifstream in(info_path);
         if (!in) {
-            std::cerr << "Error: no se pudo abrir " << info_path << " para lectura.\n";
+            std::cerr << "Can't open file " << info_path << "\n";
             return 1;
         }
 
@@ -34,26 +33,26 @@ int main(int argc, char* argv[]) {
         try {
             in >> j;
         } catch (const std::exception& e) {
-            std::cerr << "Error parseando JSON en " << info_path << ": " << e.what() << "\n";
+            std::cerr << "Error parsing JSON " << info_path << ": " << e.what() << "\n";
             return 1;
         }
 
         if (!j.is_object()) {
-            std::cerr << "Error: el contenido de " << info_path << " no es un objeto JSON.\n";
+            std::cerr << "Error: the " << info_path << " content is not a JSON object.\n";
             return 1;
         }
 
-        // Filtrar: mantener entradas cuya clave NO empieza por job_id
+        // Filter: keep entries which JOB_ID is not the one attached 
         json out = json::object();
         for (auto it = j.begin(); it != j.end(); ++it) {
             const std::string& key = it.key();
-            bool starts_with = key.rfind(job_id, 0) == 0; // true si empieza por job_id
+            bool starts_with = key.rfind(job_id, 0) == 0;
             if (!starts_with) {
                 out[it.key()] = it.value();
             }
         }
 
-        // Escribir a fichero temporal y reemplazar atómicamente
+        // Write in temporal file and save atomically
         fs::path tmp_path = info_path.parent_path() / "tmp_info.json";
         {
             std::ofstream outFile(tmp_path, std::ios::trunc);

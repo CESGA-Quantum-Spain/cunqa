@@ -396,7 +396,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     qpus = []
     for id, info in targets.items():
         client = QClient()
-        endpoint = (info["net"]["ip"], info["net"]["port"])
+        endpoint = info["net"]["endpoint"]
         name = info["name"]
         qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = name, family = info["family"], endpoint = endpoint))
     if len(qpus) != 0:

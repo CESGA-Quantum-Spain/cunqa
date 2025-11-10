@@ -94,7 +94,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
         return converted_circuit
     except Exception as error:
             logger.error(f" Unable to convert circuit to {convert_to} [{type(error).__name__}].")
-            raise SystemExit
+            raise error
 
 
 def _qc_to_cunqac(qc : 'QuantumCircuit') -> 'CunqaCircuit':
@@ -137,41 +137,41 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "has_cc":False,
             "has_qc":False,
         }
+
         for instruction in qc.data:
             qreg = [r._register.name for r in instruction.qubits]
             qubit = [q._index for q in instruction.qubits]
             
             bit = [b._index for b in instruction.clbits]
 
-            if instruction.name == "barrier":
+            if instruction.operation.name == "barrier":
                 pass
-            elif instruction.name == "unitary":
+            elif instruction.operation.name == "unitary":
 
-                json_data["instructions"].append({"name":instruction.name, 
+                json_data["instructions"].append({"name":instruction.operation.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
+                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.operation.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
                                                 })
-            elif instruction.name != "measure":
+            elif instruction.operation.name != "measure":
 
                 if (instruction.operation._condition != None):
                     json_data["is_dynamic"] = True
-                    json_data["instructions"].append({"name":instruction.name, 
+                    json_data["instructions"].append({"name":instruction.operation.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":instruction.params,
+                                                "params":instruction.operation.params,
                                                 "conditional_reg":[instruction.operation._condition[0]._index]
                                                 })
                 else:
-                    json_data["instructions"].append({"name":instruction.name, 
+                    json_data["instructions"].append({"name":instruction.operation.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":instruction.params
+                                                "params":instruction.operation.params
                                                 })
             else:
                 clreg_name = [r._register.name for r in instruction.clbits]
                 clreg = []
                 if clreg_name[0] != 'meas':
                     clreg = bit
-
-                json_data["instructions"].append({"name":instruction.name,
+                json_data["instructions"].append({"name":instruction.operation.name,
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                                                 "clbits":[classical_registers[k][b] for k,b in zip(clreg_name, bit)],
                                                 "clreg":[classical_registers[k][b] for k,b in zip(clreg_name, clreg)]

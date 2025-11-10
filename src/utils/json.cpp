@@ -6,21 +6,18 @@
 #include <unistd.h>
 
 #include "json.hpp"
-#include "logger.hpp"
 
 namespace cunqa {
 
 void write_on_file(JSON local_data, const std::string &filename, const std::string& suffix) 
 {
     try {
-        LOGGER_DEBUG("Voy a escribir");
         int file = open(filename.c_str(), O_RDWR | O_CREAT, 0666);
         if (file == -1) {
             std::cerr << "Error al abrir el archivo" << std::endl;
             return;
         }
         flock(file, LOCK_EX);
-        LOGGER_DEBUG("Dentro del bloqueo");
 
         JSON j;
         std::ifstream file_in(filename);
@@ -44,7 +41,6 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
         flock(file, LOCK_UN);
         close(file);
 
-        LOGGER_DEBUG("Todo hecho");
     } catch(const std::exception& e) {
         std::string msg("Error writing the JSON simultaneously using locks.\nError message thrown by the system: "); 
         throw std::runtime_error(msg + e.what());
