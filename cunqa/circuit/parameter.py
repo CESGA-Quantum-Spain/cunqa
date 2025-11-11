@@ -16,7 +16,7 @@ class Variable(sympy.Symbol):
     to variables please use those of the `sympy` module, e.g. `sin_a = sympy.sin(Variable('a'))`. 
 
     .. note::
-        The some available `sympy` functions are 
+        Some available `sympy` functions are 
         "sin", "cos", "tan", "exp", "log", "log10", "sqrt", "abs", "arcsin", "arccos", "arctan", "sinh", 
         "cosh", "tanh", "arcsinh", "arccosh", "arctanh", "deg2rad", "rad2deg", "floor", "round", "gamma",
         "factorial".
