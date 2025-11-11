@@ -83,7 +83,8 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     if (!args.qc) {
         if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
-            sbatchFile << "#SBATCH --mem-per-cpu=" << args.mem_per_qpu.value()/args.cores_per_qpu << "G\n";
+            int mem_per_cpu = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
+            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
         } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
             LOGGER_ERROR("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
             return;

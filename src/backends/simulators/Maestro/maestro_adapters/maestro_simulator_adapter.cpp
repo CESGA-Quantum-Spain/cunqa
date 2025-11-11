@@ -374,6 +374,10 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
         JSON circuit_json = quantum_task.circuit;
         JSON run_config_json(quantum_task.config);
 
+        //LOGGER_DEBUG("circuit_json in maestro: {}", circuit_json.dump());
+        //LOGGER_DEBUG("run_config_json in maestro: {}", run_config_json.dump());
+        
+
         SimpleSimulator simulator;
         if (simulator.Init(libmaestro_path.c_str()))
         {
@@ -478,7 +482,8 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 
                 JSON result_json = {
                 {"counts", counts_json.at("counts").get<JSON>()},
-                {"time_taken", time_taken} };
+                {"time_taken", time_taken}
+                };
 
 				return result_json;
             }

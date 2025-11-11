@@ -380,7 +380,7 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         run_config_json["seed_simulator"] = quantum_task.config.at("seed");
         Config aer_config(run_config_json);
 
-        LOGGER_DEBUG("Circiut: {}", circuit_json.dump());
+        //LOGGER_DEBUG("Circiut: {}", circuit_json.dump());
 
         Noise::NoiseModel noise_model(backend->config.at("noise_model"));
 
@@ -388,7 +388,7 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
 
         JSON result_json = result.to_json();
 
-        LOGGER_DEBUG("Result: {}", result_json.dump());
+        //LOGGER_DEBUG("Result: {}", result_json.dump());
 
         convert_standard_results_Aer(result_json, n_clbits);
 
