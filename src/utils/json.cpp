@@ -8,23 +8,22 @@
 #include <stdexcept>
 
 #include "json.hpp"
-#include "logger.hpp"
 
-namespace cunqa {
+namespace {
 
-void write_on_file(JSON local_data, const std::string &filename, const std::string &suffix)
-{
-    int fd = -1;
-    try {
-        // 1. Open (or create) the file read/write
-        fd = open(filename.c_str(), O_RDWR | O_CREAT, 0666);
+    int open_file(const std::string& filename)
+    {
+        int fd = open(filename.c_str(), O_RDWR | O_CREAT, 0666);
         if (fd == -1) {
             perror("open");
-            LOGGER_ERROR("Error opening file {}", filename);
             throw std::runtime_error("Failed to open file: " + filename);
         }
 
-        // 2. Acquire an exclusive lock (blocking)
+        return fd;
+    }
+
+    struct flock lock(const int& fd)
+    {
         struct flock fl;
         fl.l_type = F_WRLCK;
         fl.l_whence = SEEK_SET;
@@ -33,12 +32,25 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
 
         if (fcntl(fd, F_SETLKW, &fl) == -1) {
             perror("fcntl - lock");
-            LOGGER_ERROR("Error locking the file {}", filename);
             throw std::runtime_error("Failed to acquire file lock");
         }
+        return fl;
+    }
 
+    void unlock(const int& fd, struct flock& fl)
+    {
+        if (fsync(fd) == -1) {
+            perror("fsync");
+        }
 
-        // 3. Read existing JSON content (if any)
+        // 8. Unlock and close
+        fl.l_type = F_UNLCK;
+        if (fcntl(fd, F_SETLK, &fl) == -1)
+            perror("fcntl - unlock");
+    }
+
+    cunqa::JSON read_json(const int& fd) 
+    {
         lseek(fd, 0, SEEK_SET);
         std::string content;
         {
@@ -54,28 +66,19 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
             }
         }
 
-        JSON j;
+        cunqa::JSON j;
         if (!content.empty()) {
             try {
-                j = JSON::parse(content);
+                j = cunqa::JSON::parse(content);
             } catch (...) {
-                j = JSON::object(); // fallback to empty object if file corrupted
+                j = cunqa::JSON::object(); // fallback to empty object if file corrupted
             }
         }
+        return j;
+    }
 
-        // 4. Compute unique task ID (SLURM vars)
-        const char *pid_env = std::getenv("SLURM_TASK_PID");
-        const char *job_env = std::getenv("SLURM_JOB_ID");
-        std::string local_id = pid_env ? pid_env : "UNKNOWN";
-        std::string job_id = job_env ? job_env : "UNKNOWN";
-        std::string task_id =
-            (suffix.empty()) ? (job_id + "_" + local_id)
-                             : (job_id + "_" + local_id + "_" + suffix);
-
-        // 5. Merge new data
-        j[task_id] = local_data;
-
-        // 6. Truncate and write updated JSON atomically
+    void write_json(const int& fd, const cunqa::JSON& j)
+    {
         std::string output = j.dump(4);
         if (ftruncate(fd, 0) == -1) {
             perror("ftruncate");
@@ -88,17 +91,33 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
             perror("write");
             throw std::runtime_error("Failed to write complete JSON");
         }
+    }
 
-        // 7. Ensure data reaches disk before unlocking
-        if (fsync(fd) == -1) {
-            perror("fsync");
-        }
+} // End of anonymous namespace
 
-        // 8. Unlock and close
-        fl.l_type = F_UNLCK;
-        if (fcntl(fd, F_SETLK, &fl) == -1)
-            perror("fcntl - unlock");
 
+namespace cunqa {
+
+void write_on_file(JSON local_data, const std::string &filename, const std::string &suffix)
+{
+    int fd = -1;
+    try {
+        fd = open_file(filename);
+        auto fl = lock(fd);
+        auto j = read_json(fd);
+
+        // Get key and add data
+        const char *pid_env = std::getenv("SLURM_TASK_PID");
+        const char *job_env = std::getenv("SLURM_JOB_ID");
+        std::string local_id = pid_env ? pid_env : "UNKNOWN";
+        std::string job_id = job_env ? job_env : "UNKNOWN";
+        std::string task_id =
+            (suffix.empty()) ? (job_id + "_" + local_id)
+                             : (job_id + "_" + local_id + "_" + suffix);
+        j[task_id] = local_data;
+
+        write_json(fd, j);
+        unlock(fd, fl);
         close(fd);
     } catch (const std::exception &e) {
         if (fd != -1) close(fd);
@@ -108,4 +127,33 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
     }
 }
 
+void remove_from_file(const std::string &filename, const std::string &rm_key)
+{
+    int fd = -1;
+    try {
+        fd = open_file(filename);
+        auto fl = lock(fd);
+        auto j = read_json(fd);
+
+        // Filter: keep entries which JOB_ID is not the one attached 
+        JSON out = JSON::object();
+        for (auto it = j.begin(); it != j.end(); ++it) {
+            const std::string& key = it.key();
+            bool starts_with = key.rfind(rm_key, 0) == 0;
+            if (!starts_with) {
+                out[it.key()] = it.value();
+            }
+        }
+
+        write_json(fd, out);
+        unlock(fd, fl);
+        close(fd);
+    } catch (const std::exception &e) {
+        if (fd != -1) close(fd);
+        std::string msg =
+            "Error writing JSON safely using POSIX (fcntl) locks.\nSystem message: ";
+        throw std::runtime_error(msg + e.what());
+    }
 }
+
+} // End of cunqa namespace

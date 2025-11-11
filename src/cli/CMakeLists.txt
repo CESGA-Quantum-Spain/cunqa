@@ -12,16 +12,10 @@ endif()
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QDROP executable
-include(${CMAKE_SOURCE_DIR}/cmake/FindSLURM.cmake)
-
-#add_executable(qdrop qdrop.cpp)
-#target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse" "${CMAKE_SOURCE_DIR}/src/third-party/slurm")
-#target_link_libraries(qdrop PRIVATE logger_client SLURM::SLURM json)
-#install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
-
-file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
-install(FILES ${NOISE_SCRIPTS} DESTINATION "$ENV{STORE}/.cunqa/noise_model")
+add_executable(qdrop qdrop.cpp)
+target_link_libraries(qdrop PRIVATE json)
+target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # SETUP_QPUS executable
 add_executable(setup_qpus setup_qpus.cpp)
@@ -44,13 +38,13 @@ target_link_libraries(qinfo PRIVATE json logger_client)
 target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse" "${CMAKE_SOURCE_DIR}/src/third-party/slurm")
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-add_executable(cunqa_jq cunqa_jq.cpp)
-target_link_libraries(cunqa_jq PRIVATE nlohmann_json::nlohmann_json)
-install(TARGETS cunqa_jq DESTINATION "${CMAKE_INSTALL_BINDIR}")
+# Epilog tool erase_key and noise models
+add_executable(erase_key erase_key.cpp)
+target_link_libraries(erase_key PRIVATE json)
+install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
+file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
+install(FILES ${NOISE_SCRIPTS} DESTINATION "$ENV{STORE}/.cunqa/noise_model")
 
-add_executable(qdrop prueba_qdrop.cpp)
-target_link_libraries(qdrop PRIVATE json)
-target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
-install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
