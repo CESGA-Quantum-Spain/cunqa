@@ -148,7 +148,6 @@ inline bool get_first_ipv4(struct ifaddrs* head, const std::string& ifname, std:
         if (ifname != p->ifa_name) continue;
         if (p->ifa_addr->sa_family == AF_INET) {
             auto* sa = reinterpret_cast<sockaddr_in*>(p->ifa_addr);
-            // omite loopback 127.0.0.0/8
             uint32_t a = ntohl(sa->sin_addr.s_addr);
             if ((a & 0xFF000000u) == 0x7F000000u) continue;
             if (inet_ntop(AF_INET, &sa->sin_addr, buf, sizeof(buf))) { ip_out = buf; return true; }
@@ -157,7 +156,7 @@ inline bool get_first_ipv4(struct ifaddrs* head, const std::string& ifname, std:
     return false;
 }
 
-// Function employing all the others above
+// Function employing all the others above to return the IP
 
 inline std::string get_IP_address() {
     struct ifaddrs* ifaddr = nullptr;
