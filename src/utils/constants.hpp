@@ -19,6 +19,9 @@ enum INSTRUCTIONS {
     RX,
     RY,
     RZ,
+    U1,
+    U2,
+    U3,
     SWAP,
     CX,
     CY,
@@ -28,6 +31,9 @@ enum INSTRUCTIONS {
     CRZ,
     ECR,
     CECR,
+    CCX,
+    CCY,
+    CCZ,
     C_IF_X,
     C_IF_Y,
     C_IF_Z,
@@ -63,10 +69,18 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"h", H},
     {"sx", SX},
 
-    // ONE GATE PARAM
+    // ONE GATE 1 PARAM
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
+    {"u1", U1},
+
+    // ONE GATE 2 PARAM
+      {"u2", U2},
+
+    // ONE GATE 3 PARAM
+    {"u3", U3},
+    {"u", U3},
 
     // TWO GATE NO PARAM
     {"swap", SWAP},
@@ -78,8 +92,16 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"crz", CRZ},
     {"ecr", ECR},
 
-    // TWO GATE NO PARAM
+    // TWO GATE PARAM
+    {"crx", CRX},
+    {"cry", CRY},
+    {"crz", CRZ},
+
+    // THREE GATE NO PARAM
     {"cecr", CECR},
+    {"ccx", CCX},
+    {"ccy", CCY},
+    {"ccz", CCZ},
 
     //CLASSICAL CONTROLLED GATES
     {"c_if_x", C_IF_X},

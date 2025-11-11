@@ -8,17 +8,18 @@ from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator = "Maestro", co_located = True)
+family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
 
 qpus  = get_QPUs(on_node = False, family = family)
 
-qc = CunqaCircuit(2)
-qc.h(0)
-qc.cx(0, 1)
+qc = CunqaCircuit(15)
+for i in range(14):
+    qc.h(i)
+    qc.cx(i, i + 1)
 qc.measure_all()
 
 qpu = qpus[0]
-qjob = qpu.run(qc, transpile = True, shots = 100) # non-blocking call
+qjob = qpu.run(qc, transpile = False, shots = 1_000_000) # non-blocking call
 
 counts = qjob.result.counts
 time = qjob.time_taken
