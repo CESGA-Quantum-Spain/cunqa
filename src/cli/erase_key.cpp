@@ -1,8 +1,3 @@
-// filter_json.cpp
-// Uso:      ./filter_json <job_id> <info_path>
-// Compilar: g++ -std=c++17 -O2 -o filter_json filter_json.cpp
-// Requiere: nlohmann/json (single-header: json.hpp)
-
 #include <iostream>
 #include <fstream>
 #include <string>
