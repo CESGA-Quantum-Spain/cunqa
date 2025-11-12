@@ -490,18 +490,6 @@ def cunqa_dunder_methods(cls):
         self.layers
         return max(self.last_active_layer)
 
-    # def param_info(self):
-    #     """
-    #     Provides information about variable parametric gates: their labels and multiplicity.
-
-    #     Returns:
-    #         lenghts (dict[int]): dictionary with keys the names of the parameters of the circuit and the number of times they appear as values.
-    #     """
-    #     labels = self.param_labels
-    #     lenghts = {param: labels.count(param) for param in set(labels)}
-
-    #     return lenghts
-
     def index(self, gate, multiple = False):
         """
         Method to determine the position of a certain gate.
@@ -541,7 +529,6 @@ def cunqa_dunder_methods(cls):
         else:
             logger.error(f"Gate should be str (its name) or dict, but {type(gate)} was provided [{TypeError.__name__}].")
             raise SystemExit
-
 
 
     def __contains__(self, gate):
@@ -954,6 +941,7 @@ def cunqa_dunder_methods(cls):
             """
             up_qubit, down_qubit = (instr["qubits"][0], instr["qubits"][1]- n - 1) if instr["qubits"][0] > n else (instr["qubits"][1],  instr["qubits"][0] - n - 1)
             
+            # Perform the three distributed CNOTs
             with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
                 lower_circuit.cx(rcontrol, down_qubit)
 
@@ -970,6 +958,8 @@ def cunqa_dunder_methods(cls):
                 "cx":  CunqaCircuit.cx,  "cy":  CunqaCircuit.cy,  "cz":  CunqaCircuit.cz, 
                 "crx": CunqaCircuit.crx, "cry": CunqaCircuit.cry, "crz": CunqaCircuit.crz,
                 "csx": CunqaCircuit.csx, "cp":  CunqaCircuit.cp}
+            
+            # Determine which is the control qubit and which the target qubit and then distribute the gate accordingly
             if instr["qubits"][0] < instr["qubits"][1]:
 
                 qubit_up = instr["qubits"][0]
@@ -1012,7 +1002,7 @@ def cunqa_dunder_methods(cls):
                 with upper_circuit.expose(qubit_up, lower_circuit) as rcontrol:
                     upper_circuit.s(qubit_up)
                     lower_circuit.sx(qubit_down)
-                    lower_circuit.cx(rcontrol, qubit_down)
+                    lower_circuit.cx(rcontrol, qubit_down) # Only CNOT needs to be distributed
                     upper_circuit.x(qubit_up)
             else:
                 qubit_up = instr["qubits"][1]
@@ -1021,7 +1011,7 @@ def cunqa_dunder_methods(cls):
                 with lower_circuit.expose(qubit_down, upper_circuit) as rcontrol:
                     lower_circuit.s(qubit_down)
                     upper_circuit.sx(qubit_up)
-                    upper_circuit.cx(rcontrol, qubit_up)
+                    upper_circuit.cx(rcontrol, qubit_up) # Only CNOT needs to be distributed
                     lower_circuit.x(qubit_down)      
 
         # 3Qubit Gates
@@ -1042,44 +1032,7 @@ def cunqa_dunder_methods(cls):
             raise SystemExit 
 
         return upper_circuit, lower_circuit
-            
 
-    ######################## DRAWING THE CIRCUIT ########################
-
-    def draw(self, include_comm = False):
-        """
-        Method for plotting a circuit using Latex. CURRENTLY BEING DEVELOPED
-        """
-        rc('text', usetex=True)
-
-        #Create the Tikz code from the circuit (use r""" """ for a raw string literal that preserves special characters)
-        tikz_code = r"""\begin{quantikz}
-        """
-        # Iterate throught the layers to convert the gates to quantikz instructions
-        for intructions in self.layers.values():
-            new_line = r"""&"""
-            for layer, instr_index in intructions:
-                new_line += r"""\gate[]{} """# Write the gates 
-            new_line+r"""
-            """
-            tikz_code+=new_line
-
-        tikz_code + r"""\end{quantikz}"""
-        
-        # Create the figure and save it to a file
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.text(0.5, 0.5, tikz_code, ha='center', va='center', transform=ax.transAxes)
-        ax.set_xlim(0, 2)
-        ax.set_ylim(0, 2)
-        ax.set_axis_off()
-        plt.savefig('quantikz_diagram.png')
-
-        # Display the saved image within the matplotlib figure
-        plt.figure(figsize=(8, 6))
-        img = plt.imread('quantikz_diagram.png')
-        plt.imshow(img)
-        plt.axis('off')
-        plt.show() 
 
     ################### ASSIGN METHODS TO CUNQACIRCUIT ###################
 
@@ -1111,9 +1064,6 @@ def cunqa_dunder_methods(cls):
     #setattr(cls, 'param_info', param_info)
     setattr(cls, 'index', index)
     setattr(cls, '__contains__', __contains__)
-
-    # Drawing method
-    setattr(cls, 'draw', draw)
 
     return cls
 
