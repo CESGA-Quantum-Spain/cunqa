@@ -89,12 +89,9 @@ SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz"
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
 SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
-SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz"]
-SUPPORTED_GATES_DISTRIBUTED = ["d_c_if_unitary", "d_c_if_h", "d_c_if_x","d_c_if_y","d_c_if_z","d_c_if_rx","d_c_if_ry","d_c_if_rz","d_c_if_cx","d_c_if_cy","d_c_if_cz", "d_c_if_ecr"]
-all_gates = set(SUPPORTED_GATES_1Q)
-all_gates.update(SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q + SUPPORTED_GATES_PARAMETRIC_1 + SUPPORTED_GATES_PARAMETRIC_2 + SUPPORTED_GATES_PARAMETRIC_3 + SUPPORTED_GATES_PARAMETRIC_4 + SUPPORTED_GATES_CONDITIONAL + SUPPORTED_GATES_DISTRIBUTED)
-
 SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
+all_gates = set(SUPPORTED_GATES_1Q)
+all_gates.update(SUPPORTED_GATES_2Q + SUPPORTED_GATES_3Q + SUPPORTED_GATES_PARAMETRIC_1 + SUPPORTED_GATES_PARAMETRIC_2 + SUPPORTED_GATES_PARAMETRIC_3 + SUPPORTED_GATES_PARAMETRIC_4 + SUPPORTED_GATES_CONDITIONAL)
 
 class CunqaCircuitError(Exception):
     """Exception for error during circuit desing at :py:class:`~cunqa.circuit.CunqaCircuit`."""
@@ -413,7 +410,7 @@ class CunqaCircuit:
                 elif (instruction["name"] == "recv"):
                     gate_qubits = 0
 
-                elif any([instruction["name"] == u for u in ["unitary", "c_if_unitary", "remote_c_if_unitary"]]) and ("params" in instruction):
+                elif any([instruction["name"] == u for u in ["unitary"]]) and ("params" in instruction):
                     # in previous method, format of the matrix is checked, a list must be passed with the correct length given the number of qubits
                     gate_qubits = int(np.log2(len(instruction["params"][0])))
                     if not instruction["name"] == "unitary":
@@ -1121,7 +1118,6 @@ class CunqaCircuit:
             "params":[theta, phi, lam, gamma]
         })
     
-
     # methods for implementing conditional LOCAL gates
     def unitary(self, matrix: "list[list[list[complex]]]", *qubits: int) -> None:
         """
