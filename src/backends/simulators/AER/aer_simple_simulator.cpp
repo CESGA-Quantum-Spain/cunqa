@@ -12,7 +12,11 @@ JSON AerSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask
 {
     AerComputationAdapter aer_ca(quantum_task);
     AerSimulatorAdapter aer_sa(aer_ca);
-    return aer_sa.simulate(&backend);
+
+    if (quantum_task.is_dynamic) 
+        return aer_sa.simulate();
+    else
+        return aer_sa.simulate(&backend);
 }
 
 } // End namespace sim

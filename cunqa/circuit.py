@@ -343,7 +343,6 @@ class CunqaCircuit:
         """
         return len(_flatten([[c for c in cr] for cr in self.classical_regs.values()]))
 
-
     def from_instructions(self, instructions: list[dict]):
         """
         Class method to add operations to the circuit from a list of dict-type instructions.
@@ -356,7 +355,6 @@ class CunqaCircuit:
         for instruction in instructions:
             self._add_instruction(instruction)
         return self
-
 
     def _add_instruction(self, instruction):
         """
@@ -561,7 +559,6 @@ class CunqaCircuit:
         self.classical_regs[new_name] = [(self.num_clbits + i) for i in range(number_clbits)]
 
         return new_name
-    
     
     # =============== INSTRUCTIONS ===============
     
@@ -1163,7 +1160,7 @@ class CunqaCircuit:
             qubits (list[int]): qubits in which the gate is applied, first num_ctrl_qubits will be the control qubits and the remaining the target qubits.
             params (list[float | int | Parameter]): list of parameters for the gate.
             
-        .. warning:: This instructions is currently only running with AER.
+        .. warning:: This instructions is currently only supported for Aer simulator.
         """
         mgate_name = "mc" + base_gate
 
@@ -1234,7 +1231,6 @@ class CunqaCircuit:
             param (float | int): parameter for the case parametric gate is provided.
 
             matrix (list | numpy.ndarray): unitary operator in matrix form to be applied to the given qubits.
-
         """
 
         self.is_dynamic = True
@@ -1275,8 +1271,8 @@ class CunqaCircuit:
             self.measure(list_control_qubit[0], list_control_qubit[0])
             self._add_instruction({
                 "name": name,
-                "qubits": _flatten([list_target_qubit, list_control_qubit]),
-                "registers":_flatten([list_control_qubit]),
+                "qubits": _flatten([list_target_qubit]),
+                "conditional_reg":_flatten([list_control_qubit]),
                 "params":[matrix]
             })
             # we have to exit here
@@ -1290,7 +1286,7 @@ class CunqaCircuit:
             logger.error(f"instruction {gate} does not suppor matrix.")
             raise SystemExit
 
-        
+        # TODO: move this checkpoints to _check_instruction method
         if gate in SUPPORTED_GATES_PARAMETRIC_1:
             if param is None:
                 logger.error(f"Since a parametric gate was provided ({gate}) a parameter should be passed [ValueError].")
@@ -1305,15 +1301,13 @@ class CunqaCircuit:
                 logger.warning("A parameter was provided but gate is not parametric, therefore it will be ignored.")
             list_param = []
 
-
-        
         if name in SUPPORTED_GATES_CONDITIONAL:
 
             self.measure(list_control_qubit[0], list_control_qubit[0])
             self._add_instruction({
-                "name": name,
-                "qubits": _flatten([list_target_qubit, list_control_qubit]),
-                "conditional_reg":_flatten([list_control_qubit]),
+                "name": gate,
+                "qubits": _flatten([list_target_qubit]),
+                "conditional_reg": list_control_qubit,
                 "params":list_param
             })
 
