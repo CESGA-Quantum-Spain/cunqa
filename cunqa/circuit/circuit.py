@@ -442,9 +442,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                 elif (instruction["name"] in instructions_with_clbits) and ({"qubits", "clbits"}.issubset(instruction)):
                     gate_qubits = 1
 
-                elif instruction["name"] == "save_state":
-                    gate_qubits = self.num_qubits
-
                 else:
                     logger.error(f"instruction is not supported.")
                     raise ValueError # I capture this at _add_instruction method
@@ -1339,14 +1336,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
 
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
-
-    def save_state(self, pershot: bool = False, label: str = "_method_"):
-        self.instructions.append({
-            "name": "save_state",
-            "qubits": list(range(self.num_qubits)),
-            "snapshot_type": "list" if pershot else "single",
-            "label": label
-        })
 
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
