@@ -79,11 +79,14 @@ endif()
 set(QCSIM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/QCSim/QCSim)
 set(AER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro-qiskit-aer/src)
 
-FetchContent_Declare(
-    maestro
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro
-)
-FetchContent_MakeAvailable(maestro)
+#FetchContent_Declare(
+#    maestro
+#    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/maestro
+#)
+#FetchContent_MakeAvailable(maestro)
+#install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/maestro)
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64")
 
 
