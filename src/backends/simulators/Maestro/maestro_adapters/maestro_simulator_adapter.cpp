@@ -469,20 +469,16 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
                 }
             }
 
-            auto start = std::chrono::high_resolution_clock::now();
 			char* result = simulator.SimpleExecute(circuit_json.dump().c_str(), run_config_json.dump().c_str());
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            float time_taken = duration.count();
 
             if (result)
             {
-                JSON counts_json = JSON::parse(result);
+                JSON maestro_result = JSON::parse(result);
                 simulator.FreeResult(result);
 
                 JSON result_json = {
-                {"counts", counts_json.at("counts").get<JSON>()},
-                {"time_taken", time_taken}
+                {"counts", maestro_result.at("counts").get<JSON>()},
+                {"time_taken", maestro_result.at("time_taken").get<JSON>()}
                 };
 
 				return result_json;
