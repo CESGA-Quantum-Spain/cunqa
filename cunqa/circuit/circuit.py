@@ -263,8 +263,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
     quantum_regs: dict  #: Dictionary of quantum registers as ``{"name": [assigned qubits]}``.
     classical_regs: dict #: Dictionary of classical registers of the circuit as ``{"name": [assigned clbits]}``.
     sending_to: "list[str]" #: List of circuit ids to which the current circuit is sending measurement outcomes or qubits. 
-    current_params: "list[Union[int, float]]" #: List of the parameters that the circuit currently has
-    param_labels: "list[str]" #: List of labels assigned to parametric gates to be able to update them separately and conveniently. Same lenght as current_params
 
 
     def __init__(self, num_qubits: int, num_clbits: Optional[int] = None, id: Optional[str] = None):
@@ -289,9 +287,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
         self.classical_regs = {}
         self.sending_to = []
-
-        self.param_labels = []
-        self.current_params = []
 
         if not isinstance(num_qubits, int):
             logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
@@ -325,11 +320,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         Information about the main class attributes given as a dictinary.
         """
-        info = {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "has_qc": self.has_qc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
-        if self.is_parametric:
-            info.update({"param_labels": self.param_labels,"current_params": self.current_params})
-
-        return info
+        return {"id":self._id, "instructions":self.instructions, "num_qubits": self.num_qubits,"num_clbits": self.num_clbits,"classical_registers": self.classical_regs,"quantum_registers": self.quantum_regs, "has_cc":self.has_cc, "has_qc": self.has_qc, "is_dynamic":self.is_dynamic, "sending_to":self.sending_to, "is_parametric": self.is_parametric}
 
     @property
     def num_qubits(self) -> int:
@@ -517,9 +508,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                     if not all([(isinstance(p,float) or isinstance(p,int) or isinstance(p, str)) for p in instruction["params"]]):
                         logger.error(f"Instruction params must be int, float or str (for labels), but {type(instruction['params'])} was provided.")
                         raise TypeError
-                    
-                    self.current_params += instruction["params"]
-                    self.param_labels += [p if isinstance(p, str) else "no_name" for p in instruction["params"]]
 
                     if not len(instruction["params"]) == gate_params:
                         logger.error(f"instruction number of params ({gate_params}) is not consistent with params provided ({len(instruction['params'])}).")
@@ -865,7 +853,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         Args:
             param (float | int | str): parameter for the parametric gate. String identifies a variable parameter (needs to be assigned) with the string label.
 
-             qubit (int): qubit in which the gate is applied.
+            qubit (int): qubit in which the gate is applied.
         """
         self._add_instruction({
             "name":"u1",

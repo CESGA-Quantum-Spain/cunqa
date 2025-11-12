@@ -374,10 +374,6 @@ class QJob:
                 self._is_dynamic = circuit.is_dynamic
                 self._has_cc = circuit.has_cc
                 self._has_qc = circuit.has_qc
-
-                if circuit.is_parametric:
-                    self._param_labels = circuit.param_labels
-                    self._current_params = circuit.current_params
                 
                 logger.debug("Translating to dict from CunqaCircuit...")
 
