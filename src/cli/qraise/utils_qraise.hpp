@@ -11,8 +11,11 @@
 
 bool check_time_format(const std::string& time)
 {
-    std::regex format("^(\\d{2}):(\\d{2}):(\\d{2})$");
-    return std::regex_match(time, format);   
+    std::regex format_hours_minutes_seconds("^(\\d+):(\\d{2}):(\\d{2})$");
+    std::regex format_days_hours("^(\\d+)-(\\d{1,2})$");
+    std::regex format_days_hours_minutes_seconds("^(\\d+)-(\\d{1,2}):(\\d{2}):(\\d{2})$");
+    
+    return std::regex_match(time, format_hours_minutes_seconds) || std::regex_match(time, format_days_hours) || std::regex_match(time, format_days_hours_minutes_seconds);   
 }
 
 bool check_mem_format(const int& mem) 
