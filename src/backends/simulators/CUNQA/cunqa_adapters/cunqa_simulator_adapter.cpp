@@ -102,13 +102,12 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
         {
         case constants::MEASURE:
         {
-            auto clreg = inst.at("clreg").get<std::vector<std::uint64_t>>();
             int measurement = executor.apply_measure({qubits[0] + T.zero_qubit});
-            G.cvalues[qubits[0] + T.zero_qubit] = (measurement == 1);
-            if (!clreg.empty())
-            {
-                G.creg[clreg[0]] = (measurement == 1);
-            }
+
+            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
+            G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
+            G.creg[clbits[0]] = (measurement == 1);
+
             break;
         }
         case constants::ID:
