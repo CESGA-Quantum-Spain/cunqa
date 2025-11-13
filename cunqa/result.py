@@ -18,6 +18,8 @@
 
 """
 from cunqa.logger import logger
+from typing import Union, Optional
+import numpy as np
 
 class ResultError(Exception):
     """Exception for error received from a simulation."""
@@ -209,3 +211,4 @@ def _convert_counts(counts: dict, registers: dict) -> dict:
         raise ResultError # I capture this error in QJob.result()
     
     return new_counts
+
