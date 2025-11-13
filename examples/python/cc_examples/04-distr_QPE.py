@@ -201,7 +201,7 @@ def iqpe_benchmarking(angles_list, n_qpus_list, shots, cores_per_qpu, mem_per_qp
             }
             
             str_data =str(dict_data)
-            with open(f"/mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/examples/python/cc_examples/results_iterative_QPE/iQPE_results.txt", "a") as f:
+            with open(f"results_iterative_QPE/iQPE_results.txt", "a") as f:
                 f.write(str_data)
 
             qdrop(qpus)

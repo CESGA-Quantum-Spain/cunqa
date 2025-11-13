@@ -383,7 +383,7 @@ def cunqa_dunder_methods(cls):
             logger.error(f"CunqaCircuits can only be unioned with other CunqaCircuits or QuantumCircuits, but {type(lower_circuit)} was provided.[{NotImplemented.__name__}].")
             raise SystemExit
 
-        n = self.num_qubits;             cl_n = self.num_clbits;             need_to_modify_self = False
+        n = self.num_qubits;             cl_n = self.num_clbits;             
         m = lower_circuit.num_qubits;    cl_m = lower_circuit.num_clbits
 
         self._add_q_register(name = down_id, number_qubits = m)
@@ -394,10 +394,10 @@ def cunqa_dunder_methods(cls):
 
         # Go through instructions of both circuits, add n to the qubits of the lower_circuit and transform distributed operations between self and lower_circuit to be local
         try: 
-            self.process_instrs(union_circuit, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
-            self.process_instrs(union_circuit, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
+            self.process_instrs(self, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
+            self.process_instrs(self, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
 
-        except error as e:
+        except Exception as e:
             logger.error(f"Error found while processing instructions for union: \n {e}")
             raise SystemExit
 
@@ -587,7 +587,6 @@ def cunqa_dunder_methods(cls):
 
         # LOOP THROUGH INSTRUCTIONS!
         for i, instr in enumerate(iter_this_instr):
-            print(f"La instrucción {i} es {instr}")
             if displace:
                 instr["qubits"] = [qubit + n for qubit in instr["qubits"]] 
                 if "clbits" in instr :
@@ -739,8 +738,6 @@ def cunqa_dunder_methods(cls):
         
         del self.qubits_telegate # All possible communications with the second circuit have been processed, and these resources can be freed
         del self.qubits_teledata
-
-        print(f"Las instucciones de union_circuit son {union_circuit.instructions}")
 
 
     def divide_instr(self, instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int, iterator_instructions: 'list_iterator', received: bool = False, recv_remain: int = 0):
