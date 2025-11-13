@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "logger.hpp"
 
 using namespace std::literals;

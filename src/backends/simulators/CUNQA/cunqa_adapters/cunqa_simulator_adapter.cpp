@@ -7,9 +7,9 @@
 
 #include "cunqa_simulator_adapter.hpp"
 
-#include "src/result_cunqasim.hpp"
-#include "src/executor.hpp"
-#include "src/utils/types_cunqasim.hpp"
+#include "result_cunqasim.hpp"
+#include "executor.hpp"
+#include "utils/types_cunqasim.hpp"
 
 #include "utils/constants.hpp"
 #include "utils/helpers/reverse_bitstring.hpp"

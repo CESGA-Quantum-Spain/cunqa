@@ -2,11 +2,13 @@ import os, sys
 import numpy as np
 
 # path to access c++ files
-sys.path.append(os.getenv("HOME") + "/.local")
+sys.path.append(os.getenv("HOME"))
 
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
+import time
 
+begin = time.perf_counter()
 
 # --------------------------------------------------
 # Key difference between co-located and HPC
@@ -38,10 +40,15 @@ qc.measure_all()
 qjobs = []
 for _ in range(1):
     for qpu in qpus: 
-        qjobs.append(qpu.run(qc, transpile=True, shots = 100))
+        qjobs.append(qpu.run(qc, transpile=True, shots = 1000000))
 
 print("Waiting for the results...")
 results = gather(qjobs)
 
 for result in results:
     print("Result: ", result.counts)
+    print("Time taken: ", result.time_taken)
+
+end = time.perf_counter()
+print()
+print("Python took: ", end-begin)

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "args_qraise.hpp"
 
 #include "utils/json.hpp"

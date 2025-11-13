@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "zmq.hpp"
 
-#include "classical_channel.hpp"
+#include "classical_channel/classical_channel.hpp"
 #include "utils/helpers/net_functions.hpp"
 
 #include "utils/json.hpp"

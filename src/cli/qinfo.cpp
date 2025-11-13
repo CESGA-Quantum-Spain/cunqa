@@ -7,7 +7,7 @@
 #include <map>
 
 #include "utils/json.hpp"
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "logger.hpp"
 
 using namespace std::literals;

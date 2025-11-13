@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 
 #include "utils/constants.hpp"
 #include "qraise/utils_qraise.hpp"

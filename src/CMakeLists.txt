@@ -7,9 +7,9 @@ if(NOT USE_MPI_BTW_QPU AND NOT USE_ZMQ_BTW_QPU)
 endif()
 
 add_subdirectory(third-party)
+add_subdirectory(utils)
 add_subdirectory(classical_channel)
 add_subdirectory(backends)
-add_subdirectory(utils)
 add_subdirectory(comm)
 
 add_library(quantum_task quantum_task.cpp)

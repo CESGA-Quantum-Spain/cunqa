@@ -1,7 +1,6 @@
 # QRAISE executable
 add_executable(qraise qraise.cpp)
-target_include_directories(qraise PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
-target_link_libraries(qraise PRIVATE json logger_client)
+target_link_libraries(qraise PRIVATE json logger_client morrisfranken::argparse)
 
 if(USE_MPI_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_MPI_BTW_QPU)
@@ -13,8 +12,7 @@ install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QDROP executable
 add_executable(qdrop qdrop.cpp)
-target_link_libraries(qdrop PRIVATE json)
-target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+target_link_libraries(qdrop PRIVATE json morrisfranken::argparse)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # SETUP_QPUS executable
@@ -34,8 +32,7 @@ install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QINFO executable
 add_executable(qinfo qinfo.cpp)
-target_link_libraries(qinfo PRIVATE json logger_client)
-target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse" "${CMAKE_SOURCE_DIR}/src/third-party/slurm")
+target_link_libraries(qinfo PRIVATE json logger_client morrisfranken::argparse)
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Epilog tool erase_key and noise models
