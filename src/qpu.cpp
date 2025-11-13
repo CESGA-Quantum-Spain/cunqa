@@ -67,6 +67,7 @@ void QPU::compute_result_()
 
 void QPU::recv_data_() 
 {   
+    server->accept();
     while (true) {
         try {
             auto message = server->recv_data();

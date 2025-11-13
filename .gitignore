@@ -302,6 +302,7 @@ raise.sh
 condaJupyter_ft3.sh
 condaJupyter_qmio.sh
 modules.sh
+modules11.sh
 
 build_improvements/
 bash/
