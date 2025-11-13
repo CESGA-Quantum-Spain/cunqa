@@ -1423,7 +1423,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             target_circuit_id = target_circuit
 
         elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit.id
+            target_circuit_id = target_circuit._id
         else:
             logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
             raise SystemExit
@@ -1474,14 +1474,14 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             params = []
 
         if control_circuit is None:
-            logger.error("target_circuit not provided.")
+            logger.error("control_circuit not provided.")
             raise SystemExit
         
         elif isinstance(control_circuit, str):
             control_circuit = control_circuit
 
         elif isinstance(control_circuit, CunqaCircuit):
-            control_circuit = control_circuit.id
+            control_circuit = control_circuit._id
         else:
             logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
             raise SystemExit
