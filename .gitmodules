@@ -22,3 +22,6 @@
 [submodule "cunqasimulator"]
 	path = src/third-party/cunqasimulator
 	url = git@github.com:CESGA-Quantum-Spain/cunqasimulator.git
+[submodule "ViqueiraQRNN"]
+	path = src/third-party/ViqueiraQRNN
+	url = git@github.com:D-Exposito/ViqueiraQRNN.git

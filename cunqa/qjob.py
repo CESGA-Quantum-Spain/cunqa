@@ -34,7 +34,7 @@ from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert, _registers_dict
+from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
@@ -374,10 +374,6 @@ class QJob:
                 self._is_dynamic = circuit.is_dynamic
                 self._has_cc = circuit.has_cc
                 self._has_qc = circuit.has_qc
-
-                if circuit.is_parametric:
-                    self._param_labels = circuit.param_labels
-                    self._current_params = circuit.current_params
                 
                 logger.debug("Translating to dict from CunqaCircuit...")
 
@@ -454,7 +450,8 @@ class QJob:
                 "avoid_parallelization": False,
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
-                "seed": 123123}
+                "seed": 123123
+                }
 
             if (run_parameters == None) or (len(run_parameters) == 0):
                 logger.debug("No run parameters provided, default were set.")

@@ -30,11 +30,13 @@ qc = {
     {
         "name": "measure",
         "qubits": [0], 
+        "clbits":[0],
         "clreg":[]
     },
     {
         "name": "measure",
         "qubits": [1], 
+        "clbits":[1],
         "clreg":[]
     }
     ],
@@ -65,11 +67,13 @@ qc_param = {
     {
         "name": "measure",
         "qubits": [0], 
+        "clbits":[0],
         "clreg":[]
     },
     {
         "name": "measure",
         "qubits": [1], 
+        "clbits":[1],
         "clreg":[]
     }
     ],

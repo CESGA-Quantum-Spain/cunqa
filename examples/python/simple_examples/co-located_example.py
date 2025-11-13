@@ -20,6 +20,7 @@ for q in qpus:
     print(f"QPU {q.id}, backend: {q.backend.name}, simulator: {q.backend.simulator}, version: {q.backend.version}.")
 
 qc = CunqaCircuit(2)
+
 # Parámetros
 theta1 = np.pi / 4
 theta2 = np.pi / 3
@@ -38,6 +39,7 @@ qc.measure_all()
 qjobs = []
 for _ in range(1):
     for qpu in qpus: 
+        print("Llegó al bucle 2")
         qjobs.append(qpu.run(qc, transpile=True, shots = 100))
 
 results = gather(qjobs)
