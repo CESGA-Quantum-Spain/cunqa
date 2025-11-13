@@ -10,14 +10,14 @@
 
 
 from qiskit import QuantumCircuit
-from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit
+from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, CircuitError
 from qiskit.qasm2 import dumps as dumps2
 from qiskit.qasm3 import dumps as dumps3
 
-from typing import Tuple, Union, Optional
-
+from typing import Union
 from cunqa.circuit import CunqaCircuit, _is_parametric
 from cunqa.logger import logger
+
 
 class ConvertersError(Exception):
     """Exception for error during conversion between circuit types."""
@@ -93,6 +93,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
             raise SystemExit
         
         return converted_circuit
+    
     except Exception as error:
             logger.error(f" Unable to convert circuit to {convert_to} [{type(error).__name__}].")
             raise SystemExit
@@ -309,93 +310,96 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
     try:
         qc = QuantumCircuit()
 
-        qubits = []
+        # localizing qubits and clbits of the circuit
+        circuit_qubits = []
         for qr, lista in quantum_registers.items():
             for i in lista: 
-                qubits.append(i)
+                circuit_qubits.append(i)
             qc.add_register(QuantumRegister(len(lista), qr))
 
-        clbits = []
+        circuit_clbits = []
         for cr, lista in classical_registers.items():
             for i in lista: 
-                clbits.append(i)
+                circuit_clbits.append(i)
             qc.add_register(ClassicalRegister(len(lista), cr))
 
+
         for instruction in instructions:
+
+            # checking if the instruction is supported
 
             if instruction['name'] not in SUPPORTED_QISKIT_OPERATIONS:
                 logger.error(f"Instruction {instruction['name']} not supported for conversion [ValueError].")
                 raise ConvertersError
 
-            if instruction['name'] == 'measure':
-                bit = instruction['clbits'][0]
-                if bit in clbits: # checking that the bit referenced in the instruction it actually belongs to a register
+            # instanciating instruction's classical and quantum bits
+
+            inst_Clbit = []; inst_Qubit = []
+
+            if ("clbits" in instruction) and (len(instruction['clbits']) != 0):
+                for inst_clbit in instruction["clbits"]:
                     for k,v in classical_registers.items():
-                        if bit in v:
-                            reg = k
-                            l = len(v)
-                            clbit = v.index(bit)
-                            inst = CircuitInstruction(
-                                operation = Instruction(name = instruction['name'],
-                                                        num_qubits = 1,
-                                                        num_clbits = 1,
-                                                        params = []
-                                                        ),
-                                qubits = (Qubit(QuantumRegister(num_qubits, 'q'), q) for q in instruction['qubits']),
-                                clbits = (Clbit(ClassicalRegister(l, reg), clbit),)
-                                )
-                            qc.append(inst)
-                else:
-                    logger.error(f"Bit {bit} not found in {bits}, please check the format of the circuit json.")
-                    raise IndexError
-                break # we skip to the next instruction
+                        if inst_clbit in v:
+                            inst_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(inst_clbit)))
+
+            if ("qubits" in instruction) and (len(instruction["qubits"]) != 0):
+                for inst_qubit in instruction["qubits"]:
+                    for k,v in quantum_registers.items():
+                        if inst_qubit in v:
+                            inst_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
+
+            # checking for parameters
 
             if 'params' in instruction:
                 params = instruction['params']
             else:
                 params = []
 
-            if 'conditional_reg' in instruction:
-                bit = instruction['conditional_reg'][0]
-                if bit in clbits: # checking that the bit referenced in the instruction it actually belongs to a register
-                    for k,v in classical_registers.items():
-                        if bit in v:
-                            reg = k
-                            l = len(v)
-                            clbit = v.index(bit)
-                            condition = (Clbit(ClassicalRegister(l, reg), clbit), 1)
-            else:
-                condition = None
+            inst_operation = Instruction(name = instruction['name'],
+                                        num_qubits = len(inst_Qubit),
+                                        num_clbits = len(inst_Clbit),
+                                        params = params
+                                        )
             
+            # checking for conditional operations
+
+            if 'conditional_reg' in instruction:
+                inst_conditional_reg = instruction['conditional_reg'][0]
+                for k,v in classical_registers.items():
+                        if inst_conditional_reg in v:
+                            inst_operation._condition = (Clbit(ClassicalRegister(len(v),k), v.index(inst_conditional_reg)), 1)
+            
+            # adding instruction
+
             inst = CircuitInstruction( 
-                operation = Instruction(name = instruction['name'],
-                                        num_qubits = len(instruction['qubits']),
-                                        num_clbits = 0,
-                                        params = params,
-                                        condition = condition
-                                        ),
-                qubits = (Qubit(QuantumRegister(num_qubits, 'q'), q) for q in instruction['qubits']),
-                clbits = ()
+                operation = inst_operation,
+                qubits = inst_Qubit,
+                clbits = inst_Clbit
                 )
+            
             qc.append(inst)
         
         return qc
     
     except KeyError as error:
         logger.error(f"Some error with the keys of `instructions` occured, please check the format [{type(error).__name__}].")
-        raise error
+        raise ConvertersError
     
     except TypeError as error:
         logger.error(f"Error when reading instructions, check that the given elements have the correct type [{type(error).__name__}].")
-        raise TypeError
+        raise ConvertersError
     
     except IndexError as error:
         logger.error(f"Error with format for classical_registers [{type(error).__name__}].")
-        raise error
+        raise ConvertersError
+    
+    except CircuitError as error:
+        logger.error(f"Error in construction of the QuantumCircuit object [{type(error).__name__}].")
+        raise ConvertersError
 
     except Exception as error:
         logger.error(f"Error when converting json dict to QuantumCircuit [{type(error).__name__}].")
-        raise error
+        raise ConvertersError
 
 
 def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
@@ -409,11 +413,20 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
         An object :py:class:`~cunqa.circuit.CunqaCircuit` with the corresponding instructions and characteristics.
     """
     try:
-        cunqac = CunqaCircuit(circuit_dict["num_qubits"], circuit_dict["num_clbits"], circuit_dict["id"])
+        cunqac = CunqaCircuit(id = circuit_dict["id"])
+
+        for name, number_of_clbits in circuit_dict["classical_registers"].items():
+            cunqac._add_cl_register(name, len(number_of_clbits))
+
+        for name, number_of_qubits in circuit_dict["quantum_registers"].items():
+            cunqac._add_q_register(name, len(number_of_qubits))
+        
         cunqac.from_instructions(circuit_dict["instructions"])
+        
         return cunqac
+    
     except Exception as error:
-        logger.error(f"Some error occured during transformation from json dict to `cunqa.circuit.CunqaCircuit` [{type(error).__name__}].")
+        logger.error(f"Some error occured during transformation from json dict to `cunqa.circuit.CunqaCircuit`: {error} [{type(error).__name__}].")
         raise ConvertersError
 
 
@@ -484,6 +497,3 @@ def _registers_dict(qc: 'QuantumCircuit') -> "list[dict]":
         classical_registers[k] = counts[i]
 
     return [quantum_registers, classical_registers]
-
-
-    

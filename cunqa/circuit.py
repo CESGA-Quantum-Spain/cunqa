@@ -267,7 +267,7 @@ class CunqaCircuit:
     param_labels: "list[str]" #: List of labels assigned to parametric gates to be able to update them separately and conveniently. Same lenght as current_params
 
 
-    def __init__(self, num_qubits: int, num_clbits: Optional[int] = None, id: Optional[str] = None):
+    def __init__(self, num_qubits: int = None, num_clbits: Optional[int] = None, id: Optional[str] = None):
 
         """
         Class constructor to create a CunqaCirucit. Only the ``num_qubits`` argument is mandatory, also ``num_clbits`` can be provided if there is intention to incorporate intermediate measurements.
@@ -286,17 +286,20 @@ class CunqaCircuit:
         self.has_qc = False
         self.is_dynamic = False
         self.instructions = []
-        self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
+
+        self.quantum_regs = {}
+        if num_qubits is not None:
+            self._add_q_register("q0", num_qubits)
+        
         self.classical_regs = {}
+        if num_clbits is not None:
+            self._add_cl_register("c0", num_clbits)
+
         self.sending_to = []
         self._telegate = None
 
         self.param_labels = []
         self.current_params = []
-
-        if not isinstance(num_qubits, int):
-            logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
-            raise SystemExit
         
         if id is None:
             self._id = "CunqaCircuit_" + _generate_id()
@@ -304,20 +307,7 @@ class CunqaCircuit:
             self._id = id
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
-            raise SystemExit 
-        
-        self.is_parametric = False
-
-
-        self.instructions = []
-
-        self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
-
-        if num_clbits is None:
-            self.classical_regs = {}
-        
-        elif isinstance(num_clbits, int):
-            self.classical_regs = {'c0':[c for c in range(num_clbits)]}
+            raise SystemExit
 
     @property
     def info(self) -> dict:
@@ -528,7 +518,7 @@ class CunqaCircuit:
         else:
             new_name = name
 
-        self.quantum_regs[new_name] = [(self.num_qubits + 1 + i) for i in range(number_qubits)]
+        self.quantum_regs[new_name] = [(self.num_qubits + i) for i in range(number_qubits)]
 
         return new_name
 
