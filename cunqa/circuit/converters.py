@@ -15,7 +15,7 @@ from qiskit.qasm2 import dumps as dumps2
 from qiskit.qasm3 import dumps as dumps3
 
 from typing import Tuple, Union, Optional
-from cunqa.circuit import CunqaCircuit
+from cunqa.circuit.circuit import CunqaCircuit
 from cunqa.logger import logger
 
 
@@ -249,7 +249,7 @@ def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     Returns:
         The corresponding :py:class:`~cunqa.circuit.CunqaCircuit` with the propper instructions and characteristics.
     """
-    return _json_to_qc(cunqac_to_json(cunqac))
+    return _json_to_qc(_cunqac_to_json(cunqac))
 
 def _cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
     """
@@ -273,7 +273,7 @@ def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     Returns:
         The corresponding :py:class:`qiskit.QuantumCircuit` with the propper instructions and characteristics.
     """
-    return _json_to_qc(cunqac_to_json(cunqac))
+    return _json_to_qc(_cunqac_to_json(cunqac))
 
 
 def _cunqac_to_qasm(cunqac : 'CunqaCircuit') -> str:
