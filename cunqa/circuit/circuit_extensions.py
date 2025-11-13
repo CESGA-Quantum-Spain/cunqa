@@ -11,8 +11,6 @@ from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRI
 from cunqa.circuit.converters import convert
 
 from qiskit import QuantumCircuit
-import matplotlib.pyplot as plt #I use this for drawing circuits with LaTeX (quantikz)
-from matplotlib import rc
 
 class HorizontalDivisionError(Exception):
     """ Signals that a gate for which we haven't defined a division was found while trying to horizontally divide a circuit."""
