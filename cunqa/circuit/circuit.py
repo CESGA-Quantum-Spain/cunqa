@@ -329,10 +329,9 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         elif isinstance(id, str):
             other_circuits = self.__class__.access_other_instances()
             if id in other_circuits.keys():
-                logger.error(f"Id {id} was already used for another circuit.")
-                raise SystemExit
-            else:
-                self._id = id
+                logger.warning(f"Id {id} was already used for another circuit.")
+            
+            self._id = id
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
             raise SystemExit

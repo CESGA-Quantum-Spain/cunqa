@@ -232,23 +232,7 @@ def cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     Returns:
         The corresponding :py:class:`qiskit.QuantumCircuit` with the propper instructions and characteristics.
     """
-    return _json_to_qc(_cunqac_to_json(cunqac))
-
-
-def _cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
-    circuit_json = {}
-    circuit_json["id"] = cunqac._id
-    circuit_json["is_parametric"] = cunqac.is_parametric
-    circuit_json["is_dynamic"] = cunqac.is_dynamic
-    circuit_json["has_cc"] = cunqac.has_cc
-    circuit_json["has_qc"] = cunqac.has_qc
-    circuit_json["num_qubits"] = cunqac.num_qubits
-    circuit_json["num_clbits"] = cunqac.num_clbits
-    circuit_json["quantum_registers"] = cunqac.quantum_regs
-    circuit_json["classical_registers"] = cunqac.classical_regs
-    circuit_json["instructions"] = cunqac.instructions
-
-    return circuit_json
+    return _json_to_qc(cunqac_to_json(cunqac))
 
 
 def _cunqac_to_qasm(cunqac : 'CunqaCircuit') -> str:
