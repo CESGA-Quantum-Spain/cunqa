@@ -35,7 +35,7 @@ def cyclic_ccommunication(n):
 
     circuits["cc_0"].remote_c_if("x", qubits = 0, param=None, control_circuit = f"cc_{n-1}")
 
-    circuits[f"cc_0"].measure(0,0)
+    circuits["cc_0"].measure(0,0)
     
     # For loop that creates the rest of the circuits and executes the communication instructions
     for i in range(n-1):

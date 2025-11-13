@@ -90,25 +90,32 @@ void QuantumTask::update_params_(const std::vector<double> params)
         for (auto& instruction : circuit){
             std::string name = instruction.at("name");
             switch(cunqa::constants::INSTRUCTIONS_MAP.at(name)){
-                case cunqa::constants::MEASURE:
-                case cunqa::constants::ID:
-                case cunqa::constants::X:
-                case cunqa::constants::Y:
-                case cunqa::constants::Z:
-                case cunqa::constants::H:
-                case cunqa::constants::CX:
-                case cunqa::constants::CY:
-                case cunqa::constants::CZ:
-                    break;
+                // One parameter gates 
                 case cunqa::constants::RX:
                 case cunqa::constants::RY:
                 case cunqa::constants::RZ:
                     instruction.at("params")[0] = params[counter];
                     counter = counter + 1;
                     break; 
+                // Two parameter gates 
+                case cunqa::constants::R:
+                    instruction.at("params")[0] = params[counter];
+                    instruction.at("params")[1] = params[counter + 1];
+                    counter = counter + 2;
+                    break;
+                // Three parameter gates 
+                case cunqa::constants::U:
+                case cunqa::constants::CU:
+                    instruction.at("params")[0] = params[counter];
+                    instruction.at("params")[1] = params[counter + 1];
+                    instruction.at("params")[2] = params[counter + 2];
+                    counter = counter + 3;
+                    break;
+                default:
+                    break;
             }
         }
-        
+
     } catch (const std::exception& e){
         LOGGER_ERROR("Error updating parameters. (check correct size).");
         throw std::runtime_error("Error updating parameters:" + std::string(e.what())); 

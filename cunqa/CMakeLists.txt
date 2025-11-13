@@ -1,3 +1,4 @@
+add_subdirectory(circuit)
 
 pybind11_add_module(qclient bindings.cpp)
 

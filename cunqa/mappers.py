@@ -69,7 +69,7 @@ import time
 import copy
 
 
-def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any):
+def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any) -> "list[QJob]":
     """
     Function to send circuits to serveral virtual QPUs allowing classical or quantum communications among them. 
     Each circuit will be sent to each QPU in order, therefore both lists must be of the same size.
