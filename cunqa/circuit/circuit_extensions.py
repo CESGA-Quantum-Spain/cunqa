@@ -4,6 +4,7 @@ Holds dunder methods for the class CunqaCircuit and other functions to extract i
 from typing import Union, Optional, Tuple
 import copy
 import operator 
+import numpy as np
 
 from cunqa.logger import logger
 from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRIBUTED, SUPPORTED_GATES_1Q
@@ -1098,27 +1099,27 @@ def distr_rzz_rxx_ryy_rzx(instr: dict, upper_circuit: CunqaCircuit, lower_circui
     if instr["name"] == "ryy":
         circ1.rx(np.pi/2, qubit_1)
         circ2.rx(np.pi/2, qubit_2)
-    elif intr["name"] == "rxx":
+    elif instr["name"] == "rxx":
         circ1.h(qubit_1)
         circ2.h(qubit_2)
     elif instr["name"] == "rzx":
-        circ2.h(qubit2)
+        circ2.h(qubit_2)
 
     ############## Body of rzz ##################
-    with circ1.expose(qubit1, circ2) as rcontrol:
-        circ2.cx(rcontrol, qubit2)
-        circ2.rz(*instr["params"], qubit2)
-        circ2.cx(rcontrol, qubit2)
+    with circ1.expose(qubit_1, circ2) as rcontrol:
+        circ2.cx(rcontrol, qubit_2)
+        circ2.rz(*instr["params"], qubit_2)
+        circ2.cx(rcontrol, qubit_2)
     ############## End of rzz ##################
 
     if instr["name"] == "ryy":
         circ1.rx(np.pi/2, qubit_1)
         circ2.rx(np.pi/2, qubit_2)
-    elif intr["name"] == "rxx":
+    elif instr["name"] == "rxx":
         circ1.h(qubit_1)
         circ2.h(qubit_2)
     elif instr["name"] == "rzx":
-        circ2.h(qubit2)
+        circ2.h(qubit_2)
 
 def distr_ccx_ccz_cswap(instr: dict, upper_circuit: CunqaCircuit, lower_circuit: CunqaCircuit, n: int) -> None:
     """
@@ -1267,7 +1268,7 @@ def distr_ccx_ccz_cswap(instr: dict, upper_circuit: CunqaCircuit, lower_circuit:
 
     else:
         # Any other valid configuration is complementary to these ones
-        logger.error(f"Too many qubits were sent to distr_ccx: {len(circ_and_qubits1) + len(circ_and_qubits2) - 2}")
+        logger.error(f"Too many qubits were sent to distr_ccx: {qubits1, qubits2}")
         raise IndexError
 
 
