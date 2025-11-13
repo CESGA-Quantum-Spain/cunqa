@@ -1,0 +1,6 @@
+cunqa.circuit.circuit.transitive\_combinations
+==============================================
+
+.. currentmodule:: cunqa.circuit.circuit
+
+.. autofunction:: transitive_combinations

@@ -1,0 +1,6 @@
+cunqa.circuit.converters.convert
+================================
+
+.. currentmodule:: cunqa.circuit.converters
+
+.. autofunction:: convert

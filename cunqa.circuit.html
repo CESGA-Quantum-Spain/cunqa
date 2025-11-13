@@ -24,7 +24,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cunqa.circuit.ControlContext" href="cunqa.circuit.ControlContext.html" />
+    <link rel="next" title="cunqa.circuit.circuit" href="cunqa.circuit.circuit.html" />
     <link rel="prev" title="cunqa.backend.BackendData" href="cunqa.backend.BackendData.html" /> 
 </head>
 
@@ -74,16 +74,9 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">cunqa.circuit</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#building-circuits">Building circuits</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.ControlContext.html">cunqa.circuit.ControlContext</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit.html">cunqa.circuit.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.converters.html">cunqa.circuit.converters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -190,74 +183,20 @@
              
   <section id="module-cunqa.circuit">
 <span id="cunqa-circuit"></span><h1>cunqa.circuit<a class="headerlink" href="#module-cunqa.circuit" title="Link to this heading"></a></h1>
-<p>Holds CUNQA’s custom circuit class and functions to translate its instructions into other formats for circuit definition.</p>
-<section id="building-circuits">
-<h2>Building circuits<a class="headerlink" href="#building-circuits" title="Link to this heading"></a></h2>
-<p>Users can define a circuit using <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> to then send it to the virtual QPUs.
-Nevertheless, for the case in which no communications are needed among the circuits sent,  <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> is also allowed.
-Be aware that some instructions might not be supported for <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, for the list of supported instructions check its documentation.
-Module py:mod:<cite>cunqa.converters</cite> contains functions to transform between circuit formats.</p>
-</section>
-<section id="circuits-by-json-dict-format">
-<h2>Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format<a class="headerlink" href="#circuits-by-json-dict-format" title="Link to this heading"></a></h2>
-<p>A low level way of representing a circuit is by a json <code class="docutils literal notranslate"><span class="pre">dict</span></code> with specefic fields that gather the information
-needed by the simulator in order to run the circuit.</p>
-<p>This structe is presented below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="c1"># circuit identificator</span>
- <span class="s2">&quot;is_parametric&quot;</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="c1"># weather if the circuit has parametric instructions that can be updated</span>
- <span class="s2">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="c1"># weather if the circuit has intermediate measurements or conditioned operations</span>
- <span class="s2">&quot;instructions&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="c1"># list of instructions of the circuit in dict format</span>
- <span class="s2">&quot;num_qubits&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="c1"># number of qubits of the circuit</span>
- <span class="s2">&quot;num_clbits&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="c1"># number of classical bits of the circuit</span>
- <span class="s2">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="c1"># dict specifying the grouping of the qubits in registers</span>
- <span class="s2">&quot;classical_registers&quot;</span><span class="p">:</span><span class="nb">dict</span> <span class="c1"># dict specifying the grouping of the classical bits in registers</span>
- <span class="p">}</span>
-</pre></div>
-</div>
-<p>On the other hand, instructions have some mandatory and optional keys:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="c1"># MANDATORY, name of the instruction, has to be accepted by the simulator</span>
- <span class="s2">&quot;qubits&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="c1"># MANDATORY, qubits on which the instruction acts</span>
- <span class="s2">&quot;params&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[[</span><span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="p">]]],</span> <span class="c1"># OPTIONAL, only required for parametric gates and for &#39;unitary&#39; instruction.</span>
- <span class="s2">&quot;clbits&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="c1"># OPTINAL, any classical bits used in the instruction</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>For classical and quantum communications among circuits, we do not recomend working at such low level format, users rather
-describe this operations through the <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> class. If curious, you can always
-create the <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> and obtain its intructions by its attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">instructions</span></code>,
-or you can convert it to the json <cite>dict</cite> format by the <a class="reference internal" href="cunqa.converters.convert.html#cunqa.converters.convert" title="cunqa.converters.convert"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert()</span></code></a> function.</p>
-<section id="references">
-<h3>References:<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit">qiskit.QuantumCircuit</a> documentation.</p>
-</aside>
-</aside>
-</section>
-</section>
-<h2> Classes </h2><table class="autosummary longtable docutils align-default">
+<h2> Modules </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
 <col style="width: 90.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.ControlContext.html#cunqa.circuit.ControlContext" title="cunqa.circuit.ControlContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControlContext</span></code></a></p></td>
-<td><p>Class to manage the controlled telegate operations from a circuit/virtual QPU to another.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.circuit.html#module-cunqa.circuit.circuit" title="cunqa.circuit.circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circuit</span></code></a></p></td>
+<td><p>Holds CUNQA's custom circuit class and functions to translate its instructions into other formats for circuit definition.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a></p></td>
-<td><p>Class to define a quantum circuit for the <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> api.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.circuit_extensions.html#module-cunqa.circuit.circuit_extensions" title="cunqa.circuit.circuit_extensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circuit_extensions</span></code></a></p></td>
+<td><p>Holds dunder methods for the class CunqaCircuit and other functions to extract information from it.</p></td>
 </tr>
-</tbody>
-</table>
-<h2> Exceptions </h2><table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10.0%" />
-<col style="width: 90.0%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html#cunqa.circuit.CunqaCircuitError" title="cunqa.circuit.CunqaCircuitError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CunqaCircuitError</span></code></a></p></td>
-<td><p>Exception for error during circuit desing at <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.converters.html#module-cunqa.circuit.converters" title="cunqa.circuit.converters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">converters</span></code></a></p></td>
+<td><p>Holds functions for converting circuits into the different formats: <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code> and json <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -268,7 +207,7 @@ or you can convert it to the json <cite>dict</cite> format by the <a class="refe
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cunqa.backend.BackendData.html" class="btn btn-neutral float-left" title="cunqa.backend.BackendData" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.circuit.ControlContext.html" class="btn btn-neutral float-right" title="cunqa.circuit.ControlContext" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.circuit.circuit.html" class="btn btn-neutral float-right" title="cunqa.circuit.circuit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

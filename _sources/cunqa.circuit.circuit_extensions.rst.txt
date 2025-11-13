@@ -1,0 +1,46 @@
+cunqa.circuit.circuit\_extensions
+=================================
+
+.. automodule:: cunqa.circuit.circuit_extensions
+
+   
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Functions </h2>
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+      :recursive:
+   
+      cunqa_dunder_methods
+      distr_ccx_ccz_cswap
+      distr_rzz_rxx_ryy_rzx
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Exceptions </h2>
+
+   .. autosummary::
+      :toctree:
+      :recursive:
+   
+      HorizontalDivisionError
+   
+   
+
+
+

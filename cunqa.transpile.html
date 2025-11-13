@@ -74,16 +74,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.ControlContext.html">cunqa.circuit.ControlContext</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit.html">cunqa.circuit.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.converters.html">cunqa.circuit.converters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -193,7 +186,7 @@
 <p>Holds the <a class="reference internal" href="cunqa.transpile.transpiler.html#cunqa.transpile.transpiler" title="cunqa.transpile.transpiler"><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code></a> function that translates circuit instructions into native instructions that a certain virtual QPU understands.</p>
 <p>It is important and it is assumed that the circuit that is sent to the virtual QPU for its simulation is transplated into the propper native gates
 and adapted to te backend’s topology.</p>
-<p>Once the user has decribed the circuit <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> or json <code class="docutils literal notranslate"><span class="pre">dict</span></code>,
+<p>Once the user has decribed the circuit <code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> or json <code class="docutils literal notranslate"><span class="pre">dict</span></code>,
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> provides two alternatives for transpiling it accordingly to a certain backend:</p>
 <blockquote>
 <div><ul>

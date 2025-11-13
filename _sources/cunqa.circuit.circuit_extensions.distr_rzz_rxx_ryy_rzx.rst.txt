@@ -1,0 +1,6 @@
+cunqa.circuit.circuit\_extensions.distr\_rzz\_rxx\_ryy\_rzx
+===========================================================
+
+.. currentmodule:: cunqa.circuit.circuit_extensions
+
+.. autofunction:: distr_rzz_rxx_ryy_rzx

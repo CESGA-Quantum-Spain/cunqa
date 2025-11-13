@@ -1,0 +1,6 @@
+cunqa.circuit.circuit\_extensions.cunqa\_dunder\_methods
+========================================================
+
+.. currentmodule:: cunqa.circuit.circuit_extensions
+
+.. autofunction:: cunqa_dunder_methods

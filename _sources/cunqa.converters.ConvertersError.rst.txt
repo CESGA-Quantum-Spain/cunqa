@@ -1,6 +1,0 @@
-cunqa.converters.ConvertersError
-================================
-
-.. currentmodule:: cunqa.converters
-
-.. autoexception:: ConvertersError

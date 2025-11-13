@@ -13,34 +13,25 @@
 
    
    
-   .. raw:: html
-
-      <h2> Classes </h2>
-
-   .. autosummary::
-      :toctree:
-      :template: custom-class-template.rst
-      :nosignatures:
-      :recursive:
-   
-      ControlContext
-      CunqaCircuit
-   
    
 
    
    
-   .. raw:: html
-
-      <h2> Exceptions </h2>
-
-   .. autosummary::
-      :toctree:
-      :recursive:
-   
-      CunqaCircuitError
-   
    
 
 
+
+.. raw:: html
+
+   <h2> Modules </h2>
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+
+   circuit
+   circuit_extensions
+   converters
 

@@ -74,16 +74,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#building-circuits">Building circuits</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html#circuits-by-json-dict-format">Circuits by json <code class="docutils literal notranslate"><span class="pre">dict</span></code> format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.ControlContext.html">cunqa.circuit.ControlContext</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuit.html">cunqa.circuit.CunqaCircuit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.CunqaCircuitError.html">cunqa.circuit.CunqaCircuitError</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cunqa.converters.html">cunqa.converters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.convert.html">cunqa.converters.convert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.converters.ConvertersError.html">cunqa.converters.ConvertersError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit.html">cunqa.circuit.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.converters.html">cunqa.circuit.converters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -203,7 +196,7 @@ since it is used in the process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> | <a class="reference internal" href="cunqa.circuit.CunqaCircuit.html#cunqa.circuit.CunqaCircuit" title="cunqa.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>) – circuit to be transpiled.</p></li>
+<li><p><strong>circuit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code>) – circuit to be transpiled.</p></li>
 <li><p><strong>backend</strong> (<a class="reference internal" href="cunqa.backend.Backend.html#cunqa.backend.Backend" title="cunqa.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>) – backend which transpilation will be done respect to.</p></li>
 <li><p><strong>opt_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – optimization level for creating the <cite>qiskit.transpiler.passmanager.StagedPassManager</cite>. Default set to 1.</p></li>
 <li><p><strong>initial_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.</p></li>

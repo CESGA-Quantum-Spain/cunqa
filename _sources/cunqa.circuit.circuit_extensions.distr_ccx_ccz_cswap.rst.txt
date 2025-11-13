@@ -1,0 +1,6 @@
+cunqa.circuit.circuit\_extensions.distr\_ccx\_ccz\_cswap
+========================================================
+
+.. currentmodule:: cunqa.circuit.circuit_extensions
+
+.. autofunction:: distr_ccx_ccz_cswap
