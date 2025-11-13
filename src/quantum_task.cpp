@@ -92,18 +92,11 @@ void QuantumTask::update_params_(const std::vector<double> params)
                     break;
                 // Three parameter gates 
                 case cunqa::constants::U:
-                    instruction.at("params")[0] = params[counter];
-                    instruction.at("params")[1] = params[counter + 1];
-                    instruction.at("params")[2] = params[counter + 2];
-                    counter = counter + 3;
-                    break;
-                // Four parameter gates
                 case cunqa::constants::CU:
                     instruction.at("params")[0] = params[counter];
                     instruction.at("params")[1] = params[counter + 1];
                     instruction.at("params")[2] = params[counter + 2];
-                    instruction.at("params")[3] = params[counter + 3];
-                    counter = counter + 4;
+                    counter = counter + 3;
                     break;
                 default:
                     break;

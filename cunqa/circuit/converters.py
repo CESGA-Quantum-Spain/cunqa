@@ -134,9 +134,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "quantum_registers":quantum_registers,
             "classical_registers":classical_registers
         }
-        if _is_parametric(qc):
-            json_data["current_params"] = []
-            json_data["param_labels"] = []
 
         for instruction in qc.data:
             qreg = [r._register.name for r in instruction.qubits]
@@ -153,30 +150,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
                                                 "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
                                                 })
             elif instruction.name != "measure":
-                # Process instructions to avoid unhandled Parameters 
-                params = instruction.params
-                for i, param in enumerate(params):
-                    if isinstance(param, Parameter):
-
-                        label = str(param._symbol_expr)
-                        json_data["current_params"].append( label )
-                        json_data["param_labels"].append( label )
-                        params[i]= label
-
-                    elif isinstance(param, ParameterExpression):
-
-                        labels = tuple(str(name) for name in param._names.keys())
-                        json_data["current_params"].append( labels )
-                        json_data["param_labels"].append( labels )
-                        # TODO: add a third list with (lambda) functions to be applied to each parameter before updating?
-                        params[i]= labels
-
-                    else:
-                        json_data["current_params"].append( param )
-                        json_data["param_labels"].append( "no_name" )
-                        # No modification on params needed
-
-
 
                 if (instruction.operation._condition != None):
                     json_data["is_dynamic"] = True
@@ -320,15 +293,6 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
             if instruction['name'] != 'measure':
                 if 'params' in instruction:
                     params = instruction['params']
-                    
-                    if "param_labels" in circuit:
-                        for i in range(len(params)):
-                            label = circuit["param_labels"][param_counter + i]
-                            if label != "no_name":
-                                params[i] = Parameter(label)
-
-                    # TODO: should we keep current_params? how to return them?
-                    param_counter += len(params)
 
                 else:
                     params = []
@@ -342,7 +306,8 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     clbits = ()
                     )
                 qc.append(inst)
-            elif instruction['name'] == 'measure':
+
+            else: #measure
                 bit = instruction['clbits'][0]
                 if bit in bits: # checking that the bit referenced in the instruction it actually belongs to a register
                     for k,v in classical_registers.items():
