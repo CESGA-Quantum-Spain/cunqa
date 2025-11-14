@@ -19,8 +19,6 @@ cunqa.circuit.converters
       :recursive:
    
       convert
-      cunqac_to_json
-      cunqac_to_qc
    
    
 

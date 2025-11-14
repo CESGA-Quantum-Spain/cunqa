@@ -9,17 +9,6 @@ cunqa.circuit.circuit
 
    
    
-   .. raw:: html
-
-      <h2> Functions </h2>
-
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-      :recursive:
-   
-      transitive_combinations
-   
    
 
    
