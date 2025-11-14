@@ -20,6 +20,16 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
 endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 
+# Check that $STORE exists
+if(NOT DEFINED ENV{STORE})
+    message(FATAL_ERROR "The STORE environment variable is not defined")
+endif()
+set(CUNQA_PATH "$ENV{STORE}/.cunqa")
+set(QPUS_FILEPATH "$ENV{STORE}/.cunqa/qpus.json")
+set(COMM_FILEPATH "$ENV{STORE}/.cunqa/communications.json")
+include_directories("${CMAKE_BINARY_DIR}/src")
+
+
 # Set INSTALL paths
 # TODO: I put this if 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
@@ -31,13 +41,11 @@ set(CMAKE_INSTALL_LIBDIR "lib")
 set(CMAKE_INSTALL_BINDIR "bin")
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
-# System name to identify cluster
+# Fine tuning for CESGA machines (pybind11 cannot be found by default)
 set(SYSTEM_NAME $ENV{LMOD_SYSTEM_NAME})
 if(NOT SYSTEM_NAME OR NOT (SYSTEM_NAME STREQUAL "QMIO" OR SYSTEM_NAME STREQUAL "FT3"))
-    set(SYSTEM_NAME "MY_CLUSTER")
+    set(SYSTEM_NAME "EXTERNAL_CLUSTER")
 endif()
-message(STATUS "SYSTEM NAME: ${SYSTEM_NAME}")
-add_compile_definitions(SYSTEM_NAME="${SYSTEM_NAME}")
 
 if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.13.6-python-3.11.9/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
@@ -49,7 +57,7 @@ elseif(${SYSTEM_NAME} STREQUAL "FT3")
   find_package(Python 3.10.8 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
-elseif(${SYSTEM_NAME} STREQUAL "MY_CLUSTER") # Other clusters
+else() # Other clusters
   find_package(Python 3.10.8 COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
 endif()

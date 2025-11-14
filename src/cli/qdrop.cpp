@@ -12,6 +12,7 @@
 
 #include "argparse/argparse.hpp"
 //#include "logger.hpp"
+#include "utils/constants.hpp"
 #include "utils/json.hpp"
 
 using namespace std::literals;
@@ -31,9 +32,7 @@ struct Job {
 
 
 cunqa::JSON read_qpus_json() {
-    std::string store = getenv("STORE");
-    const std::string filepath = store + "/.cunqa/qpus.json"s;
-    std::ifstream in(filepath);
+    std::ifstream in(cunqa::constants::QPUS_FILEPATH);
     cunqa::JSON j;
     in >> j;
     return j;

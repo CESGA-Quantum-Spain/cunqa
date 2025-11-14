@@ -41,10 +41,8 @@ JSON CunqaQCSimulator::execute(const QCBackend& backend, const QuantumTask& quan
 
 void CunqaQCSimulator::write_executor_endpoint(const std::string endpoint, const std::string& group_id)
 {
-    const std::string store = getenv("STORE");
-    const std::string filename = store + "/.cunqa/communications.json";
     try {
-        int file = open(filename.c_str(), O_RDWR | O_CREAT, 0666);
+        int file = open(constants::COMM_FILEPATH.c_str(), O_RDWR | O_CREAT, 0666);
         if (file == -1) {
             std::cerr << "Error al abrir el archivo" << std::endl;
             return;
@@ -52,7 +50,7 @@ void CunqaQCSimulator::write_executor_endpoint(const std::string endpoint, const
         flock(file, LOCK_EX);
 
         JSON j;
-        std::ifstream file_in(filename);
+        std::ifstream file_in(constants::COMM_FILEPATH);
 
         if (file_in.peek() != std::ifstream::traits_type::eof())
             file_in >> j;
@@ -65,7 +63,7 @@ void CunqaQCSimulator::write_executor_endpoint(const std::string endpoint, const
         
         j[task_id]["executor_endpoint"] = endpoint;
 
-        std::ofstream file_out(filename, std::ios::trunc);
+        std::ofstream file_out(constants::COMM_FILEPATH, std::ios::trunc);
         file_out << j.dump(4);
         file_out.close();
 

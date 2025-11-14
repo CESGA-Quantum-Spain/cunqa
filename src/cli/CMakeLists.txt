@@ -39,9 +39,12 @@ install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 add_executable(erase_key erase_key.cpp)
 target_link_libraries(erase_key PRIVATE json)
 install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
-file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
-install(FILES ${NOISE_SCRIPTS} DESTINATION "$ENV{STORE}/.cunqa/noise_model")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh"
+    @ONLY
+)
+install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
 

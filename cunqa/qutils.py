@@ -82,20 +82,12 @@ from typing import Union, Optional
 from subprocess import run
 from json import load
 import json
+
 from cunqa.qclient import QClient
 from cunqa.backend import Backend
 from cunqa.logger import logger
 from cunqa.qpu import QPU
-
-# Adding python folder path to detect modules
-sys.path.append(os.getenv("HOME"))
-
-STORE: Optional[str] = os.getenv("STORE")
-if STORE is not None:
-    INFO_PATH = STORE + "/.cunqa/qpus.json"
-else:
-    logger.error(f"Cannot find $STORE enviroment variable.")
-    raise SystemExit
+from cunqa.constants import QPUS_FILEPATH
 
 class QRaiseError(Exception):
     """Exception for errors during qraise slurm command."""
@@ -197,8 +189,8 @@ def qraise(n, t, *,
         if SLURMD_NODENAME != None:
             command = command + "\""
 
-        if not os.path.exists(INFO_PATH):
-           with open(INFO_PATH, "w") as file:
+        if not os.path.exists(QPUS_FILEPATH):
+           with open(QPUS_FILEPATH, "w") as file:
                 file.write("{}")
 
         print(f"Command: {command}")
@@ -214,7 +206,7 @@ def qraise(n, t, *,
             state = run(cmd_getstate, capture_output=True, text=True, check=True).stdout.strip()
             if state == "RUNNING":
                 try:     
-                    with open(INFO_PATH, "r") as file:
+                    with open(QPUS_FILEPATH, "r") as file:
                         data = json.load(file)
                 except json.JSONDecodeError:
                     continue
@@ -272,7 +264,7 @@ def nodes_with_QPUs() -> "list[str]":
         List of the corresponding node names.
     """
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
 
         node_names = set()
@@ -302,7 +294,7 @@ def info_QPUs(on_node: bool = True, node_name: Optional[str] = None) -> "list[di
     """
 
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
             if len(qpus_json) == 0:
                 logger.warning(f"No QPUs were found.")
@@ -363,7 +355,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
 
     # access raised QPUs information on qpu.json file
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
             if len(qpus_json) == 0:
                 logger.error(f"No QPUs were found.")

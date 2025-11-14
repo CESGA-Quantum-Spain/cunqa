@@ -1,3 +1,4 @@
+#include "utils/constants.hpp"
 #include "utils/json.hpp"
 #include <iostream>
 #include "comm/client.hpp"
@@ -37,7 +38,8 @@ using namespace cunqa::comm;
 
 int main(int argc, char *argv[])
 {
-    Client cliente{};
+    std::cout << cunqa::constants::CUNQA_PATH << "\n";
+    /*Client cliente{};
 
     if(argc == 3) {
         cliente.connect(argv[1]);
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
         auto result = cliente.recv_results();
         std::cout << result << "\n";
     } else
-        std::cerr << "ERROR: Not introduced correct arguments.\n"; 
+        std::cerr << "ERROR: Not introduced correct arguments.\n"; */
     
     
     return 0;

@@ -20,8 +20,6 @@ namespace {
 void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     //------------------ Variables block ----------------------------
-    auto store = std::getenv("STORE");
-
     JSON infrastructure;
     std::ifstream f(args.infrastructure.value());
     infrastructure = JSON::parse(f);
@@ -90,14 +88,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
 
 
     // ------ Directory and enviroment variables block -------
-    sbatchFile << "\n";
-    sbatchFile << "if [ ! -d \"$STORE/.cunqa\" ]; then\n";
-    sbatchFile << "mkdir $STORE/.cunqa\n";
-    sbatchFile << "fi\n\n";
-
-    sbatchFile << "EPILOG_PATH=" << store << "/.cunqa/epilog.sh\n";
-    sbatchFile << "export INFO_PATH=" << store << "/.cunqa/qpus.json\n";
-    sbatchFile << "export COMM_PATH=" << store << "/.cunqa/communications.json\n\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
     //--------------------------------------------------------
 
 
@@ -131,7 +122,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         }
         qpus_path += R"(}})";
 
-        sbatchFile << "srun -n " + std::to_string(qc_group.size()) + " -c 1 --mem-per-cpu=1G --resv-ports=" + std::to_string(n_ports) + " --exclusive --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH co_located qc " + qc_group[0] + " " + simulator + " \'" + qpus_path + "\' &\n";
+        sbatchFile << "srun -n " + std::to_string(qc_group.size()) + " -c 1 --mem-per-cpu=1G --resv-ports=" + std::to_string(n_ports) + " --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located qc " + qc_group[0] + " " + simulator + " \'" + qpus_path + "\' &\n";
 
         sbatchFile << "sleep 1\n";
 
@@ -161,7 +152,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         backend_path = qpus.at(cc_qpu).at("backend").get<std::string>();
         qpus_path = R"({"backend_from_infrastructure":{")" + cc_qpu + "\":\"" + backend_path + R"("}})";
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --resv-ports=2 --exclusive --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH co_located cc " + cc_qpu + " " + simulator + " \'" + qpus_path + "\'";
+        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --resv-ports=2 --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located cc " + cc_qpu + " " + simulator + " \'" + qpus_path + "\'";
 
         written_qpus.push_back(cc_qpu);
         n_cc_qpus++;    
@@ -190,7 +181,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         backend_path = properties.at("backend").get<std::string>();
         qpus_path = R"({"backend_from_infrastructure":{")" + name + "\":\"" + backend_path +  R"("}})" ;
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH co_located no_comm "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
+        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located no_comm "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
         
     }
     //--------------------------------------------------

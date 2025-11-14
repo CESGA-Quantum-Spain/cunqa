@@ -124,13 +124,11 @@ ClassicalChannel::~ClassicalChannel() = default;
 //-------------------------------------------------
 void ClassicalChannel::publish(const std::string& suffix) 
 {
-    const std::string store = getenv("STORE");
-    const std::string filepath = store + "/.cunqa/communications.json"s;
     JSON communications_endpoint = 
     {
         {"communications_endpoint", endpoint}
     };
-    write_on_file(communications_endpoint, filepath, suffix);
+    write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
 }
 
 

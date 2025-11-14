@@ -71,18 +71,6 @@ from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.transpile import transpiler, TranspileError
 
-# path to access to json file holding information about the raised QPUs
-INFO_PATH: Optional[str] = os.getenv("INFO_PATH")
-if INFO_PATH is None:
-    STORE: Optional[str] = os.getenv("STORE")
-    if STORE is not None:
-        INFO_PATH = STORE + "/.cunqa/qpus.json"
-    else:
-        logger.error(f"Cannot find $STORE enviroment variable.")
-        raise SystemExit
-
-
-
 class QPU:
     """
     Class to represent a virtual QPU deployed for user interaction.

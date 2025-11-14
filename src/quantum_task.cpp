@@ -48,9 +48,7 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
         id = quantum_task_json.at("id");
 
         if (has_cc) {
-            const char* STORE = std::getenv("STORE");
-            std::string filepath = std::string(STORE) + "/.cunqa/communications.json";
-            std::ifstream communications_file(filepath); 
+            std::ifstream communications_file(constants::COMM_FILEPATH); 
             // TODO: Manage behaviour when file is not well opened
 
             JSON communications;

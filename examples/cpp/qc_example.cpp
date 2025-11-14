@@ -1,7 +1,9 @@
-#include "utils/json.hpp"
 #include <iostream>
-#include "comm/client.hpp"
 #include <string>
+
+#include "comm/client.hpp"
+#include "utils/json.hpp"
+#include "utils/constants.hpp"
 
 std::string circuit1 = R"(
 {
@@ -80,9 +82,7 @@ cunqa::JSON read_file(const std::string& filename)
 
 int main()
 {
-    const auto store = getenv("STORE");
-    const std::string filepath = store + "/.cunqa/qpus.json"s;
-    cunqa::JSON qpus = read_file(filepath);
+    cunqa::JSON qpus = read_file(cunqa::constants::QPUS_FILEPATH);
 
     std::vector<Client> clients(3);
     std::vector<std::string> circuits{circuit1, circuit2, std::string()};

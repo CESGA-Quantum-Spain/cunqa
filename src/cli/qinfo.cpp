@@ -7,6 +7,7 @@
 #include <map>
 
 #include "utils/json.hpp"
+#include "utils/constants.hpp"
 #include "argparse/argparse.hpp"
 #include "logger.hpp"
 
@@ -28,10 +29,7 @@ int main(int argc, char* argv[]) {
 
     auto args = argparse::parse<CunqaArgs>(argc, argv);
 
-    const char* store = std::getenv("STORE");
-    std::string info_path = std::string(store) + "/.cunqa/qpus.json";
-
-    std::ifstream file(info_path);
+    std::ifstream file(cunqa::constants::QPUS_FILEPATH);
     if (!file.is_open()) {
         std::cerr << "\033[31mCould not open the QPUs info file! Check if there are deployed QPUs. \033[0m " << "\n";
         return 1;
