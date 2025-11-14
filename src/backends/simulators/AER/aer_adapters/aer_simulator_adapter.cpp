@@ -103,7 +103,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         {
             uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
             std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
-            LOGGER_DEBUG("La medida se guarda en {} con valor {}", clbits[0] + T.zero_qubit, measurement == 1);
+            LOGGER_DEBUG("Measure is stored on register {} with value {}", clbits[0] + T.zero_qubit, measurement == 1);
             G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
             G.creg[clbits[0]] = (measurement == 1);
             break;
