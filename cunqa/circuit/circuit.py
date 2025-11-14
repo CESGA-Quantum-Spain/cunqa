@@ -90,6 +90,7 @@ SUPPORTED_GATES_PARAMETRIC_1 = ["u1", "p", "rx", "ry", "rz", "rxx", "ryy", "rzz"
 SUPPORTED_GATES_PARAMETRIC_2 = ["u2", "r"]
 SUPPORTED_GATES_PARAMETRIC_3 = ["u", "u3", "cu3"]
 SUPPORTED_GATES_PARAMETRIC_4 = ["cu"]
+SUPPORTED_GATES_CONDITIONAL = ["c_if_unitary","c_if_h", "c_if_x","c_if_y","c_if_z","c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "c_if_ecr"]
 SUPPORTED_GATES_DISTRIBUTED = ["measure_and_send", "recv"]
 SUPPORTED_GATES_QDISTRIBUTED = ["qsend", "qrecv", "expose", "rcontrol"]
 
@@ -121,7 +122,7 @@ class InstanceTrackerMeta(type):
             # sending_to has the circuits where you send but not the received ones, the graph is directed. We use sets to undirect the graph
             first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
             # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest level transitivity is addressed
-            cls._connected = transitive_combinations(first_connections) 
+            cls._connected = _transitive_combinations(first_connections) 
             cls._new_inst = False
 
         return cls._connected
@@ -294,7 +295,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
     sending_to: "list[str]" #: List of circuit ids to which the current circuit is sending measurement outcomes or qubits. 
 
 
-    def __init__(self, num_qubits: int, num_clbits: Optional[int] = None, id: Optional[str] = None):
+    def __init__(self, num_qubits: int = None, num_clbits: Optional[int] = None, id: Optional[str] = None):
 
         """
         Class constructor to create a CunqaCirucit. Only the ``num_qubits`` argument is mandatory, also ``num_clbits`` can be provided if there is intention to incorporate intermediate measurements.
@@ -313,14 +314,17 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.has_qc = False
         self.is_dynamic = False
         self.instructions = []
-        self.quantum_regs = {'q0':[q for q in range(num_qubits)]}
+
+        self.quantum_regs = {}
+        if num_qubits is not None:
+            self._add_q_register("q0", num_qubits)
+        
         self.classical_regs = {}
+        if num_clbits is not None:
+            self._add_cl_register("c0", num_clbits)
+
         self.sending_to = []
         self._telegate = None
-
-        if not isinstance(num_qubits, int):
-            logger.error(f"num_qubits must be an int, but a {type(num_qubits)} was provided [TypeError].")
-            raise SystemExit
         
         self.is_parametric = False 
 
@@ -335,14 +339,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"id must be a str, but a {type(id)} was provided [TypeError].")
             raise SystemExit
-
-        if num_clbits is None:
-            self.classical_regs = {}
-        
-        elif isinstance(num_clbits, int):
-            self.classical_regs = {'c0':[c for c in range(num_clbits)]}
-
-
 
     @property
     def info(self) -> dict:
@@ -408,7 +404,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             self._add_instruction(instruction)
         return self
 
-
     def _add_instruction(self, instruction):
         """
         Class method to add an instruction to the CunqaCircuit.
@@ -466,7 +461,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                 elif (instruction["name"] == "recv"):
                     gate_qubits = 0
 
-                elif any([instruction["name"] == u for u in ["unitary", "c_if_unitary", "remote_c_if_unitary"]]) and ("params" in instruction):
+                elif any([instruction["name"] == u for u in ["unitary"]]) and ("params" in instruction):
                     # in previous method, format of the matrix is checked, a list must be passed with the correct length given the number of qubits
                     gate_qubits = int(np.log2(len(instruction["params"][0])))
                     if not instruction["name"] == "unitary":
@@ -581,7 +576,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             new_name = name
 
-        self.quantum_regs[new_name] = [(self.num_qubits + 1 + i) for i in range(number_qubits)]
+        self.quantum_regs[new_name] = [(self.num_qubits + i) for i in range(number_qubits)]
 
         return new_name
 
@@ -1188,7 +1183,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "params":[theta, phi, lam, gamma]
         })
     
-
     # methods for implementing conditional LOCAL gates
     def unitary(self, matrix: "list[list[list[complex]]]", *qubits: int) -> None:
         """
@@ -1217,7 +1211,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "params":[matrix]
         })
 
-    def multicontrol(self, base_gate: str, num_ctrl_qubits: int, qubits: list[int], params: list[float, int, "Parameter"] = []):
+    def multicontrol(self, base_gate: str, num_ctrl_qubits: int, qubits: list[int], params: list[float, int] = []):
         """
         Class method to apply a multicontrolled gate to the given qubits.
 
@@ -1227,7 +1221,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             qubits (list[int]): qubits in which the gate is applied, first num_ctrl_qubits will be the control qubits and the remaining the target qubits.
             params (list[float | int | Parameter]): list of parameters for the gate.
             
-        .. warning:: This instructions is currently only running with AER.
+        .. warning:: This instructions is currently only supported for Aer simulator.
         """
         mgate_name = "mc" + base_gate
 
@@ -1298,7 +1292,6 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             param (float | int): parameter for the case parametric gate is provided.
 
             matrix (list | numpy.ndarray): unitary operator in matrix form to be applied to the given qubits.
-
         """
 
         self.is_dynamic = True
@@ -1339,8 +1332,8 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             self.measure(list_control_qubit[0], list_control_qubit[0])
             self._add_instruction({
                 "name": name,
-                "qubits": _flatten([list_target_qubit, list_control_qubit]),
-                "registers":_flatten([list_control_qubit]),
+                "qubits": _flatten([list_target_qubit]),
+                "conditional_reg":_flatten([list_control_qubit]),
                 "params":[matrix]
             })
             # we have to exit here
@@ -1354,7 +1347,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             logger.error(f"instruction {gate} does not suppor matrix.")
             raise SystemExit
 
-        
+        # TODO: move this checkpoints to _check_instruction method
         if gate in SUPPORTED_GATES_PARAMETRIC_1:
             if param is None:
                 logger.error(f"Since a parametric gate was provided ({gate}) a parameter should be passed [ValueError].")
@@ -1369,15 +1362,13 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                 logger.warning("A parameter was provided but gate is not parametric, therefore it will be ignored.")
             list_param = []
 
-
-        
         if name in SUPPORTED_GATES_CONDITIONAL:
 
             self.measure(list_control_qubit[0], list_control_qubit[0])
             self._add_instruction({
-                "name": name,
-                "qubits": _flatten([list_target_qubit, list_control_qubit]),
-                "conditional_reg":_flatten([list_control_qubit]),
+                "name": gate,
+                "qubits": _flatten([list_target_qubit]),
+                "conditional_reg": list_control_qubit,
                 "params":list_param
             })
 
@@ -1432,7 +1423,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             target_circuit_id = target_circuit
 
         elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit.id
+            target_circuit_id = target_circuit._id
         else:
             logger.error(f"target_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(target_circuit)} was provided [TypeError].")
             raise SystemExit
@@ -1483,14 +1474,14 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             params = []
 
         if control_circuit is None:
-            logger.error("target_circuit not provided.")
+            logger.error("control_circuit not provided.")
             raise SystemExit
         
         elif isinstance(control_circuit, str):
             control_circuit = control_circuit
 
         elif isinstance(control_circuit, CunqaCircuit):
-            control_circuit = control_circuit.id
+            control_circuit = control_circuit._id
         else:
             logger.error(f"control_circuit must be str or <class 'cunqa.circuit.CunqaCircuit'>, but {type(control_circuit)} was provided [TypeError].")
             raise SystemExit
@@ -1704,7 +1695,7 @@ def _flatten(lists: list[list]):
     return [element for sublist in lists for element in sublist]
    
 
-def transitive_combinations(pairs: set) -> set:
+def _transitive_combinations(pairs: set) -> set:
     """
     Method used to find deep connectivity between circuits from first order connections. Used on CunqaCircuit's metaclass.
     """
