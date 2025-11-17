@@ -66,8 +66,8 @@
   - [INSTALLATION](#installation)
     - [Clone repository](#clone-repository)
     - [Define STORE environment variable](#clone-repository)
-    - [Configure, build and install](#configure-build-and-install)
     - [Dependencies](#dependencies)
+    - [Configure, build and install](#configure-build-and-install)
     - [Install as Lmod module](#install-as-lmod-module)
   - [UNINSTALL](#uninstall)
   - [RUN YOUR FIRST DISTRIBUTED PROGRAM](#run-your-first-distributed-program)
@@ -96,23 +96,6 @@ Before doing any kind of compilation, the user has to define the `STORE` environ
 
 ```console
 export STORE=/path/to/your/store
-```
-
-### Configure, build and install
-Now, as with any other CMake project, is can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined and, if not, its will be the HOME environment variable value. 
-
-```console
-cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
-cmake --build build/ --parallel $(nproc)
-cmake --install build/
-```
-
-It is important to mention that the user can also employ [Ninja](https://ninja-build.org/) to perform this task.
-
-```console
-cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
-ninja -C build -j $(nproc)
-cmake --install build/
 ```
 
 ### Dependencies
@@ -153,6 +136,28 @@ And, finally, **the ones that will be installed**.
 argparse        -
 qiskit-aer      0.17.2 (modified version)
 ``` 
+
+### Configure, build and install
+Now, as with any other CMake project, is can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined and, if not, its will be the HOME environment variable value. 
+
+```console
+cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
+cmake --build build/ --parallel $(nproc)
+cmake --install build/
+```
+
+It is important to mention that the user can also employ [Ninja](https://ninja-build.org/) to perform this task.
+
+```console
+cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
+ninja -C build -j $(nproc)
+cmake --install build/
+```
+
+Alternatively, you can use the `configure.sh` file, but only after all the dependencies have been solved.
+```console
+source configure.sh /your/installation/path
+```
 
 ### Install as Lmod module
 Cunqa is available as Lmod module in CESGA. To use it all you have to do is:

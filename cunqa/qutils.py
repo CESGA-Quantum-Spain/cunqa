@@ -157,7 +157,7 @@ def qraise(n, t, *,
     else: 
         logger.warning("Be careful, you are deploying QPUs from an interactive session.")
         HOSTNAME = os.getenv("HOSTNAME")
-        command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {t}"
+        command = f"qraise -n {n} -t {t}"
 
     try:
         # Add specified flags
@@ -186,16 +186,13 @@ def qraise(n, t, *,
         if backend is not None:
             command = command + f" --backend={str(backend)}"
 
-        if SLURMD_NODENAME != None:
-            command = command + "\""
-
         if not os.path.exists(QPUS_FILEPATH):
            with open(QPUS_FILEPATH, "w") as file:
                 file.write("{}")
 
         print(f"Command: {command}")
 
-        output = run(command, shell=True, capture_output=True, text=True).stdout #run the command on terminal and capture its output on the variable 'output'
+        output = run(command, capture_output=True, shell=True, text=True).stdout #run the command on terminal and capture its output on the variable 'output'
         logger.info(output)
         job_id = ''.join(e for e in str(output) if e.isdecimal()) #sees the output on the console (looks like 'Submitted sbatch job 136285') and selects the number
         
