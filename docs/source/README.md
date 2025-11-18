@@ -204,7 +204,7 @@ So, for instance, the command
 qraise -n 4 -t 01:20:30
 ``` 
 will raise four QPUs during at most 1 hour, 20 minutes and 30 seconds. The time format is `hh:mm:ss`.
-> [!NOTE]  
+> 📘 **Note:**
 > By default, all the QPUs will be raised with [AerSimulator](https://github.com/Qiskit/qiskit-aer) as the background simulator and IdealAer as the background backend. That is, a backend of 32 qubits, all connected and without noise.
 2. The simulator and the backend configuration can be set by the user through `qraise` FLAGs:
 
@@ -228,16 +228,16 @@ The personalized backend has to be a *json* file with the following structure:
 ```json
 {"backend":{"name": "BackendExample", "version": "0.0", "n_qubits": 32,"url": "", "is_simulator": true, "conditional": true, "memory": true, "max_shots": 1000000, "description": "", "basis_gates": [], "custom_instructions": "", "gates": [], "coupling_map": []}, "noise": {}}
 ```
-> [!NOTE]
+> 📘 **Note:**
 > The "noise" key must be filled with a json with noise instructions supported by the chosen simulator.
 
-> [!IMPORTANT]  
+> ❗ **Important:**
 > Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `get_QPUs()` method presented in the section below will collect all the raised QPUs.
 
 ### 2. Python Program Example
 Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow to run a circuit on a single QPU.
 
-> [!WARNING]
+> ⚠️ **Warning:**
 > To execute the following python example it is needed  to load the [Qiskit](https://github.com/Qiskit/qiskit) module:
 
 In QMIO:
@@ -286,8 +286,8 @@ counts = result.counts # Get the counts
 print(f"Counts: {counts}" ) # {'00':546, '11':454}
 ```
 
-> [!NOTE] 
-> It is not mandatory to run a *QuantumCircuit* from Qiskit. The `.run` method also supports *OpenQASM 2.0* with the following structure: 
+> 📘 **Note:**
+> It is not mandatory to run a *QuantumCircuit* from Qiskit. The `.run` method also supports *OpenQASM 2.0* with the following structure:
 ```json
 {"instructions":"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0], q[1];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];" , "num_qubits": 2, "num_clbits": 4, "quantum_registers": {"q": [0, 1]}, "classical_registers": {"c": [0, 1], "other_measure_name": [2], "meas": [3]}}
 
