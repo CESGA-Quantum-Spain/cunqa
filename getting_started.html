@@ -313,7 +313,7 @@ So, for instance, the command</p></li>
 </pre></div>
 </div>
 <blockquote>
-<div><p>[!NOTE] <span class="raw-html-md"><br /></span>
+<div><p>📘 <strong>Note:</strong>
 By default, all the QPUs will be raised with <a class="reference external" href="https://github.com/Qiskit/qiskit-aer">AerSimulator</a> as the background simulator and IdealAer as the background backend. That is, a backend of 32 qubits, all connected and without noise.</p>
 </div></blockquote>
 <p>will raise four QPUs during at most 1 hour, 20 minutes and 30 seconds. The time format is <code class="docutils literal notranslate"><span class="pre">hh:mm:ss</span></code>.
@@ -337,11 +337,11 @@ By default, all the QPUs will be raised with <a class="reference external" href=
 </pre></div>
 </div>
 <blockquote>
-<div><p>[!NOTE]
+<div><p>📘 <strong>Note:</strong>
 The “noise” key must be filled with a json with noise instructions supported by the chosen simulator.</p>
 </div></blockquote>
 <blockquote>
-<div><p>[!IMPORTANT] <span class="raw-html-md"><br /></span>
+<div><p>❗ <strong>Important:</strong>
 Several <code class="docutils literal notranslate"><span class="pre">qraise</span></code> commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The <code class="docutils literal notranslate"><span class="pre">get_QPUs()</span></code> method presented in the section below will collect all the raised QPUs.</p>
 </div></blockquote>
 </section>
@@ -349,7 +349,7 @@ Several <code class="docutils literal notranslate"><span class="pre">qraise</spa
 <h3>2. Python Program Example<a class="headerlink" href="#python-program-example" title="Link to this heading"></a></h3>
 <p>Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow to run a circuit on a single QPU.</p>
 <blockquote>
-<div><p>[!WARNING]
+<div><p>⚠️ <strong>Warning:</strong>
 To execute the following python example it is needed  to load the <a class="reference external" href="https://github.com/Qiskit/qiskit">Qiskit</a> module:</p>
 </div></blockquote>
 <p>In QMIO:</p>
@@ -395,7 +395,7 @@ To execute the following python example it is needed  to load the <a class="refe
 </pre></div>
 </div>
 <blockquote>
-<div><p>[!NOTE]
+<div><p>📘 <strong>Note:</strong>
 It is not mandatory to run a <em>QuantumCircuit</em> from Qiskit. The <code class="docutils literal notranslate"><span class="pre">.run</span></code> method also supports <em>OpenQASM 2.0</em> with the following structure:</p>
 </div></blockquote>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="s2">&quot;OPENQASM 2.0;\ninclude \&quot;qelib1.inc\&quot;;\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0], q[1];\nmeasure q[0] -&gt; c[0];\nmeasure q[1] -&gt; c[1];&quot;</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;q&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]},</span><span class="w"> </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;other_measure_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;meas&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="p">]}}</span>
