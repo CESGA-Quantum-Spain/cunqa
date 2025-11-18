@@ -56,6 +56,7 @@ autodoc_mock_imports = [
     'argparse',
     'collections',
     'copy',
+    'cunqa.constants',
     'cunqa.fakeqmio',
     'cunqa.logger',
     'cunqa.qclient',
