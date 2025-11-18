@@ -146,8 +146,8 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
             logger.debug(f"Processing instruction: {instruction}")
 
-            if instruction.name not in SUPPORTED_QISKIT_OPERATIONS:
-                logger.error(f"Instruction {instruction.name} not supported for conversion [ValueError].")
+            if instruction.operation.name not in SUPPORTED_QISKIT_OPERATIONS:
+                logger.error(f"Instruction {instruction.operation.name} not supported for conversion [ValueError].")
                 raise ConvertersError
 
             qreg = [r._register.name for r in instruction.qubits]
@@ -159,32 +159,32 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             if instruction.operation.name == "barrier":
                 pass
 
-            elif instruction.name == "measure":
+            elif instruction.operation.name == "measure":
 
-                json_data["instructions"].append({"name":instruction.name,
+                json_data["instructions"].append({"name":instruction.operation.name,
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                                                 "clbits":[classical_registers[k][b] for k,b in zip(clreg, bit)]
                                                 })
 
-            elif instruction.name == "unitary":
+            elif instruction.operation.name == "unitary":
 
                 json_data["instructions"].append({"name":instruction.operation.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                                                 "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.operation.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
                                                 })
                 
-            elif instruction.name == "if_else":
+            elif instruction.operation.name == "if_else":
 
                 json_data["is_dynamic"] = True
 
                 # beacuse of Qiskit's notation, the mesaurement is already done, we do not need to add it.
                 # we use as conditional_reg the clbit specified by the Qiskit instruction
 
-                if not any([sub_circuit is None for sub_circuit in instruction.params]):
+                if not any([sub_circuit is None for sub_circuit in instruction.operation.params]):
                     logger.error("if_else instruction with \'else\' case is not supported for the current version [ValueError].")
                     raise ConvertersError
                 else:
-                    sub_circuit = [sub_circuit for sub_circuit in instruction.params if sub_circuit is not None][0]
+                    sub_circuit = [sub_circuit for sub_circuit in instruction.operation.params if sub_circuit is not None][0]
 
                 if instruction.condition[1] not in [1]:
                     logger.error("Only 1 is accepted as condition for classicaly contorlled operations for the current version [ValueError].")
@@ -207,16 +207,16 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
                     raise ConvertersError
 
                 json_data["is_dynamic"] = True
-                json_data["instructions"].append({"name":instruction.name, 
+                json_data["instructions"].append({"name":instruction.operation.name, 
                                             "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                            "params":instruction.params,
+                                            "params":instruction.operation.params,
                                             "conditional_reg":[instruction.operation._condition[0]._index]
                                             })                
             
             else:
-                json_data["instructions"].append({"name":instruction.name, 
+                json_data["instructions"].append({"name":instruction.operation.name, 
                                             "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                            "params":instruction.params
+                                            "params":instruction.operation.params
                                             })
        
         return json_data

@@ -6,9 +6,6 @@ sys.path.append(os.getenv("HOME"))
 
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
-import time
-
-begin = time.perf_counter()
 
 # --------------------------------------------------
 # Key difference between co-located and HPC
@@ -49,7 +46,3 @@ results = gather(qjobs)
 for result in results:
     print("Result: ", result.counts)
     print("Time taken: ", result.time_taken)
-
-end = time.perf_counter()
-print()
-print("Python took: ", end-begin)

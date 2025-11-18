@@ -111,8 +111,8 @@ From the first group, **the ones that must be installed**, the dependencies are 
 gcc             12.3.0
 qiskit          1.24.0
 CMake           3.21.0
-python          3.11.9
-pybind11        2.13.6
+python          3.9 (recommended 3.11)
+pybind11        2.7 (recommended 2.12)
 MPI             3.1
 OpenMP          4.5
 Boost           1.85.0

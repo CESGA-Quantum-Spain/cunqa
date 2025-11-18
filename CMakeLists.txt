@@ -58,8 +58,8 @@ elseif(${SYSTEM_NAME} STREQUAL "FT3")
   find_package(pybind11 2.12 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
 else() # Other clusters
-  find_package(Python 3.10.8 COMPONENTS Interpreter Development)
-  find_package(pybind11 2.12 REQUIRED)
+  find_package(Python 3.9 COMPONENTS Interpreter Development)
+  find_package(pybind11 2.7 REQUIRED)
 endif()
 
 find_package(Threads REQUIRED)
