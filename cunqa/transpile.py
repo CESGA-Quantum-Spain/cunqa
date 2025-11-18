@@ -24,7 +24,7 @@
 """
 from cunqa.backend import Backend
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert
+from cunqa.circuit.converters import convert
 from cunqa.logger import logger
 
 from qiskit import QuantumCircuit

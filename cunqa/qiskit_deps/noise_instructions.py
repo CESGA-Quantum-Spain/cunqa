@@ -141,7 +141,7 @@ if args.backend_path == "default": # we have not read the backend_json and check
             "custom_instructions": "",
             "gates": [],
             "noise_model":noise_model_json,
-            "noise_properties":noise_properties_json,
+            "noise_properties_path":args.noise_properties_path,
             "noise_path": tmp_file
     }
 
@@ -156,7 +156,7 @@ else:
         "custom_instructions": args.backend_json["custom_instructions"],
         "gates": args.backend_json["gates"],
         "noise_model":noise_model_json,
-        "noise_properties":noise_properties_json,
+        "noise_properties_path":args.noise_properties_path,
         "noise_path": tmp_file
     }
 

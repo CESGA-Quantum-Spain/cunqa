@@ -282,7 +282,6 @@ myjob.sh
 hola.sh
 test*
 generar_circuito.py
-circuit
 
 modules_alvaro.sh
 config_alvaro.sh
@@ -302,6 +301,7 @@ raise.sh
 condaJupyter_ft3.sh
 condaJupyter_qmio.sh
 modules.sh
+modules11.sh
 
 build_improvements/
 bash/

@@ -92,8 +92,8 @@ from cunqa.constants import QPUS_FILEPATH
 class QRaiseError(Exception):
     """Exception for errors during qraise slurm command."""
     pass
-
-                        
+               
+               
 def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
@@ -394,3 +394,5 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     else:
         logger.error(f"No QPUs where found with the characteristics provided: on_node={on_node}, family_name={family}.")
         raise SystemExit
+
+

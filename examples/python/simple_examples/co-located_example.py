@@ -22,6 +22,7 @@ for q in qpus:
     print(f"QPU {q.id}, backend: {q.backend.name}, simulator: {q.backend.simulator}, version: {q.backend.version}.")
 
 qc = CunqaCircuit(2)
+
 # Parámetros
 theta1 = np.pi / 4
 theta2 = np.pi / 3

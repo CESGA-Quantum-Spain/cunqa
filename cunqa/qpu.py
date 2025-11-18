@@ -65,7 +65,8 @@ import inspect
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
-from cunqa.circuit import CunqaCircuit, _is_parametric
+from cunqa.circuit import CunqaCircuit
+from cunqa.circuit.converters import _is_parametric
 from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
