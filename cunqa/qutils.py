@@ -82,20 +82,12 @@ from typing import Union, Optional
 from subprocess import run
 from json import load
 import json
+
 from cunqa.qclient import QClient
 from cunqa.backend import Backend
 from cunqa.logger import logger
 from cunqa.qpu import QPU
-
-# Adding python folder path to detect modules
-sys.path.append(os.getenv("HOME"))
-
-STORE: Optional[str] = os.getenv("STORE")
-if STORE is not None:
-    INFO_PATH = STORE + "/.cunqa/qpus.json"
-else:
-    logger.error(f"Cannot find $STORE enviroment variable.")
-    raise SystemExit
+from cunqa.constants import QPUS_FILEPATH
 
 class QRaiseError(Exception):
     """Exception for errors during qraise slurm command."""
@@ -165,7 +157,7 @@ def qraise(n, t, *,
     else: 
         logger.warning("Be careful, you are deploying QPUs from an interactive session.")
         HOSTNAME = os.getenv("HOSTNAME")
-        command = f"ssh {HOSTNAME} \"ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9 && cd bin && ./qraise -n {n} -t {t}"
+        command = f"qraise -n {n} -t {t}"
 
     try:
         # Add specified flags
@@ -194,16 +186,13 @@ def qraise(n, t, *,
         if backend is not None:
             command = command + f" --backend={str(backend)}"
 
-        if SLURMD_NODENAME != None:
-            command = command + "\""
-
-        if not os.path.exists(INFO_PATH):
-           with open(INFO_PATH, "w") as file:
+        if not os.path.exists(QPUS_FILEPATH):
+           with open(QPUS_FILEPATH, "w") as file:
                 file.write("{}")
 
         print(f"Command: {command}")
 
-        output = run(command, shell=True, capture_output=True, text=True).stdout #run the command on terminal and capture its output on the variable 'output'
+        output = run(command, capture_output=True, shell=True, text=True).stdout #run the command on terminal and capture its output on the variable 'output'
         logger.info(output)
         job_id = ''.join(e for e in str(output) if e.isdecimal()) #sees the output on the console (looks like 'Submitted sbatch job 136285') and selects the number
         
@@ -214,7 +203,7 @@ def qraise(n, t, *,
             state = run(cmd_getstate, capture_output=True, text=True, check=True).stdout.strip()
             if state == "RUNNING":
                 try:     
-                    with open(INFO_PATH, "r") as file:
+                    with open(QPUS_FILEPATH, "r") as file:
                         data = json.load(file)
                 except json.JSONDecodeError:
                     continue
@@ -272,7 +261,7 @@ def nodes_with_QPUs() -> "list[str]":
         List of the corresponding node names.
     """
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
 
         node_names = set()
@@ -302,7 +291,7 @@ def info_QPUs(on_node: bool = True, node_name: Optional[str] = None) -> "list[di
     """
 
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
             if len(qpus_json) == 0:
                 logger.warning(f"No QPUs were found.")
@@ -363,7 +352,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
 
     # access raised QPUs information on qpu.json file
     try:
-        with open(INFO_PATH, "r") as f:
+        with open(QPUS_FILEPATH, "r") as f:
             qpus_json = load(f)
             if len(qpus_json) == 0:
                 logger.error(f"No QPUs were found.")
@@ -396,7 +385,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     qpus = []
     for id, info in targets.items():
         client = QClient()
-        endpoint = (info["net"]["ip"], info["net"]["port"])
+        endpoint = info["net"]["endpoint"]
         name = info["name"]
         qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = name, family = info["family"], endpoint = endpoint))
     if len(qpus) != 0:

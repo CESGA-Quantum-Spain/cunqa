@@ -2,10 +2,7 @@ import os
 import sys
 import glob
 
-installation_path = os.getenv("HOME")
-sys.path.append(installation_path)
-
-from cunqa.logger import logger
+from ..logger import logger
 
 from qiskit.providers import BackendV2
 from qiskit.providers import QubitProperties, BackendV2, Options
