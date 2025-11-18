@@ -8,6 +8,7 @@
 #include "quantum_task.hpp"
 #include "aer_executor.hpp"
 
+#include "utils/constants.hpp"
 #include "utils/json.hpp"
 #include "logger.hpp"
 
@@ -16,8 +17,7 @@ namespace sim {
 
 AerExecutor::AerExecutor() : classical_channel{"executor"}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");
@@ -42,8 +42,7 @@ AerExecutor::AerExecutor() : classical_channel{"executor"}
 
 AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");

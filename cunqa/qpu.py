@@ -72,18 +72,6 @@ from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.transpile import transpiler, TranspileError
 
-# path to access to json file holding information about the raised QPUs
-INFO_PATH: Optional[str] = os.getenv("INFO_PATH")
-if INFO_PATH is None:
-    STORE: Optional[str] = os.getenv("STORE")
-    if STORE is not None:
-        INFO_PATH = STORE + "/.cunqa/qpus.json"
-    else:
-        logger.error(f"Cannot find $STORE enviroment variable.")
-        raise SystemExit
-
-
-
 class QPU:
     """
     Class to represent a virtual QPU deployed for user interaction.
@@ -97,10 +85,10 @@ class QPU:
     _backend: 'Backend'
     _name: str 
     _family: str
-    _endpoint: "tuple[str, int]" 
+    _endpoint: str 
     _connected: bool 
     
-    def __init__(self, id: int, qclient: 'QClient', backend: Backend, name: str, family: str, endpoint: "tuple[str, int]"):
+    def __init__(self, id: int, qclient: 'QClient', backend: Backend, name: str, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -188,10 +176,9 @@ class QPU:
 
         # Handle connection to QClient
         if not self._connected:
-            ip, port = self._endpoint
-            self._qclient.connect(ip, port)
+            self._qclient.connect(self._endpoint)
             self._connected = True
-            logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
+            logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
             self._connected = True
 
         # Transpilation if requested

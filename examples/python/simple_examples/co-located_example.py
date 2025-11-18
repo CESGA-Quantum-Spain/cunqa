@@ -7,7 +7,6 @@ sys.path.append(os.getenv("HOME"))
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
 
-
 # --------------------------------------------------
 # Key difference between co-located and HPC
 # example: on_node = False. This allows to look for
@@ -39,10 +38,11 @@ qc.measure_all()
 qjobs = []
 for _ in range(1):
     for qpu in qpus: 
-        print("Llegó al bucle 2")
-        qjobs.append(qpu.run(qc, transpile=True, shots = 100))
+        qjobs.append(qpu.run(qc, transpile=True, shots = 1000000))
 
+print("Waiting for the results...")
 results = gather(qjobs)
 
 for result in results:
-    print("Resultado: ", result.counts)
+    print("Result: ", result.counts)
+    print("Time taken: ", result.time_taken)

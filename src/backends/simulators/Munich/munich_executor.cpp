@@ -8,6 +8,7 @@
 #include "quantum_task.hpp"
 #include "munich_executor.hpp"
 
+#include "utils/constants.hpp"
 #include "utils/json.hpp"
 #include "logger.hpp"
 
@@ -16,9 +17,7 @@ namespace sim {
 
 MunichExecutor::MunichExecutor() : classical_channel{"executor"}
 {
-    LOGGER_DEBUG("Vamos a inicializar el executor.");
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");
@@ -46,8 +45,7 @@ MunichExecutor::MunichExecutor() : classical_channel{"executor"}
 
 MunichExecutor::MunichExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");

@@ -29,15 +29,23 @@ struct Client::Impl {
         io_context_.stop();
     }
 
-    void connect(const std::string& ip, const std::string& port) 
+    void connect(const std::string& endpoint) 
     {   
         try {
+            // Get the ip and port of the endpoint
+            std::string ip, port;
+            auto pos = endpoint.rfind(':');
+            ip = endpoint.substr(0, pos);
+            port = endpoint.substr(pos + 1);
+            
+
+            // Connect
             tcp::resolver resolver{io_context_};
-            auto endpoint = resolver.resolve(ip, port);
-            as::connect(socket_, endpoint);
-            LOGGER_DEBUG("Client succesfully connected to server.");
+            auto boost_endpoint = resolver.resolve(ip, port);
+            as::connect(socket_, boost_endpoint);
+            LOGGER_DEBUG("Client succesfully connected to endpoint {}", endpoint);
         } catch (const boost::system::system_error& e) {
-            LOGGER_ERROR("Imposible to connect to endpoint {}:{}. Server not available.", ip, port);
+            LOGGER_ERROR("Imposible to connect to endpoint {}. Server not available.", endpoint);
             throw;
         }
     }
@@ -88,8 +96,8 @@ Client::Client() :
 
 Client::~Client() = default;
 
-void Client::connect(const std::string& ip, const std::string& port) {
-    pimpl_->connect(ip, port);
+void Client::connect(const std::string& endpoint) {
+    pimpl_->connect(endpoint);
 }
 
 FutureWrapper<Client> Client::send_circuit(const std::string& circuit) 

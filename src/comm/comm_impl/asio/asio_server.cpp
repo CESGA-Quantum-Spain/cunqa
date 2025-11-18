@@ -19,11 +19,16 @@ struct Server::Impl {
     tcp::acceptor acceptor_;
     tcp::socket socket_;
 
-    Impl(const std::string& ip, const std::string& port) :
-        acceptor_{io_context_, tcp::endpoint{as::ip::address::from_string(ip), 
-                            static_cast<unsigned short>(stoul(port))}},
+    std::string asio_endpoint;
+
+    Impl(const std::string& ip) :
+        acceptor_{io_context_, tcp::endpoint{as::ip::address::from_string(ip), 0}},
         socket_{acceptor_.get_executor()}
-    {}
+    { 
+        auto ep = acceptor_.local_endpoint();
+        auto port = ep.port();
+        asio_endpoint = ip + ":" + std::to_string(port);  
+    }
 
     void accept()
     {
@@ -51,8 +56,8 @@ struct Server::Impl {
                 socket_.close(); 
                 return "CLOSE";
             } else {
-                LOGGER_ERROR("Error receiving data: {}", e.what());
-                throw; // rethrow unexpected errors
+                LOGGER_ERROR("Error receiving the circuit.");
+                throw;
             }
         }
 
@@ -81,13 +86,11 @@ struct Server::Impl {
 
 Server::Server(const std::string& mode) :
     mode{mode},
-    hostname{get_hostname()},
     nodename{get_nodename()},
-    ip{get_IP_address(mode)},
-    global_ip{get_global_IP_address()},
-    port{get_port()},
-    pimpl_{std::make_unique<Impl>(ip, port)}
-{ }
+    pimpl_{std::make_unique<Impl>(mode == "hpc" ? "127.0.0.1" : get_IP_address())}
+{ 
+    endpoint = pimpl_->asio_endpoint;
+}
 
 Server::~Server() = default;
 

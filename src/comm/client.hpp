@@ -25,7 +25,7 @@ public:
     Client();
     ~Client();
 
-    void connect(const std::string& ip, const std::string& port);
+    void connect(const std::string& endpoint);
     FutureWrapper<Client> send_circuit(const std::string& circuit);
     FutureWrapper<Client> send_parameters(const std::string& parameters);
     std::string recv_results();

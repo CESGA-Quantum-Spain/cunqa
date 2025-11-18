@@ -1,7 +1,6 @@
 # QRAISE executable
 add_executable(qraise qraise.cpp)
-target_include_directories(qraise PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
-target_link_libraries(qraise PRIVATE json logger_client)
+target_link_libraries(qraise PRIVATE json logger_client morrisfranken::argparse)
 
 if(USE_MPI_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_MPI_BTW_QPU)
@@ -12,16 +11,9 @@ endif()
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QDROP executable
-include(${CMAKE_SOURCE_DIR}/cmake/FindSLURM.cmake)
-
 add_executable(qdrop qdrop.cpp)
-target_include_directories(qdrop PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
-target_link_libraries(qdrop PRIVATE logger_client SLURM::SLURM json)
+target_link_libraries(qdrop PRIVATE json morrisfranken::argparse)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
-
-file(GLOB NOISE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/noise_model/*.py")
-install(FILES ${NOISE_SCRIPTS} DESTINATION "$ENV{STORE}/.cunqa/noise_model")
 
 # SETUP_QPUS executable
 add_executable(setup_qpus setup_qpus.cpp)
@@ -40,8 +32,19 @@ install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QINFO executable
 add_executable(qinfo qinfo.cpp)
-target_link_libraries(qinfo PRIVATE json logger_client)
-target_include_directories(qinfo PRIVATE "${CMAKE_SOURCE_DIR}/src/third-party/argparse/include/argparse")
+target_link_libraries(qinfo PRIVATE json logger_client morrisfranken::argparse)
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# Epilog tool erase_key and noise models
+add_executable(erase_key erase_key.cpp)
+target_link_libraries(erase_key PRIVATE json)
+install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh"
+    @ONLY
+)
+install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
 
 

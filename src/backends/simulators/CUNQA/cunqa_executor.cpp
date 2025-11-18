@@ -8,6 +8,7 @@
 #include "quantum_task.hpp"
 #include "cunqa_executor.hpp"
 
+#include "utils/constants.hpp"
 #include "utils/json.hpp"
 #include "logger.hpp"
 
@@ -17,8 +18,7 @@ namespace sim {
 
 CunqaExecutor::CunqaExecutor() : classical_channel{"executor"}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");
@@ -43,8 +43,7 @@ CunqaExecutor::CunqaExecutor() : classical_channel{"executor"}
 
 CunqaExecutor::CunqaExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
+    std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
         throw std::runtime_error("Error opening the communications file.");

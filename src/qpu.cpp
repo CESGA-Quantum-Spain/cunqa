@@ -1,16 +1,11 @@
 #include <string>
 #include <iostream>
 
+#include "utils/constants.hpp"
 #include "qpu.hpp"
 #include "logger.hpp"
 
 using namespace std::string_literals;
-
-namespace {
-    // TODO: not having this hardcoded here is an improvement for other supercomputing centers
-    const auto store = getenv("STORE");
-    const std::string filepath = store + "/.cunqa/qpus.json"s;
-}
 
 namespace cunqa {
 
@@ -27,7 +22,9 @@ void QPU::turn_ON()
     std::thread compute([this](){this->compute_result_();});
 
     JSON qpu_config = *this;
-    write_on_file(qpu_config, filepath, family_);
+    write_on_file(qpu_config, constants::QPUS_FILEPATH, family_);
+
+    //LOGGER_DEBUG("QPU info written");
 
     listen.join();
     compute.join();
@@ -84,6 +81,7 @@ void QPU::recv_data_()
         } catch (const std::exception& e) {
             LOGGER_INFO("There has happened an error receiving the circuit, the server keeps on iterating.");
             LOGGER_ERROR("Official message of the error: {}", e.what());
+            throw;
         }
     }
 }
