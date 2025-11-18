@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Detección Lusitania
-#TODO: mejorar metodo 
-if [ -d "/lusitania_apps" ]; then
-    export LMOD_SYSTEM_NAME="LUSITANIA"
-fi
-
 if [ "$LMOD_SYSTEM_NAME" == "QMIO" ]; then
     ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 gcccore/12.3.0 nlohmann_json/3.11.3 ninja/1.9.0 
 pybind11/2.13.6-python-3.11.9 qiskit/1.2.4-python-3.11.9
     conda deactivate
 
-elif [ "$LMOD_SYSTEM_NAME" == "LUSITANIA" ]; then
+elif [ $LMOD_SYSTEM_NAME == "FT3" ]
+    # Execution for FT3 
+    ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4
+    conda deactivate
+
+else   
+    #LUSITANIA
     module purge
 
     module load gcc/gcc-11.2.0 cmake/cmake-3.23 openblas/openblas-0.3.24 openmpi/openmpi-4.1.2-gcc11.2.0 python/python-3.10
@@ -30,9 +30,6 @@ elif [ "$LMOD_SYSTEM_NAME" == "LUSITANIA" ]; then
     
     export pybind11_DIR=$PYBIND_PATH
     echo "pybind11 encontrado en: $pybind11_DIR"
-else 
-    ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4
-    conda deactivate
 fi
 
 rm -rf build/

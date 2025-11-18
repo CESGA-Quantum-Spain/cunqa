@@ -109,6 +109,7 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     }
 
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
+    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
     sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
 }
 
@@ -188,7 +189,7 @@ int main(int argc, char* argv[])
 
     // Executing and deleting the file
     std::system("sbatch qraise_sbatch_tmp.sbatch");
-    //std::system("rm qraise_sbatch_tmp.sbatch");
+    std::system("rm qraise_sbatch_tmp.sbatch");
     
     
     return 0;
