@@ -71,7 +71,9 @@ void AerExecutor::run()
     std::string message;
     while (true) {
         for(const auto& qpu_id: qpu_ids) {
+            LOGGER_DEBUG("Vamos a recibir el mensaje de: {}", qpu_id);
             message = classical_channel.recv_info(qpu_id);
+            LOGGER_DEBUG("Recibimos el mensaje: {}", message);
 
             if(!message.empty()) {
                 qpus_working.push_back(qpu_id);

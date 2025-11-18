@@ -460,13 +460,13 @@ def cunqa_dunder_methods(cls):
     def hor_split(self, n: int) -> Tuple["CunqaCircuit", "CunqaCircuit"]:
         """Divides a circuit horizontally in two, separating the first n qubits from the last num_qubits-n qubits. """
         rest = self.num_qubits - n 
-        cl_n = self.num_clbits # TODO: maybe handle cl_bits more gracefully 
         
         up_id = self._id + f" up_{n}"
         down_id = self._id + f" down_{rest}"
 
-        upper_circuit = CunqaCircuit(n, cl_n, id = up_id)          
-        lower_circuit = CunqaCircuit(rest, cl_n, id = down_id)      
+        # TODO: Putting a clbit for each qubit
+        upper_circuit = CunqaCircuit(n, n, id = up_id)          
+        lower_circuit = CunqaCircuit(rest, rest, id = down_id)      
         self.circs_comm = {}
 
         # Add instructions to the two pieces according to their position
@@ -755,10 +755,13 @@ def cunqa_dunder_methods(cls):
             received (bool): determines wether 'divide_instr' is being called from within (True), in a received case or from 'hor_split' (False).
             recv_remain (int): determines the lenght of instr["instructions"] in the "rcontrol" case to handle recurrence and avoid an infinte loop. 
         """
-        qubits_up        = [q for q in instr["qubits"] if q < n+1]
-        qubits_down      = [q - (n+1) for q in instr["qubits"] if q > n]
-        conditional_up   = [q for q in instr["conditional_reg"] if q < n+1]         if ("conditional_reg" in instr) else []
-        conditional_down = [q - (n+1) for q in instr["conditional_reg"] if q > n ]  if ("conditional_reg" in instr) else []
+        qubits_up        = [q for q in instr["qubits"] if q < n]
+        qubits_down      = [q - n for q in instr["qubits"] if q >= n]
+        clbits_up        = [c for c in instr["clbits"] if c < n]                  if ("clbits" in instr) else [] # Check, not used at the moment
+        clbits_down      = [c - n for c in instr["clbits"] if c >= n]             if ("clbits" in instr) else []
+        conditional_up   = [q for q in instr["conditional_reg"] if q < n]         if ("conditional_reg" in instr) else []
+        conditional_down = [q - n for q in instr["conditional_reg"] if q >= n ]   if ("conditional_reg" in instr) else []
+
 
         if received and not hasattr(self, "rcontrol_up") and not hasattr(self, "rcontrol_down"):
             self.rcontrol_up = []    # Here we will save the divided received instructions on the corresponding side
@@ -848,6 +851,9 @@ def cunqa_dunder_methods(cls):
             instr["qubits"] = qubits_down
             if "conditional_reg" in instr: 
                 instr["conditional_reg"] = conditional_down
+            
+            if "clbits" in instr:
+                instr["clbits"] = clbits_down
 
             if "circuits" in instr:
                 if instr["circuits"][0] in self.circs_comm:
@@ -935,7 +941,7 @@ def cunqa_dunder_methods(cls):
             q_1:    ┤ X ├──■──┤ X ├
                     └───┘     └───┘
             """
-            up_qubit, down_qubit = (instr["qubits"][0], instr["qubits"][1]- n - 1) if instr["qubits"][0] > n else (instr["qubits"][1],  instr["qubits"][0] - n - 1)
+            up_qubit, down_qubit = (instr["qubits"][0], instr["qubits"][1]- n) if instr["qubits"][0] >= n else (instr["qubits"][1],  instr["qubits"][0] - n)
             
             # Perform the three distributed CNOTs
             with upper_circuit.expose(up_qubit, lower_circuit) as rcontrol:
@@ -959,17 +965,17 @@ def cunqa_dunder_methods(cls):
             if instr["qubits"][0] < instr["qubits"][1]:
 
                 qubit_up = instr["qubits"][0]
-                qubit_down = instr["qubits"][1] - n - 1
+                qubit_down = instr["qubits"][1] - n
                 method = name_to_method[instr["name"]]
                     
                 with upper_circuit.expose(qubit_up, lower_circuit) as rcontrol:
-                    method(lower_circuit, *instr["params"], qubit_down)
+                    method(lower_circuit, *instr["params"], rcontrol, qubit_down)
             else:
                 qubit_up = instr["qubits"][1]
-                qubit_down = instr["qubits"][0] - n - 1
+                qubit_down = instr["qubits"][0] - n
                     
                 with lower_circuit.expose(qubit_down, upper_circuit) as rcontrol:
-                    method(upper_circuit, *instr["params"], qubit_up)  
+                    method(upper_circuit, *instr["params"], rcontrol, qubit_up)  
 
         elif instr["name"] in ["rzz", "ryy", "rxx", "rzx"]:
             """ Rzz gate decomposition:         Ryy gate decomposition:       Rxx gate decomposition:                     Rzx gate decomposition:
@@ -993,7 +999,7 @@ def cunqa_dunder_methods(cls):
             """
             if instr["qubits"][0] < instr["qubits"][1]:
                 qubit_up = instr["qubits"][0]
-                qubit_down = instr["qubits"][1] - n - 1
+                qubit_down = instr["qubits"][1] - n
                     
                 with upper_circuit.expose(qubit_up, lower_circuit) as rcontrol:
                     upper_circuit.s(qubit_up)
@@ -1002,7 +1008,7 @@ def cunqa_dunder_methods(cls):
                     upper_circuit.x(qubit_up)
             else:
                 qubit_up = instr["qubits"][1]
-                qubit_down = instr["qubits"][0] - n - 1
+                qubit_down = instr["qubits"][0] - n
 
                 with lower_circuit.expose(qubit_down, upper_circuit) as rcontrol:
                     lower_circuit.s(qubit_down)
@@ -1088,11 +1094,11 @@ def distr_rzz_rxx_ryy_rzx(instr: dict, upper_circuit: CunqaCircuit, lower_circui
     """
     if instr["qubits"][0] < instr["qubits"][1]:
         qubit_1 = instr["qubits"][0];             circ1 = upper_circuit
-        qubit_2 = instr["qubits"][1] - n - 1;     circ2 = lower_circuit
+        qubit_2 = instr["qubits"][1] - n;         circ2 = lower_circuit
 
     else:
         qubit_1 = instr["qubits"][1];             circ1 = lower_circuit
-        qubit_2 = instr["qubits"][0] - n - 1;     circ2 = upper_circuit
+        qubit_2 = instr["qubits"][0] - n;         circ2 = upper_circuit
 
     if instr["name"] == "ryy":
         circ1.rx(np.pi/2, qubit_1)
@@ -1138,14 +1144,14 @@ def distr_ccx_ccz_cswap(instr: dict, upper_circuit: CunqaCircuit, lower_circuit:
         n (int): number of qubits of the upper_circuit
     """
     # Process instruction to decide the case
-    circ1, circ2, less_than_or_greater_equal = (upper_circuit, lower_circuit, operator.lt) if instr["qubits"][0] < n+1 else (lower_circuit, upper_circuit, operator.ge)
+    circ1, circ2, less_than_or_greater_equal = (upper_circuit, lower_circuit, operator.lt) if instr["qubits"][0] < n else (lower_circuit, upper_circuit, operator.ge)
     qubits1 = {}; qubits2 = {}
     for i, q in enumerate(instr["qubits"]):
 
-        if less_than_or_greater_equal(q, n+1): # Apply the corresponding comparation q < n+1 or q >= n+1 depending on which circuit is circ1
+        if less_than_or_greater_equal(q, n): # Apply the corresponding comparation q < n or q >= n depending on which circuit is circ1
             qubits1[str(i+1)] = q
         else:
-            qubits2[str(i+1)] = q - n - 1
+            qubits2[str(i+1)] = q - n
 
     if ("1" in qubits1 and ("2" in qubits2 and "3" in qubits2)):
         """ First qubit in circ1, second and third qubits in circ2, 

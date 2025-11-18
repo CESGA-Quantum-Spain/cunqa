@@ -19,20 +19,18 @@ AerQCSimulator::AerQCSimulator()
 
 AerQCSimulator::AerQCSimulator(const std::string& group_id)
 {
-    LOGGER_DEBUG("Inside AerQCSimulator with group_id");
     classical_channel.publish(group_id);
-    LOGGER_DEBUG("classical_channel.publish(group_id)");
     auto executor_endpoint = classical_channel.recv_info("executor");
-    LOGGER_DEBUG("executor_endpoint: {}", executor_endpoint);
     std::string id_ = "executor";
     classical_channel.connect(executor_endpoint, id_);
-    LOGGER_DEBUG("classical_channel.connect(executor_endpoint, id_)");
     write_executor_endpoint(executor_endpoint, group_id);
 };
 
 JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
     auto circuit = to_string(quantum_task);
+    LOGGER_DEBUG("Circuito que mandamos al executor: {}", circuit);
+
     classical_channel.send_info(circuit, "executor");
     if (circuit != "") {
         auto results = classical_channel.recv_info("executor");
