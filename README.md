@@ -63,18 +63,19 @@
 </ul>
 
 # Table of contents
-  - [INSTALLATION](#installation)
+- [Table of contents](#table-of-contents)
+  - [Installation](#installation)
     - [Clone repository](#clone-repository)
-    - [Define STORE environment variable](#clone-repository)
+    - [Define STORE environment variable](#define-store-environment-variable)
     - [Dependencies](#dependencies)
     - [Configure, build and install](#configure-build-and-install)
     - [Install as Lmod module](#install-as-lmod-module)
-  - [UNINSTALL](#uninstall)
-  - [RUN YOUR FIRST DISTRIBUTED PROGRAM](#run-your-first-distributed-program)
-    1. [`qraise`command](#1-qraisecommand)
-    2. [Python Program Example](#2-python-program-example)
-    3. [`qdrop` command](#3-qdrop-command)
-  - [ACKNOWLEDGEMENTS](#acknowledgements)
+  - [Uninstall](#uninstall)
+  - [Run your first distributed program](#run-your-first-distributed-program)
+    - [1. `qraise` command](#1-qraise-command)
+    - [2. Python Program Example](#2-python-program-example)
+    - [3. `qdrop` command](#3-qdrop-command)
+  - [Acknowledgements](#acknowledgements)
 
 ## Installation 
 ### Clone repository
@@ -109,7 +110,7 @@ From the first group, **the ones that must be installed**, the dependencies are 
 
 ```
 gcc             12.3.0
-qiskit          1.24.0
+qiskit          1.2.4
 CMake           3.21.0
 python          3.11.9
 pybind11        2.13.6

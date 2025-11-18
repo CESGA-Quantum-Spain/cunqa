@@ -5,12 +5,12 @@ if [ "$LMOD_SYSTEM_NAME" == "QMIO" ]; then
 pybind11/2.13.6-python-3.11.9 qiskit/1.2.4-python-3.11.9
     conda deactivate
 
-elif [ $LMOD_SYSTEM_NAME == "FT3" ]
+elif [ $LMOD_SYSTEM_NAME == "FT3" ]; then
     # Execution for FT3 
     ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4
     conda deactivate
 
-else   
+elif [ $LMOD_SYSTEM_NAME == "LUSITANIA" ]; then
     #LUSITANIA
     module purge
 
@@ -24,12 +24,15 @@ else
     PYBIND_PATH=$(python3 -c "import pybind11; print(pybind11.get_cmake_dir())")
     
     if [ -z "$PYBIND_PATH" ]; then
-        echo "Error: No se pudo encontrar pybind11. Asegúrate de ejecutar: pip install --user pybind11"
+        echo "Error: No se pudo encontrar pybind11. Asegúrate de ejecutar: pip install pybind11"
         exit 1
     fi
     
     export pybind11_DIR=$PYBIND_PATH
     echo "pybind11 encontrado en: $pybind11_DIR"
+else  
+    #YOUR CODE
+    :
 fi
 
 rm -rf build/

@@ -57,8 +57,11 @@ elseif(${SYSTEM_NAME} STREQUAL "FT3")
   find_package(Python 3.10.8 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
+elseif(${SYSTEM_NAME} STREQUAL "LUSITANIA")
+  find_package(Python 3.10.8 COMPONENTS Interpreter Development)
+  find_package(pybind11 2.12 REQUIRED)
 else() # Other clusters
-  find_package(Python 3.10.6 COMPONENTS Interpreter Development)
+  find_package(Python 3.10.8 COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
 endif()
 
