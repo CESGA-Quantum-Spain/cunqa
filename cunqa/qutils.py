@@ -372,14 +372,14 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
         logger.debug(f"User at a login node.")
     if on_node:
         if family is not None:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node) and (info.get("family") == family)}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("node_name") == local_node) and (info.get("family") == family)}
         else:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node)}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("node_name") == local_node)}
     else:
         if family is not None:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if ((info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")) and (info.get("family") == family)}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if ((info["net"].get("node_name") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")) and (info.get("family") == family)}
         else:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("nodename") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")}
+            targets = {qpu_id:info for qpu_id, info in qpus_json.items() if (info["net"].get("node_name") == local_node) or (info["net"].get("nodename") != local_node and info["net"].get("mode") == "co_located")}
     
     # create QPU objects from the dictionary information + return them on a list
     qpus = []
