@@ -17,6 +17,7 @@
     
 
 """
+import logging
 from cunqa.logger import logger
 from typing import Union, Optional
 import numpy as np
@@ -143,6 +144,129 @@ class Result:
         except Exception as error:
             logger.error(f"Some error occured with time taken [{type(error).__name__}]: {error}.")
             raise error
+        
+    @property
+    def statevector(self) -> Union[dict[np.array], np.array]:
+        """Statevector or dictionary of statevectors captured at the moment that `.save_state()` was performed on the circuit."""
+        try:
+            if ("results" in list(self._result.keys()) 
+                and "result_types" in self._result["results"][0]["metadata"] 
+                and "save_statevector" in self._result["results"][0]["metadata"]["result_types"].values()): # AER
+                    
+                    statevector = {} # Dict because we can store multiple statevecs with labels different from "statevector"
+                    for k, v in self._result["results"][0]["metadata"]["result_types"].items():
+                        if v == "save_statevector":
+                            statevector[k] = np.array(self._result["results"][0]["data"][k]).view(np.complex128)
+
+                    if len(statevector) == 1:
+                        statevector = list(statevector.values())[0] # Extract the statevector if we only have one
+                
+            # TODO: ensure this actually works in C++
+            elif "statevector" in self._result:             # MUNICH and CUNQA_SIMULATOR
+                statevector = self._result["statevector"]
+                if isinstance(statevector, dict):
+                    for k, v in statevector.items():
+                        statevector[k] = np.array(v).view(np.complex128)
+                else:
+                    statevector = np.array(statevector).view(np.complex128)
+
+            else:
+                logger.error(f"Statevector not found, try using circuit.save_state() at some point before executing.")
+                raise ResultError
+
+        except Exception as error:
+            logger.error(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
+            raise error
+        
+        return statevector
+
+    @property
+    def density_matrix(self) -> Union[dict[np.array], np.array]:
+        """Density matrix or dictionary of density matrices captured at the moment that `.save_state()` was performed on a circuit runned with `method = density_matrix` on AER."""
+        try:
+            if ("results" in list(self._result.keys()) 
+                and "result_types" in self._result["results"][0]["metadata"] 
+                and "save_density_matrix" in self._result["results"][0]["metadata"]["result_types"].values()): # AER
+                
+                density_matrix = {} # Dict because we can store multiple densmats with labels different from "density_matrix"
+                for k, v in self._result["results"][0]["metadata"]["result_types"].items():
+                    if v == "save_density_matrix":
+                        density_matrix[k] = np.array(self._result["results"][0]["data"][k]).view(np.complex128)
+
+                if len(density_matrix) == 1:
+                    density_matrix = list(density_matrix.values())[0] # Extract the statevector if we only have one
+
+            else:
+                logger.error(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
+                raise ResultError
+
+        except Exception as error:
+            logger.error(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
+            raise error
+        
+        return density_matrix
+    
+    def probabilities(self) -> Union[dict[np.array],  np.array]:
+        """
+        Extracts probabilities from result information. If we have statevector or density matrix 
+        exact probabilities are obtained, otherwise frequencies are calculated from counts.
+
+        Returns:
+            probs (dict, np.array): probabilities per bitstring of the 
+        """
+        # Temporarily disable logging
+        logging.disable(logging.CRITICAL)
+
+        try:
+            there_is_statevec = False 
+            statevecs = self.statevector
+            there_is_statevec = True
+        except Exception:
+            pass
+
+        try:
+            there_is_densmat = False
+            densmats = self.density_matrix
+            there_is_densmat = True
+        except Exception:
+            pass
+        
+        # Logging will be re-enabled after this block
+        logging.disable(logging.NOTSET)
+
+        # Statevector
+        if there_is_statevec:
+            if isinstance(statevecs, dict):
+                probs={}
+                for k, statevec in statevecs.items():
+                    probs[k] = np.reshape(np.abs(statevec), np.shape(statevec)[0])
+
+            else:
+                probs = np.reshape(np.abs(statevecs), np.shape(statevec)[0])
+
+            return probs
+
+        # Density matrix
+        elif there_is_densmat:
+            if isinstance(densmats, dict):
+                probs = {}
+                for k, densmat in densmats.items():
+                    probs[k] =  np.diagonal(densmat, axis1=0).real
+            else:
+                probs =  np.diagonal(densmats, axis1=0).real
+            
+            return probs
+
+        # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
+        else: 
+            probs = {}
+            all_shots = sum(self.counts.values())
+
+            for k, v in self.counts.items():
+                probs[k] = v/all_shots
+
+            return probs
+
     
 
 def _divide(string: str, lengths: "list[int]") -> str:
