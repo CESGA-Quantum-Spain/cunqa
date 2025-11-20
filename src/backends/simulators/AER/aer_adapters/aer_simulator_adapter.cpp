@@ -360,6 +360,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
 
 JSON AerSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Aer usual simulation");
     try {
 
         /* int result = std::system("python /mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/examples/aer_bench.py"); */
@@ -405,6 +406,8 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
 
 JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
+    LOGGER_DEBUG("Aer dynamic simulation");
+
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
