@@ -418,7 +418,7 @@ def cunqa_dunder_methods(cls):
         
         return result
 
-    ################ CIRRCUIT DIVIDING METHODS ##################
+    ################ CIRCUIT DIVIDING METHODS ##################
 
 
     def vert_split(self, position: int) -> Tuple["CunqaCircuit", "CunqaCircuit"]:

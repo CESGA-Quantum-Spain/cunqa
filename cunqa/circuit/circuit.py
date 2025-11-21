@@ -488,7 +488,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                     raise ValueError # I capture this at _add_instruction method
 
                 # checking qubits
-                if isinstance(instruction["qubits"], list):
+                """ if isinstance(instruction["qubits"], list):
                     if not all([(isinstance(q, int) or (q == -1)) for q in instruction["qubits"]]):
                         logger.error(f"instruction qubits must be a list of ints and/or <class 'cunqa.circuit.ControlContext'>, but a list of {[type(q) for q in instruction['qubits'] if not isinstance(q,int)]} was provided.")
                         raise TypeError
@@ -498,7 +498,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         raise ValueError
                 else:
                     logger.error(f"instruction qubits must be a list of ints and/or <class 'cunqa.circuit.ControlContext'>, but {type(instruction['qubits'])} was provided.")
-                    raise TypeError # I capture this at _add_instruction method
+                    raise TypeError # I capture this at _add_instruction method """
                 
                 if not (len(instruction["qubits"]) == gate_qubits):
                     logger.error(f"instruction number of qubits ({gate_qubits}) is not cosistent with qubits provided ({len(instruction['qubits'])}).")
@@ -1614,11 +1614,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         self.has_qc = True
         self.is_dynamic = True
         
-        if isinstance(qubit, int):
-            list_control_qubit = [qubit]
-        else:
-            logger.error(f"exposed qubit must be int, but {type(qubit)} was provided [TypeError].")
-            raise SystemExit
+        list_control_qubit = [qubit]
         
         if isinstance(target_circuit, CunqaCircuit):
             target_circuit_id = target_circuit._id
@@ -1658,6 +1654,11 @@ class ControlContext:
         if isinstance(control_circuit, CunqaCircuit) and isinstance(target_circuit, CunqaCircuit):
             self.control_circuit = control_circuit
             self.target_circuit = target_circuit
+            
+            control_id = control_circuit.info['id']
+            print(f"ID del control circuit:{control_id}")
+            target_id = target_circuit.info['id']
+            print(f"ID del target circuit:{target_id}")
         else:
             logger.error(f"control_circuit and target_circuit must be <class 'cunqa.circuit.CunqaCircuit'>, but {type(num_qubits)} was provided [TypeError].")
             raise SystemExit
