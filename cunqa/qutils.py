@@ -80,10 +80,10 @@ import sys
 import time
 from typing import Union, Optional
 from subprocess import run
-from json import load
 import json
 
 from cunqa.qclient import QClient
+from cunqa.pyjson import read_from_file
 from cunqa.backend import Backend
 from cunqa.logger import logger
 from cunqa.qpu import QPU
@@ -262,7 +262,7 @@ def nodes_with_QPUs() -> "list[str]":
     """
     try:
         with open(QPUS_FILEPATH, "r") as f:
-            qpus_json = load(f)
+            qpus_json = json.load(f)
 
         node_names = set()
         for info in qpus_json.values():
@@ -292,7 +292,7 @@ def info_QPUs(on_node: bool = True, node_name: Optional[str] = None) -> "list[di
 
     try:
         with open(QPUS_FILEPATH, "r") as f:
-            qpus_json = load(f)
+            qpus_json = json.load(f)
             if len(qpus_json) == 0:
                 logger.warning(f"No QPUs were found.")
                 return [{}]
@@ -352,11 +352,10 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
 
     # access raised QPUs information on qpu.json file
     try:
-        with open(QPUS_FILEPATH, "r") as f:
-            qpus_json = load(f)
-            if len(qpus_json) == 0:
-                logger.error(f"No QPUs were found.")
-                raise SystemExit
+        qpus_json = json.loads(read_from_file(QPUS_FILEPATH))
+        if len(qpus_json) == 0:
+            logger.error(f"No QPUs were found.")
+            raise SystemExit
 
     except Exception as error:
         logger.error(f"Some exception occurred [{type(error).__name__}].")

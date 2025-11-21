@@ -22,7 +22,7 @@ namespace {
         return fd;
     }
 
-    struct flock lock(const int& fd)
+    struct flock lock_write(const int& fd)
     {
         struct flock fl;
         fl.l_type = F_WRLCK;
@@ -33,6 +33,21 @@ namespace {
         if (fcntl(fd, F_SETLKW, &fl) == -1) {
             perror("fcntl - lock");
             throw std::runtime_error("Failed to acquire file lock");
+        }
+        return fl;
+    }
+
+    struct flock lock_read(const int& fd)
+    {
+        struct flock fl{};
+        fl.l_type = F_RDLCK;
+        fl.l_whence = SEEK_SET;
+        fl.l_start = 0;
+        fl.l_len = 0;
+
+        if (fcntl(fd, F_SETLKW, &fl) == -1) {
+            perror("fcntl - lock_read");
+            throw std::runtime_error("Failed to acquire read lock");
         }
         return fl;
     }
@@ -67,14 +82,8 @@ namespace {
         }
 
         cunqa::JSON j;
-        if (!content.empty()) {
-            try {
-                j = cunqa::JSON::parse(content);
-            } catch (...) {
-                j = cunqa::JSON::object(); // fallback to empty object if file corrupted
-            }
-        }
-        return j;
+        if (!content.empty()) return cunqa::JSON::parse(content);
+        return nlohmann::json::object(); 
     }
 
     void write_json(const int& fd, const cunqa::JSON& j)
@@ -103,7 +112,7 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
     int fd = -1;
     try {
         fd = open_file(filename);
-        auto fl = lock(fd);
+        auto fl = lock_write(fd);
         auto j = read_json(fd);
 
         // Get key and add data
@@ -127,12 +136,28 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
     }
 }
 
+JSON read_from_file(const std::string &filename)
+{
+    int fd = -1;
+    try {
+        fd = open_file(filename);
+        auto fl = lock_read(fd);
+        auto j = read_json(fd);
+        
+        return j;
+    } catch (const std::exception &e) {
+        if (fd != -1) close(fd);
+        throw;
+    }
+    
+}
+
 void remove_from_file(const std::string &filename, const std::string &rm_key)
 {
     int fd = -1;
     try {
         fd = open_file(filename);
-        auto fl = lock(fd);
+        auto fl = lock_write(fd);
         auto j = read_json(fd);
 
         // Filter: keep entries which JOB_ID is not the one attached 

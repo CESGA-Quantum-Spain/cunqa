@@ -2,7 +2,7 @@
 #include <pybind11/stl.h>
 
 #include "comm/client.hpp"
- 
+
 namespace py = pybind11;
 using namespace cunqa::comm;
 
