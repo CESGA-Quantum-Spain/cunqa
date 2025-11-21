@@ -239,10 +239,10 @@ class Result:
             if isinstance(statevecs, dict):
                 probs={}
                 for k, statevec in statevecs.items():
-                    probs[k] = np.reshape(np.abs(statevec), np.shape(statevec)[0])
+                    probs[k] = np.reshape(np.power(np.abs(statevec), 2), np.shape(statevec)[0])
 
             else:
-                probs = np.reshape(np.abs(statevecs), np.shape(statevec)[0])
+                probs = np.reshape(np.power(np.abs(statevecs), 2), np.shape(statevecs)[0])
 
             return probs
 
