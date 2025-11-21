@@ -212,7 +212,10 @@ class Result:
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
 
         Returns:
-            probs (dict, np.array): probabilities per bitstring of the 
+            probs (dict, np.array): probabilities per bitstring found on counts. The probabilities are
+                                    returned on an array which includes zero probabilities unless 
+                                    multiple cl_registers are found, in which case a simple dict 
+                                    with only non-zero probabilities is returned instead.
         """
         # Temporarily disable logging
         logging.disable(logging.CRITICAL)
