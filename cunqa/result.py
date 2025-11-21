@@ -56,9 +56,9 @@ class Result:
     """
     _result: dict
     _id: str
-    _registers: dict
+    _cl_registers: dict
     
-    def __init__(self, result: dict, circ_id: str, registers: dict):
+    def __init__(self, result: dict, circ_id: str, cl_registers: dict):
         """
         Initializes the Result class.
 
@@ -67,12 +67,12 @@ class Result:
 
             circ_id (str): circuit identificator.
 
-            registers (dict): dictionary specifying the classical registers defined for the circuit. This is neccessary for the correct formating of the counts bit strings.
+            cl_registers (dict): dictionary specifying the classical registers defined for the circuit. This is neccessary for the correct formating of the counts bit strings.
         """
 
         self._result = {}
         self._id = circ_id
-        self._registers = registers
+        self._cl_registers = cl_registers
         
         if result is None or len(result) == 0:
             logger.error(f"Empty object passed, result is {None} [{ValueError.__name__}].")
@@ -119,8 +119,8 @@ class Result:
                 logger.error(f"Some error occured with counts.")
                 raise ResultError
             
-            if len(self._registers) > 1:
-                counts = _convert_counts(counts, self._registers)
+            if len(self._cl_registers) > 1:
+                counts = _convert_counts(counts, self._cl_registers)
 
         except Exception as error:
             logger.error(f"Some error occured with counts [{type(error).__name__}]: {error}.")
@@ -259,14 +259,34 @@ class Result:
 
         # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
         else: 
-            probs = {}
-            all_shots = sum(self.counts.values())
+            if len(self._cl_registers) > 1:
+                logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. A dictionary with each probability will be returned.")
 
-            for k, v in self.counts.items():
-                probs[k] = v/all_shots
+                probs = {}
+                numpy_counts = np.array(list(self.counts.values()))
+                all_shots = np.sum(numpy_counts)
+
+                probs_array = numpy_counts/all_shots
+                for k, v in zip(self.counts.keys(), probs_array):
+                    probs[k] = v
+
+                return probs
+            
+            # If not all bitstrings are present, add them with count 0 (Consistent with state vctor)
+            n = len(next(iter(self.counts.keys())).split(' ')[0])
+            num_bitstrings = 2**n
+            if len(self.counts) != num_bitstrings:
+                new_counts = {**{f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, **self.counts} # Python 3.7+ is needed to preserve first dict's order
+
+            else:
+                new_counts = self.counts
+
+            numpy_counts = np.array(list(new_counts.values()))
+            all_shots = np.sum(numpy_counts)
+
+            probs = numpy_counts/all_shots
 
             return probs
-
     
 
 def _divide(string: str, lengths: "list[int]") -> str:
@@ -299,7 +319,7 @@ def _divide(string: str, lengths: "list[int]") -> str:
         raise SystemExit # User's level
 
 
-def _convert_counts(counts: dict, registers: dict) -> dict:
+def _convert_counts(counts: dict, cl_registers: dict) -> dict:
 
     """
     Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the division of the bit strings.
@@ -308,20 +328,20 @@ def _convert_counts(counts: dict, registers: dict) -> dict:
     --------
     counts (dict): dictionary of counts to apply the conversion.
 
-    registers (dict): dictionary of classical registers.
+    cl_registers (dict): dictionary of classical registers.
 
     Return:
     --------
     Counts dictionary with keys as binary string correctly separated with spaces accordingly to the classical registers.
     """
 
-    if isinstance(registers, dict):
-        # getting lenghts of bits for the different registers
+    if isinstance(cl_registers, dict):
+        # getting lenghts of bits for the different cl_registers
         lengths = []
-        for v in registers.values():
+        for v in cl_registers.values():
             lengths.append(len(v))
     else:
-        logger.error(f"regsters must be dict, but {type(registers)} was provided [TypeError].")
+        logger.error(f"regsters must be dict, but {type(cl_registers)} was provided [TypeError].")
         raise ResultError # I capture this error in QJob.result()
     
     logger.debug(f"Dividing strings into {len(lengths)} classical registers.")
@@ -331,7 +351,7 @@ def _convert_counts(counts: dict, registers: dict) -> dict:
         for k,v in counts.items():
             new_counts[_divide(k, lengths)] = v
     else:
-        logger.error(f"counts must be dict, but {type(registers)} was provided [TypeError].")
+        logger.error(f"counts must be dict, but {type(cl_registers)} was provided [TypeError].")
         raise ResultError # I capture this error in QJob.result()
     
     return new_counts
