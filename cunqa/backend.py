@@ -1,5 +1,11 @@
 """
     Cointains the class :py:class:`~cunqa.backend.Backend` which serves as a description of the characteristics of the virtual QPUs.
+
+    It can be found as the attribute :py:attr:`~cunqa.qpu.QPU.backend` of the :py:class:`~cunqa.qpu.QPU` class, it is created with
+    the corrresponding data when the :py:class:`~cunqa.qpu.QPU` object is instantiated:
+
+        >>> qpu.backend
+        <cunqa.backend.Backend object at XXXX>
 """
 
 from typing import  TypedDict
@@ -22,7 +28,7 @@ class BackendData(TypedDict):
 
 class Backend():
     """
-        Class to define backend information of a QPU server.
+        Class to define backend information of a virtual QPU.
     """
     def __init__(self, backend_dict: BackendData):
         """

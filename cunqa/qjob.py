@@ -53,7 +53,7 @@ class QJob:
     The quantum job not only contains the circuit to be simulated, but also simulation instructions and information of the virtual QPU to which the job is sent.
 
     One would want to save the :py:class:`QJob` resulting from sending a circuit in a variable.
-    Let`s say we want to send a circuit to a QPU and get the result and the time taken for the simulation:
+    Let's say we want to send a circuit to a QPU and get the result and the time taken for the simulation:
 
         >>> qjob = qpu.run(circuit)
         >>> result = qjob.result
@@ -97,7 +97,7 @@ class QJob:
         >>> result_2 = qjob_2.result
 
     This way, when we send the first job, then inmediatly the sencond one is sent, because :py:meth:`~cunqa.qpu.QPU.run` does not wait
-    for the simulation to finish. This way, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
+    for the simulation to finish. In this manner, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
     since jobs are managed by different :py:class:`QClient` objects, there can be no mix up.
 
     In fact, the function :py:func:`~cunqa.qjob.gather` is designed for recieving a list of qjobs and return the results; therefore, let's say
@@ -170,6 +170,7 @@ class QJob:
     _sending_to: "list[str]"
     _is_dynamic: bool
     _has_cc:bool
+    _has_qc:bool
 
     def __init__(self, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], **run_parameters: Any):
         """
@@ -316,9 +317,6 @@ class QJob:
             shots (int): int determining the new number of shots if it needs to be updated.
            
         """
-        if not hasattr(self, "_current_params"):
-            logger.error(f"Trying to upgrade parameters of a non-parametric circuit.")
-            raise SystemExit
 
         if self._result is None:
             self._future.get()
@@ -385,7 +383,10 @@ class QJob:
                 if "has_cc" in circuit:
                     self._has_cc = circuit["has_cc"]
                     self._is_dynamic = True
-                elif "is_dynamic" in  circuit:
+                elif "has_qc" in circuit:
+                    self._has_qc = circuit["has_qc"]
+                    self._is_dynamic = True
+                elif "is_dynamic" in circuit:
                     self._is_dynamic = circuit["is_dynamic"]
                 else:
                     self._is_dynamic = False
@@ -413,10 +414,12 @@ class QJob:
                 self._sending_to = circuit.sending_to
                 self._is_dynamic = circuit.is_dynamic
                 self._has_cc = circuit.has_cc
+                self._has_qc = circuit.has_qc
 
                 if circuit.is_parametric:
                     self._param_expressions = circuit.param_expressions
                     self._current_params = circuit.current_params
+                
                 
                 logger.debug("Translating to dict from CunqaCircuit...")
 
@@ -434,10 +437,11 @@ class QJob:
 
                 logger.debug("Translating to dict from QuantumCircuit...")
 
-                circuit_json = convert(circuit, "json")
+                circuit_json = convert(circuit, "dict")
                 instructions = circuit_json["instructions"]
                 self._is_dynamic = circuit_json["is_dynamic"]
                 self._has_cc = False
+                self.has_qc = False
 
             elif isinstance(circuit, str):
 
@@ -454,10 +458,11 @@ class QJob:
 
                 logger.debug("Translating to dict from QASM2 string...")
 
-                circuit_json = convert(qc_from_qasm, "json")
+                circuit_json = convert(qc_from_qasm, "dict")
                 instructions = circuit_json["instructions"]
                 self._is_dynamic = circuit_json["is_dynamic"]
                 self._has_cc = False
+                self._has_qc = False
 
             else:
                 logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circuit)} was provided [{TypeError.__name__}].")
@@ -487,7 +492,8 @@ class QJob:
             # config dict
             run_config = {
                 "shots": 1024, 
-                "method":"statevector", # Mandatory key for simulation, if a method is provided it will be overwritten in 11 lines. 
+                "method":"automatic", 
+                "avoid_parallelization": False,
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
                 "seed": 123123
@@ -502,8 +508,6 @@ class QJob:
             else:
                 logger.warning("Error when reading `run_parameters`, default were set.")
             
-            logger.debug("Before exec_config")
-            
             exec_config = {
                 "id": self._circuit_id,
                 "config": run_config, 
@@ -511,12 +515,12 @@ class QJob:
                 "sending_to": self._sending_to,
                 "is_dynamic": self._is_dynamic,
                 "has_cc": self._has_cc
+                #,"has_qc": self._has_qc # Not needed in C++ 
             }
             
             self._execution_config = json.dumps(exec_config)
 
             logger.debug("QJob created.")
-            logger.debug(self._execution_config)
 
         except KeyError as error:
             logger.error(f"Format of the cirucit not correct, couldn't find 'instructions'\n [{type(error).__name__}] {error}.")
@@ -528,15 +532,26 @@ class QJob:
         
 
 
-def gather(qjobs: Union[QJob, "list['QJob']"]) -> Union[Result, "list['Result']"]:
+def gather(qjobs: "list['QJob']") -> "list['Result']":
     """
-        Function to get result of several QJob objects, it also takes one QJob object.
+        Function to get the results of several :py:class:`QJob` objects.
+
+        Once the jobs are running:
+
+            >>> results = gather(qjobs)
+
+        This is a blocking call, results will be called sequentialy in . Since they are being run simultaneously,
+        even if the first one on the list takes the longest, when it finishes the rest would have been done, so
+        just the small overhead from calling them will be added.
+
+        .. warning::
+            Since this is mainly a for loop, the order must be respected when submiting jobs to the same virtual QPU.
 
         Args:
-            qjobs (list of QJob objects or QJob object)
+            qjobs (list[QJob]): list of objects to get the result from.
 
         Return:
-            Result or list of results.
+            List of :py:class:`~cunqa.result.Result` objects.
     """
     if isinstance(qjobs, list):
         if not all([isinstance(q, QJob) for q in qjobs]):
@@ -549,5 +564,5 @@ def gather(qjobs: Union[QJob, "list['QJob']"]) -> Union[Result, "list['Result']"
         return qjobs.result
 
     else:
-        logger.error(f"qjobs must be <class 'qjob.QJob'> or list, but {type(qjobs)} was provided [{TypeError.__name__}].")
+        logger.error(f"qjobs must be list, but {type(qjobs)} was provided [{TypeError.__name__}].")
         raise SystemError # User's level

@@ -1,0 +1,80 @@
+{
+
+"name":"backend_name",
+"n_qubits":2,
+"coupling_map":[[0,1]],
+"basis_gates":["sx", "x", "rz", "ecr"],
+"single_qubits":
+{
+    "q0":
+    {
+        "t1":0.0,
+        "t2":0.0,
+        "readout_fidelity":0.0,
+        "readout_duration":0.0,
+        "measuring_frecuency":0.0,
+        "drive_frecuency":0.0,
+        "gates":
+        {
+            "sx":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            },
+            "x":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            },
+            "rz":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            }
+        }
+    },
+    "q1":
+    {
+        "t1":0.0,
+        "t2":0.0,
+        "readout_fidelity":0.0,
+        "readout_duration":0.0,
+        "measuring_frecuency":0.0,
+        "drive_frecuency":0.0,
+        "gates":
+        {
+            "sx":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            },
+            "x":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            },
+            "rz":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            }
+        }
+    }
+},
+
+"paired_qubits":
+{
+    "q0-q1":
+    {
+        "gates":
+        {
+            "ecr":
+            {
+                "fidelity":0.0,
+                "gate_duration":0.0
+            }
+        }
+    }
+}
+
+}

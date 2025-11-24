@@ -249,6 +249,8 @@ _autosummary/
 
 # Logging
 logs/
+**/results*/
+
 
 # vscode
 .vscode
@@ -303,3 +305,17 @@ modules11.sh
 
 build_improvements/
 bash/
+
+
+/examples/CESGA_use_cases/EP-use-case/
+/examples/CESGA_use_cases/Paralelizing-obs/
+aer-cpp-0-15-1/
+maestro/
+maestro-latest/
+QCSim/
+qiskit-aer/
+launch_tests.sh
+
+hybrid_qc-cc.py
+distr_Grover.py
+QFT.py

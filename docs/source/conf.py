@@ -10,7 +10,11 @@ from pathlib import Path
 sys.path.insert(0, os.path.abspath('../..'))
 
 
-os.environ['INFO_PATH'] = ''
+os.environ['CUNQA_PATH'] = ''
+os.environ['HOSTNAME'] = ''
+os.environ['QPUS_FILEPATH'] = ''
+os.environ['SLURMD_NODENAME'] = ''
+os.environ['SLURM_JOB_ID'] = ''
 os.environ['STORE'] = ''
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -49,28 +53,37 @@ autodoc_member_order = "bysource"
 autodocsumm_member_order = "bysource"
 
 autodoc_mock_imports = [
-    'os', 
-    'json', 
-    'JSONDecodeError', 
-    'load', 
-    'logger', 
-    'qiskit', 
-    'dateutil', 
-    'glob',
     'argparse',
-    'logging',
-    'numpy',
-    'cunqa.qclient',
-    'QClient',
-    'cunqa.logger',
-    'qmiotools',
-    'qiskit_aer',
-    'Pandoc',
+    'collections',
+    'copy',
+    'cunqa.constants',
     'cunqa.fakeqmio',
-    'subprocess',
-    'typing',
+    'cunqa.logger',
+    'cunqa.qclient',
+    'dateutil',
+    'fcntl',
+    'glob',
     'insert',
-    'copy'
+    'inspect',
+    'JSONDecodeError',
+    'json',
+    'load',
+    'logging',
+    'logger',
+    'numpy',
+    'operator',
+    'os',
+    'Pandoc',
+    'QClient',
+    'qiskit',
+    'qiskit_aer',
+    'qmiotools',
+    'random',
+    'string',
+    'subprocess',
+    'sys',
+    'time',
+    'typing'
 ]
 
 
@@ -103,7 +116,7 @@ html_theme_options = {
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': True,
-    'navigation_depth': 4,
+    'navigation_depth': 3,
     'includehidden': True,
     'titles_only': False
 }

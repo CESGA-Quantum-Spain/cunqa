@@ -4,9 +4,11 @@ import json
 import time
 
 sys.path.append(os.getenv("HOME"))
-from cunqa.qutils import getQPUs
+from cunqa.qutils import get_QPUs, qraise, qdrop
+family = qraise(3, "00:10:00", simulator="Munich", classical_comm=True, co_located = True)
 
-qpus = getQPUs(local=False)
+qpus = get_QPUs(on_node=False, family = family)
+
 print("QPUs disponibles:")
 for q in qpus:
     print(f"QPU {q.id}, backend: {q.backend.name}")
@@ -64,9 +66,10 @@ d_qc_1_zmq = {
     "id": "losada",
     "instructions": [
     {
-        "name":"remote_c_if_x",
+        "name":"recv",
         "qubits":[1],
-        "circuits":["carballido"]
+        "circuits":["carballido"],
+        "remote_conditional_reg":[1]
     },
     {
         "name":"h",
@@ -103,13 +106,13 @@ d_qc_2_zmq = {
     "instructions": [
     {
         "name":"h",
-        "qubits":[1],
-        "qubits":[1],
+        "qubits":[1]
     },
     {
-        "name":"remote_c_if_x",
+        "name":"recv",
         "qubits":[0],
-        "circuits":["carballido"]
+        "circuits":["carballido"],
+        "remote_conditional_reg":[0]
     },
     {
         "name": "measure",
@@ -150,6 +153,8 @@ job0, job1, job2 = run_distributed([d_qc_0_zmq, d_qc_1_zmq, d_qc_2_zmq], qpus[:3
 print("Result QPU0", job0.result.counts)
 print("Result QPU1", job1.result.counts)
 print("Result QPU2", job2.result.counts)
+
+qdrop(family)
 
 
 

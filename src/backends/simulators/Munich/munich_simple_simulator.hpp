@@ -14,6 +14,7 @@ namespace sim {
 class MunichSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
     MunichSimpleSimulator() = default;
+    MunichSimpleSimulator(const std::string& group_id) {};
     ~MunichSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "MunichSimulator";}

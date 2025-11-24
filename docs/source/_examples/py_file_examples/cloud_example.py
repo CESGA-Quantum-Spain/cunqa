@@ -3,16 +3,16 @@ import os, sys
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa import getQPUs
+from cunqa import get_QPUs
 from cunqa.circuit import CunqaCircuit
 
 
 # --------------------------------------------------
-# Key difference between cloud and HPC
-# example: local = False. This allows to look for
+# Key difference between co-located and HPC
+# example: on_node = False. This allows to look for
 # QPUs out of the node where the work is executing.
 # --------------------------------------------------
-qpus  = getQPUs(local=False)
+qpus  = get_QPUs(on_node=False)
 
 
 for q in qpus:

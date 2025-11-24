@@ -9,6 +9,7 @@ namespace sim {
 class CunqaExecutor {
 public:
     CunqaExecutor();
+    CunqaExecutor(const std::string& group_id);
     ~CunqaExecutor() = default;
 
     void run();

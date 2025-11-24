@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "logger.hpp"
 
 using namespace std::literals;
@@ -10,10 +10,10 @@ using namespace std::literals;
 struct CunqaArgs : public argparse::Args 
 {
     //int& node = kwarg("node", "Specific node to raise the qpus."); //Álvaro 
-    int& n_qpus                          = kwarg("n,num_qpus", "Number of QPUs to be raised.");
-    std::string& time                    = kwarg("t,time", "Time for the QPUs to be raised.");
+    int& n_qpus                          = kwarg("n,num_qpus", "Number of QPUs to be raised.").set_default(1);
+    std::string& time                    = kwarg("t,time", "Time for the QPUs to be raised.").set_default("00:10:00");
     int& cores_per_qpu                   = kwarg("c,cores", "Number of cores per QPU.").set_default(2);
-    int& mem_per_qpu                     = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.").set_default(8);
+    std::optional<int>& mem_per_qpu = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.");
     std::optional<std::size_t>& number_of_nodes  = kwarg("N,n_nodes", "Number of nodes.").set_default(1);
     std::optional<std::vector<std::string>>& node_list = kwarg("node_list", "List of nodes where the QPUs will be deployed.").multi_argument(); 
     std::optional<int>& qpus_per_node    = kwarg("qpuN,qpus_per_node", "Number of qpus in each node.");
@@ -29,9 +29,10 @@ struct CunqaArgs : public argparse::Args
 
     std::string& family_name             = kwarg("fam,family_name", "Name that identifies which QPUs were raised together.").set_default("default");
     //bool& hpc                          = flag("hpc", "Default HPC mode. The user can connect with the local node QPUs.");
-    bool& cloud                          = flag("cloud", "CLOUD mode. The user can connect with any deployed QPU.");
+    bool& co_located                          = flag("co-located", "co-located mode. The user can connect with any deployed QPU.");
     bool& cc                             = flag("classical_comm", "Enable classical communications.");
     bool& qc                             = flag("quantum_comm", "Enable quantum communications.");
+    std::optional<std::string>& infrastructure = kwarg("infrastructure", "Path to a infrastructure of QPUs.");
 
     void welcome() {
         std::cout << "Welcome to qraise command, a command responsible for turning on the required QPUs.\n" << std::endl;

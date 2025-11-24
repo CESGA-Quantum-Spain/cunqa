@@ -17,6 +17,7 @@ namespace sim {
 class MunichCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     MunichCCSimulator();
+    MunichCCSimulator(const std::string& group_id);
     ~MunichCCSimulator() = default;
 
     inline std::string get_name() const override {return "MunichSimulator";}
