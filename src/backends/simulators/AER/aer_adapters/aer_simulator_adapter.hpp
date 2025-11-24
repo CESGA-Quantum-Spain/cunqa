@@ -1,14 +1,30 @@
+#pragma once
+
+#include <vector>
+
 #include "quantum_task.hpp"
 #include "classical_channel/classical_channel.hpp"
-#include "backends/simple_backend.hpp"
+#include "backends/backend.hpp"
+#include "aer_computation_adapter.hpp"
 
 #include "utils/json.hpp"
 
 namespace cunqa {
 namespace sim {
 
-JSON usual_execution_(const SimpleBackend& backend, const QuantumTask& quantum_task);
-JSON dynamic_execution_(const QuantumTask& quantum_task, comm::ClassicalChannel* classical_channel = nullptr);
+class AerSimulatorAdapter
+{
+public:
+    AerSimulatorAdapter() = default;
+    AerSimulatorAdapter(AerComputationAdapter& qc) : qc{qc} {}
+
+    JSON simulate(const Backend* backend);
+    JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
+
+    AerComputationAdapter qc;
+
+};
+
 
 } // End of sim namespace
 } // End of cunqa namespace

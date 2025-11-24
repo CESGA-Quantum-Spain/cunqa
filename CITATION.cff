@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Carballido Costas"
+  given-names: "Álvaro"
+  orcid: "https://orcid.org/0009-0005-9570-2420"
+- family-names: "Expósito Patiño"
+  given-names: "Daniel"
+- family-names: "Losada Estévez"
+  given-names: "Marta"
+  orcid: "https://orcid.org/0009-0005-3153-0578"
+- family-names: "Vázquez Pérez"
+  given-names: "Jorge"
+  orcid: "https://orcid.org/{0009-0002-1442-4181"
+title: "CUNQA: a tool for emulating distributed quantum computing."
+version: 0.3.1
+date-released: 2025-07-23
+url: "https://github.com/CESGA-Quantum-Spain/cunqa"
+
+ 

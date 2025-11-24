@@ -24,4 +24,16 @@ inline void reverse_bitstring_keys_json(std::map<std::string, std::size_t>& coun
     counts = modified_counts;
 }
 
+inline void reverse_bitstring_keys_json(JSON& result) 
+{
+    JSON counts = result.at("counts").get<JSON>();
+    JSON modified_counts; 
+
+    for (const auto& [key, inner] : counts.items()) {
+        std::string reverse_bitstring = reverse_string(key); 
+        modified_counts[reverse_bitstring] = inner; 
+    }
+    result.at("counts") = modified_counts;
+}
+
 } //End namespace cunqa

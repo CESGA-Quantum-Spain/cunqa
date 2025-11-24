@@ -11,7 +11,7 @@ public:
     JSON circuit;
     JSON config;
     std::vector<std::string> sending_to;
-    bool is_dynamic = false; // C_IF gates
+    bool is_dynamic = false; // C_IF gates & Classical Communications
     bool has_cc = false; // Classical Communications
     std::string id;
 

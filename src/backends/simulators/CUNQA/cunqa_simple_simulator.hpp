@@ -14,12 +14,13 @@ class CunqaSimpleSimulator final : public SimulatorStrategy<SimpleBackend>
 {
 public:
     CunqaSimpleSimulator() = default;
+    CunqaSimpleSimulator(const std::string& group_id) {};
     ~CunqaSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "CunqaSimulator";}
 
     // TODO: The [[maybe_unused]] annotation is a temporary approach while CunqaSimulator does not take into account the backend info
-    JSON execute([[maybe_unused]] const SimpleBackend& backend, const QuantumTask& quantumtask) override;
+    JSON execute([[maybe_unused]] const SimpleBackend& backend, const QuantumTask& quantum_task) override;
 
 };
 

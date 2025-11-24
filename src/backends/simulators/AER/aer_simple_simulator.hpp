@@ -14,6 +14,7 @@ class AerSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     AerSimpleSimulator() = default;
+    AerSimpleSimulator(const std::string& group_id) {};
     ~AerSimpleSimulator() override;
 
     inline std::string get_name() const override {return "AerSimulator";} 

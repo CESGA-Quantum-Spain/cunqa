@@ -51,7 +51,7 @@ logger.handlers.clear()
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setLevel(logging.WARN)
 
-formatter = ColoredFormatter('\t%(levelname)s: %(message)s')
+formatter = ColoredFormatter('\t%(levelname)s: [%(filename)s] %(message)s\n')
 console_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)

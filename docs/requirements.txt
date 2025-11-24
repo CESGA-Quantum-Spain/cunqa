@@ -8,3 +8,6 @@ nbsphinx
 pypandoc
 lxml-html-clean #needed for nbsphinx functionalities, which I use to display jupyter notebooks
 sphinx-mdinclude
+sphinx-autodoc-typehints
+autodocsumm
+sphinx-toolbox

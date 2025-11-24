@@ -1,8 +1,59 @@
-<h1 style="font-size:8em;" style="text-align: center;"> CUNQA </h1>
-<h2> A platform to simulate distributed quantum computing on CESGA HPC enviroment. </h2>
+
+<p align="center">
+  <a>
+    <img src="https://img.shields.io/badge/os-linux-blue" alt="Python version" height="18">
+  </a>
+  <a>
+    <img src="https://img.shields.io/badge/python-3.9-blue.svg" alt="Python version" height="18">
+  </a>
+  <a href="cesga-quantum-spain.github.io/cunqa/">
+    <img src="https://img.shields.io/badge/docs-blue.svg" alt="Python version" height="18">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png" width="600" height="150">
+    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_black.png" width="600" height="150">
+    <img src="docs/source/_static/logo_cunqa_black.png" width="30%" style="display: inline-block;" alt="CUNQA logo">
+  </picture>
+  </a>
+</p>
+
+<p align="center">
+  A HPC platform to simulate Distributed Quantum Computing. 
+</p>
+
+<br>
+
+<p align="center">
+  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <img width=30% src="https://img.shields.io/badge/documentation-black?style=for-the-badge&logo=read%20the%20docs" alt="Documentation">
+  </a>
+</p>
 
 
-<h2> Authors </h2>
+<p>
+    <div align="center">
+      <a href="https://www.cesga.es/">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cesga_blanco.png" width="200" height="50">
+          <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cesga_negro.png" width="200" height="50">
+          <img src="docs/source/_static/logo_cesga_negro.png" width="30%" style="display: inline-block;" alt="CESGA logo">
+        </picture>
+      </a>
+      <a href="https://quantumspain-project.es/">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/QuantumSpain_logo_white.png" width="240" height="50">
+          <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/QuantumSpain_logo_color.png" width="240" height="50">
+          <img src="docs/source/_static/QuantumSpain_logo_white.png" width="30%" style="display: inline-block;" alt="QuantumSpain logo">
+        </picture>
+      </a>
+    </div>
+</p>
+
+## Authors 
 <ul>
   <li> <a href="https://github.com/martalosada">Marta Losada Estévez </a> </li>
   <li> <a href="https://github.com/jorgevazquezperez">Jorge Vázquez Pérez </a></li>
@@ -11,38 +62,19 @@
   <br> 
 </ul>
 
-<a href="https://www.cesga.es/">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cesga_blanco.png" width="250" height="60">
-    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logotipo_CESGA_negro.png" width="200" height="60">
-    <img alt="CESGA Logo" src="docs/source/_static/logotipo_CESGA_negro.png" width="200" height="60">
-  </picture>
-</a> 
-
-<br> 
-<br>
-
 # Table of contents
-  - [USE AS LMOD MODULE](#use-as-lmod-module)
   - [INSTALLATION](#installation)
-    - [CLONE REPOSITORY](#clone-repository)
-    - [QMIO](#qmio)
-      - [Automatic installation](#automatic-installation)
-      - [Manual installation](#manual-installation)
-    - [FINISTERRAE III (FT3)](#finisterrae-iii-ft3)
-      - [Automatic installation](#automatic-installation-1)
-      - [Manual installation](#manual-installation-1)
+    - [Clone repository](#clone-repository)
+    - [Define STORE environment variable](#clone-repository)
+    - [Dependencies](#dependencies)
+    - [Configure, build and install](#configure-build-and-install)
+    - [Install as Lmod module](#install-as-lmod-module)
+  - [UNINSTALL](#uninstall)
   - [RUN YOUR FIRST DISTRIBUTED PROGRAM](#run-your-first-distributed-program)
-    - [1. `qraise`command](#1-qraisecommand)
-    - [2. Python Program Example](#2-python-program-example)
-    - [3. `qdrop` command](#3-qdrop-command)
+    1. [`qraise`command](#1-qraisecommand)
+    2. [Python Program Example](#2-python-program-example)
+    3. [`qdrop` command](#3-qdrop-command)
   - [ACKNOWLEDGEMENTS](#acknowledgements)
-
-
-## Use as Lmod module
-Cunqa is available as Lmod module in CESGA. To use it all you have to do is:
-- In QMIO: `module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi`
-- In FT3: `module load cesga/2022 gcc/system cunqa/0.3.1`
 
 ## Installation 
 ### Clone repository
@@ -54,108 +86,86 @@ ssh-add ~/.ssh/SSH_KEY
 ```
  
 Now, everything is set to get the source code. 
-> [!WARNING]
-> In order to get all the submodules correctly loaded, please remember the `--recursive` option when cloning.
 
 ```console
-git clone --recursive git@github.com:CESGA-Quantum-Spain/cunqa.git
+git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 ```
 
-As a additional step, we encourage to run the *setup_submodules.sh* file, which removes some of the files unused in the submodules and makes the repository lighter:
+### Define STORE environment variable
+Before doing any kind of compilation, the user has to define the `STORE` environment variable in bash. This repository will be the root for the `.cunqa` folder, where CUNQA is going to store several runtime files (configuration files and logging files, mainly).
 
 ```console
-cd scripts
-bash setup_submodules.sh
+export STORE=/path/to/your/store
 ```
 
-### QMIO
-#### Automatic installation
-The `scripts/configure.sh` file is prepared to bring an automatic installation of the **CUNQA** platform. The user only has to execute this file followed by the path to the desire installation folder: 
+### Dependencies
+CUNQA has a set of dependencies. They are divided in three main groups.
 
-```console
-source configure.sh
+- Must be installed before configuration.
+- Can be installed, but if they are not they will be by the configuration process.
+- They will be installed by the configuration process.
+
+From the first group, **the ones that must be installed**, the dependencies are the following. The versions here displayed are the ones that have been employed in the development and, therefore, that are recommended.
+
+```
+gcc             12.3.0
+qiskit          1.2.4
+CMake           3.21.0
+python          3.9 (recommended 3.11)
+pybind11        2.7 (recommended 2.12)
+MPI             3.1
+OpenMP          4.5
+Boost           1.85.0
+Blas            -
+Lapack          -
+```
+
+From the second group, **the ones that will be installed if they are not yet**, they are the next ones.
+
+```
+nlohmann JSON   3.11.3
+spdlog          1.16.0
+MQT-DDSIM       1.24.0
+libzmq          4.3.5
+cppzmq          4.11.0
+CunqaSimulator  0.1.1
+```
+
+And, finally, **the ones that will be installed**.
+```
+argparse        -
+qiskit-aer      0.17.2 (modified version)
 ``` 
 
-If the automatic installation fails, try the manual installation.
-
-#### Manual installation
-
-1. First of all, deactivate miniconda to not interfere with the rest of the installation:
+### Configure, build and install
+Now, as with any other CMake project, is can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined and, if not, its will be the HOME environment variable value. 
 
 ```console
-conda deactivate
-```
-
-2. Then, load the following modules:
-
-```console
-ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 pybind11/2.12.0-python-3.9.9 nlohmann_json/3.11.3 ninja/1.9.0 qiskit/1.2.4-python-3.9.9
-```
-
-3. Once the previous steps are done, everything is set for the build/installation. There are two options: 
-    
-* **Standard way (slower)**
-```console
-cmake -B build/ 
+cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
 cmake --build build/ --parallel $(nproc)
 cmake --install build/
 ```
 
-* **Using [Ninja](https://ninja-build.org/) (faster)**
-```console
-cmake -G Ninja -B build/
-ninja -C build -j $(nproc)
-cmake --install build/
-```
-> [!IMPORTANT]
-> Is **KEY** that this compilation is done in a compute node with sufficient resources (if not, the compilation process could be killed).
-
-### Finisterrae III (FT3)
-
-In the FT3, the installation is almost the same as in QMIO but with few exceptions. 
-
-#### Automatic installation
-For the **automatic installation**, the process is exactly the same as the one presented for QMIO:
+It is important to mention that the user can also employ [Ninja](https://ninja-build.org/) to perform this task.
 
 ```console
-source configure.sh
-``` 
-
-#### Manual installation
-In the case of a **manual installation**, the steps are analogous to the shown above for QMIO:
-
-1. Conda deactivation:
-
-```console
-conda deactivate
-```
-
-2. Loading modules:
-
-```console
-ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4
-```
-
-5. Again: configure, compile and install using CMake:
-
-* **Standard way**
-```console
-cmake -B build/ 
-cmake --build build/
-cmake --install build/
-```
-
-* **Using [Ninja](https://ninja-build.org/)**
-```console
-cmake -G Ninja -B build/
+cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
 ninja -C build -j $(nproc)
 cmake --install build/
 ```
 
-> [!IMPORTANT]
-> Is **KEY** that this compilation is done in a compute node with sufficient resources (if not, the compilation process could be killed).
+Alternatively, you can use the `configure.sh` file, but only after all the dependencies have been solved.
+```console
+source configure.sh /your/installation/path
+```
 
-And that's it! Everything is set—either on QMIO or in the FT3—to perform an execution. 
+### Install as Lmod module
+Cunqa is available as Lmod module in CESGA. To use it all you have to do is:
+
+- In QMIO: `module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi`
+- In FT3: `module load cesga/2022 gcc/system cunqa/0.3.1`
+
+If your HPC center is interested in using it this way, EasyBuild files employed to install it in CESGA are available inside `easybuild/` folder.
 
 ## Uninstall
 There has also been developed a Make directive to uninstall CUNQA if needed: 
@@ -182,8 +192,6 @@ Once **CUNQA** is installed, the basic workflow to use it is:
     - Execute the circuits on the QPUs.
     - Obtain the results.
 3. Drop the raised QPUs with the command `qdrop`.
-> [!IMPORTANT] 
-> Please, note that steps 1-4 of the [Installation section](#installation) have to be done every time **CUNQA** wants to be used.
 
 ### 1. `qraise` command
 The `qraise` command raises as many QPUs as desired. Each QPU can be configured by the user to have a personalized backend. There is a help FLAG with a quick guide of how this command works:
@@ -224,10 +232,10 @@ The personalized backend has to be a *json* file with the following structure:
 > The "noise" key must be filled with a json with noise instructions supported by the chosen simulator.
 
 > [!IMPORTANT]  
-> Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `getQPUs()` method presented in the section below will collect all the raised QPUs.
+> Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `get_QPUs()` method presented in the section below will collect all the raised QPUs.
 
 ### 2. Python Program Example
-Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow.
+Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow to run a circuit on a single QPU.
 
 > [!WARNING]
 > To execute the following python example it is needed  to load the [Qiskit](https://github.com/Qiskit/qiskit) module:
@@ -253,9 +261,9 @@ import sys
 sys.path.append(os.getenv("HOME"))
 
 # Let's get the raised QPUs
-from cunqa.qutils import getQPUs
+from cunqa.qutils import get_QPUs
 
-qpus  = getQPUs() # List of raised QPUs
+qpus  = get_QPUs(local=False) # List of all raised QPUs
 for q in qpus:
     print(f"QPU {q.id}, name: {q.backend.name}, backend: {q.backend.simulator}, version: {q.backend.version}.")
 
@@ -271,12 +279,11 @@ qc.measure_all()
 # Time to run
 qpu0 = qpus[0] # Select one of the raise QPUs
 
-job = qpu0.run(qc, transpile = True, shots = 1000)
+job = qpu0.run(qc, transpile = True, shots = 1000) # Run the transpiled circuit
+result = job.result # Get the result of the execution
+counts = result.counts # Get the counts
 
-result = job.result() # Get the result of the execution
-
-counts = result.get_counts() 
-print(f"Counts: {counts}" )
+print(f"Counts: {counts}" ) # {'00':546, '11':454}
 ```
 
 > [!NOTE] 
@@ -306,3 +313,9 @@ qdrop --all
 ```
 
 ## Acknowledgements
+This work has been mainly funded by the project QuantumSpain, financed by the Ministerio de Transformación Digital y Función Pública of Spain’s Government through the project call QUANTUM ENIA – Quantum Spain project, and by the European Union through the Plan de Recuperación, Transformación y Resiliencia – NextGenerationEU within the framework of the Agenda España Digital 2026. J. Vázquez-Pérez was supported by the Axencia Galega de Innovación (Xunta de Galicia) through the Programa de axudas á etapa predoutoral (ED481A & IN606A).
+
+Additionally, this research project was made possible through the access granted by the Galician Supercomputing Center (CESGA) to two key parts of its infrastructure. Firstly, its Qmio quantum computing infrastructure with funding from the European Union, through the Operational Programme Galicia 2014-2020 of ERDF_REACT EU, as part of theEuropean Union’s response to the COVID-19 pandemic. 
+
+Secondly, The supercomputer FinisTerrae III and its permanent data storage system, which have been funded by the NextGeneration EU 2021 Recovery, Transformation and Resilience Plan, ICT2021-006904, and also from the Pluriregional Operational Programme of Spain 2014-2020 of the European Regional Development Fund (ERDF), ICTS-2019-02-CESGA3, and from the State Programme for the Promotion of Scientific and Technical Research of Excellence of the State
+Plan for Scientific and Technical Research and Innovation 2013-2016 State subprogramme for scientific and technical infrastructures and equipment of ERDF, CESG15-DE-3114.

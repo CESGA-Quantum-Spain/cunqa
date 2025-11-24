@@ -1,15 +1,59 @@
-"""Contains the Result class, which deals with the output of QJobs using any simulator."""
+"""
+    Contains the :py:class:`~cunqa.result.Result` class, which gathers the information about the output of a simulations, also other functions
+    to manage them.
+
+    Once we have submmited a :py:class:`~cunqa.qjob.QJob`, for obtaining its results we call for its propperty :py:attr:`QJob.result`:
+
+        >>> qjob.result
+        <cunqa.result.Result object at XXXX>
+    
+    This object has two main attributes for out interest: the counts distribution from the simulation and the time that the simulation took in seconds:
+
+        >>> result = qjob.result
+        >>> result.counts
+        {'000':34, '111':66}
+        >>> result.time_taken
+        0.056
+    
+
+"""
 from cunqa.logger import logger
+from typing import Union, Optional
+import numpy as np
 
 class ResultError(Exception):
-    """Exception for error during job submission to QPUs."""
+    """Exception for error received from a simulation."""
     pass
 
 class Result:
     """
-    Class to describe the result of an experiment.
+    Class to describe the result of a simulation.
+
+    It has two main attributes:
+
+    - :py:attr:`Result.counts` : returns the distribution of counts from the sampling of the simulation.
+
+            >>> result.counts
+            {'000':34, '111':66}
+
+    .. note::
+        If the circuit sent has more than one classical register, bit strings corresponding to each one of them will be separated
+        by blank spaces in the order they were added:
+
+            >>> result.counts
+            {'001 11':23, '110 10':77}
+    
+    - :py:attr:`Result.time_taken` : the time that the simulation took.
+
+            >>> result.time_taken
+            0.056
+
+    Nevertheless, depending on the simulator used, more output data is provided. For checking all the information from the simulation as a ``dict``, one can
+    access the attribute :py:attr:`Result.result`.
+
+    If an error occurs at the simulation, an exception will be raised at the pyhton program, :py:exc:`ResultError`.
     """
-    _result: dict 
+    _result: dict
     _id: str
     _registers: dict
     
@@ -18,10 +62,11 @@ class Result:
         Initializes the Result class.
 
         Args:
-        -----------
-        result (dict): dictionary given as the result of the simulation.
+            result (dict): dictionary given as the output of the simulation.
 
-        registers (dict): in case the circuit has more than one classical register, dictionary for the lengths of the classical registers must be provided.
+            circ_id (str): circuit identificator.
+
+            registers (dict): dictionary specifying the classical registers defined for the circuit. This is neccessary for the correct formating of the counts bit strings.
         """
 
         self._result = {}
@@ -31,12 +76,15 @@ class Result:
         if result is None or len(result) == 0:
             logger.error(f"Empty object passed, result is {None} [{ValueError.__name__}].")
             raise ValueError
+        
         elif "ERROR" in result:
-            logger.debug(f"Result received: {result}\n")
+            #logger.debug(f"Result received: {result}\n")
             message = result["ERROR"]
             logger.error(f"Error during simulation, please check availability of QPUs, run arguments syntax and circuit syntax: {message}")
             raise ResultError
+        
         else:
+            #logger.debug(f"Result received: {result}\n")
             self._result = result
         
         #logger.debug("Results correctly loaded.")
@@ -48,16 +96,18 @@ class Result:
         YELLOW = "\033[33m"
         RESET = "\033[0m"   
         GREEN = "\033[32m"
-        return f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t time_taken: {GREEN}{float(self.time_taken)/1e3} ms{RESET}{'}'}\n"
+        return f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n"
 
 
     @property
     def result(self) -> dict:
+        """Raw output of the simulation, the ``dict`` format depends on the simulator used."""
         return self._result
     
 
     @property
     def counts(self) -> dict:
+        """Counts distribution from the sampling of the simulation, format is ``{"<bit string>":<number of counts as int>}``."""
         try:
             if "results" in list(self._result.keys()): # aer
                 counts = self._result["results"][0]["data"]["counts"]
@@ -68,16 +118,18 @@ class Result:
                 logger.error(f"Some error occured with counts.")
                 raise ResultError
             
-            #counts = convert_counts(counts, self._registers)   #TODO
+            if len(self._registers) > 1:
+                counts = _convert_counts(counts, self._registers)
 
         except Exception as error:
             logger.error(f"Some error occured with counts [{type(error).__name__}]: {error}.")
             raise error
+        
         return counts
-
 
     @property
     def time_taken(self) -> str:
+        """Time that the simulation took in seconds, since it is recieved at the virtual QPU until it is finished."""
         try:
             if "results" in list(self._result.keys()): # aer
                 time = self._result["results"][0]["time_taken"]
@@ -93,19 +145,17 @@ class Result:
             raise error
     
 
-def divide(string: str, lengths: "list[int]") -> str:
+def _divide(string: str, lengths: "list[int]") -> str:
     """
     Divides a string of bits in groups of given lenghts separated by spaces.
 
     Args:
-    --------
-    string (str): string that we want to divide.
+        string (str): string that we want to divide.
 
-    lengths (list[int]): lenghts of the resulting strings in which the original one is divided.
+        lengths (list[int]): lenghts of the resulting strings in which the original one is divided.
 
     Return:
-    --------
-    A new string in which the resulting groups are separated by spaces.
+        A new string in which the resulting groups are separated by spaces.
 
     """
 
@@ -125,7 +175,7 @@ def divide(string: str, lengths: "list[int]") -> str:
         raise SystemExit # User's level
 
 
-def convert_counts(counts: dict, registers: dict) -> dict:
+def _convert_counts(counts: dict, registers: dict) -> dict:
 
     """
     Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the division of the bit strings.
@@ -142,25 +192,23 @@ def convert_counts(counts: dict, registers: dict) -> dict:
     """
 
     if isinstance(registers, dict):
-        
-        # counting number of classical bits
-        num_clbits = sum([len(i) for i in registers.values()])
         # getting lenghts of bits for the different registers
         lengths = []
         for v in registers.values():
             lengths.append(len(v))
     else:
-        logger.error(f"Error when converting `counts` strings.")
+        logger.error(f"regsters must be dict, but {type(registers)} was provided [TypeError].")
         raise ResultError # I capture this error in QJob.result()
+    
+    logger.debug(f"Dividing strings into {len(lengths)} classical registers.")
 
     if isinstance(counts, dict):
-        res_counts = {}
+        new_counts = {}
         for k,v in counts.items():
-            if k.startswith('0x'): # converting to binary string and dividing in bit strings
-                new_counts[divide(format( int(k, 16), '0'+str(num_clbits)+'b' ), lengths)]= v
-            else: # just dividing the bit stings
-                new_counts[divide(k, lengths)] = v
-    elif isinstance(counts, list):
-        for count in counts:
-            new_counts[divide(format(count[0],'0'+str(num_clbits)+'b')[::-1], lengths)] = count[1] 
+            new_counts[_divide(k, lengths)] = v
+    else:
+        logger.error(f"counts must be dict, but {type(registers)} was provided [TypeError].")
+        raise ResultError # I capture this error in QJob.result()
+    
     return new_counts
+

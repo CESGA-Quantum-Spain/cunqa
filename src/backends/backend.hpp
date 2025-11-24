@@ -18,6 +18,8 @@ public:
     virtual ~Backend() = default;
     virtual inline JSON execute(const QuantumTask& quantum_task) const = 0;
     virtual JSON to_json() const = 0;
+
+    JSON config;
 };
 
 } // End of sim namespace

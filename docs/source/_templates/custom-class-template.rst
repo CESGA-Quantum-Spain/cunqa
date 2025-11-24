@@ -1,34 +1,43 @@
-{{ fullname | escape | underline}}
+{{ fullname | escape | underline('=') }}
 
 .. currentmodule:: {{ module }}
 
 .. autoclass:: {{ objname }}
-   :members:
    :show-inheritance:
-   :inherited-members:
-   :special-members: __call__, __add__, __mul__
 
-   {% block methods %}
-   {% if methods %}
-   .. rubric:: {{ _('Methods') }}
+{# === TABLAS (resumen) === #}
+{% if attributes %}
+{{ _('Attributes') | escape | underline('~') }}
 
-   .. autosummary::
-      :nosignatures:
-   {% for item in methods %}
-      {%- if not item.startswith('_') %}
-      ~{{ name }}.{{ item }}
-      {%- endif -%}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
+.. autosummary::
+   :nosignatures:
+{% for item in attributes%}
+{%- if not item.startswith('_') %}
+   ~{{ name }}.{{ item }}
+{%- endif %}{% endfor %}
+{% endif %}
 
-   {% block attributes %}
-   {% if attributes %}
-   .. rubric:: {{ _('Attributes') }}
+{% if methods %}
+{{ _('Methods') | escape | underline('~') }}
 
-   .. autosummary::
-   {% for item in attributes %}
-      ~{{ name }}.{{ item }}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
+.. automethod:: {{ name }}.__init__
+
+{% if objname == 'QJobMapper' or objname == 'QPUCircuitMapper' %}
+.. automethod:: {{ name }}.__call__
+{% endif %}
+
+{% if objname == 'QJob' %}
+.. automethod:: {{ name }}.result
+{% endif %}
+
+{% set ns = namespace(pub=[]) %}
+{% for item in methods %}
+{% if item != '__init__' and item[0] != '_' %}
+{% set ns.pub = ns.pub + [item] %}
+{% endif %}
+{% endfor %}
+
+{% for item in ns.pub | sort %}
+.. automethod:: {{ name }}.{{ item }}
+{% endfor %}
+{% endif %}

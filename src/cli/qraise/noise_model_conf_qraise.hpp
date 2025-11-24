@@ -3,7 +3,7 @@
 #include <string>
 #include <any>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "utils/constants.hpp"
 #include "logger.hpp"
 #include "args_qraise.hpp"
@@ -32,7 +32,7 @@ std::string get_noise_model_run_command(const CunqaArgs& args, const std::string
                + R"(","fakeqmio":")" +  std::to_string(fakeqmio)+ R"("})" ;
 
     subcommand = mode + " no_comm " + std::any_cast<std::string>(args.family_name) + " Aer \'" + noise_properties + "\'" + "\n";
-    run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH " + subcommand;
+    run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
     LOGGER_DEBUG("Qraise noisy CunqaBackend. \n");
     LOGGER_DEBUG("Run command: {}", run_command);
 

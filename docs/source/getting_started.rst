@@ -3,5 +3,5 @@ Getting Started
 ****************************
 
 .. mdinclude:: README.md
-    :start-line: 34
-    :end-line: 281
+    :start-line: 78
+    :end-line: 314

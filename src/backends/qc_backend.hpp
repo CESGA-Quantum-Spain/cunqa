@@ -23,9 +23,9 @@ struct QCConfig {
     std::vector<std::string> basis_gates = constants::BASIS_GATES;
     std::string custom_instructions;
     std::vector<std::string> gates;
-    JSON noise_model;
-    JSON noise_properties;
-    std::string noise_path = "";
+    JSON noise_model = {};
+    std::string noise_properties_path;
+    std::string noise_path;
 
     friend void from_json(const JSON& j, QCConfig &obj)
     {
@@ -38,7 +38,7 @@ struct QCConfig {
         j.at("custom_instructions").get_to(obj.custom_instructions);
         j.at("gates").get_to(obj.gates);
         j.at("noise_model").get_to(obj.noise_model);
-        j.at("noise_properties").get_to(obj.noise_properties);
+        j.at("noise_properties_path").get_to(obj.noise_properties_path);
         j.at("noise_path").get_to(obj.noise_path);
     }
 
@@ -53,7 +53,8 @@ struct QCConfig {
             {"basis_gates", obj.basis_gates}, 
             {"custom_instructions", obj.custom_instructions},
             {"gates", obj.gates},
-            {"noise", obj.noise_path}
+            {"noise_model", obj.noise_path},
+            {"noise_properties_path", obj.noise_properties_path}
         };
     }
     
@@ -61,17 +62,21 @@ struct QCConfig {
 
 class QCBackend final : public Backend {
 public:
-    QCConfig config;
+    QCConfig qc_config;
     
-    QCBackend(const QCConfig& config, std::unique_ptr<SimulatorStrategy<QCBackend>> simulator): 
-        config{config},
+    QCBackend(const QCConfig& qc_config, std::unique_ptr<SimulatorStrategy<QCBackend>> simulator): 
+        qc_config{qc_config},
         simulator_{std::move(simulator)}
-    { }
+    { 
+        config = qc_config;
+        config["noise_model"] = qc_config.noise_model; // Not in to_json() to avoid the writing on qpus.json
+    }
 
     QCBackend(QCBackend& cc_backend) = default;
 
     inline JSON execute(const QuantumTask& quantum_task) const override
     {
+        LOGGER_DEBUG("Let's execute.");
         return simulator_->execute(*this, quantum_task);
     }
 

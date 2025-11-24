@@ -10,7 +10,7 @@ sys.path.append(os.getenv("HOME"))
 examples_path: str = str(Path(__file__).resolve().parent.parent)
 
 from cunqa.logger import logger
-from cunqa.qutils import getQPUs, qraise, qdrop
+from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
@@ -26,17 +26,17 @@ def t_k(k):
 
 def how_big_a_combination(k):
     #print(f"For generating a {k}-Cut Bell Pair Factory one needs to specify {4**(k)-2**(k)+2**(2**k)-1} parameter sets.")
-    return 4**(k)-2**(k) + 2**(2**k)-1
+    return n_minus(k) + n_plus(k)
 
 
-# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using getQPUs #
-family = qraise(2,"00:10:00", simulator="Munich", classical_comm=True, cloud = True)
-qpus  = getQPUs(local = False, family = family)
+# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs #
+family = qraise(2,"00:10:00", simulator="Munich", classical_comm=True, co_located = True)
+qpus  = get_QPUs(on_node = False, family = family)
 
 # Params for the gates in the Cut Bell Pair Factory #
 with open(examples_path + "/cc_examples/two_qpd_bell_pairs_param_values.txt") as fin:
     params2 = [[float(val) for val in line.replace("\n","").split(" ")] for line in fin.readlines()]
-z = params2[0] # This one doesn't matter, it will be overwritten afterwards
+z = params2[0] # This one doesn't matter, it will be overwritten afterwards with upgrade_parameters
 
 ############ CIRCUIT 1 #########################
 Alice = CunqaCircuit(3,3, id="Alice")
@@ -59,12 +59,12 @@ Alice.rz(z[14],1)
 
 # First telegate #
 Alice.cx(0,1)
-Alice.remote_c_if("z", target_qubits = 0, param=None, control_circuit = "Bobby")
-Alice.measure_and_send(control_qubit = 1, target_circuit = "Bobby")
+Alice.remote_c_if("z", qubits = 0, param=None, control_circuit = "Bobby")
+Alice.measure_and_send(qubit = 1, target_circuit = "Bobby")
 # Second telegate #
 Alice.cx(0,2)
-Alice.remote_c_if("z", target_qubits = 0, param=None, control_circuit = "Bobby")
-Alice.measure_and_send(control_qubit = 2, target_circuit = "Bobby")
+Alice.remote_c_if("z", qubits = 0, param=None, control_circuit = "Bobby")
+Alice.measure_and_send(qubit = 2, target_circuit = "Bobby")
 
 Alice.measure(0,0)
 Alice.measure(1,1)
@@ -92,13 +92,13 @@ Bob.rz(z[15],1)
 # First telegate #
 Bob.cx(1,2)
 Bob.h(1)
-Bob.measure_and_send(control_qubit = 1, target_circuit = "Alice")
-Bob.remote_c_if("x", target_qubits = 2, param=None, control_circuit = "Alice")
+Bob.measure_and_send(qubit = 1, target_circuit = "Alice")
+Bob.remote_c_if("x", qubits = 2, param=None, control_circuit = "Alice")
 # Second telegate #
 Bob.cx(0,2)
 Bob.h(0)
-Bob.measure_and_send(control_qubit = 0, target_circuit = "Alice")
-Bob.remote_c_if("x", target_qubits = 2, param=None, control_circuit = "Alice")
+Bob.measure_and_send(qubit = 0, target_circuit = "Alice")
+Bob.remote_c_if("x", qubits = 2, param=None, control_circuit = "Alice")
 
 Bob.measure(0,0)
 Bob.measure(1,1)
@@ -108,7 +108,7 @@ Bob.measure(2,2)
 
 circs = [Alice, Bob]
 distr_jobs = run_distributed(circs, qpus, shots=1) # create the jobs to store the circuits for upgrade_parameters,
-                                                           # but the results of this first submission will be discarded.
+                                                   # but the results of this first submission will be discarded.
 
 ########## Circuit combination for successful circuit cutting ##########
 shots = 1024

@@ -115,6 +115,9 @@ inline std::string quantum_task_to_Munich(const QuantumTask& quantum_task)
                 //    qasm_circt += gate_name + " q[" + to_string(qubits[0]) + "], q[" + to_string(qubits[1]) + "], q[" + to_string(qubits[2]) + "];\n";
                 //    break;
                 // Measure, duh
+                case constants::SWAP:
+                    qasm_circt += gate_name + " q[" + to_string(qubits[0]) + "], q[" + to_string(qubits[1]) + "];\n";
+                    break;
                 case constants::MEASURE:
                     qasm_circt += "measure q[" + to_string(qubits[0]) + "] -> c[" + to_string(instruction.at("clbits")[0]) + "];\n";
                     break;

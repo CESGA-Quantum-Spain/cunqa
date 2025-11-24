@@ -4,10 +4,11 @@
 
    {% block attributes %}
    {% if attributes %}
-   .. rubric:: Module attributes
+   {{ _('Module Attributes') | escape | underline('-') }}
 
    .. autosummary::
       :toctree:
+      :recursive:
    {% for item in attributes %}
       {{ item }}
    {%- endfor %}
@@ -16,11 +17,14 @@
 
    {% block functions %}
    {% if functions %}
-   .. rubric:: {{ _('Functions') }}
+   .. raw:: html
+
+      <h2> {{ _('Functions') }} </h2>
 
    .. autosummary::
       :toctree:
       :nosignatures:
+      :recursive:
    {% for item in functions %}
       {{ item }}
    {%- endfor %}
@@ -29,12 +33,15 @@
 
    {% block classes %}
    {% if classes %}
-   .. rubric:: {{ _('Classes') }}
+   .. raw:: html
+
+      <h2> {{ _('Classes') }} </h2>
 
    .. autosummary::
       :toctree:
       :template: custom-class-template.rst
       :nosignatures:
+      :recursive:
    {% for item in classes %}
       {{ item }}
    {%- endfor %}
@@ -43,10 +50,13 @@
 
    {% block exceptions %}
    {% if exceptions %}
-   .. rubric:: {{ _('Exceptions') }}
+   .. raw:: html
+
+      <h2> {{ _('Exceptions') }} </h2>
 
    .. autosummary::
       :toctree:
+      :recursive:
    {% for item in exceptions %}
       {{ item }}
    {%- endfor %}
@@ -55,10 +65,15 @@
 
 {% block modules %}
 {% if modules %}
+.. raw:: html
+
+   <h2> {{ _('Modules') }} </h2>
+
 .. autosummary::
    :toctree:
    :template: custom-module-template.rst
    :recursive:
+
 {% for item in modules %}
    {{ item }}
 {%- endfor %}
