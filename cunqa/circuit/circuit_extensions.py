@@ -1,13 +1,13 @@
 """
 Holds dunder methods for the class CunqaCircuit and other functions to extract information from it.
 """
-from typing import Union, Optional, Tuple
+from typing import Union, Tuple
 import copy
 import operator 
 import numpy as np
 
 from cunqa.logger import logger
-from cunqa.circuit.circuit import CunqaCircuit, _flatten, SUPPORTED_GATES_DISTRIBUTED, SUPPORTED_GATES_1Q
+from cunqa.circuit.circuit import CunqaCircuit
 from cunqa.circuit.converters import convert
 
 from qiskit import QuantumCircuit
@@ -20,15 +20,20 @@ def cunqa_dunder_methods(cls):
 
     # ================ CIRCUIT MODIFICATION METHODS ==============
 
-    def _update_other_instances(self, instances_to_change, other_id, comb_id, displace_n = 0, up_to_instr = 0, instr_name = "expose"): 
+    def _update_other_instances(self, 
+                                instances_to_change: Union[set, dict], 
+                                other_id: str, 
+                                comb_id: str, 
+                                displace_n: int = 0, 
+                                up_to_instr: int = 0): 
         """ 
         Private method called from the __add__ and __or__ methods and its variations. It modifies the instructions of any other CunqaCircuit instance that references
         self or other, the circuits involved on the operation, to reference the combined circuit instead.
         
         Args:
-            instances_to_change (set or dict): set with the ids of the circuits referencing self or other, to change the reference to the combined circuit.
-                                              or dict with keys the ids of the circuits to change with values a list of names to put on each instruction in 
-                                              their place in order, eg [up_id, down_id]
+            instances_to_change (set or dict): set with the ids of the circuits referencing self or other, to change the reference to the combined circuit
+                                               or dict with keys the ids of the circuits to change with values a list of names to put on each instruction in 
+                                               their place in order, eg [up_id, down_id]
             other_id (str): id of the second circuit in the operation
             comb_id (str): id to substitute in on the instructions of circuits referencing the operands
             displace_n (int): specifies the number of qubits of the upper circuit on a union of circuits. It will displace the qubits of the lower circuit by
