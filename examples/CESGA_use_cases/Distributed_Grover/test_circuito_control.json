@@ -1,0 +1,35 @@
+{
+    "id": "241773_356101",
+    "config": {
+        "shots": 1000,
+        "method": "statevector",
+        "num_clbits": 1,
+        "num_qubits": 1,
+        "seed": 123123
+    },
+    "instructions": [
+        {
+            "name": "expose",
+            "qubits": [0],
+            "qpus": ["241773_356102"]
+        },
+        {
+            "name": "h",
+            "qubits": [0]
+        },
+        {
+            "name": "measure_and_send",
+            "qubits": [0],
+            "qpus": ["241773_356102"]
+        },
+        {
+            "name": "measure",
+            "qubits": [0],
+            "clbits": [0],
+            "clreg": []
+        }
+    ],
+    "sending_to": ["241773_356102"],
+    "is_dynamic": true,
+    "has_cc": true
+}
