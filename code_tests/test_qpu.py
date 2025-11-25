@@ -8,7 +8,7 @@ import unittest
 from cunqa.backend import Backend
 from cunqa.qclient import QClient
 from cunqa.qpu import QPU
-from cunqa.qutils import qraise, qdrop, getQPUs
+from cunqa.qpu import qraise, qdrop, getQPUs
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import QFT
@@ -91,7 +91,7 @@ import unittest
 HOME = os.getenv("HOME")
 sys.path.insert(0, HOME)
 
-from cunqa.qutils import qraise, qdrop, getQPUs, QRaiseError
+from cunqa.qpu import qraise, qdrop, getQPUs, QRaiseError
 from cunqa.circuit import CunqaCircuit
 import random
 

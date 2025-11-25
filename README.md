@@ -261,7 +261,7 @@ import sys
 sys.path.append(os.getenv("HOME"))
 
 # Let's get the raised QPUs
-from cunqa.qutils import get_QPUs
+from cunqa.qpu import get_QPUs
 
 qpus  = get_QPUs(local=False) # List of all raised QPUs
 for q in qpus:

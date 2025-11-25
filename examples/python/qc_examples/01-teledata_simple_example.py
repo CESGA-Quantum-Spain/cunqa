@@ -4,7 +4,7 @@ home = os.getenv("HOME")
 sys.path.append(home)
 
 from cunqa.mappers import run_distributed
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 

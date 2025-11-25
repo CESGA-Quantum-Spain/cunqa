@@ -13,7 +13,7 @@ backend = FakeQmio("/opt/cesga/qmio/hpc/calibrations/2025_04_02__12_00_02.json",
 import argparse
 from cunqa import transpiler
 from qiskit import transpile
-from cunqa.qutils import qraise
+from cunqa.qpu import qraise
 
 parser = argparse.ArgumentParser(description="Quantum Optimization Script")
 parser.add_argument("--num_qpus", type=int, required=True, help="Number of QPUs")

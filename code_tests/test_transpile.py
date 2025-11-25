@@ -8,7 +8,7 @@ import unittest
 from cunqa.transpile import transpiler
 from cunqa.circuit import qc_to_json
 from cunqa.backend import Backend
-from cunqa.qutils import qraise, qdrop, getQPUs
+from cunqa.qpu import qraise, qdrop, getQPUs
 
 from qiskit import QuantumCircuit
 from qiskit.qasm2 import dumps

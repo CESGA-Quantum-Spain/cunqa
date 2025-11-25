@@ -5,7 +5,7 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
 from qiskit import QuantumCircuit

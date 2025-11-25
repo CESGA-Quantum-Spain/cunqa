@@ -4,7 +4,7 @@ import json
 import time
 
 sys.path.append(os.getenv("HOME"))
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 family = qraise(3, "00:10:00", simulator="Munich", classical_comm=True, co_located = True)
 
 qpus = get_QPUs(on_node=False, family = family)

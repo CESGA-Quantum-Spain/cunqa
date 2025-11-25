@@ -5,10 +5,10 @@ HOME = os.getenv("HOME")
 sys.path.insert(0, HOME)
 
 import unittest
-from tesst_qjob import TestQJob
-from tesst_qpu import TestQPU
-from tesst_transpile import TestTranspErrors
-from tesst_qutils import Test_qraise, Test_qdrop, Test_getQPUs
+from code_tests.test_qjob import TestQJob
+from code_tests.test_qpu import TestQPU
+from code_tests.test_transpile import TestTranspErrors
+from test_qutils import Test_qraise, Test_qdrop, Test_getQPUs
 
 
 

@@ -6,7 +6,7 @@ import random
 from qiskit import QuantumCircuit
 
 sys.path.append(os.getenv("HOME"))
-from cunqa.qutils import get_QPUs
+from cunqa.qpu import get_QPUs
 
 
 

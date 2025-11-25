@@ -11,7 +11,7 @@ import numpy as np
 from cunqa.qclient import QClient
 from cunqa.backend import Backend
 from cunqa.qjob import Result, QJob, gather, QJobError
-from cunqa.qutils import qraise, qdrop,  getQPUs
+from cunqa.qpu import qraise, qdrop, getQPUs
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import QFT

@@ -4,7 +4,7 @@ import numpy as np
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.mappers import run_distributed
 from cunqa.qjob import gather

@@ -4,7 +4,7 @@ from time import sleep
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs

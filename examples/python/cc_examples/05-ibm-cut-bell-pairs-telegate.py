@@ -10,7 +10,7 @@ sys.path.append(os.getenv("HOME"))
 examples_path: str = str(Path(__file__).resolve().parent.parent)
 
 from cunqa.logger import logger
-from cunqa.qutils import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.mappers import run_distributed
 from cunqa.qjob import gather

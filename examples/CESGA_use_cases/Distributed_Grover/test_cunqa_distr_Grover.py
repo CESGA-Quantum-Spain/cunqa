@@ -6,7 +6,7 @@ from typing import Union
 sys.path.append(os.getenv("HOME"))
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
-from cunqa.qutils import qraise, qdrop, get_QPUs
+from cunqa.qpu import qraise, qdrop, get_QPUs
 from cunqa.mappers import run_distributed
 #from distr_Grover import distrGrover
 
