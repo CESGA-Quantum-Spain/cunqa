@@ -38,8 +38,7 @@ std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
     #endif
 
     #ifdef USE_ZMQ_BTW_QPU
-    int num_ports = args.n_qpus * 2;
-    run_command =  "srun --resv-ports=" + std::to_string(num_ports) + " --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
+    run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
     LOGGER_DEBUG("Run command with ZMQ comm: {}", run_command);
     #endif
 
