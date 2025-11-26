@@ -146,6 +146,10 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "has_qc":False,
         }
 
+        if _is_parametric(qc):
+            json_data["current_params"] = []
+            json_data["param_expressions"] = {"sympy_exprs": [], "lambda_funcs": []}
+
         for instruction in qc.data:
 
             if instruction.operation.name not in SUPPORTED_QISKIT_OPERATIONS:
