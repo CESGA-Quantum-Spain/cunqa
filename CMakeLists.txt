@@ -199,6 +199,19 @@ if(pybind11_FOUND)
   message(STATUS "Linked pybind aer-cpp")
 endif()
 
+# =====================================================================
+#  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
+# =====================================================================
+FetchContent_Declare(
+    qulacs
+    GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
+    GIT_TAG "main"
+
+)
+set(USE_PYTHON OFF CACHE BOOL "" FORCE) # Disable Pybind
+FetchContent_MakeAvailable(qulacs)
+
+
 #  Restore original compiler flags
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
 

@@ -3,7 +3,7 @@ add_subdirectory(qulacs_adapters)
 # Simple simulator
 add_library(qulacs_simple_simulator "${CMAKE_CURRENT_SOURCE_DIR}/qulacs_simple_simulator.cpp")
 target_link_libraries(qulacs_simple_simulator PUBLIC json
-                                           PRIVATE logger_qpu qulacs_adapters qulacs_headers)
+                                           PRIVATE logger_qpu qulacs_adapters)
 
 # Classical communications simulator
 add_library(qulacs_cc_simulator "${CMAKE_CURRENT_SOURCE_DIR}/qulacs_cc_simulator.cpp")
