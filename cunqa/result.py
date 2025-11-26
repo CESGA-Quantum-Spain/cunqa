@@ -158,7 +158,7 @@ class Result:
             raise error
         
 
-    def probabilities(self, per_qubit: bool = False, partial: list[int] = None, interface: bool = True) -> Union[dict[np.array], dict[ float], np.array]:
+    def probabilities(self, per_qubit: bool = False, partial: list[int] = False, interface: bool = True) -> Union[dict[np.array], dict[ float], np.array]:
         """
         Extracts probabilities from result information. If we have statevector or density matrix 
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
@@ -174,7 +174,7 @@ class Result:
             probs (dict, np.array): probability information of the selected mode.
         """
         num_qubits = len( next(iter(self.counts.keys())) )
-        partial = list(range( num_qubits )) if partial == None else partial 
+        partial = list(range( num_qubits )) if partial == False else partial 
 
         try:
             there_is_statevec = False 
@@ -200,8 +200,8 @@ class Result:
             else:
                 probs = np.reshape(np.abs(statevecs), np.shape(statevec)[0])
 
-            if per_qubit:
-                probs = recombine_probs(probs, partial, interface, num_qubits)
+            if per_qubit or partial:
+                probs = _recombine_probs(probs, per_qubit, partial, interface, num_qubits)
                 probs = f"Probabilities: {probs}" if interface else probs
 
             return probs
@@ -216,7 +216,7 @@ class Result:
                 probs =  np.diagonal(densmats, axis1=0).real
 
             if per_qubit:
-                probs = recombine_probs(probs, partial, interface, num_qubits)
+                probs = _recombine_probs(probs, per_qubit, partial, interface, num_qubits)
                 probs = f"Probabilities: {probs}" if interface else probs
             
             return probs
@@ -312,66 +312,56 @@ def convert_counts(counts: dict, registers: dict) -> dict:
     
     return new_counts
 
-def recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None, list[int]], interface: bool, num_qubits: int):
+def _recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None, list[int]], num_qubits: int):
     """
     Processes the probabilities per bitstring to obtain the probabilities per qubit. 
 
     Args:
-        probs (np.array[float], dict[np.array[float]]): probabilities or list of probabilities per bitstring
-        partial (None, list[int]): list of qubits (their index) that determine the total probability space
-        interface (bool): determines wether we want an bare np.array or a dict with qubit_index as keys
+        probs (np.array, dict[np.array]): one or more (dict case) set of probabilities per bitstring
+        partial (None, list[int]): list of indexes of the qubits that determine the total probability space. Good for excluding ancillae
         num_qubits (int): number of qubits that determines the lenght of the bitstrings
 
     Returns:
-        new_probs (np.array[float], dict[np.array[float]]): probabilities or list of probabilities per qubit
+        new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
     """
-    if interface:
+    if isinstance(probs, dict): # get a dict with probability arrays as values
+
         new_probs = {}
-        if isinstance(probs, dict): # Case where we have multiple sets of probs
-            new_probs = {}
+        for k, probs_k in probs.items():
 
-            for k, probs_k in probs.items():
-                new_probs[k] = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
-                for base_ten_bitstring, prob in enumerate(probs_k): # Enumerate to extract the corresponding bitstring (in base 10)
-                    for i_qubit in partial:
-
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
-                        new_probs[k][str(i_qubit)][zero_one] += prob
-
-        else: # single set of probs to recombine
-            new_probs = {str(i_qubit): np.array([0., 0.]) for i_qubit in partial}
-
-            for base_ten_bitstring, prob in enumerate(probs_k):
-                for i_qubit in partial:
-
-                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
-                    new_probs[str(i_qubit)][zero_one] += prob
-
-    else:
-        if isinstance(probs, dict):
-            new_probs = {}
-
-            for k, probs_k in probs.items():
-                new_probs[k] = np.zeros((len(partial), 2))
-                for base_ten_bitstring, prob in enumerate(probs_k):
-                    for i, i_qubit in enumerate(partial):
-
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
-                        new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
-                                                          # is determined by the zero or one on the bitstring
-        else:
-            new_probs = np.zeros((len(partial), 2))
-
+            new_probs[k] = np.zeros((len(partial), 2))
             for base_ten_bitstring, prob in enumerate(probs_k):
                 for i, i_qubit in enumerate(partial):
 
-                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
-                    new_probs[i, zero_one] += prob
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
+                    new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
+                                                        # is determined by the zero or one on the bitstring
+
+    else: # probs is an array
+        new_probs = np.zeros((len(partial), 2))
+
+        # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+        for base_ten_bitstring, prob in enumerate(probs):
+            for i, i_qubit in enumerate(partial):
+
+                zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                new_probs[i, zero_one] += prob
 
     return new_probs
 
 
 def recombine_bistring_probs(probs: Union[dict[np.array], np.array], partial: list[int], num_qubits: int):
+    """
+    Recombine the probabilities per bitstring to show the probabilities per shortened bitstring where we only keep some of the qubits.
+
+    Args:
+        probs (dict[np.array], np.array): one or more (dict case) set of probabilities per bitstring
+        partial (None, list[int]): list of indexes of the qubits that determine the total probability space
+        num_qubits (int): number of qubits that determines the lenght of the bitstrings
+
+    Returns:
+        short_bitstring_probs (dict[np.array], np.array): one or more (dict case) set of probabilities per sub-bitstring
+    """
 
     if isinstance(probs, dict):
         short_bitstring_probs = {} 
