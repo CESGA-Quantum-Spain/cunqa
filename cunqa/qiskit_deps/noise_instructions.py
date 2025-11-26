@@ -8,11 +8,11 @@ import fcntl
 # this is due to the employment of this file in the C++ field, where
 # putting the cunqa package directory in the PATH is not the responsibility
 # of the user 
-sys.path.append("..")  
+sys.path.append(os.getenv("HOME"))
 
 from cunqa.constants import CUNQA_PATH
 from cunqa.logger import logger
-from cunqabackend import CunqaBackend
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from qiskit_aer.noise import NoiseModel
 
 SLURM_JOB_ID = os.getenv("SLURM_JOB_ID")
