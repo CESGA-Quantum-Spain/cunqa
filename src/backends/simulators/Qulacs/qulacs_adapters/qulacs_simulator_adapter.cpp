@@ -430,12 +430,16 @@ JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
         circuit.update_quantum_state(&state);
 
         auto start = std::chrono::high_resolution_clock::now();
-        std::vector<ITYPE> sample = state.sampling(shots);
+        std::vector<ITYPE> samples = state.sampling(shots);
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
 
-        JSON counts = convert_to_counts(sample, n_qubits);
+        for (auto& sample : samples) {
+            std::cout << sample << ", \n";
+        }
+
+        JSON counts = convert_to_counts(samples, n_qubits);
 
         JSON result_json = 
         {

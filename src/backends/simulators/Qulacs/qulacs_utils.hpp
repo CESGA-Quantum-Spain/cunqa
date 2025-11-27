@@ -130,18 +130,19 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, JSON& circuit_json)
     }
 }
 
-inline JSON convert_to_counts(const std::vector<ITYPE>& result, int num_qubits)
+inline JSON convert_to_counts(const std::vector<ITYPE>& result, int n_qubits)
 {
-    std::unordered_map<std::string, int> counts;
+    std::unordered_map<std::string, size_t> counts;
+    size_t max_position = (1 << n_qubits) - 1;
 
     for (auto& value : result) {
-        std::bitset<64> bs(value);
+        std::bitset<64> bs(max_position - value);
         std::string bitstring = bs.to_string();
 
-        if (num_qubits <= 0) {
+        if (n_qubits <= 0) {
             bitstring = "";
-        } else if (num_qubits < 64) {
-            bitstring = bitstring.substr(64 - num_qubits);
+        } else if (n_qubits < 64) {
+            bitstring = bitstring.substr(64 - n_qubits);
         } 
         counts[bitstring]++;
     }
