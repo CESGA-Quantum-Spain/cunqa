@@ -188,7 +188,7 @@ class QPU:
                 logger.debug("Transpilation done.")
             except Exception as error:
                 logger.error(f"Transpilation failed [{type(error).__name__}].")
-                raise TranspileError # I capture the error in QPU.run() when creating the job
+                raise TranspilerError # I capture the error in QPU.run() when creating the job
 
         try:
             qjob = QJob(self._qclient, self._backend, circuit, **run_parameters)

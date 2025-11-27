@@ -1442,7 +1442,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
 
-    def assign_parameters(self, given_params) -> None:
+    def assign_parameters(self, given_params: dict) -> None:
         """
         Assigns values to the Variable parameters on the circuit. Intended for use before the first execution
         as the simulation will fail without concrete values in the Variable parameters.
@@ -1458,7 +1458,28 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         if len(given_params) == 0:
             logger.debug("No parameters provided in `assign_parameters`.")
             return
+        
+        if isinstance(given_params, list):
+            given_params_ = {}
+            counter = 0
+            while counter < len(given_params):
+                for value in self.current_params:
+                    if isinstance(value, dict):
+                        for l,v in value.items():
+                            given_params_[l] = given_params[counter]
+                counter+=1
 
+            given_params = given_params_
+
+
+        elif isinstance(given_params, dict):
+
+            for k,v in given_params.items():
+                if isinstance(k, str):
+                    del given_params[k]
+                    given_params[Variable(k)] = v
+        
+        
         if not all([isinstance(v, (int, float)) for v in given_params.values()]):
             logger.error(f"Parameters must be list[int, float], int or float but {type(given_params[v])} was given.")
             raise SystemExit
@@ -1474,7 +1495,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                             continue
                         expr_current = self.current_params[param_index + i]
 
-                        # Update the current parameters for this expression                                         
+                        # Update the current parameters for this expression                                      
                         updated_expr_current = {**expr_current, **{k: given_params[k] for k in given_params if k in expr_current}}
 
                         #Current_params will contain Symbols if it comes from the conversion of a ParameterExpression. They need to be replaced by Variables
@@ -1486,12 +1507,12 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
                         self.current_params[param_index + i] = updated_expr_current 
 
                         # Evaluate parametric expression and plug it as the new paremeter
-                        instruction["params"][i] = expr_func(*tuple(updated_expr_current.values())) 
+                        instruction["params"][i] = expr_func(*tuple(updated_expr_current.values()))
                     
                     param_index += len(instruction["params"])
                                 
         except Exception as error:
-            logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error}")
+            logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error} [{type(error).__name__}]")
             raise SystemExit
 
 

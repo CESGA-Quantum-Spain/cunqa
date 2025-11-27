@@ -267,8 +267,6 @@ class QJob:
             logger.warning("Time taken not available.")
             return ""
         
-            
-            
 
     def submit(self) -> None:
         """
@@ -518,16 +516,21 @@ class QJob:
                 #,"has_qc": self._has_qc # Not needed in C++ 
             }
             
-            self._execution_config = json.dumps(exec_config)
+            try:
+                self._execution_config = json.dumps(exec_config)
 
+            except Exception as error:
+                logger.error(f"Some error occured during serialization of instructions, please check if all Variables are assigned: {error} [{type(error).__name__}]")
+                raise error # Capture this at __init__()
+            
             logger.debug("QJob created.")
 
         except KeyError as error:
-            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions'\n [{type(error).__name__}] {error}.")
+            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}]\n {error}.")
             raise QJobError # I capture the error in QPU.run() when creating the job
         
         except Exception as error:
-            logger.error(f"Some error occured when generating configuration for the simulation:\n[{type(error).__name__}] {error}.")
+            logger.error(f"Some error occured when generating configuration for the simulation:[{type(error).__name__}]\n {error}.")
             raise QJobError # I capture the error in QPU.run() when creating the job
         
 
