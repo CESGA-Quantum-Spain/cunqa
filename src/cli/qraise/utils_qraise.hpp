@@ -64,7 +64,7 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
 
 bool check_simulator_name(const std::string& sim_name)
 {
-    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer") {  // Add new valid simulators to the check here
+    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer" || sim_name == "Qulacs") {  // Add new valid simulators to the check here
         return true;
     } else {
         return false;
