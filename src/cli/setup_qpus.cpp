@@ -117,7 +117,7 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
         LOGGER_DEBUG("No backend_path provided, defining backend from noise_properties.");
         backend_path = "default";
     }
-    std::string command("python "s + std::getenv("STORE") + "/.cunqa/noise_model/noise_instructions.py "s
+    std::string command("python "s + constants::INSTALL_PATH + "/cunqa/qiskit_deps/noise_instructions.py "s
                                    + back_path_json.at("noise_properties_path").get<std::string>() + " "s
                                    + backend_path.c_str() + " "s
                                    + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
@@ -126,41 +126,28 @@ std::string generate_noise_instructions(JSON back_path_json, std::string& family
                                    + family.c_str() + " "s
                                    + back_path_json.at("fakeqmio").get<std::string>());
                                    
-
     LOGGER_DEBUG("Command: {}", command);
-
-    if (SYSTEM_NAME == "QMIO") {
-        std::system(("ml load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.11.9 2> /dev/null\n"s + command).c_str());
-    } else if (SYSTEM_NAME == "FT3") {
-        std::system(("ml load cesga/2022 gcc/system qiskit/1.2.4 2> /dev/null\n"s + command).c_str());
-    } else if (SYSTEM_NAME == "MY_CLUSTER") {
-        std::system(("ml load NEEDED_MODULES 2> /dev/null\n"s + command).c_str());
-    } else {
-        LOGGER_ERROR("SYSTEM_NAME MACRO is not defined.");
-        throw;
-    }
-
+    std::system(command.c_str());
     return "";
 }
 
 int main(int argc, char *argv[])
 {
-    std::string info_path(argv[1]);
-    std::string mode(argv[2]);
-    std::string communications(argv[3]);
-    std::string family(argv[4]);
-    std::string sim_arg(argv[5]);
+    std::string mode(argv[1]);
+    std::string communications(argv[2]);
+    std::string family(argv[3]);
+    std::string sim_arg(argv[4]);
 
     if (family == "default")
         family = std::getenv("SLURM_JOB_ID");
 
-    auto back_path_json = (argc == 7 ? JSON::parse(std::string(argv[6]))
+    auto back_path_json = (argc == 6 ? JSON::parse(std::string(argv[5]))
                                      : JSON());
 
     JSON backend_json;
     std::string name = family + "_" + std::getenv("SLURM_PROCID");
     if (back_path_json.contains("noise_properties_path")) {
-        std::string fpath = std::getenv("STORE") + std::string("/.cunqa/tmp_noisy_backend_") + std::getenv("SLURM_JOB_ID") + ".json";
+        std::string fpath = std::string(constants::CUNQA_PATH) + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
 
         if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
             generate_noise_instructions(back_path_json, family);

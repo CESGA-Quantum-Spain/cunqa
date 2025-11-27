@@ -101,13 +101,10 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         {
         case constants::MEASURE:
         {
-            auto clreg = inst.at("clreg").get<std::vector<std::uint64_t>>();
             uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
-            G.cvalues[qubits[0] + T.zero_qubit] = (measurement == 1);
-            if (!clreg.empty())
-            {
-                G.creg[clreg[0]] = (measurement == 1);
-            }
+            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
+            G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
+            G.creg[clbits[0]] = (measurement == 1);
             break;
         }
         case constants::X:
@@ -362,9 +359,6 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
 {
     LOGGER_DEBUG("Aer usual simulation");
     try {
-
-        /* int result = std::system("python /mnt/netapp1/Store_CESGA/home/cesga/acarballido/repos/api-simulator/examples/aer_bench.py"); */
-
         auto quantum_task = qc.quantum_tasks[0];
 
         auto aer_quantum_task = quantum_task_to_AER(quantum_task);
@@ -378,14 +372,11 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         JSON run_config_json(aer_quantum_task.config);
         run_config_json["seed_simulator"] = quantum_task.config.at("seed");
         Config aer_config(run_config_json);
-
-        JSON noise = backend->config.at("noise_model");
         Noise::NoiseModel noise_model(backend->config.at("noise_model"));
 
         Result result = controller_execute<Controller>(circuits, noise_model, aer_config);
 
         JSON result_json = result.to_json();
-
         convert_standard_results_Aer(result_json, n_clbits);
 
         return result_json;

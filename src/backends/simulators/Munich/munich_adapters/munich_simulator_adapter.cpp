@@ -133,12 +133,14 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
         switch (inst_type) {
         case constants::MEASURE:
         {
-            auto clreg = inst.at("clreg").get<std::vector<std::uint64_t>>();
+
             char char_measurement = measureAdapter(qubits[0] + T.zero_qubit);
-            G.cvalues[qubits[0] + T.zero_qubit] = (char_measurement == '1');
-            if (!clreg.empty()) {
-                G.creg[clreg[0]] = (char_measurement == '1');
-            }
+
+            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
+
+            G.cvalues[clbits[0] + T.zero_qubit] = (char_measurement == '1');
+            G.creg[clbits[0]] = (char_measurement == '1');
+
             break;
         }
         case constants::X:

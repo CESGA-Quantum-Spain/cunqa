@@ -12,10 +12,9 @@ family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
 
 qpus  = get_QPUs(on_node = False, family = family)
 
-qc = CunqaCircuit(15)
-for i in range(14):
-    qc.h(i)
-    qc.cx(i, i + 1)
+qc = CunqaCircuit(5)
+qc.h(0)
+qc.cx(0, 1)
 qc.measure_all()
 
 qpu = qpus[0]
@@ -27,5 +26,10 @@ time = qjob.time_taken
 print(qjob.result)
 #print(f"Result: \n{counts}\n Time taken: {time} s.")
 
+""" qjob_1 = qpu.run(qc, transpile = True, shots = 100)# non-blocking call
+
+print(qjob_1.result) """
+
+
 ########## Drop the deployed QPUs #
-qdrop(family)
+#qdrop(family)

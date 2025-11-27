@@ -1,23 +1,24 @@
 import os
 import sys
 import glob
-
-installation_path = os.getenv("HOME")
-STORE_PATH = os.getenv("STORE")
-SLURM_JOB_ID = os.getenv("SLURM_JOB_ID")
-sys.path.append(installation_path)
-
-from cunqabackend import CunqaBackend
-from cunqa.logger import logger
-
 import argparse
 import json
-
-from qiskit_aer.noise import NoiseModel
 import fcntl
 
-schema_noise_properties = os.getenv("STORE") + "/.cunqa/json_schema/calibrations_schema.json"
-schema_backend = os.getenv("STORE") + "/.cunqa/json_schema/backend_schema.json"
+# this is due to the employment of this file in the C++ field, where
+# putting the cunqa package directory in the PATH is not the responsibility
+# of the user 
+sys.path.append(os.getenv("HOME"))
+
+from cunqa.constants import CUNQA_PATH
+from cunqa.logger import logger
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
+from qiskit_aer.noise import NoiseModel
+
+SLURM_JOB_ID = os.getenv("SLURM_JOB_ID")
+
+schema_noise_properties = CUNQA_PATH + "/json_schema/calibrations_schema.json"
+schema_backend = CUNQA_PATH + "/json_schema/backend_schema.json"
 
 parser = argparse.ArgumentParser(description="FakeQmio from calibrations")
 
@@ -126,7 +127,7 @@ if gate_error:
 
 description = description + ", ".join(errors.split())+"."
 
-tmp_file = "{}/.cunqa/tmp_noisy_backend_{}.json".format(STORE_PATH, SLURM_JOB_ID)
+tmp_file = "{}/tmp_noisy_backend_{}.json".format(CUNQA_PATH, SLURM_JOB_ID)
 
 if args.backend_path == "default": # we have not read the backend_json and checked it, we generate it using CunqaBackend
 
@@ -140,7 +141,7 @@ if args.backend_path == "default": # we have not read the backend_json and check
             "custom_instructions": "",
             "gates": [],
             "noise_model":noise_model_json,
-            "noise_properties":noise_properties_json,
+            "noise_properties_path":args.noise_properties_path,
             "noise_path": tmp_file
     }
 
@@ -155,7 +156,7 @@ else:
         "custom_instructions": args.backend_json["custom_instructions"],
         "gates": args.backend_json["gates"],
         "noise_model":noise_model_json,
-        "noise_properties":noise_properties_json,
+        "noise_properties_path":args.noise_properties_path,
         "noise_path": tmp_file
     }
 

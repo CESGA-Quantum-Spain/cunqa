@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "zmq.hpp"
 
-#include "classical_channel.hpp"
+#include "classical_channel/classical_channel.hpp"
 #include "utils/helpers/net_functions.hpp"
 
 #include "utils/json.hpp"
@@ -28,15 +28,19 @@ struct ClassicalChannel::Impl
     Impl(const std::string& id)
     {
         //Endpoint part
-        auto port = get_port(true);
-        auto IP = get_global_IP_address();
-        zmq_endpoint = "tcp://" + IP + ":" + port;
-
-        zmq_id = id == "" ? zmq_endpoint : id;
+        auto IP = get_IP_address();
+        zmq_endpoint = "tcp://" + IP + ":*";
 
         //Server part
         zmq::socket_t qpu_server_socket_(zmq_context, zmq::socket_type::router);
         qpu_server_socket_.bind(zmq_endpoint);
+        
+        char endpoint[256];
+        size_t sz = sizeof(endpoint);
+        zmq_getsockopt(qpu_server_socket_, ZMQ_LAST_ENDPOINT, endpoint, &sz);
+        zmq_endpoint = std::string(endpoint);
+        zmq_id = id == "" ? zmq_endpoint : id;
+
         zmq_comm_server = std::move(qpu_server_socket_);
     }
 
@@ -72,6 +76,8 @@ struct ClassicalChannel::Impl
             throw std::runtime_error("Error with endpoint connection.");
         }
         zmq::message_t message(data.begin(), data.end());
+
+        LOGGER_DEBUG("Enviamos el circuito a {}", target);
         zmq_sockets[target].send(message, zmq::send_flags::none);
         
     }
@@ -87,6 +93,7 @@ struct ClassicalChannel::Impl
                 zmq::message_t id;
                 zmq::message_t message;
                 
+                LOGGER_DEBUG("{} vamos a recibir el circuito de {}", zmq_id, origin);
                 [[maybe_unused]] auto ret1 = zmq_comm_server.recv(id, zmq::recv_flags::none);
                 [[maybe_unused]] auto ret2 = zmq_comm_server.recv(message, zmq::recv_flags::none);
                 std::string id_str(static_cast<char*>(id.data()), id.size());
@@ -120,13 +127,11 @@ ClassicalChannel::~ClassicalChannel() = default;
 //-------------------------------------------------
 void ClassicalChannel::publish(const std::string& suffix) 
 {
-    const std::string store = getenv("STORE");
-    const std::string filepath = store + "/.cunqa/communications.json"s;
     JSON communications_endpoint = 
     {
         {"communications_endpoint", endpoint}
     };
-    write_on_file(communications_endpoint, filepath, suffix);
+    write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
 }
 
 

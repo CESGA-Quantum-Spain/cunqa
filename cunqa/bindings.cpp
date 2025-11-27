@@ -18,8 +18,8 @@ PYBIND11_MODULE(qclient, m) {
  
         .def(py::init<>())
 
-        .def("connect", [](Client &c, const std::string& ip, const std::string& port) { 
-            c.connect(ip, port); 
+        .def("connect", [](Client &c, const std::string& endpoint) { 
+            c.connect(endpoint); 
         })
  
         .def("send_circuit", [](Client &c, const std::string& circuit) { 
