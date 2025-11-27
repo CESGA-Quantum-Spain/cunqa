@@ -8,9 +8,8 @@
 #include "qulacs_simulator_adapter.hpp"
 #include "qulacs_utils.hpp"
 
-#include <cppsim/state.hpp>
 #include <cppsim/circuit.hpp>
-#include <csim/type.hpp>
+#include <cppsim/gate_factory.hpp>
 
 #include "utils/constants.hpp"
 #include "utils/helpers/reverse_bitstring.hpp"
@@ -21,7 +20,7 @@ namespace {
 struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
-    unsigned long zero_qubit = 0;
+    UINT zero_qubit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
@@ -32,7 +31,7 @@ struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg, rcreg;
     std::map<std::size_t, bool> cvalues;
-    std::unordered_map<std::string, std::stack<ITYPE>> qc_meas;
+    std::unordered_map<std::string, std::stack<UINT>> qc_meas;
     bool ended = false;
     cunqa::comm::ClassicalChannel* chan = nullptr;
 };
@@ -91,14 +90,14 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
             if (!G.rcreg[v[0]]) return;
         }
 
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
+        std::vector<int> qubits = inst.at("qubits").get<std::vector<UINT>>();
         auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
 
         switch (inst_type)
         {
         case constants::MEASURE:
         {
-            uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT measurement = get_measurement({qubits[0] + T.zero_qubit});
             std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
             G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
             G.creg[clbits[0]] = (measurement == 1);
@@ -200,7 +199,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
         case constants::MEASURE_AND_SEND:
         {
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT measurement = state->apply_measure({qubits[0] + T.zero_qubit});
             int measurement_as_int = static_cast<int>(measurement);
             classical_channel->send_measure(measurement_as_int, endpoint[0]); 
             break;
@@ -226,7 +225,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
             // H to the sent qubit
             state->apply_h(qubits[0] + T.zero_qubit);
 
-            uint_t result = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT result = state->apply_measure({qubits[0] + T.zero_qubit});
 
             G.qc_meas[T.id].push(result);
             G.qc_meas[T.id].push(state->apply_measure({G.n_qubits - 2}));
@@ -270,7 +269,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
                 // CX to the entangled pair
                 state->apply_mcx({qubits[0] + T.zero_qubit, G.n_qubits - 2});
 
-                uint_t result = state->apply_measure({G.n_qubits - 2});
+                UINT result = state->apply_measure({G.n_qubits - 2});
 
                 G.qc_meas[T.id].push(result);
                 T.cat_entangled = true;
@@ -278,7 +277,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
                 Ts[inst.at("qpus")[0]].blocked = false;
                 return;
             } else {
-                uint_t meas = G.qc_meas[inst.at("qpus")[0]].top();
+                UINT meas = G.qc_meas[inst.at("qpus")[0]].top();
                 G.qc_meas[inst.at("qpus")[0]].pop();
 
                 if (meas) {
@@ -296,7 +295,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
                 return;
             }
 
-            uint_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
+            UINT meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
 
             if (meas2) {
@@ -309,7 +308,7 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
 
             state->apply_h(G.n_qubits - 1);
 
-            uint_t result = state->apply_measure({G.n_qubits - 1});
+            UINT result = state->apply_measure({G.n_qubits - 1});
             G.qc_meas[T.id].push(result);
 
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -375,7 +374,7 @@ JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
 
     } catch (const std::exception& e) {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Qulacs simulator.\n\tTry checking the format of the circuit sent and/or of the noise model.");
+        LOGGER_ERROR("Error executing the circuit in the Qulacs simulator.");
         return {{"ERROR", std::string(e.what())}};
     }
     return {};
@@ -422,7 +421,37 @@ JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     return JSON();
 }
 
+UINT QulacsSimulatorAdapter::get_measurement(QuantumState& state, UINT target_index)
+{
+    auto gate0 = P0(target_index);
+    auto gate1 = P1(target_index);
+    std::vector<QuantumGateBase*> _gate_list = {gate0, gate1};
+    delete gate0;
+    delete gate1;
+    double r = random.uniform();
 
+    double sum = 0.;
+    double org_norm = state->get_squared_norm();
+
+    auto buffer = state->copy();
+    UINT index = 0;
+    for (auto gate : _gate_list) {
+        gate->update_quantum_state(buffer);
+        auto norm = buffer->get_squared_norm() / org_norm;
+        sum += norm;
+        if (r < sum) {
+            state->load(buffer);
+            state->normalize(norm);
+            break;
+        } else {
+            buffer->load(state);
+            index++;
+        }
+    }
+    delete buffer;
+
+    return index;
+}
 
 } // End of sim namespace
 } // End of cunqa namespace
