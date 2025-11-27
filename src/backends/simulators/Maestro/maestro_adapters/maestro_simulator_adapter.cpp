@@ -365,7 +365,7 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 {
     LOGGER_DEBUG("Maestro usual simulation");
     const char* HOME = std::getenv("HOME");
-    std::string libmaestro_path = std::string(HOME) + "/lib64/libmaestro.so";
+    std::string libmaestro_path = std::string(HOME) + "/lib/libmaestro.so";
     try {
         auto quantum_task = qc.quantum_tasks[0];
 
