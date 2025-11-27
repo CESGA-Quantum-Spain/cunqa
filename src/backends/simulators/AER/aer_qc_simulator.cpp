@@ -29,8 +29,6 @@ AerQCSimulator::AerQCSimulator(const std::string& group_id)
 JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
     auto circuit = to_string(quantum_task);
-    LOGGER_DEBUG("Circuito que mandamos al executor: {}", circuit);
-
     classical_channel.send_info(circuit, "executor");
     if (circuit != "") {
         auto results = classical_channel.recv_info("executor");

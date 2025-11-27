@@ -66,11 +66,12 @@ from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit.converters import _is_parametric
 from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
-from cunqa.transpile import transpiler, TranspileError
+from cunqa.qiskit_deps.transpiler import transpiler, TranspilerError
 
 class QPU:
     """
@@ -88,7 +89,7 @@ class QPU:
     _endpoint: str 
     _connected: bool 
     
-    def __init__(self, id: int, qclient: 'QClient', backend: Backend, name: str, family: str, endpoint: str):
+    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.
 

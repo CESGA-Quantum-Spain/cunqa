@@ -39,6 +39,9 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
     
+    if(args.partition.has_value())
+        sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+
     if (args.qpus_per_node.has_value()) {
         if (args.n_qpus < args.qpus_per_node) {
             LOGGER_ERROR("Less qpus than selected qpus_per_node.");

@@ -1455,6 +1455,10 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             logger.warning(f"Circuit {self._id} is not parametric, no parameters can be assigned.")
             return # TODO: consider wether an error should be raised instead
 
+        if len(given_params) == 0:
+            logger.debug("No parameters provided in `assign_parameters`.")
+            return
+
         if not all([isinstance(v, (int, float)) for v in given_params.values()]):
             logger.error(f"Parameters must be list[int, float], int or float but {type(given_params[v])} was given.")
             raise SystemExit

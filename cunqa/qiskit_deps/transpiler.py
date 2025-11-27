@@ -1,11 +1,11 @@
 """
-    Holds the :py:func:`~cunqa.transpile.transpiler` function that translates circuit instructions into native instructions that a certain virtual QPU understands.
+    Holds the :py:func:`~cunqa.qiskit_deps.transpile.transpiler` function that translates circuit instructions into native instructions that a certain virtual QPU understands.
 
     It is important and it is assumed that the circuit that is sent to the virtual QPU for its simulation is transplated into the propper native gates
     and adapted to te backend's topology.
 
     Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`, :py:class:`qiskit.QuantumCircuit` or json ``dict``,
-    :py:mod:`cunqa` provides two alternatives for transpiling it accordingly to a certain backend:
+    :py:mod:`cunqa` provides two alternatives for transpiling it accordingly to a certain virtual QPU's backend:
 
         - When submmiting the circuit, set `transpile` as ``True`` and provide the rest of transpilation instructions:
 
@@ -15,49 +15,40 @@
 
         - Use :py:func:`transpiler` function before sending the circuit:
 
-            >>> circuit_transpiled = transpiler(circuit, backend = qpu.backend)
+            >>> circuit_transpiled = transpiler(circuit, target_qpu = qpu)
             >>> qpu.run(circuit_transpiled)
 
     .. warning::
         If the circuit is not transpiled, errors will not raise, but the output of the simulation will not be coherent.
     
 """
+
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend # simulator (qjob.py), para transpilar (qpu.py), instanciacion (qutils.py)
 from cunqa.backend import Backend
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.converters import convert
 from cunqa.logger import logger
 
-from qiskit import QuantumCircuit
-from qiskit.qasm2 import dumps
-from qiskit.qasm2.exceptions import QASM2Error
-from qiskit.exceptions import QiskitError
-from qiskit.transpiler.exceptions import TranspilerError
-from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
-from qiskit.providers.models import BackendConfiguration
-from qiskit.providers.backend_compat import convert_to_target
+from qiskit import QuantumCircuit, transpile
+from qiskit.transpiler import TranspilerError
 
 from typing import Union
 
 
-class TranspileError(Exception):
-    """Exception for error during the transpilation of a circuit to a given :py:class:`~cunqa.backend.Backend`. """
-    pass
-
-
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = 81) -> Union['CunqaCircuit', dict, 'QuantumCircuit', 'QASM2str']:
+def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit']:
     """
-    Function to transpile a circuit according to a given :py:class:`~cunqa.backend.Backend`.
+    Function to transpile a circuit according to a given :py:class:`~cunqa.qpu.QPU`.
     The circuit is returned in the same format as it was originally.
 
     Transpilation instructions are `opt_level`, which defines how optimal is the transpilation, default is ``1``; `initial_layout`
     specifies the set of "real" qubits to which the quantum registers of the circuit are assigned.
-    These instructions are associated to the `qiskit.transpiler.passmanager.StagedPassManager <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.transpiler.StagedPassManager>`_,
+    These instructions are associated to the `qiskit.transpiler.compiler.transpile <https://quantum.cloud.ibm.com/docs/api/qiskit/1.2/compiler#qiskit.compiler.transpile>`_,
     since it is used in the process.
 
     Args:
         circuit (dict | qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit): circuit to be transpiled.
 
-        backend (~cunqa.backend.Backend): backend which transpilation will be done respect to.
+        qpu (~cunqa.qpu.QPU): backend which transpilation will be done respect to.
 
         opt_level (int): optimization level for creating the `qiskit.transpiler.passmanager.StagedPassManager`. Default set to 1.
 
@@ -89,21 +80,10 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = 81
                 raise SystemExit # User's level
             
             qc = convert(circuit, "QuantumCircuit")
-    
-        elif isinstance(circuit, str):
-            qc = QuantumCircuit.from_qasm_str(circuit)
 
         else:
-            logger.error(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'> or dict, but {type(circuit)} was provided [{TypeError.__name__}].")
+            logger.error(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, <class 'cunqa.circuit.circuit.CunqaCircuit'> or dict, but {type(circuit)} was provided [{TypeError.__name__}].")
             raise SystemExit # User's level
-
-    except QASM2Error as error:
-        logger.error(f"Error with QASM2 string, please check that the sintex is correct [{type(error).__name__}]: {error}.")
-        raise SystemExit # User's level
-    
-    except  QiskitError as error:
-        logger.error(f"Error with QASM2 string, please check that the logic of the resulting circuit is correct [{type(error).__name__}]: {error}.")
-        raise SystemExit # User's level
     
     except Exception as error:
         logger.error(f"Some error occurred, please check sintax and logic of the resulting circuit [{type(error).__name__}]: {error}")
@@ -113,51 +93,24 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = 81
 
     # backend check
     if isinstance(backend, Backend):
-        configuration = backend.__dict__
+        cunqabackend = CunqaBackend(backend = backend)
     else:
-        logger.error(f"Transpilation backend must be <class 'python.backend.Backend'> [{TypeError.__name__}].")
+        logger.error(f"backend must be <class 'cunqa.backend.Backend'>, but {type(backend)} was provided [{TypeError.__name__}].")
         raise SystemExit # User's level
     
     # transpilation
     try:
-        #TODO: Revise the hardcoded args
-        args = {
-            "backend_name": configuration["name"],
-            "backend_version": configuration["version"],
-            "n_qubits":configuration["n_qubits"],
-            "basis_gates": configuration["basis_gates"],
-            "gates":[], # might not work
-            "local":False,
-            "simulator":False if configuration["simulator"] == "QMIO" else True,
-            "conditional":True, 
-            "open_pulse":False, #TODO: another simulator distinct from Aer might suppor open pulse.
-            "memory":True,
-            "max_shots":100000,
-            "coupling_map":configuration["coupling_map"]
-        }
-
-        backend_configuration = BackendConfiguration(**args)
-        target =  convert_to_target(backend_configuration)
-        pm = generate_preset_pass_manager(optimization_level = opt_level, target = target, initial_layout = initial_layout, seed_transpiler = seed)
-        qc_transpiled = pm.run(qc)
-    
-    except KeyError as error:
-        logger.error(f"Error in cofiguration of the backend, some keys are missing [{error}].")
-        raise SystemExit # User's level
+        qc_transpiled = transpile(qc, cunqabackend, initial_layout = initial_layout, optimization_level = opt_level, seed_transpiler = seed)
     
     except TranspilerError as error:
-        logger.error(f"Error during transpilation: {error}")
-        raise SystemExit
-    
+        logger.error(f"Some error occured with transpilation: {error} [TranspilerError]")
+
     except Exception as error:
-        logger.error(f"Some error occurred with configuration of the backend, please check that the formats are correct [{type(error).__name__}] {error}.")
+        logger.error(f"Some error occurred with transpilation, please check that the target QPU is adequate for the provided circuit (enough number of qubits, simulator supports instructions, etc): {error} [{type(error).__name__}].")
         raise SystemExit # User's level
 
     # converting to input format and returning
-    if isinstance(circuit, str):
-        return dumps(qc_transpiled)
-    
-    elif isinstance(circuit, QuantumCircuit):
+    if isinstance(circuit, QuantumCircuit):
         return qc_transpiled
     
     elif isinstance(circuit, dict):
@@ -170,7 +123,10 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = 81
         assign_dict={}
         for expr in current_params:
             if isinstance(expr, dict):
+                if None in list(expr.values()):
+                    continue
                 assign_dict.update(expr)
+
         cunqac_transpiled.assign_parameters(assign_dict)
 
         return cunqac_transpiled
