@@ -138,7 +138,7 @@ qiskit-aer      0.17.2 (modified version)
 ``` 
 
 ### Configure, build and install
-Now, as with any other CMake project, is can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined and, if not, its will be the HOME environment variable value. 
+Now, as with any other CMake project, it can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined or will be the HOME environment variable value. 
 
 ```console
 cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
@@ -150,7 +150,7 @@ It is important to mention that the user can also employ [Ninja](https://ninja-b
 
 ```console
 cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
-ninja -C build -j $(nproc)
+ninja -C build/ -j $(nproc)
 cmake --install build/
 ```
 
