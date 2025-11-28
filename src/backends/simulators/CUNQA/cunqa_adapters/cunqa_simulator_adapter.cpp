@@ -331,13 +331,23 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
 
 JSON CunqaSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
 {
-    auto n_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
-    auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
-    Executor executor(n_qubits);
-    QuantumCircuit circuit = qc.quantum_tasks[0].circuit;
-    JSON result = executor.run(circuit, shots);
+    try
+    { 
+        auto n_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
+        auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
+        Executor executor(n_qubits);
+        QuantumCircuit circuit = qc.quantum_tasks[0].circuit;
+        JSON result = executor.run(circuit, shots);
 
-    return result;
+        return result;
+    } 
+    catch (const std::exception &e)
+    {
+        // TODO: specify the circuit format in the docs.
+        LOGGER_ERROR("Error executing the circuit in the Cunqa simulator.");
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+    }
+    return {};
 
 }
 

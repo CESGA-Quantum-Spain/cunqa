@@ -20,16 +20,33 @@ const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
 enum INSTRUCTIONS {
     UNITARY,
     MEASURE,
+    MEASUREMENT, 
+    MULTIQUBITPAULIMEASUREMENT, 
     ID,
     X,
     Y,
     Z,
     H,
+    S,
+    SDAG,
+    T,
+    TDAG,
     SX,
+    SQRTXDAG,
+    SQRTY,
+    SQRTYDAG,
+    P0,
+    P1,
     RX,
     RY,
     RZ,
+    ROTINVX,
+    ROTINVY,
+    ROTINVZ,
     R,
+    U1,
+    U2,
+    U3,
     U,
     CU,
     SWAP,
@@ -75,16 +92,31 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"z", Z},
     {"h", H},
     {"sx", SX},
+    {"s", S},
+    {"sdag", SDAG},
+    {"t", T},
+    {"tdag", TDAG},
+    {"sqrtxdag", SQRTXDAG},
+    {"sqrty", SQRTY},
+    {"sqrtydag", SQRTYDAG},
+    {"p0", P0},
+    {"p1", P1},
 
     // ONE GATE PARAM
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
+    {"rotinvx", ROTINVX},
+    {"rotinvy", ROTINVY},
+    {"rotinvz", ROTINVZ},
 
     // ONE GATE TWO PARAM
     {"r", R},
 
     // ONE GATE THREE PARAM
+    {"u1", U1},
+    {"u2", U2},
+    {"u3", U3},
     {"u", U},
 
     // ONE GATE FOUR PARAM
@@ -126,7 +158,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"qrecv", QRECV},
 
     {"expose", EXPOSE},
-    {"rcontrol", RCONTROL}
+    {"rcontrol", RCONTROL},
 };
 
 const std::vector<std::string> BASIS_GATES = {
@@ -134,7 +166,7 @@ const std::vector<std::string> BASIS_GATES = {
     "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
     "swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3",
     "rxx", "ryy", "rzz", "rzx", "ccx", "ccz", "crx", "cry", "crz",
-    "cswap"
+    "cswap", "ecr"
 };
 
 const std::vector<std::string> BASIS_AND_DISTRIBUTED_GATES = {

@@ -199,6 +199,57 @@ if(pybind11_FOUND)
   message(STATUS "Linked pybind aer-cpp")
 endif()
 
+# =====================================================================
+#  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
+# =====================================================================
+FetchContent_Declare(
+    qulacs
+    GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
+    GIT_TAG "main"
+
+)
+set(USE_PYTHON OFF CACHE BOOL "" FORCE)
+set(BUILD_QULACS_WITH_MPI OFF)
+if(BUILD_QULACS_WITH_MPI)
+  #set(CXX_COMPILER "mpic++" CACHE STRING "" FORCE) # Warning!
+  set(USE_MPI ON CACHE BOOL "" FORCE)
+endif()
+FetchContent_MakeAvailable(qulacs)
+
+#FetchContent_GetProperties(qulacs)
+#if(NOT thirdparty_POPULATED)
+#    FetchContent_Populate(qulacs)
+
+#    set(qulacs_build_dir "${CMAKE_BINARY_DIR}/qulacs-build")
+#    file(MAKE_DIRECTORY "${qulacs_build_dir}")
+
+#    if(BUILD_QULACS_WITH_MPI)
+#      set(QULACS_CXX_COMPILER "mpic++") 
+#      set(QULACS_MPI ON)
+#    else()
+#      set(QULACS_CXX_COMPILER "${CMAKE_CXX_COMPILER}") 
+#      set(QULACS_MPI OFF)
+#    endif()
+
+#    execute_process(
+#        COMMAND ${CMAKE_COMMAND}
+#            -S "${qulacs_SOURCE_DIR}"
+#            -B "${qulacs_build_dir}"
+#            -DCMAKE_CXX_COMPILER="${QULACS_CXX_COMPILER}"
+#            -DUSE_MPI="${QULACS_MPI}"          
+#        COMMAND_ERROR_IS_FATAL ANY
+#    )
+
+#    execute_process(
+#        COMMAND ${CMAKE_COMMAND}
+#            --build "${qulacs_build_dir}"
+#        COMMAND_ERROR_IS_FATAL ANY
+#    )
+
+#    add_library(qulacs STATIC IMPORTED)
+#endif()
+
+
 #  Restore original compiler flags
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
 
