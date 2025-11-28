@@ -9,7 +9,7 @@
 #include "utils/helpers/reverse_bitstring.hpp"
 
 #include "maestro_simulator_adapter.hpp"
-#include "Simulator.hpp"
+#include "maestrolib/Interface.h"
 
 #include "logger.hpp"
 
@@ -40,7 +40,17 @@ struct GlobalState {
 namespace cunqa {
 namespace sim {
 
-std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
+MaestroSimulatorAdapter::MaestroSimulatorAdapter() 
+{
+    maestroInstance = GetMaestroObject();
+}
+
+MaestroSimulatorAdapter::MaestroSimulatorAdapter(MaestroComputationAdapter& qc) : qc{qc} 
+{
+    maestroInstance = GetMaestroObject();
+}
+
+std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -67,12 +77,12 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
     auto generate_entanglement_ = [&]() {
         const unsigned long int q[]{ G.n_qubits - 1, G.n_qubits - 2 };
 
-		simulator.ApplyReset(q, 2);
+		ApplyReset(simulator, q, 2);
         // Apply H to the first entanglement qubit
-        simulator.ApplyH(G.n_qubits - 2);
+        ApplyH(simulator, G.n_qubits - 2);
 
         // Apply a CX to the second one to generate an ent pair
-        simulator.ApplyCX(G.n_qubits - 2, G.n_qubits - 1);
+        ApplyCX(simulator, G.n_qubits - 2, G.n_qubits - 1);
     };
 
     std::function<void(TaskState&, const JSON&)> apply_next_instr = [&](TaskState& T, const JSON& instruction = {}) {
@@ -97,7 +107,7 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
         {
             auto clreg = inst.at("clreg").get<std::vector<std::uint64_t>>();
             const unsigned long int q[]{ qubits[0] + T.zero_qubit };
-            const unsigned long long int measurement = simulator.Measure(q, 1);
+            const unsigned long long int measurement = Measure(simulator, q, 1);
             G.cvalues[qubits[0] + T.zero_qubit] = (measurement == 1);
             if (!clreg.empty())
             {
@@ -106,36 +116,36 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
             break;
         }
         case constants::X:
-            simulator.ApplyX(qubits[0] + T.zero_qubit);
+            ApplyX(simulator, qubits[0] + T.zero_qubit);
             break;
         case constants::Y:
-            simulator.ApplyY(qubits[0] + T.zero_qubit);
+            ApplyY(simulator, qubits[0] + T.zero_qubit);
             break;
         case constants::Z:
-            simulator.ApplyZ(qubits[0] + T.zero_qubit);
+            ApplyZ(simulator, qubits[0] + T.zero_qubit);
             break;
         case constants::H:
-            simulator.ApplyH(qubits[0] + T.zero_qubit);
+            ApplyH(simulator, qubits[0] + T.zero_qubit);
             break;
         case constants::SX:
-            simulator.ApplySX(qubits[0] + T.zero_qubit);
+            ApplySX(simulator, qubits[0] + T.zero_qubit);
             break;
         case constants::CX:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCX(control, qubits[1] + T.zero_qubit);
+            ApplyCX(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
         case constants::CY:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCY(control, qubits[1] + T.zero_qubit);
+            ApplyCY(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
         case constants::CZ:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCZ(control, qubits[1] + T.zero_qubit);
+            ApplyCZ(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
         case constants::ECR:
@@ -144,40 +154,40 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
         case constants::RX:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            simulator.ApplyRx(qubits[0] + T.zero_qubit, params[0]);
+            ApplyRx(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
         case constants::RY:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            simulator.ApplyRy(qubits[0] + T.zero_qubit, params[0]);
+            ApplyRy(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
         case constants::RZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            simulator.ApplyRz(qubits[0] + T.zero_qubit, params[0]);
+            ApplyRz(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
         case constants::CRX:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCRx(control, qubits[1] + T.zero_qubit, params[0]);
+            ApplyCRx(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
         case constants::CRY:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCRy(control, qubits[1] + T.zero_qubit, params[0]);
+            ApplyCRy(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
         case constants::CRZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            simulator.ApplyCRz(control, qubits[1] + T.zero_qubit, params[0]);
+            ApplyCRz(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
         case constants::C_IF_H:
@@ -195,14 +205,14 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
             break;
         case constants::SWAP:
         {
-            simulator.ApplySwap(qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit);
+            ApplySwap(simulator, qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit);
             break;
         }
         case constants::MEASURE_AND_SEND:
         {
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
             const unsigned long int q[]{ qubits[0] + T.zero_qubit };
-            int measurement_as_int = static_cast<int>(simulator.Measure(q, 1));
+            int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
             classical_channel->send_measure(measurement_as_int, endpoint[0]); 
             break;
         }
@@ -217,26 +227,26 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
         case constants::QSEND:
         {
             //------------- Generate Entanglement ---------------
-            simulator.ApplyH(G.n_qubits - 2);
-			simulator.ApplyCX(G.n_qubits - 2, G.n_qubits - 1);
+            ApplyH(simulator, G.n_qubits - 2);
+			ApplyCX(simulator, G.n_qubits - 2, G.n_qubits - 1);
             //----------------------------------------------------
 
             // CX to the entangled pair
-            simulator.ApplyCX(qubits[0] + T.zero_qubit, G.n_qubits - 2);
+            ApplyCX(simulator, qubits[0] + T.zero_qubit, G.n_qubits - 2);
 
             // H to the sent qubit
-            simulator.ApplyH(qubits[0] + T.zero_qubit);
+            ApplyH(simulator, qubits[0] + T.zero_qubit);
 
             const unsigned long int q1[]{ qubits[0] + T.zero_qubit };
-            int measurement_as_int = static_cast<int>(simulator.Measure(q1, 1));
+            int measurement_as_int = static_cast<int>(Measure(simulator, q1, 1));
             G.qc_meas[T.id].push(measurement_as_int);
 
             const unsigned long int q2[]{ G.n_qubits - 2 };
-            int aux_meas = static_cast<int>(simulator.Measure(q2, 1));
+            int aux_meas = static_cast<int>(Measure(simulator, q2, 1));
             G.qc_meas[T.id].push(aux_meas);
 
             const unsigned long int q3[]{ G.n_qubits - 2, qubits[0] + T.zero_qubit };
-            simulator.ApplyReset(q3, 2);
+            ApplyReset(simulator, q3, 2);
 
             // Unlock QRECV
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -257,17 +267,17 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
 
             // Apply, conditioned to the measurement, the X and Z gates
             if (meas1) {
-                simulator.ApplyX(G.n_qubits - 1);
+                ApplyX(simulator, G.n_qubits - 1);
             }
             if (meas2) {
-                simulator.ApplyZ(G.n_qubits - 1);
+                ApplyZ(simulator, G.n_qubits - 1);
             }
 
             // Swap the value to the desired qubit
-            simulator.ApplySwap(G.n_qubits - 1, qubits[0] + T.zero_qubit);
+            ApplySwap(simulator, G.n_qubits - 1, qubits[0] + T.zero_qubit);
 
             const unsigned long int q[]{ G.n_qubits - 1 };
-			simulator.ApplyReset(q, 1);
+			ApplyReset(simulator, q, 1);
             break;
         }
         case constants::EXPOSE:
@@ -276,10 +286,10 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
                 generate_entanglement_();
 
                 // CX to the entangled pair
-                simulator.ApplyCX(qubits[0] + T.zero_qubit, G.n_qubits - 2);
+                ApplyCX(simulator, qubits[0] + T.zero_qubit, G.n_qubits - 2);
 
                 const unsigned long int q[]{ G.n_qubits - 2 };
-                int measurement_as_int = static_cast<int>(simulator.Measure(q, 1));
+                int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
 
                 G.qc_meas[T.id].push(measurement_as_int);
                 T.cat_entangled = true;
@@ -291,7 +301,7 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
                 G.qc_meas[inst.at("qpus")[0]].pop();
 
                 if (meas) {
-                    simulator.ApplyZ(qubits[0] + T.zero_qubit);
+                    ApplyZ(simulator, qubits[0] + T.zero_qubit);
                 }
 
                 T.cat_entangled = false;
@@ -309,17 +319,17 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
             G.qc_meas[inst.at("qpus")[0]].pop();
 
             if (meas2) {
-                simulator.ApplyX(G.n_qubits - 1);
+                ApplyX(simulator, G.n_qubits - 1);
             }
 
             for(const auto& sub_inst: inst.at("instructions")) {
                 apply_next_instr(T, sub_inst);
             }
 
-            simulator.ApplyH(G.n_qubits - 1);
+            ApplyH(simulator, G.n_qubits - 1);
 
             const unsigned long int q[]{ G.n_qubits - 1 };
-            int measurement_as_int = static_cast<int>(simulator.Measure(q, 1));
+            int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
             G.qc_meas[T.id].push(measurement_as_int);
 
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -364,132 +374,120 @@ std::string execute_shot_(Simulator& simulator, const std::vector<QuantumTask>& 
 JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
 {
     LOGGER_DEBUG("Maestro usual simulation");
-    const char* HOME = std::getenv("HOME");
-    std::string libmaestro_path = std::string(HOME) + "/lib/libmaestro.so";
     try {
         auto quantum_task = qc.quantum_tasks[0];
-
-        unsigned long n_qbits = quantum_task.config.at("num_qubits").get<unsigned long>();
+        auto n_qbits = quantum_task.config.at("num_qubits").get<unsigned long>();
  
         JSON circuit_json = quantum_task.circuit;
         JSON run_config_json(quantum_task.config);
 
-        SimpleSimulator simulator;
-        if (simulator.Init(libmaestro_path.c_str()))
+        auto simulatorHandle = CreateSimpleSimulator(n_qbits);
+        if (simulatorHandle == 0)
         {
-			unsigned long int simulatorHandle = simulator.CreateSimpleSimulator(n_qbits);
-            if (simulatorHandle == 0)
+            LOGGER_ERROR("Error creating the Maestro SimpleSimulator.");
+            return {{"ERROR", "Unable to create the Maestro SimpleSimulator."}};
+        }
+
+        std::string method = quantum_task.config.at("method").get<std::string>();
+        std::string sim_name;
+
+        if (quantum_task.config.contains("simulator"))
+            sim_name = quantum_task.config.at("simulator").get<std::string>();
+
+        // -1 for simulator type means both qiskit aer and qcsim
+        // -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
+        int simulatorType = -1; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
+        int simulationType = -1; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
+
+        // TODO: set the method into the estimator
+        // also the parameters if any and so on
+        if (method != "automatic")
+        {
+            if (method == "statevector")
             {
-                LOGGER_ERROR("Error creating the Maestro simulator.");
-                return {{"ERROR", "Unable to create the Maestro simulator."}};
-			}
-
-            std::string method = quantum_task.config.at("method").get<std::string>();
-            std::string sim_name;
-
-            if (quantum_task.config.contains("simulator"))
-                sim_name = quantum_task.config.at("simulator").get<std::string>();
-
-			// -1 for simulator type means both qiskit aer and qcsim
-			// -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
-            int simulatorType = -1; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
-            int simulationType = -1; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
-
-            // TODO: set the method into the estimator
-            // also the parameters if any and so on
-            if (method != "automatic")
-            {
-                if (method == "statevector")
-                {
-                    simulationType = 0;
-                }
-                else if (method == "matrix_product_state")
-                {
-                    // matrix_product_state_truncation_threshold
-                    // matrix_product_state_max_bond_dimension
-                    // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
-                    simulationType = 1;
-                }
-                else if (method == "stabilizer")
-                {
-                    simulationType = 2;
-                }
-                else if (method == "tensor_network")
-                {
-                    // use qcsim for this, qiskit aer is not compiled with tensor network support
-                    // in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
-                    simulationType = 3;
-                }
+                simulationType = 0;
             }
-
-            if (sim_name == "qiskit" || sim_name == "aer")
+            else if (method == "matrix_product_state")
             {
-				simulatorType = 0; // qiskit aer
+                // matrix_product_state_truncation_threshold
+                // matrix_product_state_max_bond_dimension
+                // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
+                simulationType = 1;
             }
-            else if (sim_name == "qcsim")
+            else if (method == "stabilizer")
             {
-                simulatorType = 1; // qcsim
+                simulationType = 2;
             }
-            else if (sim_name == "gpu" && simulationType != 2 && simulationType != 3) // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
+            else if (method == "tensor_network")
             {
-                simulatorType = 4; // gpu
+                // use qcsim for this, qiskit aer is not compiled with tensor network support
+                // in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
+                simulationType = 3;
             }
-            else if (sim_name == "composite_qiskit")
+        }
+
+        if (sim_name == "qiskit" || sim_name == "aer")
+        {
+            simulatorType = 0; // qiskit aer
+        }
+        else if (sim_name == "qcsim")
+        {
+            simulatorType = 1; // qcsim
+        }
+        else if (sim_name == "gpu" && simulationType != 2 && simulationType != 3) // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
+        {
+            simulatorType = 4; // gpu
+        }
+        else if (sim_name == "composite_qiskit")
+        {
+            simulatorType = 2; // p-blocks qiskit aer
+            simulationType = 0; // statevector
+        }
+        else if (sim_name == "composite_qcsim")
+        {
+            simulatorType = 3; // p-blocks qcsim
+            simulationType = 0; // statevector
+        }
+
+        if (simulatorType != -1 || simulationType != -1) // if both unspecified, leave the default
+        {
+            if (simulatorType == -1 && simulationType != -1) // simulator type not specified
             {
-                simulatorType = 2; // p-blocks qiskit aer
-                simulationType = 0; // statevector
+                // both qiskit aer and qcsim
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, 0, simulationType);
+                AddOptimizationSimulator(simulatorHandle, 1, simulationType);
             }
-            else if (sim_name == "composite_qcsim")
+            else if (simulationType == -1)
             {
-                simulatorType = 3; // p-blocks qcsim
-                simulationType = 0; // statevector
-			}
-
-            if (simulatorType != -1 || simulationType != -1) // if both unspecified, leave the default
-            {
-                if (simulatorType == -1 && simulationType != -1) // simulator type not specified
-                {
-                    // both qiskit aer and qcsim
-                    simulator.RemoveAllOptimizationSimulatorsAndAdd(0, simulationType);
-                    simulator.AddOptimizationSimulator(1, simulationType);
-                }
-                else if (simulationType == -1)
-                {
-					simulator.RemoveAllOptimizationSimulatorsAndAdd(simulatorType, 0); // statevector
-                    simulator.RemoveAllOptimizationSimulatorsAndAdd(simulatorType, 1); // mps
-                    simulator.RemoveAllOptimizationSimulatorsAndAdd(simulatorType, 2); // stabilizer
-                }
-                else
-                {
-                    simulator.RemoveAllOptimizationSimulatorsAndAdd(simulatorType, simulationType);
-                }
-            }
-
-			char* result = simulator.SimpleExecute(circuit_json.dump().c_str(), run_config_json.dump().c_str());
-
-            if (result)
-            {
-                JSON maestro_result = JSON::parse(result);
-                simulator.FreeResult(result);
-
-                JSON result_json = {
-                {"counts", maestro_result.at("counts").get<JSON>()},
-                {"time_taken", maestro_result.at("time_taken").get<JSON>()}
-                };
-
-				return result_json;
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 0); // statevector
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 1); // mps
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 2); // stabilizer
             }
             else
             {
-                LOGGER_ERROR("Error executing the circuit in the Maestro simulator.");
-                return {{"ERROR", "Unable to execute the circuit in the Maestro simulator."}};
-			}
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, simulationType);
+            }
+        }
+
+        char* result = SimpleExecute(simulatorHandle, circuit_json.dump().c_str(), run_config_json.dump().c_str());
+
+        if (result)
+        {
+            JSON maestro_result = JSON::parse(result);
+            FreeResult(result);
+
+            JSON result_json = {
+            {"counts", maestro_result.at("counts").get<JSON>()},
+            {"time_taken", maestro_result.at("time_taken").get<JSON>()}
+            };
+
+            return result_json;
         }
         else
         {
-            LOGGER_ERROR("Error initializing the Maestro library.");
-            return {{"ERROR", "Unable to initialize the Maestro library."}};
-		}
+            LOGGER_ERROR("Error executing the circuit in the Maestro simulator.");
+            return {{"ERROR", "Unable to execute the circuit in the Maestro simulator."}};
+        }
     } catch (const std::exception& e) {
         // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Maestro simulator.\n\tTry checking the format of the circuit sent.");
@@ -499,12 +497,9 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
     return {};
 }
 
-
 JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
     LOGGER_DEBUG("Maestro dynamic simulation");
-    const char* HOME = std::getenv("HOME");
-    std::string libmaestro_path = std::string(HOME) + "/lib64/libmaestro.so";
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
@@ -517,101 +512,91 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
 
-    Simulator simulator;
-    if (simulator.Init(libmaestro_path.c_str()))
+    std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
+    // is qcsim or gpu specified?
+    // otherwise use qiskit aer by default
+    std::string sim_name;
+    
+    if (qc.quantum_tasks[0].config.contains("simulator"))
+        sim_name = qc.quantum_tasks[0].config.at("simulator").get<std::string>();
+
+    int simulatorType = 0; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
+    int simulationType = 0; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
+    // the p-blocks simulators use statevector only
+
+    if (method == "automatic")
     {
-        std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
-        // is qcsim or gpu specified?
-		// otherwise use qiskit aer by default
-        std::string sim_name;
-        
-        if (qc.quantum_tasks[0].config.contains("simulator"))
-            sim_name = qc.quantum_tasks[0].config.at("simulator").get<std::string>();
+        // TODO: use the estimator to pick the best method
+        // need to use the given circuit(s) in quantum_tasks for that, also the number of shots and the usage of multithreading in the simulator (as opposed to using multiple simulators in different threads)!
 
-		int simulatorType = 0; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
-		int simulationType = 0; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
-        // the p-blocks simulators use statevector only
-
-        if (method == "automatic")
-        {
-            // TODO: use the estimator to pick the best method
-            // need to use the given circuit(s) in quantum_tasks for that, also the number of shots and the usage of multithreading in the simulator (as opposed to using multiple simulators in different threads)!
-
-			// for now pick up the statevector simulator
-        }
-        else if (method == "statevector")
-        {
-			simulationType = 0;
-        }
-        else if (method == "matrix_product_state")
-        {
-            // matrix_product_state_truncation_threshold
-            // matrix_product_state_max_bond_dimension
-            // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
-            simulationType = 1;
-        }
-        else if (method == "stabilizer")
-        {
-            simulationType = 2;
-        }
-        else if (method == "tensor_network")
-        {
-			// use qcsim for this, qiskit aer is not compiled with tensor network support
-			// in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
-            simulationType = 3;
-        }
-
-        if (sim_name == "qcsim")
-        {
-            simulatorType = 1; // qcsim
-        }
-		else if (sim_name == "gpu" && simulationType != 2 && simulationType == 3) // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
-        {
-            simulatorType = 4; // gpu
-        }
-        else if (sim_name == "composite_qiskit")
-        {
-            simulatorType = 2; // p-blocks qiskit aer
-			simulationType = 0; // statevector
-        }
-        else if (sim_name == "composite_qcsim")
-        {
-            simulatorType = 3; // p-blocks qcsim
-            simulationType = 0; // statevector
-		}
-
-        if (simulator.CreateSimulator(simulatorType, simulationType))
-        {
-            auto start = std::chrono::high_resolution_clock::now();
-            for (std::size_t i = 0; i < shots; i++)
-            {
-                simulator.AllocateQubits(n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
-                simulator.InitializeSimulator();
-                meas_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
-                simulator.ClearSimulator();
-            } // End all shots
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            float time_taken = duration.count();
-
-            reverse_bitstring_keys_json(meas_counter);
-            JSON result_json = {
-                {"counts", meas_counter},
-                {"time_taken", time_taken} };
-
-            return result_json;
-        }
-        else
-        {
-            LOGGER_ERROR("Error creating the Maestro simulator.");
-            return { {"ERROR", "Unable to create the Maestro simulator."} };
-        }
+        // for now pick up the statevector simulator
     }
-    else
+    else if (method == "statevector")
     {
-        LOGGER_ERROR("Error initializing the Maestro library.");
-        return { {"ERROR", "Unable to initialize the Maestro library."} };
+        simulationType = 0;
     }
+    else if (method == "matrix_product_state")
+    {
+        // matrix_product_state_truncation_threshold
+        // matrix_product_state_max_bond_dimension
+        // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
+        simulationType = 1;
+    }
+    else if (method == "stabilizer")
+    {
+        simulationType = 2;
+    }
+    else if (method == "tensor_network")
+    {
+        // use qcsim for this, qiskit aer is not compiled with tensor network support
+        // in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
+        simulationType = 3;
+    }
+
+    if (sim_name == "qcsim")
+    {
+        simulatorType = 1; // qcsim
+    }
+    else if (sim_name == "gpu" && simulationType != 2 && simulationType == 3) // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
+    {
+        simulatorType = 4; // gpu
+    }
+    else if (sim_name == "composite_qiskit")
+    {
+        simulatorType = 2; // p-blocks qiskit aer
+        simulationType = 0; // statevector
+    }
+    else if (sim_name == "composite_qcsim")
+    {
+        simulatorType = 3; // p-blocks qcsim
+        simulationType = 0; // statevector
+    }
+
+    auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+    if (simulatorHandle == 0) {
+        LOGGER_ERROR("Error creating the Maestro Simulator.");
+        return {{"ERROR", "Unable to create the Maestro Simulator."}};
+    }
+    auto simulator = GetSimulator(simulatorHandle);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (std::size_t i = 0; i < shots; i++)
+    {
+        AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
+        InitializeSimulator(simulator);
+        meas_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
+        ClearSimulator(simulator);
+    } // End all shots
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> duration = end - start;
+    float time_taken = duration.count();
+
+    reverse_bitstring_keys_json(meas_counter);
+    JSON result_json = {
+        {"counts", meas_counter},
+        {"time_taken", time_taken} };
+
+    return result_json;
 }
 
 

@@ -247,6 +247,9 @@ FetchContent_Declare(
     GIT_TAG "7ba339fc5595fd18d2fcb0612a6570c3c5e1fd90"
 )
 FetchContent_MakeAvailable(maestro)
+
+message(STATUS "-----------${maestro_SOURCE_DIR}")
+target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 #  Restore original compiler flags

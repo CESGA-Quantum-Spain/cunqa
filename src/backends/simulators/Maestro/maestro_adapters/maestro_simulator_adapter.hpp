@@ -15,13 +15,15 @@ namespace sim {
 class MaestroSimulatorAdapter
 {
 public:
-    MaestroSimulatorAdapter() = default;
-    MaestroSimulatorAdapter(MaestroComputationAdapter& qc) : qc{qc} {}
+    MaestroSimulatorAdapter();
+    MaestroSimulatorAdapter(MaestroComputationAdapter& qc);
 
     JSON simulate(const Backend* backend);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
 
     MaestroComputationAdapter qc;
+private:
+    void* maestroInstance = nullptr;
 };
 
 
