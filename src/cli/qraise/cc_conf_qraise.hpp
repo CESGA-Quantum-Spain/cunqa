@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <any>
+#include <algorithm>
 
 #include "argparse/argparse.hpp"
 #include "utils/constants.hpp"
@@ -16,19 +16,22 @@ std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
     std::string backend_path;
     std::string backend;
 
-    if (std::any_cast<std::string>(args.simulator) != "Cunqa" && std::any_cast<std::string>(args.simulator) != "Munich" && std::any_cast<std::string>(args.simulator) != "Aer") {
-        LOGGER_ERROR("Classical communications only are available under \"Cunqa\", \"Munich\" and \"Aer\" simulators, but the following simulator was provided: {}", std::any_cast<std::string>(args.simulator));
+    std::vector<std::string> simulators_with_cc = {"Cunqa", "Aer", "Munich", "Qulacs"};
+    bool is_available_simulator = std::find(simulators_with_cc.begin(), simulators_with_cc.end(), std::string(args.simulator)) != simulators_with_cc.end();
+
+    if (!is_available_simulator) {
+        LOGGER_ERROR("Classical communications only are available under \"Cunqa\", \"Munich\" and \"Aer\" simulators, but the following simulator was provided: {}", std::string(args.simulator));
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
 
     if (args.backend.has_value()) {
-        backend_path = std::any_cast<std::string>(args.backend.value());
+        backend_path = std::string(args.backend.value());
         backend = R"({"backend_path":")" + backend_path + R"("})" ;
-        subcommand = mode + " cc " + std::any_cast<std::string>(args.family_name) + " " + std::any_cast<std::string>(args.simulator) + " \'" + backend + "\'" "\n";
+        subcommand = mode + " cc " + std::string(args.family_name) + " " + std::string(args.simulator) + " \'" + backend + "\'" "\n";
         LOGGER_DEBUG("Qraise with classical communications and personalized CunqaSimulator backend. \n");
     } else {
-        subcommand = mode + " cc " + std::any_cast<std::string>(args.family_name) + " " + std::any_cast<std::string>(args.simulator) + "\n";
+        subcommand = mode + " cc " + std::string(args.family_name) + " " + std::string(args.simulator) + "\n";
         LOGGER_DEBUG("Qraise with classical communications and default CunqaSimulator backend. \n");
     }
 

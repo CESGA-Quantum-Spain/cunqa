@@ -77,7 +77,6 @@ struct ClassicalChannel::Impl
         }
         zmq::message_t message(data.begin(), data.end());
 
-        LOGGER_DEBUG("Enviamos el circuito a {}", target);
         zmq_sockets[target].send(message, zmq::send_flags::none);
         
     }
@@ -93,7 +92,6 @@ struct ClassicalChannel::Impl
                 zmq::message_t id;
                 zmq::message_t message;
                 
-                LOGGER_DEBUG("{} vamos a recibir el circuito de {}", zmq_id, origin);
                 [[maybe_unused]] auto ret1 = zmq_comm_server.recv(id, zmq::recv_flags::none);
                 [[maybe_unused]] auto ret2 = zmq_comm_server.recv(message, zmq::recv_flags::none);
                 std::string id_str(static_cast<char*>(id.data()), id.size());

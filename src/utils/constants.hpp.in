@@ -166,7 +166,7 @@ const std::vector<std::string> BASIS_GATES = {
     "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
     "swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3",
     "rxx", "ryy", "rzz", "rzx", "ccx", "ccz", "crx", "cry", "crz",
-    "cswap"
+    "cswap", "ecr"
 };
 
 const std::vector<std::string> BASIS_AND_DISTRIBUTED_GATES = {

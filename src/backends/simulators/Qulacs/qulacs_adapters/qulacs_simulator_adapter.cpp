@@ -25,8 +25,6 @@ UINT measure_adapter(QuantumState& state, UINT target_index)
     auto gate0 = gate::P0(target_index);
     auto gate1 = gate::P1(target_index);
     std::vector<QuantumGateBase*> _gate_list = {gate0, gate1};
-    delete gate0;
-    delete gate1;
     double r = random.uniform();
 
     double sum = 0.;
@@ -47,6 +45,9 @@ UINT measure_adapter(QuantumState& state, UINT target_index)
             index++;
         }
     }
+
+    delete gate0;
+    delete gate1;
     delete buffer;
 
     return index;
@@ -84,7 +85,7 @@ struct GlobalState {
 namespace cunqa {
 namespace sim {
  
-std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
+std::string execute_shot_(QuantumState& state, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -186,55 +187,55 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
             break;
         case constants::U1: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::U1(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::U2: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::U2(qubits[0] + T.zero_qubit, params[0], params[1])->update_quantum_state(&state);
             break;
         }
         case constants::U3: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::U3(qubits[0] + T.zero_qubit, params[0], params[1], params[2])->update_quantum_state(&state);
             break;
         }
         case constants::RX: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RX(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::RY: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RY(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::RZ: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RZ(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::ROTINVX: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RotInvX(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::ROTINVY: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RotInvY(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
         case constants::ROTINVZ: 
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
+            auto params = inst.at("params").get<std::vector<double>>();
             gate::RotInvZ(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
@@ -251,11 +252,15 @@ std::string execute_shot_(QuantumState state, const std::vector<QuantumTask>& qu
             break;
         }
         case constants::ECR:
+        {
             gate::ECR(qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
+        }
         case constants::SWAP:
+        {
             gate::SWAP(qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
+        }
         case constants::MEASURE_AND_SEND:
         {
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
@@ -446,8 +451,6 @@ JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
             {"counts", counts},
             {"time_taken", time_taken}
         };
-
-        LOGGER_DEBUG("result_json: {}", result_json.dump());
 
         return result_json;
 
