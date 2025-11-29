@@ -18,7 +18,7 @@ qpus  = get_QPUs()
 for q in qpus:
     print(f"QPU {q.id}, backend: {q.backend.name}, simulator: {q.backend.simulator}, version: {q.backend.version}.")
 
-qc = CunqaCircuit(2, 2)
+qc = CunqaCircuit(2)
 qc.h(0)
 qc.cx(0, 1)
 qc.measure_all()

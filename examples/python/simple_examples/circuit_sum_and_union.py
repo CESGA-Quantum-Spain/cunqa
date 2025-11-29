@@ -8,8 +8,8 @@ from cunqa import get_QPUs, gather
 from cunqa.logger import logger
 from cunqa.circuit import CunqaCircuit
 
-circ1 = CunqaCircuit(3, 3, id = "First")
-circ2 = CunqaCircuit(3, 3, id = "Second")
+circ1 = CunqaCircuit(3, id = "First")
+circ2 = CunqaCircuit(3, id = "Second")
 
 # Add gates to each of the two circuits
 circ1.h(0)
@@ -30,8 +30,8 @@ print(f"Id of the sum of the circuits is {circ_sum._id}")
 # Circuit sum interact in a delicate way with communications.
 # If we sum two circuits that have distributed gates between them, the first circuit will wait indefinitely (in the sum) for the second circuit,
 # which can only respond after the first has been executed. FATAL!
-circ3=CunqaCircuit(1,1, id="Third")
-circ4=CunqaCircuit(1,1, id="Fourth")
+circ3=CunqaCircuit(1, id="Third")
+circ4=CunqaCircuit(1, id="Fourth")
 
 circ3.measure_and_send(0, "Fourth")
 circ4.remote_c_if("x", 0, control_circuit="Third")
@@ -43,7 +43,7 @@ except SystemExit as error:
     pass
 
 # Another option to sum multiple circuits on a row is sum()
-circ5 = CunqaCircuit(3, 3, id="Fifth")
+circ5 = CunqaCircuit(3, id="Fifth")
 circ5.rz(np.pi, 0)
 circ5.rx(np.pi/2, 1)
 circ5.ry(np.pi/4, 2)

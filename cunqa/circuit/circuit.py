@@ -1397,6 +1397,21 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
 
+    def save_state(self, pershot: bool = False, label: str = "_method_") -> None:
+        """
+        Instruction to save the state of the circuit simulation at the particular moment the instruction is executed.
+        Args:
+            pershot (bool): determines wether the state is stored separatedly for each shot or averaged. Default: False
+            label (str): key for the state in the result dict. Used to distinguish two states saved. 
+                         Default: '_method_', which appears in the result as the name of the simulation method selected.
+        """
+        self.instructions.append({
+            "name": "save_state",
+            "qubits": list(range(self.num_qubits)),
+            "snapshot_type": "list" if pershot else "single",
+            "label": label
+        })
+
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
         Class method to measure and send a bit from the current circuit to a remote one.
