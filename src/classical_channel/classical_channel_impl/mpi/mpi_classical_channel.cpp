@@ -2,7 +2,10 @@
 #include <string>
 #include <mpi.h>
 
+#include "utils/helpers/net_functions.hpp"
 #include "classical_channel.hpp"
+#include "utils/json.hpp"
+
 #include "logger.hpp"
 
 namespace cunqa {
@@ -12,6 +15,7 @@ struct ClassicalChannel::Impl
 {
     int mpi_size;
     int mpi_rank;
+    std::unordered_map<std::string, int> mpi_group;
 
     Impl()
     {
@@ -21,42 +25,118 @@ struct ClassicalChannel::Impl
     
         LOGGER_DEBUG("Communication channel with MPI configured.");
     }
+
+    Impl(const std::string& id)
+    {
+        MPI_Init(NULL, NULL);
+        MPI_Comm_size(MPI_COMM_WORLD, &(mpi_size));
+        MPI_Comm_rank(MPI_COMM_WORLD, &(mpi_rank));
+    
+        LOGGER_DEBUG("Communication channel with MPI configured.");
+    }
+
     ~Impl() = default;
 
-    void send(int& measurement, std::string& target)
+    void connect(const std::string& endpoint, const std::string& id)
+    {
+        mpi_group[id] = std::atoi(endpoint.c_str());
+    }
+
+    void send(const int& measurement, const std::string& target)
     {
         int target_int = std::atoi(target.c_str());
         MPI_Send(&measurement, 1, MPI_INT, target_int, 1, MPI_COMM_WORLD);
         
     }
 
-    int recv(std::string& origin)
+    int recv(const std::string& origin)
     {
         int measurement;
         int origin_int = std::atoi(origin.c_str());
         MPI_Recv(&measurement, 1, MPI_INT, origin_int, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         return measurement;
     }
+
+    void send_str(const std::string& data, const std::string& target)
+    {
+        int target_int = std::atoi(target.c_str());
+        int size = data.size();
+        MPI_Send(&size, 1, MPI_INT, target_int, 1, MPI_COMM_WORLD);
+        MPI_Send(&data, size, MPI_CHAR, target_int, 1, MPI_COMM_WORLD);
+    }
+
+    std::string recv_str(const std::string& origin)
+    {
+        int datasize;
+        std::string data;
+        int origin_int = std::atoi(origin.c_str());
+        MPI_Recv(&datasize, 1, MPI_INT, origin_int, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&data, datasize, MPI_CHAR, origin_int, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        return data;
+    }
 };
 
-ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>()}, endpoint{std::to_string(pimpl_->mpi_rank)}
-{}
+
+
+ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>()}
+{
+    endpoint = std::to_string(pimpl_->mpi_rank);
+}
+
+ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)}
+{
+    endpoint = std::to_string(pimpl_->mpi_rank);
+}
 
 ClassicalChannel::~ClassicalChannel() = default;
 
-void ClassicalChannel::send_measure(int& measurement, std::string& target)
+// Connect and Publish methods that are not needed with MPI
+void ClassicalChannel::publish(const std::string& suffix)
+{
+    JSON communications_endpoint = 
+    {
+        {"communications_endpoint", endpoint}
+    };
+    write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
+}
+
+void ClassicalChannel::connect(const std::string& endpoint, const std::string& id) 
+{
+    pimpl_->connect(endpoint, id);
+}
+
+void ClassicalChannel::connect(const std::string& endpoint, const bool force_endpoint)
+{
+    //pimpl_->connect(endpoint, force_endpoint);
+}
+
+void ClassicalChannel::connect(const std::vector<std::string>& endpoints, const bool force_endpoint) 
+{
+    /* for (const auto& endpoint : endpoints) {
+        pimpl_->connect(endpoint, force_endpoint);
+    } */
+}
+
+void ClassicalChannel::send_info(const std::string& data, const std::string& target)
+{
+    pimpl_->send_str(data, target);
+}
+
+
+std::string ClassicalChannel::recv_info(const std::string& origin)
+{
+    return pimpl_->recv_str(origin);
+}
+
+void ClassicalChannel::send_measure(const int& measurement, const std::string& target)
 {
     pimpl_->send(measurement, target);
 }
 
-int ClassicalChannel::recv_measure(std::string& origin)
+int ClassicalChannel::recv_measure(const std::string& origin)
 {
     return pimpl_->recv(origin);
 }
 
-void ClassicalChannel::connect(std::vector<std::string>& endpoints)
-{
-    LOGGER_DEBUG("MPI does not need to set connections.");
-}
 } // End of comm namespace
 } // End of cunqa namespace

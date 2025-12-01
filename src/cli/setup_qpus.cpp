@@ -96,6 +96,7 @@ std::string get_qpu_name(const JSON& backend_paths)
 template<typename Simulator, typename Config, typename BackendType>
 void turn_ON_QPU(const JSON& backend_json, const std::string& mode, const std::string& name, const std::string& family)
 {
+    LOGGER_DEBUG("Inside turn_ON_QPU with family: {}", family);
     std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>(family);
     LOGGER_DEBUG("Simulator instantiated");
     Config config;
