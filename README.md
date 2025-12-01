@@ -116,6 +116,7 @@ pybind11        2.7 (recommended 2.12)
 MPI             3.1
 OpenMP          4.5
 Boost           1.85.0
+Eigen           5.0.0
 Blas            -
 Lapack          -
 ```
