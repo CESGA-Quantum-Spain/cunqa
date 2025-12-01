@@ -284,6 +284,54 @@ Methods
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .. automethod:: CunqaCircuit.c_if
 
 .. automethod:: CunqaCircuit.ccx
@@ -292,7 +340,11 @@ Methods
 
 .. automethod:: CunqaCircuit.ccz
 
+.. automethod:: CunqaCircuit.cecr
+
 .. automethod:: CunqaCircuit.cp
+
+.. automethod:: CunqaCircuit.cr
 
 .. automethod:: CunqaCircuit.crx
 
@@ -307,6 +359,8 @@ Methods
 .. automethod:: CunqaCircuit.cu
 
 .. automethod:: CunqaCircuit.cu1
+
+.. automethod:: CunqaCircuit.cu2
 
 .. automethod:: CunqaCircuit.cu3
 
@@ -342,6 +396,10 @@ Methods
 
 .. automethod:: CunqaCircuit.p
 
+.. automethod:: CunqaCircuit.P0
+
+.. automethod:: CunqaCircuit.P1
+
 .. automethod:: CunqaCircuit.process_instrs
 
 .. automethod:: CunqaCircuit.qrecv
@@ -353,6 +411,12 @@ Methods
 .. automethod:: CunqaCircuit.remote_c_if
 
 .. automethod:: CunqaCircuit.reset
+
+.. automethod:: CunqaCircuit.RotInvX
+
+.. automethod:: CunqaCircuit.RotInvZ
+
+.. automethod:: CunqaCircuit.rRotInvY
 
 .. automethod:: CunqaCircuit.rx
 
@@ -379,6 +443,14 @@ Methods
 .. automethod:: CunqaCircuit.sx
 
 .. automethod:: CunqaCircuit.sxdg
+
+.. automethod:: CunqaCircuit.sy
+
+.. automethod:: CunqaCircuit.sydg
+
+.. automethod:: CunqaCircuit.sz
+
+.. automethod:: CunqaCircuit.szdg
 
 .. automethod:: CunqaCircuit.t
 
