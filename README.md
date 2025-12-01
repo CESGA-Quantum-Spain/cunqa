@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  A HPC platform to simulate Distributed Quantum Computing. 
+  A Distributed Quantum Computing emulator for HPC 
 </p>
 
 <br>
@@ -319,3 +319,19 @@ Additionally, this research project was made possible through the access granted
 
 Secondly, The supercomputer FinisTerrae III and its permanent data storage system, which have been funded by the NextGeneration EU 2021 Recovery, Transformation and Resilience Plan, ICT2021-006904, and also from the Pluriregional Operational Programme of Spain 2014-2020 of the European Regional Development Fund (ERDF), ICTS-2019-02-CESGA3, and from the State Programme for the Promotion of Scientific and Technical Research of Excellence of the State
 Plan for Scientific and Technical Research and Innovation 2013-2016 State subprogramme for scientific and technical infrastructures and equipment of ERDF, CESG15-DE-3114.
+
+## How to cite:
+
+When citing the software, please cite the original CUNQA paper:
+
+```bibtex
+@misc{vázquezpérez2025cunqadistributedquantumcomputing,
+    title={CUNQA: a Distributed Quantum Computing emulator for HPC}, 
+    author={Jorge Vázquez-Pérez and Daniel Expósito-Patiño and Marta Losada and Álvaro Carballido and Andrés Gómez and Tomás F. Pena},
+    year={2025},
+    eprint={2511.05209},
+    archivePrefix={arXiv},
+    primaryClass={quant-ph},
+    url={https://arxiv.org/abs/2511.05209}, 
+}
+```

@@ -160,6 +160,11 @@ int main(int argc, char* argv[])
         write_sbatch_file_from_infrastructure(sbatchFile, args);
         sbatchFile.close();
     } else {
+        if (args.n_qpus == 0 || args.time == "") {
+            LOGGER_INFO("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
+            std::cout << "\033[32m qraise needs two mandatory arguments: \n\t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n \033[0m" << std::endl;
+            return 1;
+        }
         // Setting and checking mode and family name, respectively
         std::string mode = args.co_located ? "co_located" : "hpc";
         std::string family = args.family_name;
