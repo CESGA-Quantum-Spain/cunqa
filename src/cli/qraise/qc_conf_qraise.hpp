@@ -12,6 +12,11 @@
 
 std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
 {
+    #ifdef USE_MPI_BTW_QPU
+        LOGGER_ERROR("Quantum Communications are not supported with MPI.");
+        return "0";
+    #endif
+
     std::string run_command;
     std::string subcommand;
     std::string backend_path;
@@ -32,16 +37,13 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
     int simulator_n_cores = args.cores_per_qpu * args.n_qpus; 
     int simulator_memory = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() * args.n_qpus : DEFAULT_MEM_PER_CORE * args.cores_per_qpu * args.n_qpus;
     
+#ifdef USE_ZMQ_BTW_QPU
     run_command =  "srun -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
 
     // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
     run_command += "sleep 1\n";
     run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --exclusive setup_executor " + args.simulator + " " + args.family_name + "\n";
-
-    #ifndef USE_ZMQ_BTW_QPU
-        LOGGER_ERROR("For quantum communications ZMQ has to be available.");
-        return "0";
-    #endif
+#endif
 
     return run_command;
 }

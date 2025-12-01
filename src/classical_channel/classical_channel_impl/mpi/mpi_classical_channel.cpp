@@ -1,4 +1,3 @@
-
 #include <string>
 #include <mpi.h>
 
@@ -15,7 +14,6 @@ struct ClassicalChannel::Impl
 {
     int mpi_size;
     int mpi_rank;
-    std::unordered_map<std::string, int> mpi_group;
 
     Impl()
     {
@@ -36,11 +34,6 @@ struct ClassicalChannel::Impl
     }
 
     ~Impl() = default;
-
-    void connect(const std::string& endpoint, const std::string& id)
-    {
-        mpi_group[id] = std::atoi(endpoint.c_str());
-    }
 
     void send(const int& measurement, const std::string& target)
     {
@@ -69,7 +62,8 @@ struct ClassicalChannel::Impl
     {
         int datasize;
         std::string data;
-        int origin_int = std::atoi(origin.c_str());
+        int origin_int = (origin == "executor") ? (mpi_size - 1) : std::atoi(origin.c_str());
+        LOGGER_DEBUG("origin_int: {}", std::to_string(origin_int));
         MPI_Recv(&datasize, 1, MPI_INT, origin_int, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&data, datasize, MPI_CHAR, origin_int, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         return data;
@@ -90,7 +84,7 @@ ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_uni
 
 ClassicalChannel::~ClassicalChannel() = default;
 
-// Connect and Publish methods that are not needed with MPI
+
 void ClassicalChannel::publish(const std::string& suffix)
 {
     JSON communications_endpoint = 
@@ -102,26 +96,24 @@ void ClassicalChannel::publish(const std::string& suffix)
 
 void ClassicalChannel::connect(const std::string& endpoint, const std::string& id) 
 {
-    pimpl_->connect(endpoint, id);
+    LOGGER_DEBUG("connect(const std::string& endpoint, const std::string& id) not implemented for MPI");
 }
 
 void ClassicalChannel::connect(const std::string& endpoint, const bool force_endpoint)
 {
-    //pimpl_->connect(endpoint, force_endpoint);
+    LOGGER_DEBUG("connect(const std::string& endpoint, const bool force_endpoint) not implemented for MPI");
 }
 
 void ClassicalChannel::connect(const std::vector<std::string>& endpoints, const bool force_endpoint) 
 {
-    /* for (const auto& endpoint : endpoints) {
-        pimpl_->connect(endpoint, force_endpoint);
-    } */
+    LOGGER_DEBUG("connect(const std::vector<std::string>& endpoints, const bool force_endpoint) not implemented for MPI");
+
 }
 
 void ClassicalChannel::send_info(const std::string& data, const std::string& target)
 {
     pimpl_->send_str(data, target);
 }
-
 
 std::string ClassicalChannel::recv_info(const std::string& origin)
 {

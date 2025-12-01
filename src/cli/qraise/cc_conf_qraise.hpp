@@ -35,15 +35,13 @@ std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
         LOGGER_DEBUG("Qraise with classical communications and default CunqaSimulator backend. \n");
     }
 
-    #ifdef USE_MPI_BTW_QPU
+#ifdef USE_MPI_BTW_QPU
     run_command =  "srun --mpi=pmix --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
     LOGGER_DEBUG("Run command with MPI comm: {}", run_command);
-    #endif
-
-    #ifdef USE_ZMQ_BTW_QPU
+#elif defined(USE_ZMQ_BTW_QPU)
     run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
     LOGGER_DEBUG("Run command with ZMQ comm: {}", run_command);
-    #endif
+#endif
 
     return run_command;
 }

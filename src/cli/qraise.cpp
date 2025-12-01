@@ -140,6 +140,10 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
         }
     }
 
+    if (run_command == "0") { 
+        throw std::runtime_error("Unable to get the proper run command.");
+    }
+
     LOGGER_DEBUG("Run command: {}", run_command);
     sbatchFile << run_command;
 }
@@ -181,6 +185,7 @@ int main(int argc, char* argv[])
             write_run_command(sbatchFile, args, mode);
         } catch (const std::exception& e) {
             LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
+            std::system("rm qraise_sbatch_tmp.sbatch");
             return 1;
         }
         
