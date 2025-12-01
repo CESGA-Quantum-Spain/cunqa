@@ -19,7 +19,7 @@ url: "https://github.com/CESGA-Quantum-Spain/cunqa"
 
  
 preferred-citation:
-  type: article
+  type: misc
   title: "CUNQA: a Distributed Quantum Computing emulator for HPC."
   authors:
     - family-names: "Carballido Costas"
