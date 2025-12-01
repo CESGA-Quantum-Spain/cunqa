@@ -213,9 +213,8 @@ class Result:
 
         Returns:
             probs (dict, np.array): probabilities per bitstring found on counts. The probabilities are
-                                    returned on an array which includes zero probabilities unless 
-                                    multiple cl_registers are found, in which case a simple dict 
-                                    with only non-zero probabilities is returned instead.
+                                    returned on an array unless multiple cl_registers are found, 
+                                    in which case a dict is returned instead. Probs include zero probabilities.
         """
         # Temporarily disable logging
         logging.disable(logging.CRITICAL)
@@ -239,6 +238,7 @@ class Result:
 
         # Statevector
         if there_is_statevec:
+            logger.debug("Extracting probabilities from statevector.")
             if isinstance(statevecs, dict):
                 probs={}
                 for k, statevec in statevecs.items():
@@ -251,6 +251,7 @@ class Result:
 
         # Density matrix
         elif there_is_densmat:
+            logger.debug("Extracting probabilities from density_matrix.")
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
@@ -262,24 +263,32 @@ class Result:
 
         # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
         else: 
+            logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: v for i, k, v in enumerate(self.counts.items()) if i<11} }")
             if len(self._cl_registers) > 1:
-                logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. A dictionary with each probability will be returned.")
+                logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
+
+                n = len(next(iter(self.counts.keys())).replace(" ", ""))
+                num_bitstrings = 2**n
+                if len(self.counts) != num_bitstrings:
+                    new_counts = {**_convert_counts({f"{i:0{n}b}": 0 for i in range(num_bitstrings)}), **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                else:
+                    new_counts = self.counts
 
                 probs = {}
-                numpy_counts = np.array(list(self.counts.values()))
+                numpy_counts = np.array(list(new_counts.values()))
                 all_shots = np.sum(numpy_counts)
 
                 probs_array = numpy_counts/all_shots
-                for k, v in zip(self.counts.keys(), probs_array):
+                for k, v in zip(new_counts.keys(), probs_array):
                     probs[k] = v
 
                 return probs
             
-            # If not all bitstrings are present, add them with count 0 (Consistent with state vctor)
-            n = len(next(iter(self.counts.keys())).split(' ')[0])
-            num_bitstrings = 2**n
+            # If not all bitstrings are present, add them with count 0 (Consistent with state vector and density matrix methods)
+            num_qubits = len(next(iter(self.counts.keys())))
+            num_bitstrings = 2**num_qubits
             if len(self.counts) != num_bitstrings:
-                new_counts = {**{f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                new_counts = {**{f"{i:0{num_qubits}b}": 0 for i in range(num_bitstrings)}, **self.counts} # Python 3.7+ is needed to preserve first dict's order
 
             else:
                 new_counts = self.counts
@@ -359,3 +368,74 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
     
     return new_counts
 
+
+def _recombine_probs(probs: Union[dict[np.array], np.array], partial: Union[None, list[int]], num_qubits: int):
+    """
+    Processes the probabilities per bitstring to obtain the probabilities per qubit. 
+
+    Args:
+        probs (np.array, dict[np.array]): one or more (dict case) set of probabilities per bitstring
+        partial (None, list[int]): list of indexes of the qubits that determine the total probability space. Good for excluding ancillae
+        num_qubits (int): number of qubits that determines the lenght of the bitstrings
+
+    Returns:
+        new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
+    """
+    if isinstance(probs, dict): # get a dict with probability arrays as values
+
+        new_probs = {}
+        for k, probs_k in probs.items():
+
+            new_probs[k] = np.zeros((len(partial), 2))
+            for base_ten_bitstring, prob in enumerate(probs_k):
+                for i, i_qubit in enumerate(partial):
+
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
+                    new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
+                                                        # is determined by the zero or one on the bitstring
+
+    else: # probs is an array
+        new_probs = np.zeros((len(partial), 2))
+
+        # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+        for base_ten_bitstring, prob in enumerate(probs):
+            for i, i_qubit in enumerate(partial):
+
+                zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                new_probs[i, zero_one] += prob
+
+    return new_probs
+
+
+def recombine_bistring_probs(probs: Union[dict[np.array], np.array], partial: list[int], num_qubits: int):
+    """
+    Recombine the probabilities per bitstring to show the probabilities per shortened bitstring where we only keep some of the qubits.
+
+    Args:
+        probs (dict[np.array], np.array): one or more (dict case) set of probabilities per bitstring
+        partial (None, list[int]): list of indexes of the qubits that determine the total probability space
+        num_qubits (int): number of qubits that determines the lenght of the bitstrings
+
+    Returns:
+        short_bitstring_probs (dict[np.array], np.array): one or more (dict case) set of probabilities per sub-bitstring
+    """
+
+    if isinstance(probs, dict):
+        short_bitstring_probs = {} 
+        for k, probs_k in probs.items():
+
+            short_bitstring_probs[k] = {format(bitstring_ten, f"0{num_qubits}b"): 0.0 for  bitstring_ten in range(2**num_qubits)}
+            for base_ten_bitstring, prob in enumerate(probs_k):
+
+                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                short_bitstring_probs[k][shortened_bitstring] += prob
+
+    elif isinstance(probs, np.array):        
+
+        short_bitstring_probs = {format(bitstring_ten, f"0{num_qubits}b"): 0.0 for bitstring_ten in range(2**num_qubits)}
+        for base_ten_bitstring, prob in enumerate(probs):
+
+            shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+            short_bitstring_probs[shortened_bitstring] += prob
+
+    return short_bitstring_probs
