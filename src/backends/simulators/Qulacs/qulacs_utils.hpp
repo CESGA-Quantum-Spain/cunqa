@@ -56,13 +56,13 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, JSON& circuit_json)
         case constants::SX:
             circuit.add_sqrtX_gate(qubits[0]);
             break;
-        case constants::SQRTXDAG:
+        case constants::SXDAG:
             circuit.add_sqrtXdag_gate(qubits[0]);
             break;
-        case constants::SQRTY:
+        case constants::SY:
             circuit.add_sqrtY_gate(qubits[0]);
             break;
-        case constants::SQRTYDAG:
+        case constants::SYDAG:
             circuit.add_sqrtYdag_gate(qubits[0]);
             break;
         case constants::P0:
@@ -81,7 +81,8 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, JSON& circuit_json)
             circuit.add_U2_gate(qubits[0], params[0], params[1]);
             break;
         }
-        case constants::U3: {
+        case constants::U3:
+        case constants::U: {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_U3_gate(qubits[0], params[0], params[1], params[2]);
             break;

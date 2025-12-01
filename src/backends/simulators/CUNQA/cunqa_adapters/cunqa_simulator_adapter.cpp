@@ -12,7 +12,6 @@
 #include "utils/types_cunqasim.hpp"
 
 #include "utils/constants.hpp"
-#include "utils/helpers/reverse_bitstring.hpp"
 
 #include "logger.hpp"
 
@@ -379,7 +378,6 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};

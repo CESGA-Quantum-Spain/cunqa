@@ -13,7 +13,6 @@
 #include "cppsim/utility.hpp"
 
 #include "utils/constants.hpp"
-#include "utils/helpers/reverse_bitstring.hpp"
 
 #include "logger.hpp"
 
@@ -170,13 +169,13 @@ std::string execute_shot_(QuantumState& state, const std::vector<QuantumTask>& q
         case constants::SX:
             gate::sqrtX(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
-        case constants::SQRTXDAG:
+        case constants::SXDAG:
             gate::sqrtXdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
-        case constants::SQRTY:
+        case constants::SY:
             gate::sqrtY(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
-        case constants::SQRTYDAG:
+        case constants::SYDAG:
             gate::sqrtYdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
         case constants::P0:
@@ -198,6 +197,7 @@ std::string execute_shot_(QuantumState& state, const std::vector<QuantumTask>& q
             break;
         }
         case constants::U3: 
+        case constants::U:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             gate::U3(qubits[0] + T.zero_qubit, params[0], params[1], params[2])->update_quantum_state(&state);
@@ -492,7 +492,6 @@ JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};
