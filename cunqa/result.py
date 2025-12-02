@@ -18,6 +18,8 @@
 
 """
 from cunqa.logger import logger
+from typing import Union, Optional
+import numpy as np
 
 class ResultError(Exception):
     """Exception for error received from a simulation."""
@@ -76,13 +78,13 @@ class Result:
             raise ValueError
         
         elif "ERROR" in result:
-            logger.debug(f"Result received: {result}\n")
+            #logger.debug(f"Result received: {result}\n")
             message = result["ERROR"]
             logger.error(f"Error during simulation, please check availability of QPUs, run arguments syntax and circuit syntax: {message}")
             raise ResultError
         
         else:
-            logger.debug(f"Result received: {result}\n")
+            #logger.debug(f"Result received: {result}\n")
             self._result = result
         
         #logger.debug("Results correctly loaded.")
@@ -209,3 +211,4 @@ def _convert_counts(counts: dict, registers: dict) -> dict:
         raise ResultError # I capture this error in QJob.result()
     
     return new_counts
+

@@ -4,33 +4,30 @@
 #include <regex>
 #include <fstream>
 #include <cmath>
+#include <cstdio> // For popen, pclose
+#include <algorithm>
 
 #include "utils/json.hpp"
 #include "logger.hpp"
 
+constexpr int DEFAULT_MEM_PER_CORE = 4;
+
+
 bool check_time_format(const std::string& time)
 {
-    std::regex format("^(\\d{2}):(\\d{2}):(\\d{2})$");
-    return std::regex_match(time, format);   
+    std::regex format_hours_minutes_seconds("^(\\d+):(\\d{2}):(\\d{2})$");
+    std::regex format_days_hours("^(\\d+)-(\\d{1,2})$");
+    std::regex format_days_hours_minutes_seconds("^(\\d+)-(\\d{1,2}):(\\d{2}):(\\d{2})$");
+    
+    return std::regex_match(time, format_hours_minutes_seconds) || std::regex_match(time, format_days_hours) || std::regex_match(time, format_days_hours_minutes_seconds);   
 }
 
 bool check_mem_format(const int& mem) 
 {
     std::string mem_str = std::to_string(mem) + "G";
-    std::regex format("^(\\d{1,2})G$");
+    std::regex format("^(\\d{1,4})G$");
+    
     return std::regex_match(mem_str, format);
-}
-
-int check_memory_specs(const int& mem_per_qpu, const int& cores_per_qpu)
-{
-    int mem_per_cpu = mem_per_qpu/cores_per_qpu;
-    auto system_var = std::getenv("LMOD_SYSTEM_NAME");
-    if ((std::string(system_var) == "QMIO" && mem_per_cpu > 15)) {
-        return 1;
-    } else if ((std::string(system_var) == "FT3" && mem_per_cpu > 4)){
-        return 2;
-    }
-    return 0;
 }
 
 bool exists_family_name(const std::string& family, const std::string& info_path)
@@ -63,25 +60,5 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
 
             return false;
         }
-    }
-}
-
-bool check_simulator_name(const std::string& sim_name)
-{
-    if (sim_name == "Cunqa" || sim_name == "Munich" || sim_name == "Aer") {  // Add new valid simulators to the check here
-        return true;
-    } else {
-        return false;
-    }
-}
-
-int number_of_nodes(const int& number_of_qpus, const int& cores_per_qpu, const int& number_of_nodes, const int& cores_per_node)
-{
-    if (number_of_qpus * cores_per_qpu < number_of_nodes * cores_per_node) {
-        return number_of_nodes;
-    } else {
-        float aprox_number_of_nodes = ((float)number_of_qpus * (float)cores_per_qpu)/(float)cores_per_node;
-        return static_cast<int>(std::ceil(aprox_number_of_nodes));
-
     }
 }

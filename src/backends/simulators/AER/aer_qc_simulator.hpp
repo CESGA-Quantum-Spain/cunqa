@@ -13,6 +13,7 @@ namespace sim {
 class AerQCSimulator final : public SimulatorStrategy<QCBackend> {
 public:
     AerQCSimulator();
+    AerQCSimulator(const std::string& group_id);
     ~AerQCSimulator() = default;
 
     inline std::string get_name() const override {return "AerQCSimulator";}
@@ -21,6 +22,8 @@ public:
     JSON execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& circuit) override;
 
 private:
+    void write_executor_endpoint(const std::string endpoint, const std::string& group_id = "");
+
     comm::ClassicalChannel classical_channel;
 };
 

@@ -12,14 +12,23 @@ struct Server::Impl {
     zmq::socket_t socket_;
     std::queue<uint32_t> rid_queue_;
 
-    Impl(const std::string& ip, const std::string& port) :
+    std::string zmq_endpoint;
+
+    Impl(const std::string& mode) :
         socket_{context_, zmq::socket_type::server}
     {
         try {
-            socket_.bind("tcp://" + ip + ":" + port);
-            LOGGER_DEBUG("Server bound to {}:{}.", ip, port);
+            std::string ip = (mode == "hpc" ? "127.0.0.1"s : get_IP_address());
+            socket_.bind("tcp://" + ip + ":*");
+            
+            char endpoint[256];
+            size_t sz = sizeof(endpoint);
+            zmq_getsockopt(socket_, ZMQ_LAST_ENDPOINT, endpoint, &sz);
+            zmq_endpoint = std::string(endpoint);
+            LOGGER_DEBUG("Server bound to {}", endpoint);
+
         } catch (const zmq::error_t& e) {
-            LOGGER_ERROR("Error binding to endpoint {}: {}.", ip + ":" + port, e.what());
+            LOGGER_ERROR("Error binding to endpoint: ", e.what());
             throw;
         }
     }
@@ -30,6 +39,7 @@ struct Server::Impl {
             zmq::message_t message;
             auto size = socket_.recv(message, zmq::recv_flags::none);
             std::string data(static_cast<char*>(message.data()), size.value());
+            //LOGGER_DEBUG("Received data: {}", data);
             
             rid_queue_.push(message.routing_id());
             return data;
@@ -47,7 +57,7 @@ struct Server::Impl {
             rid_queue_.pop();
             
             socket_.send(message, zmq::send_flags::none);
-            LOGGER_DEBUG("Sent result: {}", result);
+            //LOGGER_DEBUG("Sent result: {}", result);
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error sending result: {}", e.what());
             throw;
@@ -62,13 +72,11 @@ struct Server::Impl {
 
 Server::Server(const std::string& mode) :
     mode{mode},
-    hostname{get_hostname()},
     nodename{get_nodename()},
-    ip{get_IP_address(mode)},
-    global_ip{get_global_IP_address()},
-    port{get_port()},
-    pimpl_{std::make_unique<Impl>(ip, port)}
-{ }
+    pimpl_{std::make_unique<Impl>(mode)}
+{ 
+    endpoint = pimpl_->zmq_endpoint;
+}
 
 Server::~Server() = default;
 

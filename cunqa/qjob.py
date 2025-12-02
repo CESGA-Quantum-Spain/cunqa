@@ -34,8 +34,7 @@ from qiskit.qasm2.exceptions import QASM2Error
 from qiskit.exceptions import QiskitError
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert, _registers_dict
-from cunqa.qmio_helpers import _config_builder
+from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
@@ -387,10 +386,6 @@ class QJob:
                     self._is_dynamic = circuit.is_dynamic
                     self._has_cc = circuit.has_cc
                     self._has_qc = circuit.has_qc
-
-                    if circuit.is_parametric:
-                        self._param_labels = circuit.param_labels
-                        self._current_params = circuit.current_params
                     
                     logger.debug("Translating to dict from CunqaCircuit...")
 
@@ -459,48 +454,44 @@ class QJob:
 
     def _configure(self, **run_parameters: Any) -> None:
         # configuration
-        if self._real_qpu:
-            if "shots" in run_parameters:
-                self._execution_config = _config_builder(run_parameters["shots"])
-            else:
-                self._execution_config = _config_builder(1024)
-        else:
-            try:
-                # config dict
-                run_config = {
-                    "shots": 1024, 
-                    "method":"statevector", 
-                    "num_clbits": self.num_clbits, 
-                    "num_qubits": self.num_qubits, 
-                    "seed": 123123}
-
-                if (run_parameters == None) or (len(run_parameters) == 0):
-                    logger.debug("No run parameters provided, default were set.")
-                    pass
-                elif (type(run_parameters) == dict): 
-                    for k,v in run_parameters.items():
-                        run_config[k] = v
-                else:
-                    logger.warning("Error when reading `run_parameters`, default were set.")
-                
-                exec_config = {
-                    "id": self._circuit_id,
-                    "config": run_config, 
-                    "instructions": self._circuit,
-                    "sending_to": self._sending_to,
-                    "is_dynamic": self._is_dynamic,
-                    "has_cc": self._has_cc
-                    #,"has_qc": self._has_qc # Not needed in C++ 
+        try:
+            # config dict
+            run_config = {
+                "shots": 1024, 
+                "method":"automatic", 
+                "avoid_parallelization": False,
+                "num_clbits": self.num_clbits, 
+                "num_qubits": self.num_qubits, 
+                "seed": 123123
                 }
-                self._execution_config = json.dumps(exec_config)
 
-                logger.debug("QJob created.")
-
-            except KeyError as error:
-                logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}].")
-                raise QJobError # I capture the error in QPU.run() when creating the job
+            if (run_parameters == None) or (len(run_parameters) == 0):
+                logger.debug("No run parameters provided, default were set.")
+                pass
+            elif (type(run_parameters) == dict): 
+                for k,v in run_parameters.items():
+                    run_config[k] = v
+            else:
+                logger.warning("Error when reading `run_parameters`, default were set.")
             
-            except Exception as error:
+            exec_config = {
+                "id": self._circuit_id,
+                "config": run_config, 
+                "instructions": self._circuit,
+                "sending_to": self._sending_to,
+                "is_dynamic": self._is_dynamic,
+                "has_cc": self._has_cc
+                #,"has_qc": self._has_qc # Not needed in C++ 
+            }
+            self._execution_config = json.dumps(exec_config)
+
+            logger.debug("QJob created.")
+
+        except KeyError as error:
+            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}].")
+            raise QJobError # I capture the error in QPU.run() when creating the job
+        
+        except Exception as error:
                 logger.error(f"Some error occured when generating configuration for the simulation [{type(error).__name__}].")
                 raise QJobError # I capture the error in QPU.run() when creating the job
         

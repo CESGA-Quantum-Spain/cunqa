@@ -1,0 +1,288 @@
+#pragma once
+
+#include <vector>
+#include <complex>
+#include <unordered_map>
+#include <string_view>
+
+namespace cunqa {
+namespace constants{
+
+// This is constexpr because it is employed in __attribute__((constructor))
+// of the logger_client, that is initialized before main (therefore before
+// const std::string variables are initialized) 
+inline constexpr std::string_view CUNQA_PATH = "@CUNQA_PATH@";
+const std::string QPUS_FILEPATH = "@QPUS_FILEPATH@";
+const std::string COMM_FILEPATH = "@COMM_FILEPATH@";
+const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
+
+
+enum INSTRUCTIONS {
+    UNITARY,
+
+    MEASURE,
+
+    ID,
+    X,
+    Y,
+    Z,
+    H,
+    S,
+    SDAG,
+    T,
+    TDAG,
+    SX,
+    SY, 
+    SZ,
+    SXDAG,
+    SYDAG,
+    SZDAG,
+    P0,
+    P1,
+
+    RX,
+    RY,
+    RZ,
+    ROTINVX,
+    ROTINVY,
+    ROTINVZ,
+    P,
+    U1,
+
+    U2,
+    R,
+
+    U3,
+    U,
+
+    ECR,
+    SWAP,
+    CX,
+    CY,
+    CZ,
+    CSX,
+    CSY, 
+    CSZ,
+    CT,
+
+    CU1,
+    CP,
+    CRX,
+    CRY,
+    CRZ,
+    RXX,
+    RYY,
+    RZZ,
+    RZX,
+
+    CU2,
+    CR,
+
+    CU,
+    CU3,
+
+    CCX,
+    CCY,
+    CCZ,
+    CECR,
+    CSWAP,
+
+    C_IF_X,
+    C_IF_Y,
+    C_IF_Z,
+    C_IF_H,
+    C_IF_SX,
+    C_IF_RX,
+    C_IF_RY,
+    C_IF_RZ,
+    C_IF_CX,
+    C_IF_CY,
+    C_IF_CZ,
+    C_IF_ECR,
+
+    MEASURE_AND_SEND,
+    RECV,
+    QSEND,
+    QRECV,
+    EXPOSE,
+    RCONTROL
+};
+
+const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
+    // UNITARY
+    {"unitary", UNITARY},
+
+    // MEASURE
+    {"measure", MEASURE},
+
+    // ONE QUBIT NO PARAM
+    {"id", ID},
+    {"x", X},
+    {"y", Y},
+    {"z", Z},
+    {"h", H},
+    {"s", S},
+    {"sx", SX},
+    {"sy", SY},
+    {"sz", SZ},
+    {"sdag", SDAG},
+    {"sxdag", SXDAG},
+    {"sydag", SYDAG},
+    {"szdag", SZDAG},
+    {"t", T},
+    {"tdag", TDAG},
+    {"p0", P0},
+    {"p1", P1},
+
+    // ONE QUBIT ONE PARAM
+    {"u1", U1},
+    {"p", P},
+    {"rx", RX},
+    {"ry", RY},
+    {"rz", RZ},
+    {"rotinvx", ROTINVX},
+    {"rotinvy", ROTINVY},
+    {"rotinvz", ROTINVZ},
+
+    // ONE QUBIT TWO PARAM
+    {"u2", U2},
+    {"r", R},
+
+    // ONE QUBIT THREE PARAM
+    {"u3", U3},
+    {"u", U},
+
+    // TWO QUBIT NO PARAM
+    {"swap", SWAP},
+    {"cx", CX},
+    {"cy", CY},
+    {"cz", CZ},
+    {"csx", CSX},
+    {"csy", CSY},
+    {"csz", CSZ},
+    {"ct", CT}, 
+    {"ecr", ECR},
+
+    // TWO QUBIT ONE PARAM
+    {"cu1", CU1},
+    {"cp", CP},
+    {"crx", CRX},
+    {"cry", CRY},
+    {"crz", CRZ},
+    {"rxx", RXX},
+    {"ryy", RYY},
+    {"rzz", RZZ},
+    {"rzx", RZX},
+
+    // TWO QUBIT TWO PARAM
+    {"cu2", CU2},
+    {"cr", CR},
+
+    // TWO QUBIT THREE PARAM
+    {"cu", CU},
+    {"cu3", CU3},
+
+    // THREE QUBIT NO PARAM
+    {"ccx", CCX},
+    {"ccy", CCY},
+    {"ccz", CCZ},
+    {"cecr", CECR},
+    {"cswap", CSWAP},
+
+    //CLASSICAL CONTROLLED GATES
+    {"c_if_x", C_IF_X},
+    {"c_if_y", C_IF_Y},
+    {"c_if_z", C_IF_Z},
+    {"c_if_h", C_IF_H},
+    {"c_if_sx", C_IF_H},
+    {"c_if_rx", C_IF_SX},
+    {"c_if_ry", C_IF_RY},
+    {"c_if_rz", C_IF_RZ},
+    {"c_if_cx", C_IF_CX},
+    {"c_if_cy", C_IF_CY},
+    {"c_if_cz", C_IF_CZ},
+    {"c_if_ecr", C_IF_ECR},
+
+    // SEND CLASSICAL QUBIT
+    {"measure_and_send", MEASURE_AND_SEND},
+    {"recv", RECV},
+
+    // REMOTE CONTROLLED GATES
+    {"qsend", QSEND},
+    {"qrecv", QRECV},
+
+    {"expose", EXPOSE},
+    {"rcontrol", RCONTROL},
+};
+
+const std::vector<std::string> BASIS_GATES = {
+    "unitary",
+    "measure",
+    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "sy", "sydg", "sz", "szdg", "t", "tdg", "p0", "p1",
+    "u1", "p", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz"
+    "u2", "r",
+    "u3", "u",
+    "ecr", "swap", "cx", "cy", "cz", "csx", "csy", "csz", "ct",
+    "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
+    "cu2", "cr",
+    "cu", "cu3",
+    "cecr", "cswap", "ccx", "ccy", "ccz", 
+};
+
+
+} // End namespace constants
+} //End namespace cunqa
+
+
+
+
+
+const std::string cafe = R"(                                                                                                
+                                                            ##*%                                                                                                
+                                                          ###%###                                                                                               
+                                                      *  ###%%%%%                                                                                               
+                                                  #%  #%%#%%%%%%%                                                                                               
+                                                  *%%%######%%%##%%%%%%#****                                                                                    
+                                                  *###############%%%%%%%%##%##                                                                                 
+                                                  %%%%##%**#*%######%%%#%%#####%%#                                                                             
+                                                  *#%#%#%##%*%**%###%######%####%%%###                                #%%%%%%%%%                                
+                                                   +#%##%%####*%%%%###%##*#####%%#%%#%###                          #%%%%%%%%%@%%###                             
+                                                     ###%#%%%#*#@%#############%%#%%%%#######                     %%%%#%%%%%%%%%%@%%%                           
+                                                     %####%%@@*%@%#%%###%%###%%#%#######*######                  #@%%%%%@%%%%%%%%#%%@%                          
+                                                        %#*#@%#%%%%%#%%%##%####*####*#*#***#%#%##               #%%%*%%%%%%%%@@%%%%@%#                          
+                                                        %##%%%%%@@%%@%%%%%%####%%#********####*##*%#         ##%%%%%%%%#%%%#%%%@%@@%%%                          
+                                                         ##%%%%%%%@@%%%%%%%%%%%%####%#######%#####%#%#       %%%%%%%%%%%%%%%%#%@@%@%@%%                         
+                                                          #%%%%%#@%@%%%%%%%%%%%%@%%%###%%#%##%##%*#####*   #%%%@%%%%%%%##%%@%@@@@%%@%%@                         
+                                                                 #%%@%%%%%%%%@%@%@@%%%%%%%@%#%%#%###*##%#%%%%%%%%%%###%%%%%@@@@@@@%@@@%                         
+                                                                  %%%@@@@@%@@@@@@@@%%%%#%#%%%####%%####%%%@%%%%%##%%%#%%@@%@@%%%%%@@%@%                         
+                                                                   %%%%@@%@@@%%@%%%#%%%%%#####%########%@%%@@%%%%%%%%%%@%%%%%%%%%*@@%@%                         
+                                                                    %%%%%%%%@%%%%%%%%%%%%##%%%%%%%#####%%%%#%%%%%%%%%%%@@%%%%%#%**@@%@                          
+                                                                @@@   %%%%%%%%%%%%%@@@%%%%#%@%%%##%##%####%%%%%%%%%%%%@@%%@@@%%@@@@%@                           
+                                                             %%%%%%#+*##%@%%#%%%%%%%%%%%%%%%%%%%%%##%#%####%%@%%%%%%@@%@%%%@%#%@@%@%%%%%%                       
+                                                          %#%%%%%*%%%%%+=-*#%%%%@%%##%%%%%%#%%%#%%%%%##%%%#%@%%%%%%%%%%%%%#%*###%%%                             
+                                                        ##%%%%%*=====+##%%*++=*%%%%#%#####%#%##%%#%%%#%%%%%%@@@%@%#%%%%%# ##* %%%                               
+                                                      %%*%@%%%%%+=++=++=+%%%@*=*+*#%#*#%%%#**####%##%@%%%%#%@@@%%%%%@%%%###                                     
+                                                     %#=:======%%%%#=====+*%%%#**+=*###%%%#**#*%%##%@%%%%##@@@@@@%@%## # #                                      
+                                                   %%%+=+===--=+==*%##====+=*+**++***%####**####%%%%%%%%#%%@@@@@%%%%##                                          
+                                                 ###+======-::..-==++%%*--=#%%#*#**+#+%%%*##%####%%%%%%%%%%%%%%%%%%%%%                                          
+                                                %%==-=-==-=------::--=+%%%%%%%   *#*+*+*####%%%%%%%%%%##%%%%%###%%%                                             
+                                              %%+=+**=+=-+++++=++=====+=*#%%#        #**+%%%%%%%%%%%%%#%%%%##*#*                                                
+                                            +*#*#%%*++++++++++++++*==#%%%%%*         -#*#%%%%%%%%%%%%%%%%#* %*                                                  
+                                           *#*-%#%%%%%@@@@@@@@@@@@@%%#@=#%%           #%#%%%@@@@%%%%%%%%#*+                                                     
+                                          +**=  #%%%@@@@@@@@@@@@@%@@%%*-#@            #%#%#%%%%%%##%%%%#%                                                       
+                                          ++=   #*#%%%####@@@@@@@@@%##%@%%             %%%%@%%#%%%###%                                                          
+                                         =++=    *##########%@%@@%%%#%#%#             %%%%%@%@%@%                                                               
+                                         ++=-    -=%%##########%###@%%+.              :+%%%%%%%%%:                                                              
+                                        :-=:      :-=#%#######=--%#%%                  :-%%%%*+#-                                                               
+                                        :-=         ::+##%##=-:##*%                      :.=+**-                                                                
+                                       .--            ::+#*==%#*#                          +***.                                                                
+                                                  @@     .+#*=                             +**#:                                                                
+                                                 @@                                        +###.                                                              
+                                                                                           =###****                                                           
+                      @@@@@@    @@   @@@@@@@ @@@@@@@  @@@@@@                              :=###=                                                              
+                      @@       @@@@  @@      @@           @@                         -+*+=*####-                                                               
+                      @@      @@  @@ @@@@@@@ @@@@@@@    @@@                      =+#######%%##**#-                                                              
+                      @@      @@  @@ @@@     @@         @@                               %+##  -##:                                                             
+                      @@      @@@@@@ @@@     @@                                         -:+++                                                               
+                      @@@@@@  @@  @@ @@      @@@@@@@@   @@                                                                                                                                                                                                                                                                   
+)";

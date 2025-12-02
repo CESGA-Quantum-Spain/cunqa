@@ -14,6 +14,7 @@ namespace sim {
 class AerCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     AerCCSimulator();
+    AerCCSimulator(const std::string& group_id);
     ~AerCCSimulator() = default;
 
     inline std::string get_name() const override {return "AerSimulator";}

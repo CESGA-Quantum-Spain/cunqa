@@ -9,6 +9,7 @@ namespace sim {
 class AerExecutor {
 public:
     AerExecutor();
+    AerExecutor(const std::string& group_id);
     ~AerExecutor() = default;
 
     void run();

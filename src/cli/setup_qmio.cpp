@@ -70,12 +70,12 @@ public:
             {"real_qpu", "qmio"},
             {"backend", qmio_config_json},
             {"net", {
-                {"ip", server->ip},
-                {"port", server->port},
+                {"endpoint", server->endpoint},
                 {"nodename", "qmio_node"},
-                {"mode", "cloud"}
+                {"mode", "co_located"}
             }},
-            {"family", "real_qmio"}
+            {"family", "real_qmio"},
+            {"name", "QMIO"}
         };
         write_on_file(qpu_info, filepath);
 
@@ -121,87 +121,8 @@ private:
     }
 
     void send_to_QPU_()
-    {
-        while (true) 
-        {
-            LOGGER_DEBUG("Sending to QPU...");
-            std::string command = "python "s + HOME + "/cunqa/qmio_helpers.py "s;
-            std::string serialized_command;
-            std::string deserialized_command;
-            std::string file_with_deserialized_circuit = store + "/.cunqa/deserialized_circuit.bin"s;
-            std::string file_with_serialized_circuit = store + "/.cunqa/serialized_circuit.bin"s;
-            std::string file_with_serialized_result = store + "/.cunqa/serialized_results.bin"s;
-            std::string file_with_deserialized_result = store + "/.cunqa/deserialized_results.bin"s;
-            int command_status;
-            std::unique_lock<std::mutex> lock(queue_mutex_);
-            queue_condition_.wait(lock, [this] { return !message_queue_.empty(); });
-
-            while (!message_queue_.empty()) 
-            {
-                try {
-                    std::string message = message_queue_.front();
-                    message_queue_.pop();
-                    lock.unlock();
-
-                    std::ofstream sermessage_outfile(file_with_deserialized_circuit, std::ios::binary);
-
-                    // Write the string bytes directly
-                    sermessage_outfile.write(message.data(), data.size());
-                    sermessage_outfile.close();
-                    
-                    serialized_command = command + R"('serialize')";
-                    LOGGER_DEBUG("Serialize command: {}", serialized_command);
-                    command_status = std::system(serialized_command.c_str());
-
-                    LOGGER_DEBUG("File with serialized circuit: {}", file_with_serialized_circuit);
-
-                    std::ifstream file(file_with_serialized_circuit, std::ios::binary | std::ios::ate);
-
-                    std::streamsize size = file.tellg();
-                    file.seekg(0, std::ios::beg);
-                    std::vector<char> buffer(size);
-                    file.read(buffer.data(), size);
-
-                    zmq::message_t serialized_circuit(buffer.size());
-                    memcpy(serialized_circuit.data(), buffer.data(), buffer.size());
-
-                    socket_.send(serialized_circuit, zmq::send_flags::none);
-                    LOGGER_DEBUG("SENT");
-
-                    zmq::message_t message_from_qpu;
-                    auto result = socket_.recv(message_from_qpu, zmq::recv_flags::none);
-                    LOGGER_DEBUG("RECEIVED");
-
-                    std::ofstream outfile(file_with_serialized_result, std::ios::binary);
-                    outfile.write(static_cast<char*>(message_from_qpu.data()), message_from_qpu.size());
-                    outfile.close();
-
-                    deserialized_command = command + R"('deserialize' )";
-                    LOGGER_DEBUG("Deserialize command: {}", deserialized_command);
-                    command_status = std::system(deserialized_command.c_str());
-
-                    std::ifstream infile(file_with_deserialized_result);
-                    std::ostringstream res;
-                    res << infile.rdbuf();  
-
-                    std::string result_str = res.str();
-
-                    LOGGER_DEBUG("Result on intermediary: {}", result_str);
-                    server->send_result(result_str);
-
-                } catch(const comm::ServerException& e) {
-                    LOGGER_ERROR("There has happened an error with the intermediary server with the QPU.");
-                    LOGGER_ERROR("Message of the error: {}", e.what());
-                } catch(const std::exception& e) {
-                    LOGGER_ERROR("There has happened an error sending the result, the server keeps on iterating.");
-                    LOGGER_ERROR("Message of the error: {}", e.what());
-                    server->send_result("{\"ERROR\":\""s + std::string(e.what()) + "\"}"s);
-                }
-                lock.lock();
-            }
-        }
-    }
-
+    {}
+    
 };
 
 } // End namespace

@@ -26,17 +26,17 @@ def t_k(k):
 
 def how_big_a_combination(k):
     #print(f"For generating a {k}-Cut Bell Pair Factory one needs to specify {4**(k)-2**(k)+2**(2**k)-1} parameter sets.")
-    return 4**(k)-2**(k) + 2**(2**k)-1
+    return n_minus(k) + n_plus(k)
 
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs #
-family = qraise(2,"00:10:00", simulator="Munich", classical_comm=True, cloud = True)
-qpus  = get_QPUs(local = False, family = family)
+family = qraise(2,"00:10:00", simulator="Munich", classical_comm=True, co_located = True)
+qpus  = get_QPUs(on_node = False, family = family)
 
 # Params for the gates in the Cut Bell Pair Factory #
 with open(examples_path + "/cc_examples/two_qpd_bell_pairs_param_values.txt") as fin:
     params2 = [[float(val) for val in line.replace("\n","").split(" ")] for line in fin.readlines()]
-z = params2[0] # This one doesn't matter, it will be overwritten afterwards
+z = params2[0] # This one doesn't matter, it will be overwritten afterwards with upgrade_parameters
 
 ############ CIRCUIT 1 #########################
 Alice = CunqaCircuit(3,3, id="Alice")
@@ -108,7 +108,7 @@ Bob.measure(2,2)
 
 circs = [Alice, Bob]
 distr_jobs = run_distributed(circs, qpus, shots=1) # create the jobs to store the circuits for upgrade_parameters,
-                                                           # but the results of this first submission will be discarded.
+                                                   # but the results of this first submission will be discarded.
 
 ########## Circuit combination for successful circuit cutting ##########
 shots = 1024

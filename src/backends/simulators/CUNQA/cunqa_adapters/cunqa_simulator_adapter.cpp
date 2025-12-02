@@ -2,318 +2,351 @@
 #include <unordered_map>
 #include <stack>
 #include <chrono>
+#include <functional>
+#include <cstdlib>
 
 #include "cunqa_simulator_adapter.hpp"
 
-#include "src/result_cunqasim.hpp"
-#include "src/executor.hpp"
-#include "src/utils/types_cunqasim.hpp"
+#include "result_cunqasim.hpp"
+#include "executor.hpp"
+#include "utils/types_cunqasim.hpp"
 
 #include "utils/constants.hpp"
-#include "utils/helpers/reverse_bitstring.hpp"
 
 #include "logger.hpp"
+
+namespace {
+struct TaskState {
+    std::string id;
+    cunqa::JSON::const_iterator it, end;
+    int zero_qubit = 0;
+    bool finished = false;
+    bool blocked = false;
+    bool cat_entangled = false;
+    std::stack<int> telep_meas;
+};
+
+struct GlobalState {
+    int n_qubits = 0, n_clbits = 0;
+    std::map<std::size_t, bool> creg, rcreg;
+    std::map<std::size_t, bool> cvalues;
+    std::unordered_map<std::string, std::stack<int>> qc_meas;
+    bool ended = false;
+    cunqa::comm::ClassicalChannel* chan = nullptr;
+};
+}
 
 namespace cunqa {
 namespace sim {
 
 std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
 {
-    std::vector<JSON::const_iterator> its;
-    std::vector<JSON::const_iterator> ends;
-    std::vector<bool> finished;
-    std::unordered_map<std::string, bool> blocked;
-    std::vector<int> zero_qubit;
-    std::vector<int> zero_clbit;
-    int n_qubits = 0;
-    int n_clbits = 0;
+    std::unordered_map<std::string, TaskState> Ts;
+    GlobalState G;
 
     for (auto &quantum_task : quantum_tasks)
     {
-        zero_qubit.push_back(n_qubits);
-        zero_clbit.push_back(n_clbits);
-        its.push_back(quantum_task.circuit.begin());
-        ends.push_back(quantum_task.circuit.end());
-        n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        n_clbits += quantum_task.config.at("num_clbits").get<int>();
-        blocked[quantum_task.id] = false;
-        finished.push_back(false);
+        TaskState T;
+        T.id = quantum_task.id;
+        T.zero_qubit = G.n_qubits;
+        T.it = quantum_task.circuit.begin();
+        T.end = quantum_task.circuit.end();
+        T.blocked = false;
+        T.finished = false;
+        Ts[quantum_task.id] = T;
+        
+        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
+        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
     }
-
-    std::string resultString(n_clbits, '0');
+    
+    // Here we add the two communication qubits
     if (size(quantum_tasks) > 1)
-        n_qubits += 2; 
+        G.n_qubits += 2;
 
-    std::vector<int> qubits;
-    std::map<std::size_t, bool> classic_values;
-    std::map<std::size_t, bool> classic_reg;
-    std::map<std::size_t, bool> r_classic_reg;
-    std::unordered_map<std::string, std::stack<int>> qc_meas;
+    auto generate_entanglement_ = [&]() {
+        //Reset
+        int meas1 = executor.apply_measure({G.n_qubits - 1});
+        int meas2 = executor.apply_measure({G.n_qubits - 2});
+        if (meas1) {
+            executor.apply_gate("x", {G.n_qubits - 1});
+        }
+        if (meas2) {
+            executor.apply_gate("x", {G.n_qubits - 1});
+        }
+        // Apply H to the first entanglement qubit
+        executor.apply_gate("h", {G.n_qubits - 2});
 
-    bool ended = false;
-    while (!ended)
-    {
-        ended = true;
-        for (size_t i = 0; i < its.size(); ++i)
+        // Apply a CX to the second one to generate an ent pair
+        executor.apply_gate("cx", {G.n_qubits - 2, G.n_qubits - 1});
+    };
+
+    std::function<void(TaskState&, const JSON&)> apply_next_instr = [&](TaskState& T, const JSON& instruction = {}) {
+
+        // This is added to be able to add instructions outside the main loop
+        const JSON& inst = instruction.empty() ? *T.it : instruction;
+
+        if (inst.contains("conditional_reg")) {
+            auto v = inst.at("conditional_reg").get<std::vector<std::uint64_t>>();
+            if (!G.creg[v[0]]) return;
+        } else if (inst.contains("remote_conditional_reg") && inst.at("name") != "recv") { // TODO: Cambiar el nombre para el recv y para el resto
+            auto v = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
+            if (!G.rcreg[v[0]]) return;
+        }
+
+        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
+        std::string inst_name = inst.at("name").get<std::string>();
+        auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+
+        switch (inst_type)
         {
-            if (finished[i] || blocked[quantum_tasks[i].id])
-                continue;
+        case constants::MEASURE:
+        {
+            int measurement = executor.apply_measure({qubits[0] + T.zero_qubit});
 
-            auto &instruction = *its[i];
-            qubits = instruction.at("qubits").get<std::vector<int>>();
-            std::string instruction_name = instruction.at("name");
-            switch (constants::INSTRUCTIONS_MAP.at(instruction_name))
-            {
-            case constants::MEASURE:
-            {
-                auto clreg = instruction.at("clreg").get<std::vector<std::uint64_t>>();
-                int measurement = executor.apply_measure({qubits[0] + zero_qubit[i]});
-                classic_values[qubits[0] + zero_qubit[i]] = (measurement == 1);
-                if (!clreg.empty()) {
-                    classic_reg[clreg[0]] = (measurement == 1);
-                }   
-                break;
-            }
-            case constants::UNITARY:
-            {
-                // TODO: Manage 2-qubit unitaries
-                auto matrix = instruction.at("params").get<Matrix>();
-                if (instruction.contains("conditional_reg")) {
-                    auto conditional_reg = instruction.at("conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (classic_reg[conditional_reg[0]]) {
-                        if (matrix.size() == 2) {
-                            executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i]});
-                        } else if (matrix.size() == 4) {
-                            executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                        }
-                    }
-                } else if (instruction.contains("remote_conditional_reg")) {
-                    auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (r_classic_reg[conditional_reg[0]]) {
-                        if (matrix.size() == 2) {
-                            executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i]});
-                        } else if (matrix.size() == 4) {
-                            executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                        }
-                    }
-                } else {
-                    if (matrix.size() == 2) {
-                        executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i]});
-                    } else if (matrix.size() == 4) {
-                        executor.apply_unitary("unitary", matrix, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                    }
-                }
-                break;
-            }
-            case constants::ID:
-            case constants::X:
-            case constants::Y:
-            case constants::Z:
-            case constants::H:
-            case constants::SX:
-                {
-                if (instruction.contains("conditional_reg")) {
-                    auto conditional_reg = instruction.at("conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (classic_reg[conditional_reg[0]]) {
-                        executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i]});
-                    }
-                } else if (instruction.contains("remote_conditional_reg")) {
-                    auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (r_classic_reg[conditional_reg[0]]) {
-                        executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i]});
-                    }
-                } else {
-                    executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i]});
-                }
-                break;
-            }
-            case constants::CX:
-            case constants::CY:
-            case constants::CZ:
-            case constants::ECR:
-            {
-                if (instruction.contains("conditional_reg")) {
-                    auto conditional_reg = instruction.at("conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (classic_reg[conditional_reg[0]]) {
-                        executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                    }
-                } else if (instruction.contains("remote_conditional_reg")) {
-                    auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (r_classic_reg[conditional_reg[0]]) {
-                        executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                    }
-                } else {
-                    executor.apply_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                }
-                break;
-            }
-            case constants::C_IF_H:
-            case constants::C_IF_X:
-            case constants::C_IF_Y:
-            case constants::C_IF_Z:
-            case constants::C_IF_CX:
-            case constants::C_IF_CY:
-            case constants::C_IF_CZ:
-            case constants::C_IF_ECR:
-            case constants::C_IF_RX:
-            case constants::C_IF_RY:
-            case constants::C_IF_RZ:
-                // Already managed on each individual gate
-                break;
-            case constants::RX:
-            case constants::RY:
-            case constants::RZ:
-            {
-                auto param =  instruction.at("params").get<std::vector<double>>();
-                if (instruction.contains("conditional_reg")) {
-                    auto conditional_reg = instruction.at("conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (classic_reg[conditional_reg[0]]) {
-                        executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i]}, param);
-                    }
-                } else if (instruction.contains("remote_conditional_reg")) {
-                    auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (r_classic_reg[conditional_reg[0]]) {
-                        executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i]}, param);
-                    }
-                } else {
-                    executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i]}, param);
-                }
-                break;
-            }
-            case constants::CRX:
-            case constants::CRY:
-            case constants::CRZ:
-            {
-                auto param =  instruction.at("params").get<std::vector<double>>();
-                if (instruction.contains("conditional_reg")) {
-                    auto conditional_reg = instruction.at("conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (classic_reg[conditional_reg[0]]) {
-                        executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]}, param);
-                    }
-                } else if (instruction.contains("remote_conditional_reg")) {
-                    auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                    if (r_classic_reg[conditional_reg[0]]) {
-                        executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]}, param);
-                    }
-                } else {
-                    executor.apply_parametric_gate(instruction_name, {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]}, param);
-                }
-                break;
-            }
-            case constants::SWAP:
-            {
-                executor.apply_gate("swap", {qubits[0] + zero_qubit[i], qubits[1] + zero_qubit[i]});
-                break;
-            }
-            case constants::MEASURE_AND_SEND:
-            {
-                auto endpoint = instruction.at("qpus").get<std::vector<std::string>>();
-                int measurement = executor.apply_measure({qubits[0] + zero_qubit[i]}); 
-                classical_channel->send_measure(measurement, endpoint[0]); 
-                break;
-            }
-            case constants::RECV:
-            {
-                auto endpoint = instruction.at("qpus").get<std::vector<std::string>>();
-                auto conditional_reg = instruction.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-                int measurement = classical_channel->recv_measure(endpoint[0]); 
-                r_classic_reg[conditional_reg[0]] = (measurement == 1);
-                break;
-            }
-            case constants::QSEND:
-            {
-                //------------- Generate Entanglement ---------------
-                executor.apply_gate("h", {n_qubits - 2});
-                executor.apply_gate("cx", {n_qubits - 2, n_qubits - 1});
-                //----------------------------------------------------
+            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
+            G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
+            G.creg[clbits[0]] = (measurement == 1);
 
+            break;
+        }
+        case constants::ID:
+        case constants::X:
+        case constants::Y:
+        case constants::Z:
+        case constants::H:
+        case constants::SX:
+            executor.apply_gate(inst_name, {qubits[0] + T.zero_qubit});
+            break;
+        case constants::CX:
+        case constants::CY:
+        case constants::CZ:
+        {
+            int control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            executor.apply_gate(inst_name, {control, qubits[1] + T.zero_qubit});
+            break;
+        }
+        case constants::ECR:
+            // TODO
+            break;
+        case constants::RX:
+        case constants::RY:
+        case constants::RZ:
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            executor.apply_parametric_gate(inst_name, {qubits[0] + T.zero_qubit}, params);
+            break;
+        }
+        case constants::CRX:
+        case constants::CRY:
+        case constants::CRZ:
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            int control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            executor.apply_parametric_gate(inst_name, {control, qubits[1] + T.zero_qubit}, params);
+            break;
+        }
+        case constants::C_IF_H:
+        case constants::C_IF_X:
+        case constants::C_IF_Y:
+        case constants::C_IF_Z:
+        case constants::C_IF_CX:
+        case constants::C_IF_CY:
+        case constants::C_IF_CZ:
+        case constants::C_IF_ECR:
+        case constants::C_IF_RX:
+        case constants::C_IF_RY:
+        case constants::C_IF_RZ:
+            // Already managed 
+            break;
+        case constants::SWAP:
+        {
+            executor.apply_gate(inst_name, {qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit});
+            break;
+        }
+        case constants::MEASURE_AND_SEND:
+        {
+            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
+            int measurement = executor.apply_measure({qubits[0] + T.zero_qubit});
+            int measurement_as_int = static_cast<int>(measurement);
+            classical_channel->send_measure(measurement_as_int, endpoint[0]); 
+            break;
+        }
+        case cunqa::constants::RECV:
+        {
+            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
+            auto conditional_reg = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
+            int measurement = classical_channel->recv_measure(endpoint[0]);
+            G.rcreg[conditional_reg[0]] = (measurement == 1);
+            break;
+        }
+        case constants::QSEND:
+        {
+            //------------- Generate Entanglement ---------------
+            executor.apply_gate("h", {G.n_qubits - 2});
+            executor.apply_gate("cx", {G.n_qubits - 2, G.n_qubits - 1});
+            //----------------------------------------------------
+
+            // CX to the entangled pair
+            executor.apply_gate("cx", {qubits[0] + T.zero_qubit, G.n_qubits - 2});
+
+            // H to the sent qubit
+            executor.apply_gate("h", {qubits[0] + T.zero_qubit});
+
+            int result = executor.apply_measure({qubits[0] + T.zero_qubit});
+            int communication_result = executor.apply_measure({G.n_qubits - 2});
+
+            G.qc_meas[T.id].push(result);
+            G.qc_meas[T.id].push(communication_result);
+            //Reset
+            if (result) {
+                executor.apply_gate("x", {qubits[0] + T.zero_qubit});
+            }
+            if (communication_result) {
+                executor.apply_gate("x", {G.n_qubits - 2});
+            }
+
+            // Unlock QRECV
+            Ts[inst.at("qpus")[0]].blocked = false;
+            break;
+        }
+        case constants::QRECV:
+        {
+            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+                T.blocked = true;
+                return;
+            }
+
+            // Receive the measurements from the sender
+            std::size_t meas1 = G.qc_meas[inst.at("qpus")[0]].top();
+            G.qc_meas[inst.at("qpus")[0]].pop();
+            std::size_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
+            G.qc_meas[inst.at("qpus")[0]].pop();
+
+            // Apply, conditioned to the measurement, the X and Z gates
+            if (meas1) {
+                executor.apply_gate("x", {G.n_qubits - 1});
+            }
+            if (meas2) {
+                executor.apply_gate("z", {G.n_qubits - 1});
+            }
+
+            // Swap the value to the desired qubit
+            executor.apply_gate("swap", {G.n_qubits - 1, qubits[0] + T.zero_qubit});
+            //Reset
+            int communcation_result = executor.apply_measure({G.n_qubits - 1});
+            if (communcation_result) {
+                executor.apply_gate("x", {G.n_qubits - 1});
+            }
+            break;
+        }
+        case constants::EXPOSE:
+        {
+            if (!T.cat_entangled) {
+                generate_entanglement_();
 
                 // CX to the entangled pair
-                executor.apply_gate("cx", {qubits[0] + zero_qubit[i], n_qubits - 2});
+                executor.apply_gate("cx", {qubits[0] + T.zero_qubit, G.n_qubits - 2});
 
-                // H to the sent qubit
-                executor.apply_gate("h", {qubits[0] + zero_qubit[i]});
+                int result = executor.apply_measure({G.n_qubits - 2});
 
-                int result = executor.apply_measure({qubits[0] + zero_qubit[i]});
-                int communication_result = executor.apply_measure({n_qubits - 2});
+                G.qc_meas[T.id].push(result);
+                T.cat_entangled = true;
+                T.blocked = true;
+                Ts[inst.at("qpus")[0]].blocked = false;
+                return;
+            } else {
+                int meas = G.qc_meas[inst.at("qpus")[0]].top();
+                G.qc_meas[inst.at("qpus")[0]].pop();
 
-                qc_meas[quantum_tasks[i].id].push(result);
-                qc_meas[quantum_tasks[i].id].push(communication_result);
-                if (result) {
-                    executor.apply_gate("x", {qubits[0] + zero_qubit[i]});
+                if (meas) {
+                    executor.apply_gate("z", {qubits[0] + T.zero_qubit}); 
                 }
-                if (communication_result) {
-                    executor.apply_gate("x", {n_qubits - 2});
-                }
 
-                // Unlock QRECV
-                blocked[instruction.at("qpus")[0]] = false;
-                break;
+                T.cat_entangled = false;
             }
-            case constants::QRECV:
-            {
-                if (!qc_meas.contains(instruction.at("qpus")[0]))
-                {
-                    blocked[quantum_tasks[i].id] = true;
-                    continue;
-                }
- 
-                // Receive the measurements from the sender
-                std::size_t meas1 = qc_meas[instruction.at("qpus")[0]].top();
-                qc_meas[instruction.at("qpus")[0]].pop();
-                std::size_t meas2 = qc_meas[instruction.at("qpus")[0]].top();
-                qc_meas[instruction.at("qpus")[0]].pop();
-
-                // Apply, conditioned to the measurement, the X and Z gates
-                if (meas1)
-                {
-                    executor.apply_gate("x", {n_qubits - 1});
-                }
-                if (meas2)
-                {
-                    executor.apply_gate("z", {n_qubits - 1});
-                }
-
-                // Swap the value to the desired qubit
-                executor.apply_gate("swap", {n_qubits - 1, qubits[0] + zero_qubit[i]});
-
-                int communcation_result = executor.apply_measure({n_qubits - 1});
-                if (communcation_result) {
-                    executor.apply_gate("x", {n_qubits - 1});
-                }
-                break;
-            }
-            default:
-                LOGGER_ERROR("Invalid gate name."); 
-                throw std::runtime_error("Invalid gate name.");
-                break;
-            } // End switch 
-            ++its[i];
-            if (its[i] != ends[i])
-                ended = false;
-            else
-                finished[i] = true;
+            break;
         }
-    }
+        case constants::RCONTROL:
+        {
+            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+                T.blocked = true;
+                return;
+            }
 
-    for (const auto &[bitIndex, value] : classic_values)
+            int meas2 = G.qc_meas[inst.at("qpus")[0]].top();
+            G.qc_meas[inst.at("qpus")[0]].pop();
+
+            if (meas2) {
+                executor.apply_gate("x", {G.n_qubits - 1});
+            }
+
+            for(const auto& sub_inst: inst.at("instructions")) {
+                apply_next_instr(T, sub_inst);
+            }
+
+            executor.apply_gate("h", {G.n_qubits - 1});
+
+            int result = executor.apply_measure({G.n_qubits - 1});
+            G.qc_meas[T.id].push(result);
+
+            Ts[inst.at("qpus")[0]].blocked = false;
+            size_t erased_elements = G.qc_meas.erase(inst.at("qpus")[0]); 
+            break;
+        }
+        default:
+            std::cerr << "Instruction not suported!" << "\n" << "Instruction that failed: " << inst.dump(4) << "\n";
+        } // End switch
+    };
+
+    while (!G.ended)
     {
-        resultString[n_clbits - bitIndex - 1] = value ? '1' : '0';
+        G.ended = true;
+        for (auto& [id, T]: Ts)
+        {
+            if (T.finished || T.blocked)
+                continue;
+
+            apply_next_instr(T, {});
+
+            if (!T.blocked)
+                ++T.it;
+
+            if (T.it != T.end)
+                G.ended = false;
+            else
+                T.finished = true;
+        }
+
+    } // End one shot
+
+    std::string result_bits(G.n_clbits, '0');
+    for (const auto &[bitIndex, value] : G.cvalues)
+    {
+        result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
     }
 
-    return resultString;
+    return result_bits;
 }
 
 JSON CunqaSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
 {
-    auto n_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
-    auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
-    Executor executor(n_qubits);
-    QuantumCircuit circuit = qc.quantum_tasks[0].circuit;
-    JSON result = executor.run(circuit, shots);
-    reverse_bitstring_keys_json(result);
+    try
+    { 
+        auto n_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
+        auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
+        Executor executor(n_qubits);
+        QuantumCircuit circuit = qc.quantum_tasks[0].circuit;
+        JSON result = executor.run(circuit, shots);
 
-    return result;
+        return result;
+    } 
+    catch (const std::exception &e)
+    {
+        // TODO: specify the circuit format in the docs.
+        LOGGER_ERROR("Error executing the circuit in the Cunqa simulator.");
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+    }
+    return {};
 
 }
 
@@ -321,15 +354,8 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
     std::map<std::string, std::size_t> meas_counter;
 
-    // This is for distinguising classical and quantum communications
-    // TODO: Make it more clear
-    if (classical_channel && qc.quantum_tasks.size() == 1)
-    {
-        std::vector<std::string> connect_with = qc.quantum_tasks[0].sending_to;
-        classical_channel->connect(connect_with);
-    }
-
     auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
+    std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
     int n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks)
@@ -352,7 +378,6 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};

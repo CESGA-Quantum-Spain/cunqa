@@ -15,10 +15,11 @@ public:
     ClassicalChannel(const std::string& id);
     ~ClassicalChannel();
 
-    void publish();
+    void publish(const std::string& suffix = "");
 
     void connect(const std::string& endpoint, const std::string& id = "");
-    void connect(const std::vector<std::string>& endpoints);
+    void connect(const std::string& endpoint, const bool force_endpoint);
+    void connect(const std::vector<std::string>& endpoints, const bool force_endpoint);
 
     void send_info(const std::string& data, const std::string& target);
     std::string recv_info(const std::string& origin);

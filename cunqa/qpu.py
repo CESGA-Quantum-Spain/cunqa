@@ -65,23 +65,13 @@ import inspect
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
-from cunqa.circuit import CunqaCircuit, _is_parametric
+from cunqa.circuit import CunqaCircuit
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
+from cunqa.circuit.converters import _is_parametric
 from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
-from cunqa.transpile import transpiler, TranspileError
-
-# path to access to json file holding information about the raised QPUs
-INFO_PATH: Optional[str] = os.getenv("INFO_PATH")
-if INFO_PATH is None:
-    STORE: Optional[str] = os.getenv("STORE")
-    if STORE is not None:
-        INFO_PATH = STORE + "/.cunqa/qpus.json"
-    else:
-        logger.error(f"Cannot find $STORE enviroment variable.")
-        raise SystemExit
-
-
+from cunqa.qiskit_deps.transpiler import transpiler, TranspilerError
 
 class QPU:
     """
@@ -91,15 +81,15 @@ class QPU:
     This communication is stablished trough the :py:attr:`QPU.qclient`.
 
     """
-    _id: int #: Id string assigned to the object.
-    _qclient: Union['QClient', None]  #: Object that holds the information to communicate with the server endpoint of the corresponding virtual QPU.
-    _backend: 'Backend' #: Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device.
-    _family: str #: Name of the family to which the corresponding virtual QPU belongs.
-    _endpoint: "tuple[str, int]" #: String refering to the endpoint of the corresponding virtual QPU.
-    _connected: bool #: Weather if the :py:class:`QClient` is already connected.
-    _real_qpu: bool #: If this QPU is associated to a real QPU device
+    _id: int 
+    _qclient: 'QClient' 
+    _backend: 'Backend'
+    _name: str 
+    _family: str
+    _endpoint: str 
+    _connected: bool 
     
-    def __init__(self, id: int, qclient: Union['QClient', None], backend: Backend, family: str, endpoint: "tuple[str, int]", real_qpu : bool = False):
+    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str, real_qpu : bool = False):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -121,6 +111,7 @@ class QPU:
         self._id = id
         self._qclient = qclient
         self._backend = backend
+        self._name = name
         self._family = family
         self._endpoint = endpoint
         self._connected = False
@@ -132,6 +123,10 @@ class QPU:
     def id(self) -> int:
         """Id string assigned to the object."""
         return self._id
+    
+    @property
+    def name(self) -> str:
+        return self._name
     
     @property
     def backend(self) -> Backend:
@@ -183,15 +178,15 @@ class QPU:
 
         # Handle connection to QClient
         if not self._connected:
-            ip, port = self._endpoint
-            self._qclient.connect(ip, port)
+            self._qclient.connect(self._endpoint)
             self._connected = True
-            logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {ip}:{port}.")
+            logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
+            self._connected = True
 
         # Transpilation if requested
         if transpile:
             try:
-                logger.debug(f"About to transpile: {circuit}")
+                #logger.debug(f"About to transpile: {circuit}")
                 circuit = transpiler(circuit, self._backend, initial_layout = initial_layout, opt_level = opt_level)
                 logger.debug("Transpilation done.")
             except Exception as error:

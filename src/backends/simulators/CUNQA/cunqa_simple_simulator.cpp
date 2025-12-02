@@ -10,7 +10,11 @@ JSON CunqaSimpleSimulator::execute([[maybe_unused]] const SimpleBackend& backend
 {
     CunqaComputationAdapter cunqa_ca(quantum_task);
     CunqaSimulatorAdapter cunqa_sa(cunqa_ca);
-    return cunqa_sa.simulate(&backend);
+    
+    if (quantum_task.is_dynamic) 
+        return cunqa_sa.simulate();
+    else
+        return cunqa_sa.simulate(&backend);
 }
 
 } // End namespace sim

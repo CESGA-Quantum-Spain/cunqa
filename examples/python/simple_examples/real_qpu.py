@@ -4,22 +4,27 @@ sys.path.append(os.getenv("HOME"))
 
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
-from cunqa.converters import convert, _cunqac_to_qc, _qc_to_qasm
+from cunqa.qutils import qraise, qdrop
 from qiskit.qasm3 import dumps as dumps3
 
 from qiskit import QuantumCircuit
 
 # qraise -t 00:10:00 --qmio
-qpus = get_QPUs(local=False)
+family = qraise(1, "00:10:00", qmio = True)
+qpus = get_QPUs(on_node = False)
 qmio = qpus[0]
+
+print(qmio)
 
 circuit = CunqaCircuit(2,2)
 circuit.h(0)
 circuit.cx(0,1)
 circuit.measure_all()
 
-qjob = qmio.run(circuit, shots = 100)
+#qjob = qmio.run(circuit, shots = 100)
 """ counts = qjob.result.counts
 time = qjob.time_taken
 
 print(f"Result: \n{counts}\n Time taken: {time} s.") """
+
+qdrop(family)

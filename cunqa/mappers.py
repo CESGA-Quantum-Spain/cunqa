@@ -65,11 +65,11 @@ from qiskit.qasm2 import QASM2Error
 import numpy as np
 from typing import  Optional, Union, Any
 
-import re
+import time
 import copy
 
 
-def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any):
+def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['QPU']", **run_args: Any) -> "list[QJob]":
     """
     Function to send circuits to serveral virtual QPUs allowing classical or quantum communications among them. 
     Each circuit will be sent to each QPU in order, therefore both lists must be of the same size.
@@ -95,11 +95,11 @@ def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['
     distributed_qjobs = []
     circuit_jsons = []
 
-    remote_controlled_gates = ["measure_and_send", "remote_c_if", "recv", "qsend", "qrecv"]
+    remote_controlled_gates = ["measure_and_send", "remote_c_if", "recv", "qsend", "qrecv", "expose", "rcontrol"]
     correspondence = {}
 
     #Check wether the circuits are valid and extract jsons
-    for circuit in circuits:   
+    for circuit in circuits:
         if isinstance(circuit, CunqaCircuit):
             info_circuit_copy = copy.deepcopy(circuit.info) # To modify the info without modifying the attribute info of the circuit
             circuit_jsons.append(info_circuit_copy)
@@ -121,16 +121,16 @@ def run_distributed(circuits: "list[Union[dict, 'CunqaCircuit']]", qpus: "list['
             correspondence[circuit["id"]] = qpu._id
         
 
-    #Check whether the QPUs are valid
-    # TODO: check only makes sense if we have selected mpi option at compilation time. For the moment it remains commented
-    """ if not all(qpu._family == qpus[0]._family for qpu in qpus):
-        logger.debug(f"QPUs of different families were provided.")
-        if not all(re.match(r"^tcp://", qpu._endpoint) for qpu in qpus):
-            names = set()
-            for qpu in qpus:
-                names.add(qpu._family)
-            logger.error(f"QPU objects provided are from different families ({list(names)}). For this version, classical communications beyond families are only supported with zmq communication type.")
-            raise SystemExit # User's level """
+    # Check whether the QPUs are valid
+    # TODO: check only makes sense if we have selected mpi option at compilation time. For the moment it remains commented.
+    # if not all(qpu._family == qpus[0]._family for qpu in qpus):
+    #     logger.debug(f"QPUs of different families were provided.")
+    #     if not all(re.match(r"^tcp://", qpu._endpoint) for qpu in qpus):
+    #         names = set()
+    #         for qpu in qpus:
+    #             names.add(qpu._family)
+    #         logger.error(f"QPU objects provided are from different families ({list(names)}). For this version, classical communications beyond families are only supported with zmq communication type.")
+    #         raise SystemExit # User's level
     
     logger.debug(f"Run arguments provided for simulation: {run_args}")
     
@@ -319,6 +319,7 @@ class QPUCircuitMapper:
         qjobs = []
 
         try:
+            tick = time.time()
             for i, params in enumerate(population):
                 qpu = self.qpus[i % len(self.qpus)]
                 circuit_assembled = self.circuit.assign_parameters(params)
@@ -329,6 +330,11 @@ class QPUCircuitMapper:
             
             logger.debug(f"About to gather {len(qjobs)} results ...")
             results = gather(qjobs)
+            tack = time.time()
+            median = sum([res.time_taken for res in results])/len(results)
+
+            print("Mean simulation time: ", median)
+            print("Total distribution and gathering time: ", tack-tick)
 
             return [func(result) for result in results]
 

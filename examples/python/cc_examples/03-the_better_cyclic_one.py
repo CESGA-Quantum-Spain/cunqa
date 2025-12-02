@@ -16,9 +16,9 @@ def mod(n, m):
 
 def cyclic_ccommunication(n):
     # Raise and get QPUs
-    family = qraise(n,"00:10:00", simulator="Aer", classical_comm=True, cloud = True)
+    family = qraise(n,"00:10:00", simulator="Aer", classical_comm=True, co_located = True)
     os.system('sleep 5')
-    qpus_comm = get_QPUs(local = False, family = family)
+    qpus_comm = get_QPUs(on_node = False, family = family)
 
     if n<5:
         print(f"This circuit relations topology needs at leats 5 circuits, but only {n} were requested.")
@@ -35,7 +35,7 @@ def cyclic_ccommunication(n):
 
     circuits["cc_0"].remote_c_if("x", qubits = 0, param=None, control_circuit = f"cc_{n-1}")
 
-    circuits[f"cc_0"].measure(0,0)
+    circuits["cc_0"].measure(0,0)
     
     # For loop that creates the rest of the circuits and executes the communication instructions
     for i in range(n-1):

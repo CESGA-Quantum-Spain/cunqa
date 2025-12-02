@@ -30,11 +30,13 @@ qc = {
     {
         "name": "measure",
         "qubits": [0], 
+        "clbits":[0],
         "clreg":[]
     },
     {
         "name": "measure",
         "qubits": [1], 
+        "clbits":[1],
         "clreg":[]
     }
     ],
@@ -65,11 +67,13 @@ qc_param = {
     {
         "name": "measure",
         "qubits": [0], 
+        "clbits":[0],
         "clreg":[]
     },
     {
         "name": "measure",
         "qubits": [1], 
+        "clbits":[1],
         "clreg":[]
     }
     ],
@@ -85,7 +89,7 @@ qc_param = {
 }
 
 
-qpus = get_QPUs(local=False)
+qpus = get_QPUs(on_node=False)
 
 print("QPUs disponibles:")
 for q in qpus:
