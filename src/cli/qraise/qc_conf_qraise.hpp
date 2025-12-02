@@ -17,19 +17,19 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
         return "0";
     #endif
 
-    std::string run_command;
-    std::string subcommand;
-    std::string backend_path;
-    std::string backend;
-
     std::vector<std::string> simulators_with_qc = {"Cunqa", "Aer", "Munich", "Qulacs"};
     bool is_available_simulator = std::find(simulators_with_qc.begin(), simulators_with_qc.end(), std::string(args.simulator)) != simulators_with_qc.end();
 
     if (!is_available_simulator) {
-        LOGGER_ERROR("Quantum communications only are available under \"Aer\", \"Munich\" and \"CUNQA\" simulators, but the following simulator was provided: {}", args.simulator);
+        LOGGER_ERROR("Quantum communications only are available under \"Aer\", \"Cunqa\", \"Munich\" and \"Qulacs\" simulators, but the following simulator was provided: {}", args.simulator);
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
+
+    std::string run_command;
+    std::string subcommand;
+    std::string backend_path;
+    std::string backend;
 
     subcommand = mode + " qc " + args.family_name + " " + args.simulator;
     LOGGER_DEBUG("Qraise with quantum communications and default backend. \n");
