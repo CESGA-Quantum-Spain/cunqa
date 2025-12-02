@@ -82,7 +82,7 @@ function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
     )
     FetchContent_MakeAvailable(${PACKAGE_NAME})
   else()
-    message(STATUS "Found package ${PACKAGE_NAME}")
+    message(STATUS "Found package ${PACKAGE_NAME}: ${PACKAGE_NAME}_DIR = ${${PACKAGE_NAME}_DIR}")
   endif()
 endfunction()
 

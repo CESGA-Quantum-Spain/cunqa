@@ -1,13 +1,14 @@
 import os, sys
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
+sys.path.append(os.getenv("STORE") + "/repos/pyzmq/")
 
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
 from cunqa.qutils import qraise, qdrop
 from qiskit.qasm3 import dumps as dumps3
 
-from qiskit import QuantumCircuit
+import zmq
 
 # qraise -t 00:10:00 --qmio
 family = qraise(1, "00:10:00", qmio = True)

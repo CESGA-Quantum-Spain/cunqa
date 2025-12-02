@@ -1,27 +1,21 @@
 
 #include <cstdlib>
-#include <cstdio>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <random>
-#include <queue>
-#include "zmq.hpp"
 
 #include "comm/server.hpp"
 #include "utils/helpers/net_functions.hpp"
 #include "utils/json.hpp"
+#include "utils/constants.hpp"
 #include "logger.hpp"
 
 using namespace cunqa;
 
 namespace {
 
-const auto store = getenv("STORE");
-const std::string HOME = getenv("HOME");
-const std::string filepath = store + "/.cunqa/qpus.json"s;
+const std::string filepath = std::string(constants::CUNQA_PATH) + "/.cunqa/qpus.json"s;
 //const std::string QPU_ENDPOINT = getenv("ZMQ_SERVER");
-const std::string QPU_ENDPOINT = "tcp://10.5.7.14:8181";
+const std::string QPU_ENDPOINT = "WIP";
 
 struct QMIOConfig {
     std::string name = "QMIOBackend";
@@ -50,80 +44,35 @@ struct QMIOConfig {
 };
 
 
-class Intermediary {
+void write_qmio_info()
+{
+    QMIOConfig qmio_config;
+    JSON qmio_config_json = qmio_config;
 
-public:
-    Intermediary() : server(std::make_unique<comm::Server>("cloud")), socket_{context_, zmq::socket_type::req}
-    {}
+    JSON qpu_info = {
+        {"real_qpu", "qmio"},
+        {"backend", qmio_config_json},
+        {"net", {
+            //{"endpoint", server->endpoint},
+            {"nodename", "qmio_node"},
+            {"mode", "co_located"}
+        }},
+        {"family", "real_qmio"},
+        {"name", "QMIO"}
+    };
+    write_on_file(qpu_info, filepath);
 
-    ~Intermediary() 
-    {
-        socket_.close();
-    }
+}
 
-    void turn_ON()
-    {
-        QMIOConfig qmio_config;
-        JSON qmio_config_json = qmio_config;
 
-        JSON qpu_info = {
-            {"real_qpu", "qmio"},
-            {"backend", qmio_config_json},
-            {"net", {
-                {"endpoint", server->endpoint},
-                {"nodename", "qmio_node"},
-                {"mode", "co_located"}
-            }},
-            {"family", "real_qmio"},
-            {"name", "QMIO"}
-        };
-        write_on_file(qpu_info, filepath);
+int set_up_intermediary()
+{
+    std::string command = "python " + constants::INSTALL_PATH + "/cunqa/intermediary.py QMIO";
+    const char* c_command = command.c_str();
+    int status = std::system(c_command);
 
-        socket_.connect(QPU_ENDPOINT);
-
-        std::thread listen([this](){this->recv_data_();});
-        std::thread compute([this](){this->send_to_QPU_();});
-
-        listen.join();
-        compute.join();
-    }
-
-private:
-
-    std::unique_ptr<comm::Server> server;
-    zmq::context_t context_;
-    zmq::socket_t socket_;
-    std::queue<std::string> message_queue_;
-    std::condition_variable queue_condition_;
-    std::mutex queue_mutex_;
-
-    void recv_data_()
-    {
-        while (true) {
-            try {
-                LOGGER_DEBUG("Waiting to recv from outside...");
-                auto message = server->recv_data();
-                    {
-                    std::lock_guard<std::mutex> lock(queue_mutex_);
-                    if (message.compare("CLOSE"s) == 0) {
-                        server->accept();
-                        continue;
-                    }
-                    else
-                        message_queue_.push(message);
-                }
-                queue_condition_.notify_one();
-            } catch (const std::exception& e) {
-                LOGGER_INFO("There has happened an error receiving the circuit, the server keeps on iterating.");
-                LOGGER_ERROR("Official message of the error: {}", e.what());
-            }
-        }
-    }
-
-    void send_to_QPU_()
-    {}
-    
-};
+    return status;
+} 
 
 } // End namespace
 
@@ -131,8 +80,13 @@ private:
 int main(int argc, char *argv[]) {
 
     LOGGER_DEBUG("Inside setup_qmio");
-    Intermediary intermediary;
-    intermediary.turn_ON();
+    write_qmio_info();
+    int setup = set_up_intermediary();
     
+    if (setup == 1) {
+        LOGGER_ERROR("An error occur in the intermediary.py.");
+        return 1;
+    }
+
     return 0;
 }
