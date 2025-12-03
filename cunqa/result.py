@@ -270,7 +270,7 @@ class Result:
 
         # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
         else: 
-            logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: v for i, k, v in enumerate(self.counts.items()) if i<11} }")
+            logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
             if len(self._cl_registers) > 1:
                 logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
 
