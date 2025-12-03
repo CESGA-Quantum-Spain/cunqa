@@ -394,11 +394,12 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
         if "real_qpu" in info:
             logger.debug("Real QPU found")
             real_qpu = True
+            client = None
         else:
             logger.debug("Virtual QPU found")
             real_qpu = False   
-
-        client = QClient()
+            client = QClient()
+        
         qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], real_qpu = real_qpu))
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")

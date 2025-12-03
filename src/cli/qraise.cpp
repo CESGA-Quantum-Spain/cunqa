@@ -16,6 +16,7 @@
 #include "qraise/simple_conf_qraise.hpp"
 #include "qraise/cc_conf_qraise.hpp"
 #include "qraise/qc_conf_qraise.hpp"
+#include "qraise/qmio_conf_qraise.hpp"
 #include "qraise/infrastructure_conf_qraise.hpp"
 
 #include "logger.hpp"
@@ -142,33 +143,6 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
 
     LOGGER_DEBUG("Run command: {}", run_command);
     sbatchFile << run_command;
-}
-
-void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
-{
-    std::string home = std::getenv("HOME");
-    std::string cunqa_path = home + "/cunqa/";
-
-    sbatchFile << "#!/bin/bash\n";
-    sbatchFile << "#SBATCH --job-name=qraise \n";
-    //sbatchFile << "#SBATCH --partition qpu \n";
-    sbatchFile << "#SBATCH --nodelist=c7-14";
-    sbatchFile << "#SBATCH --ntasks=" << 1 << "\n";
-    sbatchFile << "#SBATCH --mem-per-cpu=4G\n";
-
-    if (check_time_format(args.time))
-        sbatchFile << "#SBATCH --time=" << args.time << "\n";
-    else {
-        LOGGER_ERROR("Time format is incorrect, must be: xx:xx:xx.");
-        return;
-    }
-
-    sbatchFile << "#SBATCH --output=qraise_%j\n";
-
-    sbatchFile << "\n\n";
-
-    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio";
-
 }
 
 } // End namespace

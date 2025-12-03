@@ -72,6 +72,7 @@ from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.qiskit_deps.transpiler import transpiler, TranspilerError
+from cunqa.real_qpus.qmio_linker import run_on_qmio
 
 class QPU:
     """
@@ -133,7 +134,7 @@ class QPU:
         """Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device."""
         return self._backend
 
-    def run(self, circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], transpile: bool = False, initial_layout: Optional["list[int]"] = None, opt_level: int = 1, **run_parameters: Any) -> 'QJob':
+    def run(self, circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], transpile: bool = False, initial_layout: Optional["list[int]"] = None, opt_level: int = 1, **run_parameters: Any) -> Union['QJob', dict]:
         """
         Class method to send a circuit to the corresponding virtual QPU.
 
@@ -165,6 +166,9 @@ class QPU:
 
         """
 
+        if self._real_qpu:
+            return run_on_qmio(self._endpoint, circuit, **run_parameters)
+
         # Disallow execution of distributed circuits
         if inspect.stack()[1].function != "run_distributed": # Checks if the run() is called from run_distributed()
             if isinstance(circuit, CunqaCircuit):
@@ -191,7 +195,7 @@ class QPU:
                 logger.debug("Transpilation done.")
             except Exception as error:
                 logger.error(f"Transpilation failed [{type(error).__name__}].")
-                raise TranspileError # I capture the error in QPU.run() when creating the job
+                raise TranspilerError # I capture the error in QPU.run() when creating the job
 
         try:
             qjob = QJob(self._real_qpu, self._qclient, self._backend, circuit, **run_parameters)

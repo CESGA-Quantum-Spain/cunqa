@@ -25,7 +25,7 @@ class ConvertersError(Exception):
 
 SUPPORTED_QISKIT_OPERATIONS = {'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier'}
 
-def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to : str) -> Union['QuantumCircuit', 'CunqaCircuit', str, dict]:
+def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to : str, qasm_version : str = "2.0") -> Union['QuantumCircuit', 'CunqaCircuit', str, dict]:
     """
         Function to convert a quantum circuit to the desired format.
         Detects the intup format and transforms into the one specified by *convert_to*, that can be ``"QuantumCircuit`` for :py:class:`qiskit.QuantumCircuit`,
@@ -54,7 +54,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
             elif convert_to == "dict":
                 converted_circuit = _qc_to_json(circuit)
             elif convert_to == "qasm":
-                converted_circuit = _qc_to_qasm(circuit)
+                converted_circuit = _qc_to_qasm(circuit, qasm_version)
 
         elif isinstance(circuit, CunqaCircuit):
             if convert_to == "QuantumCircuit":
@@ -65,7 +65,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
             elif convert_to == "dict":
                 converted_circuit = _cunqac_to_json(circuit)
             elif convert_to == "qasm":
-                converted_circuit = _cunqac_to_qasm(circuit)
+                converted_circuit = _cunqac_to_qasm(circuit, qasm_version)
 
         elif isinstance(circuit, dict):
             if convert_to == "QuantumCircuit":
@@ -76,7 +76,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
                 logger.warning("Provided circuit was already a dict.")
                 converted_circuit = circuit
             elif convert_to == "qasm":
-                converted_circuit = _json_to_qasm(circuit)
+                converted_circuit = _json_to_qasm(circuit, qasm_version)
         elif isinstance(circuit, str):
             if convert_to == "QuantumCircuit":
                 converted_circuit = _qasm_to_qc(circuit)
@@ -227,7 +227,7 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         raise error
     
 
-def _qc_to_qasm(qc : 'QuantumCircuit', version = "2.0") -> str:
+def _qc_to_qasm(qc : 'QuantumCircuit', version : str) -> str:
     
     try:
         if (version == "2.0"):
@@ -238,18 +238,8 @@ def _qc_to_qasm(qc : 'QuantumCircuit', version = "2.0") -> str:
             logger.error(f"OpenQASM{version} is not supported.")
             raise SystemExit
     except Exception as error:
-        logger.error(f" Unable to convert circuit to OpenQASM{version} [{type(error).__name__}].")
+        logger.error(f"Unable to convert circuit to OpenQASM{version} [{type(error).__name__}].")
         raise SystemExit
-    
-
-def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
-    """
-    Args:
-        qc (qiskit.QuantumCircuit): object that defines the quantum circuit.
-    Returns:
-        The corresponding :py:class:`~cunqa.circuit.CunqaCircuit` with the propper instructions and characteristics.
-    """
-    return _json_to_qc(_cunqac_to_json(cunqac))
 
 def _cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
     """
@@ -276,8 +266,8 @@ def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
     return _json_to_qc(_cunqac_to_json(cunqac))
 
 
-def _cunqac_to_qasm(cunqac : 'CunqaCircuit') -> str:
-    return _qc_to_qasm(_cunqac_to_qc(cunqac))
+def _cunqac_to_qasm(cunqac : 'CunqaCircuit', qasm_version : str) -> str:
+    return _qc_to_qasm(_cunqac_to_qc(cunqac), qasm_version)
     
 
 def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
@@ -435,8 +425,8 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
         raise ConvertersError
 
 
-def _json_to_qasm(circuit_json : dict) -> str:
-    return _qc_to_qasm(_json_to_qc(circuit_json))
+def _json_to_qasm(circuit_json : dict, qasm_version : str) -> str:
+    return _qc_to_qasm(_json_to_qc(circuit_json), qasm_version)
 
 
 def _qasm_to_qc(circuit_qasm : str) -> 'QuantumCircuit':

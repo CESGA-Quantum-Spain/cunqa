@@ -155,6 +155,19 @@ find_or_fetch_package(
   "v4.11.0"
 )
 
+# -- pyzmq -----------------------------------------------------------
+set(ZMQ_PREFIX "${libzmq_BINARY_DIR}" CACHE PATH "ZMQ_PREFIX" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}/lib")
+
+FetchContent_Declare(
+    pyzmq
+    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
+    GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(pyzmq)
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
 # =====================================================================
