@@ -1,9 +1,10 @@
 import os, sys
 sys.path.append(os.getenv("HOME"))
 
-from cunqa import get_QPUs
+from cunqa import  get_QPUs
 from cunqa.circuit import CunqaCircuit
 from cunqa.qutils import qraise, qdrop
+
 
 from qiskit import QuantumCircuit
 

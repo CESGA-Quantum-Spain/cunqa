@@ -1,10 +1,11 @@
 import sys, os
+from pathlib import Path
 
-CUNQA_PREFIX = "@CMAKE_INSTALL_PREFIX@"
-sys.path.append(CUNQA_PREFIX)
+current_file_dir = Path(__file__).resolve().parent
+parent_dir = current_file_dir.parent.parent
+sys.path.append(str(parent_dir))
 
-from cunqa.constants import QPUS_FILEPATH
-from cunqa.constants import LIBS_DIR
+from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
 from cunqa.qclient import write_on_file
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit import convert
