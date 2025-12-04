@@ -208,7 +208,7 @@ def cunqa_dunder_methods(cls):
 
         if (cl_m := other_circuit.num_clbits) > self.num_clbits:
 
-            self._add_cl_register(name = other_id, number_clbits = cl_m - self.num_clbits)
+            self.add_cl_register(name = other_id, number_clbits = cl_m - self.num_clbits)
 
         circs_comm_summands = set()
         if isinstance(other_circuit, CunqaCircuit):
@@ -390,8 +390,8 @@ def cunqa_dunder_methods(cls):
         n = self.num_qubits;             cl_n = self.num_clbits;             
         m = lower_circuit.num_qubits;    cl_m = lower_circuit.num_clbits
 
-        self._add_q_register(name = down_id, number_qubits = m)
-        self._add_cl_register(name = down_id, number_clbits = cl_m)
+        self.add_q_register(name = down_id, number_qubits = m)
+        self.add_cl_register(name = down_id, number_clbits = cl_m)
 
         iter_self_instr = iter(copy.deepcopy(self.instructions))
         iter_down_instr = iter(copy.deepcopy(down_instr))
@@ -456,8 +456,8 @@ def cunqa_dunder_methods(cls):
                         circs_comm_left.add(instr["circuits"][0])
                         num_left_comms += 1
 
-        left_circuit.from_instructions(left_instrs);      self._update_other_instances(circs_comm_left, self._id, left_id, displace_n=0, up_to_instr = num_left_comms) 
-        right_circuit.from_instructions(right_instrs);    self._update_other_instances(circs_comm_right, self._id, right_circuit)
+        left_circuit.add_instructions(left_instrs);      self._update_other_instances(circs_comm_left, self._id, left_id, displace_n=0, up_to_instr = num_left_comms) 
+        right_circuit.add_instructions(right_instrs);    self._update_other_instances(circs_comm_right, self._id, right_circuit)
 
         return left_circuit, right_circuit
 

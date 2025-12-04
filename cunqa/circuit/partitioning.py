@@ -8,6 +8,39 @@ import numpy as np
 from cunqa.logger import logger
 from cunqa.circuit.core import CunqaCircuit
 
+def layers(circuit: CunqaCircuit) -> dict:
+    """
+    Dictionary with keys the qubits and values lists of sublists with elements 
+    [layer_number, index_of_gate_in_instructions, gate_name]. 
+    """
+    layer_dict = {f"{i}": [] for i in range(circuit.num_qubits)} 
+    last_active_layer = [0 for _ in range(circuit.num_qubits)]
+
+    for i, instr in enumerate(circuit.instructions):
+        if len(instr["qubits"]) == 1:
+            last_active_layer[instr["qubits"][0]]+=1
+            layer_dict[str(instr["qubits"][0])].append(
+                [last_active_layer[instr["qubits"][0]], i, instr["name"]]
+            )
+
+        elif "conditional_reg" in instr:
+            max_layer_qubit = max([last_active_layer[j] for j in set(instr["qubits"] + 
+                                                                            instr["conditonal_reg"])])
+            for j in instr["qubits"]:
+                last_active_layer[j] = max_layer_qubit + 1
+                layer_dict[str(j)].append([last_active_layer[j], i, instr["name"]])
+
+        elif len(instr["qubits"]) > 1:
+            max_layer_qubit = max([last_active_layer[j] for j in instr["qubits"]])
+            for j in instr["qubits"]:
+                last_active_layer[j] = max_layer_qubit + 1
+                layer_dict[str(j)].append([last_active_layer[j], i, instr["name"]])
+
+        # TODO: support the ever problematic rcontrol and recv (they have zero qubits)
+
+        return layer_dict
+
+
 def vsplit():
     pass
 
@@ -50,7 +83,7 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
             if len(inst["qubits"]) == 1:
                 # One qubit gate
                 inst["qubits"][0] -= initial_qubits[i]
-                sub_circuit.from_instructions([inst])
+                sub_circuit.add_instructions([inst])
             elif len(inst["qubits"]) == 2:
                 # Two qubits gate
                 j = find_index(initial_qubits, inst["qubits"][1])
@@ -64,11 +97,11 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
                     with sub_circuit.expose(ctrl_qubit, target_circuit) as rcontrol:
                         inst["qubits"][0] = rcontrol
                         inst["qubits"][1] = target_qubit
-                        target_circuit.from_instructions([inst])
+                        target_circuit.add_instructions([inst])
                 else:
                     inst["qubits"][0] -= initial_qubits[i]
                     inst["qubits"][1] -= initial_qubits[i]
-                    sub_circuit.from_instructions([inst])
+                    sub_circuit.add_instructions([inst])
             else:
                 # Puertas de más de dos qubits
                 pass

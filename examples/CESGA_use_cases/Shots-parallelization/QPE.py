@@ -45,7 +45,7 @@ def IQFT(n):
 
 
 def merge_circuits(circ1, circ2):
-    circuit = circ1.from_instructions(circ2.instructions)
+    circuit = circ1.add_instructions(circ2.instructions)
     return circuit
 
 def QPE(phase, n):

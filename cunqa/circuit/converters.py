@@ -134,12 +134,11 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "has_cc":False,
             "has_qc":False,
             "instructions":[],
+            "sending_to":[],
             "num_qubits":sum([q.size for q in qc.qregs]),
             "num_clbits": sum([c.size for c in qc.cregs]),
             "quantum_registers":quantum_registers,
-            "classical_registers":classical_registers,
-            "has_cc":False,
-            "has_qc":False,
+            "classical_registers":classical_registers
         }
 
         for instruction in qc.data:
@@ -421,12 +420,12 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
         cunqac = CunqaCircuit(id = circuit_dict["id"])
 
         for name, number_of_clbits in circuit_dict["classical_registers"].items():
-            cunqac._add_cl_register(name, len(number_of_clbits))
+            cunqac.add_cl_register(name, len(number_of_clbits))
 
         for name, number_of_qubits in circuit_dict["quantum_registers"].items():
-            cunqac._add_q_register(name, len(number_of_qubits))
+            cunqac.add_q_register(name, len(number_of_qubits))
         
-        cunqac.from_instructions(circuit_dict["instructions"])
+        cunqac.add_instructions(circuit_dict["instructions"])
         
         return cunqac
     

@@ -2,8 +2,8 @@ import os
 import sys
 import unittest
 
-# HOME = os.getenv("HOME")
-# sys.path.insert(0, HOME)
+HOME = os.getenv("HOME")
+sys.path.insert(0, HOME)
 
 from cunqa.backend import Backend
 from cunqa.qclient import QClient
@@ -12,15 +12,6 @@ from cunqa.qpu import qraise, qdrop, getQPUs
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import QFT
-
-# Adding pyhton folder path to detect modules
-INSTALL_PATH = os.getenv("INSTALL_PATH")
-sys.path.insert(0, INSTALL_PATH)
-# path to access to json file holding information about the raised QPUs
-info_path = os.getenv("INFO_PATH")
-if info_path is None:
-    STORE = os.getenv("STORE")
-    info_path = STORE+"/.api_simulator/qpus.json"
 
 
 class TestQPU(unittest.TestCase):  

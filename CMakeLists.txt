@@ -49,7 +49,7 @@ endif()
 
 if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.13.6-python-3.11.9/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.11.9 EXACT COMPONENTS Interpreter Development)
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.13 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")

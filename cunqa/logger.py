@@ -44,7 +44,7 @@ class ColoredFormatter(logging.Formatter):
         return message
 
 logger = logging.getLogger('mi_logger_coloreado')
-logger.setLevel(logging.WARN)  # Establece el nivel mínimo de log
+logger.setLevel(logging.WARN)
 logger.propagate = False
 logger.handlers.clear()
 

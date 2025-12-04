@@ -25,18 +25,10 @@
 
 
     """
-
-from typing import  Union, Any
 import json
-from typing import  Optional, Union, Any
-from qiskit import QuantumCircuit
-from qiskit.qasm2.exceptions import QASM2Error
-from qiskit.exceptions import QiskitError
+from typing import  Optional, Any
 
-from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
-from cunqa.backend import Backend
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
 
@@ -161,18 +153,14 @@ class QJob:
 
 
     """
-    _backend: 'Backend' 
-    qclient: 'QClient' #: Client linked to the server that listens at the virtual QPU.
+    qclient: QClient #: Client linked to the server that listens at the virtual QPU.
+    _circuit_id: str
     _updated: bool
     _future: 'FutureWrapper' 
     _result: Optional['Result']
-    _circuit_id: str 
-    _sending_to: "list[str]"
-    _is_dynamic: bool
-    _has_cc:bool
-    _has_qc:bool
+    _quantum_task: str
 
-    def __init__(self, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], **run_parameters: Any):
+    def __init__(self, qclient: QClient, circuit_ir: dict, **run_parameters: Any):
         """
         Initializes the :py:class:`QJob` class.
 
@@ -190,21 +178,43 @@ class QJob:
 
             backend (~cunqa.backend.Backend): gathers necessary information about the simulator.
 
-            circ (qiskit.QuantumCircuit | dict | ~cunqa.circuit.CunqaCircuit): circuit to be run.
+            circuit_ir (dict): circuit to be run.
 
             **run_parameters : any other simulation instructions.
 
         """
+        self._qclient = qclient
+        self._circuit_id = circuit_ir["id"]
+        self._cregisters = circuit_ir["classical_registers"]
+        self._updated = False
+        self._future = None
+        self._result = None
 
-        self._backend: 'Backend' = backend
-        self._qclient: 'QClient' = qclient
-        self._updated: bool = False
-        self._future: 'FutureWrapper' = None
-        self._result: Optional['Result'] = None
-        self._circuit_id: str = ""
+        run_config = {
+            "shots": 1024, 
+            "method":"automatic", 
+            "avoid_parallelization": False,
+            "num_clbits": circuit_ir["num_clbits"], 
+            "num_qubits": circuit_ir["num_qubits"], 
+            "seed": 123123
+        }
 
-        self._convert_circuit(circuit)
-        self._configure(**run_parameters)
+        if (run_parameters == None) or (len(run_parameters) == 0):
+            logger.warning("No run parameters provided, default were set.")
+        elif (type(run_parameters) == dict): 
+            for k,v in run_parameters.items():
+                run_config[k] = v
+        else:
+            logger.warning("Error when reading `run_parameters`, default were set.")
+        
+        self._quantum_task = json.dumps({
+            "config": run_config, 
+            "instructions": circuit_ir["instructions"],
+            "sending_to": circuit_ir["sending_to"],
+            "is_dynamic": circuit_ir["is_dynamic"],
+            "has_cc": circuit_ir["has_cc"]
+        })
+    
         logger.debug("Qjob configured")
 
     @property
@@ -221,28 +231,13 @@ class QJob:
             The result is not sent from the server to the :py:class:`QClient` until this method is called.
 
         """
-        try:
-            if self._future is not None and self._future.valid():
-                if self._result is not None:
-                    if not self._updated: # if the result was already obtained, we only call the server if an update was done
-                        res = self._future.get()
-                        self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
-                        self._updated = True
-                    else:
-                        pass
-                else:
-                    res = self._future.get()
-                    self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
-                    self._updated = True
-            else:
-                logger.debug(f"self._future is None or non-valid, None is returned.")
-        except Exception as error:
-                logger.error(f"Error while reading the results {error}")
-                raise SystemExit # User's level
-        
-        if self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
-            logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
-
+        if self._future is not None:
+            if (self._result is not None and not self._updated) or (self._result is None):
+                res = self._future.get()
+                self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
+                self._updated = True
+        else:
+            RuntimeError(f"self._future is None which means that the QJob has not been submitted.")
         return self._result
 
     @property
@@ -251,19 +246,17 @@ class QJob:
         Time that the job took.
         """
 
-        if self._future is not None and self._future.valid():
+        if self._future is not None:
             if self._result is not None:
                 try:
                     return self._result.time_taken
                 except AttributeError:
-                    logger.warning("Time taken not available.")
+                    logger.error("Time taken not available.")
                     return ""
             else:
-                logger.error(f"QJob not finished [{QJobError.__name__}].")
-                raise SystemExit # User's level
+                RuntimeError(f"The QJob has been submitted, but the result has not been retrieved.")
         else:
-            logger.error(f"No QJob submited [{QJobError.__name__}].")
-            raise SystemExit # User's level
+            RuntimeError(f"The QJob has not been submitted.")
 
     def submit(self) -> None:
         """
@@ -275,14 +268,13 @@ class QJob:
             the corresponding server recieves and simualtes the circuit.
         """
         if self._future is not None:
-            logger.warning("QJob has already been submitted.")
+            logger.error("QJob has already been submitted.")
         else:
             try:
-                self._future = self._qclient.send_circuit(self._execution_config)
+                self._future = self._qclient.send_circuit(self._quantum_task)
                 logger.debug("Circuit was sent.")
             except Exception as error:
-                logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
-                raise QJobError # I capture the error in QPU.run() when creating the job
+                raise RuntimeError((f"Some error occured when submitting the job [{type(error).__name__}]."))
             
     def upgrade_parameters(self, parameters: "list[float | int]") -> None:
         """
@@ -310,182 +302,16 @@ class QJob:
         if self._result is None:
             self._future.get()
 
-        if isinstance(parameters, list):
-
-            if all(isinstance(param, (int, float)) for param in parameters):  # Check if all elements are real numbers
-                message = """{{"params":{} }}""".format(parameters).replace("'", '"')
-
-            else:
-                logger.error(f"Parameters must be real numbers [{ValueError.__name__}].")
-                raise SystemExit # User's level
-        
-            try:
-                #logger.debug(f"Sending new parameters to circuit {self._circuit_id}.")
-                self._future = self._qclient.send_parameters(message)
-
-            except Exception as error:
-                logger.error(f"Some error occured when sending the new parameters to circuit {self._circuit_id} [{type(error).__name__}].")
-                raise SystemExit # User's level
-        else:
-            logger.error(f"Ivalid parameter type, list was expected but {type(parameters)} was given. [{TypeError.__name__}].")
-            raise SystemExit # User's level            
-        
-        self._updated = False # We indicate that new results will come, in order to call server
-
-    def _convert_circuit(self, circuit: Union[str, dict, 'CunqaCircuit', 'QuantumCircuit']) -> None:
         try:
-            if isinstance(circuit, dict):
-
-                logger.debug("A circuit dict was provided.")
-
-                self.num_qubits = circuit["num_qubits"]
-                self.num_clbits = circuit["num_clbits"]
-                self._cregisters = circuit["classical_registers"]
-                if "sending_to" in circuit:
-                    self._sending_to = circuit["sending_to"]
-                else:
-                    self._sending_to = []
-                if "has_cc" in circuit:
-                    self._has_cc = circuit["has_cc"]
-                    self._is_dynamic = True
-                elif "has_qc" in circuit:
-                    self._has_qc = circuit["has_qc"]
-                    self._is_dynamic = True
-                elif "is_dynamic" in circuit:
-                    self._is_dynamic = circuit["is_dynamic"]
-                else:
-                    self._is_dynamic = False
-                    self._has_cc = False
-
-                # might explode for handmade dicts not design for ditributed execution
-                self._circuit_id = circuit["id"]
-                instructions = circuit['instructions']
-            
-
-            elif isinstance(circuit, CunqaCircuit):
-
-                logger.debug("A CunqaCircuit was provided.")
-
-                self.num_qubits = circuit.num_qubits
-                self.num_clbits = circuit.num_clbits
-                self._cregisters = circuit.classical_regs
-                self._circuit_id = circuit._id
-                self._sending_to = circuit.sending_to
-                self._is_dynamic = circuit.is_dynamic
-                self._has_cc = circuit.has_cc
-                self._has_qc = circuit.has_qc
-                
-                logger.debug("Translating to dict from CunqaCircuit...")
-
-                instructions = circuit.instructions
-
-
-            elif isinstance(circuit, QuantumCircuit):
-
-                logger.debug("A QuantumCircuit was provided.")
-
-                self.num_qubits = circuit.num_qubits
-                self.num_clbits = sum([c.size for c in circuit.cregs])
-                self._cregisters = _registers_dict(circuit)[1]
-                self._sending_to = []
-
-                logger.debug("Translating to dict from QuantumCircuit...")
-
-                circuit_json = convert(circuit, "dict")
-                instructions = circuit_json["instructions"]
-                self._is_dynamic = circuit_json["is_dynamic"]
-                self._has_cc = False
-                self.has_qc = False
-
-            elif isinstance(circuit, str):
-
-                logger.debug("A QASM2 circuit was provided.")
-
-                qc_from_qasm = QuantumCircuit.from_qasm_str(circuit)
-
-                self.num_qubits = qc_from_qasm.num_qubits
-                self._cregisters = _registers_dict(qc_from_qasm)[1]
-                self.num_clbits = sum(len(k) for k in self._cregisters.values())
-                self._cregisters = _registers_dict(qc_from_qasm)[1]
-                # TODO: ¿self.circuit_id?
-                self._sending_to = []
-
-                logger.debug("Translating to dict from QASM2 string...")
-
-                circuit_json = convert(qc_from_qasm, "dict")
-                instructions = circuit_json["instructions"]
-                self._is_dynamic = circuit_json["is_dynamic"]
-                self._has_cc = False
-                self._has_qc = False
-
-            else:
-                logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circuit)} was provided [{TypeError.__name__}].")
-                raise QJobError # I capture the error in QPU.run() when creating the job
-
-            self._circuit = instructions            
-            
-        except KeyError as error:
-            logger.error(f"Format of the circuit dict not correct, couldn't find 'num_clbits', 'classical_registers' or 'instructions' [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-
-        except QASM2Error as error:
-            logger.error(f"Error while translating to QASM2 [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-    
-        except QiskitError as error:
-            logger.error(f"Format of the circuit not correct  [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-        
+            message = """{{"params":{} }}""".format(parameters).replace("'", '"')
+            self._future = self._qclient.send_parameters(message)
+            self._updated = False
         except Exception as error:
-            logger.error(f"Some error occured with the circuit dict provided [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-
-    def _configure(self, **run_parameters: Any) -> None:
-        # configuration
-        try:
-            # config dict
-            run_config = {
-                "shots": 1024, 
-                "method":"automatic", 
-                "avoid_parallelization": False,
-                "num_clbits": self.num_clbits, 
-                "num_qubits": self.num_qubits, 
-                "seed": 123123
-                }
-
-            if (run_parameters == None) or (len(run_parameters) == 0):
-                logger.debug("No run parameters provided, default were set.")
-                pass
-            elif (type(run_parameters) == dict): 
-                for k,v in run_parameters.items():
-                    run_config[k] = v
-            else:
-                logger.warning("Error when reading `run_parameters`, default were set.")
-            
-            exec_config = {
-                "id": self._circuit_id,
-                "config": run_config, 
-                "instructions": self._circuit,
-                "sending_to": self._sending_to,
-                "is_dynamic": self._is_dynamic,
-                "has_cc": self._has_cc
-                #,"has_qc": self._has_qc # Not needed in C++ 
-            }
-            self._execution_config = json.dumps(exec_config)
-
-            logger.debug("QJob created.")
-
-        except KeyError as error:
-            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-        
-        except Exception as error:
-            logger.error(f"Some error occured when generating configuration for the simulation [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-        
+            logger.error(f"Some error occured when sending the new parameters to circuit {self._circuit_id} [{type(error).__name__}].")
+            self._updated = True
 
 
-def gather(qjobs: "list['QJob']") -> "list['Result']":
+def gather(qjobs: list[QJob]) -> list[Result]:
     """
         Function to get the results of several :py:class:`QJob` objects.
 
@@ -506,13 +332,8 @@ def gather(qjobs: "list['QJob']") -> "list['Result']":
         Return:
             List of :py:class:`~cunqa.result.Result` objects.
     """
-    if isinstance(qjobs, list):
-        if all([isinstance(q, QJob) for q in qjobs]):
-            return [q.result for q in qjobs]
-        else:
-            logger.error(f"Objects of the list must be <class 'cunqa.qjob.QJob'> [{TypeError.__name__}].")
-            raise SystemExit # User's level
 
-    else:
-        logger.error(f"qjobs must be list, but {type(qjobs)} was provided [{TypeError.__name__}].")
-        raise SystemError # User's level
+    try:    
+        return [q.result for q in qjobs]
+    except TypeError:
+        logger.error("gather needs a list of <class 'cunqa.qjob.QJob'>, but this was not provided")    
