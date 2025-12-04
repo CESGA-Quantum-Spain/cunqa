@@ -15,9 +15,10 @@ import zmq
 import json
 import psutil
 import socket
+from typing import Optional
 
 
-def get_qmio_config(family : str, endpoint : str) -> str:
+def _get_qmio_config(family : str, endpoint : str) -> str:
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
@@ -60,37 +61,33 @@ def _list_interfaces(ipv4_only=True):
     return interfaces
 
 
-def get_IP(infiniband : bool = False, ethernet : bool = False) -> str:
+def _get_IP(preferred_net_iface : Optional[str] = None) -> str:
     all_ifaces = _list_interfaces()
-    if infiniband:
-        ib_ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith("ib")}
-        return all_ifaces[next(iter(ib_ifaces))][0]
-    
-    elif ethernet:
-        eth_ifaces = eth_ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith("eth")}
-        return all_ifaces[next(iter(eth_ifaces))][0]
+    if preferred_net_iface != None:
+        ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith(preferred_net_iface)}
+        return all_ifaces[next(iter(ifaces))][0]
     else:
         for name, ips in all_ifaces.items():
-            if not (name.startswith("lo") or name.startswith("eth") or name.startswith("ib")):
-                return ips[0]
+            return ips[0]
     
 
 def start_linker_server(family : str) -> None:
     logger.debug("Starting QMIO linker...")
 
     ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
+    PREFERRED_NETWORK_IFACE = "ib"
 
     linker_context = zmq.Context()
     client_comm_socket = linker_context.socket(zmq.REP)
 
-    ip = get_IP(infiniband = True)
+    ip = _get_IP(preferred_net_iface = PREFERRED_NETWORK_IFACE)
     port = client_comm_socket.bind_to_random_port(f"tcp://{ip}")
 
     qmio_comm_socket = linker_context.socket(zmq.REQ)
     qmio_comm_socket.connect(ZMQ_ENDPOINT)
 
     linker_endpoint = f"tcp://{ip}:{port}"
-    qmio_config = get_qmio_config(family, linker_endpoint)
+    qmio_config = _get_qmio_config(family, linker_endpoint)
     write_on_file(qmio_config, QPUS_FILEPATH, family)
 
     waiting = True
@@ -111,7 +108,7 @@ def start_linker_server(family : str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        logger.error("No family name given to QMIO linker")
+        logger.error("No family name provided to QMIO linker")
         sys.exit("No family name provided to QMIO linker")
 
     start_linker_server(sys.argv[1])
