@@ -13,9 +13,9 @@ using namespace cunqa;
 
 namespace {
 
-int set_up_linker()
+int set_up_linker(const std::string& family)
 {
-    std::string command = "python " + constants::INSTALL_PATH + "/cunqa/real_qpus/qmio_linker.py";
+    std::string command = "python " + constants::INSTALL_PATH + "/cunqa/real_qpus/qmio_linker.py " + family;
     const char* c_command = command.c_str();
     int status = std::system(c_command);
 
@@ -27,8 +27,18 @@ int set_up_linker()
 
 int main(int argc, char *argv[]) {
 
-    LOGGER_DEBUG("Inside setup_qmio");
-    int setup = set_up_linker();
+    if (argc < 2) {
+        LOGGER_ERROR("No family name was provided for QMIO");
+        return 1;
+    }
+
+    std::string family = argv[1];
+
+    if (family == "default") {
+        family = std::getenv("SLURM_JOB_ID");
+    }
+    
+    int setup = set_up_linker(std::string(family));
     
     if (setup == 1) {
         LOGGER_ERROR("An error occur in the qmio_linker.py.");

@@ -17,7 +17,7 @@ import psutil
 import socket
 
 
-def get_qmio_config(endpoint : str) -> str:
+def get_qmio_config(family : str, endpoint : str) -> str:
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
@@ -39,7 +39,7 @@ def get_qmio_config(endpoint : str) -> str:
             "nodename":"c7-23",
             "mode":"co_located"
         },
-        "family":"real_qmio",
+        "family":family,
         "name":"QMIO"
     }
 
@@ -75,7 +75,7 @@ def get_IP(infiniband : bool = False, ethernet : bool = False) -> str:
                 return ips[0]
     
 
-def start_linker_server() -> None:
+def start_linker_server(family : str) -> None:
     logger.debug("Starting QMIO linker...")
 
     ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
@@ -90,8 +90,8 @@ def start_linker_server() -> None:
     qmio_comm_socket.connect(ZMQ_ENDPOINT)
 
     linker_endpoint = f"tcp://{ip}:{port}"
-    qmio_config = get_qmio_config(linker_endpoint)
-    write_on_file(qmio_config, QPUS_FILEPATH)
+    qmio_config = get_qmio_config(family, linker_endpoint)
+    write_on_file(qmio_config, QPUS_FILEPATH, family)
 
     waiting = True
     while waiting:
@@ -110,4 +110,8 @@ def start_linker_server() -> None:
 
 
 if __name__ == "__main__":
-    start_linker_server()
+    if len(sys.argv) < 2:
+        logger.error("No family name given to QMIO linker")
+        sys.exit("No family name provided to QMIO linker")
+
+    start_linker_server(sys.argv[1])

@@ -13,6 +13,7 @@ sys.path.append(LIBS_DIR)
 
 import zmq
 import json
+import time
 from typing import Optional
 
 
@@ -176,21 +177,28 @@ def get_run_config(run_config : dict) -> str:
     
 
 class QMIOFuture:
-    def __init__(self, socket = None, error = None):
+    def __init__(self, socket = None, start_time = None, error = None):
         self.socket = socket
+        self.start_time = start_time
         self.error = error
     
     def valid(self) -> bool:
         return True
     
-    def get(self) -> dict:
+    def get(self) -> str:
         if self.socket is not None:
             result = self.socket.recv_pyobj()
-            return result
+            end_time = time.time_ns()
+            time_taken_ns = end_time - self.start_time
+            qmio_results = {
+                "qmio_results":result["results"],
+                "time_taken": time_taken_ns/1e9
+            }
+            return json.dumps(qmio_results)
         elif self.error is not None:
-            return {f"ERROR":{self.error}}
+            return json.dumps({"ERROR": f"{self.error}"})
         else:
-            return {"ERROR":"An error occured in QMIO."}
+            return json.dumps({"ERROR":"An error occured in QMIO."})
 
 
 class QMIOClient:
@@ -204,16 +212,16 @@ class QMIOClient:
     def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
 
         quantum_task = json.loads(quantum_task_str)
-        circuit = quantum_task["instructions"]
         run_config = quantum_task["config"]
 
-        run_config = get_run_config(run_config)
-        qasm_circuit = convert(circuit, convert_to = "qasm", qasm_version = "3.0")
-        data_to_send = (qasm_circuit, run_config)
+        qmio_run_config = get_run_config(run_config)
+        qasm_circuit = convert(quantum_task, convert_to = "qasm", qasm_version = "3.0")
+        data_to_send = (qasm_circuit, qmio_run_config)
 
         try:
+            start_time = time.time_ns()
             self.socket.send_pyobj(data_to_send)
-            qmiofuture = QMIOFuture(socket = self.socket) 
+            qmiofuture = QMIOFuture(socket = self.socket, start_time = start_time) 
             return qmiofuture
         
         except zmq.ZMQError as e:

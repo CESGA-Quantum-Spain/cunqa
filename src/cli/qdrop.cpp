@@ -79,6 +79,7 @@ void removeJobs(const std::vector<std::string>& job_ids, const bool& all = false
         job_ids_str += job_id + " ";
     }
     scancel += job_ids_str;
+    std::cout << "cmd: " << scancel.c_str() << "\n";
     std::system(scancel.c_str());
     std::cout << "Removed job(s) with ID(s): \033[1;32m"
               << job_ids_str

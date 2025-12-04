@@ -2,9 +2,11 @@
 
 #include <string>
 #include <fstream>
+#include <cstdlib>
 
 #include "argparse/argparse.hpp"
 #include "args_qraise.hpp"
+#include "utils/constants.hpp"
 
 
 #include "logger.hpp"
@@ -26,6 +28,12 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     sbatchFile << "\n\n";
 
-    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio";
+    sbatchFile << "EPILOG_PATH=" << std::string(cunqa::constants::CUNQA_PATH) << "/epilog.sh\n";
+
+    sbatchFile << "\n\n";
+
+    std::string family = args.family_name;
+
+    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio " + family;
 
 }

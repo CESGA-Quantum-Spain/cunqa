@@ -43,7 +43,6 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
         logger.error(f"{convert_to} is not a valid circuit format to convert to [{NameError.__name__}].")
         raise SystemExit
 
-
     try:
         if isinstance(circuit, QuantumCircuit):
             if convert_to == "QuantumCircuit":
@@ -89,7 +88,7 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
                 converted_circuit = circuit
 
         else:
-            logger.error(f"Provided circuit must be a QuantumCircuit, a CunqaCircuit, an OpenQASM or a dict [{TypeError.__name__}].")
+            logger.error(f"[{TypeError.__name__}] Provided circuit must be a QuantumCircuit, a CunqaCircuit, an OpenQASM or a dict but the following was given: {type(circuit)}.")
             raise SystemExit
         
         return converted_circuit
@@ -230,10 +229,13 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 def _qc_to_qasm(qc : 'QuantumCircuit', version : str) -> str:
     
     try:
+        qasm2circuit = dumps2(qc)
         if (version == "2.0"):
-            return dumps2(qc)
+            return qasm2circuit
         elif (version == "3.0"):
-            return dumps3(qc)
+            qc_from_qasm2 = QuantumCircuit.from_qasm_str(qasm2circuit)
+            qasm3circuit = dumps3(qc_from_qasm2)
+            return qasm3circuit
         else:
             logger.error(f"OpenQASM{version} is not supported.")
             raise SystemExit
@@ -433,12 +435,13 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
 
 
 def _json_to_qasm(circuit_json : dict, qasm_version : str) -> str:
-     
-    qasm2circuit = _qc_to_qasm(_json_to_qc(circuit_json), qasm_version)
+    qc = _json_to_qc(circuit_json)
+    qasm2circuit = _qc_to_qasm(qc, version = "2.0")
     if qasm_version == "2.0":
         return qasm2circuit
 
     qc_from_qasm2 = QuantumCircuit.from_qasm_str(qasm2circuit)
+
     qasm3circuit = dumps3(qc_from_qasm2)
     return qasm3circuit
     

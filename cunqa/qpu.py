@@ -133,7 +133,7 @@ class QPU:
         """Object that provides the characteristics that the simulator at the virtual QPU uses to emulate a real device."""
         return self._backend
 
-    def run(self, circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], transpile: bool = False, initial_layout: Optional["list[int]"] = None, opt_level: int = 1, **run_parameters: Any) -> Union['QJob', dict]:
+    def run(self, circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], transpile: bool = False, initial_layout: Optional["list[int]"] = None, opt_level: int = 1, **run_parameters: Any) -> 'QJob':
         """
         Class method to send a circuit to the corresponding virtual QPU.
 

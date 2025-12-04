@@ -233,7 +233,6 @@ class QJob:
                         pass
                 else:
                     res = self._future.get()
-                    logger.debug(f"RES: {res}")
                     self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
                     self._updated = True
             else:
@@ -241,9 +240,6 @@ class QJob:
         except Exception as error:
                 logger.error(f"Error while reading the results {error}")
                 raise SystemExit # User's level
-        
-        if self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
-            logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
 
         return self._result
 
@@ -344,6 +340,7 @@ class QJob:
                 self.num_qubits = circuit["num_qubits"]
                 self.num_clbits = circuit["num_clbits"]
                 self._cregisters = circuit["classical_registers"]
+                self._qregisters = circuit["quantum_registers"]
                 if "sending_to" in circuit:
                     self._sending_to = circuit["sending_to"]
                 else:
@@ -372,6 +369,7 @@ class QJob:
                 self.num_qubits = circuit.num_qubits
                 self.num_clbits = circuit.num_clbits
                 self._cregisters = circuit.classical_regs
+                self._qregisters = circuit.quantum_regs
                 self._circuit_id = circuit._id
                 self._sending_to = circuit.sending_to
                 self._is_dynamic = circuit.is_dynamic
@@ -390,6 +388,7 @@ class QJob:
                 self.num_qubits = circuit.num_qubits
                 self.num_clbits = sum([c.size for c in circuit.cregs])
                 self._cregisters = _registers_dict(circuit)[1]
+                self._qregisters = _registers_dict(circuit)[0]
                 self._sending_to = []
 
                 logger.debug("Translating to dict from QuantumCircuit...")
@@ -408,6 +407,7 @@ class QJob:
 
                 self.num_qubits = qc_from_qasm.num_qubits
                 self._cregisters = _registers_dict(qc_from_qasm)[1]
+                self._cregisters = _registers_dict(qc_from_qasm)[0]
                 self.num_clbits = sum(len(k) for k in self._cregisters.values())
                 self._cregisters = _registers_dict(qc_from_qasm)[1]
                 # TODO: ¿self.circuit_id?
@@ -469,6 +469,10 @@ class QJob:
                 "id": self._circuit_id,
                 "config": run_config, 
                 "instructions": self._circuit,
+                "num_qubits": self.num_qubits,
+                "num_clbits": self.num_clbits,
+                "classical_registers":self._cregisters,
+                "quantum_registers":self._qregisters,
                 "sending_to": self._sending_to,
                 "is_dynamic": self._is_dynamic,
                 "has_cc": self._has_cc

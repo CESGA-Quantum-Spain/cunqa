@@ -109,9 +109,10 @@ class Result:
     def counts(self) -> dict:
         """Counts distribution from the sampling of the simulation, format is ``{"<bit string>":<number of counts as int>}``."""
         try:
-            if "results" in list(self._result.keys()): # aer
+            if "qmio_results" in list(self._result.keys()): 
+                counts = self._result["qmio_results"]["meas"] #TODO: More registers?
+            elif "results" in list(self._result.keys()): # aer
                 counts = self._result["results"][0]["data"]["counts"]
-
             elif "counts" in list(self._result.keys()): # munich and cunqa
                 counts = self._result["counts"]
             else:
@@ -131,10 +132,12 @@ class Result:
     def time_taken(self) -> str:
         """Time that the simulation took in seconds, since it is recieved at the virtual QPU until it is finished."""
         try:
+            if "qmio_results" in list(self._result.keys()):
+                time = self._result["time_taken"]
+                return time
             if "results" in list(self._result.keys()): # aer
                 time = self._result["results"][0]["time_taken"]
                 return time
-
             elif "counts" in list(self._result.keys()): # munich and cunqa
                 time = self._result["time_taken"]          
                 return time
