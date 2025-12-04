@@ -13,42 +13,11 @@ sys.path.append(LIBS_DIR)
 
 import zmq
 import json
-import random
+import psutil
+import socket
 
 
-def _get_available_port() -> str: #TODO: Check availability
-    return str(random.randint(49152, 65535))
-
-def start_linker_server(frontend_endpoint : str) -> None:
-    logger.debug("Starting QMIO linker server...")
-    ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
-
-    linker_context = zmq.Context()
-
-    client_comm_socket = linker_context.socket(zmq.REP)
-    client_comm_socket.bind(frontend_endpoint)
-
-    qmio_comm_socket = linker_context.socket(zmq.REQ)
-    qmio_comm_socket.connect(ZMQ_ENDPOINT)
-
-
-    waiting = True
-    while waiting:
-        try:
-            circuit = client_comm_socket.recv_pyobj()
-            qmio_comm_socket.send_pyobj(circuit)
-            results = qmio_comm_socket.recv_pyobj()
-            client_comm_socket.send_pyobj(results)
-
-        except zmq.ZMQError as e:
-            client_comm_socket.close()
-            qmio_comm_socket.close()
-            linker_context.term()
-            sys.exit(f"ZMQError: {e}")
-
-
-if __name__ == "__main__":
-    print("Inside QMIO linker")
+def get_qmio_config(endpoint : str) -> str:
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
@@ -62,21 +31,83 @@ if __name__ == "__main__":
         "noise":"",
     }
 
-    linker_endpoint = "tcp://10.5.7.23:" + _get_available_port()
-
-    qmio_config = {
+    qmio_config_json = {
         "real_qpu":"QMIO",
         "backend":qmio_backend_config,
         "net":{
-            "endpoint":linker_endpoint,
-            "nodename":"qmio_node",
+            "endpoint":endpoint,
+            "nodename":"c7-23",
             "mode":"co_located"
         },
         "family":"real_qmio",
         "name":"QMIO"
     }
 
-    str_qmio_config = json.dumps(qmio_config)
+    return json.dumps(qmio_config_json)
+
+
+def _list_interfaces(ipv4_only=True):
+    interfaces = {}
+    for iface_name, addrs in psutil.net_if_addrs().items():
+        iface_ips = []
+        for addr in addrs:
+            if ipv4_only and addr.family == socket.AF_INET:
+                iface_ips.append(addr.address)
+            elif not ipv4_only:
+                iface_ips.append(addr.address)
+        if iface_ips:
+            interfaces[iface_name] = iface_ips
+    return interfaces
+
+
+def get_IP(infiniband : bool = False, ethernet : bool = False) -> str:
+    all_ifaces = _list_interfaces()
+    if infiniband:
+        ib_ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith("ib")}
+        return all_ifaces[next(iter(ib_ifaces))][0]
     
-    write_on_file(str_qmio_config, QPUS_FILEPATH)
-    start_linker_server(linker_endpoint)
+    elif ethernet:
+        eth_ifaces = eth_ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith("eth")}
+        return all_ifaces[next(iter(eth_ifaces))][0]
+    else:
+        for name, ips in all_ifaces.items():
+            if not (name.startswith("lo") or name.startswith("eth") or name.startswith("ib")):
+                return ips[0]
+    
+
+def start_linker_server() -> None:
+    logger.debug("Starting QMIO linker...")
+
+    ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
+
+    linker_context = zmq.Context()
+    client_comm_socket = linker_context.socket(zmq.REP)
+
+    ip = get_IP(infiniband = True)
+    port = client_comm_socket.bind_to_random_port(f"tcp://{ip}")
+
+    qmio_comm_socket = linker_context.socket(zmq.REQ)
+    qmio_comm_socket.connect(ZMQ_ENDPOINT)
+
+    linker_endpoint = f"tcp://{ip}:{port}"
+    qmio_config = get_qmio_config(linker_endpoint)
+    write_on_file(qmio_config, QPUS_FILEPATH)
+
+    waiting = True
+    while waiting:
+        try:
+            circuit = client_comm_socket.recv_pyobj()
+            qmio_comm_socket.send_pyobj(circuit)
+            results = qmio_comm_socket.recv_pyobj()
+            client_comm_socket.send_pyobj(results)
+
+        except zmq.ZMQError as e:
+            waiting = False
+            client_comm_socket.close()
+            qmio_comm_socket.close()
+            linker_context.term()
+            sys.exit(f"ZMQError: {e}")
+
+
+if __name__ == "__main__":
+    start_linker_server()

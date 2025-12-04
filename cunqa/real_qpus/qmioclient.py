@@ -13,7 +13,6 @@ sys.path.append(LIBS_DIR)
 
 import zmq
 import json
-import time
 from typing import Optional
 
 
@@ -47,7 +46,6 @@ def _optimization_options_builder(
             If asked for a not valid optimization level
 
     """
-    start = time.time_ns()
     if optimization_backend != "Tket":
         raise TypeError(f"{optimization_backend}: Not a valid type")
     if optimization == 1:
@@ -58,7 +56,6 @@ def _optimization_options_builder(
         opt_value = 1
     else:
         raise ValueError(f"{optimization}: Not a valid Optimization Value")
-    end = time.time_ns()
     return opt_value
 
 
@@ -125,7 +122,6 @@ def _config_builder(
     """
     inlineResultsProcessing, resultsFormatting = _results_format_builder(res_format)
     opt_value = _optimization_options_builder(optimization=optimization)
-    start = time.time_ns()
     config = {
         "$type": "<class 'qat.purr.compiler.config.CompilerConfig'>",
         "$data": {
@@ -156,7 +152,6 @@ def _config_builder(
         },
     }
     config_str = json.dumps(config)
-    end = time.time_ns()
     return config_str
 
 
