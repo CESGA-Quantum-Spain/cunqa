@@ -84,6 +84,7 @@ from json import load
 import json
 
 from cunqa.qclient import QClient
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.backend import Backend
 from cunqa.logger import logger
 from cunqa.qpu import QPU
@@ -393,14 +394,12 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     for id, info in targets.items():
         if "real_qpu" in info:
             logger.debug("Real QPU found")
-            real_qpu = True
-            client = None
+            client = QMIOClient()
         else:
-            logger.debug("Virtual QPU found")
-            real_qpu = False   
+            logger.debug("Virtual QPU found") 
             client = QClient()
         
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], real_qpu = real_qpu))
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"]))
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus

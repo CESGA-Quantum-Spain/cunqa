@@ -65,6 +65,7 @@ import inspect
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.circuit import CunqaCircuit
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit.converters import _is_parametric
@@ -72,7 +73,6 @@ from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.qiskit_deps.transpiler import transpiler, TranspilerError
-from cunqa.real_qpus.qmio_linker import run_on_qmio
 
 class QPU:
     """
@@ -90,7 +90,7 @@ class QPU:
     _endpoint: str 
     _connected: bool 
     
-    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str, real_qpu : bool = False):
+    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -116,7 +116,6 @@ class QPU:
         self._family = family
         self._endpoint = endpoint
         self._connected = False
-        self._real_qpu = real_qpu
         
         logger.debug(f"Object for QPU {id} created correctly.")
 
@@ -166,9 +165,6 @@ class QPU:
 
         """
 
-        if self._real_qpu:
-            return run_on_qmio(self._endpoint, circuit, **run_parameters)
-
         # Disallow execution of distributed circuits
         if inspect.stack()[1].function != "run_distributed": # Checks if the run() is called from run_distributed()
             if isinstance(circuit, CunqaCircuit):
@@ -198,7 +194,7 @@ class QPU:
                 raise TranspilerError # I capture the error in QPU.run() when creating the job
 
         try:
-            qjob = QJob(self._real_qpu, self._qclient, self._backend, circuit, **run_parameters)
+            qjob = QJob(self._qclient, self._backend, circuit, **run_parameters)
             qjob.submit()
             logger.debug(f"Qjob submitted to QPU {self._id}.")
         except Exception as error:
