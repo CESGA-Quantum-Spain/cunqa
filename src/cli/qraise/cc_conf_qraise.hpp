@@ -11,19 +11,19 @@
 
 std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
 {
-    std::string run_command;
-    std::string subcommand;
-    std::string backend_path;
-    std::string backend;
-
     std::vector<std::string> simulators_with_cc = {"Cunqa", "Aer", "Munich", "Qulacs"};
     bool is_available_simulator = std::find(simulators_with_cc.begin(), simulators_with_cc.end(), std::string(args.simulator)) != simulators_with_cc.end();
 
     if (!is_available_simulator) {
-        LOGGER_ERROR("Classical communications only are available under \"Cunqa\", \"Munich\" and \"Aer\" simulators, but the following simulator was provided: {}", std::string(args.simulator));
+        LOGGER_ERROR("Classical communications only are available under \"Aer\", \"Cunqa\", \"Munich\" and \"Qulacs\" simulators, but the following simulator was provided: {}", std::string(args.simulator));
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
+
+    std::string run_command;
+    std::string subcommand;
+    std::string backend_path;
+    std::string backend;
 
     if (args.backend.has_value()) {
         backend_path = std::string(args.backend.value());

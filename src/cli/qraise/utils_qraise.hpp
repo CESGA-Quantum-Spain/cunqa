@@ -62,11 +62,3 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
         }
     }
 }
-
-bool check_simulator_name(const std::string& sim_name)
-{
-    std::vector<std::string> available_simulators = {"Cunqa", "Aer", "Munich", "Qulacs"}; // Add new valid simulators to the check here
-    bool is_available_simulator = std::find(available_simulators.begin(), available_simulators.end(), sim_name) != available_simulators.end();
-
-    return is_available_simulator;
-}
