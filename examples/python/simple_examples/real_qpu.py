@@ -17,10 +17,12 @@ circuit.h(0)
 circuit.cx(0,1)
 circuit.measure_all()
 
-qjob = qmio.run(circuit, shots = 100)
+qjob0 = qmio.run(circuit, shots = 100)
+result0 = qjob0.result
+print(f"Result from QMIO: {result0}")
 
-result = qjob.result
-
-print(f"Result from QMIO: {result}")
+qjob1 = qmio.run(circuit, shots = 100)
+result1 = qjob1.result
+print(f"Result from QMIO: {result1}")
 
 qdrop(family)

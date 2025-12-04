@@ -123,8 +123,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
     try:
         
         quantum_registers, classical_registers = _registers_dict(qc)
-
-        logger.debug(f"Localized quamtum registers: {quantum_registers}\n Localized classical registers: {classical_registers}")
         
         json_data = {
             "id": "",
@@ -142,8 +140,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         }
 
         for instruction in qc.data:
-
-            logger.debug(f"Processing instruction: {instruction}")
 
             if instruction.operation.name not in SUPPORTED_QISKIT_OPERATIONS:
                 logger.error(f"Instruction {instruction.operation.name} not supported for conversion [ValueError].")
