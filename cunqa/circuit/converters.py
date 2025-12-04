@@ -267,7 +267,14 @@ def _cunqac_to_qc(cunqac : 'CunqaCircuit') -> 'QuantumCircuit':
 
 
 def _cunqac_to_qasm(cunqac : 'CunqaCircuit', qasm_version : str) -> str:
-    return _qc_to_qasm(_cunqac_to_qc(cunqac), qasm_version)
+    qc = _cunqac_to_qc(cunqac)
+    qasm2circ = _qc_to_qasm(qc, version = "2.0")
+    if qasm_version == "2.0":
+        return qasm2circ
+    
+    qc_from_qasm2 = QuantumCircuit.from_qasm_str(qasm2circ)
+    qasm3circuit = dumps3(qc_from_qasm2)
+    return qasm3circuit
     
 
 def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
@@ -426,8 +433,15 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
 
 
 def _json_to_qasm(circuit_json : dict, qasm_version : str) -> str:
-    return _qc_to_qasm(_json_to_qc(circuit_json), qasm_version)
+     
+    qasm2circuit = _qc_to_qasm(_json_to_qc(circuit_json), qasm_version)
+    if qasm_version == "2.0":
+        return qasm2circuit
 
+    qc_from_qasm2 = QuantumCircuit.from_qasm_str(qasm2circuit)
+    qasm3circuit = dumps3(qc_from_qasm2)
+    return qasm3circuit
+    
 
 def _qasm_to_qc(circuit_qasm : str) -> 'QuantumCircuit':
     
