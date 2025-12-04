@@ -156,6 +156,8 @@ from typing import Union, Any, Optional
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
+from cunqa.circuit import CunqaCircuit
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.backend import Backend
 from cunqa.qjob import QJob
@@ -178,6 +180,7 @@ class QPU:
     _family: str
     _endpoint: str 
     
+    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str):
     def __init__(self, id: int, backend: Backend, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.

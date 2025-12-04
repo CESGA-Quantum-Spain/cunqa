@@ -5,27 +5,65 @@
 #include <functional>
 #include <cstdlib>
 
-#include "aer_simulator_adapter.hpp"
+#include "qulacs_simulator_adapter.hpp"
+#include "qulacs_utils.hpp"
 
-#include "simulators/circuit_executor.hpp"
-#include "framework/config.hpp"
-#include "noise/noise_model.hpp"
-#include "framework/circuit.hpp"
-#include "controllers/controller_execute.hpp"
-#include "framework/results/result.hpp"
-#include "controllers/aer_controller.hpp"
-#include "controllers/state_controller.hpp"
-#include "aer_helpers.hpp"
+#include "cppsim/circuit.hpp"
+#include "cppsim/gate_factory.hpp"
+#include "cppsim/utility.hpp"
 
 #include "utils/constants.hpp"
 
 #include "logger.hpp"
 
 namespace {
+
+UINT measure_adapter(QuantumState& state, UINT target_index)
+{
+    Random random;
+    auto gate0 = gate::P0(target_index);
+    auto gate1 = gate::P1(target_index);
+    std::vector<QuantumGateBase*> _gate_list = {gate0, gate1};
+    double r = random.uniform();
+
+    double sum = 0.;
+    double org_norm = state.get_squared_norm();
+
+    auto buffer = state.copy();
+    UINT index = 0;
+    for (auto gate : _gate_list) {
+        gate->update_quantum_state(buffer);
+        auto norm = buffer->get_squared_norm() / org_norm;
+        sum += norm;
+        if (r < sum) {
+            state.load(buffer);
+            state.normalize(norm);
+            break;
+        } else {
+            buffer->load(&state);
+            index++;
+        }
+    }
+
+    delete gate0;
+    delete gate1;
+    delete buffer;
+
+    return index;
+}
+
+void reset_qubit(QuantumState& state, UINT target_index)
+{
+    UINT measurement = measure_adapter(state, target_index);
+    if (measurement == 1)
+        gate::X(target_index)->update_quantum_state(&state);
+}
+
+
 struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
-    unsigned long zero_qubit = 0;
+    UINT zero_qubit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
@@ -36,16 +74,17 @@ struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg, rcreg;
     std::map<std::size_t, bool> cvalues;
-    std::unordered_map<std::string, std::stack<uint_t>> qc_meas;
+    std::unordered_map<std::string, std::stack<UINT>> qc_meas;
     bool ended = false;
     cunqa::comm::ClassicalChannel* chan = nullptr;
 };
 }
 
+
 namespace cunqa {
 namespace sim {
-
-std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
+ 
+std::string execute_shot_(QuantumState& state, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -70,13 +109,13 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         G.n_qubits += 2;
 
     auto generate_entanglement_ = [&]() {
-        state->apply_reset({G.n_qubits - 1});
-        state->apply_reset({G.n_qubits - 2});
+        reset_qubit(state, G.n_qubits - 1);
+        reset_qubit(state, G.n_qubits - 2);
         // Apply H to the first entanglement qubit
-        state->apply_h(G.n_qubits - 2);
+        gate::H(G.n_qubits - 2)->update_quantum_state(&state);
 
         // Apply a CX to the second one to generate an ent pair
-        state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
+        gate::CNOT(G.n_qubits - 2, G.n_qubits - 1)->update_quantum_state(&state);
     };
 
 
@@ -93,103 +132,139 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
             if (!G.rcreg[v[0]]) return;
         }
 
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
+        auto qubits = inst.at("qubits").get<std::vector<UINT>>();
         auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
 
         switch (inst_type)
         {
         case constants::MEASURE:
         {
-            uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT measurement = measure_adapter(state, qubits[0] + T.zero_qubit);
             std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
             G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
             G.creg[clbits[0]] = (measurement == 1);
             break;
         }
         case constants::X:
-            state->apply_mcx({qubits[0] + T.zero_qubit});
+            gate::X(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
         case constants::Y:
-            state->apply_mcy({qubits[0] + T.zero_qubit});
+            gate::Y(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
         case constants::Z:
-            state->apply_mcz({qubits[0] + T.zero_qubit});
+            gate::Z(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
         case constants::H:
-            state->apply_h(qubits[0] + T.zero_qubit);
+            gate::H(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::SDAG:
+            gate::Sdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::T:
+            gate::T(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::TDAG:
+            gate::Tdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
         case constants::SX:
-            state->apply_mcsx({qubits[0] + T.zero_qubit});
+            gate::sqrtX(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
             break;
-        case constants::CX:
+        case constants::SXDAG:
+            gate::sqrtXdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::SY:
+            gate::sqrtY(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::SYDAG:
+            gate::sqrtYdag(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::P0:
+            gate::P0(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::P1:
+            gate::P1(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            break;
+        case constants::U1: 
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcx({control, qubits[1] + T.zero_qubit});
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::U1(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
             break;
         }
-        case constants::CY:
+        case constants::U2: 
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcy({control, qubits[1] + T.zero_qubit});
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::U2(qubits[0] + T.zero_qubit, params[0], params[1])->update_quantum_state(&state);
+            break;
+        }
+        case constants::U3: 
+        case constants::U:
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::U3(qubits[0] + T.zero_qubit, params[0], params[1], params[2])->update_quantum_state(&state);
+            break;
+        }
+        case constants::RX: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RX(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::RY: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RY(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::RZ: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RZ(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::ROTINVX: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RotInvX(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::ROTINVY: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RotInvY(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::ROTINVZ: 
+        {
+            auto params = inst.at("params").get<std::vector<double>>();
+            gate::RotInvZ(qubits[0] + T.zero_qubit, params[0])->update_quantum_state(&state);
+            break;
+        }
+        case constants::CX:
+        {
+            UINT control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            gate::CNOT(control, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
         }
         case constants::CZ:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcz({control, qubits[1] + T.zero_qubit});
+            UINT control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            gate::CZ(control, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
         }
         case constants::ECR:
-            // TODO
-            break;
-        case constants::RX:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
-            state->apply_mcrx({qubits[0] + T.zero_qubit}, params[0]);
-            break;
-        }
-        case constants::RY:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            state->apply_mcry({qubits[0] + T.zero_qubit}, params[0]);
-            break;
-        }
-        case constants::RZ:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            state->apply_mcrz({qubits[0] + T.zero_qubit}, params[0]);
-            break;
-        }
-        case constants::CRX:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcrx({control, qubits[1] + T.zero_qubit}, params[0]);
-            break;
-        }
-        case constants::CRY:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcry({control, qubits[1] + T.zero_qubit}, params[0]);
-            break;
-        }
-        case constants::CRZ:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            state->apply_mcrz({control, qubits[1] + T.zero_qubit}, params[0]);
+            gate::ECR(qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
         }
         case constants::SWAP:
         {
-            state->apply_mcswap({qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit});
+            gate::SWAP(qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit)->update_quantum_state(&state);
             break;
         }
         case constants::MEASURE_AND_SEND:
         {
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT measurement = measure_adapter(state, qubits[0] + T.zero_qubit);
             int measurement_as_int = static_cast<int>(measurement);
             classical_channel->send_measure(measurement_as_int, endpoint[0]); 
             break;
@@ -205,21 +280,23 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         case constants::QSEND:
         {
             //------------- Generate Entanglement ---------------
-            state->apply_h(G.n_qubits - 2);
-            state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
+            gate::H(G.n_qubits - 2)->update_quantum_state(&state);
+            gate::CNOT(G.n_qubits - 2, G.n_qubits - 1)->update_quantum_state(&state);
             //----------------------------------------------------
 
             // CX to the entangled pair
-            state->apply_mcx({qubits[0] + T.zero_qubit, G.n_qubits - 2});
+            gate::CNOT(qubits[0] + T.zero_qubit, G.n_qubits - 2)->update_quantum_state(&state);
 
             // H to the sent qubit
-            state->apply_h(qubits[0] + T.zero_qubit);
+            gate::H(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
 
-            uint_t result = state->apply_measure({qubits[0] + T.zero_qubit});
+            UINT result0 = measure_adapter(state, qubits[0] + T.zero_qubit);
+            UINT result1 = measure_adapter(state, G.n_qubits - 2);
 
-            G.qc_meas[T.id].push(result);
-            G.qc_meas[T.id].push(state->apply_measure({G.n_qubits - 2}));
-            state->apply_reset({G.n_qubits - 2, qubits[0] + T.zero_qubit});
+            G.qc_meas[T.id].push(result0);
+            G.qc_meas[T.id].push(result1);
+            reset_qubit(state, G.n_qubits - 2);
+            reset_qubit(state, qubits[0] + T.zero_qubit);
 
             // Unlock QRECV
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -240,15 +317,15 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
 
             // Apply, conditioned to the measurement, the X and Z gates
             if (meas1) {
-                state->apply_mcx({G.n_qubits - 1});
+                gate::X(G.n_qubits - 1)->update_quantum_state(&state);
             }
             if (meas2) {
-                state->apply_mcz({G.n_qubits - 1});
+                gate::Z(G.n_qubits - 1)->update_quantum_state(&state);
             }
 
             // Swap the value to the desired qubit
-            state->apply_mcswap({G.n_qubits - 1, qubits[0] + T.zero_qubit});
-            state->apply_reset({G.n_qubits - 1});
+            gate::SWAP(G.n_qubits - 1, qubits[0] + T.zero_qubit)->update_quantum_state(&state);
+            reset_qubit(state, G.n_qubits - 1);
             break;
         }
         case constants::EXPOSE:
@@ -257,9 +334,9 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
                 generate_entanglement_();
 
                 // CX to the entangled pair
-                state->apply_mcx({qubits[0] + T.zero_qubit, G.n_qubits - 2});
+                gate::CNOT(qubits[0] + T.zero_qubit, G.n_qubits - 2)->update_quantum_state(&state);
 
-                uint_t result = state->apply_measure({G.n_qubits - 2});
+                UINT result = measure_adapter(state, G.n_qubits - 2);
 
                 G.qc_meas[T.id].push(result);
                 T.cat_entangled = true;
@@ -267,11 +344,11 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
                 Ts[inst.at("qpus")[0]].blocked = false;
                 return;
             } else {
-                uint_t meas = G.qc_meas[inst.at("qpus")[0]].top();
+                UINT meas = G.qc_meas[inst.at("qpus")[0]].top();
                 G.qc_meas[inst.at("qpus")[0]].pop();
 
                 if (meas) {
-                    state->apply_mcz({qubits[0] + T.zero_qubit}); 
+                    gate::Z(qubits[0] + T.zero_qubit)->update_quantum_state(&state);
                 }
 
                 T.cat_entangled = false;
@@ -285,20 +362,20 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
                 return;
             }
 
-            uint_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
+            UINT meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
 
             if (meas2) {
-                state->apply_mcx({G.n_qubits - 1});
+                gate::X(G.n_qubits - 1)->update_quantum_state(&state);
             }
 
             for(const auto& sub_inst: inst.at("instructions")) {
                 apply_next_instr(T, sub_inst);
             }
 
-            state->apply_h(G.n_qubits - 1);
+            gate::H(G.n_qubits - 1)->update_quantum_state(&state);
 
-            uint_t result = state->apply_measure({G.n_qubits - 1});
+            UINT result = measure_adapter(state, G.n_qubits - 1);
             G.qc_meas[T.id].push(result);
 
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -341,53 +418,59 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
 }
 
 
-JSON AerSimulatorAdapter::simulate(const Backend* backend)
+JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Inside Qulacs usual simulation");
     try {
         auto quantum_task = qc.quantum_tasks[0];
 
-        auto aer_quantum_task = quantum_task_to_AER(quantum_task);
-        int n_clbits = quantum_task.config.at("num_clbits");
-        JSON circuit_json = aer_quantum_task.circuit;
+        size_t n_qubits = quantum_task.config.at("num_qubits").get<size_t>();
+        auto shots = qc.quantum_tasks[0].config.at("shots").get<size_t>();
+        JSON circuit_json = quantum_task.circuit;
 
-        Circuit circuit(circuit_json);
-        std::vector<std::shared_ptr<Circuit>> circuits;
-        circuits.push_back(std::make_shared<Circuit>(circuit));
+        QuantumCircuit circuit(n_qubits);
+        update_qulacs_circuit(circuit, circuit_json);
 
-        JSON run_config_json(aer_quantum_task.config);
-        run_config_json["seed_simulator"] = quantum_task.config.at("seed");
-        Config aer_config(run_config_json);
-        Noise::NoiseModel noise_model(backend->config.at("noise_model"));
+        QuantumState state(n_qubits);
+        circuit.update_quantum_state(&state);
 
-        Result result = controller_execute<Controller>(circuits, noise_model, aer_config);
+        auto start = std::chrono::high_resolution_clock::now();
+        std::vector<ITYPE> samples = state.sampling(shots);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        float time_taken = duration.count();
 
-        JSON result_json = result.to_json();
-        convert_standard_results_Aer(result_json, n_clbits);
+        for (auto& sample : samples) {
+            std::cout << sample << ", \n";
+        }
+
+        JSON counts = convert_to_counts(samples, n_qubits);
+
+        JSON result_json = 
+        {
+            {"counts", counts},
+            {"time_taken", time_taken}
+        };
 
         return result_json;
 
     } catch (const std::exception& e) {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the AER simulator.\n\tTry checking the format of the circuit sent and/or of the noise model.");
+        LOGGER_ERROR("Error executing the circuit in the Qulacs simulator.");
         return {{"ERROR", std::string(e.what())}};
     }
     return {};
 }
 
 
-JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
+JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
+    LOGGER_DEBUG("Inside Qulacs dynamic simulation");
+
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
-
-    AER::AerState* state = new AER::AerState();
-    std::string sim_method = (method == "automatic") ? "statevector" : method;
-    state->configure("method", sim_method);
-    state->configure("device", "CPU");
-    state->configure("precision", "double");
-    state->configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
 
     unsigned long n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks)
@@ -397,29 +480,23 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
 
-    reg_t qubit_ids;
+    QuantumState state(n_qubits);
+
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {
-        qubit_ids = state->allocate_qubits(n_qubits);
-        state->initialize();
         meas_counter[execute_shot_(state, qc.quantum_tasks, classical_channel)]++;
-        state->clear();
+        state.set_zero_state();
     } // End all shots
-    
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
-
-    delete state;
 
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
 }
-
-
 
 } // End of sim namespace
 } // End of cunqa namespace

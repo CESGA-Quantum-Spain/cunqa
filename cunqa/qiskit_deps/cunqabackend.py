@@ -1,8 +1,10 @@
 import os
 import sys
 import glob
+import json
 
 from ..logger import logger
+from ..backend import Backend
 
 from qiskit.providers import BackendV2
 from qiskit.providers import QubitProperties, BackendV2, Options
@@ -12,10 +14,19 @@ from qiskit.circuit.library import UGate, CXGate, Measure
 from qiskit.circuit import Parameter
 
 
-
 class CunqaBackend(BackendV2):
 
-    def __init__(self, noise_properties_json, backend_json=None, **kwargs):
+    def __init__(self, noise_properties_json = None, backend = None, **kwargs):
+
+        if noise_properties_json is None:
+
+            if isinstance(backend, Backend):
+                with open(backend.noise_properties_path, "r") as file:
+                    noise_properties_json = json.load(file)
+            else:
+                logger.error(f"If `noise_properties` is not provided, `backend` must be type <class 'cunqa.backend.Backend'>, but {type(backend)} was provided [TypeError].")
+                raise TypeError # capture this at transpile function
+
 
         super().__init__(self,name="cunqa", description="backend for cunqa", **kwargs)
 
@@ -165,6 +176,7 @@ class CunqaBackend(BackendV2):
     def run(self, run_input, **kwargs):
         # Implement the logic to execute a quantum circuit or schedule
         raise NotImplementedError("The 'run' method must be implemented.")
+
 
 
 import re

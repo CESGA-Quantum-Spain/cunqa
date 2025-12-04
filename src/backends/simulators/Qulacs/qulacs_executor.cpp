@@ -3,10 +3,10 @@
 #include <thread>
 #include <chrono>
 
-#include "aer_adapters/aer_simulator_adapter.hpp"
-#include "aer_adapters/aer_computation_adapter.hpp"
+#include "qulacs_adapters/qulacs_simulator_adapter.hpp"
+#include "qulacs_adapters/qulacs_computation_adapter.hpp"
 #include "quantum_task.hpp"
-#include "aer_executor.hpp"
+#include "qulacs_executor.hpp"
 
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
@@ -15,7 +15,7 @@
 namespace cunqa {
 namespace sim {
 
-AerExecutor::AerExecutor() : classical_channel{"executor"}
+QulacsExecutor::QulacsExecutor() : classical_channel{"executor"}
 {
     std::ifstream in(constants::COMM_FILEPATH);
 
@@ -40,7 +40,7 @@ AerExecutor::AerExecutor() : classical_channel{"executor"}
     }
 };
 
-AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"executor"}
+QulacsExecutor::QulacsExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
     std::ifstream in(constants::COMM_FILEPATH);
 
@@ -63,7 +63,7 @@ AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"execu
     }
 };
 
-void AerExecutor::run()
+void QulacsExecutor::run()
 {
     std::vector<QuantumTask> quantum_tasks;
     std::vector<std::string> qpus_working;
@@ -80,9 +80,9 @@ void AerExecutor::run()
             }
         }
 
-        AerComputationAdapter qc(quantum_tasks);
-        AerSimulatorAdapter aer_sa(qc);
-        auto result = aer_sa.simulate(&classical_channel);
+        QulacsComputationAdapter qc(quantum_tasks);
+        QulacsSimulatorAdapter qulacs_sa(qc);
+        auto result = qulacs_sa.simulate(&classical_channel);
         
         // TODO: transform results to give each qpu its results
         std::string result_str = result.dump();
