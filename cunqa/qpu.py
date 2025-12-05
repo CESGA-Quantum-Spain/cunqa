@@ -60,11 +60,12 @@
 
 import os
 from typing import  Union, Any, Optional
-import inspect
+import inspect 
 
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.circuit import CunqaCircuit
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit.converters import _is_parametric
@@ -88,8 +89,9 @@ class QPU:
     _family: str
     _endpoint: str 
     _connected: bool 
+    _real_qpu : bool
     
-    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str):
+    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str, real_qpu : bool):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -115,6 +117,7 @@ class QPU:
         self._family = family
         self._endpoint = endpoint
         self._connected = False
+        self._real_qpu = real_qpu
         
         logger.debug(f"Object for QPU {id} created correctly.")
 
@@ -178,9 +181,9 @@ class QPU:
         # Handle connection to QClient
         if not self._connected:
             self._qclient.connect(self._endpoint)
-            self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
-            self._connected = True
+            if not self._real_qpu:
+                self._connected = True
 
         # Transpilation if requested
         if transpile:
@@ -190,7 +193,7 @@ class QPU:
                 logger.debug("Transpilation done.")
             except Exception as error:
                 logger.error(f"Transpilation failed [{type(error).__name__}].")
-                raise TranspileError # I capture the error in QPU.run() when creating the job
+                raise TranspilerError # I capture the error in QPU.run() when creating the job
 
         try:
             qjob = QJob(self._qclient, self._backend, circuit, **run_parameters)

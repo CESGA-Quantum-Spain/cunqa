@@ -1,9 +1,11 @@
 add_subdirectory(circuit)
 add_subdirectory(qiskit_deps)
+add_subdirectory(real_qpus)
 
 pybind11_add_module(qclient bindings.cpp)
 
-target_link_libraries(qclient PRIVATE client) #${GNUTLS_LIB} ${SODIUM_LIB} bsd)
+target_include_directories(qclient PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
+target_link_libraries(qclient PRIVATE client json) #${GNUTLS_LIB} ${SODIUM_LIB} bsd)
 
 install(TARGETS qclient DESTINATION cunqa)
 

@@ -6,7 +6,6 @@ Code implementing the Iterative Quantum Phase Estimation (iQPE) algorithm with c
 
 import os, sys
 import math
-import math
 import numpy as np
 import time
 import statistics as st
