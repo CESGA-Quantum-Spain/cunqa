@@ -9,6 +9,7 @@ namespace sim {
 class MaestroExecutor {
 public:
     MaestroExecutor();
+    MaestroExecutor(const std::string& group_id);
     ~MaestroExecutor() = default;
 
     void run();
