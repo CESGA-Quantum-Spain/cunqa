@@ -156,7 +156,7 @@ def _config_builder(
     return config_str
 
 
-def get_run_config(run_config : dict) -> str:
+def _get_run_config(run_config : dict) -> str:
     config_build_vars = {
     "shots":1024,
     "repetition_period":None,
@@ -174,7 +174,19 @@ def get_run_config(run_config : dict) -> str:
 
     return config
 
+
+def _update_parameters(instructions : list[dict], parameters : list[float]) -> list[dict]:
     
+    param_counter = 0
+    for inst in instructions:
+        name = inst["name"]
+        match(name):
+            case "rz":
+                inst["params"] = [parameters[param_counter]]
+                param_counter += 1
+
+    return instructions
+
 
 class QMIOFuture:
     def __init__(self, socket = None, start_time = None, error = None):
@@ -205,6 +217,7 @@ class QMIOClient:
     def __init__(self):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
+        self._last_quantum_task = None
 
     def connect(self, linker_endpoint : str) -> None:
         self.socket.connect(linker_endpoint)
@@ -212,9 +225,10 @@ class QMIOClient:
     def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
 
         quantum_task = json.loads(quantum_task_str)
+        self._last_quantum_task = quantum_task
         run_config = quantum_task["config"]
 
-        qmio_run_config = get_run_config(run_config)
+        qmio_run_config = _get_run_config(run_config)
         qasm_circuit = convert(quantum_task, convert_to = "qasm", qasm_version = "3.0")
         data_to_send = (qasm_circuit, qmio_run_config)
 
@@ -229,9 +243,17 @@ class QMIOClient:
             self.context.term()
             qmiofuture = QMIOFuture(error = e) 
             return qmiofuture
+        
 
+    def send_parameters(self, parameters : str) -> 'QMIOFuture':
+        if self._last_quantum_task == None:
+            future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update its parameters")
+            return future_error
+        
+        parameters_json = json.loads(parameters)
+        
+        updated_instructions = _update_parameters(self._last_quantum_task["instructions"], parameters_json["params"])
+        self._last_quantum_task["isntructions"] = updated_instructions
 
-
-
-
+        return self.send_circuit(json.dumps(self._last_quantum_task))
 
