@@ -54,11 +54,6 @@ enum INSTRUCTIONS {
 
     U3,
     U,
-    CU,
-    P,
-    U1,
-    U2,
-    U3,
 
     ECR,
     SWAP,
@@ -75,12 +70,13 @@ enum INSTRUCTIONS {
     CRX,
     CRY,
     CRZ,
-    CP,
-    ECR,
+
     CECR,
+    CSWAP,
     CCX,
     CCY,
     CCZ,
+
     RXX,
     RYY,
     RZZ,
@@ -91,12 +87,6 @@ enum INSTRUCTIONS {
 
     CU,
     CU3,
-
-    CCX,
-    CCY,
-    CCZ,
-    CECR,
-    CSWAP,
 
     C_IF_X,
     C_IF_Y,
@@ -145,25 +135,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"p0", P0},
     {"p1", P1},
 
-    // ONE GATE 1 PARAM
-    {"rx", RX},
-    {"ry", RY},
-    {"rz", RZ},
-    {"u1", U1},
-    {"p", P},
-
-    // ONE GATE 2 PARAM
-    {"u2", U2},
-    {"r", R},
-
-    // ONE GATE 3 PARAM
-    {"u3", U3},
-    {"u", U},
-
-    // ONE GATE 4 PARAM
-    {"cu", CU},
-
-    // TWO GATE NO PARAM
     // ONE QUBIT ONE PARAM
     {"u1", U1},
     {"p", P},
@@ -204,17 +175,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rzz", RZZ},
     {"rzx", RZX},
 
-    // TWO GATE PARAM
-    {"crx", CRX},
-    {"cry", CRY},
-    {"crz", CRZ},
-    {"cp", CP},
-
-    // THREE GATE NO PARAM
-    {"cecr", CECR},
-    {"ccx", CCX},
-    {"ccy", CCY},
-    {"ccz", CCZ},
     // TWO QUBIT TWO PARAM
     {"cu2", CU2},
     {"cr", CR},

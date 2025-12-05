@@ -9,6 +9,7 @@
 #include "maestro_executor.hpp"
 
 #include "utils/json.hpp"
+#include "utils/constants.hpp"
 #include "logger.hpp"
 
 namespace cunqa {

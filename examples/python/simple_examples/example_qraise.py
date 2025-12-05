@@ -24,12 +24,6 @@ counts = qjob.result.counts
 time = qjob.time_taken
 
 print(qjob.result)
-#print(f"Result: \n{counts}\n Time taken: {time} s.")
-
-""" qjob_1 = qpu.run(qc, transpile = False, shots = 100)# non-blocking call
-
-print(qjob_1.result) """
-
 
 ########## Drop the deployed QPUs #
 qdrop(family)
