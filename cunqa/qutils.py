@@ -392,16 +392,14 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     # create QPU objects from the dictionary information + return them on a list
     qpus = []
     for id, info in targets.items():
-        is_real_qpu = False
         if "real_qpu" in info:
             logger.debug("Real QPU found")
             client = QMIOClient()
-            is_real_qpu = True
         else:
             logger.debug("Virtual QPU found") 
             client = QClient()
         
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], real_qpu = is_real_qpu))
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"]))
     if len(qpus) != 0:
         return qpus
     else:
