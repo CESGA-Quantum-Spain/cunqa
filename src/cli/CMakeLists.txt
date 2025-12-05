@@ -22,12 +22,13 @@ target_link_libraries(setup_qpus PRIVATE json logger_qpu qpu
                                          munich_simple_simulator munich_cc_simulator munich_qc_simulator 
                                          cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator
                                          maestro_simple_simulator maestro_cc_simulator maestro_qc_simulator)
+                                         qulacs_simple_simulator qulacs_cc_simulator qulacs_qc_simulator)
 target_include_directories(setup_qpus PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # EXECUTOR executable
 add_executable(setup_executor setup_executor.cpp)
-target_link_libraries(setup_executor PRIVATE aer_executor munich_executor cunqa_executor maestro_executor logger_executor)
+target_link_libraries(setup_executor PRIVATE aer_executor munich_executor cunqa_executor maestro_executor qulacs_executor logger_executor)
 target_include_directories(setup_executor PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 

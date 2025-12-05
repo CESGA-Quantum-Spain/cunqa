@@ -19,27 +19,59 @@ const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
 
 enum INSTRUCTIONS {
     UNITARY,
+
     MEASURE,
+
     ID,
     X,
     Y,
     Z,
     H,
+    S,
+    SDAG,
+    T,
+    TDAG,
     SX,
+    SY, 
+    SZ,
+    SXDAG,
+    SYDAG,
+    SZDAG,
+    P0,
+    P1,
+
     RX,
     RY,
     RZ,
+    ROTINVX,
+    ROTINVY,
+    ROTINVZ,
+    P,
+    U1,
+
+    U2,
     R,
+
+    U3,
     U,
     CU,
     P,
     U1,
     U2,
     U3,
+
+    ECR,
     SWAP,
     CX,
     CY,
     CZ,
+    CSX,
+    CSY, 
+    CSZ,
+    CT,
+
+    CU1,
+    CP,
     CRX,
     CRY,
     CRZ,
@@ -49,6 +81,23 @@ enum INSTRUCTIONS {
     CCX,
     CCY,
     CCZ,
+    RXX,
+    RYY,
+    RZZ,
+    RZX,
+
+    CU2,
+    CR,
+
+    CU,
+    CU3,
+
+    CCX,
+    CCY,
+    CCZ,
+    CECR,
+    CSWAP,
+
     C_IF_X,
     C_IF_Y,
     C_IF_Z,
@@ -61,6 +110,7 @@ enum INSTRUCTIONS {
     C_IF_CY,
     C_IF_CZ,
     C_IF_ECR,
+
     MEASURE_AND_SEND,
     RECV,
     QSEND,
@@ -76,13 +126,24 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     // MEASURE
     {"measure", MEASURE},
 
-    // ONE GATE NO PARAM
+    // ONE QUBIT NO PARAM
     {"id", ID},
     {"x", X},
     {"y", Y},
     {"z", Z},
     {"h", H},
+    {"s", S},
     {"sx", SX},
+    {"sy", SY},
+    {"sz", SZ},
+    {"sdag", SDAG},
+    {"sxdag", SXDAG},
+    {"sydag", SYDAG},
+    {"szdag", SZDAG},
+    {"t", T},
+    {"tdag", TDAG},
+    {"p0", P0},
+    {"p1", P1},
 
     // ONE GATE 1 PARAM
     {"rx", RX},
@@ -103,14 +164,45 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"cu", CU},
 
     // TWO GATE NO PARAM
+    // ONE QUBIT ONE PARAM
+    {"u1", U1},
+    {"p", P},
+    {"rx", RX},
+    {"ry", RY},
+    {"rz", RZ},
+    {"rotinvx", ROTINVX},
+    {"rotinvy", ROTINVY},
+    {"rotinvz", ROTINVZ},
+
+    // ONE QUBIT TWO PARAM
+    {"u2", U2},
+    {"r", R},
+
+    // ONE QUBIT THREE PARAM
+    {"u3", U3},
+    {"u", U},
+
+    // TWO QUBIT NO PARAM
     {"swap", SWAP},
     {"cx", CX},
     {"cy", CY},
     {"cz", CZ},
+    {"csx", CSX},
+    {"csy", CSY},
+    {"csz", CSZ},
+    {"ct", CT}, 
+    {"ecr", ECR},
+
+    // TWO QUBIT ONE PARAM
+    {"cu1", CU1},
+    {"cp", CP},
     {"crx", CRX},
     {"cry", CRY},
     {"crz", CRZ},
-    {"ecr", ECR},
+    {"rxx", RXX},
+    {"ryy", RYY},
+    {"rzz", RZZ},
+    {"rzx", RZX},
 
     // TWO GATE PARAM
     {"crx", CRX},
@@ -123,6 +215,20 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ccx", CCX},
     {"ccy", CCY},
     {"ccz", CCZ},
+    // TWO QUBIT TWO PARAM
+    {"cu2", CU2},
+    {"cr", CR},
+
+    // TWO QUBIT THREE PARAM
+    {"cu", CU},
+    {"cu3", CU3},
+
+    // THREE QUBIT NO PARAM
+    {"ccx", CCX},
+    {"ccy", CCY},
+    {"ccz", CCZ},
+    {"cecr", CECR},
+    {"cswap", CSWAP},
 
     //CLASSICAL CONTROLLED GATES
     {"c_if_x", C_IF_X},
@@ -147,35 +253,23 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"qrecv", QRECV},
 
     {"expose", EXPOSE},
-    {"rcontrol", RCONTROL}
+    {"rcontrol", RCONTROL},
 };
 
 const std::vector<std::string> BASIS_GATES = {
-    "u1", "u2", "u3", "u", "p", "r", "rx", "ry", "rz", "id",
-    "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
-    "swap", "cx", "cy", "cz", "csx", "cp", "cu", "cu1", "cu3",
-    "rxx", "ryy", "rzz", "rzx", "ccx", "ccz", "crx", "cry", "crz",
-    "cswap"
+    "unitary",
+    "measure",
+    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "sy", "sydg", "sz", "szdg", "t", "tdg", "p0", "p1",
+    "u1", "p", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz"
+    "u2", "r",
+    "u3", "u",
+    "ecr", "swap", "cx", "cy", "cz", "csx", "csy", "csz", "ct",
+    "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
+    "cu2", "cr",
+    "cu", "cu3",
+    "cecr", "cswap", "ccx", "ccy", "ccz", 
 };
 
-const std::vector<std::string> BASIS_AND_DISTRIBUTED_GATES = {
-    "id", "x", "y", "z", "h", "sx", "cx", "cy", "cz", "ecr", "c_if_x","c_if_y","c_if_z", "c_if_h", "c_if_sx", "c_if_rx","c_if_ry","c_if_rz","c_if_cx","c_if_cy","c_if_cz", "measure_and_send", "remote_c_if_x","remote_c_if_y","remote_c_if_z", "remote_c_if_h", "remote_c_if_sx", "remote_c_if_rx","remote_c_if_ry","remote_c_if_rz","remote_c_if_cx","remote_c_if_cy","remote_c_if_cz", "remote_c_if_ecr"
-};
-
-const std::unordered_map<std::string, std::string> CORRESPONDENCE_REMOTE_GATE_MAP = {
-    {"remote_c_if_x", "x"},
-    {"remote_c_if_y", "y"},
-    {"remote_c_if_z", "z"},
-    {"remote_c_if_h", "h"},
-    {"remote_c_if_sx", "sx"},
-    {"remote_c_if_rx", "rx"},
-    {"remote_c_if_ry", "ry"},
-    {"remote_c_if_rz", "rz"},
-    {"remote_c_if_cx", "cx"},
-    {"remote_c_if_cy", "cy"},
-    {"remote_c_if_cz", "cz"},
-    {"remote_c_if_ecr", "ecr"},
-};
 
 } // End namespace constants
 } //End namespace cunqa

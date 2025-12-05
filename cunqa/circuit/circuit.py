@@ -717,6 +717,54 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "name":"sxdg",
             "qubits":[qubit]
         })
+
+    def sy(self, qubit: int) -> None:
+        """
+        Class method to apply sy gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"sy",
+            "qubits":[qubit]
+        })
+    
+    def sydg(self, qubit: int) -> None:
+        """
+        Class method to apply sydg gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"sydg",
+            "qubits":[qubit]
+        })
+
+    def sz(self, qubit: int) -> None:
+        """
+        Class method to apply sz gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"sz",
+            "qubits":[qubit]
+        })
+    
+    def szdg(self, qubit: int) -> None:
+        """
+        Class method to apply szdg gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"szdg",
+            "qubits":[qubit]
+        })
     
     def t(self, qubit: int) -> None:
         """
@@ -739,6 +787,30 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         self._add_instruction({
             "name":"tdg",
+            "qubits":[qubit]
+        })
+
+    def P0(self, qubit: int) -> None:
+        """
+        Class method to apply P0 gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"p0",
+            "qubits":[qubit]
+        })
+
+    def P1(self, qubit: int) -> None:
+        """
+        Class method to apply P1 gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"p1",
             "qubits":[qubit]
         })
 
@@ -867,6 +939,18 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         self._add_instruction({
             "name":"ccz",
+            "qubits":[*qubits]
+        })
+
+    def cecr(self, *qubits: int) -> None:
+        """
+        Class method to apply cecr gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.
+        """
+        self._add_instruction({
+            "name":"cecr",
             "qubits":[*qubits]
         })
 
@@ -1022,6 +1106,51 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "params":[param]
         })
 
+    def RotInvX(self, param:  Union[float,int, str], qubit: int) -> None:
+        """
+        Class method to apply RotInvX gate to the given qubit.
+
+        Args:
+            param (float | int): parameter for the parametric gate.
+
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"rotinvx",
+            "qubits":[qubit],
+            "params":[param]
+        })
+
+    def rRotInvY(self, param:  Union[float,int, str], qubit: int) -> None:
+        """
+        Class method to apply rRotInvY gate to the given qubit.
+
+        Args:
+            param (float | int): parameter for the parametric gate.
+
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"rotinvy",
+            "qubits":[qubit],
+            "params":[param]
+        })
+    
+    def RotInvZ(self, param:  Union[float,int, str], qubit: int) -> None:
+        """
+        Class method to apply RotInvZ gate to the given qubit.
+
+        Args:
+            param (float | int): parameter for the parametric gate.
+
+            qubit (int): qubit in which the gate is applied.
+        """
+        self._add_instruction({
+            "name":"rotinvz",
+            "qubits":[qubit],
+            "params":[param]
+        })
+
     # methods for parametric two-qubit gates
 
     def rxx(self, param: Union[float,int, str], *qubits: int) -> None:
@@ -1076,6 +1205,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         self._add_instruction({
             "name":"rzx",
+            "qubits":[*qubits],
+            "params":[param]
+        })
+
+    def cr(self, param:  Union[float,int, str], *qubits: int) -> None:
+        """
+        Class method to apply cr gate to the given qubits.
+
+        Args:
+            param (float | int): parameter for the parametric gate.
+            qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.
+        """
+        self._add_instruction({
+            "name":"cr",
             "qubits":[*qubits],
             "params":[param]
         })
@@ -1146,6 +1289,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         self._add_instruction({
             "name":"cu1",
+            "qubits":[*qubits],
+            "params":[param]
+        })
+
+    def cu2(self, param:  Union[float,int, str], *qubits: int) -> None:
+        """
+        Class method to apply cu2 gate to the given qubits.
+
+        Args:
+            param (float | int): parameter for the parametric gate.
+            qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.
+        """
+        self._add_instruction({
+            "name":"cu2",
             "qubits":[*qubits],
             "params":[param]
         })

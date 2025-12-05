@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  A HPC platform to simulate Distributed Quantum Computing. 
+  A Distributed Quantum Computing emulator for HPC 
 </p>
 
 <br>
@@ -116,6 +116,7 @@ pybind11        2.7 (recommended 2.12)
 MPI             3.1
 OpenMP          4.5
 Boost           1.85.0
+Eigen           5.0.0
 Blas            -
 Lapack          -
 ```
@@ -138,7 +139,7 @@ qiskit-aer      0.17.2 (modified version)
 ``` 
 
 ### Configure, build and install
-Now, as with any other CMake project, is can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined and, if not, its will be the HOME environment variable value. 
+Now, as with any other CMake project, it can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined or will be the HOME environment variable value. 
 
 ```console
 cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
@@ -150,7 +151,7 @@ It is important to mention that the user can also employ [Ninja](https://ninja-b
 
 ```console
 cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
-ninja -C build -j $(nproc)
+ninja -C build/ -j $(nproc)
 cmake --install build/
 ```
 
@@ -319,3 +320,19 @@ Additionally, this research project was made possible through the access granted
 
 Secondly, The supercomputer FinisTerrae III and its permanent data storage system, which have been funded by the NextGeneration EU 2021 Recovery, Transformation and Resilience Plan, ICT2021-006904, and also from the Pluriregional Operational Programme of Spain 2014-2020 of the European Regional Development Fund (ERDF), ICTS-2019-02-CESGA3, and from the State Programme for the Promotion of Scientific and Technical Research of Excellence of the State
 Plan for Scientific and Technical Research and Innovation 2013-2016 State subprogramme for scientific and technical infrastructures and equipment of ERDF, CESG15-DE-3114.
+
+## How to cite:
+
+When citing the software, please cite the original CUNQA paper:
+
+```bibtex
+@misc{vázquezpérez2025cunqadistributedquantumcomputing,
+    title={CUNQA: a Distributed Quantum Computing emulator for HPC}, 
+    author={Jorge Vázquez-Pérez and Daniel Expósito-Patiño and Marta Losada and Álvaro Carballido and Andrés Gómez and Tomás F. Pena},
+    year={2025},
+    eprint={2511.05209},
+    archivePrefix={arXiv},
+    primaryClass={quant-ph},
+    url={https://arxiv.org/abs/2511.05209}, 
+}
+```

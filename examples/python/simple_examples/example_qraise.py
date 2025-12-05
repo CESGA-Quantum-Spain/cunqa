@@ -18,7 +18,7 @@ qc.cx(0, 1)
 qc.measure_all()
 
 qpu = qpus[0]
-qjob = qpu.run(qc, transpile = False, shots = 1_000_000) # non-blocking call
+qjob = qpu.run(qc, transpile = False, shots = 10) # non-blocking call
 
 counts = qjob.result.counts
 time = qjob.time_taken
@@ -26,10 +26,10 @@ time = qjob.time_taken
 print(qjob.result)
 #print(f"Result: \n{counts}\n Time taken: {time} s.")
 
-""" qjob_1 = qpu.run(qc, transpile = True, shots = 100)# non-blocking call
+""" qjob_1 = qpu.run(qc, transpile = False, shots = 100)# non-blocking call
 
 print(qjob_1.result) """
 
 
 ########## Drop the deployed QPUs #
-#qdrop(family)
+qdrop(family)
