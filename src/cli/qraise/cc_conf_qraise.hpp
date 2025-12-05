@@ -11,11 +11,14 @@
 
 std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
 {
-    std::vector<std::string> simulators_with_cc = {"Cunqa", "Aer", "Munich", "Qulacs"};
+    std::vector<std::string> simulators_with_cc = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
     bool is_available_simulator = std::find(simulators_with_cc.begin(), simulators_with_cc.end(), std::string(args.simulator)) != simulators_with_cc.end();
 
-    if (!is_available_simulator) {
-        LOGGER_ERROR("Classical communications only are available under \"Aer\", \"Cunqa\", \"Munich\" and \"Qulacs\" simulators, but the following simulator was provided: {}", std::string(args.simulator));
+    std::vector<std::string> available_simulators = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
+    std::string simulator = std::any_cast<std::string>(args.simulator);
+    auto check_sim_availability = std::find(available_simulators.begin(), available_simulators.end(), simulator);
+    if (check_sim_availability == available_simulators.end()) {
+        LOGGER_ERROR("Classical communications only are available under \"Cunqa\", \"Munich\", \"Aer\", \"Maestro\" and \"Qulacs\" simulators, but the following simulator was provided: {}", simulator);
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 

@@ -366,13 +366,15 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
 
 JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Munich usual simulation");
+    auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
+    auto quantum_task = p_qca->quantum_tasks[0];
+
+    // TODO: Change the format with the free functions
+    std::string circuit = quantum_task_to_Munich(quantum_task);
     try
     {   
-        auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
-        auto quantum_task = p_qca->quantum_tasks[0];
-
-        // TODO: Change the format with the free functions
-        std::string circuit = quantum_task_to_Munich(quantum_task);
+        
         auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
 
         float time_taken;
@@ -416,7 +418,7 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
     catch (const std::exception &e)
     {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Munich simulator.");
+        LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
     }
     return {};
@@ -424,6 +426,7 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 
 JSON CircuitSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
 {
+    LOGGER_DEBUG("Munich dynamic simulation");
     // TODO: Avoid the static casting?
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
     std::map<std::string, std::size_t> meas_counter;

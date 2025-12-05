@@ -14,7 +14,7 @@ def mod(n, m):
     return (n % m + m) % m
 
 def cyclic_ccommunication(n):
-    family_0 = qraise(n,"00:10:00", simulator="Munich", classical_comm=True, co_located = True)
+    family_0 = qraise(n,"00:10:00", simulator="Maestro", classical_comm=True, co_located = True)
     #family_1 = qraise(n,"00:10:00", simulator="Cunqa", classical_comm=True, co_located = True)
     qpus_comm_0 = get_QPUs(on_node = False, family = family_0)
     #qpus_comm_1 = get_QPUs(family_1)

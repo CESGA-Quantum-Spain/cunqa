@@ -17,11 +17,14 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
         return "0";
     #endif
 
-    std::vector<std::string> simulators_with_qc = {"Cunqa", "Aer", "Munich", "Qulacs"};
+    std::vector<std::string> simulators_with_qc = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
     bool is_available_simulator = std::find(simulators_with_qc.begin(), simulators_with_qc.end(), std::string(args.simulator)) != simulators_with_qc.end();
 
-    if (!is_available_simulator) {
-        LOGGER_ERROR("Quantum communications only are available under \"Aer\", \"Cunqa\", \"Munich\" and \"Qulacs\" simulators, but the following simulator was provided: {}", args.simulator);
+    std::vector<std::string> available_simulators = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
+    std::string simulator = std::any_cast<std::string>(args.simulator);
+    auto check_sim_availability = std::find(available_simulators.begin(), available_simulators.end(), simulator);
+    if (check_sim_availability == available_simulators.end()) {
+        LOGGER_ERROR("Quantum communications only are available under \"Aer\", \"Munich\", \"Aer\", \"Maestro\" and \"Qulacs\" simulators, but the following simulator was provided: {}", args.simulator);
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
