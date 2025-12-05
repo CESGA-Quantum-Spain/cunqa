@@ -481,6 +481,7 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
             {"time_taken", maestro_result.at("time_taken").get<JSON>()}
             };
 
+            reverse_bitstring_keys_json(result_json);
             return result_json;
         }
         else
@@ -591,7 +592,6 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken} };

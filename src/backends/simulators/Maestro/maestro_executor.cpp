@@ -41,7 +41,7 @@ MaestroExecutor::MaestroExecutor() : classical_channel{"executor"}
     }
 };
 
-MaestroExecutor::MaestroExecutor(const std::string& group_id)
+MaestroExecutor::MaestroExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
     std::ifstream in(constants::COMM_FILEPATH);
 

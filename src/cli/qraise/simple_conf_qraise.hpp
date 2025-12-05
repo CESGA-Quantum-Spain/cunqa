@@ -9,11 +9,11 @@
 
 std::string get_simple_run_command(const CunqaArgs& args, const std::string& mode)
 {
-    std::vector<std::string> simple_simulators = {"Cunqa", "Aer", "Munich", "Qulacs"};
+    std::vector<std::string> simple_simulators = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
     bool is_available_simulator = std::find(simple_simulators.begin(), simple_simulators.end(), std::string(args.simulator)) != simple_simulators.end();
 
     if (!is_available_simulator) {
-        LOGGER_ERROR("Available simple simulators are \"Aer\", \"Cunqa\", \"Munich\" and \"Qulacs\" , but the following was provided: {}", std::string(args.simulator));
+        LOGGER_ERROR("Available simple simulators are \"Aer\", \"Cunqa\", \"Munich\", \"Maestro\" and \"Qulacs\" , but the following was provided: {}", std::string(args.simulator));
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 

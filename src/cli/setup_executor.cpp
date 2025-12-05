@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
         {
             LOGGER_DEBUG("Raising executor with Maestro.");
             MaestroExecutor executor(family_name);
+            executor.run();
             break;
         }
         case murmur::hash("Qulacs"):
