@@ -180,7 +180,6 @@ class QPU:
     _family: str
     _endpoint: str 
     
-    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str):
     def __init__(self, id: int, backend: Backend, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.
@@ -213,11 +212,6 @@ class QPU:
     def id(self) -> int:
         """Id string assigned to the QPU."""
         return self._id
-    
-    @property
-    def name(self) -> str:
-        """Name assigned to the QPU."""
-        return self._name
     
     @property
     def backend(self) -> Backend:
@@ -291,8 +285,8 @@ def run(
                 if instr["name"] in REMOTE_GATES:
                     instr["qpus"] =  [correspondence[instr["circuits"][0]]]
                     instr.pop("circuits")
-            for i in range(len(circuit["sending_to"])):
-                circuit["sending_to"][i] = correspondence[circuit["sending_to"][i]]
+            circuit["sending_to"] = [correspondence[target_circuit] 
+                                     for target_circuit in circuit["sending_to"]]
             circuit["id"] = correspondence[circuit["id"]]
 
     run_parameters = {k: v for k, v in run_args.items()}
@@ -301,10 +295,6 @@ def run(
     if len(circuits_ir) == 1:
         return qjobs[0]
     return qjobs
-
-class QRaiseError(Exception):
-    """Exception for errors during qraise slurm command."""
-    pass        
             
 def qraise(n, t, *, 
            classical_comm = False, 
@@ -318,7 +308,9 @@ def qraise(n, t, *,
            mem_per_qpu = None, 
            n_nodes = None, 
            node_list = None, 
-           qpus_per_node= None) -> str:
+           qpus_per_node= None,
+           partition=None
+        ) -> str:
     """
     Raises virtual QPUs and returns the job id associated to its SLURM job.
 
@@ -358,6 +350,8 @@ def qraise(n, t, *,
         node_list (str): list of nodes in which the virtual QPUs will be deployed.
 
         qpus_per_node (str): sets the number of virtual QPUs deployed on each node.
+
+        partition (str): partition of the nodes in which the QPUs are going to be executed.
     
     Returns:
         The family name of the job deployed.
@@ -395,20 +389,21 @@ def qraise(n, t, *,
             command = command + f" --qpus_per_node={str(qpus_per_node)}"
         if backend is not None:
             command = command + f" --backend={str(backend)}"
+        if partition is not None:
+            command = command + f" --partition={str(partition)}"
 
         if not os.path.exists(QPUS_FILEPATH):
            with open(QPUS_FILEPATH, "w") as file:
                 file.write("{}")
 
-        print(f"Command: {command}")
+        print(f"Requested QPUs with command:\n\t{command}")
 
         #run the command on terminal and capture its output on the variable 'output'
-        output = subprocess.run(command, capture_output=True, shell=True, text=True).stdout 
-        logger.info(output)
+        output = subprocess.run(command, capture_output=True, shell=True, text=True).stdout.rstrip("\n")
 
-        #sees the output on the console and selects the number
-        job_id = ''.join(e for e in str(output) if e.isdecimal()) 
-        
+        #sees the output on the console and selects the job_id
+        job_id = output.split(";", 1)[0]
+
         cmd_getstate = ["squeue", "-h", "-j", job_id, "-o", "%T"]
         
         i = 0
@@ -437,11 +432,10 @@ def qraise(n, t, *,
         # Wait for QPUs to be raised, so that get_QPUs can be executed inmediately
         print("QPUs ready to work \U00002705")
 
-        return (family, str(job_id)) if family is not None else str(job_id)
+        return family if family is not None else str(job_id)
     
     except subprocess.CalledProcessError as error:
-        logger.error(f"An error was encoutered while qraising:\n {error.stderr}.")
-        raise QRaiseError
+        raise RuntimeError(f"An error was encoutered while qraising:\n {error.stderr}.")
 
 def qdrop(*families: str):
     """
@@ -465,89 +459,12 @@ def qdrop(*families: str):
  
     subprocess.run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
 
-def qinfo(on_node: bool = True, node_name: Optional[str] = None) -> list[dict]:
-    """
-    Provides information about the virtual QPUs available either in the local node, an specific node 
-    or globally.
-
-    If `on_node` is ``True`` and `node_name` provided is different from the local node, only 
-    information at local node will be displayed.
-    
-    Args:
-        on_node (bool): if ``True`` information at local node is displayed, else all information 
-        is displayed.
-
-        node_name (str): filters the displayed information by an specific node.
-
-    Returns:
-        A list with :py:class:`dict` objects that display the information of the virtual QPUs.
-    
-    """
-    with open(QPUS_FILEPATH, "r") as f:
-        qpus_json = json.load(f)
-        if len(qpus_json) == 0:
-            logger.warning(f"No QPUs were found.")
-            return [{}]
-    
-    if node_name is not None:
-        targets = [{qpu_id:info} for qpu_id, info in qpus_json.items() 
-                   if (info["net"].get("node_name") == node_name ) ]
-    else:
-        if on_node:
-            local_node = os.getenv("SLURMD_NODENAME")
-            if local_node != None:
-                logger.debug(f"User at node {local_node}.")
-                targets = [{qpu_id: info} for qpu_id, info in qpus_json.items() 
-                           if (info["net"].get("node_name") == local_node) ]
-            else:
-                logger.warning("User at a login node: no QPUs are ever displayed" 
-                               "on the login node.")
-                return [{}]
-        else:
-            targets =[{qpu_id: info} for qpu_id, info in qpus_json.items()]
-    
-    info = []
-    for t in targets:
-        key = list(t.keys())[0]
-        info.append({
-            "QPU":key,
-            "node":t[key]["net"]["node_name"],
-            "family":t[key]["family"],
-            "backend":{
-                "name":t[key]["backend"]["name"],
-                "simulator":t[key]["backend"]["simulator"],
-                "version":t[key]["backend"]["version"],
-                "description":t[key]["backend"]["description"],
-                "n_qubits":t[key]["backend"]["n_qubits"],
-                "basis_gates":t[key]["backend"]["basis_gates"],
-                "coupling_map":t[key]["backend"]["coupling_map"],
-                "custom_instructiona":t[key]["backend"]["custom_instructions"]
-            }
-        })
-    return info
-
-def nodes_with_QPUs() -> list[str]:
-    """
-    Provides information about the nodes in which virtual QPUs are available.
-
-    Return:
-        List of the corresponding node names.
-    """
-    with open(QPUS_FILEPATH, "r") as f:
-        qpus_json = json.load(f)
-
-    node_names = set()
-    for info in qpus_json.values():
-        node_names.add(info["net"]["node_name"])
-
-    return list(node_names)
-
-def get_QPUs(on_node: bool = True, family: Optional[str] = None) -> list[QPU]:
+def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the virtual QPUs raised by the user.
 
     Args:
-        on_node (bool): if ``True``, filters by the virtual QPUs available at the local node.
+        co_located (bool): if ``False``, filters by the virtual QPUs available at the local node.
         family (str): filters virtual QPUs by their family name.
 
     Return:
@@ -563,45 +480,41 @@ def get_QPUs(on_node: bool = True, family: Optional[str] = None) -> list[QPU]:
 
     # extract selected QPUs from qpu.json information 
     local_node = os.getenv("SLURMD_NODENAME")
-    if on_node:
-        if local_node is None:
-            logger.error("You are searching for QPUs in a login node, none are found.")
-            return None
-        elif family is not None:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() 
-                       if (info["net"].get("nodename") == local_node) and 
-                       (info.get("family") == family)}
-        else:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() 
-                       if (info["net"].get("nodename") == local_node)}
+    if co_located:
+        targets = {
+            qpu_id: info
+            for qpu_id, info in qpus_json.items()
+            if ((info["net"].get("nodename") == local_node or info["net"].get("mode") == "co_located") and 
+                (family is None or info.get("family") == family))
+        }
     else:
-        if family is not None:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() 
-                       if ((info["net"].get("nodename") == local_node) or 
-                           (info["net"].get("nodename") != local_node and 
-                            info["net"].get("mode") == "co_located")) and 
-                           (info.get("family") == family)}
+        if local_node is None:
+            logger.warning("You are searching for QPUs in a login node, none are found.")
+            return None
         else:
-            targets = {qpu_id:info for qpu_id, info in qpus_json.items() 
-                       if (info["net"].get("nodename") == local_node) or 
-                          (info["net"].get("nodename") != local_node and 
-                           info["net"].get("mode") == "co_located")}
+            targets = {
+                qpu_id: info
+                for qpu_id, info in qpus_json.items()
+                if ((info["net"].get("nodename") == local_node) and 
+                    (family is None or info.get("family") == family))
+            }
     
-    # create QPU objects from the dictionary information + return them on a list
-    qpus = []
-    for id, info in targets.items():
-        qpus.append(QPU(
-            id = id, 
-            backend = Backend(info['backend']), 
-            family = info["family"], 
-            endpoint = info["net"]["endpoint"])
-        )
+    qpus = [
+        QPU(
+            id = id,
+            backend = Backend(info['backend']),
+            family = info["family"],
+            endpoint = info["net"]["endpoint"]
+        ) for id, info in targets.items()
+    ]
         
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
     else:
         logger.warning(f"No QPUs where found with the characteristics provided: "
-                       f"on_node={on_node}, family_name={family}.")
+                       f"co_located={co_located}, family_name={family}.")
+        return None
+
 
 

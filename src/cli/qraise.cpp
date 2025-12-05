@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
     }
 
     // Executing and deleting the file
-    std::system("sbatch qraise_sbatch_tmp.sbatch");
+    std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
     std::system("rm qraise_sbatch_tmp.sbatch");
     
     

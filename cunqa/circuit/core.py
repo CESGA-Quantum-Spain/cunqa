@@ -59,12 +59,11 @@
     documentation.
 
 """
-
+from __future__ import annotations
 import numpy as np
 import random
 import string
 
-from __future__ import annotations
 from collections import defaultdict
 from typing import Union, Optional
 
@@ -92,38 +91,7 @@ def _generate_id(size: int = 4) -> str:
     chars = string.ascii_letters + string.digits
     return ''.join(random.choices(chars, k=size))
 
-class InstanceTrackerMeta(type):
-    """Metaclass to track instances of CunqaCircuits and extract the connections between them."""
-    _instances = {}
-    _connected = None
-    _new_inst = False
-
-    def __call__(cls, *args, **kwargs):
-        # Create the instance using the original __call__ method
-        instance = super().__call__(*args, **kwargs)
-        cls._new_inst = True
-        
-        # Store the instance 
-        cls._instances[instance._id] = instance
-        
-        return instance
-
-    def access_other_instances(cls):
-        return cls._instances
-    
-    def get_connectivity(cls):
-        if (cls._connected is None or cls._new_inst):
-            # sending_to has the circuits where you send but not the received ones, the graph is 
-            # directed. We use sets to undirect the graph
-            first_connections = {frozenset({idd, sent}) for idd, circuit in cls.access_other_instances().items() for sent in circuit.sending_to}
-            # adds (a,c) if (a,b) and (b,c) are in the set. Does this recursively until the highest 
-            # level transitivity is addressed
-            cls._connected = _transitive_combinations(first_connections) 
-            cls._new_inst = False
-
-        return cls._connected
-
-class CunqaCircuit(metaclass=InstanceTrackerMeta):
+class CunqaCircuit():
     # TODO: look for other alternatives for describing the documentation that do not requiere such 
     # long docstrings, maybe gatehring everything in another file and using decorators, as in ther 
     # APIs.
@@ -471,7 +439,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             number_clbits (int): number of classical bits.
         """
         if not num_clbits:
-            raise AttributeError("The num_qubits attribute must be strictly positive.")s
+            raise AttributeError("The num_qubits attribute must be strictly positive.")
 
         new_name = name
         if new_name in self.classical_regs:
