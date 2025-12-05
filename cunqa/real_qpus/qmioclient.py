@@ -216,10 +216,10 @@ class QMIOFuture:
 class QMIOClient:
     def __init__(self):
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.REQ)
         self._last_quantum_task = None
 
     def connect(self, linker_endpoint : str) -> None:
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(linker_endpoint)
 
     def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
@@ -240,7 +240,7 @@ class QMIOClient:
         
         except zmq.ZMQError as e:
             self.socket.close()
-            self.context.term()
+            #self.context.term()
             qmiofuture = QMIOFuture(error = e) 
             return qmiofuture
         

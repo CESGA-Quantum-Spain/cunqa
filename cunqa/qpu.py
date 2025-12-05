@@ -89,8 +89,9 @@ class QPU:
     _family: str
     _endpoint: str 
     _connected: bool 
+    _real_qpu : bool
     
-    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str):
+    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str, real_qpu : bool):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -116,6 +117,7 @@ class QPU:
         self._family = family
         self._endpoint = endpoint
         self._connected = False
+        self._real_qpu = real_qpu
         
         logger.debug(f"Object for QPU {id} created correctly.")
 
@@ -179,9 +181,9 @@ class QPU:
         # Handle connection to QClient
         if not self._connected:
             self._qclient.connect(self._endpoint)
-            self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
-            self._connected = True
+            if not self._real_qpu:
+                self._connected = True
 
         # Transpilation if requested
         if transpile:
