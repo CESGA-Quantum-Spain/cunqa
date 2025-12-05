@@ -119,7 +119,7 @@ class QPU:
         self._connected = False
         self._real_qpu = real_qpu
         
-        logger.debug(f"Object for QPU {id} created correctly.")
+        logger.debug(f"QPU {id} correctly instantiated.")
 
     @property
     def id(self) -> int:

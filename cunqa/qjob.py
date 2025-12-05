@@ -206,7 +206,7 @@ class QJob:
 
         self._convert_circuit(circuit)
         self._configure(**run_parameters)
-        logger.debug("Qjob configured")
+        logger.debug("Qjob correctly configured")
 
     @property
     def result(self) -> 'Result':
@@ -480,7 +480,7 @@ class QJob:
             }
             self._execution_config = json.dumps(exec_config)
 
-            logger.debug("QJob created.")
+            logger.debug("QJob correctly instantiated.")
 
         except KeyError as error:
             logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}].")

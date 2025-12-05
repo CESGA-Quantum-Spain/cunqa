@@ -15,7 +15,14 @@ import zmq
 import json
 import psutil
 import socket
+import pickle
+import threading
+from queue import Queue
 from typing import Optional
+
+
+ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
+PREFERRED_NETWORK_IFACE = "ib"
 
 
 def _get_qmio_config(family : str, endpoint : str) -> str:
@@ -71,39 +78,75 @@ def _get_IP(preferred_net_iface : Optional[str] = None) -> str:
             return ips[0]
     
 
-def start_linker_server(family : str) -> None:
-    logger.debug("Starting QMIO linker...")
 
-    ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
-    PREFERRED_NETWORK_IFACE = "ib"
+class QMIOLinker:
 
-    linker_context = zmq.Context()
-    client_comm_socket = linker_context.socket(zmq.REP)
+    message_queue : 'Queue'
+    client_ids_queue : 'Queue'
+    context : 'zmq.Context'
+    client_comm_socket : 'zmq.ROUTER'
+    qmio_comm_socket : 'zmq.REQ'
+    ip : str
+    port : str
+    endpoint : str
 
-    ip = _get_IP(preferred_net_iface = PREFERRED_NETWORK_IFACE)
-    port = client_comm_socket.bind_to_random_port(f"tcp://{ip}")
+    def __init__(self, family : str):
+        self.message_queue = Queue()
+        self.client_ids_queue = Queue()
 
-    qmio_comm_socket = linker_context.socket(zmq.REQ)
-    qmio_comm_socket.connect(ZMQ_ENDPOINT)
+        self.context = zmq.Context()
+        self.client_comm_socket = self.context.socket(zmq.ROUTER)
 
-    linker_endpoint = f"tcp://{ip}:{port}"
-    qmio_config = _get_qmio_config(family, linker_endpoint)
-    write_on_file(qmio_config, QPUS_FILEPATH, family)
+        self.ip = _get_IP(preferred_net_iface = PREFERRED_NETWORK_IFACE)
+        self.port = self.client_comm_socket.bind_to_random_port(f"tcp://{self.ip}")
+        self.endpoint = f"tcp://{self.ip}:{self.port}"
 
-    waiting = True
-    while waiting:
-        try:
-            circuit = client_comm_socket.recv_pyobj()
-            qmio_comm_socket.send_pyobj(circuit)
-            results = qmio_comm_socket.recv_pyobj()
-            client_comm_socket.send_pyobj(results)
+        self.qmio_comm_socket = self.context.socket(zmq.REQ)
+        self.qmio_comm_socket.connect(ZMQ_ENDPOINT)
 
-        except zmq.ZMQError as e:
-            waiting = False
-            client_comm_socket.close()
-            qmio_comm_socket.close()
-            linker_context.term()
-            sys.exit(f"ZMQError: {e}")
+        qmio_config = _get_qmio_config(family, self.endpoint)
+        write_on_file(qmio_config, QPUS_FILEPATH, family)
+
+        recv_thread = threading.Thread(target = self.recv_data)
+        compute_thread = threading.Thread(target = self.compute_result)
+
+        recv_thread.start()
+        compute_thread.start()
+
+    
+    def recv_data(self) -> None:
+        logger.debug("QMIO linker starts listening...")
+
+        waiting = True
+        while waiting:
+            try:
+                id, ser_circuit = self.client_comm_socket.recv_multipart()
+                circuit = pickle.loads(ser_circuit)
+                self.message_queue.put(circuit)
+                self.client_ids_queue.put(id)
+            except zmq.ZMQError as e:
+                waiting = False
+                self.client_comm_socket.close()
+                self.qmio_comm_socket.close()
+                self.context.term()
+                sys.exit(f"Error receiving data in QMIOLinker: {e}")
+
+    def compute_result(self) -> None:
+        checking_queue = True
+        while checking_queue:
+            try:
+                circuit = self.message_queue.get()
+                client_id = self.client_ids_queue.get()
+                self.qmio_comm_socket.send_pyobj(circuit)
+                results = self.qmio_comm_socket.recv_pyobj()
+                ser_results = pickle.dumps(results)
+                self.client_comm_socket.send_multipart([client_id, ser_results])
+            except zmq.ZMQError as e:
+                checking_queue = False
+                self.client_comm_socket.close()
+                self.qmio_comm_socket.close()
+                self.context.term()
+                sys.exit(f"Error computing result in QMIOLinker: {e}")
 
 
 if __name__ == "__main__":
@@ -111,4 +154,4 @@ if __name__ == "__main__":
         logger.error("No family name provided to QMIO linker")
         sys.exit("No family name provided to QMIO linker")
 
-    start_linker_server(sys.argv[1])
+    qmiolinker = QMIOLinker(sys.argv[1])

@@ -20,8 +20,9 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
     sbatchFile << "#SBATCH --job-name=qraise \n";
     sbatchFile << "#SBATCH --partition qpu \n";
     sbatchFile << "# SBATCH --nodelist=c7-23 \n";
-    sbatchFile << "#SBATCH --ntasks=" << 1 << "\n";
-    sbatchFile << "#SBATCH --mem-per-cpu=4G \n";
+    sbatchFile << "#SBATCH --ntasks=1 \n";
+    sbatchFile << "#SBATCH -c 2 \n";
+    sbatchFile << "#SBATCH --mem-per-cpu=15G \n";
     sbatchFile << "#SBATCH --time=" << args.time << "\n";
 
     sbatchFile << "#SBATCH --output=qraise_%j\n";

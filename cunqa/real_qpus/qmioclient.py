@@ -219,7 +219,7 @@ class QMIOClient:
         self._last_quantum_task = None
 
     def connect(self, linker_endpoint : str) -> None:
-        self.socket = self.context.socket(zmq.REQ)
+        self.socket = self.context.socket(zmq.DEALER)
         self.socket.connect(linker_endpoint)
 
     def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
@@ -251,9 +251,8 @@ class QMIOClient:
             return future_error
         
         parameters_json = json.loads(parameters)
-        
         updated_instructions = _update_parameters(self._last_quantum_task["instructions"], parameters_json["params"])
-        self._last_quantum_task["isntructions"] = updated_instructions
+        self._last_quantum_task["instructions"] = updated_instructions
 
         return self.send_circuit(json.dumps(self._last_quantum_task))
 

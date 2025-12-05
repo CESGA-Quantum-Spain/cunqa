@@ -203,8 +203,6 @@ def _convert_counts(counts: dict, registers: dict) -> dict:
         logger.error(f"regsters must be dict, but {type(registers)} was provided [TypeError].")
         raise ResultError # I capture this error in QJob.result()
     
-    logger.debug(f"Dividing strings into {len(lengths)} classical registers.")
-
     if isinstance(counts, dict):
         new_counts = {}
         for k,v in counts.items():

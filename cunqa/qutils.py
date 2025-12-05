@@ -403,7 +403,6 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
         
         qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], real_qpu = is_real_qpu))
     if len(qpus) != 0:
-        logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
     else:
         logger.error(f"No QPUs where found with the characteristics provided: on_node={on_node}, family_name={family}.")
