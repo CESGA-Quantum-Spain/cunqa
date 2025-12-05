@@ -248,7 +248,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(maestro)
 
-message(STATUS "-----------${maestro_SOURCE_DIR}")
 target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 

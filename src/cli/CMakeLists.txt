@@ -21,7 +21,7 @@ target_link_libraries(setup_qpus PRIVATE json logger_qpu qpu
                                          aer_simple_simulator aer_cc_simulator aer_qc_simulator
                                          munich_simple_simulator munich_cc_simulator munich_qc_simulator 
                                          cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator
-                                         maestro_simple_simulator maestro_cc_simulator maestro_qc_simulator)
+                                         maestro_simple_simulator maestro_cc_simulator maestro_qc_simulator
                                          qulacs_simple_simulator qulacs_cc_simulator qulacs_qc_simulator)
 target_include_directories(setup_qpus PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
