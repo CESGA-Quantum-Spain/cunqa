@@ -6,7 +6,6 @@ parent_dir = current_file_dir.parent.parent
 sys.path.append(str(parent_dir))
 
 from cunqa.constants import LIBS_DIR
-from cunqa.circuit import convert
 from cunqa.logger import logger
 
 sys.path.append(LIBS_DIR)
@@ -175,18 +174,6 @@ def _get_run_config(run_config : dict) -> str:
     return config
 
 
-def _update_parameters(instructions : list[dict], parameters : list[float]) -> list[dict]:
-    
-    param_counter = 0
-    for inst in instructions:
-        name = inst["name"]
-        match(name):
-            case "rz":
-                inst["params"] = [parameters[param_counter]]
-                param_counter += 1
-
-    return instructions
-
 
 class QMIOFuture:
     def __init__(self, socket = None, start_time = None, error = None):
@@ -216,7 +203,7 @@ class QMIOFuture:
 class QMIOClient:
     def __init__(self):
         self.context = zmq.Context()
-        self._last_quantum_task = None
+        self._last_quantum_task = False
 
     def connect(self, linker_endpoint : str) -> None:
         self.socket = self.context.socket(zmq.DEALER)
@@ -225,12 +212,14 @@ class QMIOClient:
     def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
 
         quantum_task = json.loads(quantum_task_str)
-        self._last_quantum_task = quantum_task
-        run_config = quantum_task["config"]
+        if "params" in quantum_task: 
+            data_to_send = quantum_task
+        else:
+            self._last_quantum_task = True
+            run_config = quantum_task["config"]
 
-        qmio_run_config = _get_run_config(run_config)
-        qasm_circuit = convert(quantum_task, convert_to = "qasm", qasm_version = "3.0")
-        data_to_send = (qasm_circuit, qmio_run_config)
+            qmio_run_config = _get_run_config(run_config)
+            data_to_send = (quantum_task, qmio_run_config)
 
         try:
             start_time = time.time_ns()
@@ -246,13 +235,9 @@ class QMIOClient:
         
 
     def send_parameters(self, parameters : str) -> 'QMIOFuture':
-        if self._last_quantum_task == None:
+        if not self._last_quantum_task:
             future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update its parameters")
             return future_error
-        
-        parameters_json = json.loads(parameters)
-        updated_instructions = _update_parameters(self._last_quantum_task["instructions"], parameters_json["params"])
-        self._last_quantum_task["instructions"] = updated_instructions
 
-        return self.send_circuit(json.dumps(self._last_quantum_task))
+        return self.send_circuit(parameters)
 

@@ -7,6 +7,7 @@ sys.path.append(str(parent_dir))
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
 from cunqa.qclient import write_on_file
+from cunqa.circuit import convert
 from cunqa.logger import logger
 
 sys.path.append(LIBS_DIR)
@@ -53,6 +54,17 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
 
     return json.dumps(qmio_config_json)
 
+def _upgrade_parameters(quantum_task : tuple[dict, dict], parameters : list[float]) ->tuple[dict, dict]:
+    
+    param_counter = 0
+    for inst in quantum_task[0]["instructions"]:
+        name = inst["name"]
+        match(name):
+            case "rz":
+                inst["params"] = [parameters[param_counter]]
+                param_counter += 1
+
+    return quantum_task
 
 def _list_interfaces(ipv4_only=True):
     interfaces = {}
@@ -89,6 +101,7 @@ class QMIOLinker:
     ip : str
     port : str
     endpoint : str
+    _last_quantum_task : tuple[dict, dict]
 
     def __init__(self, family : str):
         self.message_queue = Queue()
@@ -120,9 +133,19 @@ class QMIOLinker:
         waiting = True
         while waiting:
             try:
-                id, ser_circuit = self.client_comm_socket.recv_multipart()
-                circuit = pickle.loads(ser_circuit)
-                self.message_queue.put(circuit)
+                id, ser_message = self.client_comm_socket.recv_multipart()
+                message = pickle.loads(ser_message)
+                if isinstance(message, dict) and ("params" in message):
+                    upgraded_quantum_task = _upgrade_parameters(self._last_quantum_task, message["params"])
+                    self._last_quantum_task = upgraded_quantum_task
+                    upgraded_qasm_circ = convert(upgraded_quantum_task[0], convert_to = "qasm", qasm_version = "3.0")
+                    quantum_task = (upgraded_qasm_circ, self._last_quantum_task[1])
+                else:
+                    self._last_quantum_task = message
+                    qasm_circuit = convert(message[0], convert_to = "qasm", qasm_version = "3.0")
+                    quantum_task = (qasm_circuit, message[1])
+                    
+                self.message_queue.put(quantum_task)
                 self.client_ids_queue.put(id)
             except zmq.ZMQError as e:
                 waiting = False
@@ -135,9 +158,9 @@ class QMIOLinker:
         checking_queue = True
         while checking_queue:
             try:
-                circuit = self.message_queue.get()
+                quantum_task = self.message_queue.get()
                 client_id = self.client_ids_queue.get()
-                self.qmio_comm_socket.send_pyobj(circuit)
+                self.qmio_comm_socket.send_pyobj(quantum_task)
                 results = self.qmio_comm_socket.recv_pyobj()
                 ser_results = pickle.dumps(results)
                 self.client_comm_socket.send_multipart([client_id, ser_results])
