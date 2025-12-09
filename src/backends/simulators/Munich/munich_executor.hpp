@@ -9,6 +9,7 @@ namespace sim {
 class MunichExecutor {
 public:
     MunichExecutor();
+    MunichExecutor(const std::string& group_id);
     ~MunichExecutor() = default;
 
     void run();

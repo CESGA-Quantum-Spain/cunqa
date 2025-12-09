@@ -1,8 +1,9 @@
 #pragma once
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "utils/constants.hpp"
 #include "args_qraise.hpp"
+#include "utils_qraise.hpp"
 #include "logger.hpp"
 
 std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
@@ -19,23 +20,20 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
     } 
 
     subcommand = mode + " qc " + args.family_name + " " + args.simulator;
-    LOGGER_DEBUG("Qraise with quantum communications and default CunqaSimulator backend. \n");
+    LOGGER_DEBUG("Qraise with quantum communications and default backend. \n");
 
-    #ifdef USE_ZMQ_BTW_QPU
-    int num_ports = args.n_qpus * 3;
-    int qpu_task_mem = 1; //TODO
-    int qpu_task_n_cores = 1; 
-    int simulator_task_mem = args.mem_per_qpu * args.n_qpus - args.n_qpus; //TODO
-    int simulator_task_n_cores = args.cores_per_qpu * args.n_qpus; 
-    run_command =  "srun -n " + std::to_string(args.n_qpus) + " -c " + std::to_string(qpu_task_n_cores) + " --mem-per-cpu=" + std::to_string(qpu_task_mem) + "G --resv-ports=" + std::to_string(num_ports) + " --task-epilog=$EPILOG_PATH setup_qpus $INFO_PATH " +  subcommand + " &\n";
-    LOGGER_DEBUG("Run command with ZMQ comm: {}", run_command);
+    int simulator_n_cores = args.cores_per_qpu * args.n_qpus; 
+    int simulator_memory = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() * args.n_qpus : DEFAULT_MEM_PER_CORE * args.cores_per_qpu * args.n_qpus;
+    
+    run_command =  "srun -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
 
     // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
     run_command += "sleep 1\n";
-    run_command +=  "srun -n 1 -c " + std::to_string(simulator_task_n_cores) + " --mem=" + std::to_string(simulator_task_mem) + "G --resv-ports=" + std::to_string(args.n_qpus) + " setup_executor " + args.simulator + "\n";
-    #else
-    LOGGER_ERROR("For quantum communications ZMQ has to be available.");
-    return "0";
+    run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --exclusive setup_executor " + args.simulator + " " + args.family_name + "\n";
+
+    #ifndef USE_ZMQ_BTW_QPU
+        LOGGER_ERROR("For quantum communications ZMQ has to be available.");
+        return "0";
     #endif
 
     return run_command;

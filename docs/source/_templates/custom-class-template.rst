@@ -1,4 +1,4 @@
-{{ fullname | escape | underline }}
+{{ fullname | escape | underline('=') }}
 
 .. currentmodule:: {{ module }}
 
@@ -7,7 +7,7 @@
 
 {# === TABLAS (resumen) === #}
 {% if attributes %}
-{{ _('Attributes') | escape | underline('-') }}
+{{ _('Attributes') | escape | underline('~') }}
 
 .. autosummary::
    :nosignatures:
@@ -18,7 +18,7 @@
 {% endif %}
 
 {% if methods %}
-{{ _('Methods') | escape | underline('-') }}
+{{ _('Methods') | escape | underline('~') }}
 
 .. automethod:: {{ name }}.__init__
 

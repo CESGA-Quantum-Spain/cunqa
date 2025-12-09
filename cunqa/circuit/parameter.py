@@ -13,19 +13,26 @@ class Variable(sympy.Symbol):
     """
     Class for handling variable parameters on gates. These will be input as gates arguments and need to be initiallized before executing a circuit with the method `:py:meth:assign_parameters`. 
     Unlike qiskit's Parameter, it can be reassigned several times or updated with `:py:class:QJob` method `:py:meth:upgrade_parameters`.
+
+    Variables signal to a parametric gate that its value can vary. Variables can be summed, multiplied by 
+    other variables or numbers, exponentiated, divided, etc to create parametric expressions. To apply functions
+    to variables please use those of the `sympy` module, e.g. `sin_a = sympy.sin(Variable('a'))`. 
+
+    .. note::
+        Some available `sympy` functions are 
+        "sin", "cos", "tan", "exp", "log", "log10", "sqrt", "abs", "arcsin", "arccos", "arctan", "sinh", 
+        "cosh", "tanh", "arcsinh", "arccosh", "arctanh", "deg2rad", "rad2deg", "floor", "round", "gamma",
+        "factorial".
     """
     def __new__(cls, name, **assumptions):
         # Primary instance creation
         # Ensures unique symbol instances
         return sympy.Symbol.__new__(cls, name, **assumptions)
 
-    def subs(self, param, value):
-        """ Use .subs(param, value) to substitute the variable parameter for the value in the symbolic expression"""
-        result = super().subs(self, param, value)
-        return result.evalf()  
+    # Dunder methods already implemented on the parent class
+    # In particular, as sympy defines __hash__ and __eq__, so 
+    # sympy objects and therefore cunqa.Variable objects can be used as keys of a dict
 
-    # Dunder methods already implemented on the parent class (including __add__, __pow__, etc and __eq__, __hash__ etc), 
-    
 def variables(names, **args):
     r"""
     Wrapper of sympy.symbols. Transform strings into instances of :class:`Variable` class.
@@ -131,6 +138,4 @@ def variables(names, **args):
         >>> x.is_real and y.is_real and z.is_real
         True
     """
-    return sympy.symbols(names=names, cls=Variable, **args) 
-
-    
+    return sympy.symbols(names=names, cls=Variable, **args)   

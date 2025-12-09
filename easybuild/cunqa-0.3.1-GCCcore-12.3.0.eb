@@ -40,13 +40,13 @@ sources = ['%(name)s-%(version)s.tar.gz']
 builddependencies = [
    ('FlexiBLAS', '3.3.0'),
    ('Boost.Python', '1.85.0', local_pyversionsuffix),
-   ('pybind11', '2.12.0', local_pyversionsuffix),
+   ('pybind11', '2.13.6', local_pyversionsuffix),
    ('CMake', '3.27.6')
 ]
 
 # Implicit from Qiskit: ('hpcx-mt-ompi', EXTERNAL_MODULE),
 dependencies = [
-    ('Python', '3.9.9'),
+    ('Python', '3.11.9'),
 #   ('ZeroMQ', '4.3.4', local_pyversionsuffix),
     ('nlohmann_json', '3.11.3'),
     ('Qiskit', '1.2.4', versionsuffix),

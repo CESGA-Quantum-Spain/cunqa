@@ -1,8 +1,16 @@
 """
     Cointains the class :py:class:`~cunqa.backend.Backend` which serves as a description of the characteristics of the virtual QPUs.
+
+    It can be found as the attribute :py:attr:`~cunqa.qpu.QPU.backend` of the :py:class:`~cunqa.qpu.QPU` class, it is created with
+    the corrresponding data when the :py:class:`~cunqa.qpu.QPU` object is instantiated:
+
+        >>> qpu.backend
+        <cunqa.backend.Backend object at XXXX>
 """
 
 from typing import  TypedDict
+import glob
+import os
 
 class BackendData(TypedDict):
     """
@@ -22,7 +30,7 @@ class BackendData(TypedDict):
 
 class Backend():
     """
-        Class to define backend information of a QPU server.
+        Class to define backend information of a virtual QPU.
     """
     def __init__(self, backend_dict: BackendData):
         """
@@ -32,7 +40,15 @@ class Backend():
             backend_dict (BackendData): object that contains all the needed information about the backend.
         """
         for key, value in backend_dict.items():
+            
+            if key == "noise_properties_path" and value == "last_calibrations":
+                jsonpath = "/opt/cesga/qmio/hpc/calibrations"
+                files = jsonpath + "/????_??_??__??_??_??.json"
+                files = glob.glob(files)
+                value = max(files, key=os.path.getctime)
+
             setattr(self, key, value)
+
 
     #TODO: make @property?; add more methods as is_ideal, incorporate noisemodel object ot leave for transpilation only?
     def info(self) -> None:

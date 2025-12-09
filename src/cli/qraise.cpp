@@ -2,11 +2,12 @@
 #include <fstream>
 #include <regex>
 #include <any>
+#include <filesystem> //debug
 
 #include <iostream>
 #include <cstdlib>
 
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 
 #include "utils/constants.hpp"
 #include "qraise/utils_qraise.hpp"
@@ -15,14 +16,12 @@
 #include "qraise/simple_conf_qraise.hpp"
 #include "qraise/cc_conf_qraise.hpp"
 #include "qraise/qc_conf_qraise.hpp"
+#include "qraise/infrastructure_conf_qraise.hpp"
 
 #include "logger.hpp"
 
-namespace {
-    const int CORES_PER_NODE = 64; // For both QMIO and FT3
-}
-
 using namespace std::literals;
+using namespace cunqa;
 
 namespace {
 
@@ -31,13 +30,18 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     // Escribir el contenido del script SBATCH
     sbatchFile << "#!/bin/bash\n";
     sbatchFile << "#SBATCH --job-name=qraise \n";
-    int max_cores_per_task = !args.qc ? args.cores_per_qpu : args.cores_per_qpu * args.n_qpus;
-    sbatchFile << "#SBATCH -c " << max_cores_per_task << "\n";
-    int tasks = args.qc ? args.n_qpus + 1 : args.n_qpus;
-    sbatchFile << "#SBATCH --ntasks=" << tasks << "\n";
-    int n_nodes = number_of_nodes(args.n_qpus, args.cores_per_qpu, args.number_of_nodes.value(), CORES_PER_NODE);
-    sbatchFile << "#SBATCH -N " << n_nodes << "\n";
+
+    int n_tasks = args.qc ? args.n_qpus * args.cores_per_qpu + args.n_qpus : args.n_qpus;    
+    sbatchFile << "#SBATCH --ntasks=" << n_tasks << "\n";
+
+    if (!args.qc) 
+        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
+
+    sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
     
+    if(args.partition.has_value())
+        sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+
     if (args.qpus_per_node.has_value()) {
         if (args.n_qpus < args.qpus_per_node) {
             LOGGER_ERROR("Less qpus than selected qpus_per_node.");
@@ -70,19 +74,30 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
         }
     }
 
-    if (check_mem_format(args.mem_per_qpu)){
-        int mem_per_qpu = args.mem_per_qpu;
-        int cores_per_qpu = args.cores_per_qpu;
-        if (!args.qc) {
-            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_qpu/cores_per_qpu << "G\n";
-        } else {
-            sbatchFile << "#SBATCH --mem=" << mem_per_qpu * args.n_qpus << "G\n";
-        }
-        
-    } else {
-        LOGGER_ERROR("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
+    if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
+        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
         return;
     }
+
+    if (!args.qc) {
+        if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
+            sbatchFile << "#SBATCH --mem-per-cpu=" << args.mem_per_qpu.value()/args.cores_per_qpu << "G\n";
+        } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
+            LOGGER_ERROR("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
+            return;
+        } else if (!args.mem_per_qpu.has_value()) {
+            int mem_per_core = DEFAULT_MEM_PER_CORE;
+            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
+        } 
+    } else {
+        if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
+            sbatchFile << "#SBATCH --mem=" << args.mem_per_qpu.value() * args.n_qpus + args.n_qpus << "G\n";
+        } else {
+            int mem_per_core = DEFAULT_MEM_PER_CORE;
+            sbatchFile << "#SBATCH --mem=" << mem_per_core * args.cores_per_qpu * args.n_qpus + args.n_qpus << "G\n";
+        }
+    }
+
 
     if (check_time_format(args.time))
         sbatchFile << "#SBATCH --time=" << args.time << "\n";
@@ -96,30 +111,9 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
         return;
     }
 
-    int memory_specs = check_memory_specs(args.mem_per_qpu, args.cores_per_qpu);
-    if (memory_specs == 1) {
-        LOGGER_ERROR("Too much memory per QPU in QMIO. Please, decrease the mem-per-qpu or increase the cores-per-qpu. (Max mem-per-cpu = 16)");
-        return;
-    } else if (memory_specs == 2) {
-        LOGGER_ERROR("Too much memory per QPU in FT3. Please, decrease the mem-per-qpu or increase the cores-per-qpu. Max mem-per-cpu = 4");
-        return;
-    }
-
-    sbatchFile << "#SBATCH --output=qraise_%j\n";
-}
-
-void write_env_variables(std::ofstream& sbatchFile)
-{
-    auto store = std::getenv("STORE");
-
-    sbatchFile << "\n";
-    sbatchFile << "if [ ! -d \"$STORE/.cunqa\" ]; then\n";
-    sbatchFile << "mkdir $STORE/.cunqa\n";
-    sbatchFile << "fi\n";
-
-    sbatchFile << "EPILOG_PATH=" << store << "/.cunqa/epilog.sh\n";
-    sbatchFile << "export INFO_PATH=" << store << "/.cunqa/qpus.json\n";
-    sbatchFile << "export COMM_PATH=" << store << "/.cunqa/communications.json\n";
+    sbatchFile << "#SBATCH --output=qraise_%j\n\n";
+    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
 }
 
 void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const std::string& mode)
@@ -164,34 +158,42 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
 }
 
 }
-
+namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) 
 {
     auto args = argparse::parse<CunqaArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
-    const char* store = std::getenv("STORE");
-    std::string info_path = std::string(store) + "/.cunqa/qpus.json";
 
-    // Setting and checking mode and family name, respectively
-    std::string mode = args.cloud ? "cloud" : "hpc";
-    std::string family = args.family_name;
-    if (exists_family_name(family, info_path)) { //Check if there exists other QPUs with same family name
-        LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
-        std::system("rm qraise_sbatch_tmp.sbatch");
-        return -1;
+    if (args.infrastructure.has_value()) {
+            LOGGER_DEBUG("Raising infrastructure with path: {}", args.infrastructure.value());
+            fs::path current_dir = fs::current_path();
+            LOGGER_DEBUG("Current dir: {}", current_dir.string());
+
+            std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
+            write_sbatch_file_from_infrastructure(sbatchFile, args);
+            sbatchFile.close();
+    } else {
+        // Setting and checking mode and family name, respectively
+        std::string mode = args.co_located ? "co_located" : "hpc";
+        std::string family = args.family_name;
+        if (exists_family_name(family, constants::QPUS_FILEPATH)) { //Check if there exists other QPUs with same family name
+            LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
+            std::system("rm qraise_sbatch_tmp.sbatch");
+            return -1;
+        }
+
+        // Writing the sbatch file
+        std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
+        write_sbatch_header(sbatchFile, args);
+        write_run_command(sbatchFile, args, mode);
+        sbatchFile.close();
+
     }
 
-    // Writing the sbatch file
-    std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
-    write_sbatch_header(sbatchFile, args);
-    write_env_variables(sbatchFile);
-    write_run_command(sbatchFile, args, mode);
-    sbatchFile.close();
-
-    
     // Executing and deleting the file
     std::system("sbatch qraise_sbatch_tmp.sbatch");
     std::system("rm qraise_sbatch_tmp.sbatch");
-
+    
+    
     return 0;
 }

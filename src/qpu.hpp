@@ -19,7 +19,7 @@ public:
     std::unique_ptr<sim::Backend> backend;
     std::unique_ptr<comm::Server> server;
 
-    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, const std::string& family);
+    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, const std::string& name, const std::string& family);
     void turn_ON();
 
 private:
@@ -27,6 +27,7 @@ private:
     std::condition_variable queue_condition_;
     std::mutex queue_mutex_;
     std::string family_;
+    std::string name_;
 
     void compute_result_();
     void recv_data_();
@@ -37,6 +38,7 @@ private:
         j = {
             {"backend", backend_json},
             {"net", server_json},
+            {"name", obj.name_},
             {"family", obj.family_},
             {"slurm_job_id", std::getenv("SLURM_JOB_ID")}
         };

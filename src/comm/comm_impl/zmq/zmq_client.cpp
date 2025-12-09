@@ -19,13 +19,13 @@ struct Client::Impl {
         socket_.close();
     }
 
-    void connect(const std::string& ip, const std::string& port) 
+    void connect(const std::string& endpoint) 
     {
         try {
-            socket_.connect("tcp://" + ip + ":" + port);
-            LOGGER_DEBUG("Client successfully connected to server at {}:{}.", ip, port);
+            socket_.connect(endpoint);
+            LOGGER_DEBUG("Client successfully connected to server at {}.", endpoint);
         } catch (const zmq::error_t& e) {
-            LOGGER_ERROR("Unable to connect to endpoint {}:{}. Error: {}", ip, port, e.what());
+            LOGGER_ERROR("Unable to connect to endpoint {}. Error: {}", endpoint, e.what());
         } catch (const std::exception& e) {
             LOGGER_ERROR("Trying to connect to a QPU located in a external node. {}", e.what());
             throw;
@@ -58,6 +58,16 @@ struct Client::Impl {
         return std::string("{}");
     }
 
+    void disconnect(const std::string& endpoint)
+    {
+        if (endpoint != "") {
+            socket_.disconnect(endpoint);
+        } else {
+            socket_.close();
+            socket_ = zmq::socket_t(context_, zmq::socket_type::client);
+        }
+    }
+
     zmq::context_t context_;
     zmq::socket_t socket_;
 };
@@ -69,8 +79,8 @@ Client::Client() :
 
 Client::~Client() = default;
 
-void Client::connect(const std::string& ip, const std::string& port) {
-    pimpl_->connect(ip, port);
+void Client::connect(const std::string& endpoint) {
+    pimpl_->connect(endpoint);
 }
 
 FutureWrapper<Client> Client::send_circuit(const std::string& circuit) 
@@ -87,6 +97,10 @@ FutureWrapper<Client> Client::send_parameters(const std::string& parameters)
 
 std::string Client::recv_results() {
     return pimpl_->recv();
+}
+
+void Client::disconnect(const std::string& endpoint) {
+    pimpl_->disconnect(endpoint);
 }
 
 } // End of comm namespace
