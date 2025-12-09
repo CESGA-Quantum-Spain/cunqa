@@ -238,6 +238,5 @@ class QMIOClient:
         if not self._last_quantum_task:
             future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update its parameters")
             return future_error
-
         return self.send_circuit(parameters)
 

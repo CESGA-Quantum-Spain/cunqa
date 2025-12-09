@@ -55,7 +55,6 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
     return json.dumps(qmio_config_json)
 
 def _upgrade_parameters(quantum_task : tuple[dict, dict], parameters : list[float]) ->tuple[dict, dict]:
-    
     param_counter = 0
     for inst in quantum_task[0]["instructions"]:
         name = inst["name"]
