@@ -242,7 +242,7 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
                     json_data["is_dynamic"] = True
                     json_data["instructions"].append({"name":instruction.operation.name, 
                                                     "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                    "params":instruction.operation.params,
+                                                    "params":params,
                                                     "conditional_reg":[instruction.operation._condition[0]._index]
                                                     })  
                 else:
@@ -259,8 +259,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         raise error
 
 
-
-    
 
 def _qc_to_qasm(qc : 'QuantumCircuit', version = "3.0") -> str:
     
@@ -398,13 +396,6 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     for k,v in quantum_registers.items():
                         if inst_qubit in v:
                             inst_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
-
-            # checking for parameters
-
-            if 'params' in instruction:
-                params = instruction['params']
-            else:
-                params = []
 
             inst_operation = Instruction(name = instruction['name'],
                                         num_qubits = len(inst_Qubit),

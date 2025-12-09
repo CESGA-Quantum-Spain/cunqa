@@ -1,4 +1,5 @@
 add_subdirectory(circuit)
+add_subdirectory(qiskit_deps)
 
 pybind11_add_module(qclient bindings.cpp)
 
@@ -15,6 +16,3 @@ configure_file(
 file(GLOB PYTHON_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
 install(FILES ${PYTHON_SCRIPTS} DESTINATION cunqa)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/constants.py" DESTINATION cunqa)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/qiskit_deps/noise_instructions.py" 
-              "${CMAKE_CURRENT_SOURCE_DIR}/qiskit_deps/cunqabackend.py" 
-        DESTINATION cunqa/qiskit_deps)

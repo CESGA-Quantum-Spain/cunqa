@@ -9,6 +9,8 @@
 """
 
 from typing import  TypedDict
+import glob
+import os
 
 class BackendData(TypedDict):
     """
@@ -38,7 +40,15 @@ class Backend():
             backend_dict (BackendData): object that contains all the needed information about the backend.
         """
         for key, value in backend_dict.items():
+            
+            if key == "noise_properties_path" and value == "last_calibrations":
+                jsonpath = "/opt/cesga/qmio/hpc/calibrations"
+                files = jsonpath + "/????_??_??__??_??_??.json"
+                files = glob.glob(files)
+                value = max(files, key=os.path.getctime)
+
             setattr(self, key, value)
+
 
     #TODO: make @property?; add more methods as is_ideal, incorporate noisemodel object ot leave for transpilation only?
     def info(self) -> None:

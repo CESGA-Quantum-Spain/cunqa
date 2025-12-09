@@ -1446,7 +1446,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
 
-    def assign_parameters(self, given_params) -> None:
+    def assign_parameters(self, given_params: dict) -> None:
         """
         Assigns values to the Variable parameters on the circuit. Intended for use before the first execution
         as the simulation will fail without concrete values in the Variable parameters.
@@ -1459,6 +1459,15 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             logger.warning(f"Circuit {self._id} is not parametric, no parameters can be assigned.")
             return # TODO: consider wether an error should be raised instead
 
+        if len(given_params) == 0:
+            logger.debug("No parameters provided in `assign_parameters`.")
+            return
+
+        for k,v in given_params.items():
+            if isinstance(k, str):
+                del given_params[k]
+                given_params[Variable(k)] = v
+        
         if not all([isinstance((witness := v), (int, float)) for v in given_params.values()]):
             logger.error(f"Parameters must be int or float but {type(witness)} was given. \nGiven params were {given_params}")
             raise SystemExit
@@ -1507,7 +1516,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             self.assigned = True
                                 
         except Exception as error:
-            logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error}")
+            logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error} [{type(error).__name__}]")
             raise SystemExit
 
 
