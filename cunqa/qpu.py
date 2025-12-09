@@ -173,6 +173,11 @@ class QPU:
                 if ('has_cc' in circuit and circuit["has_cc"]) or ('has_qc' in circuit and circuit["has_qc"]):
                     logger.error("Distributed circuits can't run using QPU.run(), try run_distributed() instead.")
                     raise SystemExit
+                
+        # Disallow execution of circuits with non-assigned Variable parameters
+        if hasattr(circuit, "assigned") and not circuit.assigned:
+            logger.error("Circuits with Variable parameters should assign a values to them before executing.")
+            raise SystemExit
 
         # Handle connection to QClient
         if not self._connected:

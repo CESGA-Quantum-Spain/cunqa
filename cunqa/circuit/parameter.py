@@ -26,11 +26,6 @@ class Variable(sympy.Symbol):
         # Ensures unique symbol instances
         return sympy.Symbol.__new__(cls, name, **assumptions)
 
-    def subs(self, param, value):
-        """ Use .subs(param, value) to substitute the variable parameter for the value in the symbolic expression""" 
-        result = super().subs(self, param, value)
-        return float(result.evalf())
-
     # Dunder methods already implemented on the parent class
     # In particular, as sympy defines __hash__ and __eq__, so 
     # sympy objects and therefore cunqa.Variable objects can be used as keys of a dict

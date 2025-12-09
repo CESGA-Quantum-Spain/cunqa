@@ -148,7 +148,7 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
         if _is_parametric(qc):
             json_data["current_params"] = []
-            json_data["param_expressions"] = {"sympy_exprs": [], "lambda_funcs": []}
+            json_data["param_expressions"] = []
 
         for instruction in qc.data:
 
@@ -214,22 +214,23 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
                         var = Variable(str(param))
                         json_data["current_params"].append({var: None})
-                        json_data["param_expressions"]["sympy_exprs"].append(var)
-                        json_data["param_expressions"]["lambda_funcs"].append(lambda x: x)
+                        json_data["param_expressions"].append(var)
                         params[i]= var
 
                     elif isinstance(param, ParameterExpression):
 
                         expr = sympy.sympify(sympy.parsing.sympy_parser.parse_expr(str(param)))
-                        json_data["current_params"].append({symbol: None for symbol in expr.free_symbols})
-                        json_data["param_expressions"]["sympy_exprs"].append(expr)
-                        json_data["param_expressions"]["lambda_funcs"].append(sympy.lambdify(tuple(expr.free_symbols), expr, 'numpy'))
-                        params[i]= expr
+                        # Change Symbols for Variables in previous expression
+                        symbol_var_dict = {symbol: Variable(str(symbol)) for symbol in expr.free_symbols}
+                        cunqa_expr = expr.subs(symbol_var_dict)
+
+                        json_data["current_params"].append({var: None for var in symbol_var_dict.values()})
+                        json_data["param_expressions"].append(expr)
+                        params[i]= cunqa_expr
 
                     else:
                         json_data["current_params"].append(param)
-                        json_data["param_expressions"]["sympy_exprs"].append(None)
-                        json_data["param_expressions"]["lambda_funcs"].append(None)
+                        json_data["param_expressions"].append(None)
                         # No modification on params needed
                 
                 if (instruction.operation._condition != None):
@@ -362,7 +363,7 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     
                     if "param_expressions" in circuit_dict:
                         for i in range(len(params)):
-                            expr = circuit_dict["param_expressions"]["sympy_exprs"][param_counter + i]
+                            expr = circuit_dict["param_expressions"][param_counter + i]
                             if expr is None:
                                 continue
 

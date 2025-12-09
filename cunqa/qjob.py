@@ -335,7 +335,7 @@ class QJob:
                     ]
                 
                 premessage = [
-                        self._param_expressions["lambda_funcs"][i](*tuple(p.values())) 
+                        self._param_expressions[i].evalf(subs=p)
                         if isinstance(p, dict) 
                         else p 
                         for i, p in enumerate(self._current_params)
