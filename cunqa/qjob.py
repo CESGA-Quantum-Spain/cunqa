@@ -229,13 +229,13 @@ class QJob:
             if self._result is not None:
                 if not self._updated: # if the result was already obtained, we only call the server if an update was done
                     res = self._future.get()
-                    self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
+                    self._result = Result(json.loads(res), circ_id=self._circuit_id, cl_registers=self._cregisters)
                     self._updated = True
                 else:
                     pass
             else:
                 res = self._future.get()
-                self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
+                self._result = Result(json.loads(res), self._circuit_id, cl_registers=self._cregisters)
                 self._updated = True
                 
         except Exception as error:
