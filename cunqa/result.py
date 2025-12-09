@@ -207,10 +207,16 @@ class Result:
         
         return density_matrix
     
-    def probabilities(self, per_qubit: bool = False, partial: list[int] = None) -> Union[dict[np.array],  np.array]:
+    def probabilities(self, per_qubit: bool = False, partial: list[int] = None) -> Union[dict[np.array],  np.array, dict[float]]:
         """
         Extracts probabilities from result information. If we have statevector or density matrix 
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
+
+        Args:
+            per_qubit (bool): if True the probabilities are converted to per qubit probabilities.
+            partial (None, list[int]): list of indexes of the qubits that should be kept.
+             On the per bitstring case `partial` will determine the total probability space. 
+             Good for excluding ancillae.
 
         Returns:
             probs (dict, np.array): probabilities per bitstring found on counts. The probabilities are
@@ -244,12 +250,15 @@ class Result:
                 probs={}
                 for k, statevec in statevecs.items():
                     probs[k] = np.reshape(np.power(np.abs(statevec), 2), np.shape(statevec)[0])
+                # Extract number of qubits from the lenght of one of the sets of probs
+                num_qubits= int(math.log2(next(iter(probs.values())).size))
 
             else:
                 probs = np.reshape(np.power(np.abs(statevecs), 2), np.shape(statevecs)[0])
+                num_qubits= int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits= int(math.log2(probs.size)))
+                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
 
             return probs
 
@@ -260,11 +269,15 @@ class Result:
                 probs = {}
                 for k, densmat in densmats.items():
                     probs[k] =  np.diagonal(densmat, axis1=0).real
+                # Extract number of qubits from the lenght of one of the sets of probs
+                num_qubits = int(math.log2(next(iter(probs.values())).size)) 
+
             else:
                 probs =  np.diagonal(densmats, axis1=0).real
+                num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits= int(math.log2(probs.size)))
+                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
             
             return probs
 
@@ -392,7 +405,7 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
     return new_counts
 
 
-def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, partial: Union[None, list[int]], num_qubits: int):
+def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, partial: Union[None, list[int]], num_qubits: int) -> Union[dict[np.array], np.array, dict[float]]:
     """
     Modifies the probabilities per bitstring to obtain either probabilities per qubit or per 
     sub-bitstrings, were the indexes of the qubits to be kept are specified in `partial`. The per
@@ -402,7 +415,7 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         probs (np.array, dict[np.array]): one or more (dict case) set of probabilities per bitstring
         per_qubit (bool): if True the probabilities are converted to per qubit probabilities.
         partial (None, list[int]): list of indexes of the qubits that should be kept.
-         On the per bitstring case these will determine the total probability space. 
+         On the per bitstring case `partial` will determine the total probability space. 
          Good for excluding ancillae.
         num_qubits (int): number of qubits that determines the lenght of the bitstrings
 
@@ -414,6 +427,8 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         partial = list(range(num_qubits))
 
     if per_qubit:
+        logger.debug("Entering per_qubit calculation.")
+
         short_num_qubits = len(partial)
         if isinstance(probs, dict): # get a dict with probability arrays as values
 
@@ -444,7 +459,7 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
     else: # per_qubit is False, want probabilities of partial bitstrings
         short_num_qubits = len(partial)
         if isinstance(probs, dict): # get a dict with probability arrays as values
-            print("Dict detected\n")
+
             short_bitstring_probs = {}
             for k, probs_k in probs.items():
 
