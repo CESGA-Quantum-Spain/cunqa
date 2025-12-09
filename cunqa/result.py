@@ -244,12 +244,15 @@ class Result:
                 probs={}
                 for k, statevec in statevecs.items():
                     probs[k] = np.reshape(np.power(np.abs(statevec), 2), np.shape(statevec)[0])
+                # Extract number of qubits from the lenght of one of the sets of probs
+                num_qubits= int(math.log2(next(iter(probs.values())).size))
 
             else:
                 probs = np.reshape(np.power(np.abs(statevecs), 2), np.shape(statevecs)[0])
+                num_qubits= int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits= int(math.log2(probs.size)))
+                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
 
             return probs
 
@@ -260,11 +263,15 @@ class Result:
                 probs = {}
                 for k, densmat in densmats.items():
                     probs[k] =  np.diagonal(densmat, axis1=0).real
+                # Extract number of qubits from the lenght of one of the sets of probs
+                num_qubits = int(math.log2(next(iter(probs.values())).size)) 
+
             else:
                 probs =  np.diagonal(densmats, axis1=0).real
+                num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits= int(math.log2(probs.size)))
+                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
             
             return probs
 
