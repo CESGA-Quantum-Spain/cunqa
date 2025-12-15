@@ -4,6 +4,7 @@
 #include <string>
 
 #include "comm/client.hpp"
+#include "utils/helpers/qasm2_to_json.hpp"
 #include "json.hpp"
  
 namespace py = pybind11;
@@ -40,4 +41,9 @@ PYBIND11_MODULE(qclient, m) {
     py::arg("local_data"),
     py::arg("filename"),
     py::arg("suffix") = "");
+
+    m.def("qasm2_to_json", [](const std::string& circuit_qasm) {
+        return qasm2_to_json(circuit_qasm).dump();
+    });
+
 }
