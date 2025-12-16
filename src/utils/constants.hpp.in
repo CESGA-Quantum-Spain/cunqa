@@ -85,7 +85,8 @@ enum INSTRUCTIONS {
     QSEND,
     QRECV,
     EXPOSE,
-    RCONTROL
+    RCONTROL,
+    SAVE_STATE //SAVE_STATE
 };
 
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
@@ -180,7 +181,10 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"qrecv", QRECV},
 
     {"expose", EXPOSE},
-    {"rcontrol", RCONTROL}
+    {"rcontrol", RCONTROL},
+
+    // WEIRD GATES
+    {"save_state", SAVE_STATE}
 };
 
 const std::vector<std::string> BASIS_GATES = {

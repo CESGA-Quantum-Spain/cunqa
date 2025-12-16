@@ -357,6 +357,7 @@ class QJob:
         ########### Format message and send parameters to C++ ###########
         try:
             message = """{{"params":{}, "shots": {} }}""".format(premessage, shots).replace("'", '"')
+            logger.debug(f"Message to be sent for parameter updating is {message}.")
             self._future = self._qclient.send_parameters(message)
 
         except Exception as error:
@@ -364,6 +365,8 @@ class QJob:
             raise SystemExit # User's level
 
         self._updated = False # We indicate that new results will come, in order to call server
+
+        return self
 
     def _convert_circuit(self, circuit: Union[str, dict, 'CunqaCircuit', 'QuantumCircuit']) -> None:
         try:
@@ -493,8 +496,8 @@ class QJob:
                 "method":"automatic", 
                 "avoid_parallelization": False,
                 "num_clbits": self.num_clbits, 
-                "num_qubits": self.num_qubits, 
-                "seed": 123123
+                "num_qubits": self.num_qubits,
+                "seed": None
                 }
 
             if (run_parameters == None) or (len(run_parameters) == 0):

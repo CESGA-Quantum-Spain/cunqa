@@ -205,6 +205,11 @@ class Result:
             logger.error(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
             raise error
         
+        # # Divide by shots because qiskit apparently sums density matrices 
+        # logger.debug(f"Divinding density matrix/matrices by number of shots due to qiskit options")
+        # for k in density_matrix.keys():
+        #     density_matrix[k] /= sum([int(v) for v in self.counts.values()]) 
+        
         return density_matrix
     
     def probabilities(self, per_qubit: bool = False, partial: list[int] = None) -> Union[dict[np.array],  np.array, dict[float]]:
@@ -268,16 +273,21 @@ class Result:
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
-                    probs[k] =  np.diagonal(densmat, axis1=0).real
+                    probs[k] =  np.diagonal(densmat, axis1=0).real[0]
                 # Extract number of qubits from the lenght of one of the sets of probs
                 num_qubits = int(math.log2(next(iter(probs.values())).size)) 
 
             else:
-                probs =  np.diagonal(densmats, axis1=0).real
+                probs =  np.diagonal(densmats, axis1=0).real[0]
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
                 probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
+
+            # TODO: check qiskit options so that the returned density matrix is actually a density matrix
+            if isinstance(densmats, dict):
+                for k in probs.keys():
+                    probs[k] /= sum([int(v) for v in self.counts.values()]) 
             
             return probs
 
