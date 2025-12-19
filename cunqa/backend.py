@@ -8,7 +8,7 @@
         <cunqa.backend.Backend object at XXXX>
 """
 
-from typing import  TypedDict
+from typing import TypedDict
 import glob
 import os
 
@@ -16,11 +16,11 @@ class BackendData(TypedDict):
     """
         Class to gather the characteristics of a :py:class:`~cunqa.backend.Backend` object.
     """
-    basis_gates: "list[str]" #: Native gates that the Backend accepts. If other are used, they must be translated into the native gates.
-    coupling_map: "list[list[int]]" #: Defines the physical connectivity of the qubits, in which pairs two-qubit gates can be performed.
+    basis_gates: list[str] #: Native gates that the Backend accepts. If other are used, they must be translated into the native gates.
+    coupling_map: list[list[int]] #: Defines the physical connectivity of the qubits, in which pairs two-qubit gates can be performed.
     custom_instructions: str #: Any custom instructions that the Backend has defined.
     description: str #: Description of the Backend itself.
-    gates: "list[str]" #: Specific gates supported.
+    gates: list[str] #: Specific gates supported.
     n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
     name: str #: Name assigned to the Backend.
     noise_path: str #: Path to the noise model json file gathering the noise instructions needed for the simulator.

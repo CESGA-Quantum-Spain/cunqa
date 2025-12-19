@@ -1,27 +1,32 @@
 """
-    Contains objects that define and manage quantum emulation jobs.
+    Contains objects that define and manage quantum emulation jobs. The core of this module is the 
+    class :py:class:`~cunqa.qjob.QJob`. These objects are created when a quantum job is sent to a 
+    vQPU, as a return of the :py:func:`~cunqa.qpu.run` function:
 
-    The core of this module is the class :py:class:`~cunqa.qjob.QJob`. These objects are created 
-    when a quantum job is sent to a virtual QPU, as a return of the :py:meth:`~cunqa.qpu.QPU.run` 
-    method:
-
-        >>> qpu.run(circuit)
+        >>> run(circuit, qpu)
         <cunqa.qjob.QJob object at XXXXXXXX>
         
-    Once it is created, the circuit is being simulated at the virtual QPU.
-    :py:class:`QJob` is the bridge between sending a circuit with instructions and recieving the 
-    results. Because of this, usually one wants to save this output in a variable:
+    In this method, after the :py:class:`~cunqa.qjob.QJob` instance is created, the circuit is 
+    submitted for simulation at the virtual QPU. :py:class:`QJob` is the bridge between sending a 
+    circuit with instructions and receiving the results. For the latter, usually is done in the 
+    following way: 
 
-        >>> qjob = qpu.run(circuit)
+        >>> qjob = run(circuit, qpu)
+        >>> qjob.result
+        <cunqa.result.Result object at XXXXXXXX>
+
+    This :py:class:`~cunqa.result.Result` class contains all the data available from the execution 
+    and we refer the reader to its documentation for further information.
 
     Another functionality described in the submodule is the function :py:func:`~gather`, 
     which recieves a list of :py:class:`~QJob` objects and returns their results as 
     :py:class:`~cunqa.result.Result` objects.
 
-        >>> qjob_1 = qpu_1.run(circuit_1)
-        >>> qjob_2 = qpu_2.run(circuit_2)
-        >>> results = gather([qjob_1, qjob_2])
-    
+        >>> qjob_1 = run(circuit_1, qpu_1)
+        >>> qjob_2 = run(circuit_2, qpu_2)
+        >>> gather([qjob_1, qjob_2])
+        [<cunqa.result.Result object at XXXXXXXX>, <cunqa.result.Result object at XXXXXXXX>]
+
     For further information on sending and gathering quantum jobs, chekout the 
     `Examples Galery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
     """
@@ -33,18 +38,12 @@ from cunqa.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
 
-
-class QJobError(Exception):
-    """Exception for error during job submission to virtual QPUs."""
-    pass
-
 class QJob:
     """
-    Class to handle jobs sent to virtual QPUs.
-
-    A :py:class:`QJob` object is created as the output of the :py:meth:`~cunqa.qpu.QPU.run` method.
-    The quantum job not only contains the circuit to be simulated, but also simulation instructions 
-    and information of the virtual QPU to which the job is sent.
+    Class to handle jobs sent to virtual QPUs. A :py:class:`QJob` object is created as the output 
+    of the :py:meth:`~cunqa.qpu.QPU.run` method. The quantum job not only contains the circuit to be 
+    simulated, but also simulation instructions and information of the virtual QPU to which the job 
+    is sent.
 
     One would want to save the :py:class:`QJob` resulting from sending a circuit in a variable.
     Let's say we want to send a circuit to a QPU and get the result and the time taken for the 
@@ -166,8 +165,8 @@ class QJob:
     qclient: QClient #: Client linked to the server that listens at the virtual QPU.
     _circuit_id: str
     _updated: bool
-    _future: 'FutureWrapper' 
-    _result: Optional['Result']
+    _future: FutureWrapper 
+    _result: Optional[Result]
     _quantum_task: str
 
     def __init__(self, qclient: QClient, circuit_ir: dict, **run_parameters: Any):
@@ -223,17 +222,17 @@ class QJob:
             "instructions": circuit_ir["instructions"],
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
-            "has_cc": circuit_ir["has_cc"]
+            "has_cc": circuit_ir["has_cc"], 
+            "id": circuit_ir["id"]
         })
-    
+      
         logger.debug("Qjob configured")
 
     @property
-    def result(self) -> 'Result':
+    def result(self) -> Result:
         """
-        Result of the job.
-        If no error occured during simulation, a :py:class:`~cunqa.result.Result` object is retured.
-        Otherwise, :py:class:`~cunqa.result.ResultError` will be raised.
+        Result of the job. If no error occured during simulation, a :py:class:`~cunqa.result.Result` 
+        object is retured.
 
         .. note::
             Since to obtain the result the simulation has to be finished, this method is a blocking 
@@ -280,7 +279,7 @@ class QJob:
         Asynchronous method to submit a job to the corresponding :py:class:`QClient`.
 
         .. note::
-            Differently from :py:meth:`~QJob.result`, this is a non-blocking call.
+            Differently from :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
             Once a job is summited, there is no wait, the python program continues at the same time 
             that the corresponding server recieves and simualtes the circuit.
         """
@@ -369,6 +368,7 @@ def gather(qjobs: list[QJob]) -> list[Result]:
     """
 
     try:    
+        print(qjobs)
         return [q.result for q in qjobs]
     except Exception:
         logger.error("gather needs a list of <class 'cunqa.qjob.QJob'>, but this was not provided")    

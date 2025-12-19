@@ -4,7 +4,7 @@
     to manage them.
 
     Once we have submmited a :py:class:`~cunqa.qjob.QJob`, for obtaining its results we call for its 
-    propperty :py:attr:`QJob.result`:
+    property :py:attr:`~cunqa.qjob.QJob.result`:
 
         >>> qjob.result
         <cunqa.result.Result object at XXXX>
@@ -30,7 +30,7 @@ class Result:
     It has two main attributes:
 
     - :py:attr:`Result.counts` : returns the distribution of counts from the sampling of the 
-    simulation.
+      simulation.
 
             >>> result.counts
             {'000':34, '111':66}
@@ -116,8 +116,6 @@ class Result:
         
         if len(self._registers) == 1:
             return counts
-        
-        logger.debug(f"Dividing strings into {len(lengths)} classical registers.")
 
         lengths = [len(reg) for reg in self._registers.values()]
         if not lengths:

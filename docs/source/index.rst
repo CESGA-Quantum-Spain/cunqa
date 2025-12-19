@@ -21,14 +21,14 @@ Welcome to CUNQA's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   getting_started
+   Getting started <getting_started/getting_started>
 
 .. toctree::
    :maxdepth: 1
 
-   cunqa
+   CUNQA reference <api/cunqa>
 
 .. toctree::
    :maxdepth: 2
    
-   examples_gallery
+   Tutorial <tutorial/tutorial>

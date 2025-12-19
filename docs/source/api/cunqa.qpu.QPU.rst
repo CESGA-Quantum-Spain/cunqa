@@ -1,0 +1,42 @@
+cunqa.qpu.QPU
+=============
+
+.. currentmodule:: cunqa.qpu
+
+.. autoclass:: QPU
+   :show-inheritance:
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autosummary::
+   :nosignatures:
+
+   ~QPU.backend
+   ~QPU.id
+
+
+
+Methods
+~~~~~~~
+
+.. automethod:: QPU.__init__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. automethod:: QPU.execute
+

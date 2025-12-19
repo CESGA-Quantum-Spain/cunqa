@@ -22,10 +22,10 @@ def _(c: CunqaCircuit) -> dict:
     return _cunqac_to_json(c)
 
 @to_ir.register
-def _(c: QuantumCircuit) -> tuple[dict, dict]:
+def _(c: QuantumCircuit) -> dict:
     return _qc_to_json(c)
 
 @to_ir.register
 def _(c: dict) -> dict:
-    logger.warning("Circuit is already in IR format")
+    logger.debug("Circuit is already in IR format, returning it as is.")
     return c

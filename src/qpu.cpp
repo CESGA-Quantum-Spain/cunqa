@@ -24,8 +24,6 @@ void QPU::turn_ON()
     JSON qpu_config = *this;
     write_on_file(qpu_config, constants::QPUS_FILEPATH, family_);
 
-    //LOGGER_DEBUG("QPU info written");
-
     listen.join();
     compute.join();
 }
@@ -68,7 +66,8 @@ void QPU::recv_data_()
     while (true) {
         try {
             auto message = server->recv_data();
-                {
+            LOGGER_DEBUG("Circuit: {}", message);
+            {
                 std::lock_guard<std::mutex> lock(queue_mutex_);
                 if (message.compare("CLOSE"s) == 0) {
                     server->accept();

@@ -1,5 +1,18 @@
-CUNQA module
-================
+CUNQA reference
+===============
+
+
+Commands
+--------
+
+`qraise`
+`qdrop`
+`qinfo`
+
+
+Python API
+----------
+
 .. autosummary::
    :toctree:
    :template: custom-module-template.rst
@@ -7,18 +20,10 @@ CUNQA module
    
    cunqa.backend
 
-   cunqa.circuit
-
-   cunqa.converters
-
    cunqa.mappers
 
    cunqa.qjob
 
    cunqa.qpu
 
-   cunqa.qutils
-
    cunqa.result
-
-   cunqa.transpile

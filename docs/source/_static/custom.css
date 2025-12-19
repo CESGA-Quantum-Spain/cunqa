@@ -1,22 +1,33 @@
-/* Cambiar color de los bloques .. note:: */
 div.admonition.note {
-    background-color: #f4e6ff;   /* azul clarito */
+    background-color: #f4e6ff;
 }
 
-/* Cambiar color del título dentro de la nota */
 div.admonition.note > .admonition-title {
     background-color: #b97cda;
     color: white;
     font-weight: bold
 }
 
-/* Para todos los contenedores de imágenes de .. image:: */
 .rst-content p.image {
-    margin-bottom: 1.5em !important;  /* espacio extra debajo */
+    margin-bottom: 1.5em !important; 
     display: block;
 }
 
-/* Si usas .. figure:: en vez de .. image:: */
 .rst-content .figure {
     margin-bottom: 1.5em !important;
+}
+
+
+.nbgallery,
+.nbsphinx-gallery,
+.sphx-glr-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nbgallery > *,
+.nbsphinx-gallery > *,
+.sphx-glr-thumbnails > * {
+  float: none !important;
 }

@@ -3,12 +3,11 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import sys
-import os
+import os, sys
 import shutil
 from pathlib import Path
-sys.path.insert(0, os.path.abspath('../..'))
 
+sys.path.insert(0, os.path.abspath('../..'))
 
 os.environ['CUNQA_PATH'] = ''
 os.environ['HOSTNAME'] = ''
@@ -16,6 +15,7 @@ os.environ['QPUS_FILEPATH'] = ''
 os.environ['SLURMD_NODENAME'] = ''
 os.environ['SLURM_JOB_ID'] = ''
 os.environ['STORE'] = ''
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -29,6 +29,7 @@ author = 'Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx_copybutton',
     'nbsphinx',
     'sphinx_mdinclude',
     'sphinx.ext.githubpages',
@@ -40,9 +41,9 @@ extensions = [
 source_suffix = ['.rst', '.md']
 
 autosummary_generate = True
-
 autosummary_generate_overwrite = True
 
+nbsphinx_execute = "never" # Never execute the Jupyter notebooks
 
 autodoc_default_options = {
     # "members": True,        # ← NO
@@ -57,7 +58,6 @@ autodoc_mock_imports = [
     'collections',
     'copy',
     'cunqa.constants',
-    'cunqa.fakeqmio',
     'cunqa.logger',
     'cunqa.qclient',
     'dateutil',
@@ -70,14 +70,11 @@ autodoc_mock_imports = [
     'load',
     'logging',
     'logger',
-    'numpy',
     'operator',
     'os',
-    'Pandoc',
-    'QClient',
-    'qiskit',
-    'qiskit_aer',
-    'qmiotools',
+    #'QClient',
+    #'qiskit',
+    #'qiskit_aer',
     'random',
     'string',
     'subprocess',
@@ -142,11 +139,19 @@ def processing_lists_type(part, aliases):
         end += "]"
     # Common Python types
     valid_types = [
-        "int", "float", "str", "bool", "list", "dict", "tuple", "set", "None", "bytes", "complex", "object", "callable"
+        "int",      "float",       
+        "str",      "bool", 
+        "list",     "dict", 
+        "tuple",    "set", 
+        "None",     "bytes", 
+        "complex",  "object", 
+        "callable"
     ]
 
     if part not in valid_types:
-        return _old_process_type(init.strip(),aliases)+_old_process_type(part.strip(), aliases)+_old_process_type(end.strip(),aliases)
+        return _old_process_type(init.strip(),aliases)  + \
+               _old_process_type(part.strip(), aliases) + \
+               _old_process_type(end.strip(),aliases)
     else:
         return _old_process_type(original.strip(), aliases)
     
@@ -167,47 +172,6 @@ def _custom_process_type(name, aliases={}):
 # Monkeypatch
 ndoc._convert_type_spec = _custom_process_type
 
-
-
-# napoleon_include_init_with_doc = False  # Incluye __init__ si tiene docstring
-# # napoleon_include_private_with_doc = False  # Incluye miembros privados con docstring
-# napoleon_include_special_with_doc = False  # Incluye miembros especiales con docstring
-# napoleon_type_aliases = {}  # Puedes mapear tipos personalizados aquí
-# napoleon_attr_annotations = True  # Procesa anotaciones de atributos
-# napoleon_custom_sections = None  # Puedes definir secciones personalizadas en docstrings
-
 highlight_options = {
     'linenos': 'inline',  # 'table' para columna separada, 'inline' para inline numbers
 }
-
-
-def setup(app):
-    #Copy jupyter notebooks (+ .py) to folder docs/source/_examples so nbsphinx can read them for our gallery
-    here = Path(__file__).resolve() # CUNQA/docs/source/
-    project_root = here.parents[2]  # Goes from /docs/source to project root
-    source_notebooks_dir = project_root / 'examples/jupyter'
-    source_py_dir = project_root / 'examples/python'
-    dest_dir = here.parent / '_examples'  # This will be docs/source/_examples
-    dest_dir_2 = dest_dir / 'py_file_examples'
-
-    dest_dir.mkdir(exist_ok=True) 
-    dest_dir_2.mkdir(exist_ok=True)
-
-
-    for notebook in source_notebooks_dir.glob('*.ipynb'):
-        shutil.copy(notebook, dest_dir / notebook.name)
-    for py_file in source_py_dir.glob('*.py'):
-        shutil.copy(py_file, dest_dir_2 / py_file.name)
-
-    # Automatically create files that include each of the .py examples
-    for code_file in dest_dir_2.glob('*.py'):
-        filename = code_file.stem # Get the filename without the extension
-
-        # Create the Sphinx source file
-        source_file = dest_dir_2 / f'{filename}.rst'
-        with source_file.open('w') as f:
-            f.write(f'{filename}\n')
-            f.write('=' * len(filename) + '\n\n')
-            f.write(f'.. literalinclude:: {filename}.py\n')
-            f.write('   :language: python\n')
-            f.write('   :linenos:\n')

@@ -15,7 +15,8 @@ from qiskit.qasm2 import dumps as dumps2
 from qiskit.qasm3 import dumps as dumps3
 
 from typing import Tuple, Union, Optional
-from cunqa.circuit.circuit import CunqaCircuit
+from .core import CunqaCircuit
+from .helpers import generate_id
 from cunqa.logger import logger
 
 
@@ -128,7 +129,7 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         logger.debug(f"Localized quamtum registers: {quantum_registers}\n Localized classical registers: {classical_registers}")
         
         json_data = {
-            "id": "",
+            "id": "QuantumCircuit_" + generate_id(),
             "is_parametric": _is_parametric(qc),
             "is_dynamic": False,
             "has_cc":False,
@@ -217,7 +218,6 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
                                             "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                                             "params":instruction.operation.params
                                             })
-       
         return json_data
     
     except Exception as error:
