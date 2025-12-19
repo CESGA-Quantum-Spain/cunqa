@@ -136,11 +136,11 @@ class QMIOLinker:
                 message = pickle.loads(ser_message)
                 if isinstance(message, dict) and ("params" in message):
                     self._last_quantum_task = _upgrade_parameters(self._last_quantum_task, message["params"])
-                    upgraded_qasm_circ = convert(self._last_quantum_task[0], convert_to = "qasm", qasm_version = "3.0")
+                    upgraded_qasm_circ = convert(self._last_quantum_task[0], convert_to = "qasm")
                     quantum_task = (upgraded_qasm_circ, self._last_quantum_task[1])
                 else:
                     self._last_quantum_task = message 
-                    qasm_circuit = convert(message[0], convert_to = "qasm", qasm_version = "3.0")
+                    qasm_circuit = convert(message[0], convert_to = "qasm")
                     quantum_task = (qasm_circuit, message[1])
                     
                 self.message_queue.put(quantum_task)

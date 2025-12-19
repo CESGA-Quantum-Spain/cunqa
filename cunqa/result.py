@@ -110,7 +110,7 @@ class Result:
         """Counts distribution from the sampling of the simulation, format is ``{"<bit string>":<number of counts as int>}``."""
         try:
             if "qmio_results" in list(self._result.keys()): 
-                counts = self._result["qmio_results"]["meas"] #TODO: More registers?
+                counts = self._result["qmio_results"]["reg_measure"] #TODO: More registers? 
             elif "results" in list(self._result.keys()): # aer
                 counts = self._result["results"][0]["data"]["counts"]
             elif "counts" in list(self._result.keys()): # munich and cunqa
