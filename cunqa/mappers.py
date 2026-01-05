@@ -81,8 +81,6 @@ from qiskit import QuantumCircuit
 from qiskit.exceptions import QiskitError
 from typing import  Optional, Union, Any
 
-import time
-
 class QJobMapper:
     """
     Class to map the method :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` to a set of jobs sent to 
@@ -128,7 +126,6 @@ class QJobMapper:
 
         """
         self.qjobs = qjobs
-        logger.debug(f"QJobMapper initialized with {len(qjobs)} QJobs.")
 
     def __call__(self, func, population):
         """
@@ -143,21 +140,20 @@ class QJobMapper:
         Args:
             func (callable): function to be passed to the results of the jobs. 
 
-            population (list[list[int | float]]): list of vectors to be mapped to the jobs.
+            population (list[list[int | float] | np.array[int | float]]): list of numpy vectors to 
+            be mapped to the jobs.
             
         Return:
             List of outputs of the function applied to the results of each job for the given 
             population.
         """
+        if (len(self.qjobs) != len(population)):
+            raise ValueError("The size of the popultion does not match the amount of qjobs")
         qjobs_ = []
-        logger.debug(f"Updating params for QJob objects...")
         for qjob, params in zip(self.qjobs, population):
-            qjob.upgrade_parameters(params.tolist())
+            qjob.upgrade_parameters(list(params))
             qjobs_.append(qjob)
-
         results = gather(qjobs_) # we only gather the qjobs we upgraded.
-        logger.debug(f"Parameters uptaded for QJob {qjob}...")
-
         return [func(result) for result in results]
 
 
@@ -239,8 +235,6 @@ class QPUCircuitMapper:
                             f"was provided [{TypeError.__name__}].")
         
         self.run_parameters = run_parameters
-        
-        logger.debug(f"QPUMapper initialized with {len(qpus)} QPUs.")
 
     def __call__(self, func, population):
         """
@@ -265,27 +259,12 @@ class QPUCircuitMapper:
         """
 
         qjobs = []
-
         try:
-            tick = time.time()
-
             for i, params in enumerate(population):
                 qpu = self.qpus[i % len(self.qpus)]
                 circuit_assembled = self.circuit.assign_parameters(params)
-
-                logger.debug(f"Sending QJob to QPU {qpu._id}...")
                 qjobs.append(run(circuit_assembled, qpu, **self.run_parameters))
-
-            logger.debug(f"About to gather {len(qjobs)} results ...")
             results = gather(qjobs)
-            
-            tack = time.time()
-            median = sum([res.time_taken for res in results])/len(results)
-            logger.debug(f"Mean simulation time: {median}")
-            logger.debug(f"Total distribution and gathering time: {tack-tick}")
-
             return [func(result) for result in results]
-        
         except QiskitError as error:
-            raise RuntimeError(f"Error while assigning parameters to Qiskit's QuantumCircuit, please "
-                               f"check they have the correct size [{type(error).__name__}]: {error}.")
+            raise RuntimeError(f"Error while assigning parameters to Qiskit's QuantumCircuit: {error}.")

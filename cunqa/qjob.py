@@ -367,8 +367,7 @@ def gather(qjobs: list[QJob]) -> list[Result]:
             List of :py:class:`~cunqa.result.Result` objects.
     """
 
-    try:    
-        print(qjobs)
+    if(qjobs):
         return [q.result for q in qjobs]
-    except Exception:
-        logger.error("gather needs a list of <class 'cunqa.qjob.QJob'>, but this was not provided")    
+    else: 
+        raise AttributeError("qjobs in gather cannot be none.")    

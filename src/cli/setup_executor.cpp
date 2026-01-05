@@ -55,13 +55,13 @@ int main(int argc, char *argv[])
             executor.run();
             break;
         }
-        case murmur::hash("Qulacs"):
+        /* case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
             QulacsExecutor executor(family_name);
             executor.run();
             break;
-        }
+        } */
         default:
             LOGGER_ERROR("Not a supported simulator: {}.", sim_arg);
             return EXIT_FAILURE;

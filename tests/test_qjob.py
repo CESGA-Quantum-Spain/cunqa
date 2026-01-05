@@ -6,7 +6,7 @@ import pytest
 HOME = os.getenv("HOME")
 sys.path.insert(0, HOME)
 
-import cunqa.qjob as qjob_module
+import cunqa.qjob as qjob_mod
 from cunqa.qjob import QJob, gather
 
 
@@ -30,7 +30,7 @@ def qclient_mock():
 @pytest.fixture
 def logger_mock(monkeypatch):
     mock_logger_cls = Mock(name="logger")
-    monkeypatch.setattr(qjob_module, "logger", mock_logger_cls)
+    monkeypatch.setattr(qjob_mod, "logger", mock_logger_cls)
 
     return mock_logger_cls
 
@@ -98,7 +98,7 @@ def test_result_fetches_once_and_caches(monkeypatch, qclient_mock, circuit_ir):
 
     result_instance = Mock(name="Result")
     result_mock = Mock(return_value=result_instance)
-    monkeypatch.setattr(qjob_module, "Result", result_mock)
+    monkeypatch.setattr(qjob_mod, "Result", result_mock)
 
     job = QJob(qclient_mock, circuit_ir)
     job._future = future_mock
@@ -296,8 +296,6 @@ def test_gather_returns_list_of_results(monkeypatch):
     assert results == ["r1", "r2", "r3"]
 
 
-def test_gather_with_non_iterable_logs_error_and_returns_none(logger_mock):
-    res = gather(None)
-
-    assert res is None
-    logger_mock.error.assert_called_once()
+def test_gather_with_non_iterable_raises():
+    with pytest.raises(AttributeError) as _:
+        _ = gather(None)
