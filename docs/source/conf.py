@@ -7,6 +7,7 @@ import sys
 import os
 import shutil
 from pathlib import Path
+from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -52,12 +53,15 @@ autodoc_default_options = {
 autodoc_member_order = "bysource"
 autodocsumm_member_order = "bysource"
 
+mock_constants = MagicMock()
+mock_constants.LIBS_DIR = "." 
+sys.modules["cunqa.constants"] = mock_constants
+
 autodoc_mock_imports = [
     'argparse',
     'collections',
     'copy',
     'cunqa.constants',
-    'cunqa.fakeqmio',
     'cunqa.logger',
     'cunqa.qclient',
     'dateutil',
@@ -83,7 +87,14 @@ autodoc_mock_imports = [
     'subprocess',
     'sys',
     'time',
-    'typing'
+    'typing',
+    'zmq',
+    'pathlib',
+    'psutil',
+    'socket',
+    'pickle',
+    'threading',
+    'queue', 
 ]
 
 

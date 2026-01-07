@@ -8,7 +8,10 @@ from cunqa.qclient import write_on_file
 from cunqa.circuit import convert
 from cunqa.logger import logger
 
-sys.path.append(LIBS_DIR)
+try:
+    sys.path.append(LIBS_DIR)
+except Exception:
+    pass
 
 import zmq
 import json

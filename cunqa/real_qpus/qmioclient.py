@@ -6,7 +6,10 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.constants import LIBS_DIR
 from cunqa.logger import logger
 
-sys.path.append(LIBS_DIR)
+try:
+    sys.path.append(LIBS_DIR)
+except Exception:
+    pass
 
 import zmq
 import json
