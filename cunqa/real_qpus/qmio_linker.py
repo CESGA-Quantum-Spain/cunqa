@@ -1,9 +1,7 @@
 import sys, os
 from pathlib import Path
 
-current_file_dir = Path(__file__).resolve().parent
-parent_dir = current_file_dir.parent.parent
-sys.path.append(str(parent_dir))
+sys.path.append(os.getenv("HOME"))
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
 from cunqa.qclient import write_on_file
