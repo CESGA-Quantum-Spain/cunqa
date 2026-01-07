@@ -84,6 +84,7 @@ from json import load
 import json
 
 from cunqa.qclient import QClient
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.backend import Backend
 from cunqa.logger import logger
 from cunqa.qpu import QPU
@@ -107,7 +108,8 @@ def qraise(n, t, *,
            n_nodes = None, 
            node_list = None, 
            qpus_per_node= None,
-           partition = None) -> Union[tuple, str]:
+           partition = None,
+           qmio = None) -> Union[tuple, str]:
     """
     Raises virtual QPUs and returns the job id associated to its SLURM job.
 
@@ -181,6 +183,8 @@ def qraise(n, t, *,
             command = command + f" --backend={str(backend)}"
         if partition is not None:
             command = command + f" --partition={str(partition)}"
+        if qmio is not None:
+            command = command + " --qmio"
 
 
         if not os.path.exists(QPUS_FILEPATH):
@@ -381,12 +385,15 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
     # create QPU objects from the dictionary information + return them on a list
     qpus = []
     for id, info in targets.items():
-        client = QClient()
-        endpoint = info["net"]["endpoint"]
-        name = info["name"]
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = name, family = info["family"], endpoint = endpoint))
+        if "real_qpu" in info:
+            logger.debug("Real QPU found")
+            client = QMIOClient()
+        else:
+            logger.debug("Virtual QPU found") 
+            client = QClient()
+        
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"]))
     if len(qpus) != 0:
-        logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
     else:
         logger.error(f"No QPUs where found with the characteristics provided: on_node={on_node}, family_name={family}.")

@@ -37,6 +37,17 @@ add_executable(qinfo qinfo.cpp)
 target_link_libraries(qinfo PRIVATE json logger_client morrisfranken::argparse)
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
+# SETUP_QMIO executable
+add_executable(setup_qmio setup_qmio.cpp)
+target_link_libraries(setup_qmio PRIVATE json cppzmq server logger_qpu)
+target_include_directories(setup_qmio PRIVATE   "${CMAKE_SOURCE_DIR}/src"
+                                                "${ZMQ_BINARY_DIR}"
+                                                "${ZMQ_INCLUDE_DIR}"
+                                                "${CMAKE_SOURCE_DIR}/src/third-party/zmq")
+target_link_directories(setup_qmio PRIVATE "${ZMQ_BINARY_DIR}/lib")
+target_include_directories(setup_qmio PRIVATE )
+install(TARGETS setup_qmio DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
 # Epilog tool erase_key and noise models
 add_executable(erase_key erase_key.cpp)
 target_link_libraries(erase_key PRIVATE json)
