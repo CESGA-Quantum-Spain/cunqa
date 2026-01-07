@@ -82,7 +82,7 @@ function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
     )
     FetchContent_MakeAvailable(${PACKAGE_NAME})
   else()
-    message(STATUS "Found package ${PACKAGE_NAME}")
+    message(STATUS "Found package ${PACKAGE_NAME}: ${PACKAGE_NAME}_DIR = ${${PACKAGE_NAME}_DIR}")
   endif()
 endfunction()
 
@@ -154,6 +154,19 @@ find_or_fetch_package(
   "4.11.0"
   "v4.11.0"
 )
+
+# -- pyzmq -----------------------------------------------------------
+set(ZMQ_PREFIX "${libzmq_BINARY_DIR}" CACHE PATH "ZMQ_PREFIX" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}/lib")
+
+FetchContent_Declare(
+    pyzmq
+    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
+    GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(pyzmq)
+install(DIRECTORY  "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq")
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq/backend/cython")
 
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain

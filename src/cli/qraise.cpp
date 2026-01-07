@@ -16,6 +16,7 @@
 #include "qraise/simple_conf_qraise.hpp"
 #include "qraise/cc_conf_qraise.hpp"
 #include "qraise/qc_conf_qraise.hpp"
+#include "qraise/qmio_conf_qraise.hpp"
 #include "qraise/infrastructure_conf_qraise.hpp"
 
 #include "logger.hpp"
@@ -144,7 +145,7 @@ void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const s
     sbatchFile << run_command;
 }
 
-}
+} // End namespace
 namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) 
@@ -177,8 +178,13 @@ int main(int argc, char* argv[])
         // Writing the sbatch file
         std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
         try {
-            write_sbatch_header(sbatchFile, args);
-            write_run_command(sbatchFile, args, mode);
+            if (args.qmio) {
+                write_qmio_sbatch(sbatchFile, args);
+                sbatchFile.close();
+            } else {
+                write_sbatch_header(sbatchFile, args);
+                write_run_command(sbatchFile, args, mode);
+            }
         } catch (const std::exception& e) {
             LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
             std::system("rm qraise_sbatch_tmp.sbatch");
