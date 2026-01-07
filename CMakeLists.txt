@@ -205,7 +205,7 @@ endif()
 FetchContent_Declare(
     qulacs
     GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
-    GIT_TAG "main"
+    GIT_TAG "228f617b9e31007b54488f467c031ebbf07efcdb"
 
 )
 set(USE_PYTHON OFF CACHE BOOL "" FORCE)
