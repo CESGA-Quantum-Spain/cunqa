@@ -3,24 +3,25 @@
 #include <thread>
 #include <chrono>
 
-#include "aer_adapters/aer_simulator_adapter.hpp"
-#include "aer_adapters/aer_computation_adapter.hpp"
+#include "maestro_adapters/maestro_simulator_adapter.hpp"
+#include "maestro_adapters/maestro_computation_adapter.hpp"
 #include "quantum_task.hpp"
-#include "aer_executor.hpp"
+#include "maestro_executor.hpp"
 
-#include "utils/constants.hpp"
 #include "utils/json.hpp"
+#include "utils/constants.hpp"
 #include "logger.hpp"
 
 namespace cunqa {
 namespace sim {
 
-AerExecutor::AerExecutor() : classical_channel{"executor"}
+MaestroExecutor::MaestroExecutor() : classical_channel{"executor"}
 {
-    std::ifstream in(constants::COMM_FILEPATH);
+    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
+    std::ifstream in(filename);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file in AerExecutor.");
+        throw std::runtime_error("Error opening the communications file in MaestroExecutor.");
     }
 
     JSON j;
@@ -40,12 +41,12 @@ AerExecutor::AerExecutor() : classical_channel{"executor"}
     }
 };
 
-AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"executor"}
+MaestroExecutor::MaestroExecutor(const std::string& group_id) : classical_channel{"executor"}
 {
     std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file in AerExecutor.");
+        throw std::runtime_error("Error opening the communications file in MaestroExecutor.");
     }
 
     JSON j;
@@ -63,7 +64,8 @@ AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"execu
     }
 };
 
-void AerExecutor::run()
+
+void MaestroExecutor::run()
 {
     std::vector<QuantumTask> quantum_tasks;
     std::vector<std::string> qpus_working;
@@ -72,7 +74,6 @@ void AerExecutor::run()
     while (true) {
         for(const auto& qpu_id: qpu_ids) {
             message = classical_channel.recv_info(qpu_id);
-
             if(!message.empty()) {
                 qpus_working.push_back(qpu_id);
                 quantum_task_json = JSON::parse(message);
@@ -80,9 +81,9 @@ void AerExecutor::run()
             }
         }
 
-        AerComputationAdapter qc(quantum_tasks);
-        AerSimulatorAdapter aer_sa(qc);
-        auto result = aer_sa.simulate(&classical_channel);
+        MaestroComputationAdapter qc(quantum_tasks);
+        MaestroSimulatorAdapter maestro_sa(qc);
+        auto result = maestro_sa.simulate(&classical_channel);
         
         // TODO: transform results to give each qpu its results
         std::string result_str = result.dump();

@@ -70,6 +70,13 @@ enum INSTRUCTIONS {
     CRX,
     CRY,
     CRZ,
+
+    CECR,
+    CSWAP,
+    CCX,
+    CCY,
+    CCZ,
+
     RXX,
     RYY,
     RZZ,
@@ -80,12 +87,6 @@ enum INSTRUCTIONS {
 
     CU,
     CU3,
-
-    CCX,
-    CCY,
-    CCZ,
-    CECR,
-    CSWAP,
 
     C_IF_X,
     C_IF_Y,

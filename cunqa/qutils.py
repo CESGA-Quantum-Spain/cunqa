@@ -153,14 +153,7 @@ def qraise(n, t, *,
     """
     logger.debug("Setting up the requested QPUs...")
 
-    SLURMD_NODENAME = os.getenv("SLURMD_NODENAME")
-
-    if SLURMD_NODENAME == None:
-        command = f"qraise -n {n} -t {t}"
-    else: 
-        logger.warning("Be careful, you are deploying QPUs from an interactive session.")
-        HOSTNAME = os.getenv("HOSTNAME")
-        command = f"qraise -n {n} -t {t}"
+    command = f"qraise -n {n} -t {t}"
 
     try:
         # Add specified flags

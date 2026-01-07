@@ -17,6 +17,9 @@
 #include "backends/simulators/Munich/munich_simple_simulator.hpp"
 #include "backends/simulators/Munich/munich_cc_simulator.hpp"
 #include "backends/simulators/Munich/munich_qc_simulator.hpp"
+#include "backends/simulators/Maestro/maestro_simple_simulator.hpp"
+#include "backends/simulators/Maestro/maestro_cc_simulator.hpp"
+#include "backends/simulators/Maestro/maestro_qc_simulator.hpp"
 #include "backends/simulators/CUNQA/cunqa_simple_simulator.hpp"
 #include "backends/simulators/CUNQA/cunqa_cc_simulator.hpp"
 #include "backends/simulators/CUNQA/cunqa_qc_simulator.hpp"
@@ -188,6 +191,10 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");
                     turn_ON_QPU<MunichSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break;
+                case murmur::hash("Maestro"):
+                    LOGGER_DEBUG("QPU going to turn on with MaestroSimpleSimulator.");
+                    turn_ON_QPU<MaestroSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
+                    break;
                 case murmur::hash("Cunqa"):
                     LOGGER_DEBUG("QPU going to turn on with CunqaSimpleSimulator.");
                     turn_ON_QPU<CunqaSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
@@ -212,6 +219,10 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with MunichCCSimulator.");
                     turn_ON_QPU<MunichCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
+                case murmur::hash("Maestro"):
+                    LOGGER_DEBUG("QPU going to turn on with MaestroCCSimulator.");
+                    turn_ON_QPU<MaestroCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
+                    break;
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
                     turn_ON_QPU<CunqaCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
@@ -235,6 +246,10 @@ int main(int argc, char *argv[])
                 case murmur::hash("Munich"): 
                     LOGGER_DEBUG("QPU going to turn on with MunichQCSimulator.");
                     turn_ON_QPU<MunichQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
+                    break;
+                case murmur::hash("Maestro"):
+                    LOGGER_DEBUG("QPU going to turn on with MaestroQCSimulator.");
+                    turn_ON_QPU<MaestroQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");

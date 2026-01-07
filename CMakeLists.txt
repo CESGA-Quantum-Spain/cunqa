@@ -68,6 +68,7 @@ find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+find_package(Eigen3 5.0.0 REQUIRED) # Maestro dependency
 
 include(FetchContent)
 
@@ -211,6 +212,57 @@ if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
   message(STATUS "Linked pybind aer-cpp")
 endif()
+
+# =====================================================================
+#  Maestro and its dependencies
+# =====================================================================
+get_target_property(
+    EIGEN5_INCLUDE_PATH 
+    Eigen3::Eigen 
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+get_target_property(
+    JSON_INCLUDE_PATH 
+    nlohmann_json::nlohmann_json 
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}") 
+
+# -- QCSim ------------------------------------------------------------
+FetchContent_Declare(
+    qcsim
+    GIT_REPOSITORY "git@github.com:aromanro/QCSim.git"
+    GIT_TAG "5a458c8b4bddfbbe445de09376b366a97d474266"
+)
+if(NOT qcsim_POPULATED)
+    FetchContent_Populate(qcsim) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
+
+# -- AER - Qiskit simulator headers (fork for Maestro) ----------------
+FetchContent_Declare(
+    maestro-aer
+    GIT_REPOSITORY "git@github.com:InvictusWingsSRL/qiskit-aer.git"
+    GIT_TAG "96e82fdd1c8c1b17d749863ee5095262372e0d7e"
+)
+if(NOT maestro-aer_POPULATED)
+    FetchContent_Populate(maestro-aer) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
+
+# -- Maestro ----------------------------------------------------------
+FetchContent_Declare(
+    maestro
+    GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
+    GIT_TAG "7ba339fc5595fd18d2fcb0612a6570c3c5e1fd90"
+)
+FetchContent_MakeAvailable(maestro)
+
+target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
+install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 # =====================================================================
 #  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
