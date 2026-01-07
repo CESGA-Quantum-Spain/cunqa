@@ -18,6 +18,8 @@ cunqa.circuit.converters
       :nosignatures:
       :recursive:
    
+      WIP_json_to_qasm
+      WIP_qasm_to_json
       convert
    
    

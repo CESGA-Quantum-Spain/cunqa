@@ -1,0 +1,54 @@
+cunqa.real\_qpus.qmio\_linker.QMIOLinker
+========================================
+
+.. currentmodule:: cunqa.real_qpus.qmio_linker
+
+.. autoclass:: QMIOLinker
+   :show-inheritance:
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autosummary::
+   :nosignatures:
+
+   ~QMIOLinker.message_queue
+   ~QMIOLinker.client_ids_queue
+   ~QMIOLinker.context
+   ~QMIOLinker.client_comm_socket
+   ~QMIOLinker.qmio_comm_socket
+   ~QMIOLinker.ip
+   ~QMIOLinker.port
+   ~QMIOLinker.endpoint
+
+
+
+Methods
+~~~~~~~
+
+.. automethod:: QMIOLinker.__init__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. automethod:: QMIOLinker.compute_result
+
+.. automethod:: QMIOLinker.recv_data
+

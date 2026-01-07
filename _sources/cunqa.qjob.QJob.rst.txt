@@ -16,7 +16,6 @@ Attributes
 
    ~QJob.result
    ~QJob.time_taken
-   ~QJob.qclient
 
 
 

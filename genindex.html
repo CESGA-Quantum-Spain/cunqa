@@ -73,6 +73,11 @@
 <li class="toctree-l3"><a class="reference internal" href="cunqa.backend.BackendData.html">cunqa.backend.BackendData</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa.real_qpus.html">cunqa.real_qpus</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.real_qpus.qmio_linker.html">cunqa.real_qpus.qmio_linker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.real_qpus.qmioclient.html">cunqa.real_qpus.qmioclient</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit.html">cunqa.circuit.circuit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
@@ -198,6 +203,7 @@
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  | <a href="#X"><strong>X</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
  | <a href="#Z"><strong>Z</strong></a>
@@ -230,6 +236,12 @@
         <li><a href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.__init__">(cunqa.qjob.QJob method)</a>
 </li>
         <li><a href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.__init__">(cunqa.qpu.QPU method)</a>
+</li>
+        <li><a href="cunqa.real_qpus.qmio_linker.QMIOLinker.html#cunqa.real_qpus.qmio_linker.QMIOLinker.__init__">(cunqa.real_qpus.qmio_linker.QMIOLinker method)</a>
+</li>
+        <li><a href="cunqa.real_qpus.qmioclient.QMIOClient.html#cunqa.real_qpus.qmioclient.QMIOClient.__init__">(cunqa.real_qpus.qmioclient.QMIOClient method)</a>
+</li>
+        <li><a href="cunqa.real_qpus.qmioclient.QMIOFuture.html#cunqa.real_qpus.qmioclient.QMIOFuture.__init__">(cunqa.real_qpus.qmioclient.QMIOFuture method)</a>
 </li>
         <li><a href="cunqa.result.Result.html#cunqa.result.Result.__init__">(cunqa.result.Result method)</a>
 </li>
@@ -272,6 +284,10 @@
 </li>
       <li><a href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.clear">clear() (cunqa.backend.BackendData method)</a>
 </li>
+      <li><a href="cunqa.real_qpus.qmio_linker.QMIOLinker.html#cunqa.real_qpus.qmio_linker.QMIOLinker.compute_result">compute_result() (cunqa.real_qpus.qmio_linker.QMIOLinker method)</a>
+</li>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOClient.html#cunqa.real_qpus.qmioclient.QMIOClient.connect">connect() (cunqa.real_qpus.qmioclient.QMIOClient method)</a>
+</li>
       <li><a href="cunqa.circuit.circuit.ControlContext.html#cunqa.circuit.circuit.ControlContext">ControlContext (class in cunqa.circuit.circuit)</a>
 </li>
       <li><a href="cunqa.circuit.converters.convert.html#cunqa.circuit.converters.convert">convert() (in module cunqa.circuit.converters)</a>
@@ -309,8 +325,6 @@
         <li><a href="cunqa.backend.html#module-cunqa.backend">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cunqa.circuit
 
@@ -318,6 +332,8 @@
         <li><a href="cunqa.circuit.html#module-cunqa.circuit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cunqa.circuit.circuit
 
@@ -365,6 +381,27 @@
 
       <ul>
         <li><a href="cunqa.qutils.html#module-cunqa.qutils">module</a>
+</li>
+      </ul></li>
+      <li>
+    cunqa.real_qpus
+
+      <ul>
+        <li><a href="cunqa.real_qpus.html#module-cunqa.real_qpus">module</a>
+</li>
+      </ul></li>
+      <li>
+    cunqa.real_qpus.qmio_linker
+
+      <ul>
+        <li><a href="cunqa.real_qpus.qmio_linker.html#module-cunqa.real_qpus.qmio_linker">module</a>
+</li>
+      </ul></li>
+      <li>
+    cunqa.real_qpus.qmioclient
+
+      <ul>
+        <li><a href="cunqa.real_qpus.qmioclient.html#module-cunqa.real_qpus.qmioclient">module</a>
 </li>
       </ul></li>
       <li>
@@ -433,7 +470,11 @@
       <li><a href="cunqa.qjob.gather.html#cunqa.qjob.gather">gather() (in module cunqa.qjob)</a>
 </li>
       <li><a href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.get">get() (cunqa.backend.BackendData method)</a>
+
+      <ul>
+        <li><a href="cunqa.real_qpus.qmioclient.QMIOFuture.html#cunqa.real_qpus.qmioclient.QMIOFuture.get">(cunqa.real_qpus.qmioclient.QMIOFuture method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cunqa.circuit.circuit.InstanceTrackerMeta.html#cunqa.circuit.circuit.InstanceTrackerMeta.get_connectivity">get_connectivity() (cunqa.circuit.circuit.InstanceTrackerMeta method)</a>
@@ -516,6 +557,12 @@
 </li>
         <li><a href="cunqa.qutils.html#module-cunqa.qutils">cunqa.qutils</a>
 </li>
+        <li><a href="cunqa.real_qpus.html#module-cunqa.real_qpus">cunqa.real_qpus</a>
+</li>
+        <li><a href="cunqa.real_qpus.qmio_linker.html#module-cunqa.real_qpus.qmio_linker">cunqa.real_qpus.qmio_linker</a>
+</li>
+        <li><a href="cunqa.real_qpus.qmioclient.html#module-cunqa.real_qpus.qmioclient">cunqa.real_qpus.qmioclient</a>
+</li>
         <li><a href="cunqa.result.html#module-cunqa.result">cunqa.result</a>
 </li>
       </ul></li>
@@ -567,10 +614,16 @@
 </li>
       <li><a href="cunqa.mappers.QJobMapper.html#cunqa.mappers.QJobMapper">QJobMapper (class in cunqa.mappers)</a>
 </li>
-      <li><a href="cunqa.qpu.QPU.html#cunqa.qpu.QPU">QPU (class in cunqa.qpu)</a>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOClient.html#cunqa.real_qpus.qmioclient.QMIOClient">QMIOClient (class in cunqa.real_qpus.qmioclient)</a>
+</li>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOFuture.html#cunqa.real_qpus.qmioclient.QMIOFuture">QMIOFuture (class in cunqa.real_qpus.qmioclient)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.real_qpus.qmio_linker.QMIOLinker.html#cunqa.real_qpus.qmio_linker.QMIOLinker">QMIOLinker (class in cunqa.real_qpus.qmio_linker)</a>
+</li>
+      <li><a href="cunqa.qpu.QPU.html#cunqa.qpu.QPU">QPU (class in cunqa.qpu)</a>
+</li>
       <li><a href="cunqa.mappers.QPUCircuitMapper.html#cunqa.mappers.QPUCircuitMapper">QPUCircuitMapper (class in cunqa.mappers)</a>
 </li>
       <li><a href="cunqa.qutils.qraise.html#cunqa.qutils.qraise">qraise() (in module cunqa.qutils)</a>
@@ -589,6 +642,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.r">r() (cunqa.circuit.circuit.CunqaCircuit method)</a>
 </li>
+      <li><a href="cunqa.real_qpus.qmio_linker.QMIOLinker.html#cunqa.real_qpus.qmio_linker.QMIOLinker.recv_data">recv_data() (cunqa.real_qpus.qmio_linker.QMIOLinker method)</a>
+</li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.remote_c_if">remote_c_if() (cunqa.circuit.circuit.CunqaCircuit method)</a>
 </li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.reset">reset() (cunqa.circuit.circuit.CunqaCircuit method)</a>
@@ -603,10 +658,10 @@
 </li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.RotInvZ">RotInvZ() (cunqa.circuit.circuit.CunqaCircuit method)</a>
 </li>
-      <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.rRotInvY">rRotInvY() (cunqa.circuit.circuit.CunqaCircuit method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.rRotInvY">rRotInvY() (cunqa.circuit.circuit.CunqaCircuit method)</a>
+</li>
       <li><a href="cunqa.qpu.QPU.html#cunqa.qpu.QPU.run">run() (cunqa.qpu.QPU method)</a>
 </li>
       <li><a href="cunqa.mappers.run_distributed.html#cunqa.mappers.run_distributed">run_distributed() (in module cunqa.mappers)</a>
@@ -635,16 +690,20 @@
 </li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.sdg">sdg() (cunqa.circuit.circuit.CunqaCircuit method)</a>
 </li>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOClient.html#cunqa.real_qpus.qmioclient.QMIOClient.send_circuit">send_circuit() (cunqa.real_qpus.qmioclient.QMIOClient method)</a>
+</li>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOClient.html#cunqa.real_qpus.qmioclient.QMIOClient.send_parameters">send_parameters() (cunqa.real_qpus.qmioclient.QMIOClient method)</a>
+</li>
       <li><a href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.setdefault">setdefault() (cunqa.backend.BackendData method)</a>
 </li>
       <li><a href="cunqa.qjob.QJob.html#cunqa.qjob.QJob.submit">submit() (cunqa.qjob.QJob method)</a>
 </li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.sum">sum() (cunqa.circuit.circuit.CunqaCircuit class method)</a>
 </li>
-      <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.swap">swap() (cunqa.circuit.circuit.CunqaCircuit method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.swap">swap() (cunqa.circuit.circuit.CunqaCircuit method)</a>
+</li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.sx">sx() (cunqa.circuit.circuit.CunqaCircuit method)</a>
 </li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.sxdg">sxdg() (cunqa.circuit.circuit.CunqaCircuit method)</a>
@@ -699,11 +758,25 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.values">values() (cunqa.backend.BackendData method)</a>
+      <li><a href="cunqa.real_qpus.qmioclient.QMIOFuture.html#cunqa.real_qpus.qmioclient.QMIOFuture.valid">valid() (cunqa.real_qpus.qmioclient.QMIOFuture method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.backend.BackendData.html#cunqa.backend.BackendData.values">values() (cunqa.backend.BackendData method)</a>
+</li>
       <li><a href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit.vert_split">vert_split() (cunqa.circuit.circuit.CunqaCircuit method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.circuit.converters.WIP_json_to_qasm.html#cunqa.circuit.converters.WIP_json_to_qasm">WIP_json_to_qasm() (in module cunqa.circuit.converters)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cunqa.circuit.converters.WIP_qasm_to_json.html#cunqa.circuit.converters.WIP_qasm_to_json">WIP_qasm_to_json() (in module cunqa.circuit.converters)</a>
 </li>
   </ul></td>
 </tr></table>

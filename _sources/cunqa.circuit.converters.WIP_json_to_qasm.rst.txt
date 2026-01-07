@@ -1,0 +1,6 @@
+cunqa.circuit.converters.WIP\_json\_to\_qasm
+============================================
+
+.. currentmodule:: cunqa.circuit.converters
+
+.. autofunction:: WIP_json_to_qasm
