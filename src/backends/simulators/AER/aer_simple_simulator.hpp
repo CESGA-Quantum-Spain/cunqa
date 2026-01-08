@@ -12,8 +12,6 @@ namespace sim {
 
 class AerSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
-
-    AerSimpleSimulator() = default;
     AerSimpleSimulator(const std::string& group_id) {};
     ~AerSimpleSimulator() override;
 

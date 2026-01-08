@@ -76,7 +76,7 @@ class Result:
         self._registers = registers
         
         if result is None or len(result) == 0:
-            raise ValueError(f"Empty object passed, result is {None} [{ValueError.__name__}].")
+            raise ValueError(f"Empty object passed, result is {None}.")
         elif "ERROR" in result:
             message = result["ERROR"]
             raise RuntimeError(f"Error during simulation, please check availability of QPUs, run "

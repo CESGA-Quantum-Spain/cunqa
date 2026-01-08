@@ -50,7 +50,6 @@ d_qc_0_zmq = {
         "clreg":[]
     }
     ],
-    "has_cc": True,
     "sending_to":["losada", "exposito"],
     "num_qubits": 2,
     "num_clbits": 2,
@@ -89,7 +88,6 @@ d_qc_1_zmq = {
         "clreg":[]
     }
     ],
-    "has_cc": True,
     "sending_to":[],
     "num_qubits": 2,
     "num_clbits": 2,
@@ -127,7 +125,6 @@ d_qc_2_zmq = {
         "clreg":[]
     }
     ],
-    "has_cc": True,
     "sending_to":[],
     "num_qubits": 2,
     "num_clbits": 2,

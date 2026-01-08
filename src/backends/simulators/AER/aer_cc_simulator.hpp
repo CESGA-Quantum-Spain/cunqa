@@ -13,7 +13,6 @@ namespace sim {
 
 class AerCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
-    AerCCSimulator();
     AerCCSimulator(const std::string& group_id);
     ~AerCCSimulator() = default;
 

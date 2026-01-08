@@ -24,15 +24,6 @@ struct ClassicalChannel::Impl
         LOGGER_DEBUG("Communication channel with MPI configured.");
     }
 
-    Impl(const std::string& id)
-    {
-        MPI_Init(NULL, NULL);
-        MPI_Comm_size(MPI_COMM_WORLD, &(mpi_size));
-        MPI_Comm_rank(MPI_COMM_WORLD, &(mpi_rank));
-    
-        LOGGER_DEBUG("Communication channel with MPI configured.");
-    }
-
     ~Impl() = default;
 
     void send(const int& measurement, const std::string& target)
@@ -70,14 +61,7 @@ struct ClassicalChannel::Impl
     }
 };
 
-
-
-ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>()}
-{
-    endpoint = std::to_string(pimpl_->mpi_rank);
-}
-
-ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)}
+ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>()}
 {
     endpoint = std::to_string(pimpl_->mpi_rank);
 }

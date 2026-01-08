@@ -20,7 +20,6 @@ def circuit_ir():
         "instructions": [{"name": "h", "qubits": [0]}],
         "sending_to": "qpu-1",
         "is_dynamic": False,
-        "has_cc": False,
     }
 
 @pytest.fixture
@@ -64,7 +63,6 @@ def test_qjob_init_default_run_config(qclient_mock, logger_mock, circuit_ir):
     assert task["instructions"] == circuit_ir["instructions"]
     assert task["sending_to"] == circuit_ir["sending_to"]
     assert task["is_dynamic"] == circuit_ir["is_dynamic"]
-    assert task["has_cc"] == circuit_ir["has_cc"]
 
     # warning because no run_parameters
     logger_mock.warning.assert_called_once()

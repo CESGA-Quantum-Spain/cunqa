@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 
+#include <utils/json.hpp>
+
 namespace cunqa {
 namespace comm {
 
@@ -11,16 +13,11 @@ class ClassicalChannel {
 public:
     std::string endpoint;
 
-    ClassicalChannel();
-    ClassicalChannel(const std::string& id);
+    ClassicalChannel(const std::string& id = "");
     ~ClassicalChannel();
 
     void publish(const std::string& suffix = "");
-
-    void connect(const std::string& endpoint, const std::string& id = "");
-    void connect(const std::string& endpoint, const bool force_endpoint);
-    void connect(const std::vector<std::string>& endpoints, const bool force_endpoint);
-
+    void connect(const std::string& qpu_id);
     void send_info(const std::string& data, const std::string& target);
     std::string recv_info(const std::string& origin);
 
@@ -30,6 +27,7 @@ public:
 private:
     struct Impl;
     std::unique_ptr<Impl> pimpl_;
+    JSON communications;
 };  
 
 } // End of comm namespace

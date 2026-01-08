@@ -24,6 +24,7 @@ public:
 private:
     void write_executor_endpoint(const std::string endpoint, const std::string& group_id = "");
 
+    std::string executor_id;
     comm::ClassicalChannel classical_channel;
 };
 

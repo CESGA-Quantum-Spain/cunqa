@@ -222,7 +222,6 @@ class QJob:
             "instructions": circuit_ir["instructions"],
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
-            "has_cc": circuit_ir["has_cc"], 
             "id": circuit_ir["id"]
         })
       

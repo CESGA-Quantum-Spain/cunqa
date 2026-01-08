@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
             executor.run();
             break;
         }
-        case murmur::hash("Munich"):
+        /*case murmur::hash("Munich"):
         {
             LOGGER_DEBUG("Raising executor with Munich.");
             MunichExecutor executor(family_name);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
             executor.run();
             break;
         }
-        /* case murmur::hash("Qulacs"):
+        case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
             QulacsExecutor executor(family_name);

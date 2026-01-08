@@ -17,7 +17,7 @@ class AerSimulatorAdapter
 public:
     AerSimulatorAdapter() = default;
     AerSimulatorAdapter(AerComputationAdapter& qc) : qc{qc} {}
-
+    
     JSON simulate(const Backend* backend);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
 

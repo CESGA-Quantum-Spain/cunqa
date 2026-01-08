@@ -145,19 +145,6 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
             executor.apply_parametric_gate(inst_name, {control, qubits[1] + T.zero_qubit}, params);
             break;
         }
-        case constants::C_IF_H:
-        case constants::C_IF_X:
-        case constants::C_IF_Y:
-        case constants::C_IF_Z:
-        case constants::C_IF_CX:
-        case constants::C_IF_CY:
-        case constants::C_IF_CZ:
-        case constants::C_IF_ECR:
-        case constants::C_IF_RX:
-        case constants::C_IF_RY:
-        case constants::C_IF_RZ:
-            // Already managed 
-            break;
         case constants::SWAP:
         {
             executor.apply_gate(inst_name, {qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit});

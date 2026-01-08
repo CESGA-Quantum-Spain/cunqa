@@ -101,8 +101,8 @@ from cunqa.qpu import run
 
 def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
     circuits = ["c1", "c2"]
-    c1_ir = {"id": "c1", "has_cc": False, "has_qc": False}
-    c2_ir = {"id": "c2", "has_cc": False, "has_qc": False}
+    c1_ir = {"id": "c1"}
+    c2_ir = {"id": "c2"}
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1._id, qpu2._id = 1, 2
@@ -128,7 +128,7 @@ def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
 
 def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     circuit = "c1"
-    circuit_ir = {"id": "c1", "has_cc": False, "has_qc": False}
+    circuit_ir = {"id": "c1"}
 
     qpu, job = Mock(name="QPU"), Mock(name="Job")
     qpu._id = 1
@@ -145,8 +145,8 @@ def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
 
 def test_run_raises_if_not_enough_qpus(monkeypatch):
     circuits = ["c1", "c2"]
-    c1_ir = {"id": "c1", "has_cc": False, "has_qc": False}
-    c2_ir = {"id": "c2", "has_cc": False, "has_qc": False}
+    c1_ir = {"id": "c1"}
+    c2_ir = {"id": "c2"}
 
     qpu = Mock(name="QPU")
     qpu._id = 1
@@ -167,7 +167,7 @@ def test_run_raises_if_not_enough_qpus(monkeypatch):
 
 def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
     circuits = ["c1"]
-    circuit_ir = {"id": "c1", "has_cc": False, "has_qc": False}
+    circuit_ir = {"id": "c1"}
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1._id, qpu2._id = 1, 2
@@ -188,20 +188,10 @@ def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
     qpu2.execute.assert_not_called()
     assert result is job1
 
-
-has_comm = pytest.mark.parametrize("has_cc, has_qc", [
-    (True, False),
-    (False, True),
-    (True, True)
-])
-
-@has_comm
-def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch, has_cc, has_qc):
+def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch):
     circuits = ["c1"]
     circuit_ir = {
         "id": "c1",
-        "has_cc": has_cc,
-        "has_qc": has_qc,
         "instructions": [
             {"name": "REMOTE_GATE", "circuits": ["c1"]},
             {"name": "LOCAL_GATE"},
@@ -230,14 +220,11 @@ def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch, has_cc,
     qpu.execute.assert_called_once_with(circuit_ir)
     assert result is job
 
-@has_comm
-def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(monkeypatch, has_cc, has_qc):
+def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(monkeypatch):
     circuits = ["c1"]
     original_instr = {"name": "LOCAL_GATE", "qubits": []}
     circuit_ir = {
         "id": "c1",
-        "has_cc": has_cc,
-        "has_qc": has_qc,
         "instructions": [original_instr],
         "sending_to": ["c1"],
     }

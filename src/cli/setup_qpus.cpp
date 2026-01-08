@@ -97,12 +97,11 @@ template<typename Simulator, typename Config, typename BackendType>
 void turn_ON_QPU(const JSON& backend_json, const std::string& mode, const std::string& name, const std::string& family)
 {
     std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>(family);
-    LOGGER_DEBUG("Simulator instantiated");
     Config config;
     if (!backend_json.empty())
         config = backend_json;
+
     QPU qpu(std::make_unique<BackendType>(config, std::move(simulator)), mode, name, family);
-    LOGGER_DEBUG("QPU instantiated.");
     qpu.turn_ON();
 }
 
@@ -184,7 +183,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with AerSimpleSimulator.");
                     turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break;
-                case murmur::hash("Munich"):
+                /* case murmur::hash("Munich"):
                     LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");
                     turn_ON_QPU<MunichSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break;
@@ -192,7 +191,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with CunqaSimpleSimulator.");
                     turn_ON_QPU<CunqaSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break;
-                /* case murmur::hash("Qulacs"):
+                case murmur::hash("Qulacs"):
                     LOGGER_DEBUG("QPU going to turn on with QulacsSimpleSimulator.");
                     turn_ON_QPU<QulacsSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break; */
@@ -208,7 +207,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with AerCCSimulator.");
                     turn_ON_QPU<AerCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
-                case murmur::hash("Munich"): 
+                /* case murmur::hash("Munich"): 
                     LOGGER_DEBUG("QPU going to turn on with MunichCCSimulator.");
                     turn_ON_QPU<MunichCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
@@ -216,7 +215,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
                     turn_ON_QPU<CunqaCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break;
-                /* case murmur::hash("Qulacs"): 
+                case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsCCSimulator.");
                     turn_ON_QPU<QulacsCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
                     break; */
@@ -232,7 +231,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with AerQCSimulator.");
                     turn_ON_QPU<AerQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
-                case murmur::hash("Munich"): 
+                /* case murmur::hash("Munich"): 
                     LOGGER_DEBUG("QPU going to turn on with MunichQCSimulator.");
                     turn_ON_QPU<MunichQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
@@ -240,7 +239,7 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");
                     turn_ON_QPU<CunqaQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break;
-                /* case murmur::hash("Qulacs"): 
+                case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsQCSimulator.");
                     turn_ON_QPU<QulacsQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
                     break; */

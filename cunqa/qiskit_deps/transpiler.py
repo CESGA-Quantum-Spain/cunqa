@@ -65,7 +65,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
 
         elif isinstance(circuit, CunqaCircuit):
 
-            if circuit.has_cc or circuit.has_qc:
+            if circuit.is_dynamic:
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
             else:

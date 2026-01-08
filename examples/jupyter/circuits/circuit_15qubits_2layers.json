@@ -1,7 +1,5 @@
 {
     "id": "Circuit1",
-    "has_cc": false,
-    "has_qc": false,
     "sending_to": [],
     "is_dynamic": false,
     "instructions": [

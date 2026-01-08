@@ -87,20 +87,8 @@ enum INSTRUCTIONS {
     CECR,
     CSWAP,
 
-    C_IF_X,
-    C_IF_Y,
-    C_IF_Z,
-    C_IF_H,
-    C_IF_SX,
-    C_IF_RX,
-    C_IF_RY,
-    C_IF_RZ,
-    C_IF_CX,
-    C_IF_CY,
-    C_IF_CZ,
-    C_IF_ECR,
-
-    MEASURE_AND_SEND,
+    CIF,
+    SEND,
     RECV,
     QSEND,
     QRECV,
@@ -189,22 +177,11 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"cecr", CECR},
     {"cswap", CSWAP},
 
-    //CLASSICAL CONTROLLED GATES
-    {"c_if_x", C_IF_X},
-    {"c_if_y", C_IF_Y},
-    {"c_if_z", C_IF_Z},
-    {"c_if_h", C_IF_H},
-    {"c_if_sx", C_IF_H},
-    {"c_if_rx", C_IF_SX},
-    {"c_if_ry", C_IF_RY},
-    {"c_if_rz", C_IF_RZ},
-    {"c_if_cx", C_IF_CX},
-    {"c_if_cy", C_IF_CY},
-    {"c_if_cz", C_IF_CZ},
-    {"c_if_ecr", C_IF_ECR},
+    // CLASSICAL IF
+    {"cif", CIF},
 
     // SEND CLASSICAL QUBIT
-    {"measure_and_send", MEASURE_AND_SEND},
+    {"send", SEND},
     {"recv", RECV},
 
     // REMOTE CONTROLLED GATES

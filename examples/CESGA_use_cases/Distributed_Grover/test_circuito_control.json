@@ -30,6 +30,5 @@
         }
     ],
     "sending_to": ["241773_356102"],
-    "is_dynamic": true,
-    "has_cc": true
+    "is_dynamic": true
 }

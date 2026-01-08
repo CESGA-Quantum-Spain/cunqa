@@ -235,14 +235,13 @@ def run(
     # translate circuit ids in comm instruction to qpu endpoints
     correspondence = {circuit["id"]: qpu._id for circuit, qpu in zip(circuits_ir, qpus)}
     for circuit in circuits_ir:
-        if circuit["has_cc"] or circuit["has_qc"]:
-            for instr in circuit["instructions"]:
-                if instr["name"] in REMOTE_GATES:
-                    instr["qpus"] =  [correspondence[instr["circuits"][0]]]
-                    instr.pop("circuits")
-            circuit["sending_to"] = [correspondence[target_circuit] 
-                                     for target_circuit in circuit["sending_to"]]
-            circuit["id"] = correspondence[circuit["id"]]
+        for instr in circuit["instructions"]:
+            if instr["name"] in REMOTE_GATES:
+                instr["qpus"] =  [correspondence[circ] for circ in instr["circuits"]]
+                instr.pop("circuits")
+        circuit["sending_to"] = [correspondence[target_circuit] 
+                                    for target_circuit in circuit["sending_to"]]
+        circuit["id"] = correspondence[circuit["id"]]
 
     run_parameters = {k: v for k, v in run_args.items()}
     qjobs = [qpu.execute(circuit, **run_parameters) for circuit, qpu in zip(circuits_ir, qpus)]

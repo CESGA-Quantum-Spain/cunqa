@@ -46,26 +46,13 @@ struct ClassicalChannel::Impl
 
     ~Impl() = default;
 
-
-    void connect(const std::string& endpoint, const std::string& id = "")
+    void connect(const std::string& endpoint, const std::string& id)
     {   
-        auto client_id = id == "" ? endpoint : id; 
-        if (zmq_sockets.find(client_id) == zmq_sockets.end()) {
+        if (zmq_sockets.find(id) == zmq_sockets.end()) {
             zmq::socket_t tmp_client_socket(zmq_context, zmq::socket_type::dealer);
             tmp_client_socket.setsockopt(ZMQ_IDENTITY, zmq_id.c_str(), zmq_id.size());
-            zmq_sockets[client_id] = std::move(tmp_client_socket);
-            zmq_sockets[client_id].connect(endpoint);
-        }
-    }
-
-    void connect(const std::string& endpoint, const bool force_endpoint)
-    {   
-        if (zmq_sockets.find(endpoint) == zmq_sockets.end()) {
-            zmq::socket_t tmp_client_socket(zmq_context, zmq::socket_type::dealer);
-            std::string connexion_id = force_endpoint ? zmq_endpoint : zmq_id;
-            tmp_client_socket.setsockopt(ZMQ_IDENTITY, connexion_id.c_str(), connexion_id.size());
-            zmq_sockets[endpoint] = std::move(tmp_client_socket);
-            zmq_sockets[endpoint].connect(endpoint);
+            zmq_sockets[id] = std::move(tmp_client_socket);
+            zmq_sockets[id].connect(endpoint);
         }
     }
 
@@ -107,12 +94,6 @@ struct ClassicalChannel::Impl
     }
 };
 
-
-ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>("")} 
-{ 
-    endpoint = pimpl_->zmq_endpoint;
-}
-
 ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)} 
 { 
     endpoint = pimpl_->zmq_endpoint;
@@ -125,10 +106,7 @@ ClassicalChannel::~ClassicalChannel() = default;
 //-------------------------------------------------
 void ClassicalChannel::publish(const std::string& suffix) 
 {
-    JSON communications_endpoint = 
-    {
-        {"communications_endpoint", endpoint}
-    };
+    JSON communications_endpoint = { {"communications_endpoint", endpoint} };
     write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
 }
 
@@ -136,23 +114,13 @@ void ClassicalChannel::publish(const std::string& suffix)
 //--------------------------------------------------
 // Functions to stablish the other devices connected
 //--------------------------------------------------
-void ClassicalChannel::connect(const std::string& endpoint, const std::string& id) 
+void ClassicalChannel::connect(const std::string& qpu_id) 
 {
-    pimpl_->connect(endpoint, id);
-}
+    if(!communications.contains(qpu_id))
+        communications = read_file(constants::COMM_FILEPATH);
 
-void ClassicalChannel::connect(const std::string& endpoint, const bool force_endpoint)
-{
-    pimpl_->connect(endpoint, force_endpoint);
-}
-
-// No id in this overload because is thought for classical communications,
-// which do not care for ids, its ok for them to use only the endpoints
-void ClassicalChannel::connect(const std::vector<std::string>& endpoints, const bool force_endpoint) 
-{
-    for (const auto& endpoint : endpoints) {
-        pimpl_->connect(endpoint, force_endpoint);
-    }
+    auto endpoint = communications.at(qpu_id).at("communications_endpoint").get<std::string>();
+    pimpl_->connect(endpoint, qpu_id);
 }
 
 //------------------------------------------------------------------------------------

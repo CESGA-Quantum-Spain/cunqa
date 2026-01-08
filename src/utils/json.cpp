@@ -98,6 +98,23 @@ namespace {
 
 namespace cunqa {
 
+JSON read_file(const std::string &filename)
+{
+    int fd = -1;
+    try {
+        fd = open_file(filename);
+        auto fl = lock(fd);
+        auto j = read_json(fd);
+        unlock(fd, fl);
+        close(fd);
+    } catch (const std::exception &e) {
+        if (fd != -1) close(fd);
+        std::string msg =
+            "Error reading JSON safely using POSIX (fcntl) locks.\nSystem message: ";
+        throw std::runtime_error(msg + e.what());
+    }
+}
+
 void write_on_file(JSON local_data, const std::string &filename, const std::string &suffix)
 {
     int fd = -1;

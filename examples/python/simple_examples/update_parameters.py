@@ -40,7 +40,6 @@ qc = {
         "clreg":[]
     }
     ],
-    "has_cc": False,
     "num_qubits": 2,
     "num_clbits": 2,
     "classical_registers": {
@@ -77,7 +76,6 @@ qc_param = {
         "clreg":[]
     }
     ],
-    "has_cc": False,
     "num_qubits": 2,
     "num_clbits": 2,
     "classical_registers": {

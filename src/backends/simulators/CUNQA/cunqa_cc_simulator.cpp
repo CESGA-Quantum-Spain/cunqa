@@ -5,11 +5,6 @@
 namespace cunqa {
 namespace sim {
 
-CunqaCCSimulator::CunqaCCSimulator()
-{
-    classical_channel.publish();
-};
-
 CunqaCCSimulator::CunqaCCSimulator(const std::string& group_id)
 {
     classical_channel.publish(group_id);

@@ -39,6 +39,5 @@
         }
     ],
     "sending_to": [],
-    "is_dynamic": true,
-    "has_cc": true
+    "is_dynamic": true
 }
