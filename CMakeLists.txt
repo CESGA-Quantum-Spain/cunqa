@@ -216,6 +216,7 @@ endif()
 # =====================================================================
 #  Maestro and its dependencies
 # =====================================================================
+find_package(Eigen3 5.0 QUIET)
 if(NOT Eigen3_FOUND)
   message(STATUS "Package Eigen3 not found, fetching from https://gitlab.com/libeigen/eigen.git")
   FetchContent_Declare(
@@ -230,6 +231,7 @@ if(NOT Eigen3_FOUND)
   #FetchContent_MakeAvailable(MaestroEigen)
   set(EIGEN5_INCLUDE_DIR "${maestroeigen_SOURCE_DIR}") 
 else()
+  message(STATUS "Eigen 5.0 found")
   set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
 endif()
 
