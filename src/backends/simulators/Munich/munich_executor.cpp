@@ -32,7 +32,7 @@ MunichExecutor::MunichExecutor() : classical_channel{"executor"}
 
     for (const auto& [key, value]: j.items()) {
         if (key.rfind(job_id, 0) == 0) {
-            auto qpu_endpoint = value.at("communications_endpoint").get<std::string>();
+            auto qpu_endpoint = value.at("endpoint").get<std::string>();
             qpu_ids.push_back(qpu_endpoint);
             classical_channel.connect(qpu_endpoint);
             classical_channel.send_info(classical_channel.endpoint, qpu_endpoint);
@@ -58,7 +58,7 @@ MunichExecutor::MunichExecutor(const std::string& group_id) : classical_channel{
 
     for (const auto& [key, value]: j.items()) {
         if (key.rfind(group_id) == key.size() - group_id.size()) {
-            auto qpu_endpoint = value["communications_endpoint"].get<std::string>();
+            auto qpu_endpoint = value["endpoint"].get<std::string>();
             qpu_ids.push_back(qpu_endpoint);
             classical_channel.connect(qpu_endpoint);
             classical_channel.send_info(classical_channel.endpoint, qpu_endpoint);

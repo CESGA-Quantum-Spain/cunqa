@@ -107,31 +107,26 @@ JSON read_file(const std::string &filename)
         auto j = read_json(fd);
         unlock(fd, fl);
         close(fd);
+        return j;
     } catch (const std::exception &e) {
         if (fd != -1) close(fd);
         std::string msg =
             "Error reading JSON safely using POSIX (fcntl) locks.\nSystem message: ";
         throw std::runtime_error(msg + e.what());
     }
+
+    return {};
 }
 
-void write_on_file(JSON local_data, const std::string &filename, const std::string &suffix)
+void write_on_file(JSON local_data, const std::string &filename, const std::string &id)
 {
     int fd = -1;
     try {
         fd = open_file(filename);
         auto fl = lock(fd);
         auto j = read_json(fd);
-
-        // Get key and add data
-        const char *pid_env = std::getenv("SLURM_TASK_PID");
-        const char *job_env = std::getenv("SLURM_JOB_ID");
-        std::string local_id = pid_env ? pid_env : "UNKNOWN";
-        std::string job_id = job_env ? job_env : "UNKNOWN";
-        std::string task_id =
-            (suffix.empty()) ? (job_id + "_" + local_id)
-                             : (job_id + "_" + local_id + "_" + suffix);
-        j[task_id] = local_data;
+        
+        j[id] = local_data;
 
         write_json(fd, j);
         unlock(fd, fl);

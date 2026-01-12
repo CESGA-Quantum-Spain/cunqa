@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include "qpu.hpp"
 #include "backends/simulators/AER/aer_executor.hpp"
@@ -21,23 +22,20 @@ using namespace cunqa::sim;
 int main(int argc, char *argv[])
 {
     std::string sim_arg;
-    std::string family_name;
+    std::size_t n_qpus;
     if (argc == 3) {
         sim_arg = argv[1];
-        family_name = argv[2]; 
+        n_qpus = static_cast<size_t>(std::stoull(argv[2]));
     } else {
         LOGGER_ERROR("Passing incorrect number of arguments.");
         return EXIT_FAILURE;
     }
 
-    if (family_name == "default")
-        family_name = std::getenv("SLURM_JOB_ID");
-
     switch(murmur::hash(sim_arg)) {
         case murmur::hash("Aer"): 
         {
             LOGGER_DEBUG("Raising executor with Aer.");
-            AerExecutor executor(family_name);
+            AerExecutor executor(n_qpus);
             executor.run();
             break;
         }

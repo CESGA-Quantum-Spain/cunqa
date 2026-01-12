@@ -84,9 +84,10 @@ std::string execute_shot_(
         [&](TaskState& T, const cunqa::JSON& instruction = {}) 
     {
         const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
-        LOGGER_DEBUG("Instruction: {}", inst.dump());
 
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
+        std::vector<int> qubits;
+        if (inst.contains("qubits"))
+            qubits = inst.at("qubits").get<std::vector<int>>();
         auto inst_type = cunqa::constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
 
         switch (inst_type)
@@ -112,6 +113,9 @@ std::string execute_shot_(
             break;
         case cunqa::constants::SX:
             state->apply_mcsx({qubits[0] + T.zero_qubit});
+            break;
+        case cunqa::constants::RESET:
+            state->apply_reset({qubits[0] + T.zero_qubit});
             break;
         case cunqa::constants::CX:
         {
@@ -181,22 +185,26 @@ std::string execute_shot_(
         case cunqa::constants::SEND:
         {
             auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbits = inst.at("clbits").get<std::vector<int>>();
-            classical_channel->send_measure(G.creg[0], qpu_id); 
+            auto clbits = inst.at("clbits").get<std::vector<int>>();   
+
+            for (const auto& clbit: clbits)
+                classical_channel->send_measure(G.creg[clbit], qpu_id);
             break;
         }
         case cunqa::constants::RECV:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbit = inst.at("clbits").get<std::vector<int>>()[0];
-            int measurement = classical_channel->recv_measure(endpoint);
-            G.creg[clbit] = (measurement == 1);
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+
+            for (const auto& clbit: clbits) {
+                int measurement = classical_channel->recv_measure(qpu_id);
+                G.creg[clbit] = (measurement == 1);
+            }
             break;
         }
         case cunqa::constants::CIF:
         {
             const auto& clbits = inst.at("clbits").get<std::vector<int>>();
-            LOGGER_DEBUG("Measurement result: {}", G.creg[clbits.at(0)]);
             if (G.creg[clbits.at(0)]) {
                 for(const auto& sub_inst: inst.at("instructions")) {
                     apply_next_instr(T, sub_inst);

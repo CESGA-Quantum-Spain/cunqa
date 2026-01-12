@@ -13,10 +13,10 @@ class ClassicalChannel {
 public:
     std::string endpoint;
 
-    ClassicalChannel(const std::string& id = "");
+    ClassicalChannel(const std::string& qpu_id);
     ~ClassicalChannel();
 
-    void publish(const std::string& suffix = "");
+    void publish();
     void connect(const std::string& qpu_id);
     void send_info(const std::string& data, const std::string& target);
     std::string recv_info(const std::string& origin);
@@ -28,6 +28,7 @@ private:
     struct Impl;
     std::unique_ptr<Impl> pimpl_;
     JSON communications;
+    std::string qpu_id;
 };  
 
 } // End of comm namespace

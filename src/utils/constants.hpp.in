@@ -39,6 +39,7 @@ enum INSTRUCTIONS {
     SZDAG,
     P0,
     P1,
+    RESET,
 
     RX,
     RY,
@@ -121,6 +122,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"tdag", TDAG},
     {"p0", P0},
     {"p1", P1},
+    {"reset", RESET},
 
     // ONE QUBIT ONE PARAM
     {"u1", U1},

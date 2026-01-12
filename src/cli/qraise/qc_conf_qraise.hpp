@@ -39,10 +39,7 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
     
 #ifdef USE_ZMQ_BTW_QPU
     run_command =  "srun -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
-
-    // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
-    run_command += "sleep 1\n";
-    run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --exclusive setup_executor " + args.simulator + " " + args.family_name + "\n";
+    run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --exclusive setup_executor " + args.simulator + " " + std::to_string(args.n_qpus) + "\n";
 #endif
 
     return run_command;

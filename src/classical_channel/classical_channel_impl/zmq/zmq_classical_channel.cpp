@@ -94,7 +94,9 @@ struct ClassicalChannel::Impl
     }
 };
 
-ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)} 
+ClassicalChannel::ClassicalChannel(const std::string& qpu_id) : 
+    qpu_id{qpu_id},
+    pimpl_{std::make_unique<Impl>(qpu_id)} 
 { 
     endpoint = pimpl_->zmq_endpoint;
 }
@@ -104,10 +106,10 @@ ClassicalChannel::~ClassicalChannel() = default;
 //-------------------------------------------------
 // Publish the endpoint for other processes to read
 //-------------------------------------------------
-void ClassicalChannel::publish(const std::string& suffix) 
+void ClassicalChannel::publish()
 {
-    JSON communications_endpoint = { {"communications_endpoint", endpoint} };
-    write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
+    JSON endpoint_json = { {"endpoint", endpoint} };
+    write_on_file(endpoint_json, constants::COMM_FILEPATH, qpu_id);
 }
 
 
@@ -119,7 +121,7 @@ void ClassicalChannel::connect(const std::string& qpu_id)
     if(!communications.contains(qpu_id))
         communications = read_file(constants::COMM_FILEPATH);
 
-    auto endpoint = communications.at(qpu_id).at("communications_endpoint").get<std::string>();
+    auto endpoint = communications.at(qpu_id).at("endpoint").get<std::string>();
     pimpl_->connect(endpoint, qpu_id);
 }
 

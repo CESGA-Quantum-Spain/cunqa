@@ -5,12 +5,14 @@
 #include <sys/file.h>
 #include <unistd.h>
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-AerQCSimulator::AerQCSimulator(const std::string& group_id) : 
-    executor_id{"executor_" + group_id},
-    classical_channel{executor_id}
+AerQCSimulator::AerQCSimulator() : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")},
+    executor_id{std::getenv("SLURM_JOB_ID") + "_executor"s}
 {
     classical_channel.publish();
     auto ready = classical_channel.recv_info(executor_id);

@@ -94,9 +94,12 @@ std::string get_qpu_name(const JSON& backend_paths)
 }
 
 template<typename Simulator, typename Config, typename BackendType>
-void turn_ON_QPU(const JSON& backend_json, const std::string& mode, const std::string& name, const std::string& family)
+void turn_ON_QPU(
+    const JSON& backend_json, const std::string& mode, 
+    const std::string& name, const std::string& family
+)
 {
-    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>(family);
+    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
     Config config;
     if (!backend_json.empty())
         config = backend_json;
@@ -181,7 +184,8 @@ int main(int argc, char *argv[])
             switch(murmur::hash(sim_arg)) {
                 case murmur::hash("Aer"): 
                     LOGGER_DEBUG("QPU going to turn on with AerSimpleSimulator.");
-                    turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
+                    turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, 
+                                                                                 name, family);
                     break;
                 /* case murmur::hash("Munich"):
                     LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");

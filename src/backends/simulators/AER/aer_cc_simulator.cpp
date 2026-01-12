@@ -5,8 +5,8 @@
 namespace cunqa {
 namespace sim {
 
-AerCCSimulator::AerCCSimulator(const std::string& group_id) : 
-    classical_channel{group_id}
+AerCCSimulator::AerCCSimulator() : 
+    classical_channel{std::getenv("SLURM_JOB_ID")}
 {
     classical_channel.publish();
 };

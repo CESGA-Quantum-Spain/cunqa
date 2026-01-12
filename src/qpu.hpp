@@ -19,7 +19,8 @@ public:
     std::unique_ptr<sim::Backend> backend;
     std::unique_ptr<comm::Server> server;
 
-    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, const std::string& name, const std::string& family);
+    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, 
+        const std::string& name, const std::string& family);
     void turn_ON();
 
 private:

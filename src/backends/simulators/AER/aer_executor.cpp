@@ -12,14 +12,20 @@
 #include "utils/json.hpp"
 #include "logger.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"executor_" + group_id}
+AerExecutor::AerExecutor(const std::size_t& n_qpus) : classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
 {
-    JSON ids = read_file(constants::COMM_FILEPATH);
+    JSON ids;
+    do {
+        ids = read_file(constants::COMM_FILEPATH);
+    } while (ids.size() != n_qpus);
+
     for (const auto& [key, _]: ids.items()) {
-        if (key.rfind(group_id) == key.size() - group_id.size()) {
+        if (std::string(std::getenv("SLURM_JOB_ID")) == key.substr(0, key.find('_'))) {
             qpu_ids.push_back(key);
             classical_channel.publish();
             classical_channel.connect(key);

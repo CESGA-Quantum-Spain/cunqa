@@ -98,6 +98,7 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     }
 
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
+
     sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
     sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
 }
@@ -152,9 +153,7 @@ int main(int argc, char* argv[])
     auto args = argparse::parse<CunqaArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
 
     if (args.infrastructure.has_value()) {
-        LOGGER_DEBUG("Raising infrastructure with path: {}", args.infrastructure.value());
         fs::path current_dir = fs::current_path();
-        LOGGER_DEBUG("Current dir: {}", current_dir.string());
 
         std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
         write_sbatch_file_from_infrastructure(sbatchFile, args);
@@ -163,15 +162,15 @@ int main(int argc, char* argv[])
         if (args.n_qpus == 0 || args.time == "") {
             LOGGER_INFO("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
             std::cout << "\033[32m qraise needs two mandatory arguments: \n\t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n \033[0m" << std::endl;
-            return 1;
+            return EXIT_FAILURE;
         }
         // Setting and checking mode and family name, respectively
         std::string mode = args.co_located ? "co_located" : "hpc";
-        std::string family = args.family_name;
-        if (exists_family_name(family, constants::QPUS_FILEPATH)) { //Check if there exists other QPUs with same family name
-            LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
-            std::system("rm qraise_sbatch_tmp.sbatch");
-            return 1;
+        if (args.family_name != "default"){
+            if (exists_family_name(args.family_name, constants::QPUS_FILEPATH)) {
+                LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name);
+                return EXIT_FAILURE;
+            }
         }
 
         // Writing the sbatch file
@@ -182,18 +181,16 @@ int main(int argc, char* argv[])
         } catch (const std::exception& e) {
             LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
             std::system("rm qraise_sbatch_tmp.sbatch");
-            return 1;
+            return EXIT_FAILURE;
         }
         
-        
         sbatchFile.close();
-
     }
 
     // Executing and deleting the file
     std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
-    //std::system("rm qraise_sbatch_tmp.sbatch");
+    std::system("rm qraise_sbatch_tmp.sbatch");
     
     
-    return 0;
+    return EXIT_SUCCESS;
 }

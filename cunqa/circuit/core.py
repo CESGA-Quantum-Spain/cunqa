@@ -1274,8 +1274,7 @@ class CunqaCircuit():
             self.add_instructions({
                 "name":"measure",
                 "qubits":[q],
-                "clbits":[c],
-                "clreg":[]
+                "clbits":[c]
             })
 
     def measure_all(self) -> None:
@@ -1288,12 +1287,10 @@ class CunqaCircuit():
         new_clreg = self.add_cl_register(new_clreg, self.num_qubits)
 
         for q in range(self.num_qubits):
-
             self.add_instructions({
                 "name":"measure",
                 "qubits":[q],
                 "clbits":[self.classical_regs[new_clreg][q]],
-                "clreg":[]
             })
 
     def cif(
@@ -1342,11 +1339,10 @@ class CunqaCircuit():
 
         self.instructions.append({
             'name': 'reset', 
-            'qubits': [qubit],
-            'params': []
+            'qubits': [qubit]
         })
 
-    def send(self, clbit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
+    def send(self, clbits: Union[int, list[int]], recving_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
         Class method to measure and send a bit from the current circuit to a remote one.
         
@@ -1360,27 +1356,23 @@ class CunqaCircuit():
         """
         self.is_dynamic = True
         
-        if(not isinstance(clbits, list)):
+        if isinstance(clbits, int):
             clbits = [clbits]
         
-        if isinstance(target_circuit, str):
-            target_circuit_id = target_circuit
-        elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit._id
+        if isinstance(recving_circuit, str):
+            recving_circuit_id = recving_circuit
+        elif isinstance(recving_circuit, CunqaCircuit):
+            recving_circuit_id = recving_circuit._id
 
         self.add_instructions({
             "name": "send",
             "clbits": clbits,
-            "circuits": [target_circuit_id]
+            "circuits": [recving_circuit_id]
         })
 
-        self.sending_to.append(target_circuit_id)
+        self.sending_to.append(recving_circuit_id)
 
-    def recv(
-            self,  
-            control_circuit: Union[str, CunqaCircuit], 
-            clbits,
-        ) -> None:
+    def recv(self, clbits: Union[int, list[int]], sending_circuit: Union[str, CunqaCircuit]) -> None:
         """
         Class method to apply a distributed instruction as a gate condioned by a non local classical 
         measurement from a remote circuit and applied locally.
@@ -1406,15 +1398,18 @@ class CunqaCircuit():
 
         self.is_dynamic = True
 
-        if isinstance(control_circuit, str):
-            control_circuit_id = control_circuit
-        elif isinstance(control_circuit, CunqaCircuit):
-            control_circuit_id = control_circuit._id
+        if isinstance(clbits, int):
+            clbits = [clbits]
+
+        if isinstance(sending_circuit, str):
+            sending_circuit_id = sending_circuit
+        elif isinstance(sending_circuit, CunqaCircuit):
+            sending_circuit_id = sending_circuit._id
 
         self.add_instructions({
             "name": "recv",
             "clbits": clbits,
-            "circuits": [control_circuit_id]
+            "circuits": [sending_circuit_id]
         })
 
     def qsend(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
@@ -1517,7 +1512,6 @@ class ClassicalControlContext:
 
         cif = {
             "name": "cif",
-            "qubits": [],
             "clbits": [self._clbits],
             "instructions": instructions
         }
@@ -1565,7 +1559,6 @@ class QuantumControlContext:
 
         rcontrol = {
             "name": "rcontrol",
-            "qubits": [],  
             "instructions": instructions,
             "circuits": [self.control_circuit.info['id']]
         }
