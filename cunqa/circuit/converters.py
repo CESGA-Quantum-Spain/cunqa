@@ -46,51 +46,47 @@ def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to 
 
     try:
         if isinstance(circuit, QuantumCircuit):
-            match(convert_to):
-                case "QuantumCircuit":
-                    logger.warning("Provided circuit was already a QuantumCircuit.")
-                    converted_circuit = circuit
-                case "CunqaCircuit":
-                    converted_circuit = _qc_to_cunqac(circuit)
-                case "dict":
-                    converted_circuit = _qc_to_json(circuit)
-                case "qasm":
-                    converted_circuit = _qc_to_qasm(circuit)
+            if (convert_to == "QuantumCircuit"):
+                logger.warning("Provided circuit was already a QuantumCircuit.")
+                converted_circuit = circuit
+            elif (convert_to == "CunqaCircuit"):
+                converted_circuit = _qc_to_cunqac(circuit)
+            elif (convert_to == "dict"):
+                converted_circuit = _qc_to_json(circuit)
+            elif (convert_to == "qasm"):
+                converted_circuit = _qc_to_qasm(circuit)
         elif isinstance(circuit, CunqaCircuit):
-            match(convert_to):
-                case "QuantumCircuit":
-                    converted_circuit = _cunqac_to_qc(circuit)
-                case "CunqaCircuit":
-                    logger.warning("Provided circuit was already a CunqaCircuit.")
-                    converted_circuit = circuit
-                case "dict":
-                    converted_circuit = _cunqac_to_json(circuit)
-                case "qasm":
-                    converted_circuit = _cunqac_to_qasm(circuit)
+            if(convert_to == "QuantumCircuit"):
+                converted_circuit = _cunqac_to_qc(circuit)
+            elif (convert_to == "CunqaCircuit"):
+                logger.warning("Provided circuit was already a CunqaCircuit.")
+                converted_circuit = circuit
+            elif (convert_to == "dict"):
+                converted_circuit = _cunqac_to_json(circuit)
+            elif (convert_to =="qasm"):
+                converted_circuit = _cunqac_to_qasm(circuit)
 
         elif isinstance(circuit, dict):
-            match(convert_to):
-                case "QuantumCircuit":
-                    converted_circuit = _json_to_qc(circuit)
-                case "CunqaCircuit":
-                    converted_circuit = _json_to_cunqac(circuit)
-                case "dict":
-                    logger.warning("Provided circuit was already a dict.")
-                    converted_circuit = circuit
-                case "qasm":
-                    converted_circuit = _json_to_qasm(circuit)
+            if (convert_to == "QuantumCircuit"):
+                converted_circuit = _json_to_qc(circuit)
+            elif (convert_to == "CunqaCircuit"):
+                converted_circuit = _json_to_cunqac(circuit)
+            elif (convert_to == "dict"):
+                logger.warning("Provided circuit was already a dict.")
+                converted_circuit = circuit
+            elif (convert_to == "qasm"):
+                converted_circuit = _json_to_qasm(circuit)
                 
         elif isinstance(circuit, str):
-            match(convert_to):
-                case "QuantumCircuit":
-                    converted_circuit = _qasm_to_qc(circuit)
-                case "CunqaCircuit":
-                    converted_circuit = _qasm_to_cunqac(circuit)
-                case "dict":
-                    converted_circuit = _qasm_to_json(circuit)
-                case "qasm":
-                    logger.warning("Provided circuit was already a OpenQASM.")
-                    converted_circuit = circuit
+            if (convert_to == "QuantumCircuit"):
+                converted_circuit = _qasm_to_qc(circuit)
+            elif (convert_to == "CunqaCircuit"):
+                converted_circuit = _qasm_to_cunqac(circuit)
+            elif (convert_to == "dict"):
+                converted_circuit = _qasm_to_json(circuit)
+            elif (convert_to == "qasm"):
+                logger.warning("Provided circuit was already a OpenQASM.")
+                converted_circuit = circuit
 
         else:
             logger.error(f"[{TypeError.__name__}] Provided circuit must be a QuantumCircuit, a CunqaCircuit, an OpenQASM or a dict but the following was given: {type(circuit)}.")
@@ -435,47 +431,46 @@ def WIP_json_to_qasm(circuit_json : dict) -> str:
     for inst in circuit_json["instructions"]:
         gate_name = inst["name"]
         qubits = inst["qubits"]
-        match gate_name:
-            case"measure":
-                clbits = inst["clbits"]
-                qasm_circuit += f"measure q[{qubits[0]}] -> c[{clbits[0]}];\n"
+        if (gate_name == "measure"):
+            clbits = inst["clbits"]
+            qasm_circuit += f"measure q[{qubits[0]}] -> c[{clbits[0]}];\n"
 
-            case "id" | "x" | "y" | "z" | "h" | "s" | "sdg" | "sx" | "sxdg" | "sy" | "sydg" | "sz" | "szdg" | "t" | "tdg" | "p0" | "p1":
-                qasm_circuit += f"{gate_name} q[{qubits[0]}];\n"
+        elif (gate_name == "id" or "x" or "y" or "z" or "h" or "s" or "sdg" or "sx" or "sxdg" or "sy" or "sydg" or "sz" or "szdg" or "t" or "tdg" or "p0" or "p1"):
+            qasm_circuit += f"{gate_name} q[{qubits[0]}];\n"
                 
-            case "u1" | "p" | "rx" | "ry" | "rz" | "rotinvx" | "rotinvy" | "rotinvz":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}) q[{qubits[0]}];\n"
+        elif (gate_name == "u1" or "p" or "rx" or "ry" or "rz" or "rotinvx" or "rotinvy" or "rotinvz"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}) q[{qubits[0]}];\n"
 
-            case "u2" | "r":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}, {params[1]}) q[{qubits[0]}];\n"
+        elif (gate_name == "u2" or "r"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}, {params[1]}) q[{qubits[0]}];\n"
 
-            case "u3" | "u":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}, {params[1]}, {params[2]}) q[{qubits[0]}];\n"
+        elif (gate_name == "u3" or "u"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}, {params[1]}, {params[2]}) q[{qubits[0]}];\n"
 
-            case "ecr" | "swap" | "cx" | "cy" | "cz" | "csx" | "csy" | "csz" | "ct":
-                qasm_circuit += f"{gate_name} q[{qubits[0]}, q[{qubits[1]}]];\n"
+        elif (gate_name == "ecr" or "swap" or "cx" or "cy" or "cz" or "csx" or "csy" or "csz" or "ct"):
+            qasm_circuit += f"{gate_name} q[{qubits[0]}, q[{qubits[1]}]];\n"
 
-            case "cp" | "cu1" | "crx" | "cry" | "crz" | "rxx" | "ryy" | "rzz" | "rzx":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}) q[{qubits[0]}], q[{qubits[1]}];\n"
+        elif (gate_name == "cp" or "cu1" or "crx" or "cry" or "crz" or "rxx" or "ryy" or "rzz" or "rzx"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}) q[{qubits[0]}], q[{qubits[1]}];\n"
 
-            case "cu2" | "cr":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}, {params[1]}) q[{qubits[0]}, q[{qubits[1]}]];\n"
+        elif (gate_name == "cu2" or "cr"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}, {params[1]}) q[{qubits[0]}, q[{qubits[1]}]];\n"
 
-            case "cu" | "cu3":
-                params = inst["params"]
-                qasm_circuit += f"{gate_name}({params[0]}, {params[1]}, {params[2]}) q[{qubits[0]}], q[{qubits[1]}];\n"
+        elif (gate_name == "cu" or "cu3"):
+            params = inst["params"]
+            qasm_circuit += f"{gate_name}({params[0]}, {params[1]}, {params[2]}) q[{qubits[0]}], q[{qubits[1]}];\n"
 
-            case "cecr" | "cswap" | "ccx" | "ccy" | "ccz":
-                qasm_circuit += f"{gate_name} q[{qubits[0]}], q[{qubits[1]}], q[{qubits[2]}];\n"
+        elif (gate_name == "cecr" or "cswap" or "ccx" or "ccy" or "ccz"):
+            qasm_circuit += f"{gate_name} q[{qubits[0]}], q[{qubits[1]}], q[{qubits[2]}];\n"
 
-            case _:
-                logger.error(f"Gate {gate_name} not supported. Aborting.")
-                sys.exit(f"Gate {gate_name} not supported. Aborting.")
+        else:
+            logger.error(f"Gate {gate_name} not supported. Aborting.")
+            sys.exit(f"Gate {gate_name} not supported. Aborting.")
 
     return qasm_circuit
 
@@ -558,61 +553,60 @@ def WIP_qasm_to_json(circuit_qasm : str) -> dict:
 
     for inst in instructions:
         type, inst_split = _inst_type(inst)
-        match(type):
-            case("reg"):
-                if inst_split[0] == "qreg":
-                    circuit_json["quantum_registers"][f"{inst_split[1]}"] = list(range(num_qubits, num_qubits + int(inst_split[2])))
-                    num_qubits += int(inst_split[2])
-                elif inst_split[0] == "creg":
-                    circuit_json["classical_registers"][f"{inst_split[1]}"] = list(range(num_clbits, num_clbits + int(inst_split[2])))
-                    num_clbits += int(inst_split[2])
-            case("meas"):
-                new_measure["qubits"] = inst_split[2]
-                new_measure["clbits"] = circuit_json["classical_registers"][f"{inst_split[3]}"][int(inst_split[4])]
-                circuit_json["instructions"].append(new_measure)
-            case("1QnP"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[2])]
-                new_gate["params"] = []
-                circuit_json["instructions"].append(new_gate)
-            case("1Q1P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[3])]
-                new_gate["params"] = [float(inst_split[1])]
-                circuit_json["instructions"].append(new_gate)
-            case("1Q2P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[4])]
-                new_gate["params"] = [float(inst_split[1]), float(inst_split[2])]
-                circuit_json["instructions"].append(new_gate)
-            case("1Q3P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[5])]
-                new_gate["params"] = [float(inst_split[1]), float(inst_split[2]), float(inst_split[3])]
-                circuit_json["instructions"].append(new_gate)
-            case("2QnP"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[2]), int(inst_split[4])]
-                new_gate["params"] = []
-                circuit_json["instructions"].append(new_gate)
-            case("2Q1P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[3]), int(inst_split[5])]
-                new_gate["params"] = [float(inst_split[1])]
-                circuit_json["instructions"].append(new_gate)
-            case("2Q2P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[4]), int(inst_split[6])]
-                new_gate["params"] = [float(inst_split[1]), float(inst_split[2])]
-                circuit_json["instructions"].append(new_gate)
-            case("2Q3P"):
-                new_gate["name"] = inst_split[0]
-                new_gate["qubits"] = [int(inst_split[5]), int(inst_split[7])]
-                new_gate["params"] = [float(inst_split[1]), float(inst_split[2]), float(inst_split[3])]
-                circuit_json["instructions"].append(new_gate)
-            case("unsopported"):
-                print(f"Instruction {inst} not supported. Iteration continues...")
-                continue
+        if (type == "reg"):
+            if inst_split[0] == "qreg":
+                circuit_json["quantum_registers"][f"{inst_split[1]}"] = list(range(num_qubits, num_qubits + int(inst_split[2])))
+                num_qubits += int(inst_split[2])
+            elif inst_split[0] == "creg":
+                circuit_json["classical_registers"][f"{inst_split[1]}"] = list(range(num_clbits, num_clbits + int(inst_split[2])))
+                num_clbits += int(inst_split[2])
+        elif (type == "meas"):
+            new_measure["qubits"] = inst_split[2]
+            new_measure["clbits"] = circuit_json["classical_registers"][f"{inst_split[3]}"][int(inst_split[4])]
+            circuit_json["instructions"].append(new_measure)
+        elif(type == "1QnP"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[2])]
+            new_gate["params"] = []
+            circuit_json["instructions"].append(new_gate)
+        elif(type == "1Q1P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[3])]
+            new_gate["params"] = [float(inst_split[1])]
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "1Q2P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[4])]
+            new_gate["params"] = [float(inst_split[1]), float(inst_split[2])]
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "1Q3P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[5])]
+            new_gate["params"] = [float(inst_split[1]), float(inst_split[2]), float(inst_split[3])]
+            circuit_json["instructions"].append(new_gate)
+        elif(type == "2QnP"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[2]), int(inst_split[4])]
+            new_gate["params"] = []
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "2Q1P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[3]), int(inst_split[5])]
+            new_gate["params"] = [float(inst_split[1])]
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "2Q2P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[4]), int(inst_split[6])]
+            new_gate["params"] = [float(inst_split[1]), float(inst_split[2])]
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "2Q3P"):
+            new_gate["name"] = inst_split[0]
+            new_gate["qubits"] = [int(inst_split[5]), int(inst_split[7])]
+            new_gate["params"] = [float(inst_split[1]), float(inst_split[2]), float(inst_split[3])]
+            circuit_json["instructions"].append(new_gate)
+        elif (type == "unsopported"):
+            print(f"Instruction {inst} not supported. Iteration continues...")
+            continue
 
     circuit_json["num_qubits"] = num_qubits
     circuit_json["num_clbits"] = num_clbits

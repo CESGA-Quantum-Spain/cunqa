@@ -53,10 +53,11 @@ if(${SYSTEM_NAME} STREQUAL "QMIO")
   find_package(pybind11 2.13 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
-  set(pybind11_DIR "/opt/cesga/2022/software/Core/pybind11/2.12.0-python-3.10.8/lib64/python3.10/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.10.8 EXACT COMPONENTS Interpreter Development)
+  set(pybind11_DIR "/opt/cesga/2020/software/Core/pybind11/2.13.1-python-3.9.9/lib/python3.9/site-packages/pybind11/share/cmake/pybind11/")
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
+  include_directories("/opt/cesga/2020/software/Core/python/3.9.9/include/python3.9/")
 else() # Other clusters
   find_package(Python 3.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.7 REQUIRED)
@@ -68,7 +69,6 @@ find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
-find_package(Eigen3 5.0.0 REQUIRED) # Maestro dependency
 
 include(FetchContent)
 
@@ -216,12 +216,23 @@ endif()
 # =====================================================================
 #  Maestro and its dependencies
 # =====================================================================
-get_target_property(
-    EIGEN5_INCLUDE_PATH 
-    Eigen3::Eigen 
-    INTERFACE_INCLUDE_DIRECTORIES
-)
-set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+if(NOT Eigen3_FOUND)
+  message(STATUS "Package Eigen3 not found, fetching from https://gitlab.com/libeigen/eigen.git")
+  FetchContent_Declare(
+      MaestroEigen
+      GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
+      GIT_TAG        "bc3b39870ecb690a623a3f49149a358b95c5781d"
+  )
+  FetchContent_GetProperties(MaestroEigen)
+  if(NOT maestroeigen_POPULATED)
+      FetchContent_Populate(MaestroEigen)
+  endif()
+  #FetchContent_MakeAvailable(MaestroEigen)
+  set(EIGEN5_INCLUDE_DIR "${maestroeigen_SOURCE_DIR}") 
+else()
+  set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+endif()
+
 get_target_property(
     JSON_INCLUDE_PATH 
     nlohmann_json::nlohmann_json 
@@ -254,6 +265,7 @@ endif()
 set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
 
 # -- Maestro ----------------------------------------------------------
+
 FetchContent_Declare(
     maestro
     GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
@@ -271,8 +283,8 @@ FetchContent_Declare(
     qulacs
     GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
     GIT_TAG "228f617b9e31007b54488f467c031ebbf07efcdb"
-
 )
+
 set(USE_PYTHON OFF CACHE BOOL "" FORCE)
 set(BUILD_QULACS_WITH_MPI OFF)
 if(BUILD_QULACS_WITH_MPI)
