@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     
     Client cliente{};
     
-    if(argc == 3) {
+    if(argc == 2) {
         cliente.connect(argv[1]);
 
         cliente.send_circuit(circuit);
