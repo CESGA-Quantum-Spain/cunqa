@@ -99,6 +99,7 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
         throw std::runtime_error("Incorrect time format");
     }
 
+    //sbatchFile << "#SBATCH --profile=all\n";   // Enable comprehensive profiling
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
     sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
