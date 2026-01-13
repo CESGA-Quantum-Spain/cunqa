@@ -88,7 +88,7 @@ int main()
     std::vector<std::string> circuits{circuit1, circuit2, std::string()};
     int i=0;
     for (const auto& qpu: qpus) {
-        clients[i].connect(qpu.at("endpoint"));
+        clients[i].connect(qpu.at("net").at("endpoint"));
         clients[i].send_circuit(circuits[i]);
         i++;
     }
