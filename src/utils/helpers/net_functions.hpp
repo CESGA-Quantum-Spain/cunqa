@@ -190,3 +190,27 @@ inline std::string get_IP_address() {
     if (best_mbps > 0 && !best_ip.empty()) return best_ip;
     else return "";
 }
+
+// Auxiliary GPU functions
+
+inline std::vector<int> get_associated_gpu() {
+    std::vector<int> devices;
+
+    const char* visible_devices = std::getenv("CUDA_VISIBLE_DEVICES");
+    if (!visible_devices) {
+        return devices;
+    }
+
+    std::string envStr(visible_devices);
+    std::stringstream ss(envStr);
+    std::string token;
+
+    while (std::getline(ss, token, ',')) {
+        devices.push_back(std::stoi(token));
+    }
+
+    const char* slurm_procid = std::getenv("SLURM_PROCID");
+    int index = std::stoi(slurm_procid);
+
+    return {devices[index]};
+}

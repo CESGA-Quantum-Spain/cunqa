@@ -4,6 +4,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <vector>
 
 #include "backends/simple_backend.hpp"
 #include "utils/json.hpp"
@@ -26,6 +27,7 @@ public:
     std::string mode;
     std::string nodename;
     std::string endpoint;
+    std::vector<int> gpu;
 
     Server(const std::string& mode);
     ~Server();
@@ -43,7 +45,8 @@ private:
         j = {   
             {"mode", obj.mode}, 
             {"nodename", obj.nodename}, 
-            {"endpoint", obj.endpoint}
+            {"endpoint", obj.endpoint},
+            {"gpu", obj.gpu}
         };
     }
 
@@ -51,6 +54,7 @@ private:
         j.at("mode").get_to(obj.mode);
         j.at("nodename").get_to(obj.nodename);
         j.at("endpoint").get_to(obj.endpoint);
+        j.at("gpu").get_to(obj.gpu);
     }
 };
 

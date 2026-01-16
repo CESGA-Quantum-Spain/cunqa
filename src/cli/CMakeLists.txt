@@ -7,6 +7,9 @@ if(USE_MPI_BTW_QPU)
 elseif(USE_ZMQ_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_ZMQ_BTW_QPU)
 endif()
+#GPU MACROS
+target_compile_definitions(qraise PUBLIC CUDA_ARCH=${CUDA_ARCH} 
+                                         MAX_GPUS_PER_NODE=${MAX_GPUS_PER_NODE})
 
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 

@@ -21,6 +21,10 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
 endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 
+# GPU MACROS
+set(CUDA_ARCH "")
+set(MAX_GPUS_PER_NODE "")
+
 # Check that $STORE exists
 if(NOT DEFINED ENV{STORE})
     message(FATAL_ERROR "The STORE environment variable is not defined")
@@ -232,6 +236,7 @@ if (DEFINED AER_GPU)
   # Hopper                 H100                   90
   
   set(CUDA_ARCH 75)
+  set(MAX_GPUS_PER_NODE 1) # Dependent on CUDA_ARCH and CLUSTER
   set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH})
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 20)
