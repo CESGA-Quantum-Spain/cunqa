@@ -1,5 +1,6 @@
 from __future__ import annotations
 from functools import singledispatch
+import copy
 
 from qiskit import QuantumCircuit
 from .core import CunqaCircuit
@@ -19,13 +20,13 @@ def to_ir(circuit: object) -> dict:
 
 @to_ir.register
 def _(c: CunqaCircuit) -> dict:
-    return c.info
+    return copy.deepcopy(c.info)
 
 @to_ir.register
 def _(c: QuantumCircuit) -> dict:
-    return qc_to_json(c)
+    return copy.deepcopy(qc_to_json(c))
 
 @to_ir.register
 def _(c: dict) -> dict:
-    logger.debug("Circuit is already in IR format, returning it as is.")
+    logger.warning("Circuit is already in IR format, returning it as is.")
     return c

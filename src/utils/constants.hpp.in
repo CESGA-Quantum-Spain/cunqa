@@ -21,6 +21,7 @@ enum INSTRUCTIONS {
     UNITARY,
 
     MEASURE,
+    COPY,
 
     ID,
     X,
@@ -103,6 +104,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // MEASURE
     {"measure", MEASURE},
+    {"copy", COPY},
 
     // ONE QUBIT NO PARAM
     {"id", ID},

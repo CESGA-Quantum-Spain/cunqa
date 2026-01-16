@@ -20,7 +20,7 @@ c1.send(0, recving_circuit = "Second")
 c1.measure(1,1)
 
 c2 = CunqaCircuit(2, 2, id="Second")
-#c2.recv(0, sending_circuit = "First")
+c2.recv(0, sending_circuit = "First")
 with c2.cif(0) as cgates:
     cgates.x(1)
 c2.measure(0,0)

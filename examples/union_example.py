@@ -9,7 +9,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.partitioning import union
 from pprint import pprint
 
-""" circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
+circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
 circuit2 = CunqaCircuit(1, id = "circuit2")
 circuit1.h(0)
 circuit1.cx(0,1)
@@ -32,7 +32,7 @@ for q in results:
     print()
 qdrop(family)
 
-print("\n\n") """
+print("\n\n")
 
 circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
 circuit2 = CunqaCircuit(1, id = "circuit2")
@@ -61,4 +61,4 @@ print("Result before union:")
 for q in results:
     print("Result: ", q.counts)
     print()
-#qdrop(family)
+qdrop(family)

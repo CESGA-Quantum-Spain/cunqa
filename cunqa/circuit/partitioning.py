@@ -105,6 +105,11 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
             and all(cid in circuit_ids for cid in instr["circuits"])
         )
 
+    union_circuit = CunqaCircuit(
+        num_qubits=sum(c.num_qubits for c in circuits),
+        num_clbits=sum(c.num_clbits for c in circuits),
+        id="|".join(c.id for c in circuits),
+    )
     union_instructions: list[dict] = []
     blocked: dict[str, dict] = {}
 
@@ -123,14 +128,25 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
         for target_id in instr["circuits"]:
             name = instr["name"]
 
-            if name in ("send", "recv"):
-                # swap de clbits pendiente
-                return True
-
+            if name == "send":
+                if target_id not in blocked:
+                    return False
+                blocked_instr = blocked[target_id]
+                if blocked_instr["name"] == "recv":
+                    instr_i = reindex(instr, idx)
+                    union_instructions.append(
+                        {
+                            "name": "copy",
+                            "l_clbits": instr_i["clbits"],
+                            "r_clbits": blocked_instr["clbits"]
+                        })
+                    
+                    del blocked[target_id]
+                    return True
+                
             if name == "qsend":
                 if target_id not in blocked:
                     return False
-
                 blocked_instr = blocked[target_id]
                 if blocked_instr["name"] == "qrecv":
                     instr_i = reindex(instr, idx)
@@ -149,14 +165,13 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
                     del blocked[target_id]
                     return True
 
-            elif name in ("qrecv", "expose"):
+            elif name in ("qrecv", "expose", "recv"):
                 blocked[circuit_id] = reindex(instr, idx)
                 return True
 
             elif name == "rcontrol":
                 if target_id not in blocked:
                     return False
-
                 blocked_instr = blocked[target_id]
                 if blocked_instr["name"] == "expose":
                     for sub_instr in instr["instructions"]:
@@ -176,6 +191,7 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
 
             if is_valid_remote(instr):
                 consumed = process_remote(instr, idx, circuit.id)
+                union_circuit.is_dynamic = True
 
             elif circuit.id not in blocked:
                 union_instructions.append(reindex(instr, idx))
@@ -184,11 +200,6 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
             if consumed:
                 advance(idx)
 
-    union_circuit = CunqaCircuit(
-        num_qubits=sum(c.num_qubits for c in circuits),
-        num_clbits=sum(c.num_clbits for c in circuits),
-        id="|".join(c.id for c in circuits),
-    )
     union_circuit.add_instructions(union_instructions)
     return union_circuit
 

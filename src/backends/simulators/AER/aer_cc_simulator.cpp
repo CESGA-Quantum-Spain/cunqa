@@ -2,11 +2,13 @@
 #include "aer_adapters/aer_computation_adapter.hpp"
 #include "aer_adapters/aer_simulator_adapter.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
 AerCCSimulator::AerCCSimulator() : 
-    classical_channel{std::getenv("SLURM_JOB_ID")}
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
 {
     classical_channel.publish();
 };

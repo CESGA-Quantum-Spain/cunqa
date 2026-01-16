@@ -26,6 +26,7 @@ struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
     unsigned long zero_qubit = 0;
+    unsigned long zero_clbit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
@@ -55,6 +56,7 @@ std::string execute_shot_(
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
+        T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked = false;
@@ -95,8 +97,22 @@ std::string execute_shot_(
         case cunqa::constants::MEASURE:
         {
             uint_t measurement = state->apply_measure({qubits[0] + T.zero_qubit});
-            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
-            G.creg[clbits[0] + T.zero_qubit] = (measurement == 1);
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+            G.creg[clbits[0] + T.zero_clbit] = (measurement == 1);
+            break;
+        }
+        case cunqa::constants::COPY:
+        {
+            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
+            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
+
+            if(l_clbits.size() != r_clbits.size())
+                throw std::runtime_error("The number of copied clbits and the number of clbits "
+                                         "copied on does not match.");
+
+            for (size_t i = 0; i < l_clbits.size(); ++i)
+                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+                
             break;
         }
         case cunqa::constants::X:
@@ -188,7 +204,7 @@ std::string execute_shot_(
             auto clbits = inst.at("clbits").get<std::vector<int>>();   
 
             for (const auto& clbit: clbits)
-                classical_channel->send_measure(G.creg[clbit], qpu_id);
+                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
             break;
         }
         case cunqa::constants::RECV:
@@ -198,14 +214,14 @@ std::string execute_shot_(
 
             for (const auto& clbit: clbits) {
                 int measurement = classical_channel->recv_measure(qpu_id);
-                G.creg[clbit] = (measurement == 1);
+                G.creg[clbit + T.zero_clbit] = (measurement == 1);
             }
             break;
         }
         case cunqa::constants::CIF:
         {
             const auto& clbits = inst.at("clbits").get<std::vector<int>>();
-            if (G.creg[clbits.at(0)]) {
+            if (G.creg[clbits.at(0) + T.zero_clbit]) {
                 for(const auto& sub_inst: inst.at("instructions")) {
                     apply_next_instr(T, sub_inst);
                 }

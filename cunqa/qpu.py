@@ -247,9 +247,6 @@ def run(
     
     # translate circuit ids in comm instruction to qpu endpoints
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
-    from pprint import pprint
-    pprint(transformed_circs)
-
     correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
     for circuit in circuits_ir:
         for instr in circuit["instructions"]:
