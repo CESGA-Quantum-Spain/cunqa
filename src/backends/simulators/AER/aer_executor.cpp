@@ -21,16 +21,18 @@ AerExecutor::AerExecutor(const std::size_t& n_qpus) : classical_channel{std::get
 {
     JSON ids;
     do {
-        ids = read_file(constants::COMM_FILEPATH);
+        JSON whole_ids = read_file(constants::COMM_FILEPATH);
+        for (const auto& [key, value] : whole_ids.items()) {
+            if(std::string(std::getenv("SLURM_JOB_ID")) == key.substr(0, key.find('_')))
+                ids[key] = value;
+        }
     } while (ids.size() != n_qpus);
 
     for (const auto& [key, _]: ids.items()) {
-        if (std::string(std::getenv("SLURM_JOB_ID")) == key.substr(0, key.find('_'))) {
-            qpu_ids.push_back(key);
-            classical_channel.publish();
-            classical_channel.connect(key);
-            classical_channel.send_info("ready", key);
-        }
+        qpu_ids.push_back(key);
+        classical_channel.publish();
+        classical_channel.connect(key);
+        classical_channel.send_info("ready", key);
     }
 };
 

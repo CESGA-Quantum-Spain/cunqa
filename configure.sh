@@ -8,10 +8,8 @@ elif [ $LMOD_SYSTEM_NAME == "FT3" ]; then
     # Execution for FT3 
     ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost pybind11 cmake qiskit/1.2.4
     conda deactivate
-else
-    # PUT YOUR MODULES HERE
 fi
 
-cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
-cmake --build build/ --parallel $(nproc)
-cmake --install build/
+#cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+#cmake --build build/ --parallel $(nproc)
+#cmake --install build/

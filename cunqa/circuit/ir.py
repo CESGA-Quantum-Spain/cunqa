@@ -3,7 +3,7 @@ from functools import singledispatch
 
 from qiskit import QuantumCircuit
 from .core import CunqaCircuit
-from .converters import cunqa_to_json, qc_to_json
+from ..qiskit_deps.converter import qc_to_json
 
 from cunqa.logger import logger
 
@@ -19,7 +19,7 @@ def to_ir(circuit: object) -> dict:
 
 @to_ir.register
 def _(c: CunqaCircuit) -> dict:
-    return cunqa_to_json(c)
+    return c.info
 
 @to_ir.register
 def _(c: QuantumCircuit) -> dict:

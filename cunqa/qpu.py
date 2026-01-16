@@ -220,6 +220,19 @@ def run(
     else:
         circuits_ir = [to_ir(circuits)]
 
+    def expand_mapping(items: list[str], sep: str = "|") -> dict[str, str]:
+        singles = {item for item in items if sep not in item}
+        conflicts = {part for item in items for part in item.split(sep) if sep in item and part in singles}
+        if conflicts:
+            raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
+
+        return {
+            part: item
+            for item in items
+            for part in item.split(sep)
+            if part
+        }
+
     if not isinstance(qpus, list):
         qpus = [qpus]
 
@@ -233,11 +246,15 @@ def run(
                        "Last QPUs will remain unused.")
     
     # translate circuit ids in comm instruction to qpu endpoints
-    correspondence = {circuit["id"]: qpu._id for circuit, qpu in zip(circuits_ir, qpus)}
+    transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
+    from pprint import pprint
+    pprint(transformed_circs)
+
+    correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
     for circuit in circuits_ir:
         for instr in circuit["instructions"]:
             if instr["name"] in REMOTE_GATES:
-                instr["qpus"] =  [correspondence[circ] for circ in instr["circuits"]]
+                instr["qpus"] = [correspondence[transformed_circs[circ]] for circ in instr["circuits"]]
                 instr.pop("circuits")
         circuit["sending_to"] = [correspondence[target_circuit] 
                                     for target_circuit in circuit["sending_to"]]

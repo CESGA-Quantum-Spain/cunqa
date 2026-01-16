@@ -99,11 +99,13 @@ void turn_ON_QPU(
     const std::string& name, const std::string& family
 )
 {
+    LOGGER_DEBUG("Vamos a inicializar el simulador");
     std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
     Config config;
     if (!backend_json.empty())
         config = backend_json;
 
+    LOGGER_DEBUG("Vamos a inicializar la QPU");
     QPU qpu(std::make_unique<BackendType>(config, std::move(simulator)), mode, name, family);
     qpu.turn_ON();
 }
@@ -147,9 +149,14 @@ int main(int argc, char *argv[])
                                      : JSON());
 
     JSON backend_json;
-    std::string name = family + "_" + std::getenv("SLURM_PROCID");
+    std::string name = std::getenv("SLURM_JOB_ID") + "_"s 
+                     + std::getenv("SLURM_TASK_PID");
+
     if (back_path_json.contains("noise_properties_path")) {
-        std::string fpath = std::string(constants::CUNQA_PATH) + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
+        std::string fpath = std::string(constants::CUNQA_PATH) 
+                          + "/tmp_noisy_backend_" 
+                          + std::getenv("SLURM_JOB_ID") 
+                          + ".json";
 
         if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
             generate_noise_instructions(back_path_json, family);

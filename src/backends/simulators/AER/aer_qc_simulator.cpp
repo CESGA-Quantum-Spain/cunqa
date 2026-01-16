@@ -14,8 +14,11 @@ AerQCSimulator::AerQCSimulator() :
     classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")},
     executor_id{std::getenv("SLURM_JOB_ID") + "_executor"s}
 {
+    LOGGER_DEBUG("Definimos ya el classical_channel y el executor_id");
     classical_channel.publish();
+    LOGGER_DEBUG("Publicamos nuestra ip");
     auto ready = classical_channel.recv_info(executor_id);
+    LOGGER_DEBUG("El executor está {}", ready);
     classical_channel.connect(executor_id);
 };
 

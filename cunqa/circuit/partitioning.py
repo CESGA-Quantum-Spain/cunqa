@@ -4,42 +4,11 @@ Holds dunder methods for the class CunqaCircuit and other functions to extract i
 from typing import Union
 import copy
 import numpy as np
+from itertools import accumulate
 
 from cunqa.logger import logger
 from cunqa.circuit.core import CunqaCircuit
-
-def layers(circuit: CunqaCircuit) -> dict:
-    """
-    Dictionary with keys the qubits and values lists of sublists with elements 
-    [layer_number, index_of_gate_in_instructions, gate_name]. 
-    """
-    layer_dict = {f"{i}": [] for i in range(circuit.num_qubits)} 
-    last_active_layer = [0 for _ in range(circuit.num_qubits)]
-
-    for i, instr in enumerate(circuit.instructions):
-        if len(instr["qubits"]) == 1:
-            last_active_layer[instr["qubits"][0]]+=1
-            layer_dict[str(instr["qubits"][0])].append(
-                [last_active_layer[instr["qubits"][0]], i, instr["name"]]
-            )
-
-        elif "conditional_reg" in instr:
-            max_layer_qubit = max([last_active_layer[j] for j in set(instr["qubits"] + 
-                                                                            instr["conditonal_reg"])])
-            for j in instr["qubits"]:
-                last_active_layer[j] = max_layer_qubit + 1
-                layer_dict[str(j)].append([last_active_layer[j], i, instr["name"]])
-
-        elif len(instr["qubits"]) > 1:
-            max_layer_qubit = max([last_active_layer[j] for j in instr["qubits"]])
-            for j in instr["qubits"]:
-                last_active_layer[j] = max_layer_qubit + 1
-                layer_dict[str(j)].append([last_active_layer[j], i, instr["name"]])
-
-        # TODO: support the ever problematic rcontrol and recv (they have zero qubits)
-
-        return layer_dict
-
+from cunqa.constants import REMOTE_GATES
 
 def vsplit():
     pass
@@ -103,9 +72,126 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
                     inst["qubits"][1] -= initial_qubits[i]
                     sub_circuit.add_instructions([inst])
             else:
-                # Puertas de más de dos qubits
-                pass
+                raise ValueError("Three qubits gates cannot be partitioned.")
         
         return sub_circuits 
     
     return get_subcircuits(copy.deepcopy(circuit), initial_qubits, Nsections)
+
+def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
+    if not circuits:
+        raise ValueError("Empty list passed to perform union.")
+    if len(circuits) == 1:
+        logger.warning("Not enough circuits to perform a union, returning the original circuit.")
+        return circuits[0]
+
+    circuits = copy.deepcopy(circuits) # avoid aliasing
+
+    qubit_offsets = [0] + list(accumulate(c.num_qubits for c in circuits[:-1]))
+    clbit_offsets = [0] + list(accumulate(c.num_clbits for c in circuits[:-1]))
+    circuit_ids = {c.id for c in circuits}
+
+    def reindex(instr: dict, idx: int) -> dict:
+        new_instr = dict(instr)
+        if "qubits" in new_instr:
+            new_instr["qubits"] = [q + qubit_offsets[idx] for q in new_instr["qubits"]]
+        if "clbits" in new_instr:
+            new_instr["clbits"] = [c + clbit_offsets[idx] for c in new_instr["clbits"]]
+        return new_instr
+
+    def is_valid_remote(instr: dict) -> bool:
+        return (
+            instr["name"] in REMOTE_GATES
+            and all(cid in circuit_ids for cid in instr["circuits"])
+        )
+
+    union_instructions: list[dict] = []
+    blocked: dict[str, dict] = {}
+
+    finished = [False] * len(circuits)
+    pointers = [0] * len(circuits)
+
+    def advance(idx: int) -> None:
+        pointers[idx] += 1
+        if pointers[idx] == len(circuits[idx].instructions):
+            finished[idx] = True
+
+    def process_remote(instr: dict, idx: int, circuit_id: str) -> bool:
+        """
+        Returns True if instruction was consumed.
+        """
+        for target_id in instr["circuits"]:
+            name = instr["name"]
+
+            if name in ("send", "recv"):
+                # swap de clbits pendiente
+                return True
+
+            if name == "qsend":
+                if target_id not in blocked:
+                    return False
+
+                blocked_instr = blocked[target_id]
+                if blocked_instr["name"] == "qrecv":
+                    instr_i = reindex(instr, idx)
+                    union_instructions.append(
+                        {
+                            "name": "swap",
+                            "qubits": [
+                                instr_i["qubits"][0],
+                                blocked_instr["qubits"][0],
+                            ],
+                        }
+                    )
+                    union_instructions.append(
+                        {"name": "reset", "qubits": instr_i["qubits"]}
+                    )
+                    del blocked[target_id]
+                    return True
+
+            elif name in ("qrecv", "expose"):
+                blocked[circuit_id] = reindex(instr, idx)
+                return True
+
+            elif name == "rcontrol":
+                if target_id not in blocked:
+                    return False
+
+                blocked_instr = blocked[target_id]
+                if blocked_instr["name"] == "expose":
+                    for sub_instr in instr["instructions"]:
+                        union_instructions.append(reindex(sub_instr, idx))
+                    del blocked[target_id]
+                    return True
+
+        return False
+
+    while not all(finished):
+        for idx, circuit in enumerate(circuits):
+            if finished[idx]:
+                continue
+
+            instr = circuit.instructions[pointers[idx]]
+            consumed = False
+
+            if is_valid_remote(instr):
+                consumed = process_remote(instr, idx, circuit.id)
+
+            elif circuit.id not in blocked:
+                union_instructions.append(reindex(instr, idx))
+                consumed = True
+
+            if consumed:
+                advance(idx)
+
+    union_circuit = CunqaCircuit(
+        num_qubits=sum(c.num_qubits for c in circuits),
+        num_clbits=sum(c.num_clbits for c in circuits),
+        id="|".join(c.id for c in circuits),
+    )
+    union_circuit.add_instructions(union_instructions)
+    return union_circuit
+
+
+
+    

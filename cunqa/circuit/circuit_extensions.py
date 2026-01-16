@@ -8,7 +8,7 @@ import numpy as np
 
 from cunqa.logger import logger
 from cunqa.circuit.circuit import CunqaCircuit
-from cunqa.circuit.converters import convert
+from cunqa.qiskit_deps.converter import convert
 
 from qiskit import QuantumCircuit
 
@@ -50,7 +50,6 @@ def cunqa_dunder_methods(cls):
                 if displace_n != 0:
                     for instr in (iterator_instrs := iter(instance.instructions)):
                         if ("circuits" in instr and instr["circuits"][0] == other_id): # Notice here we only check for other_id to not displace those of self
-                            print(instr)
                             instr["circuits"] = [comb_id]
 
                             if instr["name"] == "recv":
@@ -61,13 +60,13 @@ def cunqa_dunder_methods(cls):
                 else:
                     if up_to_instr != 0:
                         for instr in instance.instructions:
-                            if ("circuits" in instr and instr["circuits"][0] in [self._id, other_id]):
+                            if ("circuits" in instr and instr["circuits"][0] in [self.id, other_id]):
                                 instr["circuits"] = [comb_id]
 
                     else:
                         i = 0 # Count how many instructions we substitute
                         for instr in instance.instructions:
-                            if ("circuits" in instr and instr["circuits"][0] in [self._id, other_id]):
+                            if ("circuits" in instr and instr["circuits"][0] in [self.id, other_id]):
                                 instr["circuits"] = [comb_id]
                                 i += 1
                                 if  i > up_to_instr: # if we have substituted up_to_instr instructions we stop
@@ -78,7 +77,7 @@ def cunqa_dunder_methods(cls):
                 instance = other_instances[circ]
 
                 for instr in instance.instructions:
-                    if ("circuits" in instr and instr["circuits"][0] == self._id):
+                    if ("circuits" in instr and instr["circuits"][0] == self.id):
                         instr["circuits"] = name_list.pop(0)
 
             
@@ -110,12 +109,12 @@ def cunqa_dunder_methods(cls):
 
         if isinstance(other_circuit, CunqaCircuit):
             if not force_execution:
-                if any([(self._id in path and other_circuit._id in path) for path in self.__class__.get_connectivity()]):
+                if any([(self.id in path and other_circuit.id in path) for path in self.__class__.get_connectivity()]):
                     logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
                     raise SystemExit
                 
             other_instr = other_circuit.instructions
-            other_id = other_circuit._id  
+            other_id = other_circuit.id  
             circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
 
         elif isinstance(other_circuit, QuantumCircuit):
@@ -127,7 +126,7 @@ def cunqa_dunder_methods(cls):
             raise SystemExit
 
         cl_n = self.num_clbits; cl_m = other_circuit.num_clbits
-        sum_id = self._id + " + " + other_id
+        sum_id = self.id + " + " + other_id
         summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id) 
 
         summed_circuit.quantum_regs = self.quantum_regs     # The registers of the first circuit are kept
@@ -138,7 +137,7 @@ def cunqa_dunder_methods(cls):
 
         # Ahora mismo le falta updatear los que apuntan a self
         self._update_other_instances(circs_comm_summands, other_id, sum_id) # Update instances that communicated with the summands to point to the sum
-        self._update_other_instances(circs_comm_summands, self._id, sum_id) # May be unefficient 
+        self._update_other_instances(circs_comm_summands, self.id, sum_id) # May be unefficient 
         
         return summed_circuit
 
@@ -167,7 +166,7 @@ def cunqa_dunder_methods(cls):
 
         elif isinstance(left_circuit, QuantumCircuit):
             left_id = "qc"
-            sum_id = left_id + " + " + self._id
+            sum_id = left_id + " + " + self.id
 
             cl_n=self.num_clbits; cl_m=left_circuit.num_clbits
             summed_circuit = CunqaCircuit(n, max(cl_n, cl_m), id = sum_id)
@@ -213,12 +212,12 @@ def cunqa_dunder_methods(cls):
         circs_comm_summands = set()
         if isinstance(other_circuit, CunqaCircuit):
             if not force_execution:
-                if any([(self._id in connection and other_circuit._id in connection) for connection in self.__class__.get_connectivity()]):
+                if any([(self.id in connection and other_circuit.id in connection) for connection in self.__class__.get_connectivity()]):
                     logger.error(f"Circuits to sum are connected, directly or through a chain of other circuits. This could result in execution waiting forever.\n If you're sure this won't happen try the syntax CunqaCircuit.sum(circ_1, circ_2, force_execution = True).")
                     raise SystemExit
                 
             other_instr = other_circuit.instructions
-            other_id = other_circuit._id
+            other_id = other_circuit.id
             circs_comm_summands.update({instr["circuits"][0] for instr in other_instr if "circuits" in instr})
 
         elif isinstance(other_circuit, QuantumCircuit):
@@ -233,10 +232,10 @@ def cunqa_dunder_methods(cls):
         for instruction in list(other_instr):
             self._add_instruction(instruction)
 
-        if self._id in circs_comm_summands:
+        if self.id in circs_comm_summands:
             logger.error("The circuits to be summed contain distributed instructions that reference eachother.")
             raise SystemExit
-        self._update_other_instances(circs_comm_summands, other_id, self._id)
+        self._update_other_instances(circs_comm_summands, other_id, self.id)
 
         return self
             
@@ -281,7 +280,7 @@ def cunqa_dunder_methods(cls):
         """
         if isinstance(lower_circuit, CunqaCircuit):
             down_instr = lower_circuit.instructions
-            down_id = lower_circuit._id
+            down_id = lower_circuit.id
 
         elif isinstance(lower_circuit, QuantumCircuit):
             down_instr = convert(lower_circuit, "dict")['instructions']
@@ -293,7 +292,7 @@ def cunqa_dunder_methods(cls):
         
         n    = self.num_qubits;           m = lower_circuit.num_qubits
         cl_n = self.num_clbits;        cl_m = lower_circuit.num_clbits
-        union_id = self._id + " | " + down_id
+        union_id = self.id + " | " + down_id
         union_circuit = CunqaCircuit(n + m, cl_n + cl_m, id = union_id)
 
         iter_self_instr = iter(copy.deepcopy(self.instructions))
@@ -301,8 +300,8 @@ def cunqa_dunder_methods(cls):
 
         # Go through instructions of both circuits, add n to the qubits of the lower_circuit and transform distributed operations between self and lower_circuit to be local
         try: 
-            self.process_instrs(union_circuit, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
-            self.process_instrs(union_circuit, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
+            self.process_instrs(union_circuit, iter_self_instr, iter_down_instr, self.id, down_id, n, cl_n, m, cl_m, displace = False)
+            self.process_instrs(union_circuit, iter_down_instr, iter_self_instr, down_id, self.id, n, cl_n, m, cl_m, displace = True)
 
         except Exception as error:
             logger.error(f"Error found while processing instructions for union: \n {error}")
@@ -326,7 +325,7 @@ def cunqa_dunder_methods(cls):
         elif isinstance(upper_circuit, QuantumCircuit):
             upper_instr = convert(upper_circuit, "dict")['instructions']
             upper_id ="qiskit_c"
-            union_id = self._id + " | " + upper_id
+            union_id = self.id + " | " + upper_id
 
             n    = self.num_qubits;          m = upper_circuit.num_qubits
             cl_n = self.num_clbits;       cl_m = upper_circuit.num_clbits
@@ -355,7 +354,7 @@ def cunqa_dunder_methods(cls):
 
                 union_circuit._add_instruction(instrr)
 
-            self._update_other_instances(circs_comm_self, self._id, union_id, n)
+            self._update_other_instances(circs_comm_self, self.id, union_id, n)
 
             return union_circuit
                 
@@ -377,7 +376,7 @@ def cunqa_dunder_methods(cls):
         """
         if isinstance(lower_circuit, CunqaCircuit):
             down_instr = lower_circuit.instructions
-            down_id = lower_circuit._id
+            down_id = lower_circuit.id
 
         elif isinstance(lower_circuit, QuantumCircuit):
             down_instr = convert(lower_circuit, "dict")['instructions']
@@ -398,8 +397,8 @@ def cunqa_dunder_methods(cls):
 
         # Go through instructions of both circuits, add n to the qubits of the lower_circuit and transform distributed operations between self and lower_circuit to be local
         try: 
-            self.process_instrs(self, iter_down_instr, iter_self_instr, down_id, self._id, n, cl_n, m, cl_m, displace = True)
-            self.process_instrs(self, iter_self_instr, iter_down_instr, self._id, down_id, n, cl_n, m, cl_m, displace = False)
+            self.process_instrs(self, iter_down_instr, iter_self_instr, down_id, self.id, n, cl_n, m, cl_m, displace = True)
+            self.process_instrs(self, iter_self_instr, iter_down_instr, self.id, down_id, n, cl_n, m, cl_m, displace = False)
 
         except Exception as e:
             logger.error(f"Error found while processing instructions for union: \n {e}")
@@ -430,8 +429,8 @@ def cunqa_dunder_methods(cls):
         """Divides a circuit vertically in two, separating all instructions up to and after a certain layer."""
         n_qubits = self.num_qubits; n_clbits=self.num_clbits
 
-        left_id = self._id + f" left of {position}"
-        right_id = self._id + f" right of {position}"
+        left_id = self.id + f" left of {position}"
+        right_id = self.id + f" right of {position}"
 
         left_circuit = CunqaCircuit(n_qubits, n_clbits, id=left_id)
         right_circuit = CunqaCircuit(n_qubits, n_clbits, id=right_id)
@@ -456,8 +455,8 @@ def cunqa_dunder_methods(cls):
                         circs_comm_left.add(instr["circuits"][0])
                         num_left_comms += 1
 
-        left_circuit.add_instructions(left_instrs);      self._update_other_instances(circs_comm_left, self._id, left_id, displace_n=0, up_to_instr = num_left_comms) 
-        right_circuit.add_instructions(right_instrs);    self._update_other_instances(circs_comm_right, self._id, right_circuit)
+        left_circuit.add_instructions(left_instrs);      self._update_other_instances(circs_comm_left, self.id, left_id, displace_n=0, up_to_instr = num_left_comms) 
+        right_circuit.add_instructions(right_instrs);    self._update_other_instances(circs_comm_right, self.id, right_circuit)
 
         return left_circuit, right_circuit
 
@@ -466,8 +465,8 @@ def cunqa_dunder_methods(cls):
         """Divides a circuit horizontally in two, separating the first n qubits from the last num_qubits-n qubits. """
         rest = self.num_qubits - n 
         
-        up_id = self._id + f" up_{n}"
-        down_id = self._id + f" down_{rest}"
+        up_id = self.id + f" up_{n}"
+        down_id = self.id + f" down_{rest}"
 
         # TODO: Putting a clbit for each qubit
         upper_circuit = CunqaCircuit(n, n, id = up_id)          
@@ -479,7 +478,7 @@ def cunqa_dunder_methods(cls):
         for instr in iterator_instructions:
             upper_circuit, lower_circuit = self.divide_instr(instr, upper_circuit, lower_circuit, n, iterator_instructions)
 
-        self._update_other_instances(self.circs_comm, self._id, "")   
+        self._update_other_instances(self.circs_comm, self.id, "")   
          
         # Clean up instance attributes that shouldn't bloat the instance beyond this method
         del self.circs_comm          
@@ -733,11 +732,11 @@ def cunqa_dunder_methods(cls):
             union_circuit._add_instruction(instr)
 
         if (displace and union_circuit != self):
-            self._update_other_instances(self.circs_comm_down, this_id , union_circuit._id, n)
+            self._update_other_instances(self.circs_comm_down, this_id , union_circuit.id, n)
             del self.circs_comm_down # This point is only reached if the iterator finishes, so all instructions are accounted for
 
         elif (not displace and union_circuit != self):
-            self._update_other_instances(self.circs_comm_up, this_id, union_circuit._id)
+            self._update_other_instances(self.circs_comm_up, this_id, union_circuit.id)
             del self.circs_comm_up  
         
         del self.qubits_telegate # All possible communications with the second circuit have been processed, and these resources can be freed
@@ -791,18 +790,18 @@ def cunqa_dunder_methods(cls):
                 upper_circuit._add_instruction(*self.rcontrol_up)
 
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [upper_circuit.id]
 
             elif self.rcontrol_down:
                 lower_circuit._add_instruction(instr) # recv
                 lower_circuit._add_instruction(*self.rcontrol_down)
 
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [lower_circuit.id]
             
             del self.rcontrol_up
             del self.rcontrol_down
@@ -830,18 +829,18 @@ def cunqa_dunder_methods(cls):
                 upper_circuit._add_instruction(instr) # rcontrol
 
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [upper_circuit.id]
 
             elif self.rcontrol_down:
                 instr["instructions"] = self.rcontrol_down
                 lower_circuit._add_instruction(instr) # rcontrol
 
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [lower_circuit.id]
 
             # TODO: modify other instances to point to the correct one
             
@@ -862,9 +861,9 @@ def cunqa_dunder_methods(cls):
 
             if "circuits" in instr:
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(lower_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(lower_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [lower_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [lower_circuit.id]
 
             if received:
                 self.rcontrol_down.append(instr)
@@ -879,9 +878,9 @@ def cunqa_dunder_methods(cls):
         elif (len(qubits_down) == 0 and len(conditional_down) == 0):
             if "circuits" in instr:
                 if instr["circuits"][0] in self.circs_comm:
-                    self.circs_comm[instr["circuits"][0]].append(upper_circuit._id)
+                    self.circs_comm[instr["circuits"][0]].append(upper_circuit.id)
                 else:
-                    self.circs_comm[instr["circuits"][0]] = [upper_circuit._id]
+                    self.circs_comm[instr["circuits"][0]] = [upper_circuit.id]
 
             if received:
                 self.rcontrol_up.append(instr)
@@ -907,7 +906,7 @@ def cunqa_dunder_methods(cls):
                 "name": "recv",
                 "qubits":[],
                 "remote_conditional_reg":conditional_reg,
-                "circuits": [upper_circuit._id]
+                "circuits": [upper_circuit.id]
             })
             instr["remote_conditional_reg"] = [conditional_reg]
             lower_circuit._add_instruction(instr)
@@ -921,7 +920,7 @@ def cunqa_dunder_methods(cls):
                 "name": "recv",
                 "qubits":[],
                 "remote_conditional_reg":conditional_reg,
-                "circuits": [lower_circuit._id]
+                "circuits": [lower_circuit.id]
             })
             instr["remote_conditional_reg"] = [conditional_reg]
             upper_circuit._add_instruction(instr)

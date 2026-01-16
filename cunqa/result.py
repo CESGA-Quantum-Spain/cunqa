@@ -55,7 +55,7 @@ class Result:
     :py:exc:`ResultError`.
     """
     _result: dict
-    _id: str
+    id: str
     _registers: dict
     
     def __init__(self, result: dict, circ_id: str, registers: dict):
@@ -72,7 +72,7 @@ class Result:
         """
 
         self._result = {}
-        self._id = circ_id
+        self.id = circ_id
         self._registers = registers
         
         if result is None or len(result) == 0:
@@ -90,7 +90,7 @@ class Result:
         YELLOW = "\033[33m"
         RESET = "\033[0m"   
         GREEN = "\033[32m"
-        return (f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t "
+        return (f"{YELLOW}{self.id}:{RESET} {'{'}counts: {self.counts}, \n\t "
                f"time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n")
 
 

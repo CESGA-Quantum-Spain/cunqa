@@ -4,7 +4,7 @@ import json
 import warnings, logging
 import os,sys
 sys.path.append(os.getenv("HOME"))
-from cunqa.circuit.converters import convert
+from cunqa.qiskit_deps.converter import convert
 from cunqa import get_QPUs, gather
 from cunqa.circuit import CunqaCircuit
 from qmiotools.integrations.qiskitqmio import FakeQmio

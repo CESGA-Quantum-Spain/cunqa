@@ -63,7 +63,7 @@ def test_execute_creates_qjob_submits_and_returns(monkeypatch, qpu):
 
     result = qpu.execute(circuit, **run_parameters)
     
-    QJobMock.assert_called_once_with(qpu._qclient, qpu._backend, circuit, **run_parameters)
+    QJobMock.assert_called_once_with(qpu._qclient, circuit, **run_parameters)
     qjob_instance.submit.assert_called_once_with()
     assert result is qjob_instance
 
@@ -77,7 +77,7 @@ def test_execute_reraises_if_qjob_creation_fails(monkeypatch, qpu):
     with pytest.raises(RuntimeError, match="boom"):
         qpu.execute(circuit)
     
-    QJobMock.assert_called_once_with(qpu._qclient, qpu._backend, circuit)
+    QJobMock.assert_called_once_with(qpu._qclient, circuit)
 
 def test_execute_reraises_if_qjob_submit_fails(monkeypatch, qpu):
     circuit = {"some": "circuit"}
@@ -100,9 +100,9 @@ def test_execute_reraises_if_qjob_submit_fails(monkeypatch, qpu):
 from cunqa.qpu import run
 
 def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
+    c1_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
+    c2_ir = {"id": "c2", "instructions": [{"name": "x"}], "sending_to": []}
     circuits = ["c1", "c2"]
-    c1_ir = {"id": "c1"}
-    c2_ir = {"id": "c2"}
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1._id, qpu2._id = 1, 2
@@ -128,7 +128,7 @@ def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
 
 def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     circuit = "c1"
-    circuit_ir = {"id": "c1"}
+    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
 
     qpu, job = Mock(name="QPU"), Mock(name="Job")
     qpu._id = 1
@@ -166,8 +166,8 @@ def test_run_raises_if_not_enough_qpus(monkeypatch):
     qpu.execute.assert_not_called()
 
 def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
-    circuits = ["c1"]
-    circuit_ir = {"id": "c1"}
+    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
+    circuits = [circuit_ir]
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1._id, qpu2._id = 1, 2
