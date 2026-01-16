@@ -32,6 +32,7 @@ struct CunqaArgs : public argparse::Args
     bool& qc                                            = flag("quantum_comm", "Enable quantum communications.");
     std::optional<std::string>& infrastructure          = kwarg("infrastructure", "Path to a infrastructure of QPUs.");
     bool& qmio                                          = flag("qmio", "Deploy QMIO.");
+    bool& gpu                                           = flag("gpu", "Deploy QPU on a node with GPU");
 
     void welcome() {
         std::cout << "Welcome to qraise command, a command responsible for turning on the required QPUs.\n" << std::endl;

@@ -35,6 +35,13 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     int n_tasks = args.qc ? args.n_qpus * args.cores_per_qpu + args.n_qpus : args.n_qpus;    
     sbatchFile << "#SBATCH --ntasks=" << n_tasks << "\n";
 
+    //TODO: Better management of resources
+    if (args.gpu) {
+        sbatchFile << "#SBATCH --gres=gpu:t4\n";
+        sbatchFile << "#SBATCH -p viz\n";
+        args.cores_per_qpu = 32; 
+    }
+
     if (!args.qc) 
         sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
 

@@ -6,9 +6,12 @@ if [ $LMOD_SYSTEM_NAME == "QMIO" ]; then
     conda deactivate
 elif [ $LMOD_SYSTEM_NAME == "FT3" ]; then
     # Execution for FT3 
-    ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost cython/3.0.11 pybind11 cmake qiskit/1.2.4
+    #TODO
+    ml cesga/2022 gcc/system gcccore/system cmake boost openmpi/5.0.6-cuda-system cython/3.0.11 pybind11/2.12.0 qiskit/1.2.4-aer-gpu-cu11
+    # ml cuda/12.8.0 # Uncomment for AerGPU 
     conda deactivate
 else
+    echo "You need to specify your cluster modules"
     # PUT YOUR MODULES HERE
 fi
 

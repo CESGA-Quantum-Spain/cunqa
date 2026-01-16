@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CUNQA VERSION 0.0.1 LANGUAGES CXX)
+project(CUNQA VERSION 1.2.0 LANGUAGES CXX)
 
 message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE CONFIGURATION TYPE: ${CMAKE_CONFIGURATION_TYPES}")
@@ -55,10 +55,11 @@ if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
   set(pybind11_DIR "/opt/cesga/2020/software/Core/pybind11/2.13.1-python-3.9.9/lib/python3.9/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
-  find_package(pybind11 2.12 REQUIRED)
-  set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
   include_directories("/opt/cesga/2020/software/Core/python/3.9.9/include/python3.9/")
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
+  find_package(pybind11 2.13.1 REQUIRED)
+  set(PYBIND11_PYTHON_VERSION 2.13 CACHE STRING "")
+  
 else() # Other clusters
   find_package(Python 3.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.7 REQUIRED)
@@ -66,7 +67,7 @@ endif()
 
 find_package(Threads REQUIRED)
 find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
@@ -212,6 +213,53 @@ endif()
 if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
   message(STATUS "Linked pybind aer-cpp")
+endif()
+if (DEFINED AER_GPU)
+  message(STATUS "Compiling with AER_GPU")
+  
+  #set(CMAKE_CUDA_COMPILER "/path/to/bin/nvcc")
+  #set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
+  #set(CMAKE_CUDA_COMPILER_VERSION "12.8.0")
+  #set(CMAKE_CUDA_COMPILER_WORKS TRUE)
+  
+  # Architecture           GPUs (examples)        SM
+  # -------------------------------------------------
+  # Volta                  V100                   70
+  # Turing                 T4, RTX 2080           75
+  # Ampere                 A100                   80
+  # Ampere (GA10x)         RTX 30xx               86
+  # Ada Lovelace           RTX 40xx               89
+  # Hopper                 H100                   90
+  
+  set(CUDA_ARCH 75)
+  set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH})
+  enable_language(CUDA)
+  set(CMAKE_CUDA_STANDARD 20)
+  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+  
+  find_package(Python REQUIRED COMPONENTS Interpreter Development)
+  find_library(PMIX_LIB NAMES pmix REQUIRED)
+
+  find_package(CUDAToolkit REQUIRED)
+  target_compile_definitions(aer_headers INTERFACE
+      AER_THRUST_GPU
+      AER_THRUST_CUDA
+      AER_THRUST_SUPPORTED=TRUE
+      THRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA
+  )
+  target_compile_options(aer_headers INTERFACE
+      $<$<COMPILE_LANGUAGE:CUDA>:
+          --expt-extended-lambda
+          --use_fast_math
+          -use_fast_math 
+          --expt-extended-lambda
+          -Xcompiler=-fPIC 
+          -Xcompiler=-Wno-psabi 
+          -Xcompiler=-Wno-ignored-attributes 
+          -Xcompiler=-fopenmp
+      >
+  )
+  target_link_libraries(aer_headers INTERFACE Python::Python Threads::Threads ${PMIX_LIB} CUDA::cudart)
 endif()
 
 # =====================================================================

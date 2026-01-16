@@ -363,6 +363,7 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         Result result = controller_execute<Controller>(circuits, noise_model, aer_config);
 
         JSON result_json = result.to_json();
+        LOGGER_DEBUG("aer_result: {}", result_json.dump());
         convert_standard_results_Aer(result_json, n_clbits);
 
         return result_json;

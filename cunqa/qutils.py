@@ -109,7 +109,8 @@ def qraise(n, t, *,
            node_list = None, 
            qpus_per_node= None,
            partition = None,
-           qmio = None) -> Union[tuple, str]:
+           qmio = None,
+           gpu = None) -> Union[tuple, str]:
     """
     Raises virtual QPUs and returns the job id associated to its SLURM job.
 
@@ -183,8 +184,10 @@ def qraise(n, t, *,
             command = command + f" --backend={str(backend)}"
         if partition is not None:
             command = command + f" --partition={str(partition)}"
-        if qmio is not None:
+        if qmio:
             command = command + " --qmio"
+        if gpu:
+            command = command + " --gpu"
 
 
         if not os.path.exists(QPUS_FILEPATH):
