@@ -23,10 +23,7 @@ void QPU::turn_ON()
     std::thread compute([this](){this->compute_result_();});
 
     JSON qpu_config = *this;
-
-    LOGGER_DEBUG("Llegamos justo antes de escribir.");
     write_on_file(qpu_config, constants::QPUS_FILEPATH, name_);
-    LOGGER_DEBUG("Escribimos.");
 
     listen.join();
     compute.join();

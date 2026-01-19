@@ -102,6 +102,7 @@ import os
 import time
 import json
 import subprocess
+import re
 from typing import Union, Any, Optional
 
 from qiskit import QuantumCircuit
@@ -220,17 +221,27 @@ def run(
     else:
         circuits_ir = [to_ir(circuits)]
 
-    def expand_mapping(items: list[str], sep: str = "|") -> dict[str, str]:
-        singles = {item for item in items if sep not in item}
-        conflicts = {part for item in items for part in item.split(sep) if sep in item and part in singles}
+    def expand_mapping(items: list[str]) -> dict[str, str]:
+        def split(item: str) -> list[str]:
+            return [p for p in re.split(r"[|+]", item) if p]
+
+        singles = {item for item in items if len(split(item)) == 1}
+
+        conflicts = {
+            part
+            for item in items
+            if len(split(item)) > 1
+            for part in split(item)
+            if part in singles
+        }
+
         if conflicts:
             raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
 
         return {
             part: item
             for item in items
-            for part in item.split(sep)
-            if part
+            for part in split(item)
         }
 
     if not isinstance(qpus, list):

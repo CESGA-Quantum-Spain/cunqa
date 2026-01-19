@@ -99,13 +99,10 @@ void turn_ON_QPU(
     const std::string& name, const std::string& family
 )
 {
-    LOGGER_DEBUG("Vamos a inicializar el simulador");
     std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
     Config config;
     if (!backend_json.empty())
         config = backend_json;
-
-    LOGGER_DEBUG("Vamos a inicializar la QPU");
     QPU qpu(std::make_unique<BackendType>(config, std::move(simulator)), mode, name, family);
     qpu.turn_ON();
 }

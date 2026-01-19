@@ -137,8 +137,8 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
                     union_instructions.append(
                         {
                             "name": "copy",
-                            "l_clbits": instr_i["clbits"],
-                            "r_clbits": blocked_instr["clbits"]
+                            "l_clbits": blocked_instr["clbits"],
+                            "r_clbits": instr_i["clbits"]
                         })
                     
                     del blocked[target_id]
@@ -203,6 +203,32 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     union_circuit.add_instructions(union_instructions)
     return union_circuit
 
+def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
+    if not circuits:
+        raise ValueError("Empty list passed to perform union.")
+    if len(circuits) == 1:
+        logger.warning("Not enough circuits to perform an addition, returning the original circuit.")
+        return circuits[0]
 
+    circuits = copy.deepcopy(circuits)
+    circuit_ids = {c.id for c in circuits}
 
-    
+    addition_circuit = CunqaCircuit(
+        num_qubits=max(c.num_qubits for c in circuits),
+        num_clbits=max(c.num_clbits for c in circuits),
+        id="+".join(c.id for c in circuits),
+    )
+
+    addition_instructions: list[dict] = []
+
+    for circuit in circuits:
+        for instr in circuit.instructions:
+            if instr["name"] in REMOTE_GATES:
+                for circ_id in instr["circuits"]:
+                    if circ_id in circuit_ids:
+                        raise ValueError("Cannot add two circuits that communicate with eachother.")
+            addition_instructions.append(instr)
+
+    addition_circuit.add_instructions(addition_instructions)
+    return addition_circuit        
+
