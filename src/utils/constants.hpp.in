@@ -47,7 +47,6 @@ enum INSTRUCTIONS {
     ROTINVX,
     ROTINVY,
     ROTINVZ,
-    P,
     U1,
 
     U2,
@@ -55,8 +54,6 @@ enum INSTRUCTIONS {
 
     U3,
     U,
-    U1,
-    U3,
 
     ECR,
     CU1,
@@ -70,12 +67,10 @@ enum INSTRUCTIONS {
     CSZ,
     CT,
 
-    CU1,
     CP,
     CRX,
     CRY,
     CRZ,
-    CP,
     RXX,
     RYY,
     RZZ,
@@ -87,16 +82,10 @@ enum INSTRUCTIONS {
     CCY,
     CCZ,
 
-    RXX,
-    RYY,
-    RZZ,
-    RZX,
-
     CU2,
     CR,
 
     CU,
-    CU3,
 
     C_IF_X,
     C_IF_Y,

@@ -350,8 +350,9 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
             qc.add_register(ClassicalRegister(len(lista), cr))
 
         param_counter = 0
-        parameter_tracker = {} # No two Parameter instances with the same name can be created or FAILURE will occur qhen adding them to the circuit 
+        parameter_tracker = {} # No two Parameter instances with the same name can be created or FAILURE will occur when adding them to the circuit 
         for instruction in copy.deepcopy(instructions):
+            params = []
             if instruction['name'] != 'measure':
                 if 'params' in instruction:
                     params = instruction['params']

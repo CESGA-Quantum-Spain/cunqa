@@ -12,7 +12,7 @@ from cunqa.circuit.parameter import Variable, variables
 from cunqa.circuit.converters import convert
 from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.backend import Backend
-from cunqa.transpile import transpiler
+from cunqa.qiskit_deps.transpiler import transpiler
 from cunqa.logger import logger
 
 from qiskit.circuit import QuantumCircuit, Parameter
@@ -33,7 +33,10 @@ class TestVariables(unittest.TestCase):
             "coupling_map": [[0,1],[2,1],[2,3],[4,3],[5,4],[6,3],[6,12],[7,0],[7,9],[9,10],[11,10],[11,12],[13,21],[14,11],[14,18],[15,8],[15,16],[18,17],[18,19],[20,19],[22,21],[22,31],[23,20],[23,30],[24,17],[24,27],[25,16],[25,26],[26,27],[28,27],[28,29],[30,29],[30,31]],
             "basis_gates": ["sx","x","rz","ecr"],
             "custom_instructions": "",
-            "gates": []
+            "gates": [],
+            "noise_model": {"errors": []},
+            "noise_properties_path": "last_calibrations",
+            "noise_path": "/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
         })
 
     @classmethod
@@ -133,10 +136,12 @@ class TestVariables(unittest.TestCase):
 
         circ_transpiled = transpiler(circ_param, backend = self.fakeqmio_backend, opt_level = 3, initial_layout = None)
 
-        # Circuit was modified in transpilation so new fixed parameters appeared. I extract the variable parameters current dicts
-        transpiled_current = [e for e in circ_transpiled.current_params if isinstance(e, dict)]
+        # Circuit was modified in transpilation so new fixed parameters appeared. I extract the dictionaries in current, which are variable parameters
+        # Additionally, I transform the dictionaries to tuples, that are hashable and can be contained in a set
+        transpiled_current = set([tuple(sorted(e.items())) for e in circ_transpiled.current_params if isinstance(e, dict)])
+        old_current = set([tuple(sorted(e.items())) for e in circ_param.current_params])
 
-        return self.assertListEqual(circ_param.current_params, transpiled_current)
+        return self.assertEqual(old_current, transpiled_current)
 
 
     def test_upgrade_variable_parameters(self):
