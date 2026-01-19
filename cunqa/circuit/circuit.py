@@ -49,7 +49,6 @@
     .. [#] `qiskit.QuantumCircuit <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit>`_ documentation.
 
 """
-import sympy
 import numpy as np
 import random
 import string

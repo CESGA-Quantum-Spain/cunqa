@@ -88,6 +88,7 @@ autodoc_mock_imports = [
     'string',
     'subprocess',
     'socket',
+    'symengine',
     'sympy',
     'sys',
     'threading',
