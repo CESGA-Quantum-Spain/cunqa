@@ -1110,6 +1110,20 @@ where we can search for the second half of any internal quantum communication.</
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.circuit.CunqaCircuit.save_state">
+<span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">save_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pershot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'_method_'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.circuit.CunqaCircuit.save_state" title="Link to this definition"></a></dt>
+<dd><p>Instruction to save the state of the circuit simulation at the particular moment the instruction is executed.
+:param pershot: determines wether the state is stored separatedly for each shot or averaged. Default: False
+:type pershot: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
+:param label: key for the state in the result dict. Used to distinguish two states saved.</p>
+<blockquote>
+<div><p>Default: ‘_method_’, which appears in the result as the name of the simulation method selected.</p>
+</div></blockquote>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.circuit.CunqaCircuit.sdg">
 <span class="sig-prename descclassname"><span class="pre">CunqaCircuit.</span></span><span class="sig-name descname"><span class="pre">sdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cunqa.circuit.circuit.CunqaCircuit.sdg" title="Link to this definition"></a></dt>
 <dd><p>Class method to apply sdg gate to the given qubit.</p>

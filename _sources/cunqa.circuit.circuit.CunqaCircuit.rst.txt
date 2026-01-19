@@ -332,6 +332,10 @@ Methods
 
 
 
+
+
+
+
 .. automethod:: CunqaCircuit.c_if
 
 .. automethod:: CunqaCircuit.ccx
@@ -433,6 +437,8 @@ Methods
 .. automethod:: CunqaCircuit.rzz
 
 .. automethod:: CunqaCircuit.s
+
+.. automethod:: CunqaCircuit.save_state
 
 .. automethod:: CunqaCircuit.sdg
 

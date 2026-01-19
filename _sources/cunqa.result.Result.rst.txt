@@ -15,7 +15,9 @@ Attributes
    :nosignatures:
 
    ~Result.counts
+   ~Result.density_matrix
    ~Result.result
+   ~Result.statevector
    ~Result.time_taken
 
 
@@ -34,4 +36,10 @@ Methods
 
 
 
+
+
+
+
+
+.. automethod:: Result.probabilities
 
