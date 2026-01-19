@@ -74,6 +74,7 @@ autodoc_mock_imports = [
     'load',
     'logging',
     'logger',
+    'math',
     'numpy',
     'operator',
     'os',
@@ -83,9 +84,13 @@ autodoc_mock_imports = [
     'qiskit_aer',
     'qmiotools',
     'random',
+    're',
     'string',
     'subprocess',
+    'socket',
+    'sympy',
     'sys',
+    'threading',
     'time',
     'typing',
     'zmq',
@@ -93,8 +98,10 @@ autodoc_mock_imports = [
     'psutil',
     'socket',
     'pickle',
+    'psutil',
     'threading',
     'queue', 
+    'zmq'
 ]
 
 
