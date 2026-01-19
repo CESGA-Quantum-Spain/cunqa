@@ -32,8 +32,10 @@ from cunqa.logger import logger
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
 
+from typing import Union
 
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = None):
+
+def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit']:
     """
     Function to transpile a circuit according to a given :py:class:`~cunqa.qpu.QPU`.
     The circuit is returned in the same format as it was originally.
@@ -53,30 +55,31 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
         initial_layout (list[int]): initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.
     """
 
-    # converting to QuantumCircuit
+    logger.debug("Converting to QuantumCircuit...")
+    
     try:
 
         if isinstance(circuit, QuantumCircuit):
             if initial_layout is not None and len(initial_layout) != circuit.num_qubits:
                 logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
                 raise SystemExit # User's level
-            else:
-                qc = circuit
+            
+            qc = circuit
 
         elif isinstance(circuit, CunqaCircuit):
-
             if circuit.has_cc or circuit.has_qc:
                 logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
                 raise SystemExit
-            else:
-                qc = convert(circuit, "QuantumCircuit")
+            
+            current_params = circuit.current_params
+            qc = convert(circuit.info, "QuantumCircuit")
 
         elif isinstance(circuit, dict):
             if initial_layout is not None and len(initial_layout) != circuit['num_qubits']:
-                logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
+                logger.error(f"initial_layout must be of the size of the circuit: {circuit['num_qubits']} [{TypeError.__name__}].")
                 raise SystemExit # User's level
-            else:
-                qc = convert(circuit, "QuantumCircuit")
+            
+            qc = convert(circuit, "QuantumCircuit")
 
         else:
             logger.error(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, <class 'cunqa.circuit.circuit.CunqaCircuit'> or dict, but {type(circuit)} was provided [{TypeError.__name__}].")
@@ -86,8 +89,9 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
         logger.error(f"Some error occurred, please check sintax and logic of the resulting circuit [{type(error).__name__}]: {error}")
         raise SystemExit # User's level
         
+    logger.debug("Circuit converted to QuantumCircuit")
 
-    # qpu check
+    # backend check
     if isinstance(backend, Backend):
         cunqabackend = CunqaBackend(backend = backend)
     else:
@@ -113,4 +117,18 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
         return convert(qc_transpiled, "dict")
     
     elif isinstance(circuit, CunqaCircuit):
-        return convert(qc_transpiled, "CunqaCircuit")
+        cunqac_transpiled = convert(qc_transpiled, "CunqaCircuit")
+        cunqac_transpiled._id = circuit._id + "_transpiled"
+        
+        assign_dict={}
+        for expr in current_params:
+            if isinstance(expr, dict):
+                if None in list(expr.values()):
+                    continue
+                assign_dict.update(expr)
+
+        cunqac_transpiled.assign_parameters(assign_dict)
+
+        return cunqac_transpiled
+
+    

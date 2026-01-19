@@ -10,13 +10,17 @@
 
 import sys
 from qiskit import QuantumCircuit
-from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, CircuitError
+from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, CircuitError, Parameter, ParameterExpression
 from qiskit.qasm2 import dumps as dumps2
 from qiskit.qasm3 import dumps as dumps3
 import re
 
 from typing import Tuple, Union, Optional, Any
+import sympy
+import copy
+
 from cunqa.circuit.circuit import CunqaCircuit
+from cunqa.circuit.parameter import Variable
 from cunqa.logger import logger
 
 
@@ -140,6 +144,10 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
             "has_qc":False,
         }
 
+        if _is_parametric(qc):
+            json_data["current_params"] = []
+            json_data["param_expressions"] = []
+
         for instruction in qc.data:
 
             if instruction.operation.name not in SUPPORTED_QISKIT_OPERATIONS:
@@ -195,25 +203,51 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
                     sub_instruction["conditional_reg"] = [classical_registers[k][b] for k,b in zip(clreg, bit)]
                     json_data["instructions"].append(sub_instruction)
-                
-            elif (instruction.operation._condition != None):
-
-                if instruction.operation._condition[1] not in [1]:
-                    logger.error("Only 1 is accepted as condition for classicaly contorlled operations for the current version [ValueError].")
-                    raise ConvertersError
-
-                json_data["is_dynamic"] = True
-                json_data["instructions"].append({"name":instruction.operation.name, 
-                                            "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                            "params":instruction.operation.params,
-                                            "conditional_reg":[instruction.operation._condition[0]._index]
-                                            })                
+                              
             
             else:
-                json_data["instructions"].append({"name":instruction.operation.name, 
-                                            "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                            "params":instruction.operation.params
-                                            })
+                params = instruction.operation.params
+                for i, param in enumerate(params):
+                    if isinstance(param, Parameter):
+
+                        var = Variable(str(param))
+                        json_data["current_params"].append({var: None})
+                        json_data["param_expressions"].append(var)
+                        params[i]= var
+
+                    elif isinstance(param, ParameterExpression):
+
+                        expr = sympy.sympify(sympy.parsing.sympy_parser.parse_expr(str(param)))
+                        # Change Symbols for Variables in previous expression
+                        symbol_var_dict = {symbol: Variable(str(symbol)) for symbol in expr.free_symbols}
+                        cunqa_expr = expr.subs(symbol_var_dict)
+
+                        json_data["current_params"].append({var: None for var in symbol_var_dict.values()})
+                        json_data["param_expressions"].append(expr)
+                        params[i]= cunqa_expr
+
+                    else:
+                        json_data["current_params"].append(param)
+                        json_data["param_expressions"].append(None)
+                        # No modification on params needed
+                
+                if (instruction.operation._condition != None):
+
+                    if instruction.operation._condition[1] not in [1]:
+                        logger.error("Only 1 is accepted as condition for classicaly contorlled operations for the current version [ValueError].")
+                        raise ConvertersError
+
+                    json_data["is_dynamic"] = True
+                    json_data["instructions"].append({"name":instruction.operation.name, 
+                                                    "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                                    "params":params,
+                                                    "conditional_reg":[instruction.operation._condition[0]._index]
+                                                    })  
+                else:
+                    json_data["instructions"].append({"name":instruction.operation.name, 
+                                                    "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                                    "params":params
+                                                    })
        
         return json_data
     
@@ -221,9 +255,10 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
         logger.error(f"Some error occured during transformation from `qiskit.QuantumCircuit` to json dict [{type(error).__name__}].")
         logger.error(f"{error}")
         raise error
-    
 
-def _qc_to_qasm(qc : 'QuantumCircuit') -> str:
+
+
+def _qc_to_qasm(qc : 'QuantumCircuit', version = "3.0") -> str:
     
     try:
         qasm2circuit = dumps2(qc)
@@ -232,6 +267,7 @@ def _qc_to_qasm(qc : 'QuantumCircuit') -> str:
     except Exception as error:
         logger.error(f"Unable to convert circuit to OpenQASM2.0 [{type(error).__name__}].")
         raise SystemExit
+    
 
 def _cunqac_to_json(cunqac : 'CunqaCircuit') -> dict:
     """
@@ -313,10 +349,31 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                 circuit_clbits.append(i)
             qc.add_register(ClassicalRegister(len(lista), cr))
 
+        param_counter = 0
+        parameter_tracker = {} # No two Parameter instances with the same name can be created or FAILURE will occur when adding them to the circuit 
+        for instruction in copy.deepcopy(instructions):
+            params = []
+            if instruction['name'] != 'measure':
+                if 'params' in instruction:
+                    params = instruction['params']
+                    
+                    if "param_expressions" in circuit_dict:
+                        for i in range(len(params)):
+                            expr = circuit_dict["param_expressions"][param_counter + i]
+                            if expr is None:
+                                continue
 
-        for instruction in instructions:
+                            elif isinstance(expr, Variable):
+                                if not str(expr) in parameter_tracker:
+                                    parameter_tracker[str(expr)] = Parameter(str(expr)) # Create Parameters only once and reuse them all other times
 
-            # checking if the instruction is supported
+                                params[i] = parameter_tracker[str(expr)]
+
+                            elif get_module(expr) == "sympy":
+                                parameter_tracker |= {str(sym): Parameter(str(sym)) for sym in expr.free_symbols if str(sym) not in parameter_tracker} # Create and add any new Parameters
+                                params[i] = ParameterExpression({parameter_tracker[str(sym)]: sym for sym in expr.free_symbols}, expr)
+
+                    param_counter += len(params)
 
             if instruction['name'] not in SUPPORTED_QISKIT_OPERATIONS:
                 logger.error(f"Instruction {instruction['name']} not supported for conversion [ValueError].")
@@ -337,13 +394,6 @@ def _json_to_qc(circuit_dict: dict) -> 'QuantumCircuit':
                     for k,v in quantum_registers.items():
                         if inst_qubit in v:
                             inst_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
-
-            # checking for parameters
-
-            if 'params' in instruction:
-                params = instruction['params']
-            else:
-                params = []
 
             inst_operation = Instruction(name = instruction['name'],
                                         num_qubits = len(inst_Qubit),
@@ -403,6 +453,7 @@ def _json_to_cunqac(circuit_dict : dict) -> 'CunqaCircuit':
         An object :py:class:`~cunqa.circuit.CunqaCircuit` with the corresponding instructions and characteristics.
     """
     try:
+
         cunqac = CunqaCircuit(id = circuit_dict["id"])
 
         for name, number_of_clbits in circuit_dict["classical_registers"].items():
@@ -617,44 +668,6 @@ def WIP_qasm_to_json(circuit_qasm : str) -> dict:
 def _qasm_to_json(circuit_qasm : str) -> dict:
     return _qc_to_json(_qasm_to_qc(circuit_qasm))
 
-    
-def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bool:
-    """
-    Function to determine weather a cirucit has gates that accept parameters, not necesarily parametric :py:class:`qiskit.QuantumCircuit`.
-    For example, a circuit that is composed by hadamard and cnot gates is not a parametric circuit; but if a circuit has any of the gates defined in `parametric_gates` we
-    consider it a parametric circuit for our purposes.
-
-    Args:
-        circuit (qiskit.QuantumCircuit | dict | str): the circuit from which we want to find out if it's parametric.
-
-    Return:
-        True if the circuit is considered parametric, False if it's not.
-    """
-    parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
-    if isinstance(circuit, QuantumCircuit):
-        for instruction in circuit.data:
-            if instruction.operation.name in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, dict):
-        for instruction in circuit['instructions']:
-            if instruction['name'] in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, list):
-        for instruction in circuit:
-            if instruction['name'] in parametric_gates:
-                return True
-        return False
-    elif isinstance(circuit, CunqaCircuit):
-        return circuit.is_parametric
-    elif isinstance(circuit, str):
-        lines = circuit.splitlines()
-        for line in lines:
-            line = line.strip()
-            if any(line.startswith(gate) for gate in parametric_gates):
-                return True
-        return False
 
 def _registers_dict(qc: 'QuantumCircuit') -> "list[dict]":
     """
@@ -702,3 +715,47 @@ def _registers_dict(qc: 'QuantumCircuit') -> "list[dict]":
         classical_registers[k] = counts[i]
 
     return [quantum_registers, classical_registers]
+
+def _is_parametric(circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit']) -> bool:
+    """
+    Function to determine weather a cirucit has gates that accept parameters, not necesarily parametric :py:class:`qiskit.QuantumCircuit`.
+    For example, a circuit that is composed by hadamard and cnot gates is not a parametric circuit; but if a circuit has any of the gates defined in `parametric_gates` we
+    consider it a parametric circuit for our purposes.
+
+    Args:
+        circuit (qiskit.QuantumCircuit | dict | str): the circuit from which we want to find out if it's parametric.
+
+    Return:
+        True if the circuit is considered parametric, False if it's not.
+    """
+    parametric_gates = ["u", "u1", "u2", "u3", "rx", "ry", "rz", "crx", "cry", "crz", "cu1", "cu3", "rxx", "ryy", "rzz", "rzx", "cp", "cswap", "ccx", "crz", "cu"]
+    if isinstance(circuit, QuantumCircuit):
+        for instruction in circuit.data:
+            if instruction.operation.name in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, dict):
+        for instruction in circuit['instructions']:
+            if instruction['name'] in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, list):
+        for instruction in circuit:
+            if instruction['name'] in parametric_gates:
+                return True
+        return False
+    elif isinstance(circuit, CunqaCircuit):
+        return circuit.is_parametric
+    elif isinstance(circuit, str):
+        lines = circuit.splitlines()
+        for line in lines:
+            line = line.strip()
+            if any(line.startswith(gate) for gate in parametric_gates):
+                return True
+        return False
+
+def get_module(obj):
+    """ Returns the root module that the passed object is from."""
+    if not hasattr(obj, '__module__'):
+        return
+    return obj.__module__.split('.')[0]
