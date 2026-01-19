@@ -9,9 +9,14 @@ elif [ $LMOD_SYSTEM_NAME == "FT3" ]; then
     ml load cesga/2022 gcc/system flexiblas/3.3.0 openmpi/5.0.5 boost cython/3.0.11 pybind11 cmake qiskit/1.2.4
     conda deactivate
 else
+    echo "You need to specify the modules for your cluster"
     # PUT YOUR MODULES HERE
 fi
 
-cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+if [ -n "$1" ]; then
+    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+else
+    cmake -B build/
+fi
 cmake --build build/ --parallel $(nproc)
 cmake --install build/

@@ -1595,10 +1595,10 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
         """
         if isinstance(qubits, list):
             for q in qubits:
-                self.instructions.append({'name': 'c_if_x', 'qubits': [q, q], 'conditional_reg': [q], 'params': []})
+                self.instructions.append({'name': 'x', 'qubits': [q, q], 'conditional_reg': [q], 'params': []})
 
         elif isinstance(qubits, int):
-            self.instructions.append({'name': 'c_if_x', 'qubits': [qubits, qubits], 'conditional_reg': [qubits], 'params': []})
+            self.instructions.append({'name': 'x', 'qubits': [qubits, qubits], 'conditional_reg': [qubits], 'params': []})
 
         else:
             logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
@@ -1676,6 +1676,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             logger.error(f"Error while assigning parameters, try checking that the provided params are of the correct lenght. \n {error} [{type(error).__name__}]")
             raise SystemExit
 
+    def save_state(self, pershot: bool = False, label: str = "_method_") -> None:
+        """
+        Instruction to save the state of the circuit simulation at the particular moment the instruction is executed.
+        Args:
+            pershot (bool): determines wether the state is stored separatedly for each shot or averaged. Default: False
+            label (str): key for the state in the result dict. Used to distinguish two states saved. 
+                         Default: '_method_', which appears in the result as the name of the simulation method selected.
+        """
+        self.instructions.append({
+            "name": "save_state",
+            "qubits": list(range(self.num_qubits)),
+            "snapshot_type": "list" if pershot else "single",
+            "label": label
+        })
 
     def measure_and_send(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
