@@ -13,6 +13,10 @@ else
     # PUT YOUR MODULES HERE
 fi
 
-cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+if [ -n "$1" ]; then
+    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+else
+    cmake -B build/
+fi
 cmake --build build/ --parallel $(nproc)
 cmake --install build/
