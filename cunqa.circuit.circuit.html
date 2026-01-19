@@ -24,7 +24,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cunqa.circuit.circuit.ControlContext" href="cunqa.circuit.circuit.ControlContext.html" />
+    <link rel="next" title="cunqa.circuit.circuit.get_module" href="cunqa.circuit.circuit.get_module.html" />
     <link rel="prev" title="cunqa.circuit" href="cunqa.circuit.html" /> 
 </head>
 
@@ -85,6 +85,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.circuit.circuit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.converters.html">cunqa.circuit.converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.parameter.html">cunqa.circuit.parameter</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -187,7 +188,7 @@
              
   <section id="module-cunqa.circuit.circuit">
 <span id="cunqa-circuit-circuit"></span><h1>cunqa.circuit.circuit<a class="headerlink" href="#module-cunqa.circuit.circuit" title="Link to this heading"></a></h1>
-<p>Holds CUNQA’s custom circuit class and functions to translate its instructions into other formats for circuit definition.</p>
+<p>Holds Cunqa’s custom circuit class for circuit definition.</p>
 <section id="building-circuits">
 <h2>Building circuits<a class="headerlink" href="#building-circuits" title="Link to this heading"></a></h2>
 <p>Users can define a circuit using <a class="reference internal" href="cunqa.circuit.circuit.CunqaCircuit.html#cunqa.circuit.circuit.CunqaCircuit" title="cunqa.circuit.circuit.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> to then send it to the virtual QPUs.
@@ -233,6 +234,17 @@ or you can convert it to the json <cite>dict</cite> format by the <code class="x
 </aside>
 </section>
 </section>
+<h2> Functions </h2><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.circuit.get_module.html#cunqa.circuit.circuit.get_module" title="cunqa.circuit.circuit.get_module"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_module</span></code></a></p></td>
+<td><p>Returns the root module that the passed object is from.</p></td>
+</tr>
+</tbody>
+</table>
 <h2> Classes </h2><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10.0%" />
@@ -268,7 +280,7 @@ or you can convert it to the json <cite>dict</cite> format by the <code class="x
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cunqa.circuit.html" class="btn btn-neutral float-left" title="cunqa.circuit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.circuit.circuit.ControlContext.html" class="btn btn-neutral float-right" title="cunqa.circuit.circuit.ControlContext" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.circuit.circuit.get_module.html" class="btn btn-neutral float-right" title="cunqa.circuit.circuit.get_module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

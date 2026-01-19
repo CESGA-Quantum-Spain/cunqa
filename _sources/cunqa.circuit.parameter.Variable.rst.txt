@@ -1,0 +1,27 @@
+cunqa.circuit.parameter.Variable
+================================
+
+.. currentmodule:: cunqa.circuit.parameter
+
+.. autoclass:: Variable
+   :show-inheritance:
+
+
+
+
+
+Methods
+~~~~~~~
+
+.. automethod:: Variable.__init__
+
+
+
+
+
+
+
+
+
+
+

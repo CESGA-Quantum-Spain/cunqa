@@ -85,6 +85,7 @@
 <li class="toctree-l3 current"><a class="reference internal" href="cunqa.circuit.circuit.html">cunqa.circuit.circuit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.circuit_extensions.html">cunqa.circuit.circuit_extensions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.converters.html">cunqa.circuit.converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.parameter.html">cunqa.circuit.parameter</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a><ul>
@@ -205,12 +206,22 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.circuit.InstanceTrackerMeta.access_other_instances">
 <span class="sig-prename descclassname"><span class="pre">InstanceTrackerMeta.</span></span><span class="sig-name descname"><span class="pre">access_other_instances</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.circuit.InstanceTrackerMeta.access_other_instances" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns a dictionary with all the CunqaCircuit instances created. Keys are circuit ids while the values are the circuit objects.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.circuit.InstanceTrackerMeta.get_connectivity">
 <span class="sig-prename descclassname"><span class="pre">InstanceTrackerMeta.</span></span><span class="sig-name descname"><span class="pre">get_connectivity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.circuit.InstanceTrackerMeta.get_connectivity" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method to obtain the connectivity of circuit instances where two circuits are connected if they have distributed instructions referencing eachother.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>contains frozen sets with paths that connect circuit instances. If two circuits belong to an element in _connected, they are connected.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>_connected (set)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.circuit.InstanceTrackerMeta.mro">

@@ -26,6 +26,8 @@ Attributes
    ~CunqaCircuit.quantum_regs
    ~CunqaCircuit.classical_regs
    ~CunqaCircuit.sending_to
+   ~CunqaCircuit.current_params
+   ~CunqaCircuit.param_expressions
 
 
 
@@ -335,6 +337,12 @@ Methods
 
 
 
+
+
+
+
+
+.. automethod:: CunqaCircuit.assign_parameters
 
 .. automethod:: CunqaCircuit.c_if
 

@@ -1,0 +1,46 @@
+cunqa.circuit.parameter
+=======================
+
+.. automodule:: cunqa.circuit.parameter
+
+   
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Functions </h2>
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+      :recursive:
+   
+      variables
+   
+   
+
+   
+   
+   .. raw:: html
+
+      <h2> Classes </h2>
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+      :recursive:
+   
+      Variable
+   
+   
+
+   
+   
+   
+
+
+
