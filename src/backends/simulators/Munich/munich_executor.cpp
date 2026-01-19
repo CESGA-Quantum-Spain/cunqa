@@ -20,7 +20,7 @@ MunichExecutor::MunichExecutor() : classical_channel{"executor"}
     std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file.");
+        throw std::runtime_error("Error opening the communications file in MunichExecutor.");
     }
 
     JSON j;
@@ -48,7 +48,7 @@ MunichExecutor::MunichExecutor(const std::string& group_id) : classical_channel{
     std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file.");
+        throw std::runtime_error("Error opening the communications file in MunichExecutor.");
     }
 
     JSON j;

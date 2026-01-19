@@ -18,7 +18,6 @@
 #include "aer_helpers.hpp"
 
 #include "utils/constants.hpp"
-#include "utils/helpers/reverse_bitstring.hpp"
 
 #include "logger.hpp"
 
@@ -182,19 +181,6 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
             state->apply_mcrz({control, qubits[1] + T.zero_qubit}, params[0]);
             break;
         }
-        case constants::C_IF_H:
-        case constants::C_IF_X:
-        case constants::C_IF_Y:
-        case constants::C_IF_Z:
-        case constants::C_IF_CX:
-        case constants::C_IF_CY:
-        case constants::C_IF_CZ:
-        case constants::C_IF_ECR:
-        case constants::C_IF_RX:
-        case constants::C_IF_RY:
-        case constants::C_IF_RZ:
-            // Managed by use
-            break;
         case constants::SWAP:
         {
             state->apply_mcswap({qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit});
@@ -357,6 +343,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
 
 JSON AerSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Aer usual simulation");
     try {
         auto quantum_task = qc.quantum_tasks[0];
 
@@ -391,6 +378,8 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
 
 JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
+    LOGGER_DEBUG("Aer dynamic simulation");
+
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
@@ -427,7 +416,6 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 
     delete state;
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};

@@ -20,7 +20,7 @@ AerExecutor::AerExecutor() : classical_channel{"executor"}
     std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file.");
+        throw std::runtime_error("Error opening the communications file in AerExecutor.");
     }
 
     JSON j;
@@ -45,7 +45,7 @@ AerExecutor::AerExecutor(const std::string& group_id) : classical_channel{"execu
     std::ifstream in(constants::COMM_FILEPATH);
 
     if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file.");
+        throw std::runtime_error("Error opening the communications file in AerExecutor.");
     }
 
     JSON j;
@@ -71,9 +71,7 @@ void AerExecutor::run()
     std::string message;
     while (true) {
         for(const auto& qpu_id: qpu_ids) {
-            LOGGER_DEBUG("Vamos a recibir el mensaje de: {}", qpu_id);
             message = classical_channel.recv_info(qpu_id);
-            LOGGER_DEBUG("Recibimos el mensaje: {}", message);
 
             if(!message.empty()) {
                 qpus_working.push_back(qpu_id);

@@ -17,3 +17,8 @@ install(TARGETS example3 DESTINATION example)
 add_executable(qc_example qc_example.cpp)
 target_link_libraries(qc_example PRIVATE client json) 
 install(TARGETS qc_example DESTINATION example)
+
+#Example 5: send circuit without needing to manually connect to the client 
+add_executable(simplest simplest_example.cpp)
+target_link_libraries(simplest PRIVATE client json) 
+install(TARGETS simplest DESTINATION example)

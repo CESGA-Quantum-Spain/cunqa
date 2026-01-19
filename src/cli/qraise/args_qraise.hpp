@@ -9,8 +9,8 @@ using namespace std::literals;
 
 struct CunqaArgs : public argparse::Args 
 {
-    int& n_qpus                                         = kwarg("n,num_qpus", "Number of QPUs to be raised.").set_default(1);
-    std::string& time                                   = kwarg("t,time", "Time for the QPUs to be raised.").set_default("00:10:00");
+    int& n_qpus                                         = kwarg("n,num_qpus", "Number of QPUs to be raised.").set_default(0);
+    std::string& time                                   = kwarg("t,time", "Time for the QPUs to be raised.").set_default("");
     int& cores_per_qpu                                  = kwarg("c,cores", "Number of cores per QPU.").set_default(2);
     std::optional<std::string>& partition               = kwarg("p,partition", "Partition requested for the QPUs.");
     std::optional<int>& mem_per_qpu                     = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.");
@@ -31,6 +31,7 @@ struct CunqaArgs : public argparse::Args
     bool& cc                                            = flag("classical_comm", "Enable classical communications.");
     bool& qc                                            = flag("quantum_comm", "Enable quantum communications.");
     std::optional<std::string>& infrastructure          = kwarg("infrastructure", "Path to a infrastructure of QPUs.");
+    bool& qmio                                          = flag("qmio", "Deploy QMIO.");
 
     void welcome() {
         std::cout << "Welcome to qraise command, a command responsible for turning on the required QPUs.\n" << std::endl;

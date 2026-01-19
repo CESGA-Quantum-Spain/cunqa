@@ -20,13 +20,15 @@ add_executable(setup_qpus setup_qpus.cpp)
 target_link_libraries(setup_qpus PRIVATE json logger_qpu qpu 
                                          aer_simple_simulator aer_cc_simulator aer_qc_simulator
                                          munich_simple_simulator munich_cc_simulator munich_qc_simulator 
-                                         cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator)
+                                         cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator
+                                         maestro_simple_simulator maestro_cc_simulator maestro_qc_simulator
+                                         qulacs_simple_simulator qulacs_cc_simulator qulacs_qc_simulator)
 target_include_directories(setup_qpus PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # EXECUTOR executable
 add_executable(setup_executor setup_executor.cpp)
-target_link_libraries(setup_executor PRIVATE aer_executor munich_executor cunqa_executor logger_executor)
+target_link_libraries(setup_executor PRIVATE aer_executor munich_executor cunqa_executor maestro_executor qulacs_executor logger_executor)
 target_include_directories(setup_executor PRIVATE "${CMAKE_SOURCE_DIR}/src")
 install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
@@ -34,6 +36,17 @@ install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 add_executable(qinfo qinfo.cpp)
 target_link_libraries(qinfo PRIVATE json logger_client morrisfranken::argparse)
 install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# SETUP_QMIO executable
+add_executable(setup_qmio setup_qmio.cpp)
+target_link_libraries(setup_qmio PRIVATE json cppzmq server logger_qpu)
+target_include_directories(setup_qmio PRIVATE   "${CMAKE_SOURCE_DIR}/src"
+                                                "${ZMQ_BINARY_DIR}"
+                                                "${ZMQ_INCLUDE_DIR}"
+                                                "${CMAKE_SOURCE_DIR}/src/third-party/zmq")
+target_link_directories(setup_qmio PRIVATE "${ZMQ_BINARY_DIR}/lib")
+target_include_directories(setup_qmio PRIVATE )
+install(TARGETS setup_qmio DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Epilog tool erase_key and noise models
 add_executable(erase_key erase_key.cpp)
