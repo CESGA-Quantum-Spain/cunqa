@@ -7,10 +7,8 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
-# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(1, "00:10:00", simulator = "Aer", co_located = True, gpu = True)
-
-qpus  = get_QPUs(on_node = False, family = family)
+family_name = "gpufam"
+qpus  = get_QPUs(on_node = False, family = family_name)
 
 qc = CunqaCircuit(5)
 qc.h(0)
@@ -26,4 +24,4 @@ time = qjob.time_taken
 print(qjob.result)
 
 ########## Drop the deployed QPUs #
-qdrop(family)
+qdrop(family_name)

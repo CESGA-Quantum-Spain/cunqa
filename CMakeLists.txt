@@ -22,7 +22,8 @@ endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 
 # GPU MACROS
-set(CUDA_ARCH "")
+set(COMPILATION_FOR_GPU FALSE)
+set(GPU_ARCH "")
 set(MAX_GPUS_PER_NODE "")
 
 # Check that $STORE exists
@@ -216,10 +217,11 @@ if(OpenMP_FOUND)
 endif()
 if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
-  message(STATUS "Linked pybind aer-cpp")
+  message(STATUS "Linked pybind aer-cpp") 
 endif()
 if (DEFINED AER_GPU)
   message(STATUS "Compiling with AER_GPU")
+  set(COMPILATION_FOR_GPU TRUE)
   
   #set(CMAKE_CUDA_COMPILER "/path/to/bin/nvcc")
   #set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
@@ -235,9 +237,9 @@ if (DEFINED AER_GPU)
   # Ada Lovelace           RTX 40xx               89
   # Hopper                 H100                   90
   
-  set(CUDA_ARCH 75)
-  set(MAX_GPUS_PER_NODE 1) # Dependent on CUDA_ARCH and CLUSTER
-  set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH})
+  set(GPU_ARCH 75)
+  set(MAX_GPUS_PER_NODE 1) # Dependent on GPU_ARCH and CLUSTER
+  set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 20)
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)

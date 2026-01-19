@@ -22,6 +22,11 @@ std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
+#if COMPILATION_FOR_GPU
+    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
+#else 
+    std::string setup_qpus = "setup_qpus";
+#endif
 
     std::string run_command;
     std::string subcommand;
@@ -39,10 +44,10 @@ std::string get_cc_run_command(const CunqaArgs& args, const std::string& mode)
     }
 
 #ifdef USE_MPI_BTW_QPU
-    run_command =  "srun --mpi=pmix --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
+    run_command =  "srun --mpi=pmix --task-epilog=$EPILOG_PATH " + setup_qpus + " " +  subcommand;
     LOGGER_DEBUG("Run command with MPI comm: {}", run_command);
 #elif defined(USE_ZMQ_BTW_QPU)
-    run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
+    run_command =  "srun --task-epilog=$EPILOG_PATH " + setup_qpus + " " +  subcommand;
     LOGGER_DEBUG("Run command with ZMQ comm: {}", run_command);
 #endif
 

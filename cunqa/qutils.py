@@ -246,15 +246,15 @@ def qdrop(*families: Union[tuple[str], str]):
     else:
         for family in families:
             if isinstance(family, str):
-                cmd.append(family)
+                cmd.append(f"--fam={family}")
 
             elif isinstance(family, tuple):
-                cmd.append(family[1])
+                cmd.append(f"--fam={family[1]}")
+
             else:
                 logger.error(f"Invalid type for qdrop.")
                 raise SystemExit
     
- 
     run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
 
 def nodes_with_QPUs() -> "list[str]":
@@ -395,7 +395,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
             logger.debug("Virtual QPU found") 
             client = QClient()
         
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"]))
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], gpu = info["net"]["gpu"]))
     if len(qpus) != 0:
         return qpus
     else:

@@ -17,6 +17,11 @@ std::string get_simple_run_command(const CunqaArgs& args, const std::string& mod
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
+#if COMPILATION_FOR_GPU
+    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
+#else 
+    std::string setup_qpus = "setup_qpus";
+#endif
 
     std::string run_command;
     std::string subcommand;
@@ -32,12 +37,12 @@ std::string get_simple_run_command(const CunqaArgs& args, const std::string& mod
             backend_path = std::string(args.backend.value());
             backend = R"({"backend_path":")" + backend_path + R"("})" ;
             subcommand = mode + " no_comm " + std::string(args.family_name) + " " + std::string(args.simulator) + " \'" + backend + "\'" "\n";
-            run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
+            run_command = "srun --task-epilog=$EPILOG_PATH " + setup_qpus + " " + subcommand;
             LOGGER_DEBUG("Qraise with no communications and personalized backend. \n");
         }
     } else {
         subcommand = mode + " no_comm " + std::string(args.family_name) + " " + std::string(args.simulator) + "\n";
-        run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
+        run_command = "srun --task-epilog=$EPILOG_PATH " + setup_qpus + " " + subcommand;
         LOGGER_DEBUG("Qraise default with no communications. \n");
     }
 

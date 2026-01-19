@@ -42,6 +42,14 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
     std::string qpus_path;
     std::string family_name;
 
+#if COMPILATION_FOR_GPU
+    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
+    std::string setup_executor = "setup_executor_gpu" + std::to_string(GPU_ARCH);
+#else 
+    std::string setup_qpus = "setup_qpus";
+    std::string setup_executor = "setup_executor";
+#endif
+
     //---------------------------------------------------------------
 
 
@@ -120,11 +128,11 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         }
         qpus_path += R"(}})";
 
-        sbatchFile << "srun -n " + std::to_string(qc_group.size()) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located qc " + qc_group[0] + " " + simulator + " \'" + qpus_path + "\' &\n";
+        sbatchFile << "srun -n " + std::to_string(qc_group.size()) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH " + setup_qpus + " co_located qc " + qc_group[0] + " " + simulator + " \'" + qpus_path + "\' &\n";
 
         sbatchFile << "sleep 1\n";
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(group_cores) + " --mem=" + std::to_string(group_memory) + "G --exclusive setup_executor " + simulator + " " + qc_group[0];
+        sbatchFile << "srun -n 1 -c " + std::to_string(group_cores) + " --mem=" + std::to_string(group_memory) + "G --exclusive " + setup_executor + " " + simulator + " " + qc_group[0];
     }
     //------------------------------------------------------
 
@@ -149,7 +157,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         backend_path = qpus.at(cc_qpu).at("backend").get<std::string>();
         qpus_path = R"({"backend_from_infrastructure":{")" + cc_qpu + "\":\"" + backend_path + R"("}})";
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located cc " + cc_qpu + " " + simulator + " \'" + qpus_path + "\'";
+        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH " + setup_qpus + " co_located cc " + cc_qpu + " " + simulator + " \'" + qpus_path + "\'";
 
         written_qpus.push_back(cc_qpu);
         n_cc_qpus++;    
@@ -178,7 +186,7 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
         backend_path = properties.at("backend").get<std::string>();
         qpus_path = R"({"backend_from_infrastructure":{")" + name + "\":\"" + backend_path +  R"("}})" ;
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH setup_qpus co_located no_comm "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
+        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --exclusive --task-epilog=$EPILOG_PATH " + setup_qpus + " co_located no_comm "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
         
     }
     //--------------------------------------------------
