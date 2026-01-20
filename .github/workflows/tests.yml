@@ -42,4 +42,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -q tests/test_mappers.py
+          pytest -q tests/
