@@ -25,7 +25,6 @@ jobs:
       - name: Create stub cunqa/qclient.py (empty QClient)
         shell: bash
         run: |
-          mkdir -p cunqa
           cat > cunqa/qclient.py <<'PY'
           class QClient:
               pass
