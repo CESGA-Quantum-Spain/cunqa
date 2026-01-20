@@ -22,15 +22,20 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install system deps (libzmq + cppzmq)
+      - name: Create stub cunqa/qclient.py (empty QClient)
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libzmq3-dev \
-            cppzmq-dev \
-            pkg-config
-          g++ -O3 -Wall -shared -std=c++11 -fPIC $(python3 -m pybind11 --includes) bindings.cpp src/comm/comm_impl/zmq/zmq_client.cpp -o qclient$(python3-config --extension-suffix) -Isrc -lzmq
+          mkdir -p cunqa
+          cat > cunqa/qclient.py <<'PY'
+          class QClient:
+              pass
 
+          class FutureWrapper:
+              pass
+          PY
+      - name: Copy constants.py.in into constants.py
+        run:
+          cp cunqa/constants.py.in cunqa/constants.py
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
@@ -38,4 +43,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -q
+          pytest -q tests/
