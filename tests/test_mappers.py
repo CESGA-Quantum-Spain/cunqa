@@ -7,7 +7,7 @@ import pytest
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 if IN_GITHUB_ACTIONS:
-    sys.path.insert(0, "..")
+    sys.path.insert(0, "/home/runner/work/cunqa/cunqa")
     print(sys.path)
     import cunqa
 else:
