@@ -263,7 +263,7 @@ class CunqaCircuit():
     _ids: set = set() #: Set with ids in use.
     _communicated: dict[str, CunqaCircuit] = {} #: Dictionary with the circuits that employ communication directives.
 
-    id: str #: Circuit identificator.
+    _id: str #: Circuit identificator.
     is_dynamic: bool #: Whether the circuit has local non-unitary operations.
     instructions: list[dict] #: Set of operations applied to the circuit.
     quantum_regs: dict  #: Dictionary of quantum registers as ``{"name": [assigned qubits]}``.
@@ -304,13 +304,18 @@ class CunqaCircuit():
             self.add_cl_register("c0", num_clbits)
 
         if not id:
-            self.id = "CunqaCircuit_" + generate_id()
+            self._id = "CunqaCircuit_" + generate_id()
         elif id in self._ids:
-            self.id = "CunqaCircuit_" + generate_id()
+            self._id = "CunqaCircuit_" + generate_id()
             logger.warning(f"Id {id} was already used for another circuit, using an automatically "
-                           f"generated one: {self.id}.")
+                           f"generated one: {self._id}.")
         else:
-            self.id = id
+            self._id = id
+
+    @property
+    def id(self) -> str:
+        """Returns circuit id."""
+        return self._id
 
     @property
     def info(self) -> dict:
@@ -318,7 +323,7 @@ class CunqaCircuit():
         Information about the main class attributes given as a dictinary.
         """
         return {
-            "id":self.id, 
+            "id":self._id, 
             "instructions": self.instructions, 
             "num_qubits": self.num_qubits,
             "num_clbits": self.num_clbits,
@@ -412,7 +417,7 @@ class CunqaCircuit():
     # =============== INSTRUCTIONS ===============
     # Methods for implementing non parametric single-qubit gates
 
-    def id(self, qubit: int) -> None:
+    def i(self, qubit: int) -> None:
         """
         Class method to apply id gate to the given qubit.
 

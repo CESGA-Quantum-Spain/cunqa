@@ -6,7 +6,7 @@ sys.path.append(home)
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.qjob import gather
 from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.partitioning import union
+from cunqa.circuit.transformations import union
 
 circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
 circuit2 = CunqaCircuit(1, id = "circuit2")

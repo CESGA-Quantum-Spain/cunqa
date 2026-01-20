@@ -26,7 +26,7 @@ def test_init_generates_id_and_adds_default_q_register(monkeypatch):
 
     circuit = CunqaCircuit(2)
 
-    assert circuit._id == "CunqaCircuit_ABC"
+    assert circuit.id == "CunqaCircuit_ABC"
     assert circuit.num_qubits == 2
     assert circuit.quantum_regs["q0"] == [0, 1]
     assert circuit.num_clbits == 0
@@ -50,7 +50,7 @@ def test_init_duplicate_id(monkeypatch):
     CunqaCircuit._ids.add("dup")
     circuit = CunqaCircuit(1, id="dup")
 
-    assert circuit._id == "CunqaCircuit_XYZ"
+    assert circuit.id == "CunqaCircuit_XYZ"
     logger_mock.warning.assert_called_once()
 
 
@@ -60,7 +60,7 @@ def test_info_property(monkeypatch):
     circuit = CunqaCircuit(2, num_clbits=1)
 
     info = circuit.info
-    assert info["id"] == circuit._id
+    assert info["id"] == circuit.id
     assert info["instructions"] == circuit.instructions
     assert info["num_qubits"] == 2
     assert info["num_clbits"] == 1
@@ -123,7 +123,7 @@ def test_add_instructions_accepts_dict_or_list(monkeypatch):
 
 
 ONEQUBIT_NOPARAM = [
-    ("id",      (0,), {"name": "id",    "qubits": [0]}),
+    ("i",       (0,), {"name": "id",    "qubits": [0]}),
     ("x",       (0,), {"name": "x",     "qubits": [0]}),
     ("y",       (0,), {"name": "y",     "qubits": [0]}),
     ("z",       (0,), {"name": "z",     "qubits": [0]}),

@@ -1,6 +1,3 @@
-"""
-Holds dunder methods for the class CunqaCircuit and other functions to extract information from it.
-"""
 from typing import Union
 import copy
 import numpy as np
@@ -11,7 +8,7 @@ from cunqa.circuit.core import CunqaCircuit
 from cunqa.constants import REMOTE_GATES
 
 def vsplit():
-    pass
+    pass # TODO
 
 def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[CunqaCircuit]:
     num_qubits = circuit.num_qubits
@@ -19,8 +16,8 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
     if isinstance(qubits_or_sections, list):
         # handle list case.
         if np.sum(qubits_or_sections) != num_qubits:
-            logger.error(f"Error: Incorrect hsplit of the circuit, {qubits_or_sections} does not add up to {num_qubits} qubits")
-            raise RuntimeError
+            raise RuntimeError(f"Error: Incorrect hsplit of the circuit, {qubits_or_sections} does "
+                               f"not add up to {num_qubits} qubits")
         Nsections = len(qubits_or_sections)
         initial_qubits = [0] + list(np.cumsum(qubits_or_sections))
 
@@ -63,10 +60,10 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
                     ctrl_qubit = inst["qubits"][0] - initial_qubits[i]
                     target_qubit = inst["qubits"][1] - initial_qubits[j]
 
-                    with sub_circuit.expose(ctrl_qubit, target_circuit) as rcontrol:
+                    with sub_circuit.expose(ctrl_qubit, target_circuit) as (subcircuit, rcontrol):
                         inst["qubits"][0] = rcontrol
                         inst["qubits"][1] = target_qubit
-                        target_circuit.add_instructions([inst])
+                        subcircuit.add_instructions([inst])
                 else:
                     inst["qubits"][0] -= initial_qubits[i]
                     inst["qubits"][1] -= initial_qubits[i]
@@ -91,10 +88,19 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     clbit_offsets = [0] + list(accumulate(c.num_clbits for c in circuits[:-1]))
     circuit_ids = {c.id for c in circuits}
 
-    def reindex(instr: dict, idx: int) -> dict:
+    def reindex(instr: dict, idx: int, exposed_q: int = -1) -> dict:
         new_instr = dict(instr)
+        if "instructions" in new_instr:
+            sub_instructions = []
+            for sub_instr in new_instr["instructions"]:
+                sub_instructions.append(reindex(sub_instr, idx, exposed_q))
+            new_instr = sub_instructions
         if "qubits" in new_instr:
-            new_instr["qubits"] = [q + qubit_offsets[idx] for q in new_instr["qubits"]]
+            if exposed_q == -1:
+                new_instr["qubits"] = [q + qubit_offsets[idx] for q in new_instr["qubits"]]
+            else:
+                new_instr["qubits"] = [q + qubit_offsets[idx] if q != -1 else exposed_q 
+                                       for q in new_instr["qubits"]]
         if "clbits" in new_instr:
             new_instr["clbits"] = [c + clbit_offsets[idx] for c in new_instr["clbits"]]
         return new_instr
@@ -113,7 +119,7 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     union_instructions: list[dict] = []
     blocked: dict[str, dict] = {}
 
-    finished = [False] * len(circuits)
+    finished = [False if len(circ.instructions) > 0 else True for circ in circuits]
     pointers = [0] * len(circuits)
 
     def advance(idx: int) -> None:
@@ -168,14 +174,13 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
             elif name in ("qrecv", "expose", "recv"):
                 blocked[circuit_id] = reindex(instr, idx)
                 return True
-
             elif name == "rcontrol":
                 if target_id not in blocked:
                     return False
                 blocked_instr = blocked[target_id]
                 if blocked_instr["name"] == "expose":
-                    for sub_instr in instr["instructions"]:
-                        union_instructions.append(reindex(sub_instr, idx))
+                    for sub_instr in reindex(instr, idx, blocked_instr["qubits"][0]):
+                        union_instructions.append(sub_instr)
                     del blocked[target_id]
                     return True
 

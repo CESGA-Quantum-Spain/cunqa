@@ -21,7 +21,7 @@ def test_init_connects_when_endpoint_is_ok():
         qpu = QPU(id=1, backend=backend, family="f", endpoint=endpoint)
     QClientMock.assert_called_once_with()
     qclient_instance.connect.assert_called_once_with(endpoint)
-    assert qpu._id == 1
+    assert qpu.id == 1
     assert qpu._backend is backend
     assert qpu._family == "f"
     assert qpu._qclient is qclient_instance
@@ -105,7 +105,7 @@ def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
     circuits = ["c1", "c2"]
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
-    qpu1._id, qpu2._id = 1, 2
+    qpu1.id, qpu2.id = 1, 2
     job1, job2 = Mock(name="Job1"), Mock(name="Job2")
     qpu1.execute.return_value, qpu2.execute.return_value = job1, job2
 
@@ -131,7 +131,7 @@ def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
 
     qpu, job = Mock(name="QPU"), Mock(name="Job")
-    qpu._id = 1
+    qpu.id = 1
     qpu.execute.return_value = job
 
     to_ir_mock = Mock(return_value=circuit_ir)
@@ -149,7 +149,7 @@ def test_run_raises_if_not_enough_qpus(monkeypatch):
     c2_ir = {"id": "c2"}
 
     qpu = Mock(name="QPU")
-    qpu._id = 1
+    qpu.id = 1
 
     def _to_ir_side_effect(circuit):
         if circuit == "c1":
@@ -170,7 +170,7 @@ def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
     circuits = [circuit_ir]
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
-    qpu1._id, qpu2._id = 1, 2
+    qpu1.id, qpu2.id = 1, 2
     job1 = Mock(name="Job1")
     qpu1.execute.return_value = job1
 
@@ -200,7 +200,7 @@ def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch):
     }
 
     qpu = Mock(name="QPU")
-    qpu._id = 10
+    qpu.id = 10
     job = Mock(name="Job")
     qpu.execute.return_value = job
 
@@ -230,7 +230,7 @@ def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(mon
     }
 
     qpu = Mock(name="QPU")
-    qpu._id = 7
+    qpu.id = 7
     job = Mock(name="Job")
     qpu.execute.return_value = job
 
