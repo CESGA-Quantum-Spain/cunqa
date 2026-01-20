@@ -420,9 +420,9 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
     """
     # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
     if partial is None:
-        partial = [num_qubits - i for i in range(num_qubits)]
+        partial = [num_qubits - 1 - i for i in range(num_qubits)]
     else:
-        partial = [num_qubits - i for i in partial]
+        partial = [num_qubits - 1 - i for i in partial]
 
     if per_qubit:
         short_num_qubits = len(partial)
