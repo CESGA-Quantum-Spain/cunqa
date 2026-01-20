@@ -1,6 +1,13 @@
 #circuit/test_partitioning.py
 import os, sys
-sys.path.append(os.getenv("HOME"))
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+if IN_GITHUB_ACTIONS:
+    sys.path.insert(0, os.getcwd())
+else:
+    HOME = os.getenv("HOME")
+    sys.path.insert(0, HOME)
 
 import copy
 import pytest
