@@ -27,7 +27,7 @@ jobs:
         run: |
           cat > cunqa/qclient.py <<'PY'
           class QClient:
-              def connect(a):
+              def connect(self, a):
                 pass
           class FutureWrapper:
               pass
