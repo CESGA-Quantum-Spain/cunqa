@@ -8,7 +8,7 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 if IN_GITHUB_ACTIONS:
     sys.path.insert(0, "..")
-    print("ENTRAMOS AQUI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(sys.path)
     import cunqa
 else:
     HOME = os.getenv("HOME")
