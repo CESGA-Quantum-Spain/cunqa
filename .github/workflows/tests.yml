@@ -29,11 +29,12 @@ jobs:
             libzmq3-dev \
             cppzmq-dev \
             pkg-config
+          g++ -O3 -Wall -shared -std=c++11 -fPIC $(python3 -m pybind11 --includes) bindings.cpp src/comm/comm_impl/zmq/zmq_client.cpp -o qclient$(python3-config --extension-suffix) -Isrc -lzmq
 
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
-          pip install qiskit=1.2.4
+          pip install qiskit==1.2.4
 
       - name: Run tests
         run: |
