@@ -1,7 +1,11 @@
 name: tests
 
-on:
-  workflow_dispatch
+on: 
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
 
 jobs:
   tests:
