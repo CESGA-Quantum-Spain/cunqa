@@ -418,8 +418,11 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
         short_bitstring_probs (np.array, dict[np.array]): set of probabilities per sub-bitstring
     """
+    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
     if partial is None:
-        partial = list(range(num_qubits))
+        partial = [num_qubits - i for i in range(num_qubits)]
+    else:
+        partial = [num_qubits - i for i in partial]
 
     if per_qubit:
         short_num_qubits = len(partial)
@@ -452,7 +455,6 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
     else: # per_qubit is False, want probabilities of partial bitstrings
         short_num_qubits = len(partial)
         if isinstance(probs, dict): # get a dict with probability arrays as values
-            print("Dict detected\n")
             short_bitstring_probs = {}
             for k, probs_k in probs.items():
 
