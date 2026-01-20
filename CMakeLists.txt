@@ -225,7 +225,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURR
 
 add_subdirectory(src)
 add_subdirectory(cunqa)
-add_subdirectory(examples)
 
 # uninstall target
 if(NOT TARGET uninstall)

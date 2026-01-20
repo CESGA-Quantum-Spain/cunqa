@@ -1,0 +1,44 @@
+name: tests
+
+on: 
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Create stub cunqa/qclient.py (empty QClient)
+        shell: bash
+        run: |
+          cat > cunqa/qclient.py <<'PY'
+          class QClient:
+              def connect(self, a):
+                pass
+          class FutureWrapper:
+              pass
+          PY
+      - name: Copy constants.py.in into constants.py
+        run:
+          cp cunqa/constants.py.in cunqa/constants.py
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install qiskit==1.2.4 pytest
+
+      - name: Run tests
+        run: |
+          pytest -q tests/

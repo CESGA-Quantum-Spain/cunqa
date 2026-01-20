@@ -3,8 +3,13 @@
 import os, sys
 import pytest
 
-HOME = os.getenv("HOME")
-sys.path.insert(0, HOME)
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+if IN_GITHUB_ACTIONS:
+    sys.path.insert(0, os.getcwd())
+else:
+    HOME = os.getenv("HOME")
+    sys.path.insert(0, HOME)
 
 from cunqa.result import Result
 

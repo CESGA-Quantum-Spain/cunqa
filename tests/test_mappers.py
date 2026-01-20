@@ -4,8 +4,13 @@ import numpy as np
 from unittest.mock import Mock
 import pytest
 
-HOME = os.getenv("HOME")
-sys.path.insert(0, HOME)
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+if IN_GITHUB_ACTIONS:
+    sys.path.insert(0, os.getcwd())
+else:
+    HOME = os.getenv("HOME")
+    sys.path.insert(0, HOME)
 
 # If your classes live in a different module, adjust this import accordingly.
 from cunqa.mappers import QJobMapper, QPUCircuitMapper
