@@ -7,9 +7,9 @@ CUNQA module
    
    cunqa.backend
 
-   cunqa.circuit
+   cunqa.real_qpus
 
-   cunqa.converters
+   cunqa.circuit
 
    cunqa.mappers
 
@@ -20,5 +20,3 @@ CUNQA module
    cunqa.qutils
 
    cunqa.result
-
-   cunqa.transpile

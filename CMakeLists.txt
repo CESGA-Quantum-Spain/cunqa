@@ -11,6 +11,7 @@ endif()
 # Adding C++20 standard as required
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg") # Dani, for profiling with gprof
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 message(STATUS "C++ version ${CXX_STANDARD} configured.")
 message(STATUS "${CMAKE_VERSION}")
@@ -53,10 +54,11 @@ if(${SYSTEM_NAME} STREQUAL "QMIO")
   find_package(pybind11 2.13 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
-  set(pybind11_DIR "/opt/cesga/2022/software/Core/pybind11/2.12.0-python-3.10.8/lib64/python3.10/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.10.8 EXACT COMPONENTS Interpreter Development)
+  set(pybind11_DIR "/opt/cesga/2020/software/Core/pybind11/2.13.1-python-3.9.9/lib/python3.9/site-packages/pybind11/share/cmake/pybind11/")
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
   find_package(pybind11 2.12 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
+  include_directories("/opt/cesga/2020/software/Core/python/3.9.9/include/python3.9/")
 else() # Other clusters
   find_package(Python 3.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.7 REQUIRED)
@@ -82,7 +84,7 @@ function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
     )
     FetchContent_MakeAvailable(${PACKAGE_NAME})
   else()
-    message(STATUS "Found package ${PACKAGE_NAME}")
+    message(STATUS "Found package ${PACKAGE_NAME}: ${PACKAGE_NAME}_DIR = ${${PACKAGE_NAME}_DIR}")
   endif()
 endfunction()
 
@@ -155,6 +157,19 @@ find_or_fetch_package(
   "v4.11.0"
 )
 
+# -- pyzmq -----------------------------------------------------------
+set(ZMQ_PREFIX "${libzmq_BINARY_DIR}" CACHE PATH "ZMQ_PREFIX" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}/lib")
+
+FetchContent_Declare(
+    pyzmq
+    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
+    GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(pyzmq)
+install(DIRECTORY  "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq")
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq/backend/cython")
+
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
 # =====================================================================
@@ -198,6 +213,89 @@ if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
   message(STATUS "Linked pybind aer-cpp")
 endif()
+
+# =====================================================================
+#  Maestro and its dependencies
+# =====================================================================
+find_package(Eigen3 5.0 QUIET)
+if(NOT Eigen3_FOUND)
+  message(STATUS "Package Eigen3 not found, fetching from https://gitlab.com/libeigen/eigen.git")
+  FetchContent_Declare(
+      MaestroEigen
+      GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
+      GIT_TAG        "bc3b39870ecb690a623a3f49149a358b95c5781d"
+  )
+  FetchContent_GetProperties(MaestroEigen)
+  if(NOT maestroeigen_POPULATED)
+      FetchContent_Populate(MaestroEigen)
+  endif()
+  #FetchContent_MakeAvailable(MaestroEigen)
+  set(EIGEN5_INCLUDE_DIR "${maestroeigen_SOURCE_DIR}") 
+else()
+  message(STATUS "Eigen 5.0 found")
+  set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+endif()
+
+get_target_property(
+    JSON_INCLUDE_PATH 
+    nlohmann_json::nlohmann_json 
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}") 
+
+# -- QCSim ------------------------------------------------------------
+FetchContent_Declare(
+    qcsim
+    GIT_REPOSITORY "git@github.com:aromanro/QCSim.git"
+    GIT_TAG "5a458c8b4bddfbbe445de09376b366a97d474266"
+)
+if(NOT qcsim_POPULATED)
+    FetchContent_Populate(qcsim) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
+
+# -- AER - Qiskit simulator headers (fork for Maestro) ----------------
+FetchContent_Declare(
+    maestro-aer
+    GIT_REPOSITORY "git@github.com:InvictusWingsSRL/qiskit-aer.git"
+    GIT_TAG "96e82fdd1c8c1b17d749863ee5095262372e0d7e"
+)
+if(NOT maestro-aer_POPULATED)
+    FetchContent_Populate(maestro-aer) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
+
+# -- Maestro ----------------------------------------------------------
+
+FetchContent_Declare(
+    maestro
+    GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
+    GIT_TAG "7ba339fc5595fd18d2fcb0612a6570c3c5e1fd90"
+)
+FetchContent_MakeAvailable(maestro)
+
+target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
+install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+# =====================================================================
+#  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
+# =====================================================================
+FetchContent_Declare(
+    qulacs
+    GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
+    GIT_TAG "228f617b9e31007b54488f467c031ebbf07efcdb"
+)
+
+set(USE_PYTHON OFF CACHE BOOL "" FORCE)
+set(BUILD_QULACS_WITH_MPI OFF)
+if(BUILD_QULACS_WITH_MPI)
+  #set(CXX_COMPILER "mpic++" CACHE STRING "" FORCE) # Warning!
+  set(USE_MPI ON CACHE BOOL "" FORCE)
+endif()
+FetchContent_MakeAvailable(qulacs)
+
 
 #  Restore original compiler flags
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

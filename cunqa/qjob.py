@@ -39,6 +39,7 @@ from cunqa.logger import logger
 from cunqa.backend import Backend
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
+from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
 
 
 class QJobError(Exception):
@@ -162,17 +163,17 @@ class QJob:
 
     """
     _backend: 'Backend' 
-    qclient: 'QClient' #: Client linked to the server that listens at the virtual QPU.
+    _qclient: Union['QClient', 'QMIOClient'] #: Client linked to the server that listens at the virtual QPU.
     _updated: bool
-    _future: 'FutureWrapper' 
+    _future: Union['FutureWrapper', 'QMIOFuture'] 
     _result: Optional['Result']
     _circuit_id: str 
     _sending_to: "list[str]"
     _is_dynamic: bool
-    _has_cc:bool
-    _has_qc:bool
+    _has_cc: bool
+    _has_qc: bool
 
-    def __init__(self, qclient: 'QClient', backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit'], **run_parameters: Any):
+    def __init__(self, qclient: Union['QClient', 'QMIOClient'], backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
         """
         Initializes the :py:class:`QJob` class.
 
@@ -197,15 +198,15 @@ class QJob:
         """
 
         self._backend: 'Backend' = backend
-        self._qclient: 'QClient' = qclient
+        self._qclient: Union['QClient', 'QMIOClient'] = qclient
         self._updated: bool = False
-        self._future: 'FutureWrapper' = None
+        self._future: Union['FutureWrapper', 'QMIOFuture'] = None
         self._result: Optional['Result'] = None
         self._circuit_id: str = ""
 
         self._convert_circuit(circuit)
         self._configure(**run_parameters)
-        logger.debug("Qjob configured")
+        logger.debug("Qjob correctly configured")
 
     @property
     def result(self) -> 'Result':
@@ -222,7 +223,19 @@ class QJob:
 
         """
         try:
-            if self._future is None or not self._future.valid():
+            if self._future is not None and self._future.valid():
+                if self._result is not None:
+                    if not self._updated: # if the result was already obtained, we only call the server if an update was done
+                        res = self._future.get()
+                        self._result = Result(json.loads(res), circ_id=self._circuit_id, cl_registers=self._cregisters)
+                        self._updated = True
+                    else:
+                        pass
+                else:
+                    res = self._future.get()
+                    self._result = Result(json.loads(res), self._circuit_id, cl_registers=self._cregisters)
+                    self._updated = True
+            else:
                 logger.debug(f"self._future is None or non-valid, None is returned.")
                 return
 
@@ -241,9 +254,6 @@ class QJob:
         except Exception as error:
                 logger.error(f"Error while reading the results {error}")
                 raise SystemExit # User's level
-        
-        if self._backend.simulator == "CunqaSimulator" and self.num_clbits != self.num_qubits:
-            logger.warning(f"Be aware that for CunqaSimualtor, number of clbits is required to be equal than the number of qubits of the circuit. Classical bits can appear to be rewritten.")
 
         return self._result
 
@@ -369,6 +379,7 @@ class QJob:
         return self
 
     def _convert_circuit(self, circuit: Union[str, dict, 'CunqaCircuit', 'QuantumCircuit']) -> None:
+
         try:
             if isinstance(circuit, dict):
 
@@ -377,6 +388,7 @@ class QJob:
                 self.num_qubits = circuit["num_qubits"]
                 self.num_clbits = circuit["num_clbits"]
                 self._cregisters = circuit["classical_registers"]
+                self._qregisters = circuit["quantum_registers"]
                 if "sending_to" in circuit:
                     self._sending_to = circuit["sending_to"]
                 else:
@@ -411,6 +423,7 @@ class QJob:
                 self.num_qubits = circuit.num_qubits
                 self.num_clbits = circuit.num_clbits
                 self._cregisters = circuit.classical_regs
+                self._qregisters = circuit.quantum_regs
                 self._circuit_id = circuit._id
                 self._sending_to = circuit.sending_to
                 self._is_dynamic = circuit.is_dynamic
@@ -434,6 +447,7 @@ class QJob:
                 self.num_qubits = circuit.num_qubits
                 self.num_clbits = sum([c.size for c in circuit.cregs])
                 self._cregisters = _registers_dict(circuit)[1]
+                self._qregisters = _registers_dict(circuit)[0]
                 self._sending_to = []
 
                 logger.debug("Translating to dict from QuantumCircuit...")
@@ -452,6 +466,7 @@ class QJob:
 
                 self.num_qubits = qc_from_qasm.num_qubits
                 self._cregisters = _registers_dict(qc_from_qasm)[1]
+                self._cregisters = _registers_dict(qc_from_qasm)[0]
                 self.num_clbits = sum(len(k) for k in self._cregisters.values())
                 self._cregisters = _registers_dict(qc_from_qasm)[1]
                 # TODO: ¿self.circuit_id?
@@ -513,6 +528,10 @@ class QJob:
                 "id": self._circuit_id,
                 "config": run_config, 
                 "instructions": self._circuit,
+                "num_qubits": self.num_qubits,
+                "num_clbits": self.num_clbits,
+                "classical_registers":self._cregisters,
+                "quantum_registers":self._qregisters,
                 "sending_to": self._sending_to,
                 "is_dynamic": self._is_dynamic,
                 "has_cc": self._has_cc

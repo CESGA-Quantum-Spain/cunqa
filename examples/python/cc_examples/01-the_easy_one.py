@@ -10,7 +10,7 @@ from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator="Cunqa", classical_comm=True, co_located = True)
+family = qraise(2, "00:10:00", simulator="Aer", classical_comm=True, co_located = True)
 qpus  = get_QPUs(on_node=False, family = family)
 
 
@@ -35,7 +35,7 @@ circs = [cc_1, cc_2]
 
 
 ########## Distributed run ##########
-distr_jobs = run_distributed(circs, qpus, shots=100) 
+distr_jobs = run_distributed(circs, qpus, shots=10) 
 
 ########## Collect the counts #######
 result_list = gather(distr_jobs)

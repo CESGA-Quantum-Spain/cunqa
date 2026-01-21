@@ -60,11 +60,12 @@
 
 import os
 from typing import  Union, Any, Optional
-import inspect
+import inspect 
 
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.circuit import CunqaCircuit
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit.converters import _is_parametric
@@ -89,7 +90,7 @@ class QPU:
     _endpoint: str 
     _connected: bool 
     
-    def __init__(self, id: int, qclient: 'QClient', backend: CunqaBackend, name: str, family: str, endpoint: str):
+    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -116,7 +117,7 @@ class QPU:
         self._endpoint = endpoint
         self._connected = False
         
-        logger.debug(f"Object for QPU {id} created correctly.")
+        logger.debug(f"QPU {id} correctly instantiated.")
 
     @property
     def id(self) -> int:
@@ -183,7 +184,6 @@ class QPU:
         # Handle connection to QClient
         if not self._connected:
             self._qclient.connect(self._endpoint)
-            self._connected = True
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
 
         # Transpilation if requested

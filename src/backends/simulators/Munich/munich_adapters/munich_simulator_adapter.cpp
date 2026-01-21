@@ -10,7 +10,6 @@
 
 #include "quantum_task.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
-#include "utils/helpers/reverse_bitstring.hpp"
 
 #include "logger.hpp"
 
@@ -189,20 +188,6 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
-        case constants::C_IF_H:
-        case constants::C_IF_X:
-        case constants::C_IF_Y:
-        case constants::C_IF_Z:
-        case constants::C_IF_ECR:
-        case constants::C_IF_RX:
-        case constants::C_IF_RY:
-        case constants::C_IF_RZ:
-            // TODO: Look how Munich natively applies C_IFs operations
-            /* clreg = std::make_pair(conditional_reg[0], 1);
-            auto std_op = std::make_unique<StandardOperation>(qubits[1] + T.zero_qubit, OpType::X);
-            c_op = std::make_unique<ClassicControlledOperation>(std_op, clreg);
-            CCcircsim.CCapplyOperationToState(c_op); */
-            break;
         case constants::MEASURE_AND_SEND:
         {
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
@@ -381,13 +366,15 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
 
 JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Munich usual simulation");
+    auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
+    auto quantum_task = p_qca->quantum_tasks[0];
+
+    // TODO: Change the format with the free functions
+    std::string circuit = quantum_task_to_Munich(quantum_task);
     try
     {   
-        auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
-        auto quantum_task = p_qca->quantum_tasks[0];
-
-        // TODO: Change the format with the free functions
-        std::string circuit = quantum_task_to_Munich(quantum_task);
+        
         auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
 
         float time_taken;
@@ -408,7 +395,6 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 
             if (!result.empty()) {
                 LOGGER_DEBUG("Result non empty");
-                reverse_bitstring_keys_json(result);
                 return {{"counts", result}, {"time_taken", time_taken}};
             }
             throw std::runtime_error("QASM format is not correct.");
@@ -424,7 +410,6 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 
             if (!result.empty()) {
                 LOGGER_DEBUG("Result non empty");
-                reverse_bitstring_keys_json(result);
                 return {{"counts", result}, {"time_taken", time_taken}};
             }
             throw std::runtime_error("QASM format is not correct.");
@@ -433,7 +418,7 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
     catch (const std::exception &e)
     {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Munich simulator.");
+        LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
     }
     return {};
@@ -441,17 +426,10 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
 
 JSON CircuitSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
 {
+    LOGGER_DEBUG("Munich dynamic simulation");
     // TODO: Avoid the static casting?
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
     std::map<std::string, std::size_t> meas_counter;
-
-    // This is for distinguising classical and quantum communications
-    // TODO: Make it more clear
-    /* if (classical_channel && p_qca->quantum_tasks.size() == 1)
-    {
-        std::vector<std::string> connect_with = p_qca->quantum_tasks[0].sending_to;
-        classical_channel->connect(connect_with);
-    } */
 
     auto shots = p_qca->quantum_tasks[0].config.at("shots").get<std::size_t>();
     auto start = std::chrono::high_resolution_clock::now();
@@ -464,7 +442,6 @@ JSON CircuitSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    reverse_bitstring_keys_json(meas_counter);
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};

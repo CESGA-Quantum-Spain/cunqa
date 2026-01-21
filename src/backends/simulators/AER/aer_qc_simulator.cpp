@@ -11,6 +11,7 @@ namespace sim {
 AerQCSimulator::AerQCSimulator()
 { 
     classical_channel.publish();
+    LOGGER_DEBUG("Publish done in ()");
     auto executor_endpoint = classical_channel.recv_info("executor");
     std::string id_ = "executor";
     classical_channel.connect(executor_endpoint, id_);
@@ -20,6 +21,7 @@ AerQCSimulator::AerQCSimulator()
 AerQCSimulator::AerQCSimulator(const std::string& group_id)
 {
     classical_channel.publish(group_id);
+    LOGGER_DEBUG("Publish done in (group_id)");
     auto executor_endpoint = classical_channel.recv_info("executor");
     std::string id_ = "executor";
     classical_channel.connect(executor_endpoint, id_);
@@ -29,6 +31,7 @@ AerQCSimulator::AerQCSimulator(const std::string& group_id)
 JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
     auto circuit = to_string(quantum_task);
+    
     classical_channel.send_info(circuit, "executor");
     if (circuit != "") {
         auto results = classical_channel.recv_info("executor");
