@@ -45,14 +45,14 @@ int main(int argc, char *argv[])
             MunichExecutor executor(family_name);
             executor.run();
             break;
-        }
+        }*/
         case murmur::hash("Cunqa"):
         {
             LOGGER_DEBUG("Raising executor with Cunqa.");
-            CunqaExecutor executor(family_name);
+            CunqaExecutor executor(n_qpus);
             executor.run();
             break;
-        }
+        }/*
         case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");

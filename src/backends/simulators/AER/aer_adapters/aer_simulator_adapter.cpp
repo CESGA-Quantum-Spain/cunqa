@@ -74,10 +74,7 @@ std::string execute_shot_(
     auto generate_entanglement_ = [&]() {
         state->apply_reset({G.n_qubits - 1});
         state->apply_reset({G.n_qubits - 2});
-        // Apply H to the first entanglement qubit
         state->apply_h(G.n_qubits - 2);
-
-        // Apply a CX to the second one to generate an ent pair
         state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
     };
 

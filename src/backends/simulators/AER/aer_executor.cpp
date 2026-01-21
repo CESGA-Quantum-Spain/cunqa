@@ -17,7 +17,8 @@ using namespace std::string_literals;
 namespace cunqa {
 namespace sim {
 
-AerExecutor::AerExecutor(const std::size_t& n_qpus) : classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
+AerExecutor::AerExecutor(const std::size_t& n_qpus) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
 {
     JSON ids;
     do {

@@ -11,6 +11,12 @@
 #include "executor.hpp"
 #include "utils/types_cunqasim.hpp"
 
+
+
+
+
+
+
 #include "utils/constants.hpp"
 
 #include "logger.hpp"
@@ -20,6 +26,7 @@ struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
     int zero_qubit = 0;
+    int zero_clbit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
@@ -28,18 +35,18 @@ struct TaskState {
 
 struct GlobalState {
     int n_qubits = 0, n_clbits = 0;
-    std::map<std::size_t, bool> creg, rcreg;
-    std::map<std::size_t, bool> cvalues;
+    std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<int>> qc_meas;
     bool ended = false;
     cunqa::comm::ClassicalChannel* chan = nullptr;
 };
-}
 
-namespace cunqa {
-namespace sim {
 
-std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
+std::string execute_shot_(
+    Executor& executor, 
+    const std::vector<cunqa::QuantumTask>& quantum_tasks, 
+    cunqa::comm::ClassicalChannel* classical_channel
+)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -49,6 +56,7 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
+        T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked = false;
@@ -64,109 +72,120 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
         G.n_qubits += 2;
 
     auto generate_entanglement_ = [&]() {
-        //Reset
         int meas1 = executor.apply_measure({G.n_qubits - 1});
         int meas2 = executor.apply_measure({G.n_qubits - 2});
-        if (meas1) {
-            executor.apply_gate("x", {G.n_qubits - 1});
-        }
-        if (meas2) {
-            executor.apply_gate("x", {G.n_qubits - 1});
-        }
-        // Apply H to the first entanglement qubit
+        if (meas1) executor.apply_gate("x", {G.n_qubits - 1});
+        if (meas2) executor.apply_gate("x", {G.n_qubits - 1});
         executor.apply_gate("h", {G.n_qubits - 2});
-
-        // Apply a CX to the second one to generate an ent pair
         executor.apply_gate("cx", {G.n_qubits - 2, G.n_qubits - 1});
     };
 
-    std::function<void(TaskState&, const JSON&)> apply_next_instr = [&](TaskState& T, const JSON& instruction = {}) {
+    std::function<void(TaskState&, const cunqa::JSON&)> apply_next_instr = 
+        [&](TaskState& T, const cunqa::JSON& instruction = {}) 
+    {
+        const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
 
-        // This is added to be able to add instructions outside the main loop
-        const JSON& inst = instruction.empty() ? *T.it : instruction;
-
-        if (inst.contains("conditional_reg")) {
-            auto v = inst.at("conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.creg[v[0]]) return;
-        } else if (inst.contains("remote_conditional_reg") && inst.at("name") != "recv") { // TODO: Cambiar el nombre para el recv y para el resto
-            auto v = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.rcreg[v[0]]) return;
-        }
-
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
-        std::string inst_name = inst.at("name").get<std::string>();
-        auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        std::vector<int> qubits;
+        if (inst.contains("qubits"))
+            qubits = inst.at("qubits").get<std::vector<int>>();
+        auto inst_type = cunqa::constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        auto inst_name = inst.at("name").get<std::string>();
 
         switch (inst_type)
         {
-        case constants::MEASURE:
+        case cunqa::constants::MEASURE:
         {
             int measurement = executor.apply_measure({qubits[0] + T.zero_qubit});
-
-            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
-            G.cvalues[clbits[0] + T.zero_qubit] = (measurement == 1);
-            G.creg[clbits[0]] = (measurement == 1);
-
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+            G.creg[clbits[0] + T.zero_clbit] = (measurement == 1);
             break;
         }
-        case constants::ID:
-        case constants::X:
-        case constants::Y:
-        case constants::Z:
-        case constants::H:
-        case constants::SX:
+        case cunqa::constants::COPY:
+        {
+            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
+            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
+
+            if(l_clbits.size() != r_clbits.size())
+                throw std::runtime_error("The number of copied clbits and the number of clbits "
+                                         "copied on does not match.");
+
+            for (size_t i = 0; i < l_clbits.size(); ++i)
+                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+                
+            break;
+        }
+        case cunqa::constants::ID:
+        case cunqa::constants::X:
+        case cunqa::constants::Y:
+        case cunqa::constants::Z:
+        case cunqa::constants::H:
+        case cunqa::constants::SX:
             executor.apply_gate(inst_name, {qubits[0] + T.zero_qubit});
             break;
-        case constants::CX:
-        case constants::CY:
-        case constants::CZ:
+        case cunqa::constants::CX:
+        case cunqa::constants::CY:
+        case cunqa::constants::CZ:
         {
             int control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             executor.apply_gate(inst_name, {control, qubits[1] + T.zero_qubit});
             break;
         }
-        case constants::ECR:
+        case cunqa::constants::ECR:
             // TODO
             break;
-        case constants::RX:
-        case constants::RY:
-        case constants::RZ:
+        case cunqa::constants::RX:
+        case cunqa::constants::RY:
+        case cunqa::constants::RZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             executor.apply_parametric_gate(inst_name, {qubits[0] + T.zero_qubit}, params);
             break;
         }
-        case constants::CRX:
-        case constants::CRY:
-        case constants::CRZ:
+        case cunqa::constants::CRX:
+        case cunqa::constants::CRY:
+        case cunqa::constants::CRZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             int control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             executor.apply_parametric_gate(inst_name, {control, qubits[1] + T.zero_qubit}, params);
             break;
         }
-        case constants::SWAP:
+        case cunqa::constants::SWAP:
         {
             executor.apply_gate(inst_name, {qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit});
             break;
         }
-        case constants::MEASURE_AND_SEND:
+        case cunqa::constants::SEND:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            int measurement = executor.apply_measure({qubits[0] + T.zero_qubit});
-            int measurement_as_int = static_cast<int>(measurement);
-            classical_channel->send_measure(measurement_as_int, endpoint[0]); 
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();  
+
+            for (const auto& clbit: clbits)
+                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
             break;
         }
         case cunqa::constants::RECV:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            auto conditional_reg = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-            int measurement = classical_channel->recv_measure(endpoint[0]);
-            G.rcreg[conditional_reg[0]] = (measurement == 1);
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+
+            for (const auto& clbit: clbits) {
+                int measurement = classical_channel->recv_measure(qpu_id);
+                G.creg[clbit + T.zero_clbit] = (measurement == 1);
+            }
             break;
         }
-        case constants::QSEND:
+        case cunqa::constants::CIF:
+        {
+            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
+            if (G.creg[clbits.at(0) + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.at("instructions")) {
+                    apply_next_instr(T, sub_inst);
+                }
+            }
+            break;
+        }
+        case cunqa::constants::QSEND:
         {
             //------------- Generate Entanglement ---------------
             executor.apply_gate("h", {G.n_qubits - 2});
@@ -196,7 +215,7 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
             Ts[inst.at("qpus")[0]].blocked = false;
             break;
         }
-        case constants::QRECV:
+        case cunqa::constants::QRECV:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
@@ -226,7 +245,7 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
             }
             break;
         }
-        case constants::EXPOSE:
+        case cunqa::constants::EXPOSE:
         {
             if (!T.cat_entangled) {
                 generate_entanglement_();
@@ -253,7 +272,7 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
             }
             break;
         }
-        case constants::RCONTROL:
+        case cunqa::constants::RCONTROL:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
@@ -307,13 +326,18 @@ std::string execute_shot_(Executor& executor, const std::vector<QuantumTask>& qu
     } // End one shot
 
     std::string result_bits(G.n_clbits, '0');
-    for (const auto &[bitIndex, value] : G.cvalues)
+    for (const auto &[bitIndex, value] : G.creg)
     {
         result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
     }
 
     return result_bits;
 }
+
+} // End of anonymous namespace
+
+namespace cunqa {
+namespace sim {
 
 JSON CunqaSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
 {

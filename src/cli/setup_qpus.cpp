@@ -194,11 +194,11 @@ int main(int argc, char *argv[])
                 /* case murmur::hash("Munich"):
                     LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");
                     turn_ON_QPU<MunichSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
-                    break;
+                    break;*/
                 case murmur::hash("Cunqa"):
                     LOGGER_DEBUG("QPU going to turn on with CunqaSimpleSimulator.");
                     turn_ON_QPU<CunqaSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
-                    break;
+                    break;/*
                 case murmur::hash("Qulacs"):
                     LOGGER_DEBUG("QPU going to turn on with QulacsSimpleSimulator.");
                     turn_ON_QPU<QulacsSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
@@ -218,11 +218,11 @@ int main(int argc, char *argv[])
                 /* case murmur::hash("Munich"): 
                     LOGGER_DEBUG("QPU going to turn on with MunichCCSimulator.");
                     turn_ON_QPU<MunichCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
-                    break;
+                    break;*/
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
                     turn_ON_QPU<CunqaCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
-                    break;
+                    break;/*
                 case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsCCSimulator.");
                     turn_ON_QPU<QulacsCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
@@ -242,11 +242,11 @@ int main(int argc, char *argv[])
                 /* case murmur::hash("Munich"): 
                     LOGGER_DEBUG("QPU going to turn on with MunichQCSimulator.");
                     turn_ON_QPU<MunichQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
-                    break;
+                    break;*/
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");
                     turn_ON_QPU<CunqaQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
-                    break;
+                    break;/*
                 case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsQCSimulator.");
                     turn_ON_QPU<QulacsQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
