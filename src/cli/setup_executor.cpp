@@ -16,7 +16,6 @@
 #include "logger.hpp"
 
 using namespace std::string_literals;
-
 using namespace cunqa::sim;
 
 int main(int argc, char *argv[])
@@ -52,14 +51,14 @@ int main(int argc, char *argv[])
             CunqaExecutor executor(n_qpus);
             executor.run();
             break;
-        }/*
+        }
         case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
-            QulacsExecutor executor(family_name);
+            QulacsExecutor executor(n_qpus);
             executor.run();
             break;
-        } */
+        }
         default:
             LOGGER_ERROR("Not a supported simulator: {}.", sim_arg);
             return EXIT_FAILURE;

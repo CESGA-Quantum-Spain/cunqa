@@ -29,7 +29,6 @@
 #include "logger.hpp"
 
 using namespace std::string_literals;
-
 using namespace cunqa;
 using namespace cunqa::sim;
 
@@ -198,11 +197,11 @@ int main(int argc, char *argv[])
                 case murmur::hash("Cunqa"):
                     LOGGER_DEBUG("QPU going to turn on with CunqaSimpleSimulator.");
                     turn_ON_QPU<CunqaSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
-                    break;/*
+                    break;
                 case murmur::hash("Qulacs"):
                     LOGGER_DEBUG("QPU going to turn on with QulacsSimpleSimulator.");
                     turn_ON_QPU<QulacsSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
-                    break; */
+                    break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support simple simulation or does not exist.", sim_arg);
                     return EXIT_FAILURE;
@@ -222,11 +221,11 @@ int main(int argc, char *argv[])
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
                     turn_ON_QPU<CunqaCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
-                    break;/*
+                    break;
                 case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsCCSimulator.");
                     turn_ON_QPU<QulacsCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family);
-                    break; */
+                    break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support classical communication simulation or does not exist.", sim_arg);
                     return EXIT_FAILURE;
@@ -246,11 +245,11 @@ int main(int argc, char *argv[])
                 case murmur::hash("Cunqa"): 
                     LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");
                     turn_ON_QPU<CunqaQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
-                    break;/*
+                    break;
                 case murmur::hash("Qulacs"): 
                     LOGGER_DEBUG("QPU going to turn on with QulacsQCSimulator.");
                     turn_ON_QPU<QulacsQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family);
-                    break; */
+                    break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support quantum communication simulation or does not exist.", sim_arg);
                     return EXIT_FAILURE;

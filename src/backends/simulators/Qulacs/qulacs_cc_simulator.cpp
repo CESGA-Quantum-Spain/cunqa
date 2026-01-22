@@ -2,24 +2,22 @@
 #include "qulacs_adapters/qulacs_computation_adapter.hpp"
 #include "qulacs_adapters/qulacs_simulator_adapter.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-QulacsCCSimulator::QulacsCCSimulator()
+QulacsCCSimulator::QulacsCCSimulator() :
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
 {
     classical_channel.publish();
-};
-
-QulacsCCSimulator::QulacsCCSimulator(const std::string& group_id)
-{
-    classical_channel.publish(group_id);
 };
 
 // Distributed QulacsSimulator
 JSON QulacsCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {
-    std::vector<std::string> connect_with = quantum_task.sending_to;
-    classical_channel.connect(connect_with, false);
+    for(const auto& qpu_id: quantum_task.sending_to)
+        classical_channel.connect(qpu_id);
 
     QulacsComputationAdapter qulacs_ca(quantum_task);
     QulacsSimulatorAdapter qulacs_sa(qulacs_ca);

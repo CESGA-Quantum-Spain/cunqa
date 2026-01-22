@@ -204,6 +204,16 @@ std::string MunichSimulatorAdapter::execute_shot_(
             }
             break;
         }
+        case cunqa::constants::CIF:
+        {
+            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
+            if (G.creg[clbits.at(0) + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.at("instructions")) {
+                    apply_next_instr(T, sub_inst);
+                }
+            }
+            break;
+        }
         case constants::QSEND:
         {
             generate_entanglement_();

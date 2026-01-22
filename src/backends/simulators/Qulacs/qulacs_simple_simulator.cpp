@@ -5,9 +5,6 @@
 namespace cunqa {
 namespace sim {
 
-// Simple QulacsSimulator
-QulacsSimpleSimulator::~QulacsSimpleSimulator() = default;
-
 JSON QulacsSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask& quantum_task) 
 {
     QulacsComputationAdapter qulacs_ca(quantum_task);
