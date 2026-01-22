@@ -186,8 +186,6 @@ class QJob:
         Args:
             qclient (QClient): client linked to the server that listens at the virtual QPU.
 
-            backend (~cunqa.backend.Backend): gathers necessary information about the simulator.
-
             circuit_ir (dict): circuit to be run.
 
             **run_parameters : any other simulation instructions.

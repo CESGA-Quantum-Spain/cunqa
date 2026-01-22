@@ -500,18 +500,14 @@ def _mock_qpus_json(monkeypatch, qpus_dict: dict):
 
 
 @pytest.fixture
-def qpu_backend_mocks(monkeypatch):
+def qpu_mock(monkeypatch):
     """
     Replace real QPU and Backend with mocks so we don't depend on
     their implementation, only on how get_QPUs uses them.
     """
-    mock_backend_cls = Mock(name="Backend")
     mock_qpu_cls = Mock(name="QPU")
-
-    monkeypatch.setattr(qpu_mod, "Backend", mock_backend_cls)
     monkeypatch.setattr(qpu_mod, "QPU", mock_qpu_cls)
-
-    return mock_backend_cls, mock_qpu_cls
+    return mock_qpu_cls
 
 def test_qpu_file_empty(monkeypatch):
     _mock_qpus_json(monkeypatch, {})
@@ -540,9 +536,8 @@ def test_login_node_hpc(monkeypatch):
     assert result is None
 
 def test_login_node_co_located(
-    monkeypatch, qpu_backend_mocks
+    monkeypatch, qpu_mock
 ):
-    backend_mock, qpu_mock = qpu_backend_mocks
     _mock_qpus_json(
         monkeypatch,
         {
@@ -564,20 +559,17 @@ def test_login_node_co_located(
     assert qpus is not None
     assert len(qpus) == 1
     assert qpus[0] is qpu_mock.return_value
-    backend_mock.assert_called_once_with("backend-A")
     qpu_mock.assert_called_once_with(
         id="qpu-1",
-        backend=backend_mock.return_value,
+        backend="backend-A",
         family="fam-A",
         endpoint="tcp://node-1:1234",
     )
 
 
 def test_hpc_without_family_filter(
-    monkeypatch, qpu_backend_mocks
+    monkeypatch, qpu_mock
 ):
-    backend_mock, qpu_mock = qpu_backend_mocks
-
     _mock_qpus_json(
         monkeypatch,
         {
@@ -601,20 +593,17 @@ def test_hpc_without_family_filter(
     assert len(qpus) == 1
     assert qpus[0] is qpu_mock.return_value
 
-    backend_mock.assert_called_once_with("backend-A")
     qpu_mock.assert_called_once_with(
         id="qpu-1",
-        backend=backend_mock.return_value,
+        backend="backend-A",
         family="fam-A",
         endpoint="tcp://node-1:1234",
     )
 
 
 def test_hpc_with_family_filter(
-    monkeypatch, qpu_backend_mocks
+    monkeypatch, qpu_mock
 ):
-    backend_mock, qpu_mock = qpu_backend_mocks
-
     _mock_qpus_json(
         monkeypatch,
         {
@@ -629,16 +618,12 @@ def test_hpc_with_family_filter(
 
     result = get_QPUs(co_located=False, family="other-family")
     assert result is None
-
-    backend_mock.assert_not_called()
     qpu_mock.assert_not_called()
 
 
 def test_co_located_without_family_filter(
-    monkeypatch, qpu_backend_mocks
+    monkeypatch, qpu_mock
 ):
-    backend_mock, qpu_mock = qpu_backend_mocks
-
     _mock_qpus_json(
         monkeypatch,
         {
@@ -681,12 +666,9 @@ def test_co_located_without_family_filter(
     ids = {call.kwargs["id"] for call in qpu_mock.call_args_list}
     assert ids == {"qpu-1", "qpu-2"}
 
-    backend_calls = [call.args[0] for call in backend_mock.call_args_list]
-    assert backend_calls == ["backend-A", "backend-B"]
 
-
-def test_co_located_with_family_filter(monkeypatch, qpu_backend_mocks):
-    backend_mock, qpu_mock = qpu_backend_mocks
+def test_co_located_with_family_filter(monkeypatch, qpu_mock):
+    qpu_mock = qpu_mock
 
     _mock_qpus_json(
         monkeypatch,
@@ -718,8 +700,8 @@ def test_co_located_with_family_filter(monkeypatch, qpu_backend_mocks):
     assert len(qpus) == 1
     assert qpus[0] is qpu_mock.return_value
 
-    # ensure we filtered to fam-B and used the right backend
-    backend_mock.assert_called_once_with("backend-B")
     qpu_mock.assert_called_once()
-    assert qpu_mock.call_args.kwargs["family"] == "fam-B"
     assert qpu_mock.call_args.kwargs["id"] == "qpu-2"
+    assert qpu_mock.call_args.kwargs["family"] == "fam-B"
+    assert qpu_mock.call_args.kwargs["backend"] == "backend-B"
+    

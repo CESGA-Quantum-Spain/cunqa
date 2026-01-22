@@ -108,13 +108,27 @@ from typing import Union, Any, Optional
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
-from cunqa.circuit import CunqaCircuit
-from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
+from typing import TypedDict
+
+class Backend(TypedDict):
+    """
+        Class to gather the characteristics of a :py:class:`~cunqa.backend.Backend` object.
+    """
+    basis_gates: list[str] #: Native gates that the Backend accepts. If other are used, they must be translated into the native gates.
+    coupling_map: list[list[int]] #: Defines the physical connectivity of the qubits, in which pairs two-qubit gates can be performed.
+    custom_instructions: str #: Any custom instructions that the Backend has defined.
+    description: str #: Description of the Backend itself.
+    gates: list[str] #: Specific gates supported.
+    n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
+    name: str #: Name assigned to the Backend.
+    simulator: str #: Name of the simulatior that simulates the circuits accordingly to the Backend.
+    version: str #: Version of the Backend.
+
 
 class QPU:
     """
@@ -475,7 +489,7 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
     qpus = [
         QPU(
             id = id,
-            backend = Backend(info['backend']),
+            backend = info['backend'],
             family = info["family"],
             endpoint = info["net"]["endpoint"]
         ) for id, info in targets.items()

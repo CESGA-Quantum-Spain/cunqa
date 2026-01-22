@@ -3,10 +3,17 @@ from functools import singledispatch
 import copy
 
 from qiskit import QuantumCircuit
-from .core import CunqaCircuit
-from ..qiskit_deps.converter import qc_to_json
 
+from cunqa.circuit import CunqaCircuit
+from cunqa.circuit.helpers import generate_id
 from cunqa.logger import logger
+
+SUPPORTED_QISKIT_OPERATIONS = {
+    'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 
+    'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 
+    'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 
+    'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier'
+}
 
 @singledispatch
 def to_ir(circuit: object) -> dict:
@@ -23,10 +30,104 @@ def _(c: CunqaCircuit) -> dict:
     return copy.deepcopy(c.info)
 
 @to_ir.register
-def _(c: QuantumCircuit) -> dict:
-    return copy.deepcopy(qc_to_json(c))
-
-@to_ir.register
 def _(c: dict) -> dict:
     logger.warning("Circuit is already in IR format, returning it as is.")
     return c
+
+@to_ir.register
+def _(c: QuantumCircuit) -> dict:
+    """
+    Transforms a :py:class:`qiskit.QuantumCircuit` to json :py:class:`dict`.
+
+    Args:
+        c (qiskit.QuantumCircuit): circuit to transform to json.
+
+    Return:
+        Json dict with the circuit information.
+    """
+    quantum_registers = {}
+    qinit = 0
+    for qr in c.qregs:
+        quantum_registers[qr.name] = list(range(qinit, qinit + qr.size))
+        qinit += qr.size
+
+    classical_registers = {}
+    cinit = 0
+    for cr in c.cregs:
+        classical_registers[cr.name] = list(range(cinit, cinit + cr.size))
+        cinit += cr.size
+    
+    json_data = {
+        "id": "QuantumCircuit_" + generate_id(),
+        "is_dynamic": False,
+        "instructions":[],
+        "sending_to":[],
+        "num_qubits":sum([q.size for q in c.qregs]),
+        "num_clbits": sum([c.size for c in c.cregs]),
+        "quantum_registers": quantum_registers,
+        "classical_registers": classical_registers
+    }
+
+    for instruction in c.data:
+        if instruction.operation.name not in SUPPORTED_QISKIT_OPERATIONS:
+            raise ValueError(f"Instruction {instruction.operation.name} not supported for conversion.")
+
+        qreg = [r._register.name for r in instruction.qubits]
+        qubit = [q._index for q in instruction.qubits]
+        
+        clreg = [r._register.name for r in instruction.clbits]
+        bit = [b._index for b in instruction.clbits]
+
+        if instruction.operation.name == "barrier":
+            pass
+        elif instruction.operation.name == "measure":
+            json_data["instructions"].append({
+                "name":instruction.operation.name,
+                "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                "clbits":[classical_registers[k][b] for k,b in zip(clreg, bit)]
+            })
+        elif instruction.operation.name == "unitary":
+            json_data["instructions"].append({
+                "name":instruction.operation.name, 
+                "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                "params":[[list(map(lambda z: [z.real, z.imag], row)) 
+                           for row in instruction.operation.params[0].tolist()]]
+            })
+        elif instruction.operation.name == "if_else":
+            json_data["is_dynamic"] = True
+
+            if not any([sub_circuit is None for sub_circuit in instruction.operation.params]):
+                raise ValueError("if_else instruction with \'else\' case is not supported for the " \
+                                 "current version.")
+            else:
+                sub_circuit = [
+                    sub_circuit for sub_circuit in instruction.operation.params 
+                    if sub_circuit is not None
+                ][0]
+
+            if instruction.condition[1] not in [1]:
+                raise ValueError("Only 1 is accepted as condition for classicaly controlled " \
+                                 "operations for the current version.")
+            
+            for re in c.qregs:
+                sub_circuit.add_register(re)
+
+            sub_instructions = to_ir(sub_circuit)["instructions"]
+            for sub_instruction in sub_instructions:
+                json_data["instructions"].append(sub_instruction)
+        elif (instruction.operation._condition != None):
+            if instruction.operation._condition[1] not in [1]:
+                raise ValueError("Only 1 is accepted as condition for classicaly controlled operations for the current version.")
+
+            json_data["is_dynamic"] = True
+            json_data["instructions"].append({"name":instruction.operation.name, 
+                                        "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                        "params":instruction.operation.params
+                                        })                
+        else:
+            json_data["instructions"].append({"name":instruction.operation.name, 
+                                        "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                        "params":instruction.operation.params
+                                        })
+    return json_data
+    
