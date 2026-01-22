@@ -46,7 +46,6 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
         is_dynamic = ((quantum_task_json.contains("is_dynamic")) ? quantum_task_json.at("is_dynamic").get<bool>() : false);
         has_cc = ((quantum_task_json.contains("has_cc")) ? quantum_task_json.at("has_cc").get<bool>() : false);
         id = quantum_task_json.at("id");
-        gpu = config.at("gpu").get<std::vector<int>>();
 
         if (has_cc) {
             std::ifstream communications_file(constants::COMM_FILEPATH); 

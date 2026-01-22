@@ -197,6 +197,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         }
         case cunqa::constants::RECV:
         {
+            state->flush_ops();
             auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
             auto conditional_reg = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
             int measurement = classical_channel->recv_measure(endpoint[0]);
@@ -205,6 +206,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         }
         case constants::QSEND:
         {
+            // state->flush_ops();
             //------------- Generate Entanglement ---------------
             state->apply_h(G.n_qubits - 2);
             state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
@@ -228,6 +230,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         }
         case constants::QRECV:
         {
+            // state->flush_ops();
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
                 return;
@@ -254,6 +257,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         }
         case constants::EXPOSE:
         {
+            // state->flush_ops();
             if (!T.cat_entangled) {
                 generate_entanglement_();
 
@@ -281,6 +285,7 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         }
         case constants::RCONTROL:
         {
+            // state->flush_ops();
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
                 return;
@@ -386,12 +391,22 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
-    AER::AerState* state = new AER::AerState();
+    AER::AerState state; // Before: AER::AerState* state = new AER::AerState();
     std::string sim_method = (method == "automatic") ? "statevector" : method;
-    state->configure("method", sim_method);
-    state->configure("device", "CPU");
-    state->configure("precision", "double");
-    state->configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
+    std::string device = qc.quantum_tasks[0].config.at("device")["device_name"];
+    state.configure("method", sim_method);
+    state.configure("device", device);
+    state.configure("precision", "double");
+    state.configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
+    /* if (device == "GPU") {
+        std::vector<int> target_gpus = quantum_tasks[0].config.at("device")["target_devices"].get<std::vector<int>>()
+        JSON gpu_config = {
+            {"device", device},
+            {"target_gpus", target_gpus}
+        };
+        
+        state.set_config(gpu_config);
+    } */
 
     unsigned long n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks)
@@ -405,17 +420,23 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {
-        qubit_ids = state->allocate_qubits(n_qubits);
-        state->initialize();
-        meas_counter[execute_shot_(state, qc.quantum_tasks, classical_channel)]++;
-        state->clear();
+        qubit_ids = state.allocate_qubits(n_qubits);
+        state.initialize();
+        /* initialize_state_controller();
+        initialize_qreg_state(nullptr);
+        state_->initialize_qreg(n_qubits);
+        state_->initialize_creg(n_qubits, n_qubits);
+        clear_ops();
+        state.initialized_ = true; */
+        meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
+        state.clear();
     } // End all shots
     
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    delete state;
+    //delete state;
 
     JSON result_json = {
         {"counts", meas_counter},

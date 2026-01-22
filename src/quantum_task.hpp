@@ -14,7 +14,6 @@ public:
     bool is_dynamic = false; // C_IF gates & Classical Communications
     bool has_cc = false; // Classical Communications
     std::string id;
-    std::vector<int> gpu;
 
     QuantumTask() = default;
     QuantumTask(const std::string& quantum_task);

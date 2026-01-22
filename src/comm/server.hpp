@@ -27,7 +27,7 @@ public:
     std::string mode;
     std::string nodename;
     std::string endpoint;
-    std::vector<int> gpu;
+    JSON device;
 
     Server(const std::string& mode);
     ~Server();
@@ -46,7 +46,7 @@ private:
             {"mode", obj.mode}, 
             {"nodename", obj.nodename}, 
             {"endpoint", obj.endpoint},
-            {"gpu", obj.gpu}
+            {"device", obj.device}
         };
     }
 
@@ -54,7 +54,7 @@ private:
         j.at("mode").get_to(obj.mode);
         j.at("nodename").get_to(obj.nodename);
         j.at("endpoint").get_to(obj.endpoint);
-        j.at("gpu").get_to(obj.gpu);
+        j.at("device").get_to(obj.device);
     }
 };
 

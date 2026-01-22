@@ -32,90 +32,97 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     sbatchFile << "#!/bin/bash\n";
     sbatchFile << "#SBATCH --job-name=qraise \n";
 
-#if !COMPILATION_FOR_GPU
-    int n_tasks = args.qc ? args.n_qpus * args.cores_per_qpu + args.n_qpus : args.n_qpus;    
-    sbatchFile << "#SBATCH --ntasks=" << n_tasks << "\n";
-    if (!args.qc) 
-        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-    
-    sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
-    
-    if(args.partition.has_value())
-        sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
-    
-    if (args.qpus_per_node.has_value()) {
-        if (args.n_qpus < args.qpus_per_node) {
-            std::system("rm qraise_sbatch_tmp.sbatch");
-            throw std::runtime_error("Less QPUs than qpus_per_node");
-        } else {
-            sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";
-        }
-    }
-    
-    if (args.node_list.has_value()) {
-        if (args.number_of_nodes.value() != args.node_list.value().size()) {
-            throw std::runtime_error("Different number of node names than total nodes");
-        } else {
-            sbatchFile << "#SBATCH --nodelist=";
-            int comma = 0;
-            for (auto& node_name : args.node_list.value()) {
-                if (comma > 0 ) {
-                    sbatchFile << ",";
-                }
-                sbatchFile << node_name;
-                comma++;
+    if (!args.gpu){
+        int n_tasks = args.qc ? args.n_qpus * args.cores_per_qpu + args.n_qpus : args.n_qpus;    
+        sbatchFile << "#SBATCH --ntasks=" << n_tasks << "\n";
+        if (!args.qc) 
+            sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
+        
+        sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
+        
+        if(args.partition.has_value())
+            sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+        
+        if (args.qpus_per_node.has_value()) {
+            if (args.n_qpus < args.qpus_per_node) {
+                std::system("rm qraise_sbatch_tmp.sbatch");
+                throw std::runtime_error("Less QPUs than qpus_per_node");
+            } else {
+                sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";
             }
-            sbatchFile << "\n";
         }
-    }
-#else
-    std::vector<std::string> simulators_with_gpu_support = {"Aer"};
-    if (std::find(simulators_with_gpu_support.begin(), simulators_with_gpu_support.end(), std::string(args.simulator)) == simulators_with_gpu_support.end()) {
-        LOGGER_ERROR("At this moment, only Aer supports GPU simulation");
-        throw std::runtime_error("At this moment, only Aer supports GPU simulation.");
-    }
+        
+        if (args.node_list.has_value()) {
+            if (args.number_of_nodes.value() != args.node_list.value().size()) {
+                throw std::runtime_error("Different number of node names than total nodes");
+            } else {
+                sbatchFile << "#SBATCH --nodelist=";
+                int comma = 0;
+                for (auto& node_name : args.node_list.value()) {
+                    if (comma > 0 ) {
+                        sbatchFile << ",";
+                    }
+                    sbatchFile << node_name;
+                    comma++;
+                }
+                sbatchFile << "\n";
+            }
+        }
 
-    if (args.n_qpus > MAX_GPUS_PER_NODE) {
-        LOGGER_ERROR("Node with GPU_ARCH = {} only supports {} QPU", std::to_string(GPU_ARCH), std::to_string(MAX_GPUS_PER_NODE));
-        throw std::runtime_error("The nodes with the selected GPU architecture do not support as many GPUs as the selected number of vQPUs.");
-    }
-#if GPU_ARCH == 75
-    sbatchFile << "#SBATCH --gres=gpu:t4\n";
-    if(args.partition.has_value()) {
-        sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
-    } else {
-        sbatchFile << "#SBATCH -p viz\n";
-    }
-#elif GPU_ARCH == 80
-    sbatchFile << "#SBATCH --gres=gpu:a100:" << "\n"
-#endif // GPU_ARCH
-    //TODO: Try to manage the cores per GPU needed
-    sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
+        if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
+            throw std::runtime_error("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
+        }
 
-#endif
-
-
-    if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
-        throw std::runtime_error("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
-    }
-
-    if (!args.qc) {
-        if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
-            int mem_per_cpu = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
-            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
-        } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
-            throw std::runtime_error("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
-        } else if (!args.mem_per_qpu.has_value()) {
-            int mem_per_core = DEFAULT_MEM_PER_CORE;
-            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
-        } 
-    } else {
-        if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
-            sbatchFile << "#SBATCH --mem=" << args.mem_per_qpu.value() * args.n_qpus + args.n_qpus << "G\n";
+        if (!args.qc) {
+            if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
+                int mem_per_cpu = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
+                sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
+            } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
+                throw std::runtime_error("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
+            } else if (!args.mem_per_qpu.has_value()) {
+                int mem_per_core = DEFAULT_MEM_PER_CORE;
+                sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
+            } 
         } else {
-            int mem_per_core = DEFAULT_MEM_PER_CORE;
-            sbatchFile << "#SBATCH --mem=" << mem_per_core * args.cores_per_qpu * args.n_qpus + args.n_qpus << "G\n";
+            if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
+                sbatchFile << "#SBATCH --mem=" << args.mem_per_qpu.value() * args.n_qpus + args.n_qpus << "G\n";
+            } else {
+                int mem_per_core = DEFAULT_MEM_PER_CORE;
+                sbatchFile << "#SBATCH --mem=" << mem_per_core * args.cores_per_qpu * args.n_qpus + args.n_qpus << "G\n";
+            }
         }
+    } else { //args.gpu
+#if !COMPILATION_FOR_GPU
+        LOGGER_ERROR("CUNQA was not compiled with GPU support.");
+        throw std::runtime_error("CUNQA was not compiled with GPU support.");
+#else
+        std::vector<std::string> simulators_with_gpu_support = {"Aer"};
+        if (std::find(simulators_with_gpu_support.begin(), simulators_with_gpu_support.end(), std::string(args.simulator)) == simulators_with_gpu_support.end()) {
+            LOGGER_ERROR("At this moment, only Aer supports GPU simulation");
+            throw std::runtime_error("At this moment, only Aer supports GPU simulation.");
+        }
+
+        if (args.n_qpus > MAX_GPUS_PER_NODE) {
+            LOGGER_ERROR("Node with GPU_ARCH = {} only supports {} QPU", std::to_string(GPU_ARCH), std::to_string(MAX_GPUS_PER_NODE));
+            throw std::runtime_error("The nodes with the selected GPU architecture do not support as many GPUs as the selected number of vQPUs.");
+        }
+#if GPU_ARCH == 75
+        sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
+        sbatchFile << "#SBATCH --gres=gpu:t4\n";
+        if(args.partition.has_value()) {
+            sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+        } else {
+            sbatchFile << "#SBATCH -p viz\n";
+        }
+        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
+        sbatchFile << "#SBATCH --mem=" << args.n_qpus * args.cores_per_qpu * DEFAULT_MEM_PER_CORE << "G\n";
+#elif GPU_ARCH == 80
+        sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
+        sbatchFile << "#SBATCH --gres=gpu:a100:" << args.n_qpus << "\n";
+        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
+        sbatchFile << "#SBATCH --mem=" << 2 * args.cores_per_qpu << "G\n";
+#endif // GPU_ARCH
+#endif //!COMPILATION_FOR_GPU
     }
 
 

@@ -395,7 +395,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
             logger.debug("Virtual QPU found") 
             client = QClient()
         
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], gpu = info["net"]["gpu"]))
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], device = info["net"]["device"]))
     if len(qpus) != 0:
         return qpus
     else:

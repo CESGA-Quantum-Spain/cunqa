@@ -36,19 +36,14 @@ void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const Cunq
     bool qpu_already_written;
     bool classical_resources_read;
 
+    std::string setup_qpus = "setup_qpus";
+    std::string setup_executor = "setup_executor";
     std::string simulator;
     std::string backend_path;
     std::string path;
     std::string qpus_path;
     std::string family_name;
 
-#if COMPILATION_FOR_GPU
-    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
-    std::string setup_executor = "setup_executor_gpu" + std::to_string(GPU_ARCH);
-#else 
-    std::string setup_qpus = "setup_qpus";
-    std::string setup_executor = "setup_executor";
-#endif
 
     //---------------------------------------------------------------
 

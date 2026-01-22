@@ -23,9 +23,9 @@ else
 fi
 
 if [ -n "$1" ]; then
-    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
+    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1 #-DAER_GPU=TRUE
 else
-    cmake -B build/
+    cmake -B build/ #-DAER_GPU=TRUE
 fi
 cmake --build build/ --parallel $(nproc)
 cmake --install build/

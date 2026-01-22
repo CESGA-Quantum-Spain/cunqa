@@ -73,7 +73,7 @@ struct Server::Impl {
 Server::Server(const std::string& mode) :
     mode{mode},
     nodename{get_nodename()},
-    gpu{get_associated_gpu()},
+    device(get_device()),
     pimpl_{std::make_unique<Impl>(mode)}
 { 
     endpoint = pimpl_->zmq_endpoint;

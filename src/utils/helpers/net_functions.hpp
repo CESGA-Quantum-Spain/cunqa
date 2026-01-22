@@ -19,7 +19,9 @@
 
 #include "logger.hpp"
 #include "utils/constants.hpp"
+#include "utils/json.hpp"
 
+using namespace cunqa;
 using namespace std::string_literals;
 
 // Secure cast of size
@@ -193,24 +195,28 @@ inline std::string get_IP_address() {
 
 // Auxiliary GPU functions
 
-inline std::vector<int> get_associated_gpu() {
-    std::vector<int> devices;
+inline JSON get_device() {
+    JSON device = {
+        {"device_name", "CPU"},
+        {"target_devices", std::vector<int>()}
+    };
 
     const char* visible_devices = std::getenv("CUDA_VISIBLE_DEVICES");
     if (!visible_devices) {
-        return devices;
+        return device;
     }
+    device["device_name"] = "GPU";
 
     std::string envStr(visible_devices);
     std::stringstream ss(envStr);
     std::string token;
-
+    std::vector<int> available_gpus;
     while (std::getline(ss, token, ',')) {
-        devices.push_back(std::stoi(token));
+        available_gpus.push_back(std::stoi(token));
     }
 
     const char* slurm_procid = std::getenv("SLURM_PROCID");
     int index = std::stoi(slurm_procid);
-
-    return {devices[index]};
+    device["target_devices"].push_back(available_gpus[index]);
+    return device;
 }

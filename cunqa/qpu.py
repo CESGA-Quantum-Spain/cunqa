@@ -88,10 +88,10 @@ class QPU:
     _name: str 
     _family: str
     _endpoint: str 
-    _gpu: 'list[int]'
+    _device: dict
     _connected: bool 
     
-    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str, gpu : 'list[int]'):
+    def __init__(self, id: int, qclient: Union['QClient', 'QMIOClient'], backend: CunqaBackend, name: str, family: str, endpoint: str, device : dict):
         """
         Initializes the :py:class:`QPU` class.
 
@@ -116,7 +116,7 @@ class QPU:
         self._name = name
         self._family = family
         self._endpoint = endpoint
-        self._gpu = gpu
+        self._device = device
         self._connected = False
         
         logger.debug(f"QPU {id} correctly instantiated.")
@@ -195,7 +195,7 @@ class QPU:
                 raise TranspilerError # I capture the error in QPU.run() when creating the job
 
         try:
-            qjob = QJob(self._qclient, self._gpu, self._backend, circuit, **run_parameters)
+            qjob = QJob(self._qclient, self._device, self._backend, circuit, **run_parameters)
             qjob.submit()
             logger.debug(f"Qjob submitted to QPU {self._id}.")
         except Exception as error:

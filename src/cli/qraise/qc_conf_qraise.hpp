@@ -29,14 +29,9 @@ std::string get_qc_run_command(const CunqaArgs& args, const std::string& mode)
         return "0";
     } 
 
-#if COMPILATION_FOR_GPU
-    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
-    std::string setup_executor = "setup_executor_gpu" + std::to_string(GPU_ARCH);
-#else 
+
     std::string setup_qpus = "setup_qpus";
     std::string setup_executor = "setup_executor";
-#endif
-
     std::string run_command;
     std::string subcommand;
     std::string backend_path;

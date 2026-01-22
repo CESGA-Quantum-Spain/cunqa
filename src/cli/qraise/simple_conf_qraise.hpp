@@ -17,12 +17,8 @@ std::string get_simple_run_command(const CunqaArgs& args, const std::string& mod
         std::system("rm qraise_sbatch_tmp.sbatch");
         return "0";
     } 
-#if COMPILATION_FOR_GPU
-    std::string setup_qpus = "setup_qpus_gpu" + std::to_string(GPU_ARCH);
-#else 
-    std::string setup_qpus = "setup_qpus";
-#endif
 
+    std::string setup_qpus = "setup_qpus";
     std::string run_command;
     std::string subcommand;
     std::string backend_path;

@@ -1,10 +1,6 @@
 # QRAISE executable
-if (COMPILATION_FOR_GPU)
-    set(QRAISE_NAME "qraisegpu${GPU_ARCH}")
-else()
-    set(QRAISE_NAME "qraise")
-endif()
 
+set(QRAISE_NAME "qraise")
 add_executable(${QRAISE_NAME} qraise.cpp)
 target_link_libraries(${QRAISE_NAME} PRIVATE json logger_client morrisfranken::argparse)
 
@@ -28,11 +24,8 @@ target_link_libraries(qdrop PRIVATE json morrisfranken::argparse)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # SETUP_QPUS executable
-if (COMPILATION_FOR_GPU)
-    set(SETUP_QPUS_NAME "setup_qpus_gpu${GPU_ARCH}")
-else()
-    set(SETUP_QPUS_NAME "setup_qpus")
-endif()
+
+set(SETUP_QPUS_NAME "setup_qpus")
 add_executable(${SETUP_QPUS_NAME} setup_qpus.cpp)
 target_link_libraries(${SETUP_QPUS_NAME} PRIVATE json logger_qpu qpu 
                                          aer_simple_simulator aer_cc_simulator aer_qc_simulator
@@ -50,11 +43,8 @@ endif()
 install(TARGETS ${SETUP_QPUS_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # EXECUTOR executable
-if (COMPILATION_FOR_GPU)
-    set(SETUP_EXECUTOR_NAME "setup_executor_gpu${GPU_ARCH}")
-else()
-    set(SETUP_EXECUTOR_NAME "setup_executor")
-endif()
+
+set(SETUP_EXECUTOR_NAME "setup_executor")
 add_executable(${SETUP_EXECUTOR_NAME} setup_executor.cpp)
 target_link_libraries(${SETUP_EXECUTOR_NAME} PRIVATE aer_executor munich_executor cunqa_executor maestro_executor qulacs_executor logger_executor)
 target_include_directories(${SETUP_EXECUTOR_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")

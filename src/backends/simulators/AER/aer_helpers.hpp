@@ -17,14 +17,14 @@ namespace sim {
 QuantumTask quantum_task_to_AER(const QuantumTask& quantum_task)
 {
     int mem_slots = quantum_task.config.at("num_clbits");
-    auto gpu = quantum_task.config.at("gpu").get<std::vector<int>>();
-    std::string device = (gpu.size() > 0) ? "GPU" : "CPU";
+    std::string device = quantum_task.config.at("device")["device_name"];
+    std::vector<int> target_gpus = (device == "GPU") ? quantum_task.config.at("device")["target_devices"].get<std::vector<int>>() : std::vector<int>();
     JSON new_config = {
         {"method", quantum_task.config.at("method")},
         {"shots", quantum_task.config.at("shots")},
         {"memory_slots", quantum_task.config.at("num_clbits")},
         {"device", device},
-        {"target_gpus", gpu},
+        {"target_gpus", target_gpus},
         {"method", "statevector"},
         // TODO: Tune in the different options of the AER simulator
     };

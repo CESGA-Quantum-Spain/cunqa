@@ -7,7 +7,11 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 
-family_name = "gpufam"
+#--------------------------------------------------------------------------
+# qraise -n 1 -c 32 -t 00:10:00 --co-located --gpu --fam="simplegpu"
+#--------------------------------------------------------------------------
+
+family_name = "simplegpu"
 qpus  = get_QPUs(on_node = False, family = family_name)
 
 qc = CunqaCircuit(5)

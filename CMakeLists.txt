@@ -237,8 +237,8 @@ if (DEFINED AER_GPU)
   # Ada Lovelace           RTX 40xx               89
   # Hopper                 H100                   90
   
-  set(GPU_ARCH 75)
-  set(MAX_GPUS_PER_NODE 1) # Dependent on GPU_ARCH and CLUSTER
+  set(GPU_ARCH 80)
+  set(MAX_GPUS_PER_NODE 8) # Dependent on GPU_ARCH and CLUSTER
   set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 20)
