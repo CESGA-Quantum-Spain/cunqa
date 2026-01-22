@@ -28,7 +28,7 @@ class ConvertersError(Exception):
     """Exception for error during conversion between circuit types."""
     pass
 
-SUPPORTED_QISKIT_OPERATIONS = {'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier'}
+SUPPORTED_QISKIT_OPERATIONS = {'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset'}
 
 def convert(circuit : Union['QuantumCircuit', 'CunqaCircuit', dict], convert_to : str) -> Union['QuantumCircuit', 'CunqaCircuit', str, dict]:
     """
@@ -162,6 +162,19 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
             if instruction.operation.name == "barrier":
                 pass
+            
+            # Temporal fix for the reset instruction that will later on be native
+            elif instruction.operation.name == "reset":
+            #     json_data["instructions"].append({"name": "measure",
+            #                                     "qubits":instruction.qubits,
+            #                                     "clbits":instruction.qubits
+            #                                     })
+                
+                json_data["instructions"].append({'name': 'x', 
+                                                'qubits': [quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                                'conditional_reg': [quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                                                'params': []
+                                                })
 
             elif instruction.operation.name == "measure":
 
