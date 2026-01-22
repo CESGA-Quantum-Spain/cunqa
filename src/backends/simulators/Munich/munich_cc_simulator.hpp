@@ -17,12 +17,9 @@ namespace sim {
 class MunichCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     MunichCCSimulator();
-    MunichCCSimulator(const std::string& group_id);
     ~MunichCCSimulator() = default;
 
     inline std::string get_name() const override {return "MunichSimulator";}
-
-    // TODO: The [[maybe_unused]] annotation is a temporary approach while CunqaSimulator does not take into account the backend info
     JSON execute([[maybe_unused]] const CCBackend& backend, const QuantumTask& circuit) override;
 
 private:

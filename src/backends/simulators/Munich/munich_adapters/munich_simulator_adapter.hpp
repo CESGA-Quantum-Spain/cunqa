@@ -10,13 +10,13 @@
 namespace cunqa {
 namespace sim {
 
-class CircuitSimulatorAdapter : public CircuitSimulator<dd::DDPackageConfig>
+class MunichSimulatorAdapter : public CircuitSimulator<dd::DDPackageConfig>
 {
 public:
 
     // Constructors
-    CircuitSimulatorAdapter() = default;
-    CircuitSimulatorAdapter(std::unique_ptr<QuantumComputationAdapter>&& qc_) : 
+    MunichSimulatorAdapter() = default;
+    MunichSimulatorAdapter(std::unique_ptr<QuantumComputationAdapter>&& qc_) : 
         CircuitSimulator(std::unique_ptr<QuantumComputationAdapter>(std::move(qc_)))
     {}
 
@@ -28,7 +28,10 @@ public:
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
 private:
 
-    std::string execute_shot_(const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel);
+    std::string execute_shot_(
+        const std::vector<QuantumTask>& quantum_tasks, 
+        comm::ClassicalChannel* classical_channel
+    );
     
 };
 

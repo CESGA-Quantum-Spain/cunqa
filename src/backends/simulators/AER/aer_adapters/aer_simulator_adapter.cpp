@@ -30,7 +30,6 @@ struct TaskState {
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
-    std::stack<int> telep_meas;
 };
 
 struct GlobalState {
@@ -38,7 +37,6 @@ struct GlobalState {
     std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<uint_t>> qc_meas;
     bool ended = false;
-    cunqa::comm::ClassicalChannel* chan = nullptr;
 };
 
 

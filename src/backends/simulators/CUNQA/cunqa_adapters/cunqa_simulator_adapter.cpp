@@ -11,12 +11,6 @@
 #include "executor.hpp"
 #include "utils/types_cunqasim.hpp"
 
-
-
-
-
-
-
 #include "utils/constants.hpp"
 
 #include "logger.hpp"

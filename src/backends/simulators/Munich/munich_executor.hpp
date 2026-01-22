@@ -8,8 +8,7 @@ namespace sim {
 
 class MunichExecutor {
 public:
-    MunichExecutor();
-    MunichExecutor(const std::string& group_id);
+    MunichExecutor(const std::size_t& n_qpus);
     ~MunichExecutor() = default;
 
     void run();
