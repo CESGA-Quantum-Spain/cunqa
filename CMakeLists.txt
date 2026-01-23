@@ -197,12 +197,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(argparse)
 
 # =====================================================================
-#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix)
+#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix and GPU setter)
 # =====================================================================
 FetchContent_Declare(
     aer
     GIT_REPOSITORY "git@github.com:CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git"
-    GIT_TAG "717e77a5257c35ce49dfbb4e8ba8c23acbadfe14"
+    GIT_TAG "target_gpus_setter"
 )
 FetchContent_GetProperties(aer)
 if(NOT aer_POPULATED)

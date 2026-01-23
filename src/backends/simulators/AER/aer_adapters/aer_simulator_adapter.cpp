@@ -398,15 +398,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     state.configure("device", device);
     state.configure("precision", "double");
     state.configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
-    /* if (device == "GPU") {
-        std::vector<int> target_gpus = quantum_tasks[0].config.at("device")["target_devices"].get<std::vector<int>>()
-        JSON gpu_config = {
-            {"device", device},
-            {"target_gpus", target_gpus}
-        };
-        
-        state.set_config(gpu_config);
-    } */
+    reg_t target_gpus = (device == "GPU") ? qc.quantum_tasks[0].config.at("device")["target_devices"].get<reg_t>() : reg_t();
 
     unsigned long n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks)
@@ -422,12 +414,8 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     {
         qubit_ids = state.allocate_qubits(n_qubits);
         state.initialize();
-        /* initialize_state_controller();
-        initialize_qreg_state(nullptr);
-        state_->initialize_qreg(n_qubits);
-        state_->initialize_creg(n_qubits, n_qubits);
-        clear_ops();
-        state.initialized_ = true; */
+        /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
+        state.set_target_gpus(target_gpus);
         meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
         state.clear();
     } // End all shots

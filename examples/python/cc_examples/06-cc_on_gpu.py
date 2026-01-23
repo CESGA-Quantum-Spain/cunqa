@@ -12,11 +12,11 @@ from cunqa.qjob import gather
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
 
 #-----------------------------------------------------------------------------------
-# qraise -n 2 -t 00:10:00 -c 32 --co-located --classical_comm --gpu --fam="ccongpu"
+# qraise -n 2 -t 00:10:00 -c 32 mem-per-qpu 64 --co-located --classical_comm --gpu --fam="ccongpu"
 #-----------------------------------------------------------------------------------
 
-family_name = "ccongpu"
-qpus  = get_QPUs(on_node=False, family = family_name)
+family = qraise(2, "00:10:00", simulator="Aer", cores = 32, mem_per_qpu=64, classical_comm=True, co_located = True, gpu = True)
+qpus  = get_QPUs(on_node=False, family = family)
 
 
 
@@ -50,4 +50,4 @@ for result in result_list:
     print(result)
 
 ########## Drop the deployed QPUs #
-qdrop(family_name)
+qdrop(family)

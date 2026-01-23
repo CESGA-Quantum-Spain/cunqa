@@ -24,216 +24,38 @@
 using namespace std::literals;
 using namespace cunqa;
 
-namespace {
-
-void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args) 
-{
-    // Escribir el contenido del script SBATCH
-    sbatchFile << "#!/bin/bash\n";
-    sbatchFile << "#SBATCH --job-name=qraise \n";
-
-    if (!args.gpu){
-        int n_tasks = args.qc ? args.n_qpus * args.cores_per_qpu + args.n_qpus : args.n_qpus;    
-        sbatchFile << "#SBATCH --ntasks=" << n_tasks << "\n";
-        if (!args.qc) 
-            sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-        
-        sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
-        
-        if(args.partition.has_value())
-            sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
-        
-        if (args.qpus_per_node.has_value()) {
-            if (args.n_qpus < args.qpus_per_node) {
-                std::system("rm qraise_sbatch_tmp.sbatch");
-                throw std::runtime_error("Less QPUs than qpus_per_node");
-            } else {
-                sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";
-            }
-        }
-        
-        if (args.node_list.has_value()) {
-            if (args.number_of_nodes.value() != args.node_list.value().size()) {
-                throw std::runtime_error("Different number of node names than total nodes");
-            } else {
-                sbatchFile << "#SBATCH --nodelist=";
-                int comma = 0;
-                for (auto& node_name : args.node_list.value()) {
-                    if (comma > 0 ) {
-                        sbatchFile << ",";
-                    }
-                    sbatchFile << node_name;
-                    comma++;
-                }
-                sbatchFile << "\n";
-            }
-        }
-
-        if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
-            throw std::runtime_error("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
-        }
-
-        if (!args.qc) {
-            if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
-                int mem_per_cpu = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
-                sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
-            } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
-                throw std::runtime_error("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
-            } else if (!args.mem_per_qpu.has_value()) {
-                int mem_per_core = DEFAULT_MEM_PER_CORE;
-                sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
-            } 
-        } else {
-            if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
-                sbatchFile << "#SBATCH --mem=" << args.mem_per_qpu.value() * args.n_qpus + args.n_qpus << "G\n";
-            } else {
-                int mem_per_core = DEFAULT_MEM_PER_CORE;
-                sbatchFile << "#SBATCH --mem=" << mem_per_core * args.cores_per_qpu * args.n_qpus + args.n_qpus << "G\n";
-            }
-        }
-    } else { //args.gpu
-#if !COMPILATION_FOR_GPU
-        LOGGER_ERROR("CUNQA was not compiled with GPU support.");
-        throw std::runtime_error("CUNQA was not compiled with GPU support.");
-#else
-        std::vector<std::string> simulators_with_gpu_support = {"Aer"};
-        if (std::find(simulators_with_gpu_support.begin(), simulators_with_gpu_support.end(), std::string(args.simulator)) == simulators_with_gpu_support.end()) {
-            LOGGER_ERROR("At this moment, only Aer supports GPU simulation");
-            throw std::runtime_error("At this moment, only Aer supports GPU simulation.");
-        }
-
-        if (args.n_qpus > MAX_GPUS_PER_NODE) {
-            LOGGER_ERROR("Node with GPU_ARCH = {} only supports {} QPU", std::to_string(GPU_ARCH), std::to_string(MAX_GPUS_PER_NODE));
-            throw std::runtime_error("The nodes with the selected GPU architecture do not support as many GPUs as the selected number of vQPUs.");
-        }
-#if GPU_ARCH == 75
-        sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
-        sbatchFile << "#SBATCH --gres=gpu:t4\n";
-        if(args.partition.has_value()) {
-            sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
-        } else {
-            sbatchFile << "#SBATCH -p viz\n";
-        }
-        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-        sbatchFile << "#SBATCH --mem=" << args.n_qpus * args.cores_per_qpu * DEFAULT_MEM_PER_CORE << "G\n";
-#elif GPU_ARCH == 80
-        sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
-        sbatchFile << "#SBATCH --gres=gpu:a100:" << args.n_qpus << "\n";
-        sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-        sbatchFile << "#SBATCH --mem=" << 2 * args.cores_per_qpu << "G\n";
-#endif // GPU_ARCH
-#endif //!COMPILATION_FOR_GPU
-    }
-
-
-    if (check_time_format(args.time))
-        sbatchFile << "#SBATCH --time=" << args.time << "\n";
-    else {
-        throw std::runtime_error("Incorrect time format");
-    }
-
-    //sbatchFile << "#SBATCH --profile=all\n";   // Enable comprehensive profiling
-    sbatchFile << "#SBATCH --output=qraise_%j\n\n";
-    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
-    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
-}
-
-void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const std::string& mode)
-{
-    std::string run_command;
-    if (args.noise_properties.has_value() || args.fakeqmio.has_value()){
-        LOGGER_DEBUG("noise_properties json path provided");
-        if (args.simulator == "Munich" or args.simulator == "Cunqa"){
-            LOGGER_WARN("Personalized noise models only supported for AerSimulator, switching simulator setting from {} to Aer.", args.simulator.c_str());
-        }
-        if (args.cc || args.qc){
-            throw std::runtime_error("Personalized noise models not supported for classical/quantum communications schemes.");
-        }
-
-        if (args.backend.has_value()){
-            LOGGER_WARN("Because noise properties were provided backend will be redefined according to them.");
-        }
-
-        run_command = get_noise_model_run_command(args, mode);
-
-
-    } else if ((!args.noise_properties.has_value() || !args.fakeqmio.has_value()) && (args.no_thermal_relaxation || args.no_gate_error || args.no_readout_error)){
-        throw std::runtime_error("noise_properties flags where provided but --noise_properties nor --fakeqmio args were not included.");
-    } else {
-        if (args.cc) {
-            LOGGER_DEBUG("Classical communications");
-            run_command = get_cc_run_command(args, mode);
-        } else if (args.qc) {
-            LOGGER_DEBUG("Quantum communications");
-            run_command = get_qc_run_command(args, mode);
-        } else {
-            LOGGER_DEBUG("No communications");
-            run_command = get_simple_run_command(args, mode);
-        }
-    }
-
-    if (run_command == "0") { 
-        throw std::runtime_error("Unable to get the proper run command.");
-    }
-
-    LOGGER_DEBUG("Run command: {}", run_command);
-    sbatchFile << run_command;
-}
-
-} // End namespace
 namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) 
 {
     auto args = argparse::parse<CunqaArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
 
-    if (args.infrastructure.has_value()) {
-        LOGGER_DEBUG("Raising infrastructure with path: {}", args.infrastructure.value());
-        fs::path current_dir = fs::current_path();
-        LOGGER_DEBUG("Current dir: {}", current_dir.string());
-
-        std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
-        write_sbatch_file_from_infrastructure(sbatchFile, args);
+    std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
+    try {
+        if (args.infrastructure.has_value()) {
+            write_infrastructure_sbatch(sbatchFile, args);
+        } else if (args.qmio) {
+            write_qmio_sbatch(sbatchFile, args);
+        } else if (args.noise_properties.has_value() || args.fakeqmio.has_value()) {
+            write_noise_model_sbatch(sbatchFile, args);
+        } else if (args.cc) {
+            write_cc_sbatch(sbatchFile, args);
+        } else if (args.qc) {
+            write_qc_sbatch(sbatchFile, args);
+        } else {
+            write_simple_sbatch(sbatchFile, args);
+        }
+    } catch (const std::exception& e) {
         sbatchFile.close();
-    } else {
-        if (args.n_qpus == 0 || args.time == "") {
-            LOGGER_INFO("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
-            std::cout << "\033[32m qraise needs two mandatory arguments: \n\t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n \033[0m" << std::endl;
-            return 1;
-        }
-        // Setting and checking mode and family name, respectively
-        std::string mode = args.co_located ? "co_located" : "hpc";
-        std::string family = args.family_name;
-        if (exists_family_name(family, constants::QPUS_FILEPATH)) { //Check if there exists other QPUs with same family name
-            LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", family);
-            std::system("rm qraise_sbatch_tmp.sbatch");
-            return 1;
-        }
-
-        // Writing the sbatch file
-        std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
-        try {
-            if (args.qmio) {
-                write_qmio_sbatch(sbatchFile, args);
-                sbatchFile.close();
-            } else {
-                write_sbatch_header(sbatchFile, args);
-                write_run_command(sbatchFile, args, mode);
-            }
-        } catch (const std::exception& e) {
-            LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
-            std::system("rm qraise_sbatch_tmp.sbatch");
-            return 1;
-        }
-        
-        
-        sbatchFile.close();
-
+        LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
+        std::system("rm qraise_sbatch_tmp.sbatch");
+        return 1;
     }
+    sbatchFile.close();
 
     // Executing and deleting the file
     std::system("sbatch qraise_sbatch_tmp.sbatch");
-    std::system("rm qraise_sbatch_tmp.sbatch");
+    //std::system("rm qraise_sbatch_tmp.sbatch");
     
     
     return 0;

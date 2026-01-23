@@ -11,8 +11,8 @@ from cunqa.circuit import CunqaCircuit
 # qraise -n 1 -c 32 -t 00:10:00 --co-located --gpu --fam="simplegpu"
 #--------------------------------------------------------------------------
 
-family_name = "simplegpu"
-qpus  = get_QPUs(on_node = False, family = family_name)
+family = qraise(1, "00:10:00", cores = 32, simulator = "Aer", co_located = True, gpu = True)
+qpus  = get_QPUs(on_node = False, family = family)
 
 qc = CunqaCircuit(5)
 qc.h(0)
@@ -28,4 +28,4 @@ time = qjob.time_taken
 print(qjob.result)
 
 ########## Drop the deployed QPUs #
-qdrop(family_name)
+qdrop(family)

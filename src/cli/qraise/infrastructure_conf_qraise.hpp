@@ -17,7 +17,7 @@ namespace {
     
 }
 
-void write_sbatch_file_from_infrastructure(std::ofstream& sbatchFile, const CunqaArgs& args)
+void write_infrastructure_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     //------------------ Variables block ----------------------------
     JSON infrastructure;
