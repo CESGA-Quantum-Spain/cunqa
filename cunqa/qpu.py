@@ -177,18 +177,21 @@ class QPU:
                 if ('has_cc' in circuit and circuit["has_cc"]) or ('has_qc' in circuit and circuit["has_qc"]):
                     logger.error("Distributed circuits can't run using QPU.run(), try run_distributed() instead.")
                     raise SystemExit
+                
+        # Disallow execution of circuits with non-assigned Variable parameters
+        if hasattr(circuit, "assigned") and not circuit.assigned:
+            logger.error("Circuits with Variable parameters should assign a values to them before executing.")
+            raise SystemExit
 
         # Handle connection to QClient
         if not self._connected:
             self._qclient.connect(self._endpoint)
             logger.debug(f"QClient connection stabished for QPU {self._id} to endpoint {self._endpoint}.")
-            self._connected = True
 
         # Transpilation if requested
         if transpile:
             try:
-                #logger.debug(f"About to transpile: {circuit}")
-                circuit = transpiler(circuit, self._backend, initial_layout = initial_layout, opt_level = opt_level)
+                circuit = transpiler(circuit, self._backend, opt_level = opt_level, initial_layout = initial_layout)
                 logger.debug("Transpilation done.")
             except Exception as error:
                 logger.error(f"Transpilation failed [{type(error).__name__}].")
