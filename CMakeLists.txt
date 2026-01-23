@@ -202,7 +202,7 @@ FetchContent_MakeAvailable(argparse)
 FetchContent_Declare(
     aer
     GIT_REPOSITORY "git@github.com:CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git"
-    GIT_TAG "target_gpus_setter"
+    GIT_TAG "8679dbe68458a43661222bc86e6e877d1084125b"
 )
 FetchContent_GetProperties(aer)
 if(NOT aer_POPULATED)
