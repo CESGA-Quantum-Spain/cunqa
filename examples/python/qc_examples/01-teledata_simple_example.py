@@ -25,9 +25,9 @@ qpus = get_QPUs(on_node=False)
 
 qjobs = run_distributed([circuit1, circuit2], qpus, shots = 100)
 
-resutls = gather(qjobs)
+results = gather(qjobs)
 
-for q in resutls:
+for q in results:
     print("Result: ", q.counts)
     print()
 

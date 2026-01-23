@@ -72,7 +72,7 @@ public:
         config["noise_model"] = qc_config.noise_model; // Not in to_json() to avoid the writing on qpus.json
     }
 
-    QCBackend(QCBackend& cc_backend) = default;
+    QCBackend(QCBackend& qc_backend) = default;
 
     inline JSON execute(const QuantumTask& quantum_task) const override
     {

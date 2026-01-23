@@ -8,10 +8,11 @@ from cunqa.qutils import get_QPUs, qraise, qdrop
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-family = qraise(2, "00:10:00", cores = 32, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
+family = qraise(3, "00:10:00", cores = 8, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
 
-circuit1 = CunqaCircuit(2, id = "circuit1") # adding ancilla
+circuit1 = CunqaCircuit(2, id = "circuit1") 
 circuit2 = CunqaCircuit(1, id = "circuit2")
+circuit3 = CunqaCircuit(1, id = "circuit3") # Only to match the number of vQPUs
 
 circuit1.h(0)
 circuit1.cx(0,1)
@@ -23,11 +24,11 @@ circuit2.measure_all()
 
 qpus = get_QPUs(on_node=False)
 
-qjobs = run_distributed([circuit1, circuit2], qpus, shots = 100)
+qjobs = run_distributed([circuit1, circuit2, circuit3], qpus, shots = 100)
 
-resutls = gather(qjobs)
+results = gather(qjobs)
 
-for q in resutls:
+for q in [results[0], results[1]]:
     print("Result: ", q.counts)
     print()
 

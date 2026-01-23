@@ -16,7 +16,7 @@ using namespace cunqa;
 bool write_qc_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus + 1) << "\n";
-    sbatchFile << "#SBATCH -c " << std::to_string(args.n_qpus * args.cores_per_qpu + args.n_qpus) << "\n";
+    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu) << "\n";
     sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
     
     if(args.partition.has_value())
@@ -96,11 +96,10 @@ bool write_qc_gpu_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
 #elif GPU_ARCH == 80
     int mem_per_qpu = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() : DEFAULT_MEM_PER_CORE * args.cores_per_qpu; 
     int mem = mem_per_qpu + args.n_qpus;
-    int cores = (int)((double)(args.cores_per_qpu + args.n_qpus))/(double)(args.n_qpus + 1) + 1;
         
     sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus + 1) << "\n";
     sbatchFile << "#SBATCH --gres=gpu:a100:1" << "\n";
-    sbatchFile << "#SBATCH -c " << std::to_string(cores) << "\n";
+    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu) << "\n";
     sbatchFile << "#SBATCH --mem=" << std::to_string(mem) << "G\n";
 #endif // GPU_ARCH
 #endif //COMPILATION_FOR_GPU
@@ -168,25 +167,26 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 
     
 #ifdef USE_ZMQ_BTW_QPU
-    run_command =  "srun -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --exclusive --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
-
-    // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
-    run_command += "sleep 1\n";
-
     if (!args.gpu) {
         int simulator_n_cores = args.cores_per_qpu * args.n_qpus; 
         int simulator_memory = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() * args.n_qpus : DEFAULT_MEM_PER_CORE * args.cores_per_qpu * args.n_qpus;
 
-        run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --exclusive setup_executor " + args.simulator + " " + args.family_name + "\n";
+        run_command =  "srun --exclusive  -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
+        // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
+        run_command += "sleep 1\n";
+        run_command +=  "srun --exclusive  -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G setup_executor " + args.simulator + " " + args.family_name + "\n";
     } else {
 #if !COMPILATION_FOR_GPU
         LOGGER_ERROR("CUNQA was not compiled with GPU support.");
         return false;
 #endif
-        //TODO
-        int simulator_n_cores = args.cores_per_qpu; 
+        int simulator_n_cores = args.cores_per_qpu - args.n_qpus; 
         int simulator_memory = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() : DEFAULT_MEM_PER_CORE * args.cores_per_qpu;
-        run_command +=  "srun -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --gres=gpu:a100:1 --exclusive setup_executor " + args.simulator + " " + args.family_name + "\n";
+
+        run_command =  "srun --exclusive  -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --gres=gpu:0 --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
+        // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
+        run_command += "sleep 1\n";
+        run_command +=  "srun --exclusive -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --gres=gpu:1 setup_executor " + args.simulator + " " + args.family_name + "\n";
     }
 #endif //USE_ZMQ_BTW_QPU
 
@@ -196,7 +196,7 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 }
 
 
-void write_qc_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args)
+void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");

@@ -74,8 +74,7 @@ class Result:
         self._registers = registers
         
         if result is None or len(result) == 0:
-            logger.error(f"Empty object passed, result is {None} [{ValueError.__name__}].")
-            raise ValueError
+            logger.warning(f"Empty object passed, result is {None} [{ValueError.__name__}].")
         
         elif "ERROR" in result:
             #logger.debug(f"Result received: {result}\n")
@@ -96,7 +95,10 @@ class Result:
         YELLOW = "\033[33m"
         RESET = "\033[0m"   
         GREEN = "\033[32m"
-        return f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n"
+        if self._result != None:
+            return f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n"
+        else:
+            return "{}"
 
 
     @property
