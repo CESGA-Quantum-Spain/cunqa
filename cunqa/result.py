@@ -265,16 +265,21 @@ class Result:
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
-                    probs[k] =  np.diagonal(densmat, axis1=0).real
+                    probs[k] =  np.diagonal(densmat, axis1=0).real[0]
                 # Extract number of qubits from the lenght of one of the sets of probs
                 num_qubits = int(math.log2(next(iter(probs.values())).size)) 
 
             else:
-                probs =  np.diagonal(densmats, axis1=0).real
+                probs =  np.diagonal(densmats, axis1=0).real[0]
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
                 probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
+
+            # TODO: check qiskit options so that the returned density matrix is actually a density matrix
+            if isinstance(densmats, dict):
+                for k in probs.keys():
+                    probs[k] /= sum([int(v) for v in self.counts.values()])
             
             return probs
 
@@ -425,6 +430,8 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         partial = [num_qubits - 1 - i for i in partial]
 
     if per_qubit:
+        logger.debug("Entering per_qubit calculation.")
+        
         short_num_qubits = len(partial)
         if isinstance(probs, dict): # get a dict with probability arrays as values
 
