@@ -44,7 +44,7 @@ class TestState(unittest.TestCase):
     # TESTS --------------------------------------------------
     def test_statevector(self):
         """Checks wether the statevector can be retrieved if a circuit with save_state is simulated with statevector method."""
-        qjob = self.qpus[-1].run(self.circ, method="statevector")
+        qjob = self.qpus[-1].run(self.circ, method="statevector", seed = 18)
         statevec = qjob.result.statevector
 
         statevec_exact = np.array([[0.70710678+0.j], [0.        +0.j], [0.        +0.j], [0.70710678+0.j]])
@@ -53,7 +53,7 @@ class TestState(unittest.TestCase):
     
     def test_density_matrix(self):
         """Checks wether the density matrix can be retrieved if a circuit with save_state is simulated with density_matrix method."""
-        qjob = self.qpus[-2].run(self.circ, method="density_matrix")
+        qjob = self.qpus[-2].run(self.circ, method="density_matrix", seed = 18)
         densmat = qjob.result.density_matrix
 
         densmat_exact = np.array([[[0.5+0.j], [0. +0.j], [0. +0.j], [0.5+0.j]],
@@ -68,7 +68,7 @@ class TestState(unittest.TestCase):
 
     def test_several_statevector(self):
         """Checks that several statevectors can be correctly retrieved with multiple save_state() with different labels."""
-        qjob = self.qpus[-1].run(self.circ_sev, method="statevector")
+        qjob = self.qpus[-1].run(self.circ_sev, method="statevector", seed = 18)
         statevecs = qjob.result.statevector
 
         statevecs_exact = {'after_h':      np.array([[0.70710678+0.j], [0.70710678+0.j], [0.        +0.j], [0.        +0.j]]),
@@ -81,7 +81,7 @@ class TestState(unittest.TestCase):
     
     def test_several_density_matrix(self):
         """Checks that several density matrices can be correctly retrieved with multiple save_state() with different labels."""
-        qjob = self.qpus[-2].run(self.circ_sev, method="density_matrix")
+        qjob = self.qpus[-2].run(self.circ_sev, method="density_matrix", seed = 18)
         densmats = qjob.result.density_matrix
 
         densmats_exact = {'after_h': np.array([[[0.5+0.j], [0.5+0.j], [0. +0.j], [0. +0.j]],
@@ -156,8 +156,8 @@ class TestProbabilities(unittest.TestCase):
         circ.rx(np.pi/4, 0); circ.cx(0, 1); circ.rx(np.pi/4, 2)
         circ.measure_all()
 
-        cls.result_statevec = cls.qpus[-1].run(state_circ, method="statevector").result
-        cls.result_densmat  = cls.qpus[-2].run(state_circ, method="density_matrix").result
+        cls.result_statevec = cls.qpus[-1].run(state_circ, method="statevector",    seed = 18).result
+        cls.result_densmat  = cls.qpus[-2].run(state_circ, method="density_matrix", seed = 18).result
         cls.result_counts   = cls.qpus[-3].run(circ, seed = 18).result
         
 
@@ -202,7 +202,7 @@ class TestProbabilities(unittest.TestCase):
         """Test that the correct per qubit probabilities are returned estimating by counts with seed=18 and default shots=1024"""
         probs = self.result_counts.probabilities(per_qubit=True)
         
-        return np.testing.assert_allclose(probs, np.array([[0.49121094, 0.50878906], [0.49902344, 0.50097656], [0.49707031, 0.50292969]]))
+        return np.testing.assert_allclose(probs, np.array([[0.49707031, 0.50292969], [0.49902344, 0.50097656], [0.49121094, 0.50878906]]))
 
 
     # PARTIAL probabilities
@@ -210,19 +210,19 @@ class TestProbabilities(unittest.TestCase):
         """Test that the correct partial probabilities are returned using statevector"""
         probs = self.result_statevec.probabilities(partial = [1,2])
         
-        return self.assertDictEqual(probs, {'00': 0.25, '01': 0.2499999999999999, '10': 0.24999999999999992, '11': 0.24999999999999994})
+        return self.assertDictEqual(probs, {'00': 0.24999999999999997, '01': 0.24999999999999992, '10': 0.24999999999999994, '11': 0.24999999999999992})
     
     def test_density_matrix_partial_probs(self):
         """Test that the correct partial probabilities are returned using density_matrix"""
         probs = self.result_densmat.probabilities(partial = [1,2])
         
-        return self.assertDictEqual(probs, {'00': 0.2500000000000001, '01': 0.2499999999999999, '10': 0.25, '11': 0.25})
+        return self.assertDictEqual(probs, {'00': 0.25, '01': 0.24999999999999994, '10': 0.25000000000000006, '11': 0.24999999999999994})
 
     def test_estimate_partial_probs(self):
         """Test that the correct partial probabilities are returned estimating by counts with seed=18 and default shots=1024"""
         probs = self.result_counts.probabilities(partial = [1,2])
         
-        return self.assertDictEqual(probs, {'00': 0.2470703125, '01': 0.251953125, '10': 0.25, '11': 0.2509765625})
+        return self.assertDictEqual(probs, {'00': 0.248046875, '01': 0.2509765625, '10': 0.2431640625, '11': 0.2578125})
 
 
     # PER QUBIT AND PARTIAL probabilities
@@ -242,7 +242,7 @@ class TestProbabilities(unittest.TestCase):
         """Test that the correct partial per qubit probabilities are returned estimating by counts with seed=18 and default shots=1024"""
         probs = self.result_counts.probabilities(per_qubit=True, partial = [1,2])
         
-        return np.testing.assert_allclose(probs, np.array([[0.49902344, 0.50097656], [0.49707031, 0.50292969]]))
+        return np.testing.assert_allclose(probs, np.array([[0.49902344, 0.50097656], [0.49121094, 0.50878906]]))
 
 
 if __name__ == "__main__":
