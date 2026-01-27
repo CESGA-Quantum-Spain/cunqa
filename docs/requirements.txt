@@ -3,6 +3,7 @@ sphinx==7.4.7
 docutils
 sphinx-rtd-theme
 sphinx-autobuild
+sphinx-multiversion
 sphinx-copybutton
 myst-nb
 nbsphinx

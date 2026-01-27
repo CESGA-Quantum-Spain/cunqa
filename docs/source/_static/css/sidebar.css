@@ -1,0 +1,125 @@
+.wy-nav-side {
+  padding: 0%;
+}
+
+.sidebar-header {
+  padding: 1em;
+  border-bottom: 1px solid #ddd;
+}
+
+.project-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.version-switcher {
+  margin-top: 0.5rem;
+}
+
+
+.version-switcher__select,
+.version-switcher select {
+  width: 100%;
+  padding: 0.55rem 2.2rem 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  font-weight: 600;
+
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.version-switcher {
+  position: relative;
+}
+
+.version-switcher::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  pointer-events: none;
+
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  opacity: 0.9;
+}
+
+.version-switcher__select:hover,
+.version-switcher select:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+.version-switcher__select:focus,
+.version-switcher select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16), 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.version-switcher__select option,
+.version-switcher select option {
+  color: #000;
+}
+
+/* SIDEBAR'S FOOTER*/
+
+/* Empuja el footer al fondo del sidebar (RTD) */
+.wy-side-scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-side-scroll .wy-side-nav-search,
+.wy-side-scroll .wy-menu {
+  flex: 0 0 auto;
+}
+
+/* El footer se va al fondo */
+.wy-side-scroll .rst-footer-buttons,
+.wy-side-scroll .sidebar-logos {
+  flex: 0 0 auto;
+}
+
+.sidebar-logos {
+  margin-top: auto;          /* clave: empuja hacia abajo */
+  padding: 0.9rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-logos__item img {
+  display: block;
+  height: 28px;              /* ajusta tamaño */
+  width: auto;
+  opacity: 0.92;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.sidebar-logos__item:hover img {
+  opacity: 1;
+  transform: translateY(-1px);
+}

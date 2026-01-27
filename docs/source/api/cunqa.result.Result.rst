@@ -1,4 +1,4 @@
-cunqa.result.Result
+﻿cunqa.result.Result
 ===================
 
 .. currentmodule:: cunqa.result
@@ -17,6 +17,7 @@ Attributes
    ~Result.counts
    ~Result.result
    ~Result.time_taken
+   ~Result.id
 
 
 
@@ -24,8 +25,6 @@ Methods
 ~~~~~~~
 
 .. automethod:: Result.__init__
-
-
 
 
 

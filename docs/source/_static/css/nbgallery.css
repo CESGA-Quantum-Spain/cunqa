@@ -1,13 +1,3 @@
-div.admonition.note {
-    background-color: #f4e6ff;
-}
-
-div.admonition.note > .admonition-title {
-    background-color: #b97cda;
-    color: white;
-    font-weight: bold
-}
-
 .rst-content p.image {
     margin-bottom: 1.5em !important; 
     display: block;
@@ -16,7 +6,6 @@ div.admonition.note > .admonition-title {
 .rst-content .figure {
     margin-bottom: 1.5em !important;
 }
-
 
 .nbgallery,
 .nbsphinx-gallery,

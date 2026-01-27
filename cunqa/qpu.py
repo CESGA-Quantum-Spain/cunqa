@@ -109,7 +109,6 @@ from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
-from cunqa.backend import Backend
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
@@ -218,11 +217,10 @@ def run(
     less than the number of circuits is an error will be raised. 
 
     Args:
-        circuits (list[dict | ~cunqa.circuit.CunqaCircuit | ~qiskit.QuantumCircuit] | dict |
-                  ~cunqa.circuit.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
+        
+        circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
 
-        qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the virtual QPUs in 
-        which the circuits want to be run.
+        qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the virtual QPUs in which the circuits want to be run.
     
         run_args: any other run arguments and parameters.
 

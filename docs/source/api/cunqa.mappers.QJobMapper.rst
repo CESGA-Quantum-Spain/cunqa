@@ -1,4 +1,4 @@
-cunqa.mappers.QJobMapper
+﻿cunqa.mappers.QJobMapper
 ========================
 
 .. currentmodule:: cunqa.mappers
@@ -25,8 +25,6 @@ Methods
 
 
 .. automethod:: QJobMapper.__call__
-
-
 
 
 

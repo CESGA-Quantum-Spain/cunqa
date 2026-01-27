@@ -1,7 +1,7 @@
-﻿cunqa.backend
-=============
+﻿cunqa.circuit.core
+==================
 
-.. automodule:: cunqa.backend
+.. automodule:: cunqa.circuit.core
 
    
    
@@ -23,8 +23,9 @@
       :nosignatures:
       :recursive:
    
-      Backend
-      BackendData
+      ClassicalControlContext
+      CunqaCircuit
+      QuantumControlContext
    
    
 

@@ -1,4 +1,4 @@
-cunqa.qjob.QJob
+﻿cunqa.qjob.QJob
 ===============
 
 .. currentmodule:: cunqa.qjob
@@ -25,10 +25,6 @@ Methods
 
 .. automethod:: QJob.__init__
 
-
-
-
-.. automethod:: QJob.result
 
 
 

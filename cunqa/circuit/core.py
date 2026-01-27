@@ -1,60 +1,52 @@
 """
-    Holds CUNQA's custom circuit class and functions to translate its instructions into other 
-    formats for circuit definition.
+    Holds CUNQA's custom circuit class. This custom class may seem like a 
+    :py:class:`qiskit.QuantumCircuit` [#]_ *wannabe*, and this is because it is. This imitation is 
+    intended, as the similarity is seeked in order to easen the learning curve of the user when using 
+    the API (taking into account that Qiskit is one of the most employed quantum programming languages).
+    This can raise the question of why not using directly :py:class:`qiskit.QuantumCircuit`. The reason
+    is that Qiskit's circuit does not support communication directives, which are the core of the CUNQA
+    project. Once the existance of CunqaCircuit has been justified, let's highligth the difference with
+    respect to :py:class:`qiskit.QuantumCircuit`.
 
-    Building circuits
-    =================
+    Classically controlled gates
+    ============================
+    Even though `c_if` and `if_else` directives in :py:class:`qiskit.QuantumCircuit` exist, they are 
+    not easy to use.
 
-    Users can define a circuit using :py:class:`~CunqaCircuit` to then send it to the virtual QPUs.
-    Nevertheless, for the case in which no communications are needed among the circuits sent,  
-    :py:class:`qiskit.QuantumCircuit` [#]_ is also allowed. Be aware that some instructions might 
-    not be supported for :py:class:`~CunqaCircuit`, for the list of supported instructions check 
-    its documentation. Module py:mod:`cunqa.converters` contains functions to transform between 
-    circuit formats.
-
-    Circuits by json ``dict`` format
-    ================================
-
-    A low level way of representing a circuit is by a json ``dict`` with specefic fields that gather 
-    the information needed by the simulator in order to run the circuit.
-
-    This structe is presented below:
-
-    .. code-block:: python
-
-       {"id":str, # circuit identificator
-        "is_dynamic":bool, # weather if the circuit has intermediate measurements or conditioned 
-        operations
-        "instructions":list[dict], # list of instructions of the circuit in dict format
-        "num_qubits":int, # number of qubits of the circuit
-        "num_clbits":int, # number of classical bits of the circuit
-        "quantum_registers":dict, # dict specifying the grouping of the qubits in registers
-        "classical_registers":dict # dict specifying the grouping of the classical bits in registers
-        }
-
-    On the other hand, instructions have some mandatory and optional keys:
+        >>> qc.x(q[1]).c_if(c, 1)
+        >>> qc.if_else((c, 1), true_body, false_body)
+    
+    Due to this, `~cunqa.circuit.core.CunqaCircuit` implements the instruction `cif` that works as 
+    follows.
 
     .. code-block:: python
 
-        {"name":str, # MANDATORY, name of the instruction, has to be accepted by the simulator
-         "qubits":list[int], # MANDATORY, qubits on which the instruction acts
-         "params":list[int|float] | list[list[[int|float]]], # OPTIONAL, only required for 
-         parametric gates and for \'unitary\' instruction.
-         "clbits":list[int], # OPTINAL, any classical bits used in the instruction
-        }
+        c = CunqaCircuit(2, 2)
+        c.h(0)
+        c.measure(0, 0)
 
-    For classical and quantum communications among circuits, we do not recomend working at such low 
-    level format, users rather describe this operations through the 
-    :py:class:`~cunqa.circuit.CunqaCircuit` class. If curious, you can always create the 
-    :py:class:`~cunqa.circuit.CunqaCircuit` and obtain its intructions by its attribute 
-    :py:attr:`~cunqa.circuit.CunqaCircuit.instructions`, or you can convert it to the json `dict` 
-    format by the :py:func:`~cunqa.converters.convert` function.
+        with c.cif(0) as cgates:
+            cgates.x(1)
+    
+    In this small portion of code it is clear what is happening: `cgates` are executing into `c` 
+    CunqaCircuit whenever the classical register 0 has 1 as value. The downside of this approach is 
+    the fact that it cannot create an *else* block. We take this design decission based on the fact 
+    that none of the algorithms and protocols revised is affected. In the future, in case this 
+    functionality is needed by the users, it will be implemented. 
+
+    Classical communications
+    ========================
+    Now, we are entering the bread and butter of CUNQA: communications directives. In this case, classical communication
+    
+    Quantum communications
+    ======================
+
 
     References:
     ~~~~~~~~~~~
     .. [#] `qiskit.QuantumCircuit 
-    <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit>`_ 
-    documentation.
+       <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit>`_ 
+       documentation.
 
 """
 from __future__ import annotations
@@ -194,7 +186,7 @@ class CunqaCircuit():
         :height: 300px
 
     The teledata protocol consists on the reconstruction of an unknown quantum state of a given 
-    physical system at a different location without actually transmitting the system [#]_. Within 
+    physical system at a different location without actually transmitting the system [1]. Within 
     :py:mod:`cunqa`, when quantum communications among the virtual QPUs utilized are available, a 
     qubit from one circuit can be sent to another, the teledata protocol is implemented at a lower 
     level so there is no need for the user to implement it. In this scheme, generally an acilla 
@@ -226,7 +218,7 @@ class CunqaCircuit():
 
     Quantum gate teleportation, also known as telegate, reduces the topological requirements by 
     substituting two-qubit gates with other cost-effective resources: auxiliary entangled states, 
-    local measurements, and single-qubit operations [#]_. This is another feature available in 
+    local measurements, and single-qubit operations [1]. This is another feature available in 
     :py:mod:`cunqa` in the quantum communications scheme, managed by the 
     :py:class:`~cunqa.circuit.QuantumControlContext` class. Here is an example analogous to the one 
     presented above:
@@ -254,7 +246,7 @@ class CunqaCircuit():
 
     References:
     ~~~~~~~~~~~
-    [#] `Review of Distributed Quantum Computing. From single QPU to High Performance Quantum 
+    [1] `Review of Distributed Quantum Computing. From single QPU to High Performance Quantum 
     # Computing <https://arxiv.org/abs/2404.01265>`_
 
     """
@@ -733,6 +725,7 @@ class CunqaCircuit():
         """
         Class method to apply ccy gate to the given qubits. Gate is decomposed asfollows as it is 
         not commonly supported by simulators.
+        
         q_0: ──────────────■─────────────
                            │             
         q_1: ──────────────■─────────────

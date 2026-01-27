@@ -18,7 +18,9 @@ Python API
    :template: custom-module-template.rst
    :recursive:
    
-   cunqa.backend
+   cunqa.circuit.core
+
+   cunqa.circuit.transformations
 
    cunqa.mappers
 

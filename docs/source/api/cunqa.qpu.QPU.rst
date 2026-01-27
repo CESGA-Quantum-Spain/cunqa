@@ -1,4 +1,4 @@
-cunqa.qpu.QPU
+﻿cunqa.qpu.QPU
 =============
 
 .. currentmodule:: cunqa.qpu
@@ -23,8 +23,6 @@ Methods
 ~~~~~~~
 
 .. automethod:: QPU.__init__
-
-
 
 
 

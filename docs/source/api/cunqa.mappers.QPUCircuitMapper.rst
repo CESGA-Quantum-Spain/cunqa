@@ -1,4 +1,4 @@
-cunqa.mappers.QPUCircuitMapper
+﻿cunqa.mappers.QPUCircuitMapper
 ==============================
 
 .. currentmodule:: cunqa.mappers
@@ -16,8 +16,6 @@ Attributes
 
    ~QPUCircuitMapper.qpus
    ~QPUCircuitMapper.circuit
-   ~QPUCircuitMapper.transpile
-   ~QPUCircuitMapper.initial_layout
    ~QPUCircuitMapper.run_parameters
 
 
@@ -29,8 +27,6 @@ Methods
 
 
 .. automethod:: QPUCircuitMapper.__call__
-
-
 
 
 
