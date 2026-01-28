@@ -87,6 +87,7 @@ struct Server::Impl {
 Server::Server(const std::string& mode) :
     mode{mode},
     nodename{get_nodename()},
+    gpu{get_associated_gpu()},
     pimpl_{std::make_unique<Impl>(mode == "hpc" ? "127.0.0.1" : get_IP_address())}
 { 
     endpoint = pimpl_->asio_endpoint;

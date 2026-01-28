@@ -1,6 +1,7 @@
 #pragma once
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+//SPDLOG_ACTIVE_LEVEL set in the CMakeLists of our own logger
+//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG 
 
 #include <memory>
 #include <spdlog/spdlog.h>

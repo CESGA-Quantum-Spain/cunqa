@@ -168,12 +168,13 @@ class QJob:
     _future: Union['FutureWrapper', 'QMIOFuture'] 
     _result: Optional['Result']
     _circuit_id: str 
+    _device: dict
     _sending_to: "list[str]"
     _is_dynamic: bool
     _has_cc: bool
     _has_qc: bool
 
-    def __init__(self, qclient: Union['QClient', 'QMIOClient'], backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
+    def __init__(self, qclient: Union['QClient', 'QMIOClient'], device: dict, backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
         """
         Initializes the :py:class:`QJob` class.
 
@@ -203,6 +204,7 @@ class QJob:
         self._future: Union['FutureWrapper', 'QMIOFuture'] = None
         self._result: Optional['Result'] = None
         self._circuit_id: str = ""
+        self.device: dict = device
 
         self._convert_circuit(circuit)
         self._configure(**run_parameters)
@@ -509,7 +511,8 @@ class QJob:
                 "avoid_parallelization": False,
                 "num_clbits": self.num_clbits, 
                 "num_qubits": self.num_qubits, 
-                "seed": 123123
+                "seed": 123123,
+                "device": self.device,
                 }
 
             if (run_parameters == None) or (len(run_parameters) == 0):

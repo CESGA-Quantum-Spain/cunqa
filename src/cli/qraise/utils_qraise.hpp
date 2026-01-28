@@ -6,12 +6,16 @@
 #include <cmath>
 #include <cstdio> // For popen, pclose
 #include <algorithm>
+#include <filesystem>
 
+#include "args_qraise.hpp"
 #include "utils/json.hpp"
 #include "logger.hpp"
 
-constexpr int DEFAULT_MEM_PER_CORE = 4;
+namespace fs = std::filesystem;
 
+
+constexpr int DEFAULT_MEM_PER_CORE = 4;
 
 bool check_time_format(const std::string& time)
 {
@@ -61,4 +65,13 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
             return false;
         }
     }
+}
+
+int compute_needed_n_tasks(const int& cores_per_qpu){
+
+}
+
+void remove_tmp_files(const std::string directory = "./")
+{
+    std::system("rm qraise_sbatch_tmp.sbatch");
 }
