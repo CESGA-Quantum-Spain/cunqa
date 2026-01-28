@@ -1,13 +1,14 @@
 {% extends "!layout.html" %}
 
+
 {% block sidebartitle %}
 
   <div class="sidebar-header">
-    <div class="project-name">
-      {{ project }}
-    </div>
+    <div class="project-name"> {{ project }} </div>
+    <div class="project-version">latest</div>
+    <div></div>
 
-    <div class="version-switcher">
+    <!--<div class="version-switcher">
       <select onchange="location = this.value;">
         {% for version in versions %}
           <option value="{{ pathto('', 1) }}../{{ version.name }}/"
@@ -17,10 +18,11 @@
           </option>
         {% endfor %}
       </select>
-    </div>
+    </div>-->
   </div>
 
 {% endblock %}
+
 
 {% block navigation %}
   {{ super() }}

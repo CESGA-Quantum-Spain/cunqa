@@ -8,9 +8,16 @@
 }
 
 .project-name {
-  font-size: 1.2em;
+  font-size: 1.8em;
   font-weight: bold;
   margin-bottom: 0.5em;
+}
+
+.project-version {
+  display: block;
+  font-style: italic;
+  font-size: 0.9em;
+  color: #ffffff;
 }
 
 .version-switcher {

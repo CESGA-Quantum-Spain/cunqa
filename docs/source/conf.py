@@ -1,25 +1,5 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 import os, sys
-import shutil
-from pathlib import Path
-
 sys.path.insert(0, os.path.abspath('../..'))
-
-
-sys.path = [
-    p for p in sys.path
-    if not os.path.abspath(p).startswith(
-        "/mnt/netapp1/Store_CESGA/home/cesga/jvazquez/works/cunqa"
-    )
-]
-
-print(sys.path)
-
-
 
 os.environ['CUNQA_PATH'] = ''
 os.environ['HOSTNAME'] = ''
@@ -36,9 +16,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx_copybutton',
-    #'nbsphinx',
-    "sphinx_multiversion",
-    'sphinx_mdinclude',
+    'nbsphinx',
+    "sphinx.ext.napoleon",
     'sphinx.ext.githubpages',
     "autodocsumm",
     "sphinx_toolbox.more_autosummary"
@@ -46,20 +25,6 @@ extensions = [
 
 source_suffix = ['.rst']
 
-# ---------------  VERSIONING OPTIONS ---------------
-smv_tag_whitelist = r'^(0\.(2|[3-9])\.\d+|[1-9]\d*\.\d+\.\d+)$'
-smv_branch_whitelist = r"^62-testssss-automatic$"   
-smv_latest_version = ''
-
-# --------------- AUTOSUMMARY OPTIONS ---------------
-autosummary_generate = True
-autosummary_generate_overwrite = True
-autodoc_default_options = {
-    "private-members": False,
-    "special-members": "",
-}
-autodoc_member_order = "bysource"
-autodocsumm_member_order = "bysource"
 autodoc_mock_imports = [
     'argparse',
     'collections',
@@ -90,7 +55,11 @@ autodoc_mock_imports = [
 nbsphinx_execute = "never" # Never execute the Jupyter notebooks
 
 templates_path = ['_templates']
-exclude_patterns = ['tutorial/*']
+
+autodoc_typehints = "none"
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+add_module_names = False
 
 
 html_theme = 'sphinx_rtd_theme' 

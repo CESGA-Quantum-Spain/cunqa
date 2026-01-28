@@ -7,11 +7,9 @@ Documentation is available in the docstrings.
 Subpackages
 -----------
 - circuit       --- Circuit-related utilities
-- qiskit_deps   --- Qiskit-related integration / deps
 
 Top-level modules
 -----------------
-- backend
 - qjob
 - result
 - qpu

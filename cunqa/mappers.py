@@ -1,13 +1,8 @@
 """
     Contains map-like callables to distribute circuits in virtual QPUS, needed when communications 
-    among circuits are present.
-
-    Submitting circuits with classical or quantum communications
-    ------------------------------------------------------------
-
-    When having classical or quantum communications among circuits, method 
-    :py:func:`~cunqa.qpu.QPU.run` is obsolete, circuits must be sent as an ensemble in order to 
-    ensure correct functioning of the communication protocols.
+    among circuits are present. When having classical or quantum communications among circuits, 
+    method :py:func:`~cunqa.qpu.QPU.run` is obsolete, circuits must be sent as an ensemble in order 
+    to ensure correct functioning of the communication protocols.
 
     So, once the virtual QPUs that allow the desired type of communications are raised and circuits 
     have been defined using :py:class:`~cunqa.circuit.CunqaCircuit`, they can be sent using the 
@@ -24,10 +19,6 @@
     >>> qjobs = run_distributed([circuit1, circuit2], qpus)
     >>> results = gather(qjobs)
 
-
-    Mapping circuits to virtual QPUs in optimization problems
-    ---------------------------------------------------------
-
     **Variational Quantum Algorithms** [#]_ require from numerous executions of parametric cirucits, 
     while in each step of the optimization process new parameters are assigned to them. This implies 
     that, after parameters are updated, a new circuit must be created, transpiled and then sent to 
@@ -35,29 +26,24 @@
     :py:class:`~QJobMapper` and :py:class:`~QPUCircuitMapper` classes. Both classes are thought to 
     be used for Scipy optimizers [#]_ as the *workers* argument in global optimizers.
 
-    QJobMapper
-    ==========
-    :py:class:`~QJobMapper` takes a list of existing :py:class:`~cunqa.qjob.QJob` objects, then, the 
-    class can be called passing a set of **parameters** and a **cost function**. This callable 
-    updates the each existing :py:class:`~cunqa.qjob.QJob` object with such **parameters** through 
-    the :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` method. Then, it gathers the results of the 
-    executions and returns the **value of the cost function** for each.
+    - :py:class:`~QJobMapper` takes a list of existing :py:class:`~cunqa.qjob.QJob` 
+      objects, then, the class can be called passing a set of **parameters** and a **cost function**. 
+      This callable updates the each existing :py:class:`~cunqa.qjob.QJob` object with such 
+      **parameters** through the :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` method. Then, it 
+      gathers the results of the executions and returns the **value of the cost function** for each.
     
-    QPUCircuitMapper
-    ================
-    On the other hand, :py:class:`~QPUCircuitMapper` is instanciated with a circuit and instructions 
-    for its execution, toguether with a list of the :py:class:`~cunqa.qpu.QPU` objects. The 
-    difference with :py:class:`~QJobMapper` is that here the method :py:meth:`~cunqa.qpu.QPU.run` is 
-    mapped to each QPU, passing it the circuit with the given parameters assigned so that for this 
-    case several :py:class:`~cunqa.qjob.QJob` objects are created.
+    - :py:class:`~QPUCircuitMapper` is instanciated with a circuit and instructions for its 
+      execution, toguether with a list of the :py:class:`~cunqa.qpu.QPU` objects. The difference 
+      with :py:class:`~QJobMapper` is that here the method :py:meth:`~cunqa.qpu.QPU.run` is mapped 
+      to each QPU, passing it the circuit with the given parameters assigned so that for this case 
+      several :py:class:`~cunqa.qjob.QJob` objects are created.
 
     Examples utilizing both classes can be found in the `Examples gallery 
     <https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html>`_. 
     These examples focus on optimization of VQAs, using a global optimizer called 
     Differential Evolution [#]_.
 
-    References:
-    ~~~~~~~~~~~
+    *References*:
 
     .. [#] `Variational Quantum Algorithms arXiv <https://arxiv.org/abs/2012.09265>`_ .
 
@@ -113,18 +99,15 @@ class QJobMapper:
     cost back. Examples applied to optimizations are shown at the 
     `Examples gallery <https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html>`_.
 
+    Attributes: 
+        qjobs (:py:class:`~cunqa.qjob.QJob`): list of objects to be mapped.
+
+    .. automethod:: __call__
+
     """
-    qjobs: list[QJob] #: List of jobs that are mapped.
+    qjobs: list[QJob]
 
     def __init__(self, qjobs: list[QJob]):
-        """
-        Class constructor.
-
-        Args:
-            qjobs (list[~cunqa.qjob.QJob]): list of :py:class:`~cunqa.qjob.QJob` objects to be 
-            mapped.
-
-        """
         self.qjobs = qjobs
 
     def __call__(self, func, population):
@@ -194,10 +177,19 @@ class QPUCircuitMapper:
     cost values are calculated. Its implementation for optimization problems is shown at the 
     `Examples gallery <https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html>`_.
 
+    Attributes: 
+        qpus (list[:py:class:`~cunqa.qpu.QPU`]): Objects linked to the virtual QPUs to wich the 
+                                                 circuit is mapped.
+        circuit (QuantumCircuit): Circuit to which parameters are assigned at the 
+                                  :py:meth:`QPUCircuitMapper.__call__` method.
+        run_parameters (Optional[Any]) : Any other run instructions needed for the simulation.
+
+    .. automethod:: __call__
+
     """
-    qpus: list[QPU] #: :py:class:`~cunqa.qpu.QPU` ibjects linked to the virtual QPUs to wich the circuit is mapped.
-    circuit: QuantumCircuit #: Circuit to which parameters are assigned at the :py:meth:`QPUCircuitMapper.__call__` method.
-    run_parameters: Optional[Any] #: Any other run instructions needed for the simulation.
+    qpus: list[QPU]
+    circuit: QuantumCircuit
+    run_parameters: Optional[Any]
 
     def __init__(
         self, 
@@ -210,16 +202,10 @@ class QPUCircuitMapper:
 
         Args:
             qpus (list[~cunqa.qpu.QPU]): list of objects linked to the virtual QPUs intended to be 
-            used.
+                                         used.
 
             circuit (dict | ~cunqa.circuit.CunqaCircuit | qiskit.QuantumCirucit): circuit to be run 
-            in the QPUs.
-
-            transpile (bool): if True, transpilation will be done with respect to the backend of the 
-            given QPU. Default is set to False.
-
-            initial_layout (list[int]): Initial position of virtual qubits on physical qubits for 
-            transpilation.
+                                                                                  in the QPUs.
 
             **run_parameters : any other simulation instructions.
 

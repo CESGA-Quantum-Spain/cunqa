@@ -1,54 +1,61 @@
 """
-    Holds CUNQA's custom circuit class. This custom class may seem like a 
-    :py:class:`qiskit.QuantumCircuit` [#]_ *wannabe*, and this is because it is. This imitation is 
-    intended, as the similarity is seeked in order to easen the learning curve of the user when using 
-    the API (taking into account that Qiskit is one of the most employed quantum programming languages).
-    This can raise the question of why not using directly :py:class:`qiskit.QuantumCircuit`. The reason
-    is that Qiskit's circuit does not support communication directives, which are the core of the CUNQA
-    project. Once the existance of CunqaCircuit has been justified, let's highligth the difference with
-    respect to :py:class:`qiskit.QuantumCircuit`.
+Core implementation of CUNQA's custom quantum circuit abstraction.
 
-    Classically controlled gates
-    ============================
-    Even though `c_if` and `if_else` directives in :py:class:`qiskit.QuantumCircuit` exist, they are 
-    not easy to use.
+This module defines :class:`~cunqa.circuit.core.CunqaCircuit`, a custom circuit class designed to
+extend the functionality of :class:`qiskit.circuit.QuantumCircuit` by incorporating explicit
+classical and quantum communication directives. While the interface intentionally resembles
+Qiskit's circuit API in order to reduce the learning curve for users, the underlying motivation
+is fundamentally different.
 
-        >>> qc.x(q[1]).c_if(c, 1)
-        >>> qc.if_else((c, 1), true_body, false_body)
-    
-    Due to this, `~cunqa.circuit.core.CunqaCircuit` implements the instruction `cif` that works as 
-    follows.
+The use of a custom circuit class is required because
+:class:`qiskit.circuit.QuantumCircuit` does not natively support communication primitives between
+distributed circuits, which constitute the core functionality of the CUNQA project.
 
-    .. code-block:: python
+The main conceptual differences with respect to Qiskit are highlighted below.
 
-        c = CunqaCircuit(2, 2)
-        c.h(0)
-        c.measure(0, 0)
+Classically controlled operations
+---------------------------------
+Although Qiskit provides mechanisms such as ``c_if`` and ``if_else`` for classical control, their
+usage can become verbose and unintuitive in practice:
 
-        with c.cif(0) as cgates:
-            cgates.x(1)
-    
-    In this small portion of code it is clear what is happening: `cgates` are executing into `c` 
-    CunqaCircuit whenever the classical register 0 has 1 as value. The downside of this approach is 
-    the fact that it cannot create an *else* block. We take this design decission based on the fact 
-    that none of the algorithms and protocols revised is affected. In the future, in case this 
-    functionality is needed by the users, it will be implemented. 
+    >>> qc.x(q[1]).c_if(c, 1)
+    >>> qc.if_else((c, 1), true_body, false_body)
 
-    Classical communications
-    ========================
-    Now, we are entering the bread and butter of CUNQA: communications directives. In this case, classical communication
-    
-    Quantum communications
-    ======================
+To address this, :class:`~cunqa.circuit.core.CunqaCircuit` introduces the ``cif`` context manager,
+which enables a more expressive and readable way to define classically controlled blocks:
 
+.. code-block:: python
 
-    References:
-    ~~~~~~~~~~~
-    .. [#] `qiskit.QuantumCircuit 
-       <https://quantum.cloud.ibm.com/docs/es/api/qiskit/qiskit.circuit.QuantumCircuit>`_ 
-       documentation.
+    c = CunqaCircuit(2, 2)
+    c.h(0)
+    c.measure(0, 0)
 
+    with c.cif(0) as cgates:
+        cgates.x(1)
+
+In this example, the operations defined inside the ``cif`` block are executed only if the value of
+classical bit 0 is equal to 1. Currently, this construct does not support an explicit *else* branch.
+This design decision is based on the observation that none of the reviewed algorithms or protocols
+require such functionality. Support for an *else* branch may be added in future versions if needed.
+
+Classical communications
+------------------------
+CUNQA provides explicit directives to model classical communication between distributed circuits.
+Measurement outcomes produced in one circuit can be transmitted and used to condition operations
+in another circuit executed on a different virtual QPU.
+
+Quantum communications
+----------------------
+Beyond classical communication, CUNQA also supports quantum communication primitives, enabling the
+transfer of qubits and the implementation of protocols such as teledata and telegate at an
+abstract level, without requiring the user to explicitly implement the underlying mechanisms.
+
+References:
+~~~~~~~~~~~
+.. [#] `Qiskit QuantumCircuit documentation
+   <https://quantum.cloud.ibm.com/docs/api/qiskit/qiskit.circuit.QuantumCircuit>`_
 """
+
 from __future__ import annotations
 import numpy as np
 from typing import Union, Optional
@@ -56,200 +63,82 @@ from typing import Union, Optional
 from .helpers import generate_id
 from cunqa.logger import logger
 
-class CunqaCircuit():
-    # TODO: look for other alternatives for describing the documentation that do not requiere such 
-    # long docstrings, maybe gathering everything in another file and using decorators, as in ther 
-    # APIs.
+class CunqaCircuit:
     """
-    Class to define a quantum circuit for the :py:mod:`~cunqa` api.
+    Quantum circuit abstraction for the :py:mod:`cunqa` API.
 
-    This class serves as a tool for the user to describe not only simple circuits, but also to 
-    describe classical and quantum operations between circuits. On its initialization, it takes as 
-    mandatory the number of qubits for the circuit *num_qubits*), also number of classical 
-    bits (*num_clbits*) and a personalized id (*id*), which by default would be randomly generated.
-    Once the object is created, class methods canbe used to add instructions to the circuit such as 
-    single-qubit and two-qubits gates, measurements, conditional operations,... but also operations 
-    that allow to send measurement outcomes or qubits to other circuits. This sending operations 
-    require that the virtual QPUs to which the circuits are sent support classical or quantum 
-    communications with the desired connectivity.
-    
+    This class allows users to describe quantum circuits that include not only local quantum
+    operations, but also classical and quantum communication directives between distributed
+    circuits. A ``CunqaCircuit`` can therefore represent both computation and communication in
+    distributed quantum computing scenarios.
+
+    Upon initialization, the circuit is defined by its number of qubits and, optionally, its
+    number of classical bits and a user-defined identifier. If no identifier is provided, a
+    unique one is generated automatically. The circuit identifier is later used to reference
+    the circuit in communication-related instructions.
+
+    Once created, instructions can be appended to the circuit using the provided methods,
+    including single- and multi-qubit gates, measurements, classically controlled operations,
+    and remote communication primitives.
+
     Supported operations
-    ----------------------
+    --------------------
+    The following categories of operations are supported:
 
-    **Single-qubit gates:**
-    :py:meth:`~CunqaCircuit.id`, :py:meth:`~CunqaCircuit.x`, :py:meth:`~CunqaCircuit.y`, 
-    :py:meth:`~CunqaCircuit.z`, :py:meth:`~CunqaCircuit.h`,  :py:meth:`~CunqaCircuit.s`,
-    :py:meth:`~CunqaCircuit.sdg`, :py:meth:`~CunqaCircuit.sx`, :py:meth:`~CunqaCircuit.sxdg`, 
-    :py:meth:`~CunqaCircuit.t`, :py:meth:`~CunqaCircuit.tdg`, :py:meth:`~CunqaCircuit.u1`,
-    :py:meth:`~CunqaCircuit.u2`, :py:meth:`~CunqaCircuit.u3`, :py:meth:`~CunqaCircuit.u`, 
-    :py:meth:`~CunqaCircuit.p`, :py:meth:`~CunqaCircuit.r`, :py:meth:`~CunqaCircuit.rx`,
-    :py:meth:`~CunqaCircuit.ry`, :py:meth:`~CunqaCircuit.rz`.
+    **Single-qubit gates**
+        ``id``, ``x``, ``y``, ``z``, ``h``, ``s``, ``sdg``, ``sx``, ``sxdg``, ``t``, ``tdg``,
+        ``u1``, ``u2``, ``u3``, ``u``, ``p``, ``r``, ``rx``, ``ry``, ``rz``.
 
-    **Two-qubits gates:**
-    :py:meth:`~CunqaCircuit.swap`, :py:meth:`~CunqaCircuit.cx`, :py:meth:`~CunqaCircuit.cy`, 
-    :py:meth:`~CunqaCircuit.cz`, :py:meth:`~CunqaCircuit.csx`, :py:meth:`~CunqaCircuit.cp`,
-    :py:meth:`~CunqaCircuit.cu`, :py:meth:`~CunqaCircuit.cu1`, :py:meth:`~CunqaCircuit.cu3`, 
-    :py:meth:`~CunqaCircuit.rxx`, :py:meth:`~CunqaCircuit.ryy`, :py:meth:`~CunqaCircuit.rzz`,
-    :py:meth:`~CunqaCircuit.rzx`, :py:meth:`~CunqaCircuit.crx`, :py:meth:`~CunqaCircuit.cry`, 
-    :py:meth:`~CunqaCircuit.crz`, :py:meth:`~CunqaCircuit.ecr`,
+    **Two-qubit gates**
+        ``swap``, ``cx``, ``cy``, ``cz``, ``csx``, ``cp``, ``cu``, ``cu1``, ``cu3``,
+        ``rxx``, ``ryy``, ``rzz``, ``rzx``, ``crx``, ``cry``, ``crz``, ``ecr``.
 
-    **Three-qubits gates:**
-    :py:meth:`~CunqaCircuit.ccx`, :py:meth:`~CunqaCircuit.ccy`, :py:meth:`~CunqaCircuit.ccz`, 
-    :py:meth:`~CunqaCircuit.cswap`.
+    **Three-qubit gates**
+        ``ccx``, ``ccy``, ``ccz``, ``cswap``.
 
-    **n-qubits gates:**
-    :py:meth:`~CunqaCircuit.unitary`.
+    **Multi-qubit gates**
+        ``unitary``.
 
-    **Non-unitary local operations:**
-    :py:meth:`~CunqaCircuit.c_if`, :py:meth:`~CunqaCircuit.measure`, 
-    :py:meth:`~CunqaCircuit.measure_all`, :py:meth:`~CunqaCircuit.reset`.
+    **Local non-unitary operations**
+        ``cif``, ``measure``, ``measure_all``, ``reset``.
 
-    **Remote operations for classical communications:**
-    :py:meth:`~CunqaCircuit.measure_and_send`, :py:meth:`~CunqaCircuit.remote_c_if`.
+    **Remote operations (classical communication)**
+        ``send``, ``recv``.
 
-    **Remote operations for quantum comminications:**
-    :py:meth:`~CunqaCircuit.qsend`, :py:meth:`~CunqaCircuit.qrecv`, :py:meth:`~CunqaCircuit.expose`, 
-    :py:meth:`~CunqaCircuit.rcontrol`.
+    **Remote operations (quantum communication)**
+        ``qsend``, ``qrecv``, ``expose``, ``rcontrol``.
 
-    Creating your first CunqaCircuit
-    ---------------------------------
-
-    Start by instantiating the class providing the desired number of qubits:
+    Creating a circuit
+    ------------------
+    A circuit is instantiated by specifying the number of qubits:
 
         >>> circuit = CunqaCircuit(2)
 
-    Then, gates can be added through the mentioned methods. Let's add a Hadamard gate and CNOT gates 
-    to create a Bell state:
+    Gates can then be appended using the corresponding methods. For example, a Bell state can
+    be prepared as follows:
 
-        >>> circuit.h(0) # adding hadamard to qubit 0
-        >>> circuit.cx(0,1)
+        >>> circuit.h(0)
+        >>> circuit.cx(0, 1)
 
-    Finally, qubits are measured by:
+    Finally, all qubits can be measured with:
 
         >>> circuit.measure_all()
 
-    Once the circuit is ready, it is ready to be sent to a QPU by the method 
-    :py:meth:`~cunqa.qpu.QPU.run`.
+    The resulting circuit can then be executed on a suitable virtual QPU using
+    :py:meth:`cunqa.qpu.QPU.run`.
 
-    Other methods to manupulate the class are:
+    Distributed computation
+    -----------------------
+    The main strength of ``CunqaCircuit`` lies in its ability to explicitly model communication
+    between circuits. Classical measurement outcomes can be sent from one circuit to another and
+    used to condition operations remotely. When quantum communication is available, qubits can
+    also be transferred between circuits, enabling protocols such as teledata and telegate to be
+    expressed at a high level of abstraction.
 
-    .. list-table::
-       :header-rows: 1
-       :widths: 20 80
-
-       * - Method
-         - 
-       * - :py:meth:`~CunqaCircuit.add_instructions`
-         - Class method to add operations to the circuit from a list of dict-type instructions.
-       * - :py:meth:`~CunqaCircuit.assign_parameters`
-         - Plugs values into the intructions of parametric gates marked with a parameter name.
-    
-
-    Classical communications among circuits
-    ---------------------------------------
-
-    The strong part of :py:class:`CunqaCircuit` is that it allows to define communication 
-    directives between circuits. We can define the sending of a classical bit from one circuit to 
-    another by:
-
-        >>> circuit_1 = CunqaCircuit(2)
-        >>> circuit_2 = CunqaCircuit(2)
-        >>> circuit_1.h(0)
-        >>> circuit_1.measure_and_send(0, circuit_2) # qubit 0 is measured and the outcome is sent 
-        to circuit_2
-        >>> circuit_2.remote_c_if("x", 0, circuit_1) # the outcome is recived to perform a 
-        classically controlled operation
-        >>> circuit_1.measure_all()
-        >>> circuit_2.measure_all()
-
-    Then, circuits can be sent to QPUs that support classical communications using the 
-    :py:meth:`~cunqa.mappers.run_distributed` function.
-
-    Circuits can also be referend to through their *id* string. When a CunqaCircuit is created, by 
-    default a random *id* is assigned, but it can also be personalized:
-
-        >>> circuit_1 = CunqaCircuit(2, id = "1")
-        >>> circuit_2 = CunqaCircuit(2, id = "2")
-        >>> circuit_1.h(0)
-        >>> circuit_1.measure_and_send(0, "2") # qubit 0 is measured and the outcome is sent to 
-        circuit_2
-        >>> circuit_2.remote_c_if("x", 0, "1") # the outcome is recived to perform a classicaly 
-        controlled operation
-        >>> circuit_1.measure_all()
-        >>> circuit_2.measure_all()
-
-    Teledata protocol
-    -----------------
-    .. image:: /_static/teledata.png
-        :align: center
-        :width: 150
-        :height: 300px
-
-    The teledata protocol consists on the reconstruction of an unknown quantum state of a given 
-    physical system at a different location without actually transmitting the system [1]. Within 
-    :py:mod:`cunqa`, when quantum communications among the virtual QPUs utilized are available, a 
-    qubit from one circuit can be sent to another, the teledata protocol is implemented at a lower 
-    level so there is no need for the user to implement it. In this scheme, generally an acilla 
-    qubit would be neccesary to recieve the quantum state. Let's see an example for the creation of 
-    a Bell pair remotely:
-
-        >>> circuit_1 = CunqaCircuit(2, 1, id = "1")
-        >>> circuit_2 = CunqaCircuit(2, 2, id = "2")
-        >>>
-        >>> circuit_1.h(0); circuit_1.cx(0,1)
-        >>> circuit_1.qsend(1, "1") # sending qubit 1 to circuit with id "2"
-        >>> circuit_1.measure(0,0)
-        >>>
-        >>> circuit_2.qrecv(0, "2") # reciving qubit from circuit with id "1" and assigning it 
-        to qubit 0
-        >>> circuit_2.cx(0,1)
-        >>> circuit_2.measure_all()
-
-    It is important to note that the qubit used for the communication, the one send, after the 
-    operation it is reset, so in a general basis it wouldn't need to be measured. If we want to send 
-    more qubits afer, we can use it since it is reset to zero.
-
-    Telegate protocol
-    -----------------
-    .. image:: /_static/telegate.png
-        :align: center
-        :width: 150
-        :height: 300px
-
-    Quantum gate teleportation, also known as telegate, reduces the topological requirements by 
-    substituting two-qubit gates with other cost-effective resources: auxiliary entangled states, 
-    local measurements, and single-qubit operations [1]. This is another feature available in 
-    :py:mod:`cunqa` in the quantum communications scheme, managed by the 
-    :py:class:`~cunqa.circuit.QuantumControlContext` class. Here is an example analogous to the one 
-    presented above:
-
-        >>> circuit_1 = CunqaCircuit(2, id = "1")
-        >>> circuit_2 = CunqaCircuit(1, id = "2")
-        >>>
-        >>> circuit_1.h(0); circuit_1.cx(0,1)
-        >>>
-        >>> with circuit_1.expose(1, circuit_2) as rcontrol: # exposing qubit at circuit_1
-        >>>     circuit_2.cx(rcontol, 1) # applying telegate operation controlled by the exposed 
-        qubit
-        >>>
-        >>> circuit_1.measure_all()
-        >>> circuit_2.measure_all()
-
-    Here there is no need for an ancilla since the control is the exposed qubit from the other 
-    circuit/virtual QPU.
-
-    .. warning::
-        Note that the circuit specification in :py:meth:`CunqaCircuit.expose` cannot be done by 
-        passing the circuit :py:attr:`CunqaCircuit.id` since the 
-        :py:class:`~cunqa.circuit.QuantumControlContext` object needs the :py:class:`CunqaCircuit` object 
-        in order to manage the telegate block.
-
-    References:
-    ~~~~~~~~~~~
-    [1] `Review of Distributed Quantum Computing. From single QPU to High Performance Quantum 
-    # Computing <https://arxiv.org/abs/2404.01265>`_
-
+    These features make ``CunqaCircuit`` a central building block for describing distributed
+    quantum algorithms within the CUNQA framework.
     """
+
     
     # global attributes
     _ids: set = set() #: Set with ids in use.

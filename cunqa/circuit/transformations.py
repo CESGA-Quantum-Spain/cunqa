@@ -11,6 +11,9 @@ def vsplit():
     pass # TODO
 
 def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[CunqaCircuit]:
+    """
+    DOCUMENTADO
+    """
     num_qubits = circuit.num_qubits
 
     if isinstance(qubits_or_sections, list):
@@ -76,6 +79,9 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
     return get_subcircuits(copy.deepcopy(circuit), initial_qubits, Nsections)
 
 def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
+    """
+    DOCUMENTADO
+    """
     if not circuits:
         raise ValueError("Empty list passed to perform union.")
     if len(circuits) == 1:
@@ -209,6 +215,9 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     return union_circuit
 
 def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
+    """
+    DOCUMENTADO
+    """
     if not circuits:
         raise ValueError("Empty list passed to perform union.")
     if len(circuits) == 1:

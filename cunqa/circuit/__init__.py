@@ -2,15 +2,14 @@ from __future__ import annotations
 import importlib as _importlib
 
 _submodules = [
-    "circuit_extensions",
-    "converters",
     "core",
     "helpers",
     "ir",
-    "partitioning"
+    "transformations"
 ]
 
 _lazy_symbols = {
+    "hsplit": ("cunqa.circuit.transformations", "hsplit"),
     "to_ir": ("cunqa.circuit.ir", "to_ir"),
     "CunqaCircuit": ("cunqa.circuit.core", "CunqaCircuit"),
 }

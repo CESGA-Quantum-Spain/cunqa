@@ -19,18 +19,9 @@ to Qiskit users, while the backend is written in C++ for performance. All code a
 
 
 .. toctree::
-   :maxdepth: 2
    :caption: Contents:
 
    Getting started <getting_started/getting_started>
-
-.. toctree::
-   :maxdepth: 1
-
-   CUNQA reference <api/cunqa>
-
-.. 
-   toctree::
-   :maxdepth: 2
-   
+   Examples <examples/examples>
+   CUNQA reference <reference/reference>
    Tutorial <tutorial/tutorial>

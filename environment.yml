@@ -1,0 +1,22 @@
+# Source - https://stackoverflow.com/a
+# Posted by Daniel Lenz, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-01-28, License - CC BY-SA 4.0
+
+# environment.yaml
+
+name: new-docs
+channels:
+  - conda-forge
+dependencies:
+  - sphinx
+  - docutils
+  - sphinx-rtd-theme
+  - sphinx-autobuild
+  - sphinx-copybutton
+  - nbsphinx
+  - pandoc
+  - lxml-html-clean
+  - autodocsumm
+  - sphinx-toolbox
+  - qiskit==1.2.4
+  - ipython
