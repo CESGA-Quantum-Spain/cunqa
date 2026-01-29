@@ -7,14 +7,12 @@
 #include <vector>
 #include <regex>
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
-
+#include "utils/json.hpp"
 
 namespace
 {
-
-using AddersFn = void(*)(std::string_view, json&, json&);
+using namespace cunqa;
+using AddersFn = void(*)(std::string_view, JSON&, JSON&);
 constexpr double PI = 3.141592653589793;
 const std::string PI_STR = "pi";
 
@@ -50,7 +48,7 @@ std::string_view get_inst_name(std::string_view line)
 }
 
 
-void add_qreg_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json)
+void add_qreg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json)
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -70,7 +68,7 @@ void add_qreg_instruction(std::string_view sv_inst, json& circuit_json, json& au
 
 }
 
-void add_creg_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json)
+void add_creg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json)
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -89,7 +87,7 @@ void add_creg_instruction(std::string_view sv_inst, json& circuit_json, json& au
     circuit_json["num_clbits"] = circuit_json.value("num_clbits", 0) + num_cregs;
 }
 
-void add_meas_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json)
+void add_meas_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json)
 {
     auto p0 = sv_inst.find_first_not_of(" \t\n\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -143,7 +141,7 @@ void add_meas_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_1q0p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_1q0p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -163,7 +161,7 @@ void add_1q0p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_1q1p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_1q1p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -189,7 +187,7 @@ void add_1q1p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_1q2p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_1q2p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -222,7 +220,7 @@ void add_1q2p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_1q3p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_1q3p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -258,7 +256,7 @@ void add_1q3p_instruction(std::string_view sv_inst, json& circuit_json, json& au
 
 }
 
-void add_2q0p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_2q0p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -287,7 +285,7 @@ void add_2q0p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_2q1p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_2q1p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -323,7 +321,7 @@ void add_2q1p_instruction(std::string_view sv_inst, json& circuit_json, json& au
 
 }
 
-void add_2q2p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_2q2p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -365,7 +363,7 @@ void add_2q2p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_2q3p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_2q3p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find('(', p0);
@@ -409,7 +407,7 @@ void add_2q3p_instruction(std::string_view sv_inst, json& circuit_json, json& au
     aux_json.clear();
 }
 
-void add_3q0p_instruction(std::string_view sv_inst, json& circuit_json, json& aux_json) 
+void add_3q0p_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json) 
 {
     auto p0 = sv_inst.find_first_not_of(" \t\r");
     auto p1 = sv_inst.find(' ', p0);
@@ -519,17 +517,17 @@ std::unordered_map<std::string_view, AddersFn> add_instruction {
 
 } // End namespace
 
-json qasm2_to_json(const std::string& circuit_qasm) {
+JSON qasm2_to_json(const std::string& circuit_qasm) {
 
-    json circuit_json = 
+    JSON circuit_json = 
     {
-        {"instructions", std::vector<json>()},
+        {"instructions", std::vector<JSON>()},
         {"num_qubits", 0},
         {"num_clbits", 0},
-        {"quantum_registers", json()},
-        {"classical_registers", json()}
+        {"quantum_registers", JSON()},
+        {"classical_registers", JSON()}
     };
-    json aux_json;
+    JSON aux_json;
 
     size_t start = 0;
     size_t end;

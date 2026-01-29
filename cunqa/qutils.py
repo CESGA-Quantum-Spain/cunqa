@@ -109,7 +109,8 @@ def qraise(n, t, *,
            node_list = None, 
            qpus_per_node= None,
            partition = None,
-           qmio = None) -> Union[tuple, str]:
+           qmio = None,
+           gpu = None) -> Union[tuple, str]:
     """
     Raises virtual QPUs and returns the job id associated to its SLURM job.
 
@@ -183,8 +184,10 @@ def qraise(n, t, *,
             command = command + f" --backend={str(backend)}"
         if partition is not None:
             command = command + f" --partition={str(partition)}"
-        if qmio is not None:
+        if qmio:
             command = command + " --qmio"
+        if gpu:
+            command = command + " --gpu"
 
 
         if not os.path.exists(QPUS_FILEPATH):
@@ -243,15 +246,15 @@ def qdrop(*families: Union[tuple[str], str]):
     else:
         for family in families:
             if isinstance(family, str):
-                cmd.append(family)
+                cmd.append(f"--fam={family}")
 
             elif isinstance(family, tuple):
-                cmd.append(family[1])
+                cmd.append(f"--fam={family[1]}")
+
             else:
                 logger.error(f"Invalid type for qdrop.")
                 raise SystemExit
     
- 
     run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
 
 def nodes_with_QPUs() -> "list[str]":
@@ -392,7 +395,7 @@ def get_QPUs(on_node: bool = True, family: Optional[Union[tuple, str]] = None) -
             logger.debug("Virtual QPU found") 
             client = QClient()
         
-        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"]))
+        qpus.append(QPU(id = id, qclient = client, backend = Backend(info['backend']), name = info["name"], family = info["family"], endpoint = info["net"]["endpoint"], device = info["net"]["device"]))
     if len(qpus) != 0:
         return qpus
     else:

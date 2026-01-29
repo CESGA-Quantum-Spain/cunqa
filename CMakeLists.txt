@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CUNQA VERSION 0.0.1 LANGUAGES CXX)
+project(CUNQA VERSION 1.2.0 LANGUAGES CXX)
 
 message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE CONFIGURATION TYPE: ${CMAKE_CONFIGURATION_TYPES}")
@@ -20,6 +20,11 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
     cmake_policy(SET CMP0135 NEW)
 endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+
+# GPU MACROS
+set(COMPILATION_FOR_GPU FALSE)
+set(GPU_ARCH "")
+set(MAX_GPUS_PER_NODE "")
 
 # Check that $STORE exists
 if(NOT DEFINED ENV{STORE})
@@ -55,10 +60,11 @@ if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
   set(pybind11_DIR "/opt/cesga/2020/software/Core/pybind11/2.13.1-python-3.9.9/lib/python3.9/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
-  find_package(pybind11 2.12 REQUIRED)
-  set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
   include_directories("/opt/cesga/2020/software/Core/python/3.9.9/include/python3.9/")
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
+  find_package(pybind11 2.13.1 REQUIRED)
+  set(PYBIND11_PYTHON_VERSION 2.13 CACHE STRING "")
+  
 else() # Other clusters
   find_package(Python 3.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.7 REQUIRED)
@@ -66,7 +72,7 @@ endif()
 
 find_package(Threads REQUIRED)
 find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
@@ -191,12 +197,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(argparse)
 
 # =====================================================================
-#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix)
+#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix and GPU setter)
 # =====================================================================
 FetchContent_Declare(
     aer
     GIT_REPOSITORY "git@github.com:CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git"
-    GIT_TAG "717e77a5257c35ce49dfbb4e8ba8c23acbadfe14"
+    GIT_TAG "8679dbe68458a43661222bc86e6e877d1084125b"
 )
 FetchContent_GetProperties(aer)
 if(NOT aer_POPULATED)
@@ -211,7 +217,56 @@ if(OpenMP_FOUND)
 endif()
 if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
-  message(STATUS "Linked pybind aer-cpp")
+  message(STATUS "Linked pybind aer-cpp") 
+endif()
+if (DEFINED AER_GPU)
+  message(STATUS "Compiling with AER_GPU")
+  set(COMPILATION_FOR_GPU TRUE)
+  
+  #set(CMAKE_CUDA_COMPILER "/path/to/bin/nvcc")
+  #set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
+  #set(CMAKE_CUDA_COMPILER_VERSION "12.8.0")
+  #set(CMAKE_CUDA_COMPILER_WORKS TRUE)
+  
+  # Architecture           GPUs (examples)        SM
+  # -------------------------------------------------
+  # Volta                  V100                   70
+  # Turing                 T4, RTX 2080           75
+  # Ampere                 A100                   80
+  # Ampere (GA10x)         RTX 30xx               86
+  # Ada Lovelace           RTX 40xx               89
+  # Hopper                 H100                   90
+  
+  set(GPU_ARCH 80)
+  set(MAX_GPUS_PER_NODE 8) # Dependent on GPU_ARCH and CLUSTER
+  set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
+  enable_language(CUDA)
+  set(CMAKE_CUDA_STANDARD 20)
+  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+  
+  find_package(Python REQUIRED COMPONENTS Interpreter Development)
+  find_library(PMIX_LIB NAMES pmix REQUIRED)
+
+  find_package(CUDAToolkit REQUIRED)
+  target_compile_definitions(aer_headers INTERFACE
+      AER_THRUST_GPU
+      AER_THRUST_CUDA
+      AER_THRUST_SUPPORTED=TRUE
+      THRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA
+  )
+  target_compile_options(aer_headers INTERFACE
+      $<$<COMPILE_LANGUAGE:CUDA>:
+          --expt-extended-lambda
+          --use_fast_math
+          -use_fast_math 
+          --expt-extended-lambda
+          -Xcompiler=-fPIC 
+          -Xcompiler=-Wno-psabi 
+          -Xcompiler=-Wno-ignored-attributes 
+          -Xcompiler=-fopenmp
+      >
+  )
+  target_link_libraries(aer_headers INTERFACE Python::Python Threads::Threads ${PMIX_LIB} CUDA::cudart)
 endif()
 
 # =====================================================================
@@ -247,7 +302,7 @@ set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}")
 FetchContent_Declare(
     qcsim
     GIT_REPOSITORY "git@github.com:aromanro/QCSim.git"
-    GIT_TAG "5a458c8b4bddfbbe445de09376b366a97d474266"
+    GIT_TAG "76db3f97974221306c9e2b7be4c4c9f6e7318d6e"
 )
 if(NOT qcsim_POPULATED)
     FetchContent_Populate(qcsim) # Emply of populate to avoid the compilation of wrappers
@@ -272,7 +327,7 @@ set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
 FetchContent_Declare(
     maestro
     GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
-    GIT_TAG "7ba339fc5595fd18d2fcb0612a6570c3c5e1fd90"
+    GIT_TAG "a4d54721a718189362a4a9c8329d7211b662a8f9"
 )
 FetchContent_MakeAvailable(maestro)
 
