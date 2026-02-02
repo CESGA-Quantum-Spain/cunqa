@@ -13,6 +13,14 @@
   margin-bottom: 0.5em;
 }
 
+.project-name a,
+.project-name a:visited,
+.project-name a:hover,
+.project-name a:focus {
+    color: #ffffff;  /* Asegura que el color del texto no cambie */
+    text-decoration: none !important;  /* Elimina el subrayado */
+}
+
 .project-version {
   display: block;
   font-style: italic;

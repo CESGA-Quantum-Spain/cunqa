@@ -1,101 +1,18 @@
 """
-    Contains the description of the :py:class:`~cunqa.qpu.QPU` class and the functions to manage
-    the virtual QPUs (vQPUs).
+Contains the :py:class:`~cunqa.qpu.QPU` class and the functions to manage the virtual QPUs (vQPUs).
+For the first purpose two classes exist: :py:class:`~cunqa.qpu.QPU` and 
+:py:class:`~cunqa.qpu.Backend`, where the second is dependent on the first in the sense that the 
+:py:class:`~cunqa.qpu.Backend` class is used to hold the features of the vQPU. Additionally, there 
+are four functions: :py:func:`~cunqa.qpu.get_QPUs`, :py:func:`~cunqa.qpu.qdrop`, 
+:py:func:`~cunqa.qpu.qraise`, and :py:func:`~cunqa.qpu.run`. We can divide this group of functions 
+into two subgroups:
 
-    First, these :py:class:`QPU` objects are the python representation of the vQPUs deployed.
-    Each one has its :py:class:`QClient` object that communicates with the server of the 
-    corresponding virtual QPU. Through these objects we are able to send circuits and recieve 
-    results from simulations.
-
-    Virtual QPUs
-    ============
-    Each virtual QPU is described by three elements:
-
-    - **Server**: classical resources intended to communicate with the python API to recieve 
-      circuits or quantum tasks and to send results of the simulations.
-    - **Backend**: characteristics that define the QPU that is emulated: coupling map, 
-      basis gates, noise model, etc.
-    - **Simulator**: classical resources intended to simulate circuits accordingly to 
-      the backend characteristics.
-    
-    .. image:: /_static/virtualqpuequal.png
-        :align: center
-        :width: 400px
-        :height: 200px
-
-    In order to stablish communication with the server, :py:class:`QPU` objects 
-    are created, each one of them associated with a virtual QPU. Each object will have a 
-    :py:class:`QClient` C++ object through which the communication with the classical resoruces 
-    is performed.
-    
-    .. image:: /_static/client-server-comm.png
-        :align: center
-        :width: 150
-        :height: 300px
-
-    Connecting to virtual QPUs
-    ==========================
-    This submodule, as hinted before, gathers the functions related with the management and 
-    interaction with the vQPUs. For obtaining information about the available vQPUs the 
-    :py:func:`~cunqa.qpu.get_QPUs` function returns a list of :py:class:`QPU` objects with the 
-    desired filtering:
-
-    >>> from cunqa import get_QPUs
-    >>> get_QPUs()
-    [<cunqa.qpu.QPU object at XXXX>, <cunqa.qpu.QPU object at XXXX>, <cunqa.qpu.QPU object at XXXX>]
-
-    When each :py:class:`QPU` is instanciated, the corresponding :py:class:`QClient` is created and 
-    connected to the endpoint that corresponds to the server of the vQPU. This way, the 
-    :py:class:`QPU` is ready to submit jobs and obtain their results from the connected vQPU. 
-    Other properties and information gathered in the :py:class:`QPU` class are shown on its 
-    documentation.
-
-    It is important to note that the `get_QPUs` function has 
-
-    Interacting with virtual QPUs
-    =============================
-    Once we have the :py:class:`QPU` objects created, we can start interacting with them. The most 
-    important function is :py:func:`~cunqa.qpu.run`, which allows to send a circuit 
-    for its simulation into the virtual QPUs indicated, returning a :py:class:`~cunqa.qjob.QJob` 
-    object associated with the quantum task:
-
-        >>> qpus = get_QPUs()
-        >>> qpu = qpus[0]
-        >>> run(circuit, qpu)
-        <cunqa.qjob.QJob object at XXXX>
-
-    This method takes several arguments for specifications of the simulation such as `shots`. For a 
-    larger description of its functionalities checkout its documentation.
-
-    `qraise` and `qdrop`
-    ==================================
-    This submodule allows to raise and drop virtual QPUs, with no need to use the command line.
-    One must provide the neccesary information, analogous to the ``qraise`` command:
-
-        >>> qraise(n = 4, # MANDATORY, number of QPUs to be raised
-        >>> ...    t = "2:00:00", # MANDATORY, maximum time until they are automatically dropped
-        >>> ...    classical_comm = True, # allow classical communications
-        >>> ...    simulator = "Aer", # choosing Aer simulator
-        >>> ...    co_located = True, # allowing co-located mode, QPUs can be accessed from any node
-        >>> ...    family = "my_family_of_QPUs" # assigning a name to the group of QPUs
-        >>> ...    )
-        '<family name>'
-
-    The function :py:func:`qraise` returns a string specifying the family name of the vQPUs deployed.
-
-    Once we are finished with our work, we should drop the virtual QPUs in order to release 
-    classical resources. Knowing the `family` name of the group of virtual QPUs:
-
-        >>> qdrop('<family name>')
-
-    If no argument is passed to :py:func:`qdrop`, all QPUs deployed by the user are dropped.
-
-    .. note::
-        Even if we did not raise the vQPUs by the :py:func:`qraise` function, we can still use 
-        :py:func:`qdrop` to cancel them. In the same way, if we raise virtual QPUs by the python 
-        function, we can still drop them by terminal commands. Python and bash functionalities are
-        not exclusive.
-
+- :py:func:`~cunqa.qpu.qdrop` and :py:func:`~cunqa.qpu.qraise`, which are adaptations of the
+  ``qdrop`` and ``qraise`` bash commands to Python, respectively. This allows the use of these
+  commands within the Python workflow.
+- :py:func:`~cunqa.qpu.get_QPUs` and :py:func:`~cunqa.qpu.run`, which are responsible for
+  creating the :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs and for sending
+  quantum tasks to the specified vQPUs, respectively.
 """
 
 import os
@@ -116,7 +33,15 @@ from typing import TypedDict
 
 class Backend(TypedDict):
     """
-        Class to gather the characteristics of a :py:class:`~cunqa.backend.Backend` object.
+    .. autoattribute:: basis_gates
+    .. autoattribute:: coupling_map
+    .. autoattribute:: custom_instructions
+    .. autoattribute:: description
+    .. autoattribute:: gates
+    .. autoattribute:: n_qubits
+    .. autoattribute:: name
+    .. autoattribute:: simulator
+    .. autoattribute:: version
     """
     basis_gates: list[str] #: Native gates that the Backend accepts. If other are used, they must be translated into the native gates.
     coupling_map: list[list[int]] #: Defines the physical connectivity of the qubits, in which pairs two-qubit gates can be performed.
@@ -125,45 +50,34 @@ class Backend(TypedDict):
     gates: list[str] #: Specific gates supported.
     n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
     name: str #: Name assigned to the Backend.
-    simulator: str #: Name of the simulatior that simulates the circuits accordingly to the Backend.
+    simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
     version: str #: Version of the Backend.
-
 
 class QPU:
     """
-    Class to represent a virtual QPU deployed for user interaction.
+    Class that serves as representation of a vQPU for user interaction. This class contains the 
+    necessary data for connecting to the vQPU in order to send quantum tasks and obtain the results. 
+    This communication is performed through the :py:attr:`QPU._qclient` attribute, which represents 
+    the connection between the Python and the C++ parts of CUNQA.
 
-    This class contains the neccesary data for connecting to the virtual QPU's server in order to 
-    communicate circuits and results in both ways. This communication is stablished trough 
-    the :py:attr:`QPU.qclient`.
+    The initialization of the class is normally done by the :py:func:`~cunqa.qpu.get_QPUs` 
+    function, which loads the `id`, `family` and `endpoint`, and instanciates the `backend` 
+    objects. It could also be manually initialized by the user, but this is not recommended.
+
+    .. autoattribute:: id
+        :annotation: : int
+    .. autoattribute:: backend
+        :annotation: : Backend
+    .. autoattribute:: family
+        :annotation: : str
 
     """
     _id: int 
-    _qclient: QClient 
     _backend: Backend
-    _name: str 
     _family: str
-    _endpoint: str 
-    
+    _qclient: QClient
+
     def __init__(self, id: int, backend: Backend, family: str, endpoint: str):
-        """
-        Initializes the :py:class:`QPU` class.
-
-        This initialization of the class is normally done by the :py:func:`~cunqa.qpu.get_QPUs` 
-        function, which loads the `id`, `family` and `endpoint`, and instanciates the `backend` 
-        objects. It could also be manually initialized by the user, but this is not recommended.
-
-        Args:
-            id (str): id string assigned to the object.
-                
-            backend (~cunqa.backend.Backend): object that provides the characteristics that the 
-            simulator at the virtual QPU uses to emulate a real device.
-
-            family (str):  name of the family to which the corresponding virtual QPU belongs.
-            
-            endpoint (str): string refering to the endpoint of the corresponding virtual QPU.
-        """
-        
         self._id = id
         self._backend = backend
         self._family = family
@@ -175,28 +89,31 @@ class QPU:
 
     @property
     def id(self) -> int:
-        """Id string assigned to the QPU."""
+        """ID string assigned to the object."""
         return self._id
     
     @property
     def backend(self) -> Backend:
-        """Object that provides the characteristics that the simulator at the virtual QPU uses to 
-        emulate a real device."""
+        """
+        Object that provides the characteristics that the simulator at the vQPU uses to emulate a 
+        real device.
+        """
         return self._backend
+
+    @property
+    def family(self) -> str:
+        """Name of the family to which the corresponding vQPU belongs."""
+        return self._family
 
     def execute(self, circuit_ir: dict, **run_parameters: Any) -> QJob:
         """
-        Class method to execute a circuit into the corresponding virtual QPU that this class 
+        Class method responsible of executing a circuit into the corresponding vQPU that this class 
         connects to. Possible instructions to add as `**run_parameters` are simulator dependant, 
-        but mainly `shots` and `method` are used.
+        with `shots` and `method` being the most common ones.
 
         Args:
-            circuit_ir (dict): circuit IR to be simulated at the virtual QPU.
-
+            circuit_ir (dict): circuit IR to be simulated at the vQPU.
             **run_parameters: any other simulation instructions.
-
-        Return:
-            A :py:class:`~cunqa.qjob.QJob` object related to the job sent.
         """
         qjob = QJob(self._qclient, circuit_ir, **run_parameters)
         qjob.submit()
@@ -211,21 +128,22 @@ def run(
         **run_args: Any
     ) -> Union[list[QJob], QJob]:
     """
-    Function to send circuits to several virtual QPUs. Each circuit will be sent to each QPU in 
-    order, therefore, both lists should be the same size. If they are not, but the number of circuits
-    is less than the numbers of QPUs, the circuit will get executed. In case the number of QPUs is 
-    less than the number of circuits is an error will be raised. 
+    Function responsible of sending circuits to several vQPUs. Each circuit will be sent to each 
+    QPU in order, therefore, both lists should be the same size. If they are not, but the number of 
+    circuits is less than the numbers of QPUs, the circuit will get executed. In case the number of 
+    QPUs is less than the number of circuits an error will be raised. 
+
+    .. note::
+        This method will check if two circuits are related, i.e., if one of them was part of a 
+        transformation and the other is the result of a transformation. If this is true and a third
+        circuit tries to communicate with them, an error will be raised. A detailed example can be 
+        seen in #TODO.
 
     Args:
-        
         circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
-
-        qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the virtual QPUs in which the circuits want to be run.
-    
+        qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the vQPUs in which 
+                                                      the circuits want to be run.
         run_args: any other run arguments and parameters.
-
-    Return:
-        List of :py:class:`~cunqa.qjob.QJob` objects.
     """
 
     if isinstance(circuits, list):
@@ -286,7 +204,62 @@ def run(
     if len(circuits_ir) == 1:
         return qjobs[0]
     return qjobs
-            
+
+def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
+    """
+    Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs raised by the user. It 
+    will use the two args `co_located` and `family` to filter from all the QPUs available.
+
+    Args:
+        co_located (bool): if ``False``, filters by the vQPUs available at the local node.
+        family (str): filters vQPUs by their family name.    
+    """
+    # access raised QPUs information on qpu.json file
+    with open(QPUS_FILEPATH, "r") as f:
+        qpus_json = json.load(f)
+        if len(qpus_json) == 0:
+            logger.warning(f"No QPUs were found.")
+            return None
+
+    # extract selected QPUs from qpu.json information 
+    local_node = os.getenv("SLURMD_NODENAME")
+    if co_located:
+        targets = {
+            qpu_id: info
+            for qpu_id, info in qpus_json.items()
+            if ((info["net"].get("nodename") == local_node or info["net"].get("mode") == "co_located") and 
+                (family is None or info.get("family") == family))
+        }
+    else:
+        if local_node is None:
+            logger.warning("You are searching for QPUs in a login node, none are found.")
+            return None
+        else:
+            targets = {
+                qpu_id: info
+                for qpu_id, info in qpus_json.items()
+                if ((info["net"].get("nodename") == local_node) and 
+                    (family is None or info.get("family") == family))
+            }
+    
+    qpus = [
+        QPU(
+            id = id,
+            backend = info['backend'],
+            family = info["family"],
+            endpoint = info["net"]["endpoint"]
+        ) for id, info in targets.items()
+    ]
+        
+    if len(qpus) != 0:
+        logger.debug(f"{len(qpus)} QPU objects were created.")
+        return qpus
+    else:
+        logger.warning(f"No QPUs where found with the characteristics provided: "
+                       f"co_located={co_located}, family_name={family}.")
+        return None
+
+
 def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
@@ -303,48 +276,32 @@ def qraise(n, t, *,
            partition=None
         ) -> str:
     """
-    Raises virtual QPUs and returns the family name associated them. This function allows to raise 
+    Raises vQPUs and returns the family name associated them. This function allows to raise 
     QPUs from the python API, what can also be done at terminal by ``qraise`` command.
 
     Args:
-        n (int): number of virtual QPUs to be raised in the job.
-
+        n (int): number of vQPUs to be raised.
         t (str): maximun time that the classical resources will be reserved for the job. Format: 
                  'D-HH:MM:SS'.
-
-        classical_comm (bool): if ``True``, virtual QPUs will allow classical communications.
-
-        quantum_comm (bool): if ``True``, virtual QPUs will allow quantum communications.
-
+        classical_comm (bool): if ``True``, vQPUs will allow classical communications.
+        quantum_comm (bool): if ``True``, vQPUs will allow quantum communications.
         simulator (str): name of the desired simulator to use. Default is `Aer 
                          <https://github.com/Qiskit/qiskit-aer>`_.
-
         backend (str): path to a file containing the backend information.
-
-        fakeqmio (bool): ``True`` for raising `n` virtual QPUs with FakeQmio backend. Only available 
+        fakeqmio (bool): ``True`` for raising `n` vQPUs with FakeQmio backend. Only available 
                          at CESGA.
-
-        family (str): name to identify the group of virtual QPUs raised.
-
+        family (str): name to identify the group of vQPUs raised.
         co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In 
-                           `hpc` mode, virtual QPUs can only be accessed from the node in which they 
-                           are deployed. In `co-located` mode, they can be accessed from other nodes.
-
-        cores (str): number of cores per virtual QPU, the total for the SLURM job will be 
+                           `hpc` mode, vQPUs can only be accessed from the node in which they 
+                           are deployed. In `co-located` mode, they can be accessed from other 
+                           nodes.
+        cores (str): number of cores per vQPU, the total for the SLURM job will be 
                      `n*cores`.
-
-        mem_per_qpu (str): memory to allocate for each virtual QPU in GB, format to use is "XXG".
-
+        mem_per_qpu (str): memory to allocate for each vQPU in GB, format to use is "XXG".
         n_nodes (str): number of nodes for the SLURM job.
-
-        node_list (str): list of nodes in which the virtual QPUs will be deployed.
-
-        qpus_per_node (str): sets the number of virtual QPUs deployed on each node.
-
+        node_list (str): list of nodes in which the vQPUs will be deployed.
+        qpus_per_node (str): sets the number of vQPUs deployed on each node.
         partition (str): partition of the nodes in which the QPUs are going to be executed.
-    
-    Returns:
-        The family name of the job deployed.
     """
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
@@ -424,11 +381,14 @@ def qraise(n, t, *,
 
 def qdrop(*families: str):
     """
-    Drops the virtual QPU families corresponding to the the input family names.
-    If no families are provided, all virtual QPUs deployed by the user will be dropped.
+    Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as 
+    argument the vQPU family names (and it does not accept the job ID as the bash command). This is 
+    done because the Python version of the `qraise` bash command returns only the family name. 
+
+    If no families are provided, all vQPUs deployed by the user will be dropped.
 
     Args:
-        families (str): family names of the groups of virtual QPUs to be dropped.
+        families (str): family names of the groups of vQPUs to be dropped.
     """
     
     # Building the terminal command to drop the specified families
@@ -443,63 +403,3 @@ def qdrop(*families: str):
             cmd.append(family)
  
     subprocess.run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
-
-def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
-    """
-    Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the virtual QPUs raised by the user.
-
-    Args:
-        co_located (bool): if ``False``, filters by the virtual QPUs available at the local node.
-        family (str): filters virtual QPUs by their family name.
-
-    Return:
-        List of :py:class:`~cunqa.qpu.QPU` objects.
-    
-    """
-    # access raised QPUs information on qpu.json file
-    with open(QPUS_FILEPATH, "r") as f:
-        qpus_json = json.load(f)
-        if len(qpus_json) == 0:
-            logger.warning(f"No QPUs were found.")
-            return None
-
-    # extract selected QPUs from qpu.json information 
-    local_node = os.getenv("SLURMD_NODENAME")
-    if co_located:
-        targets = {
-            qpu_id: info
-            for qpu_id, info in qpus_json.items()
-            if ((info["net"].get("nodename") == local_node or info["net"].get("mode") == "co_located") and 
-                (family is None or info.get("family") == family))
-        }
-    else:
-        if local_node is None:
-            logger.warning("You are searching for QPUs in a login node, none are found.")
-            return None
-        else:
-            targets = {
-                qpu_id: info
-                for qpu_id, info in qpus_json.items()
-                if ((info["net"].get("nodename") == local_node) and 
-                    (family is None or info.get("family") == family))
-            }
-    
-    qpus = [
-        QPU(
-            id = id,
-            backend = info['backend'],
-            family = info["family"],
-            endpoint = info["net"]["endpoint"]
-        ) for id, info in targets.items()
-    ]
-        
-    if len(qpus) != 0:
-        logger.debug(f"{len(qpus)} QPU objects were created.")
-        return qpus
-    else:
-        logger.warning(f"No QPUs where found with the characteristics provided: "
-                       f"co_located={co_located}, family_name={family}.")
-        return None
-
-
-

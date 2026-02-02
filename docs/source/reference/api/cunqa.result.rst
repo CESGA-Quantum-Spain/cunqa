@@ -2,4 +2,7 @@
 ============
 
 .. automodule:: cunqa.result
-   :members:
+   :no-members:
+
+.. autoclass:: cunqa.result.Result
+   :no-members:

@@ -15,6 +15,7 @@ author = 'Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    "sphinx_design",
     'sphinx_copybutton',
     'nbsphinx',
     "sphinx.ext.napoleon",
@@ -56,7 +57,10 @@ nbsphinx_execute = "never" # Never execute the Jupyter notebooks
 
 templates_path = ['_templates']
 
-autodoc_typehints = "none"
+autodoc_member_order = 'bysource'
+autodoc_typehints = "description"
+add_function_parentheses = False
+
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 add_module_names = False
@@ -67,7 +71,9 @@ html_static_path = ['_static']
 html_css_files = [
     'css/nbgallery.css',
     'css/table.css',
-    'css/sidebar.css'
+    'css/sidebar.css', 
+    'css/python_domain.css',
+    'css/general.css'
 ]
 
 html_logo = "_static/logo_cesga_blanco.png"

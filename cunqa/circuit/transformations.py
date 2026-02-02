@@ -8,11 +8,29 @@ from cunqa.circuit.core import CunqaCircuit
 from cunqa.constants import REMOTE_GATES
 
 def vsplit():
+    """TODO: Vertical split of a quantum circuit."""
     pass # TODO
 
-def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[CunqaCircuit]:
+def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> list[CunqaCircuit]:
     """
-    DOCUMENTADO
+    Horizontal split of a quantum circuit. 
+    
+    This function splits a circuit into a given number of subcircuits. This number is determined by 
+    the `qubits_or_sections` argument. If it is a list, then it specifies the cut qubits; however, 
+    if it is an int, it specifies the number of subcircuits to be created (each having the same 
+    number of qubits, except for one in case the split is not exact, which will take the remainder 
+    as its number of qubits).
+
+    If a controlled gate is divided an expose quantum directive will be used in order to maintain 
+    the global state intact.
+
+    This operation is the inverse of the :py:func:`union`.
+
+    Args:
+        circuit (~cunqa.circuit.core.CunqaCircuit): circuit to be splited.
+        qubits_or_sections(list[int], int): if is a list, qubits in which to split, if an int, 
+                                            number of subcircuits that result of the split.
+
     """
     num_qubits = circuit.num_qubits
 
@@ -80,7 +98,25 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list, int]) -> list[
 
 def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
-    DOCUMENTADO
+    Union of circuits (addition of qubits).
+
+    This function joins the qubits of several ~cunqa.circuit.core.CunqaCircuit. These circuits may 
+    be connected via communication directives and, depending on their nature, they are replaced.
+
+    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.expose`. The gates applied remotely simply switch 
+      to local operations.
+    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.qrecv` and 
+      :py:meth:`~cunqa.circuit.core.CunqaCircuit.qsend`. Switch to be a
+      :py:meth:`~cunqa.circuit.core.CunqaCircuit.swap` operation between local qubits.
+    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.send` and 
+      :py:meth:`~cunqa.circuit.core.CunqaCircuit.recv`. They provoke a special copy operation 
+      among classical registers called `copy`. For now, this operation is not available in the 
+      public API of ~cunqa.circuit.core.CunqaCircuit.
+
+    This operation is the inverse of the :py:func:`hsplit`.
+
+    Args:
+        circuits (list[~cunqa.circuit.core.CunqaCircuit]): circuits to join.
     """
     if not circuits:
         raise ValueError("Empty list passed to perform union.")
@@ -216,7 +252,17 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
 
 def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
-    DOCUMENTADO
+    This function concatenates the instructions of two circuits.
+
+    This function appends the gates from a list of circuits into a final resulting circuit. The 
+    order of the list passed as an argument is important, since the instructions will be appended 
+    in that same order.
+
+    In this operation, if two circuits in the list contain communication directives between them, 
+    an exception will be raised to prevent potential deadlocks and undefined or incorrectly 
+    specified behavior.
+
+    This operation is the inverse of the :py:func:`vsplit`.
     """
     if not circuits:
         raise ValueError("Empty list passed to perform union.")

@@ -7,28 +7,17 @@
         <cunqa.qjob.QJob object at XXXXXXXX>
         
     In this method, after the :py:class:`~cunqa.qjob.QJob` instance is created, the circuit is 
-    submitted for simulation at the virtual QPU. :py:class:`QJob` is the bridge between sending a 
-    circuit with instructions and receiving the results. For the latter, usually is done in the 
-    following way: 
-
-        >>> qjob = run(circuit, qpu)
-        >>> qjob.result
-        <cunqa.result.Result object at XXXXXXXX>
-
-    This :py:class:`~cunqa.result.Result` class contains all the data available from the execution 
-    and we refer the reader to its documentation for further information.
+    submitted for simulation at the vQPU. :py:class:`QJob` is the bridge between sending a 
+    circuit with instructions and receiving the results.
 
     Another functionality described in the submodule is the function :py:func:`~gather`, 
-    which recieves a list of :py:class:`~QJob` objects and returns their results as 
+    which receives a list of :py:class:`~QJob` objects and returns their results as 
     :py:class:`~cunqa.result.Result` objects.
 
         >>> qjob_1 = run(circuit_1, qpu_1)
         >>> qjob_2 = run(circuit_2, qpu_2)
         >>> gather([qjob_1, qjob_2])
         [<cunqa.result.Result object at XXXXXXXX>, <cunqa.result.Result object at XXXXXXXX>]
-
-    For further information on sending and gathering quantum jobs, chekout the 
-    `Examples Galery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
     """
 
 import json
@@ -40,129 +29,34 @@ from cunqa.qclient import QClient, FutureWrapper
 
 class QJob:
     """
-    Class to handle jobs sent to virtual QPUs. A :py:class:`QJob` object is created as the output 
-    of the :py:meth:`~cunqa.qpu.QPU.run` method. The quantum job not only contains the circuit to be 
-    simulated, but also simulation instructions and information of the virtual QPU to which the job 
-    is sent.
+    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output 
+    of the :py:meth:`~cunqa.qpu.QPU.run` method. The quantum job not only contains the circuit to 
+    be simulated, but also simulation instructions and information of the vQPU to which the job 
+    is sent. This class has a main attribute: :py:attr:`QJob.result` which stores the information 
+    about the execution. 
 
-    One would want to save the :py:class:`QJob` resulting from sending a circuit in a variable.
-    Let's say we want to send a circuit to a QPU and get the result and the time taken for the 
-    simulation:
+    .. autoattribute:: result
 
-        >>> qjob = qpu.run(circuit)
-        >>> result = qjob.result
-        >>> print(result)
-        <cunqa.result.Result object at XXXXXXXX>
-        >>> time_taken = qjob.time_taken
-        >>> print(time_taken)
-        0.876
+    But first, in order to be able to call the attribute :py:attr:`QJob.result`, it is necessary to 
+    submit the job for execution. To do so, we will use the method :py:meth:`QJob.submit`.
 
-    Note that the `time_taken` is expressed in seconds. More instructions on obtaining data from 
-    :py:class:`~cunqa.result.Result` objects can be found on its documentation.
+    .. automethod:: submit
 
-    Handling QJobs sent to the same QPU
-    ====================================
-    Let's say we are sending two different jobs to the same QPU.
-    This would not result on a parallelization, each QPU can only execute one simulation at the 
-    time. When a virtual QPU recieves a job while simulating one, it would wait in line untill the 
-    earlier finishes. Because of how the client-server comunication is built, we must be careful and 
-    call for the results in the same order in which the jobs where submited. The correct workflow 
-    would be:
+    But the objective of this :py:class:`QJob` class is not only to retrieve the result. It also 
+    allows to easily update the quantum task sent without the need of resending the whole circuit. 
+    This is really useful, especially working with variational quantum algorithms (VQAs) [#]_, which 
+    need to change the parameters of the gates in a circuit as they are optimized in each iteration. 
+    This parameter update is done using the :py:meth:`~QJob.upgrade_parameters` method.
 
-        >>> qjob_1 = qpu.run(circuit_1)
-        >>> qjob_2 = qpu.run(circuit_2)
-        >>> result_1 = qjob_1.result
-        >>> result_2 = qjob_2.result
+    .. automethod:: upgrade_parameters
 
-    This is because the server follows the rule FIFO (*First in first out*), if we want to recieve 
-    the second result, the first one has to be out.
-
-    .. warning::
-        In the case in which the order is not respected, everything would work, but results will not 
-        correspond to the job. A mix up would happen.
-
-    Handling QJobs sent to different QPUs
-    =====================================
-    Here we can have parallelization since we are working with more than one virtual QPU.
-    Let's send two circuits to two different QPUs:
-
-        >>> qjob_1 = qpu_1.run(circuit_1)
-        >>> qjob_2 = qpu_2.run(circuit_2)
-        >>> result_1 = qjob_1.result
-        >>> result_2 = qjob_2.result
-
-    This way, when we send the first job, then inmediatly the sencond one is sent, because 
-    :py:meth:`~cunqa.qpu.QPU.run` does not wait for the simulation to finish. In this manner, both 
-    jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order, since 
-    jobs are managed by different :py:class:`QClient` objects, there can be no mix up.
-
-    In fact, the function :py:func:`~cunqa.qjob.gather` is designed for recieving a list of qjobs 
-    and return the results; therefore, let's say we have a list of circuits that we want to submit 
-    to a group of QPUs:
-
-        >>> qjobs = []
-        >>> for circuit, qpu in zip(circuits, qpus):
-        >>> ... qjob = qpu.run(circuit)
-        >>> ... qjobs.append(qjob)
-        >>> results = gather(qjobs)
-
-    In this workflow, all circuits are sent to each QPU an simulated at the same time. Then, when 
-    calling for the results, the program is blocked waiting for all of them to finish. Other 
-    examples of classical parallelization of quantum simulation taks can be found at the
-    `Examples Gellery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-
-    .. note::
-        The function :py:func:`~cunqa.qjob.gather` can also handle :py:class:`~QJob` objects sent to 
-        the same virtual QPU, but the order must be perserved in the list provided.
-
-
-    Upgrading parameters from QJobs
-    ===============================
-
-    In some ocassion, especially working with variational quantum algorithms (VQAs) [#]_, they need 
-    of changing the parameters of the gates in a circuit arises. These parameters are optimzied in 
-    order to get the circuit to output a result that minimizes a problem. In this minimization 
-    process, parameters are updated on each iteration (in general).
-    
-    Our first thought can be to update the parameters, build a new circuit with them and send it to 
-    the QPU. Nevertheless, since the next circuit will have the same data but for the value of the 
-    parameters in the gates, a lot of information is repeated, so :py:mod:`~cunqa` has a more 
-    efficient and simple way to handle this cases: a method to send to the QPU a list with the new 
-    parameters to be assigned to the circuit, :py:meth:`~QJob.upgrade_parameters`.
-
-    Let's see a simple example: creating a parametric circuit and uptading its parameters:
-
-        >>> # building the parametric circuit
-        >>> circuit = CunqaCircuit(3)
-        >>> circuit.ry(0.25, 0)
-        >>> circuit.rx(0.5, 1)
-        >>> circuit.p(0.98, 2)
-        >>> circuit.measure_all()
-        >>> # sending the circuit to a virtual QPU
-        >>> qjob = qpu.run(circuit)
-        >>> # defining the new set of parameters
-        >>> new_parameters = [1,1,0]
-        >>> # upgrading the parameters of the job
-        >>> qjob.upgrade_parameters(new_parameters)
-        >>> result = qjob.result
-
-    From this simple workflow, we can build loops that update parameters according to some rules, or 
-    by a optimizator, and upgrade the circuit until some stoping criteria is fulfilled.
-
-    .. warning::
-        Before sending the circuit or upgrading its parameters, the result of the prior job must be 
-        called. It can be done manually, so that we can save it and obtain its information, or it 
-        can be done automatically as in the example above, but be aware that once the 
-        :py:meth:`upgrade_parameters` method is called, this result is discarded.
-
-    References:
-    ~~~~~~~~~~~
+    *References*:
 
     .. [#] `Variational Quantum Algorithms arXiv <https://arxiv.org/abs/2012.09265>`_ .
 
 
     """
-    qclient: QClient #: Client linked to the server that listens at the virtual QPU.
+    qclient: QClient
     _circuit_id: str
     _updated: bool
     _future: FutureWrapper 
@@ -170,27 +64,6 @@ class QJob:
     _quantum_task: str
 
     def __init__(self, qclient: QClient, circuit_ir: dict, **run_parameters: Any):
-        """
-        Initializes the :py:class:`QJob` class.
-
-        Possible instructions to add as `**run_parameters` can be: *shots*, *method*, 
-        *parameter_binds*, *meas_level*, ... For further information, check 
-        :py:meth:`~cunqa.qpu.QPU.run` method.
-
-        .. warning::
-
-            At this point, *circuit* is asumed to be translated into the native gates of the 
-            *backend*. Otherwise, simulation will fail and an error will be returned as the result.
-            For further details, checkout :py:mod:`~cunqa.transpile`.
-
-        Args:
-            qclient (QClient): client linked to the server that listens at the virtual QPU.
-
-            circuit_ir (dict): circuit to be run.
-
-            **run_parameters : any other simulation instructions.
-
-        """
         self._qclient = qclient
         self._circuit_id = circuit_ir["id"]
         self._cregisters = circuit_ir["classical_registers"]
@@ -231,11 +104,23 @@ class QJob:
         Result of the job. If no error occured during simulation, a :py:class:`~cunqa.result.Result` 
         object is retured.
 
+            >>> qjob = qpu.run(circuit)
+            >>> result = qjob.result
+            >>> print(result.counts)
+            {'00': 524, '11': 500}
+
         .. note::
             Since to obtain the result the simulation has to be finished, this method is a blocking 
             call, which means that the program will be blocked until the :py:class:`QClient` has 
             recieved from the corresponding server the outcome of the job. The result is not sent 
             from the server to the :py:class:`QClient` until this method is called.
+        
+        .. warning::
+            Because of how the client-server comunication is built, the user must be careful and call 
+            for the results in the same order in which the jobs where submited. In the case in which 
+            the order is not respected, everything would work, but results will not correspond to the 
+            job. A mix up would happen. This is because the server follows the rule FIFO (*First in 
+            first out*), if we want to recieve the second result, the first one has to be out.
 
         """
         if self._future is not None:
@@ -252,28 +137,12 @@ class QJob:
                                "been submitted.")
         return self._result
 
-    @property
-    def time_taken(self) -> str:
-        """
-        Time that the job took.
-        """
-
-        if self._future is not None:
-            if self._result is not None:
-                try:
-                    return self._result.time_taken
-                except AttributeError:
-                    logger.error("Time taken not available.")
-                    return ""
-            else:
-                raise RuntimeError("The QJob has been submitted, but the result has not "
-                                   "been retrieved.")
-        else:
-            raise RuntimeError("The QJob has not been submitted.")
-
     def submit(self) -> None:
         """
         Asynchronous method to submit a job to the corresponding :py:class:`QClient`.
+
+            >>> qjob = QJob(qclient, circuit_ir, **run_parameters)
+            >>> qjob.submit() # Already has all the info of where and what to send
 
         .. note::
             Differently from :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
@@ -295,22 +164,23 @@ class QJob:
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
         By this call, first it is checked weather if the prior simulation's result was called. If 
         not, it calls it but does not store it, then sends the new set of parameters to the server 
-        to be reasigned to the circuit and to simulate it.
+        to be reasigned to the circuit and to simulate it. This method can be used on a loop, 
+        always being careful if we want to save the intermediate results. Also, this method is used 
+        by the class :py:class:`~cunqa.mappers.QJobMapper`, checkout its documentation for a 
+        extensive description.
 
-        This method can be used on a loop, always being careful if we want to save the intermediate 
-        results.
-
-        Examples of usage are shown above and on the 
-        `Examples Gallery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, checkout its 
-        documentation for a extensive description.
+        .. warning::
+            Before sending the circuit or upgrading its parameters, the result of the prior job must be 
+            called. It can be done manually, so that we can save it and obtain its information, or it 
+            can be done automatically as in the example above, but be aware that once the 
+            :py:meth:`upgrade_parameters` method is called, this result is discarded.
 
         .. warning::
             In the current version, parameters will be assigned to **ALL** parametric gates in the 
             circuit. This means that if we want to make some parameters fixed, it is on our 
             responsibility to pass them correctly and in the correct order in the list. If the 
             number of parameters is less than the number of parametric gates in the circuit, an 
-            error will occur at the virtual QPU, on the other hand, if more parameters are provided, 
+            error will occur at the vQPU, on the other hand, if more parameters are provided, 
             there will only be used up to the number of parametric gates.
             
             Also, only *rx*, *ry* and *rz* gates are supported for this functionality, that is, they 
@@ -355,7 +225,7 @@ def gather(qjobs: list[QJob]) -> list[Result]:
 
         .. warning::
             Since this is mainly a for loop, the order must be respected when submiting jobs to the 
-            same virtual QPU.
+            same vQPU.
 
         Args:
             qjobs (list[QJob]): list of objects to get the result from.

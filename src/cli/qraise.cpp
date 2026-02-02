@@ -12,7 +12,6 @@
 #include "utils/constants.hpp"
 #include "qraise/utils_qraise.hpp"
 #include "qraise/args_qraise.hpp"
-#include "qraise/noise_model_conf_qraise.hpp"
 #include "qraise/simple_conf_qraise.hpp"
 #include "qraise/cc_conf_qraise.hpp"
 #include "qraise/qc_conf_qraise.hpp"
@@ -106,35 +105,15 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
 void write_run_command(std::ofstream& sbatchFile, const CunqaArgs& args, const std::string& mode)
 {
     std::string run_command;
-    if (args.noise_properties.has_value() || args.fakeqmio.has_value()){
-        LOGGER_DEBUG("noise_properties json path provided");
-        if (args.simulator == "Munich" or args.simulator == "Cunqa"){
-            LOGGER_WARN("Personalized noise models only supported for AerSimulator, switching simulator setting from {} to Aer.", args.simulator.c_str());
-        }
-        if (args.cc || args.qc){
-            throw std::runtime_error("Personalized noise models not supported for classical/quantum communications schemes.");
-        }
-
-        if (args.backend.has_value()){
-            LOGGER_WARN("Because noise properties were provided backend will be redefined according to them.");
-        }
-
-        run_command = get_noise_model_run_command(args, mode);
-
-
-    } else if ((!args.noise_properties.has_value() || !args.fakeqmio.has_value()) && (args.no_thermal_relaxation || args.no_gate_error || args.no_readout_error)){
-        throw std::runtime_error("noise_properties flags where provided but --noise_properties nor --fakeqmio args were not included.");
+    if (args.cc) {
+        LOGGER_DEBUG("Classical communications");
+        run_command = get_cc_run_command(args, mode);
+    } else if (args.qc) {
+        LOGGER_DEBUG("Quantum communications");
+        run_command = get_qc_run_command(args, mode);
     } else {
-        if (args.cc) {
-            LOGGER_DEBUG("Classical communications");
-            run_command = get_cc_run_command(args, mode);
-        } else if (args.qc) {
-            LOGGER_DEBUG("Quantum communications");
-            run_command = get_qc_run_command(args, mode);
-        } else {
-            LOGGER_DEBUG("No communications");
-            run_command = get_simple_run_command(args, mode);
-        }
+        LOGGER_DEBUG("No communications");
+        run_command = get_simple_run_command(args, mode);
     }
 
     if (run_command == "0") { 

@@ -1,0 +1,22 @@
+/* Fondo suave para los bloques de clases (Sphinx HTML) */
+dl.py.class {
+  padding: 0.75rem 1rem;
+  border-left: 2px solid #343131;
+}
+
+dl.py.attribute {
+  background: rgba(0, 0, 0, 0.035);  /* gris muy suave */
+  padding: 0.75rem 1rem;
+}
+
+dl.py.attribute dt.sig.sig-object.py {
+  border-left: none !important;
+  border-top: 3px solid #ccc !important;
+  background-color: #ffffff !important;
+}
+
+dl.py.method{
+  border-left: 2px solid #ccc;
+  padding: 6px 24px 6px 12px !important;
+}
+

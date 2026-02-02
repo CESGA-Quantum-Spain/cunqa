@@ -1,60 +1,4 @@
-"""
-Core implementation of CUNQA's custom quantum circuit abstraction.
-
-This module defines :class:`~cunqa.circuit.core.CunqaCircuit`, a custom circuit class designed to
-extend the functionality of :class:`qiskit.circuit.QuantumCircuit` by incorporating explicit
-classical and quantum communication directives. While the interface intentionally resembles
-Qiskit's circuit API in order to reduce the learning curve for users, the underlying motivation
-is fundamentally different.
-
-The use of a custom circuit class is required because
-:class:`qiskit.circuit.QuantumCircuit` does not natively support communication primitives between
-distributed circuits, which constitute the core functionality of the CUNQA project.
-
-The main conceptual differences with respect to Qiskit are highlighted below.
-
-Classically controlled operations
----------------------------------
-Although Qiskit provides mechanisms such as ``c_if`` and ``if_else`` for classical control, their
-usage can become verbose and unintuitive in practice:
-
-    >>> qc.x(q[1]).c_if(c, 1)
-    >>> qc.if_else((c, 1), true_body, false_body)
-
-To address this, :class:`~cunqa.circuit.core.CunqaCircuit` introduces the ``cif`` context manager,
-which enables a more expressive and readable way to define classically controlled blocks:
-
-.. code-block:: python
-
-    c = CunqaCircuit(2, 2)
-    c.h(0)
-    c.measure(0, 0)
-
-    with c.cif(0) as cgates:
-        cgates.x(1)
-
-In this example, the operations defined inside the ``cif`` block are executed only if the value of
-classical bit 0 is equal to 1. Currently, this construct does not support an explicit *else* branch.
-This design decision is based on the observation that none of the reviewed algorithms or protocols
-require such functionality. Support for an *else* branch may be added in future versions if needed.
-
-Classical communications
-------------------------
-CUNQA provides explicit directives to model classical communication between distributed circuits.
-Measurement outcomes produced in one circuit can be transmitted and used to condition operations
-in another circuit executed on a different virtual QPU.
-
-Quantum communications
-----------------------
-Beyond classical communication, CUNQA also supports quantum communication primitives, enabling the
-transfer of qubits and the implementation of protocols such as teledata and telegate at an
-abstract level, without requiring the user to explicitly implement the underlying mechanisms.
-
-References:
-~~~~~~~~~~~
-.. [#] `Qiskit QuantumCircuit documentation
-   <https://quantum.cloud.ibm.com/docs/api/qiskit/qiskit.circuit.QuantumCircuit>`_
-"""
+"""Core implementation of CUNQA's custom quantum circuit abstraction."""
 
 from __future__ import annotations
 import numpy as np
@@ -65,78 +9,153 @@ from cunqa.logger import logger
 
 class CunqaCircuit:
     """
-    Quantum circuit abstraction for the :py:mod:`cunqa` API.
-
-    This class allows users to describe quantum circuits that include not only local quantum
-    operations, but also classical and quantum communication directives between distributed
-    circuits. A ``CunqaCircuit`` can therefore represent both computation and communication in
-    distributed quantum computing scenarios.
-
-    Upon initialization, the circuit is defined by its number of qubits and, optionally, its
-    number of classical bits and a user-defined identifier. If no identifier is provided, a
-    unique one is generated automatically. The circuit identifier is later used to reference
-    the circuit in communication-related instructions.
+    Quantum circuit abstraction for the CUNQA API. This class allows the design of quantum 
+    circuits to be executed in the vQPUs. Upon initialization, the circuit is defined by its number 
+    of qubits and, optionally, its number of classical bits and a user-defined identifier. If no 
+    identifier is provided, a unique one is generated automatically. The circuit identifier is 
+    later used to reference the circuit in communication-related instructions.
 
     Once created, instructions can be appended to the circuit using the provided methods,
     including single- and multi-qubit gates, measurements, classically controlled operations,
     and remote communication primitives.
 
-    Supported operations
-    --------------------
-    The following categories of operations are supported:
+    .. list-table:: Supported operations
+        :header-rows: 1
+        :widths: 20 30 50
+        :class: wrap-table
 
-    **Single-qubit gates**
-        ``id``, ``x``, ``y``, ``z``, ``h``, ``s``, ``sdg``, ``sx``, ``sxdg``, ``t``, ``tdg``,
-        ``u1``, ``u2``, ``u3``, ``u``, ``p``, ``r``, ``rx``, ``ry``, ``rz``.
+        * - Group
+          - Category
+          - Operations
 
-    **Two-qubit gates**
-        ``swap``, ``cx``, ``cy``, ``cz``, ``csx``, ``cp``, ``cu``, ``cu1``, ``cu3``,
-        ``rxx``, ``ryy``, ``rzz``, ``rzx``, ``crx``, ``cry``, ``crz``, ``ecr``.
+        * - Unitary operations
+          - Single-qubit gates
+          - :py:meth:`id`, :py:meth:`x`, :py:meth:`y`, :py:meth:`z`, :py:meth:`h`, :py:meth:`s`, :py:meth:`sdg`,
+            :py:meth:`sx`, :py:meth:`sxdg`, :py:meth:`t`, :py:meth:`tdg`, :py:meth:`u1`, :py:meth:`u2`, :py:meth:`u3`,
+            :py:meth:`u`, :py:meth:`p`, :py:meth:`r`, :py:meth:`rx`, :py:meth:`ry`, :py:meth:`rz`
 
-    **Three-qubit gates**
-        ``ccx``, ``ccy``, ``ccz``, ``cswap``.
+        * - 
+          - Two-qubit gates
+          - :py:meth:`swap`, :py:meth:`cx`, :py:meth:`cy`, :py:meth:`cz`, :py:meth:`csx`, :py:meth:`cp`, :py:meth:`cu`,
+            :py:meth:`cu1`, :py:meth:`cu3`, :py:meth:`rxx`, :py:meth:`ryy`, :py:meth:`rzz`, :py:meth:`rzx`,
+            :py:meth:`crx`, :py:meth:`cry`, :py:meth:`crz`, :py:meth:`ecr`
 
-    **Multi-qubit gates**
-        ``unitary``.
+        * - 
+          - Three-qubit gates
+          - :py:meth:`ccx`, :py:meth:`ccy`, :py:meth:`ccz`, :py:meth:`cswap`
 
-    **Local non-unitary operations**
-        ``cif``, ``measure``, ``measure_all``, ``reset``.
+        * - 
+          - Multi-qubit gates
+          - :py:meth:`unitary`
 
-    **Remote operations (classical communication)**
-        ``send``, ``recv``.
+        * - Local non-unitary operations
+          - Local non-unitary operations
+          - :py:meth:`cif`, :py:meth:`measure`, :py:meth:`measure_all`, :py:meth:`reset`
 
-    **Remote operations (quantum communication)**
-        ``qsend``, ``qrecv``, ``expose``, ``rcontrol``.
+        * - Remote operations
+          - Classical communication
+          - :py:meth:`send`, :py:meth:`recv`
 
-    Creating a circuit
+        * - 
+          - Quantum communication
+          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`, :py:meth:`rcontrol`
+
+
+    .. autoattribute:: id
+        :annotation: : str
+    .. autoattribute:: info
+        :annotation: : dict
+    .. autoattribute:: num_qubits
+        :annotation: : int
+    .. autoattribute:: num_clbits
+        :annotation: : int
+    .. autoattribute:: instructions
+    .. autoattribute:: is_dynamic
+    .. autoattribute:: quantum_regs
+    .. autoattribute:: classical_regs
+    .. autoattribute:: sending_to
+
+    Operations
+    ==========
+
+    Classical communication directives
+    ----------------------------------
+    .. automethod:: send
+    .. automethod:: recv
+
+
+    Quantum communication directives
+    --------------------------------
+    .. automethod:: qsend
+    .. automethod:: qrecv
+    .. automethod:: expose
+
+
+    Non-unitary operations
+    ----------------------
+    .. automethod:: cif
+    .. dropdown:: All non-unitary operations
+        :animate: fade-in-slide-down
+
+        .. automethod:: measure_all
+        .. automethod:: measure
+        .. automethod:: reset
+
+    Unitary operations
     ------------------
-    A circuit is instantiated by specifying the number of qubits:
+    .. automethod:: unitary
 
-        >>> circuit = CunqaCircuit(2)
+    .. dropdown:: Single-qubit gates
+        :animate: fade-in-slide-down
 
-    Gates can then be appended using the corresponding methods. For example, a Bell state can
-    be prepared as follows:
+        .. automethod:: i
+        .. automethod:: x
+        .. automethod:: y
+        .. automethod:: z
+        .. automethod:: h
+        .. automethod:: s
+        .. automethod:: sdg
+        .. automethod:: sx
+        .. automethod:: sxdg
+        .. automethod:: t
+        .. automethod:: tdg
+        .. automethod:: u1
+        .. automethod:: u2
+        .. automethod:: u3
+        .. automethod:: u
+        .. automethod:: p
+        .. automethod:: r
+        .. automethod:: rx
+        .. automethod:: ry
+        .. automethod:: rz
 
-        >>> circuit.h(0)
-        >>> circuit.cx(0, 1)
+    .. dropdown:: Two-qubit gates
+        :animate: fade-in-slide-down
 
-    Finally, all qubits can be measured with:
+        .. automethod:: swap
+        .. automethod:: cx
+        .. automethod:: cy
+        .. automethod:: cz
+        .. automethod:: csx
+        .. automethod:: cp
+        .. automethod:: cu
+        .. automethod:: rxx
+        .. automethod:: ryy
+        .. automethod:: rzz
+        .. automethod:: rzx
+        .. automethod:: crx
+        .. automethod:: cry
+        .. automethod:: crz
+        .. automethod:: ecr
+    
+    .. dropdown:: Three-qubit gates
+        :animate: fade-in-slide-down
 
-        >>> circuit.measure_all()
-
-    The resulting circuit can then be executed on a suitable virtual QPU using
-    :py:meth:`cunqa.qpu.QPU.run`.
-
-    Distributed computation
-    -----------------------
-    The main strength of ``CunqaCircuit`` lies in its ability to explicitly model communication
-    between circuits. Classical measurement outcomes can be sent from one circuit to another and
-    used to condition operations remotely. When quantum communication is available, qubits can
-    also be transferred between circuits, enabling protocols such as teledata and telegate to be
-    expressed at a high level of abstraction.
-
-    These features make ``CunqaCircuit`` a central building block for describing distributed
-    quantum algorithms within the CUNQA framework.
+        .. automethod:: ccx
+        .. automethod:: ccy
+        .. automethod:: ccz
+        .. automethod:: cswap
+        
     """
 
     
@@ -157,22 +176,6 @@ class CunqaCircuit:
             num_clbits: Optional[int] = None, 
             id: Optional[str] = None
         ):
-
-        """
-        Class constructor to create a CunqaCirucit. Only the ``num_qubits`` argument is mandatory, 
-        also ``num_clbits`` can be provided if there is intention to incorporate intermediate 
-        measurements. If no ``id`` is provided, one is generated randomly, then it can be accessed 
-        through the class attribute :py:attr:`~CunqaCircuit.id`.
-
-        Args:
-            num_qubits (int): Number of qubits of the circuit.
-
-            num_clbits (int): Numeber of classical bits for the circuit. A classical register is 
-            initially added.
-
-            id (str): Label for identifying the circuit. This id is then used for refering to the 
-            circuit in classical and quantum communications methods.
-        """
         self.is_dynamic = False
         self.instructions = []
         self.quantum_regs = {}
@@ -230,10 +233,7 @@ class CunqaCircuit:
 
     def add_instructions(self, instructions: Union[dict, list[dict]]):
         """
-        Class method to add an instruction to the CunqaCircuit.
-
-        Each instruction must have as mandatory keys "name" and "qubits", while other keys are 
-        accepted: "clbits", "params" or "circuits".
+        Class method to add an instruction to the CunqaCircuit. 
 
         Args:
             instruction (dict | list[dist]): instruction to be added.
@@ -252,7 +252,6 @@ class CunqaCircuit:
 
         Args:
             name (str): label for the quantum register.
-
             num_qubits (int): number of qubits.
         """
 
@@ -277,7 +276,6 @@ class CunqaCircuit:
 
         Args:
             name (str): label for the quantum register.
-
             number_clbits (int): number of classical bits.
         """
         if num_clbits < 1:
@@ -1134,34 +1132,31 @@ class CunqaCircuit:
 
     def cif(
             self, 
-            clbits
+            clbits: Union[int, list[int]]
         ) -> ClassicalControlContext:
         """
         Method for implementing a gate conditioned to a classical measurement. The control qubit 
-        provided is measured, if it's 1 the gate provided is applied to the given qubits.
+        provided is measured, if it's 1 the gate provided is applied to the given qubits. In order
+        to do this,  ``cif`` context manager is introduced, which enables a more expressive and 
+        readable way to define classically controlled blocks:
 
-        For parametric gates, only one-parameter gates are supported, therefore only one parameter 
-        must be passed.
+        .. code-block:: python
 
-        The gates supported by the method are the following: h, x, y, z, rx, ry, rz, cx, cy, cz, 
-        unitary.
+            c = CunqaCircuit(2, 2)
+            c.h(0)
+            c.measure(0, 0)
 
-        To implement the conditioned uniraty gate, the corresponding matrix should be passed by the 
-        `matrix` argument.
+            with c.cif(0) as cgates:
+                cgates.x(1)
+
+        In this example, the operations defined inside the ``cif`` block are executed only if the 
+        value of classical bit 0 is equal to 1. Currently, this construct does not support an 
+        explicit *else* branch. This design decision is based on the observation that none of the 
+        reviewed algorithms or protocols require such functionality. Support for an *else* branch 
+        may be added in future versions if needed.
 
         Args:
-            gate (str): gate to be applied. Has to be supported by CunqaCircuit.
-
-            control_qubit (int): control qubit whose classical measurement will control the 
-            execution of the gate.
-
-            target_qubit (int | list[int]): list of qubits or qubit to which the gate is intended 
-            to be applied.
-
-            param (float | int): parameter for the case parametric gate is provided.
-
-            matrix (list | numpy.ndarray): unitary operator in matrix form to be applied to the 
-            given qubits.
+            clbits (int | list[int]): clbits employed as the condition.
         """
         self.is_dynamic = True
         return ClassicalControlContext(self, clbits)

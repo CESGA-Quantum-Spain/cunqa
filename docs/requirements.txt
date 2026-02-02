@@ -5,10 +5,11 @@ sphinx-rtd-theme
 sphinx-autobuild
 sphinx-multiversion
 sphinx-copybutton
+sphinx-design
 myst-nb
 nbsphinx
 pandoc
-lxml-html-clean #needed for nbsphinx functionalities, which I use to display jupyter notebooks
+lxml-html-clean #needed for nbsphinx functionalities
 sphinx-mdinclude
 autodocsumm
 sphinx-toolbox

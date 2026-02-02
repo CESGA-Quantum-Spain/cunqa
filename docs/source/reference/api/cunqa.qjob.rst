@@ -2,4 +2,7 @@
 ==========
 
 .. automodule:: cunqa.qjob
-   :members:
+   :no-members:
+
+.. autoclass:: cunqa.qjob.QJob
+   :no-members:

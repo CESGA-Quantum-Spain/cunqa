@@ -1,0 +1,10 @@
+.admonition {
+    box-shadow: 0 2px 8px rgba(31, 75, 153, 0.25);
+}
+
+table.wrap-table td,
+table.wrap-table th {
+  white-space: normal !important;   /* permite salto de línea */
+  overflow-wrap: anywhere;          /* corta si hace falta */
+  word-break: break-word;           /* fallback */
+}

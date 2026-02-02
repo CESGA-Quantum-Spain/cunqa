@@ -18,13 +18,7 @@ struct CunqaArgs : public argparse::Args
     std::optional<std::vector<std::string>>& node_list  = kwarg("node_list", "List of nodes where the QPUs will be deployed.").multi_argument(); 
     std::optional<int>& qpus_per_node                   = kwarg("qpuN,qpus_per_node", "Number of qpus in each node.");
     std::optional<std::string>& backend                 = kwarg("b,backend", "Path to the backend config file.");
-    std::optional<std::string>& noise_properties        = kwarg("noise-prop,noise-properties", "Path to the noise properties json file, only supported for simulator Aer.");
     std::string& simulator                              = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer");
-    
-    std::optional<std::string>& fakeqmio                = kwarg("fq,fakeqmio", "Raise FakeQmio backend from calibration file.", /*implicit*/"last_calibrations");
-    bool& no_thermal_relaxation                         = flag("no-thermal-relaxation", "Deactivate thermal relaxation on FakeQmio.").set_default("false");
-    bool& no_readout_error                              = flag("no-readout-error", "Deactivate readout error on FakeQmio.").set_default("false");
-    bool& no_gate_error                                 = flag("no-gate-error", "Deactivate gate error on FakeQmio.").set_default("false");
 
     std::string& family_name                            = kwarg("fam,family_name", "Name that identifies which QPUs were raised together.").set_default("default");
     bool& co_located                                    = flag("co-located", "co-located mode. The user can connect with any deployed QPU.");

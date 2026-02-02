@@ -13,6 +13,7 @@ dependencies:
   - sphinx-rtd-theme
   - sphinx-autobuild
   - sphinx-copybutton
+  - sphinx-design
   - nbsphinx
   - pandoc
   - lxml-html-clean
