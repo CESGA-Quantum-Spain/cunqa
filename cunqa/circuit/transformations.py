@@ -16,10 +16,10 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
     Horizontal split of a quantum circuit. 
     
     This function splits a circuit into a given number of subcircuits. This number is determined by 
-    the `qubits_or_sections` argument. If it is a list, then it specifies the cut qubits; however, 
-    if it is an int, it specifies the number of subcircuits to be created (each having the same 
-    number of qubits, except for one in case the split is not exact, which will take the remainder 
-    as its number of qubits).
+    the `qubits_or_sections` argument. If it is a list, then it specifies the number of qubits each 
+    subcircuit will have; however, if it is an int, it specifies the number of subcircuits to be 
+    created (each having the same number of qubits, except for one in case the split is not exact, 
+    which will take the remainder as its number of qubits).
 
     If a controlled gate is divided an expose quantum directive will be used in order to maintain 
     the global state intact.
