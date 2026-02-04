@@ -21,7 +21,8 @@ extensions = [
     "sphinx.ext.napoleon",
     'sphinx.ext.githubpages',
     "autodocsumm",
-    "sphinx_toolbox.more_autosummary"
+    "sphinx_toolbox.more_autosummary",
+    "sphinx_inline_tabs"
 ]
 
 source_suffix = ['.rst']

@@ -20,7 +20,8 @@ to employ the platform. This includes a series of commands that allow the user t
 and the Python API. Both explanations can be found in the :doc:`CUNQA reference <reference/reference>` 
 section.
 
-All the code is available on the `GitHub repository <https://github.com/CESGA-Quantum-Spain/cunqa>`_.
+All the code is available on the `GitHub repository <https://github.com/CESGA-Quantum-Spain/cunqa>`_ 
+and a detailed explanation of the work done can be seen at the CUNQA preprint [vazquez2025]_.
 
 .. raw:: html
 
@@ -44,6 +45,12 @@ All the code is available on the `GitHub repository <https://github.com/CESGA-Qu
    and technical infrastructures and equipment of ERDF, CESG15-DE-3114. 
    </p>
 
+.. [vazquez2025] J. Vázquez-Pérez, D. Expósito-Patiño, M. Losada, 
+   Á. Carballido, A. Gómez y T. F. Pena,
+   *CUNQA: a Distributed Quantum Computing emulator for HPC*,
+   arXiv:2511.05209 [quant-ph], 2025.
+   Available at: https://arxiv.org/abs/2511.05209
+
 
 .. toctree::
    :maxdepth: 1
@@ -53,4 +60,3 @@ All the code is available on the `GitHub repository <https://github.com/CESGA-Qu
    Getting started <getting_started/getting_started>
    Examples <examples/examples>
    CUNQA reference <reference/reference>
-   Tutorial <tutorial/tutorial>
