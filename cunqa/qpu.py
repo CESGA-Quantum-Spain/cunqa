@@ -26,6 +26,7 @@ from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
@@ -75,16 +76,21 @@ class QPU:
     _id: int 
     _backend: Backend
     _family: str
-    _qclient: QClient
+    _qclient: Union[QClient, QMIOClient]
+    _device: dict
 
-    def __init__(self, id: int, backend: Backend, family: str, endpoint: str):
+    def __init__(self, id: int, backend: Backend, device: dict, family: str, endpoint: str):
         self._id = id
         self._backend = backend
+        self._device = device
         self._family = family
         
-        self._qclient = QClient()
-        self._qclient.connect(endpoint)
+        if (device['device_name'] == 'QPU'):
+            self._qclient = QMIOClient() # TODO: Generalize QPU
+        else:
+            self._qclient = QClient()
 
+        self._qclient.connect(endpoint)
         logger.debug(f"Object for QPU {id} created and connected to endpoint {endpoint}.")
 
     @property
@@ -115,7 +121,7 @@ class QPU:
             circuit_ir (dict): circuit IR to be simulated at the vQPU.
             **run_parameters: any other simulation instructions.
         """
-        qjob = QJob(self._qclient, circuit_ir, **run_parameters)
+        qjob = QJob(self._qclient, self._device, circuit_ir, **run_parameters)
         qjob.submit()
         logger.debug(f"Qjob submitted to QPU {self._id}.")
 
@@ -260,8 +266,9 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         QPU(
             id = id,
             backend = info['backend'],
-            family = info["family"],
-            endpoint = info["net"]["endpoint"]
+            device = info['net']['device'],
+            family = info['family'],
+            endpoint = info['net']['endpoint']
         ) for id, info in targets.items()
     ]
         

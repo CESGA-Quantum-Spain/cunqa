@@ -1,10 +1,15 @@
 add_subdirectory(circuit)
+add_subdirectory(qiskit_deps)
+add_subdirectory(real_qpus)
 
-pybind11_add_module(qclient bindings.cpp)
+set(LIB_NAME "qclient")
 
-target_link_libraries(qclient PRIVATE client)
+pybind11_add_module(${LIB_NAME} bindings.cpp)
 
-install(TARGETS qclient DESTINATION cunqa)
+target_include_directories(${LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
+target_link_libraries(${LIB_NAME} PRIVATE client json)
+
+install(TARGETS ${LIB_NAME} DESTINATION cunqa)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/constants.py.in"

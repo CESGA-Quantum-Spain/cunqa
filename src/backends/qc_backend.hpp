@@ -63,7 +63,7 @@ public:
         config = qc_config;
     }
 
-    QCBackend(QCBackend& cc_backend) = default;
+    QCBackend(QCBackend& qc_backend) = default;
 
     inline JSON execute(const QuantumTask& quantum_task) const override
     {

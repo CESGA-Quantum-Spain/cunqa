@@ -132,51 +132,6 @@ def test_result_with_no_future(qclient_mock, circuit_ir):
     
     assert job._future is None
 
-
-# ------------------------
-# QJob.time_taken property
-# ------------------------
-
-def test_time_taken_returns_correctly(qclient_mock, circuit_ir):
-    job = QJob(qclient_mock, circuit_ir)
-    job._future = Mock()  # submitted
-    result_mock = Mock()
-    result_mock.time_taken = "0.123"
-    job._result = result_mock
-
-    assert job.time_taken == "0.123"
-
-
-def test_time_taken_no_time_attribute(
-    qclient_mock, logger_mock, circuit_ir
-):
-    job = QJob(qclient_mock, circuit_ir)
-    job._future = Mock(name="FutureWrapper")
-    job._result = Mock(name="Result")
-    del job._result.time_taken
-
-    value = job.time_taken
-
-    assert value == ""
-    logger_mock.error.assert_called_once_with("Time taken not available.")
-
-
-def test_time_taken_without_result(qclient_mock, circuit_ir):
-    with pytest.raises(RuntimeError) as _:
-        job = QJob(qclient_mock, circuit_ir)
-        job._future = Mock()
-        job._result = None
-        job.time_taken
-
-
-def test_time_taken_without_future(qclient_mock, circuit_ir):
-    with pytest.raises(RuntimeError) as _:
-        job = QJob(qclient_mock, circuit_ir)
-        job.time_taken
-
-    assert job._future is None
-
-
 # ------------------------
 # QJob.submit method
 # ------------------------

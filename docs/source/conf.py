@@ -1,4 +1,12 @@
-import os, sys
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+import sys
+import os
+import shutil
+from pathlib import Path
 sys.path.insert(0, os.path.abspath('../..'))
 
 os.environ['CUNQA_PATH'] = ''
@@ -25,7 +33,20 @@ extensions = [
     "sphinx_inline_tabs"
 ]
 
-source_suffix = ['.rst']
+source_suffix = ['.rst', '.md']
+
+autosummary_generate = True
+
+autosummary_generate_overwrite = True
+
+
+autodoc_default_options = {
+    # "members": True,        # ← NO
+    "private-members": False,
+    "special-members": "",
+}
+autodoc_member_order = "bysource"
+autodocsumm_member_order = "bysource"
 
 autodoc_mock_imports = [
     'argparse',
@@ -44,14 +65,29 @@ autodoc_mock_imports = [
     'load',
     'logging',
     'logger',
+    'numpy',
     'operator',
     'os',
     'random',
+    're',
     'string',
     'subprocess',
+    'socket',
+    'symengine',
+    'sympy',
     'sys',
+    'threading',
     'time',
-    'typing'
+    'typing',
+    'zmq',
+    'pathlib',
+    'psutil',
+    'socket',
+    'pickle',
+    'psutil',
+    'threading',
+    'queue', 
+    'zmq'
 ]
 
 nbsphinx_execute = "never" # Never execute the Jupyter notebooks

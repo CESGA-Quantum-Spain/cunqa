@@ -45,10 +45,10 @@ enum INSTRUCTIONS {
     RX,
     RY,
     RZ,
+    P,
     ROTINVX,
     ROTINVY,
     ROTINVZ,
-    P,
     U1,
 
     U2,
@@ -58,6 +58,8 @@ enum INSTRUCTIONS {
     U,
 
     ECR,
+    CU1,
+    CU3,
     SWAP,
     CX,
     CY,
@@ -67,7 +69,6 @@ enum INSTRUCTIONS {
     CSZ,
     CT,
 
-    CU1,
     CP,
     CRX,
     CRY,
@@ -77,17 +78,16 @@ enum INSTRUCTIONS {
     RZZ,
     RZX,
 
+    CECR,
+    CSWAP,
+    CCX,
+    CCY,
+    CCZ,
+
     CU2,
     CR,
 
     CU,
-    CU3,
-
-    CCX,
-    CCY,
-    CCZ,
-    CECR,
-    CSWAP,
 
     CIF,
     SEND,
@@ -95,7 +95,9 @@ enum INSTRUCTIONS {
     QSEND,
     QRECV,
     EXPOSE,
-    RCONTROL
+    RCONTROL,
+
+    SAVE_STATE
 };
 
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
@@ -132,6 +134,8 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
+    {"p", P},
+    {"u1", U1},
     {"rotinvx", ROTINVX},
     {"rotinvy", ROTINVY},
     {"rotinvz", ROTINVZ},
@@ -165,10 +169,14 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
+    {"cp", CP},
+    {"cu1", CU1},
 
-    // TWO QUBIT TWO PARAM
+    // TWO GATE THREE PARAM
     {"cu2", CU2},
     {"cr", CR},
+    {"cu", CU},
+    {"cu3", CU3},
 
     // TWO QUBIT THREE PARAM
     {"cu", CU},
@@ -194,6 +202,8 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     {"expose", EXPOSE},
     {"rcontrol", RCONTROL},
+
+    {"save_state", SAVE_STATE}
 };
 
 const std::vector<std::string> BASIS_GATES = {

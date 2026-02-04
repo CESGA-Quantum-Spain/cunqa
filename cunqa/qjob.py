@@ -26,6 +26,7 @@ from typing import  Optional, Any, Union
 from cunqa.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
+from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
 
 class QJob:
     """
@@ -56,15 +57,23 @@ class QJob:
 
 
     """
-    qclient: QClient
+    qclient: Union[QClient, QMIOClient]
     _circuit_id: str
     _updated: bool
-    _future: FutureWrapper 
+    _device: dict
+    _future: Union[FutureWrapper, QMIOFuture] 
     _result: Optional[Result]
     _quantum_task: str
 
-    def __init__(self, qclient: QClient, circuit_ir: dict, **run_parameters: Any):
+    def __init__(
+            self, 
+            qclient: Union[QClient, QMIOClient], 
+            device: dict, 
+            circuit_ir: dict, 
+            **run_parameters: Any
+    ):
         self._qclient = qclient
+        self._device = device
         self._circuit_id = circuit_ir["id"]
         self._cregisters = circuit_ir["classical_registers"]
         self._updated = False
@@ -77,7 +86,8 @@ class QJob:
             "avoid_parallelization": False,
             "num_clbits": circuit_ir["num_clbits"], 
             "num_qubits": circuit_ir["num_qubits"], 
-            "seed": 123123
+            "seed": 123123,
+            "device": self._device
         }
 
         if (run_parameters == None) or (len(run_parameters) == 0):
