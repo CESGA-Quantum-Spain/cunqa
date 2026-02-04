@@ -11,9 +11,8 @@ make this clear.
 
 Circuit without communications
 -------------------------------
-To visualize what we are saying, it is first key to see that, indeed,
-:py:class:`~cunqa.circuit.core.CunqaCircuit` is very similar to the rest of the APIs and does not 
-imply a steep learning curve for those who are already used to programming quantum circuits.
+Indeed, :py:class:`~cunqa.circuit.core.CunqaCircuit` is very similar to the rest of the APIs and 
+does not imply a steep learning curve for those who are already used to programming quantum circuits.
 
 In the following code snippet we see how to construct a Bell pair, which allows us to understand 
 how gates are applied; effectively confirming that the CUNQA API does not explore any new method.
@@ -189,10 +188,10 @@ operating as shown below.
     :caption: Horizontal split of the ``union_circuit`` circuit.
 
     # As a list
-    [c1, c2] = hsplit(union, [2,1])
+    [c1, c2] = hsplit(union_circuit, [2,1])
 
     # As int, in this case is equivalent
-    [c1, c2] = hsplit(union, 2)
+    [c1, c2] = hsplit(union_circuit, 2)
 
 We see that one can specify the number of qubits required in each subcircuit—first
 :py:func:`hsplit`—or the number of circuits—second. In this case they are the same, but this is not
@@ -235,9 +234,9 @@ After this, we are ready to execute the circuits. To do so we will use the funct
 
         qjob = run(c, qpu, shots = 1024)
 
-    And now, thanks to the fact that the :py:class:`~cunqa.qjob.QJob` class has the necessary methods, 
-    we can obtain the result. It must be taken into account that obtaining the result is a blocking 
-    call, that is, the program waits until the result is returned.
+    And now, we can obtain the result as a property of the :py:class:`~cunqa.qjob.QJob` class.
+    Note that retrieving the result is a blocking call, that is, the program waits until the result 
+    is returned.
 
     .. code-block:: python
 
@@ -253,9 +252,8 @@ After this, we are ready to execute the circuits. To do so we will use the funct
         qjobs = run([c1, c2], [qpu1, qpu2], shots = 1024)
 
     And now, thanks to the fact that the :py:mod:`~cunqa.qjob` module has the function 
-    :py:class:`~cunqa.qjob.gather`, we can obtain the results. It must be taken into account that 
-    obtaining the result is a blocking call, that is, the program waits until the result is 
-    returned.
+    :py:class:`~cunqa.qjob.gather`, we can obtain the results. Note that retrieving the result is 
+    a blocking call, that is, the program waits until the result is returned.
 
     .. code-block:: python
 
@@ -265,8 +263,8 @@ After this, we are ready to execute the circuits. To do so we will use the funct
             result.counts # obtaining the counts
             result.time_taken # obtaining the execution time
 
-Finally, a good practice is to perform a relinquishing of the resources in order to make a 
-responsible use of the HPC infraestructures CUNQA is working on. For this we have two options, same 
+Finally, it is good practice is to relinquish the resources used in order to make a 
+responsible use of the HPC infraestructures that CUNQA runs on. For this we have two options, same 
 as with the deployment of the vQPUs: bash command (:doc:`../reference/commands/qdrop`) or Python 
 function (:py:func:`~cunqa.qpu.qdrop`).
 
