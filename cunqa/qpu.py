@@ -43,10 +43,10 @@ class Backend(TypedDict):
     .. autoattribute:: simulator
     .. autoattribute:: version
     """
-    basis_gates: list[str] #: Native gates that the Backend accepts. If other are used, they must be translated into the native gates.
-    coupling_map: list[list[int]] #: Defines the physical connectivity of the qubits, in which pairs two-qubit gates can be performed.
+    basis_gates: list[str] #: Native gates that the Backend accepts. If others are used, they must be translated into the native gates.
+    coupling_map: list[list[int]] #: Defines the physical connectivity of the qubits, that is, which pairs are connected by two-qubit gates.
     custom_instructions: str #: Any custom instructions that the Backend has defined.
-    description: str #: Description of the Backend itself.
+    description: str #: Custom description of the Backend itself.
     gates: list[str] #: Specific gates supported.
     n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
     name: str #: Name assigned to the Backend.
@@ -131,7 +131,21 @@ def run(
     Function responsible of sending circuits to several vQPUs. Each circuit will be sent to each 
     QPU in order, therefore, both lists should be the same size. If they are not, but the number of 
     circuits is less than the numbers of QPUs, the circuit will get executed. In case the number of 
-    QPUs is less than the number of circuits an error will be raised. 
+    QPUs is less than the number of circuits an error will be raised. Usage example:
+
+    .. code-block:: python
+
+        >>> circuit1 = CunqaCircuit(1, id="circuit_1")
+        >>> circuit2 = CunqaCircuit(1, id="circuit_2")
+        >>> circuit1.h(0)
+        >>> circuit1.measure(0,0)
+        >>> circuit1.send(0, "circuit_2")      # Send bit 0 to circuit_2
+        >>> circuit2.recv("x", 0, "circuit_1") # Receive bit from circuit_1 and apply a conditional x
+        >>>
+        >>> qpus = get_QPUs()
+        >>>
+        >>> qjobs = run([circuit1, circuit2], qpus)
+        >>> results = gather(qjobs)
 
     .. note::
         This method will check if two circuits are related, i.e., if one of them was part of a 
@@ -276,8 +290,8 @@ def qraise(n, t, *,
            partition=None
         ) -> str:
     """
-    Raises vQPUs and returns the family name associated them. This function allows to raise 
-    QPUs from the python API, what can also be done at terminal by ``qraise`` command.
+    Raises vQPUs and returns the family name associated them. This function raises 
+    QPUs from the python API, which can also be done from terminal by ``qraise`` command.
 
     Args:
         n (int): number of vQPUs to be raised.

@@ -45,7 +45,7 @@ General deployment options
 
 ``--node_list <string>``
     List of nodes where the QPUs will be deployed.
-    This option can be specified multiple times.
+    Multiple nodes can be specified at a time.
 
 ``--qpus_per_node <int>``
     Number of QPUs deployed on each node.
@@ -57,7 +57,7 @@ Backend and simulation options
     Path to the backend configuration file.
 
 ``-sim, --simulator <string>``
-    Simulator responsible for running the simulations.
+    Selects simulator responsible for running the simulations.
     Default: ``Aer``
 
 Grouping and communication options
@@ -69,8 +69,8 @@ Grouping and communication options
 
 ``--co-located``
     Enable co-located mode.
-    In this mode, the user can connect to any deployed QPU. If set, the vQPU can be accesed from 
-    any node. If not set, the user can only access it from the node it is deployed on.
+    If set, the vQPU can be accesed from any node.
+    Otherwise, the user can only access it from the node it is deployed on.
 
 ``--classical_comm``
     Enable classical communications between QPUs.

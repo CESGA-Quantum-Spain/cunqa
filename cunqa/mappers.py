@@ -1,41 +1,22 @@
 """
     Contains map-like callables to distribute circuits among vQPUS.
-    
-    When having classical or quantum communications among circuits, 
-    method :py:func:`~cunqa.qpu.QPU.run` is obsolete, circuits must be sent as an ensemble in order 
-    to ensure correct functioning of the communication protocols.
 
-    So, once the virtual QPUs that allow the desired type of communications are raised and circuits 
-    have been defined using :py:class:`~cunqa.circuit.CunqaCircuit`, they can be sent using the 
-    :py:meth:`~run_distributed` function:
-
-    >>> circuit1 = CunqaCircuit(1, "circuit_1")
-    >>> circuit2 = CunqaCircuit(1, "circuit_2")
-    >>> circuit1.h(0)
-    >>> circuit1.measure_and_send(0, "circuit_2")
-    >>> circuit2.remote_c_if("x", 0, "circuit_1")
-    >>>
-    >>> qpus = get_QPUs()
-    >>>
-    >>> qjobs = run_distributed([circuit1, circuit2], qpus)
-    >>> results = gather(qjobs)
-
-    **Variational Quantum Algorithms** [#]_ require from numerous executions of parametric cirucits, 
-    while in each step of the optimization process new parameters are assigned to them. This implies 
+    **Variational Quantum Algorithms** [#]_ require numerous executions of parametric cirucits, 
+    where in each step of the optimization process new parameters are assigned to them. This implies 
     that, after parameters are updated, a new circuit must be created, transpiled and then sent to 
     the quantum processor or simulator. For simplifying this process, we have 
-    :py:class:`~QJobMapper` and :py:class:`~QPUCircuitMapper` classes. Both classes are thought to 
-    be used for Scipy optimizers [#]_ as the *workers* argument in global optimizers.
+    :py:class:`~QJobMapper` and :py:class:`~QPUCircuitMapper` classes. Both classes are conceived to 
+    be used with Scipy optimizers [#]_ as the *workers* argument in global optimizers.
 
     - :py:class:`~QJobMapper` takes a list of existing :py:class:`~cunqa.qjob.QJob` 
       objects, then, the class can be called passing a set of **parameters** and a **cost function**. 
-      This callable updates the each existing :py:class:`~cunqa.qjob.QJob` object with such 
+      This callable updates each existing :py:class:`~cunqa.qjob.QJob` object with such 
       **parameters** through the :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` method. Then, it 
       gathers the results of the executions and returns the **value of the cost function** for each.
     
     - :py:class:`~QPUCircuitMapper` is instanciated with a circuit and instructions for its 
-      execution, toguether with a list of the :py:class:`~cunqa.qpu.QPU` objects. The difference 
-      with :py:class:`~QJobMapper` is that here the method :py:meth:`~cunqa.qpu.QPU.run` is mapped 
+      execution, together with a list of the :py:class:`~cunqa.qpu.QPU` objects. The difference 
+      with :py:class:`~QJobMapper` is that here the method :py:meth:`~cunqa.qpu.QPU.execute` is mapped 
       to each QPU, passing it the circuit with the given parameters assigned so that for this case 
       several :py:class:`~cunqa.qjob.QJob` objects are created.
 
@@ -50,10 +31,10 @@
 
     .. [#] `scipy.optimize documentation <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_.
 
-    .. [#] Differential Evolution initializes a population of inidividuals that evolute from 
-       generation to generation in order to collectively find the lowest value to a given cost 
+    .. [#] Differential Evolution initializes a population of inidividuals that evolve from 
+       generation to generation in order to collectively find the lowest value of a given cost 
        function. This optimizer has shown great performance for VQAs 
-       [`Reference <https://arxiv.org/abs/2303.12186>`_]. It is well implemented at Scipy by the 
+       [`Reference <https://arxiv.org/abs/2303.12186>`_]. It is well implemented in Scipy through the 
        `scipy.optimize.differential_evolution <https://docs.scipy.org/doc/scipy/reference/generated/
        scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution>`_ 
        function.
@@ -75,7 +56,7 @@ class QJobMapper:
 
     The core of the class is on its :py:meth:`~cunqa.mappers.QJobMapper.__call__` method, to which 
     parameters that the method :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` takes are passed 
-    toguether with a cost function, so that a the value for this cost for each initial 
+    together with a cost function, so that a the value for this cost for each initial 
     :py:class:`~cunqa.qjob.QJob` is returned.
 
     An example is shown below, once we have a list of :py:class:`~cunqa.qjob.QJob` objects as 
@@ -95,9 +76,9 @@ class QJobMapper:
     >>> 
     >>> cost_values = mapper(cost_function, new_parameters)
 
-    We intuitively see how convinient this class can be for optimization algorithms: one has a 
-    parametric circuit to which updated sets of parameters can be sent obtaining the value of the 
-    cost back. Examples applied to optimizations are shown at the 
+    We intuitively see how convenient this class can be for optimization algorithms: one has a 
+    parametric circuit to which updated sets of parameters can be sent, getting back the value of the 
+    cost function. Examples applied to optimizations are shown at the 
     `Examples gallery <https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html>`_.
 
     Attributes: 
@@ -143,30 +124,30 @@ class QJobMapper:
 
 class QPUCircuitMapper:
     """
-    Class to map the method :py:meth:`~cunqa.qpu.QPU.run` to a list of QPUs.
+    Class to map the method :py:meth:`~cunqa.qpu.QPU.execute` to a list of QPUs.
 
     The class is initialized with a list of :py:class:`~cunqa.qpu.QPU` objects associated to the 
-    virtual QPUs that are intended to work with, toguether with the circuit and the simulation 
+    virtual QPUs that the optimization will require, together with the circuit and the simulation 
     instructions needed for its execution.
 
     Then, its :py:meth:`~cunqa.mappers.QPUCircuitMapper.__call__` method takes a set of parameters 
-    as *population* to assing to the circuit. Each assembled circuit is sent to each virtual QPU 
+    as *population* to assign to the circuit. Each assembled circuit is sent to each virtual QPU 
     with the instructions provided on the instatiation of the mapper. The method returns the value 
     for the provided function *func* for the result of each simulation.
 
-    Its use is pretty similar to :py:class:`~cunqa.mappers.QJobMapper`, but not needing to create 
-    the :py:class:`~cunqa.qjob.QJob` objects ahead:
+    Its use is pretty similar to :py:class:`~cunqa.mappers.QJobMapper`, though creating 
+    :py:class:`~cunqa.qjob.QJob` objects ahead is not needed.
 
     >>> qpus = get_QPUs(...)
     >>>
-    >>> # creating the mapper with the pre-defined parametric circuit and other simulation instructions.
+    >>> # Creating the mapper with the pre-defined parametric circuit and other simulation instructions.
     >>> mapper = QPUCircuitMapper(qpus, circuit, shots = 1000, ...)
     >>>
-    >>> # defining the parameters set accordingly to the number of parameters
+    >>> # Defining the parameters set according to the number of parameters
     >>> # of the circuit and the number of QJobs in the list.
     >>> new_parameters = [...]
     >>> 
-    >>> # defining the cost function passed to the result of each QJob
+    >>> # Defining the cost function passed to the result of each QJob
     >>> def cost_function(result):
     >>>     counts = result.counts
     >>>     ...

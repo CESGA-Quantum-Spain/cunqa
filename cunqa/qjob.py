@@ -10,7 +10,7 @@
     submitted for simulation at the vQPU. :py:class:`QJob` is the bridge between sending a 
     circuit with instructions and receiving the results.
 
-    Another functionality described in the submodule is the function :py:func:`~gather`, 
+    Another functionality described in the submodule is the function :py:func:`~cunqa.qjob.gather`, 
     which receives a list of :py:class:`~QJob` objects and returns their results as 
     :py:class:`~cunqa.result.Result` objects.
 
@@ -30,7 +30,7 @@ from cunqa.qclient import QClient, FutureWrapper
 class QJob:
     """
     Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output 
-    of the :py:meth:`~cunqa.qpu.QPU.run` method. The quantum job not only contains the circuit to 
+    of the :py:meth:`~cunqa.qpu.run` method. The quantum job not only contains the circuit to 
     be simulated, but also simulation instructions and information of the vQPU to which the job 
     is sent. This class has a main attribute: :py:attr:`QJob.result` which stores the information 
     about the execution. 
@@ -42,8 +42,8 @@ class QJob:
 
     .. automethod:: submit
 
-    But the objective of this :py:class:`QJob` class is not only to retrieve the result. It also 
-    allows to easily update the quantum task sent without the need of resending the whole circuit. 
+    But the objective of the :py:class:`QJob` class is not only to retrieve the result. It also 
+    allows an easy updating of the quantum task sent without the need of resend the whole circuit. 
     This is really useful, especially working with variational quantum algorithms (VQAs) [#]_, which 
     need to change the parameters of the gates in a circuit as they are optimized in each iteration. 
     This parameter update is done using the :py:meth:`~QJob.upgrade_parameters` method.
@@ -117,10 +117,10 @@ class QJob:
         
         .. warning::
             Because of how the client-server comunication is built, the user must be careful and call 
-            for the results in the same order in which the jobs where submited. In the case in which 
-            the order is not respected, everything would work, but results will not correspond to the 
-            job. A mix up would happen. This is because the server follows the rule FIFO (*First in 
-            first out*), if we want to recieve the second result, the first one has to be out.
+            for the results in the same order in which the jobs where submited. If the order is not 
+            respected, no errors would be raised but results will not correspond to the job -
+            a mix up would happen. This is because the server follows the FIFO rule (*First in 
+            first out*): if we want to receive the second result, the first one has to be out.
 
         """
         if self._future is not None:
@@ -145,9 +145,9 @@ class QJob:
             >>> qjob.submit() # Already has all the info of where and what to send
 
         .. note::
-            Differently from :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
-            Once a job is summited, there is no wait, the python program continues at the same time 
-            that the corresponding server recieves and simualtes the circuit.
+            Opposite to :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
+            Once a job is submitted, the python program continues without waiting while  
+            the corresponding server receives and simulates the circuit.
         """
         if self._future is not None:
             logger.error("QJob has already been submitted.")
@@ -162,12 +162,11 @@ class QJob:
     def upgrade_parameters(self, parameters: list[Union[float, int]]) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
-        By this call, first it is checked weather if the prior simulation's result was called. If 
-        not, it calls it but does not store it, then sends the new set of parameters to the server 
-        to be reasigned to the circuit and to simulate it. This method can be used on a loop, 
-        always being careful if we want to save the intermediate results. Also, this method is used 
-        by the class :py:class:`~cunqa.mappers.QJobMapper`, checkout its documentation for a 
-        extensive description.
+        First it checks weather the prior simulation's result was retrieved. If not, it is discarded,
+        and the new set of parameters is sent to the server to be reassigned to the circuit for 
+        simulation. This method can be used on a loop, carefully saving the intermediate results. 
+        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, check out its 
+        documentation for a extensive description.
 
         .. warning::
             Before sending the circuit or upgrading its parameters, the result of the prior job must be 
@@ -176,15 +175,14 @@ class QJob:
             :py:meth:`upgrade_parameters` method is called, this result is discarded.
 
         .. warning::
-            In the current version, parameters will be assigned to **ALL** parametric gates in the 
-            circuit. This means that if we want to make some parameters fixed, it is on our 
-            responsibility to pass them correctly and in the correct order in the list. If the 
-            number of parameters is less than the number of parametric gates in the circuit, an 
-            error will occur at the vQPU, on the other hand, if more parameters are provided, 
-            there will only be used up to the number of parametric gates.
-            
-            Also, only *rx*, *ry* and *rz* gates are supported for this functionality, that is, they 
-            are the only gates considered *parametric* for this functionality.
+            There are two ways of passing new parameters. First, as a **list** with the corresponding 
+            values in the order of the gates in the circuit, in which case missing parameters will
+            result in an error. On the other hand, as a **dict** where the keys are 
+            :py:class:`~cunqa.circuit.parameter.Variable` instances, which signify that the parameter
+            can vary, and the values the corresponding new value to that :py:class:`~cunqa.circuit.parameter.Variable`.
+            In this case not all parameters need to be updated - the ones not given keep their last 
+            value - but :py:class:`~cunqa.circuit.parameter.Variable` objects need to be given a value at 
+            least once with :py:meth:`CunqaCircuit.bind_parameters` or :py:meth:`upgrade_parameters`.
 
         Args:
             parameters (list[float | int]): list of parameters to assign to the parametrized 

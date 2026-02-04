@@ -1,7 +1,7 @@
 qdrop
 =====
 
-Drop one or more vQPUs.
+Release the resource of one or more vQPUs.
 
 The ``qdrop`` command is used to terminate (drop) virtual QPUs previously deployed with
 ``qraise``. Targets can be specified either by their Slurm job IDs, by a family name, or by
@@ -22,7 +22,7 @@ Target selection options
 
 ``IDS...``
     Slurm IDs of the QPUs to be dropped.
-    This argument can be specified multiple times.
+    Multiple IDs can be given at a time.
 
 ``--fam, --family_name <string>``
     Family name of the QPUs to be dropped.

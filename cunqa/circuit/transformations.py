@@ -100,8 +100,8 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
     Union of circuits (addition of qubits).
 
-    This function joins the qubits of several ~cunqa.circuit.core.CunqaCircuit. These circuits may 
-    be connected via communication directives and, depending on their nature, they are replaced.
+    This function joins the qubits of several :py:class:`~cunqa.circuit.core.CunqaCircuit` objects. These circuits may 
+    be connected via communication directives which will be replaced as follows:
 
     - :py:meth:`~cunqa.circuit.core.CunqaCircuit.expose`. The gates applied remotely simply switch 
       to local operations.
@@ -111,7 +111,7 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     - :py:meth:`~cunqa.circuit.core.CunqaCircuit.send` and 
       :py:meth:`~cunqa.circuit.core.CunqaCircuit.recv`. They provoke a special copy operation 
       among classical registers called `copy`. For now, this operation is not available in the 
-      public API of ~cunqa.circuit.core.CunqaCircuit.
+      public API of :py:class:`~cunqa.circuit.core.CunqaCircuit`.
 
     This operation is the inverse of the :py:func:`hsplit`.
 
@@ -254,7 +254,7 @@ def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
     This function concatenates the instructions of two circuits.
 
-    This function appends the gates from a list of circuits into a final resulting circuit. The 
+    It appends the gates from a list of circuits into a final resulting circuit. The 
     order of the list passed as an argument is important, since the instructions will be appended 
     in that same order.
 

@@ -1,5 +1,5 @@
 """
-    Contains the :py:class:`~cunqa.result.Result`, which contains the output of the executions.
+    Contains the :py:class:`~cunqa.result.Result` class, which holds the output of the executions.
 
     Once we have submmited a :py:class:`~cunqa.qjob.QJob`, for obtaining its results we call for its 
     property :py:attr:`~cunqa.qjob.QJob.result`:
@@ -7,7 +7,7 @@
         >>> qjob.result
         <cunqa.result.Result object at XXXX>
     
-    This object has two main attributes for out interest: the counts distribution from the 
+    This object has two main attributes of interest: the counts distribution from the 
     simulation and the time that the simulation took in seconds:
 
         >>> result = qjob.result
@@ -21,13 +21,12 @@ from itertools import accumulate
 
 class Result:
     """
-    Class to describe the result of a simulation. It has two main attributes, 
-    :py:attr:`Result.counts` and :py:attr:`Result.time_taken`. These attributes are common to every 
-    simulator available on the backends. 
-    
-    Nevertheless, depending on the simulator used, more output data is provided. For checking all 
-    the information from the simulation as a ``dict``, one can access the attribute 
-    :py:attr:`Result.result`.
+    Class to describe the result of a simulation. 
+
+    There are two main attributes, :py:attr:`Result.counts` and :py:attr:`Result.time_taken`, common
+    to every simulator available on the backends.Nevertheless, depending on the simulator used, more
+    output data is provided. For checking all the information from the simulation as a ``dict``, 
+    one can access the attribute :py:attr:`Result.result`.
 
     .. autoattribute:: counts
     .. autoattribute:: time_taken
