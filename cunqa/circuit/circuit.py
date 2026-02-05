@@ -1436,7 +1436,7 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             "num_ctrl_qubits": num_ctrl_qubits,
             "qubits": qubits,
             "num_qubits": len(qubits),
-            "params": params
+            "params": [params]
         })
         
     def measure(self, qubits: Union[int, "list[int]"], clbits: Union[int, "list[int]"]) -> None:
