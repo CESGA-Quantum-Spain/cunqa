@@ -99,7 +99,8 @@ def qraise(n, t, *,
            classical_comm = False, 
            quantum_comm = False,  
            simulator = None, 
-           backend = None, 
+           backend = None,
+           noise_properties = None, 
            fakeqmio = False, 
            family = None, 
            co_located = True, 
@@ -128,6 +129,8 @@ def qraise(n, t, *,
         simulator (str): name of the desired simulator to use. Default is `Aer <https://github.com/Qiskit/qiskit-aer>`_.
 
         backend (str): path to a file containing backend information.
+
+        noise_properties (str): Path to the noise properties json file, only supported for simulator Aer. Default: None
 
         fakeqmio (bool): ``True`` for raising `n` virtual QPUs with FakeQmio backend.
 
@@ -182,6 +185,8 @@ def qraise(n, t, *,
             command = command + f" --qpus_per_node={str(qpus_per_node)}"
         if backend is not None:
             command = command + f" --backend={str(backend)}"
+        if noise_properties is not None:
+            command = command + f" --noise-properties={str(noise_properties)}"
         if partition is not None:
             command = command + f" --partition={str(partition)}"
         if qmio:
