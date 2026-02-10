@@ -122,6 +122,9 @@ std::string execute_shot_(AER::AerState* state, const std::vector<QuantumTask>& 
         case constants::SX:
             state->apply_mcsx({qubits[0] + T.zero_qubit});
             break;
+        case cunqa::constants::RESET:
+            state->apply_reset({qubits[0] + T.zero_qubit});
+            break;
         case constants::CX:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;

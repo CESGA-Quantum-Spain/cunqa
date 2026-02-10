@@ -1583,24 +1583,20 @@ class CunqaCircuit(metaclass=InstanceTrackerMeta):
             raise SystemExit
             # TODO: maybe in the future this can be check at the begining for a more efficient processing 
 
-    # TODO: check if simulators accept reset instruction as native
-    def reset(self, qubits: Union[int, list]):
+    def reset(self, qubit: Union[int, list[int]]):
         """
-        Method to reset to zero one or multiple qubits, separated by commas (use after measure).
+        Class method to add reset to zero instruction to a qubit or list of qubits 
+        (use after measure).
 
         Args:
-            qubits (int): qubits to which the reset operation is applied.
+            qubit (int, list[int]]): qubits to which the reset operation is applied.
         
         """
-        if isinstance(qubits, list):
-            for q in qubits:
-                self.instructions.append({'name': 'x', 'qubits': [q], 'conditional_reg': [q], 'params': []})
 
-        elif isinstance(qubits, int):
-            self.instructions.append({'name': 'x', 'qubits': [qubits], 'conditional_reg': [qubits], 'params': []})
-
-        else:
-            logger.error(f"Argument for reset must be list or int, but {type(qubits)} was provided.")
+        self.instructions.append({
+            'name': 'reset', 
+            'qubits': [qubit]
+        })
 
     def assign_parameters(self, given_params: dict) -> None:
         """
