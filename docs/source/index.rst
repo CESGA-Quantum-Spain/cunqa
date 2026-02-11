@@ -7,17 +7,14 @@ is a  combination of classical resources and simulation software that, working t
 the appearance and operation of a real QPU. These vQPUs are responsible for executing the quantum 
 tasks defined by the user.
 
-For these vQPUs to function, they require a management system. This part is written in C++, aiming 
+For these vQPUs to work, they require a management system. This system is written in C++, aiming 
 for higher performance and better integration with the simulation libraries, most of which are also 
-written in this language. In addition to this management system, it is necessary to define an API 
-that allows the definition of quantum tasks and their subsequent submission to the vQPUs. In other 
-words, it is essential to provide the user with the tools necessary to use the platform in an 
-intuitive and convenient way. For this, a Python API was developed, as this language is the most 
-commonly used in the quantum computing field. 
+written in this language. In addition to this management system, it was necessary to define an API 
+that allows the definition of quantum tasks and their subsequent submission to the vQPUs, providing
+an intuitive and convenient way of using the platform.
 
 This documentation will exclusively detail the parts of the library that are required by the user 
-to employ the platform. This includes a series of commands that allow the user to manage the vQPUs 
-and the Python API. Both explanations can be found in the :doc:`CUNQA reference <reference/reference>` 
+to employ the platform which can be found in the :doc:`CUNQA reference <reference/reference>` 
 section.
 
 All the code is available on the `GitHub repository <https://github.com/CESGA-Quantum-Spain/cunqa>`_ 
@@ -57,6 +54,8 @@ and a detailed explanation of the work done can be seen at the CUNQA preprint [v
    :hidden:
    :caption: Contents:
 
-   Getting started <getting_started/getting_started>
-   Examples <examples/examples>
+   Installation <installation/getting_started>
+   Quick start <quick_start/quick_start>
+   CUNQA overview <cunqa_overview/cunqa_overview>
+   Examples <further_examples/further_examples>
    CUNQA reference <reference/reference>

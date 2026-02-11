@@ -1,8 +1,5 @@
-Getting started
-===============
-
 Installation
-------------
+=============
 
 Clone repository
 ^^^^^^^^^^^^^^^^
@@ -124,7 +121,7 @@ CESGA are available inside ``easybuild/`` folder.
 
 
 Uninstall
----------
+^^^^^^^^^^
 
 There has also been developed a Make directive to uninstall CUNQA if needed:
 

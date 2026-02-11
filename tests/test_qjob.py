@@ -23,7 +23,7 @@ def circuit_ir():
         "num_clbits": 2,
         "num_qubits": 3,
         "instructions": [{"name": "h", "qubits": [0]}],
-        "sending_to": "qpu-1",
+        "sending_to": ["qpu-1"],
         "is_dynamic": False,
     }
 
