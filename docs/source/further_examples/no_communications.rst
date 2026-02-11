@@ -1,6 +1,6 @@
-*****************
-No communications
-*****************
+**************************
+No-communications scheme
+**************************
 
 The no-communications scheme is the simplest one and, at the same time, the one that yields the
 largest improvement in terms of execution time. This is because it entails a classical distribution

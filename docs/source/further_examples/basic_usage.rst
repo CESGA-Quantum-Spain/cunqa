@@ -4,18 +4,16 @@ CUNQA basic usage
 
 Circuit design
 ==============
-As already explained when discussing the API of :py:class:`~cunqa.circuit.core.CunqaCircuit`, this 
+As it is explained in :py:class:`~cunqa.circuit.core.CunqaCircuit`, this 
 class does not aim to solve any existing problem in current circuit design APIs, but rather to 
 extend them by adding communication directives. Here we will look at several simple examples that 
 make this clear.
 
 Circuit without communications
 -------------------------------
-Indeed, :py:class:`~cunqa.circuit.core.CunqaCircuit` is very similar to the rest of the APIs and 
-does not imply a steep learning curve for those who are already used to programming quantum circuits.
 
-In the following code snippet we see how to construct a Bell pair, which allows us to understand 
-how gates are applied; effectively confirming that the CUNQA API does not explore any new method.
+In the following code snippet we see how to build a circuit that prepares a Bell pair. This allows us to understand 
+how quantum instructions are applied, illustrating the simplicity of the process.
 
 .. code-block:: python
     :caption: Simple Bell pair constructed.
@@ -26,10 +24,9 @@ how gates are applied; effectively confirming that the CUNQA API does not explor
     c.measure(0, 0)
     c.measure(1, 1)
 
-The only novelty in this type of operation without communications is found in the case of
-:py:meth:`~~cunqa.circuit.core.CunqaCircuit.cif`. This defines a ``ContextManager`` responsible for 
-adding conditional gates. In the following example we see that this is done by applying the gates 
-to a subcircuit that we name ``cgates``.
+For the classically conditioned gates, we implemented the  
+:py:meth:`~~cunqa.circuit.core.CunqaCircuit.cif` instruction which is used within a ``with`` statement as a context manager responsible for 
+adding the conditioned gates. This is illustrated in the following example:
 
 .. code-block:: python
     :caption: :py:meth:`~~cunqa.circuit.core.CunqaCircuit.cif` example.
@@ -41,23 +38,18 @@ to a subcircuit that we name ``cgates``.
     with c.cif(0) as cgates:
         cgates.x(1)
 
-The operations inside the ``cif`` block are executed only if the value stored in classical bit
-``0`` is equal to ``1``. Currently, ``cif`` does not support an explicit *else* branch. This design
-choice reflects the requirements of the distributed algorithms currently supported by CUNQA.
+In the example above, the operations inside the block are applied only if the value stored in the
+``0`` bit of the classical register is equal to ``1``.
 Future extensions may introduce *else* support if needed.
 
 Circuits with classical communications
 --------------------------------------
 Entering the realm of communication directives, it is convenient to start with the simplest ones:
-classical communication directives. In CUNQA, for the moment there are only two,
-:py:meth:`~~cunqa.circuit.core.CunqaCircuit.send` and :py:meth:`~~cunqa.circuit.core.CunqaCircuit.recv`; 
-both are two sides of the same coin, since :py:meth:`~~cunqa.circuit.core.CunqaCircuit.send` is 
-responsible for sending a bit of classical information and 
-:py:meth:`~~cunqa.circuit.core.CunqaCircuit.recv` for receiving it. We can observe how they work in 
-the following example.
+classical communication directives. CUNQA supports send and receive
+directives, two sides of the same coin, since they are responsible for exchanging classical bits between vQPUs. These directives are implemented through the :py:class:`~cunqa.circuit.core.CunqaCircuit` methods :py:meth:`~~cunqa.circuit.core.CunqaCircuit.send` and :py:meth:`~~cunqa.circuit.core.CunqaCircuit.recv` as the code below shows.
 
 .. code-block:: python
-    :caption: ``circuit1`` sending the bit from classical bit ``0``.
+    :caption: ``circuit1`` sending the index ``0`` bit.
 
     c1 = CunqaCircuit(1, 1, id="circuit1")
     c1.h(0)
@@ -65,7 +57,7 @@ the following example.
     c1.send(0, recving_circuit = "circuit2")
 
 .. code-block:: python
-    :caption: ``circuit2`` receiving the bit on classical bit ``0`` and using it in a ``cif``.
+    :caption: ``circuit2`` receiving the coming bit into index ``0``.
     
     c2 = CunqaCircuit(1, 1, id="circuit2")
     c2.recv(0, sending_circuit = "circuit1")
@@ -73,24 +65,17 @@ the following example.
     with c2.cif(0) as cgates:
         cgates.x(1)
 
-As is well known in, for example, MPI, classical communications include a series of collective
-operations that allow the massive communication of information among participants. In CUNQA we have
-moved away from this type of use case because we have not found them used in any algorithm. In any
-case, if they were needed by some algorithm or user, they would be added.
+Although this is similar to the MPI protocol, CUNQA does not support collective communications yet. They can be added if the need arises.
 
 Circuits with quantum communications
 ------------------------------------
-In this case we find that there are two protocols: teledata and telegate. The first corresponds to
-the well-known quantum teleportation, which transfers the state of a qubit from one QPU to the 
-qubit of another (which in the case of CUNQA are virtual QPUs). The second is a protocol that 
-allows controlling qubits of one QPU with the state of a qubit from another QPU, that is, 
-controlling gates remotely (hence the name telegate). Let us see how they work.
+In this scheme, the teledata and telegate communication protocols were implemented.
 
 Teledata
 ^^^^^^^^
-Teledata directives are analogous to those of :py:meth:`~~cunqa.circuit.core.CunqaCircuit.send` and
-:py:meth:`~~cunqa.circuit.core.CunqaCircuit.recv`, but instead of sending and receiving the state 
-of a bit, they send and receive the state of a qubit.
+This is the well-known quantum teleportation, which transfers the state of a qubit from one QPU to the 
+qubit of another QPU.
+Teledata is implemented through the :py:class:`~cunqa.circuit.core.CunqaCircuit` methods :py:meth:`~~cunqa.circuit.core.CunqaCircuit.qsend` and :py:meth:`~~cunqa.circuit.core.CunqaCircuit.qrecv` as shown in the code below.
 
 .. code-block:: python
     :caption: ``circuit1`` sending the state of qubit ``0``.
@@ -100,18 +85,16 @@ of a bit, they send and receive the state of a qubit.
     c1.qsend(0, recving_circuit = "circuit2")
 
 .. code-block:: python
-    :caption: ``circuit2`` receiving the state of qubit ``0`` of ``circuit1`` into its qubit ``0``.
+    :caption: ``circuit2`` receiving the state of qubit ``0`` from ``circuit1`` into qubit ``0``.
     
     c2 = CunqaCircuit(1, 1, id="circuit2")
     c2.qrecv(0, sending_circuit = "circuit1")
 
 Telegate
 ^^^^^^^^
-This protocol, as we already anticipated, allows gates to be controlled remotely. To do so, we will
-use a structure very similar to that of :py:meth:`~~cunqa.circuit.core.CunqaCircuit.cif`, that is, 
-we will have a ``ContextManager`` that, in this case, will return a subcircuit on which to apply 
-the gates and, additionally, an index representing the communication qubit that contains the state 
-of the remote qubit. We observe this below.
+This protocol allows applying remote two-qubit gates between different QPUs. To implement this as a :py:class:`~cunqa.circuit.core.CunqaCircuit` method, a structure very similar to that of :py:meth:`~~cunqa.circuit.core.CunqaCircuit.cif` is used.
+The example below shows how the implementation returns a subcircuit on which to apply 
+the gates and the index representing the communication qubit that contains the state.
 
 .. code-block:: python
     :caption: ``circuit1`` exposing qubit ``0`` and ``circuit2`` using it as the control of a ``cx`` gate.
@@ -131,9 +114,9 @@ transformations along with their execution can be observed.
 
 Union
 ^^^^^
-Union involves creating a larger circuit by joining the qubits and their operations from the
-circuits subject to this transformation. In the following example we observe the union of two 
-simple circuits.
+Given two circuits with *n* and *m* qubits, their union returns a circuit with *n + m* qubits, where the operations of the former are applied to the first *n* qubits and those of the latter
+are applied to the last *m* qubits. If originally there were distributed instructions between the circuits, they would be replaced by local ones. In the following example we observe the union of two 
+simple circuits. 
 
 .. code-block:: python
     :caption: Union of two quantum circuits.
@@ -156,8 +139,7 @@ Which corresponds to the following union.
 
 Addition
 ^^^^^^^^
-Addition, unlike union, results in a circuit with the size of the largest circuit. What this
-operation does is concatenate the operations of the circuits that are part of the operation.
+Addition of two circuits results in a new circuit with the size of the largest circuit and whose instructions are the concatenation of the original circuits instructions.
 
 .. code-block:: python
     :caption: Addition of two quantum circuits.
@@ -179,10 +161,8 @@ Which corresponds to the following addition.
 
 Horizontal split
 ^^^^^^^^^^^^^^^^
-Horizontal split, as the inverse of union, involves dividing circuits into smaller ones, with the
-operations associated with each qubit ending up in the subcircuit that contains it. Let us take the
-``union_circuit`` resulting from the union example. The original circuits are obtained simply by
-operating as shown below.
+Given a circuit, this function divides the set of qubits into smaller subsets preserving each qubit's operations. Multi-qubit gates that involve different resulting subcircuits will be replaced by their remote counterpart. Therefore, horizontal split is the inverse of the union, so, let us take the
+``union_circuit`` resulting from the union example to illustrate this operation:
 
 .. code-block:: python
     :caption: Horizontal split of the ``union_circuit`` circuit.
@@ -193,13 +173,10 @@ operating as shown below.
     # As int, in this case is equivalent
     [c1, c2] = hsplit(union_circuit, 2)
 
-We see that one can specify the number of qubits required in each subcircuit—first
-:py:func:`hsplit`—or the number of circuits—second. In this case they are the same, but this is not
-usually common, since the first option offers greater modularity than the second, which always
-divides the number of qubits evenly among the circuits.
+In the :py:class:`~cunqa.circuit.core.CunqaCircuit` method implementation, one can specify the number of qubits required in each subcircuit as a list or the number of circuits. The list form allows the resulting circuits to have different amount of qubits.
 
 Circuit execution
-=================
+==================
 We will now see how to execute the circuits that we have just built. We will go to the simplest
 possible example, ignoring, for the moment, the communication paradigm used.
 

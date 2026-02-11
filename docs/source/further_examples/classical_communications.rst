@@ -1,6 +1,6 @@
-************************
-Classical communications
-************************
+*******************************
+Classical-communications scheme
+*******************************
 
 The classical-communications directives are already explained in the documentation of
 :py:class:`~cunqa.circuit.core.CunqaCircuit`, so here we will look at an example of how to use them.
