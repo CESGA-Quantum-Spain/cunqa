@@ -15,7 +15,7 @@
 namespace fs = std::filesystem;
 
 
-constexpr int DEFAULT_MEM_PER_CORE = 4;
+constexpr int DEFAULT_MEM_PER_CORE = 15;
 
 bool check_time_format(const std::string& time)
 {
