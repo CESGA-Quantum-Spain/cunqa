@@ -21,8 +21,8 @@ cc_2 = CunqaCircuit(1, id="Second")
 
 cc_1.h(0)
 
-with cc_1.expose(0, cc_2) as rcontrol:
-    cc_2.cx(rcontrol,0)
+with cc_1.expose(0, cc_2) as (rqubit, subcircuit):
+    subcircuit.cx(rqubit,0)
 
 
 cc_1.measure_all()

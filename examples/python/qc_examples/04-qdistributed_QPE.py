@@ -22,9 +22,9 @@ def dist_QPE_rz_circuits(n_ancilla_qubits, angle_to_compute):
         ancilla_circuit.h(i)
 
     for i in range(n_ancilla_qubits):
-        with ancilla_circuit.expose(n_ancilla_qubits - 1 - i, register_circuit) as rcontrol:
+        with ancilla_circuit.expose(n_ancilla_qubits - 1 - i, register_circuit) as (rqubit, subcircuit):
             param = (2**i) * angle_to_compute
-            register_circuit.crz(param, rcontrol, 0)
+            subcircuit.crz(param, rqubit, 0)
 
     
     if (n_ancilla_qubits % 2) == 0:

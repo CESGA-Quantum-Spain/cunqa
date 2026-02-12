@@ -6,3 +6,5 @@
 
 .. autoclass:: cunqa.qjob.QJob
    :no-members:
+
+.. autofunction:: cunqa.qjob.gather

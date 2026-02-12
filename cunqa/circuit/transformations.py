@@ -81,8 +81,8 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
                     ctrl_qubit = inst["qubits"][0] - initial_qubits[i]
                     target_qubit = inst["qubits"][1] - initial_qubits[j]
 
-                    with sub_circuit.expose(ctrl_qubit, target_circuit) as (subcircuit, rcontrol):
-                        inst["qubits"][0] = rcontrol
+                    with sub_circuit.expose(ctrl_qubit, target_circuit) as (rqubit, subcircuit):
+                        inst["qubits"][0] = rqubit
                         inst["qubits"][1] = target_qubit
                         subcircuit.add_instructions([inst])
                 else:

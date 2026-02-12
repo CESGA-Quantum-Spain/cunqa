@@ -103,8 +103,8 @@ the gates and the index representing the communication qubit that contains the s
     c2 = CunqaCircuit(1, id="circuit2")
 
     c1.h(0)
-    with c1.expose(0, c2) as cgates, rcontrol:
-        cgates.cx(rcontrol,0)
+    with c1.expose(0, c2) as rqubit, subcircuit:
+        subcircuit.cx(rqubit,0)
 
 Circuit transformations
 -----------------------

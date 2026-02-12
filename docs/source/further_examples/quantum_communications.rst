@@ -79,8 +79,8 @@ each protocol.
 
         c2 = CunqaCircuit(1, id="circuit2")
 
-        with c1.expose(0, c2) as rcontrol:
-            c2.cx(rcontrol,0)
+        with c1.expose(0, c2) as rqubit, subcircuit:
+            subcircuit.cx(rqubit,0)
 
         c1.measure_all()
         c2.measure_all()

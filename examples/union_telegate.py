@@ -14,8 +14,8 @@ circuit1 = CunqaCircuit(1, id = "circuit1") # adding ancilla
 circuit1.h(0)
 circuit2 = CunqaCircuit(1, id = "circuit2")
 
-with circuit1.expose(0, circuit2) as (subcircuit, rcontrol):
-    subcircuit.cx(rcontrol,0)
+with circuit1.expose(0, circuit2) as (rqubit, subcircuit):
+    subcircuit.cx(rqubit,0)
 
 circuit1.measure_all()
 circuit2.measure_all()
