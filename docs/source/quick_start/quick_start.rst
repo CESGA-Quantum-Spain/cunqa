@@ -1,7 +1,7 @@
 Quick start
 ===========
 
-The basic CUNQA workflow can be summarized as:
+Once :ref:`installed <sec_installation>`, the basic CUNQA workflow can be summarized as:
 
 1. **Deploy vQPUs:** allocate classical resources for simulation. 
 2. **Design quantum task:** create quantum circuits to be run on vQPUs. 

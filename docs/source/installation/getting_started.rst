@@ -1,3 +1,5 @@
+.. _sec_installation:
+
 Installation
 =============
 
@@ -90,6 +92,8 @@ value.
    cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
    cmake --build build/ --parallel $(nproc)
    cmake --install build/
+
+To enable the GPU execution provided by AerSimulator, the flag `-DAER_GPU=TRUE` must be provided at build time.
 
 It is important to mention that the user can also employ `Ninja <https://ninja-build.org/>`_ to 
 perform this task.

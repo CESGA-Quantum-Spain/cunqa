@@ -26,3 +26,4 @@ capabilities of CUNQA in distributed quantum computing scenarios.
       No-communications <no_communications.rst>
       Classical-communications <classical_communications.rst>
       Quantum-communications <quantum_communications.rst>
+      Raw JSON examples <json_examples/json_examples.rst>
