@@ -57,5 +57,5 @@ and a detailed explanation of the work done can be seen at the CUNQA preprint [v
    Installation <installation/getting_started>
    Quick start <quick_start/quick_start>
    CUNQA overview <cunqa_overview/cunqa_overview>
-   Examples <further_examples/further_examples>
+   Further Examples <further_examples/further_examples>
    CUNQA reference <reference/reference>
