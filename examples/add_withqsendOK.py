@@ -32,8 +32,8 @@ results = gather(qjobs)
 pprint(union_circuit.instructions)
 pprint(circuit3.instructions)
 
-print("--------- Result before addition: ---------")
+print("--------- Result after addition: ---------")
 for q in results:
-    print("Result: ", q.counts)
-    print()
+    print(f"Result: {q.counts}\n")
+
 qdrop(family)
