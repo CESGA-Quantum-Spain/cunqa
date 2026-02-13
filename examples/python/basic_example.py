@@ -1,30 +1,37 @@
 import os, sys
-from time import sleep
 
-# path to access c++ files
+# Adding path to access CUNQA module
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.qutils import get_QPUs, qraise, qdrop
+# Let's get the raised QPUs
+from cunqa.qpu import get_QPUs
+
+# List of deployed vQPUs
+qpus  = get_QPUs(co_located=True)
+
+# Let's create a circuit to run in our QPUs
 from cunqa.circuit import CunqaCircuit
 
-# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
-
-qpus  = get_QPUs(on_node = False, family = family)
-
-qc = CunqaCircuit(5)
+qc = CunqaCircuit(num_qubits = 2)
 qc.h(0)
-qc.cx(0, 1)
+qc.cx(0,1)
 qc.measure_all()
 
-qpu = qpus[0]
-qjob = qpu.run(qc, transpile = False, shots = 10) # non-blocking call
+qcs = [qc] * 4
 
+# Submitting the same circuit to all vQPUs
+from cunqa.qpu import run
 
-counts = qjob.result.counts
-time = qjob.time_taken
+qjobs = run(qcs , qpus, shots = 1000)
 
-print(qjob.result)
+# Gathering results
+from cunqa.qjob import gather
 
-########## Drop the deployed QPUs #
-qdrop(family)
+results = gather(qjobs)
+
+# Getting the counts
+counts_list = [result.counts for result in results]
+
+# Printing the counts
+for counts in counts_list:
+    print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
