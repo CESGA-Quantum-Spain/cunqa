@@ -37,7 +37,7 @@ def _(c: dict) -> dict:
 @to_ir.register
 def _(c: QuantumCircuit) -> dict:
     """
-    Transforms a :py:class:`qiskit.QuantumCircuit` to json :py:class:`dict`.
+    Transforms a `qiskit.QuantumCircuit` to json `dict`.
 
     Args:
         c (qiskit.QuantumCircuit): circuit to transform to json.
@@ -130,4 +130,3 @@ def _(c: QuantumCircuit) -> dict:
                                         "params":instruction.operation.params
                                         })
     return json_data
-    

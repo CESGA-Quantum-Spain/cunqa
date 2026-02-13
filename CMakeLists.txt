@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CUNQA VERSION 0.0.1 LANGUAGES CXX)
+project(CUNQA VERSION 1.2.0 LANGUAGES CXX)
 
 message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE CONFIGURATION TYPE: ${CMAKE_CONFIGURATION_TYPES}")
@@ -11,6 +11,7 @@ endif()
 # Adding C++20 standard as required
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg") # Dani, for profiling with gprof
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 message(STATUS "C++ version ${CXX_STANDARD} configured.")
 message(STATUS "${CMAKE_VERSION}")
@@ -19,6 +20,11 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
     cmake_policy(SET CMP0135 NEW)
 endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+
+# GPU MACROS
+set(COMPILATION_FOR_GPU FALSE)
+set(GPU_ARCH "")
+set(MAX_GPUS_PER_NODE "")
 
 # Check that $STORE exists
 if(NOT DEFINED ENV{STORE})
@@ -53,10 +59,12 @@ if(${SYSTEM_NAME} STREQUAL "QMIO")
   find_package(pybind11 2.13 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
-  set(pybind11_DIR "/opt/cesga/2022/software/Core/pybind11/2.12.0-python-3.10.8/lib64/python3.10/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.10.8 COMPONENTS Interpreter Development)
-  find_package(pybind11 2.12 REQUIRED)
-  set(PYBIND11_PYTHON_VERSION 3.10 CACHE STRING "")
+  set(pybind11_DIR "/opt/cesga/2020/software/Core/pybind11/2.13.1-python-3.9.9/lib/python3.9/site-packages/pybind11/share/cmake/pybind11/")
+  include_directories("/opt/cesga/2020/software/Core/python/3.9.9/include/python3.9/")
+  find_package(Python 3.9.9 EXACT COMPONENTS Interpreter Development)
+  find_package(pybind11 2.13.1 REQUIRED)
+  set(PYBIND11_PYTHON_VERSION 2.13 CACHE STRING "")
+  
 else() # Other clusters
   find_package(Python 3.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.7 REQUIRED)
@@ -64,7 +72,7 @@ endif()
 
 find_package(Threads REQUIRED)
 find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
@@ -82,7 +90,7 @@ function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
     )
     FetchContent_MakeAvailable(${PACKAGE_NAME})
   else()
-    message(STATUS "Found package ${PACKAGE_NAME}")
+    message(STATUS "Found package ${PACKAGE_NAME}: ${PACKAGE_NAME}_DIR = ${${PACKAGE_NAME}_DIR}")
   endif()
 endfunction()
 
@@ -155,6 +163,19 @@ find_or_fetch_package(
   "v4.11.0"
 )
 
+# -- pyzmq -----------------------------------------------------------
+set(ZMQ_PREFIX "${libzmq_BINARY_DIR}" CACHE PATH "ZMQ_PREFIX" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}/lib")
+
+FetchContent_Declare(
+    pyzmq
+    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
+    GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(pyzmq)
+install(DIRECTORY  "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq")
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq/backend/cython")
+
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
 # =====================================================================
@@ -176,12 +197,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(argparse)
 
 # =====================================================================
-#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix)
+#  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix and GPU setter)
 # =====================================================================
 FetchContent_Declare(
     aer
     GIT_REPOSITORY "git@github.com:CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git"
-    GIT_TAG "717e77a5257c35ce49dfbb4e8ba8c23acbadfe14"
+    GIT_TAG "8679dbe68458a43661222bc86e6e877d1084125b"
 )
 FetchContent_GetProperties(aer)
 if(NOT aer_POPULATED)
@@ -196,8 +217,122 @@ if(OpenMP_FOUND)
 endif()
 if(pybind11_FOUND)
   target_link_libraries(aer_headers INTERFACE pybind11::headers)
-  message(STATUS "Linked pybind aer-cpp")
+  message(STATUS "Linked pybind aer-cpp") 
 endif()
+if (DEFINED AER_GPU)
+  message(STATUS "Compiling with AER_GPU")
+  set(COMPILATION_FOR_GPU TRUE)
+  
+  #set(CMAKE_CUDA_COMPILER "/path/to/bin/nvcc")
+  #set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
+  #set(CMAKE_CUDA_COMPILER_VERSION "12.8.0")
+  #set(CMAKE_CUDA_COMPILER_WORKS TRUE)
+  
+  # Architecture           GPUs (examples)        SM
+  # -------------------------------------------------
+  # Volta                  V100                   70
+  # Turing                 T4, RTX 2080           75
+  # Ampere                 A100                   80
+  # Ampere (GA10x)         RTX 30xx               86
+  # Ada Lovelace           RTX 40xx               89
+  # Hopper                 H100                   90
+  
+  set(GPU_ARCH 80)
+  set(MAX_GPUS_PER_NODE 8) # Dependent on GPU_ARCH and CLUSTER
+  set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
+  enable_language(CUDA)
+  set(CMAKE_CUDA_STANDARD 20)
+  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+  
+  find_package(Python REQUIRED COMPONENTS Interpreter Development)
+  find_library(PMIX_LIB NAMES pmix REQUIRED)
+
+  find_package(CUDAToolkit REQUIRED)
+  target_compile_definitions(aer_headers INTERFACE
+      AER_THRUST_GPU
+      AER_THRUST_CUDA
+      AER_THRUST_SUPPORTED=TRUE
+      THRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA
+  )
+  target_compile_options(aer_headers INTERFACE
+      $<$<COMPILE_LANGUAGE:CUDA>:
+          --expt-extended-lambda
+          --use_fast_math
+          -use_fast_math 
+          --expt-extended-lambda
+          -Xcompiler=-fPIC 
+          -Xcompiler=-Wno-psabi 
+          -Xcompiler=-Wno-ignored-attributes 
+          -Xcompiler=-fopenmp
+      >
+  )
+  target_link_libraries(aer_headers INTERFACE Python::Python Threads::Threads ${PMIX_LIB} CUDA::cudart)
+endif()
+
+# =====================================================================
+#  Maestro and its dependencies
+# =====================================================================
+find_package(Eigen3 5.0 QUIET)
+if(NOT Eigen3_FOUND)
+  message(STATUS "Package Eigen3 not found, fetching from https://gitlab.com/libeigen/eigen.git")
+  FetchContent_Declare(
+      MaestroEigen
+      GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
+      GIT_TAG        "bc3b39870ecb690a623a3f49149a358b95c5781d"
+  )
+  FetchContent_GetProperties(MaestroEigen)
+  if(NOT maestroeigen_POPULATED)
+      FetchContent_Populate(MaestroEigen)
+  endif()
+  #FetchContent_MakeAvailable(MaestroEigen)
+  set(EIGEN5_INCLUDE_DIR "${maestroeigen_SOURCE_DIR}") 
+else()
+  message(STATUS "Eigen 5.0 found")
+  set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
+endif()
+
+get_target_property(
+    JSON_INCLUDE_PATH 
+    nlohmann_json::nlohmann_json 
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}") 
+
+# -- QCSim ------------------------------------------------------------
+FetchContent_Declare(
+    qcsim
+    GIT_REPOSITORY "git@github.com:aromanro/QCSim.git"
+    GIT_TAG "76db3f97974221306c9e2b7be4c4c9f6e7318d6e"
+)
+if(NOT qcsim_POPULATED)
+    FetchContent_Populate(qcsim) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
+
+# -- AER - Qiskit simulator headers (fork for Maestro) ----------------
+FetchContent_Declare(
+    maestro-aer
+    GIT_REPOSITORY "git@github.com:InvictusWingsSRL/qiskit-aer.git"
+    GIT_TAG "96e82fdd1c8c1b17d749863ee5095262372e0d7e"
+)
+if(NOT maestro-aer_POPULATED)
+    FetchContent_Populate(maestro-aer) # Emply of populate to avoid the compilation of wrappers
+endif()
+
+set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
+
+# -- Maestro ----------------------------------------------------------
+
+FetchContent_Declare(
+    maestro
+    GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
+    GIT_TAG "a4d54721a718189362a4a9c8329d7211b662a8f9"
+)
+FetchContent_MakeAvailable(maestro)
+
+target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
+install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 # =====================================================================
 #  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
@@ -206,8 +341,8 @@ FetchContent_Declare(
     qulacs
     GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
     GIT_TAG "228f617b9e31007b54488f467c031ebbf07efcdb"
-
 )
+
 set(USE_PYTHON OFF CACHE BOOL "" FORCE)
 set(BUILD_QULACS_WITH_MPI OFF)
 if(BUILD_QULACS_WITH_MPI)

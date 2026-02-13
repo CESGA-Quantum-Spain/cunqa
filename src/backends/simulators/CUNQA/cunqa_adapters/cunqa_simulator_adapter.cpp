@@ -349,7 +349,7 @@ JSON CunqaSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
     {
         // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Cunqa simulator.");
-        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }
     return {};
 

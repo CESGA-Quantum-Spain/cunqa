@@ -374,61 +374,45 @@ std::string MunichSimulatorAdapter::execute_shot_(
 
 JSON MunichSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Munich usual simulation");
+    auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
+    auto quantum_task = p_qca->quantum_tasks[0];
+
+    // TODO: Change the format with the free functions
+    std::string circuit = quantum_task_to_Munich(quantum_task);
     try
     {   
-        auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
-        auto quantum_task = p_qca->quantum_tasks[0];
-
-        // TODO: Change the format with the free functions
-        std::string circuit = quantum_task_to_Munich(quantum_task);
+        
         auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
 
         float time_taken;
         int n_qubits = quantum_task.config.at("num_qubits");
+        CircuitSimulator sim(std::move(mqt_circuit));
 
-        JSON noise_model_json = backend->config.at("noise_model");
-        if (!noise_model_json.empty()) {
-            const ApproximationInfo approx_info{noise_model_json["step_fidelity"], noise_model_json["approx_steps"], ApproximationInfo::FidelityDriven};
-            StochasticNoiseSimulator sim(std::move(mqt_circuit), approx_info, quantum_task.config["seed"], "APD", noise_model_json["noise_prob"],
-                                            noise_model_json["noise_prob_t1"], noise_model_json["noise_prob_multi"]);
+        auto start = std::chrono::high_resolution_clock::now();
+        // TODO: Change this to directly call the simulate without creating a new instance?
+        auto result = sim.simulate(quantum_task.config["shots"]);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        time_taken = duration.count();
 
-            auto start = std::chrono::high_resolution_clock::now();
-            auto result = sim.simulate(quantum_task.config["shots"]);
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            time_taken = duration.count();
-
-            if (!result.empty()) {
-                return {{"counts", result}, {"time_taken", time_taken}};
-            }
-            throw std::runtime_error("QASM format is not correct.");
-        } else {
-            CircuitSimulator sim(std::move(mqt_circuit));
-
-            auto start = std::chrono::high_resolution_clock::now();
-            // TODO: Change this to directly call the simulate without creating a new instance?
-            auto result = sim.simulate(quantum_task.config["shots"]);
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            time_taken = duration.count();
-
-            if (!result.empty()) {
-                return {{"counts", result}, {"time_taken", time_taken}};
-            }
-            throw std::runtime_error("QASM format is not correct.");
+        if (!result.empty()) {
+            return {{"counts", result}, {"time_taken", time_taken}};
         }
+        throw std::runtime_error("QASM format is not correct.");
     }
     catch (const std::exception &e)
     {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Munich simulator.");
-        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+        LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }
     return {};
 }
 
 JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
 {
+    LOGGER_DEBUG("Munich dynamic simulation");
     // TODO: Avoid the static casting?
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
     std::map<std::string, std::size_t> meas_counter;

@@ -1,16 +1,11 @@
 import os, sys
-sys.path.insert(0, os.path.abspath('../..'))
-
-os.environ['CUNQA_PATH'] = ''
-os.environ['HOSTNAME'] = ''
-os.environ['QPUS_FILEPATH'] = ''
-os.environ['SLURMD_NODENAME'] = ''
-os.environ['SLURM_JOB_ID'] = ''
-os.environ['STORE'] = ''
+import types
 
 project = 'CUNQA'
 copyright = '2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
 author = 'Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
+
+sys.path.insert(0, os.path.abspath('../..'))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -27,9 +22,21 @@ extensions = [
 
 source_suffix = ['.rst']
 
+os.environ['HOSTNAME'] = ''
+os.environ['SLURMD_NODENAME'] = ''
+os.environ['SLURM_JOB_ID'] = ''
+os.environ['STORE'] = ''
+
+mock_constants = types.ModuleType("cunqa.constants")
+mock_constants.LIBS_DIR = ""
+mock_constants.QPUS_FILEPATH = ""
+mock_constants.CUNQA_PATH = ""
+mock_constants.REMOTE_GATES = ""
+sys.modules["cunqa.constants"] = mock_constants
+
 autodoc_mock_imports = [
     'argparse',
-    'collections',
+    'collections', 
     'copy',
     'cunqa.constants',
     'cunqa.logger',
@@ -48,10 +55,10 @@ autodoc_mock_imports = [
     'os',
     'random',
     'string',
-    'subprocess',
+    'subprocess', 
     'sys',
     'time',
-    'typing'
+    'typing',
 ]
 
 nbsphinx_execute = "never" # Never execute the Jupyter notebooks

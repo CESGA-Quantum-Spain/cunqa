@@ -26,6 +26,7 @@ from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
+from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
@@ -75,16 +76,21 @@ class QPU:
     _id: int 
     _backend: Backend
     _family: str
-    _qclient: QClient
+    _qclient: Union[QClient, QMIOClient]
+    _device: dict
 
-    def __init__(self, id: int, backend: Backend, family: str, endpoint: str):
+    def __init__(self, id: int, backend: Backend, device: dict, family: str, endpoint: str):
         self._id = id
         self._backend = backend
+        self._device = device
         self._family = family
         
-        self._qclient = QClient()
-        self._qclient.connect(endpoint)
+        if (device['device_name'] == 'QPU'):
+            self._qclient = QMIOClient() # TODO: Generalize QPU
+        else:
+            self._qclient = QClient()
 
+        self._qclient.connect(endpoint)
         logger.debug(f"Object for QPU {id} created and connected to endpoint {endpoint}.")
 
     @property
@@ -105,7 +111,12 @@ class QPU:
         """Name of the family to which the corresponding vQPU belongs."""
         return self._family
 
-    def execute(self, circuit_ir: dict, **run_parameters: Any) -> QJob:
+    def execute(
+        self, 
+        circuit_ir: dict, 
+        param_values: dict[str, Union[float, int]] = None, 
+        **run_parameters: Any
+    ) -> QJob:
         """
         Class method responsible of executing a circuit into the corresponding vQPU that this class 
         connects to. Possible instructions to add as `**run_parameters` are simulator dependant, 
@@ -115,8 +126,8 @@ class QPU:
             circuit_ir (dict): circuit IR to be simulated at the vQPU.
             **run_parameters: any other simulation instructions.
         """
-        qjob = QJob(self._qclient, circuit_ir, **run_parameters)
-        qjob.submit()
+        qjob = QJob(self._qclient, self._device, circuit_ir, **run_parameters)
+        qjob.submit(param_values)
         logger.debug(f"Qjob submitted to QPU {self._id}.")
 
         return qjob
@@ -125,6 +136,7 @@ class QPU:
 def run(
         circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
+        param_values: dict[str, Union[float, int]] = None,
         **run_args: Any
     ) -> Union[list[QJob], QJob]:
     """
@@ -213,7 +225,7 @@ def run(
         circuit["id"] = correspondence[circuit["id"]]
 
     run_parameters = {k: v for k, v in run_args.items()}
-    qjobs = [qpu.execute(circuit, **run_parameters) for circuit, qpu in zip(circuits_ir, qpus)]
+    qjobs = [qpu.execute(circuit, param_values, **run_parameters) for circuit, qpu in zip(circuits_ir, qpus)]
 
     if len(circuits_ir) == 1:
         return qjobs[0]
@@ -260,8 +272,9 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         QPU(
             id = id,
             backend = info['backend'],
-            family = info["family"],
-            endpoint = info["net"]["endpoint"]
+            device = info['net']['device'],
+            family = info['family'],
+            endpoint = info['net']['endpoint']
         ) for id, info in targets.items()
     ]
         

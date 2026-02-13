@@ -1,10 +1,14 @@
 """Core implementation of CUNQA's custom quantum circuit abstraction."""
 
 from __future__ import annotations
+
 import numpy as np
 from typing import Union, Optional
+from sympy.core.sympify import sympify, SympifyError
 
-from .helpers import generate_id
+from cunqa.circuit.helpers import generate_id
+from cunqa.circuit.parameter import Param
+
 from cunqa.logger import logger
 
 class CunqaCircuit:
@@ -59,7 +63,7 @@ class CunqaCircuit:
 
         * - 
           - Quantum communication
-          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`, :py:meth:`rcontrol`
+          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`
 
 
     .. autoattribute:: id
@@ -170,6 +174,7 @@ class CunqaCircuit:
     quantum_regs: dict  #: Dictionary of quantum registers as ``{"name": [assigned qubits]}``.
     classical_regs: dict #: Dictionary of classical registers of the circuit as ``{"name": [assigned clbits]}``.
     sending_to: set[str] #: Set of circuit ids to which the current circuit is sending measurement outcomes or qubits. 
+    params: list[Param] #: Ordered list of the parameters names that the circuit currently has.
 
     def __init__(
             self, 
@@ -179,6 +184,7 @@ class CunqaCircuit:
         ):
         self.is_dynamic = False
         self.instructions = []
+        self.params = []
         self.quantum_regs = {}
         self.classical_regs = {}        
         self.sending_to = set()
@@ -208,14 +214,15 @@ class CunqaCircuit:
         Information of the instance attributes, given in a dictionary.
         """
         return {
-            "id":self._id, 
-            "instructions": self.instructions, 
+            "id": self._id,
+            "instructions": self.instructions,
             "num_qubits": self.num_qubits,
             "num_clbits": self.num_clbits,
             "classical_registers": self.classical_regs,
-            "quantum_registers": self.quantum_regs,  
-            "is_dynamic":self.is_dynamic, 
-            "sending_to":list(self.sending_to)
+            "quantum_registers": self.quantum_regs,
+            "is_dynamic": self.is_dynamic, 
+            "sending_to": list(self.sending_to),
+            "params": self.params
         }
 
     @property
@@ -239,7 +246,28 @@ class CunqaCircuit:
         Args:
             instruction (dict | list[dist]): instruction to be added.
         """
-
+        
+        if "params" in instructions:
+            
+            # Converting the string to a symbolic expression
+            try:
+                exprs = sympify(instructions["params"])
+            except SympifyError:
+                raise ValueError(f"Expression {instructions['params']} cannot be converted to "
+                                 f"symbolic expression.")
+            
+            # Adding to the instruction the Param object or a real number depending on the specified
+            # (if real, the parameter will not be changed)
+            new_list = []
+            for expr, param in zip(exprs, instructions["params"]):
+                if not expr.is_real:
+                    new_param = Param(expr)
+                    self.params.append(new_param)
+                    new_list.append(new_param)
+                else:
+                    new_list.append(param)
+            instructions["params"] = new_list
+            
         if (isinstance(instructions, dict)):
             self.instructions.append(instructions)
         else:
@@ -270,7 +298,7 @@ class CunqaCircuit:
         self.quantum_regs[new_name] = [(self.num_qubits + i) for i in range(num_qubits)]
         return new_name
 
-    def add_cl_register(self, name, num_clbits):
+    def add_cl_register(self, name: str, num_clbits: int):
         """
         Class method to add a classical register to the circuit. A classical register is understood 
         as a group of classical bits with a label.
@@ -292,10 +320,27 @@ class CunqaCircuit:
         
         self.classical_regs[new_name] = [(self.num_clbits + i) for i in range(num_clbits)]
         return new_name
-
     
     # =============== INSTRUCTIONS ===============
     # Methods for implementing non parametric single-qubit gates
+
+    def save_state(self, pershot: bool = False, label: str = "_method_") -> None:
+        """
+        Instruction to save the state of the circuit simulation at the particular moment the 
+        instruction is executed.
+        Args:
+            pershot (bool): determines wether the state is stored separatedly for each shot or 
+                            averaged. Default: False
+            label (str): key for the state in the result dict. Used to distinguish two states saved. 
+                         Default: '_method_', which appears in the result as the name of the 
+                         simulation method selected.
+        """
+        self.instructions.append({
+            "name": "save_state",
+            "qubits": list(range(self.num_qubits)),
+            "snapshot_type": "list" if pershot else "single",
+            "label": label
+        })
 
     def i(self, qubit: int) -> None:
         """
@@ -683,29 +728,30 @@ class CunqaCircuit:
     
     # methods for parametric single-qubit gates
 
-    def u1(self, param: Union[float,int, "Variable"], qubit: int) -> None:
+    def u1(self, param: Union[float, int, str], qubit: int) -> None:
         """
         Class method to apply u1 gate to the given qubit.
 
         Args:
-            param (float | int | Variable): parameter for the parametric gate. String identifies a 
+            param (float | int | str): parameter for the parametric gate. String identifies a 
                                        variable parameter (needs to be assigned) with the string label.
 
             qubit (int): qubit in which the gate is applied.
         """
+        
         self.add_instructions({
             "name":"u1",
             "qubits":[qubit],
             "params":[param]
         })
     
-    def u2(self, theta:  Union[float,int, str], phi:  Union[float,int, str], qubit: int) -> None:
+    def u2(self, theta:  Union[float, int, str], phi:  Union[float, int, str], qubit: int) -> None:
         """
         Class method to apply u2 gate to the given qubit.
 
         Args:
-            theta (float | int): angle.
-            phi (float | int): angle.
+            theta (float | int | str): angle.
+            phi (float | int | str): angle.
             qubit (int): qubit in which the gate is applied.
         """
         self.add_instructions({
@@ -1065,7 +1111,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"unitary",
             "qubits":[*qubits],
-            "params":[matrix]
+            "elements":[matrix]
         })
 
     def multicontrol(
@@ -1223,27 +1269,27 @@ class CunqaCircuit:
             "circuits": [sending_circuit_id]
         })
 
-    def qsend(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
+    def qsend(self, qubit: int, recving_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
         Class method to send a qubit from the current circuit to another one.
         
         Args:
             qubit (int): qubit to be sent.
 
-            target_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
+            recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                  sent.
         """
         self.is_dynamic = True
         
-        if isinstance(target_circuit, str):
-            target_circuit_id = target_circuit
-        elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit.id
+        if isinstance(recving_circuit, str):
+            recving_circuit_id = recving_circuit
+        elif isinstance(recving_circuit, CunqaCircuit):
+            recving_circuit_id = recving_circuit.id
         
         self.add_instructions({
             "name": "qsend",
             "qubits": [qubit],
-            "circuits": [target_circuit_id]
+            "circuits": [recving_circuit_id]
         })
 
     def qrecv(self, qubit: int, control_circuit: Union[str, 'CunqaCircuit']) -> None:
@@ -1287,8 +1333,8 @@ class CunqaCircuit:
 
         .. code-block:: python
 
-            with origin_circ.expose(0, target_circuit) as rcontrol:
-                target_circuit.cx(rcontrol, 1)
+            with origin_circ.expose(0, target_circuit) as rqubit, subcircuit:
+                subcircuit.cx(rqubit, 1)
             
         """ 
         self.is_dynamic = True
@@ -1340,8 +1386,8 @@ class QuantumControlContext:
     Used as a context manager, it can be passed to controlled operations in order to implement 
     telgate operations:
 
-        >>> with circuit_1.expose(0, circuit_2) as rcontrol:
-        >>>     circuit_2.cx(rcontrol, 0)
+        >>> with circuit_1.expose(0, circuit_2) as rqubit, subcircuit:
+        >>>     subcircuit.cx(rqubit, 0)
     
     Then, when the block ends, the :py:class:`QuantumControlContext` adds the propper "rcontrol" 
     instruction to the target circuit.
@@ -1360,7 +1406,7 @@ class QuantumControlContext:
 
     def __enter__(self):
         self._subcircuit = CunqaCircuit(self.target_circuit.num_qubits, self.target_circuit.num_clbits)
-        return self._subcircuit, -1
+        return -1, self._subcircuit
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         instructions = []

@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include "utils/json.hpp"
+
 #include "logger.hpp"
 
 namespace cunqa {
