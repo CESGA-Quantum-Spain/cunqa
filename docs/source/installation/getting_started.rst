@@ -6,27 +6,28 @@ Installation
 Clone repository
 ^^^^^^^^^^^^^^^^
 
-It is important to say that, for ensuring a correct cloning of the repository, the SSH is the one 
-preferred. In order to get this to work one has to do:
-
-.. code-block:: console
-   
-   eval "$(ssh-agent -s)"
-   ssh-add ~/.ssh/SSH_KEY
-
-Now, everything is set to get the source code.
+To get the source code, simply clone CUNQA repository:
 
 .. code-block:: console
 
    git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 
+.. warning::
+   If SSH cloning fails, you may not have properly linked your environment to GitHub. To do this, run the following commands:
+
+   .. code-block:: console
+      
+      eval "$(ssh-agent -s)"
+      ssh-add ~/.ssh/SSH_KEY
+
+   where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in the *~/.ssh* folder.
+
 
 Define STORE environment variable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Before doing any kind of compilation, the user has to define the ``STORE`` environment variable in 
-bash. This repository will be the root for the ``.cunqa`` folder, where CUNQA is going to store 
-several runtime files (configuration files and logging files, mainly).
+At build time, CUNQA will look at the ``STORE`` environment variable to set the root of the ``.cunqa`` folder where configuration files and logging files will be stored.
+So, if it is **not** defined by default on the environment, just run:
 
 .. code-block:: console
 
@@ -83,9 +84,7 @@ And, finally, **the ones that will be installed**.
 Configure, build and install
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Now, as with any other CMake project, it can be installed using the usual directives. The 
-``CMAKE_INSTALL_PREFIX`` variable should be defined or will be the ``HOME`` environment variable 
-value.
+To build, compile, and install CUNQA, the three usual steps in a CMake project are followed.
 
 .. code-block:: console
 
@@ -93,10 +92,20 @@ value.
    cmake --build build/ --parallel $(nproc)
    cmake --install build/
 
-To enable the GPU execution provided by AerSimulator, the flag `-DAER_GPU=TRUE` must be provided at build time.
+.. note::
 
-It is important to mention that the user can also employ `Ninja <https://ninja-build.org/>`_ to 
-perform this task.
+   If ``CMAKE_PREFIX_INSTALL`` is not provided, CUNQA will be installed where the environment variable ``HOME`` points.
+
+.. note::   
+
+   To enable the GPU execution provided by AerSimulator, the flag ``-DAER_GPU=TRUE`` must be provided at build time: 
+
+   .. code-block:: console
+
+      cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path -DAER_GPU=TRUE
+
+
+The user can also employ `Ninja <https://ninja-build.org/>`_ to perform this task.
 
 .. code-block:: console
 
@@ -115,7 +124,7 @@ solved.
 Install as Lmod module
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Cunqa is available as Lmod module in CESGA. To use it all you have to do is:
+CUNQA is available as Lmod module in CESGA. To use it all you have to do is:
 
 - In QMIO: ``module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi``
 - In FT3: ``module load cesga/2022 gcc/system cunqa/0.3.1``
