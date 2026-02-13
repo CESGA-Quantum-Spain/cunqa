@@ -1,8 +1,7 @@
-Getting started
-===============
+.. _sec_installation:
 
 Installation
-------------
+=============
 
 Clone repository
 ^^^^^^^^^^^^^^^^
@@ -94,6 +93,8 @@ value.
    cmake --build build/ --parallel $(nproc)
    cmake --install build/
 
+To enable the GPU execution provided by AerSimulator, the flag `-DAER_GPU=TRUE` must be provided at build time.
+
 It is important to mention that the user can also employ `Ninja <https://ninja-build.org/>`_ to 
 perform this task.
 
@@ -124,7 +125,7 @@ CESGA are available inside ``easybuild/`` folder.
 
 
 Uninstall
----------
+^^^^^^^^^^
 
 There has also been developed a Make directive to uninstall CUNQA if needed:
 

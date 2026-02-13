@@ -1,6 +1,6 @@
-*****************
-No communications
-*****************
+**************************
+No-communications scheme
+**************************
 
 The no-communications scheme is the simplest one and, at the same time, the one that yields the
 largest improvement in terms of execution time. This is because it entails a classical distribution
@@ -14,6 +14,8 @@ concepts presented in a complete program.
 .. code-block:: python
 
     import os, sys
+    # In order to import cunqa, we append to the search path the cunqa installation path.
+    # In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
     sys.path.append(os.getenv("HOME"))
 
     from cunqa.qpu import get_QPUs, qraise, qdrop, run

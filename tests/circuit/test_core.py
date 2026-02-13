@@ -449,9 +449,9 @@ def test_quantum_control_context_adds_rcontrol_to_target():
     control = CunqaCircuit(1, id="CTRL")
     target = CunqaCircuit(1, id="TGT")
 
-    with control.expose(0, target) as (sub, rcontrol_qubit):
-        assert rcontrol_qubit == -1
-        sub.x(0)
+    with control.expose(0, target) as (rqubit, subcircuit):
+        assert rqubit == -1
+        subcircuit.x(0)
 
     rcontrol_instr = target.instructions[-1]
     assert rcontrol_instr["name"] == "rcontrol"
@@ -464,5 +464,5 @@ def test_quantum_control_context_rejects_remote_ops_inside_block():
     target = CunqaCircuit(1, id="TGT")
 
     with pytest.raises(RuntimeError):
-        with control.expose(0, target) as (sub, _):
-            sub.recv(0, "OTHER")  # forbidden by __exit__
+        with control.expose(0, target) as (rqubit, subcircuit):
+            subcircuit.recv(0, "OTHER")  # forbidden by __exit__

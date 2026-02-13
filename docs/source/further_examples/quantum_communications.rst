@@ -23,6 +23,8 @@ each protocol.
     .. code-block:: python
 
         import os, sys
+        # In order to import cunqa, we append to the search path the cunqa installation path.
+        # In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
         sys.path.append(os.getenv("HOME"))
 
         from cunqa.qpu import get_QPUs, qraise, qdrop, run
@@ -51,7 +53,7 @@ each protocol.
 
 .. tab:: Telegate
 
-    In this protocol there is also a parallel with a previous case, but here with
+    This protocol is the quantum analogue to the classical condition procedure given by
     :py:meth:`~cunqa.circuit.core.CunqaCircuit.cif`. Both use a Python ``ContextManager`` to
     include the gates subject to the operation: in the case of
     :py:meth:`~cunqa.circuit.core.CunqaCircuit.cif`, these are classically controlled gates, while
@@ -61,6 +63,8 @@ each protocol.
     .. code-block:: python
 
         import os, sys
+        # In order to import cunqa, we append to the search path the cunqa installation path.
+        # In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
         sys.path.append(os.getenv("HOME"))
 
         from cunqa.qpu import get_QPUs, qraise, qdrop, run
@@ -75,8 +79,8 @@ each protocol.
 
         c2 = CunqaCircuit(1, id="circuit2")
 
-        with c1.expose(0, c2) as rcontrol:
-            c2.cx(rcontrol,0)
+        with c1.expose(0, c2) as rqubit, subcircuit:
+            subcircuit.cx(rqubit,0)
 
         c1.measure_all()
         c2.measure_all()

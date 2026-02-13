@@ -1,6 +1,6 @@
-************************
-Classical communications
-************************
+*******************************
+Classical-communications scheme
+*******************************
 
 The classical-communications directives are already explained in the documentation of
 :py:class:`~cunqa.circuit.core.CunqaCircuit`, so here we will look at an example of how to use them.
@@ -10,6 +10,8 @@ comment on the code fragments whenever necessary.
 .. code-block:: python
 
     import os, sys
+    # In order to import cunqa, we append to the search path the cunqa installation path.
+    # In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
     sys.path.append(os.getenv("HOME"))
 
     from cunqa.qpu import get_QPUs, qraise, qdrop, run

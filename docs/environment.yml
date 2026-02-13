@@ -21,4 +21,4 @@ dependencies:
   - sphinx-toolbox
   - qiskit==1.2.4
   - ipython
-  - sphinx_inline_tabs
+  - sphinx-inline-tabs

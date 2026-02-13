@@ -63,7 +63,7 @@ class CunqaCircuit:
 
         * - 
           - Quantum communication
-          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`, :py:meth:`rcontrol`
+          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`
 
 
     .. autoattribute:: id
@@ -1269,27 +1269,27 @@ class CunqaCircuit:
             "circuits": [sending_circuit_id]
         })
 
-    def qsend(self, qubit: int, target_circuit: Union[str, 'CunqaCircuit']) -> None:
+    def qsend(self, qubit: int, recving_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
         Class method to send a qubit from the current circuit to another one.
         
         Args:
             qubit (int): qubit to be sent.
 
-            target_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
+            recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                  sent.
         """
         self.is_dynamic = True
         
-        if isinstance(target_circuit, str):
-            target_circuit_id = target_circuit
-        elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit.id
+        if isinstance(recving_circuit, str):
+            recving_circuit_id = recving_circuit
+        elif isinstance(recving_circuit, CunqaCircuit):
+            recving_circuit_id = recving_circuit.id
         
         self.add_instructions({
             "name": "qsend",
             "qubits": [qubit],
-            "circuits": [target_circuit_id]
+            "circuits": [recving_circuit_id]
         })
 
     def qrecv(self, qubit: int, control_circuit: Union[str, 'CunqaCircuit']) -> None:
@@ -1333,8 +1333,8 @@ class CunqaCircuit:
 
         .. code-block:: python
 
-            with origin_circ.expose(0, target_circuit) as rcontrol:
-                target_circuit.cx(rcontrol, 1)
+            with origin_circ.expose(0, target_circuit) as rqubit, subcircuit:
+                subcircuit.cx(rqubit, 1)
             
         """ 
         self.is_dynamic = True
@@ -1386,8 +1386,8 @@ class QuantumControlContext:
     Used as a context manager, it can be passed to controlled operations in order to implement 
     telgate operations:
 
-        >>> with circuit_1.expose(0, circuit_2) as rcontrol:
-        >>>     circuit_2.cx(rcontrol, 0)
+        >>> with circuit_1.expose(0, circuit_2) as rqubit, subcircuit:
+        >>>     subcircuit.cx(rqubit, 0)
     
     Then, when the block ends, the :py:class:`QuantumControlContext` adds the propper "rcontrol" 
     instruction to the target circuit.
@@ -1406,7 +1406,7 @@ class QuantumControlContext:
 
     def __enter__(self):
         self._subcircuit = CunqaCircuit(self.target_circuit.num_qubits, self.target_circuit.num_clbits)
-        return self._subcircuit, -1
+        return -1, self._subcircuit
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         instructions = []
