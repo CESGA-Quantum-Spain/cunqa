@@ -1,3 +1,19 @@
+.. rst-class:: big-cunqa
+
+CUNQA
+======
+
+.. figure:: /_static/QuantumCommScheme.png
+   :alt: Quantum Communications scheme
+   :width: 50%
+   :align: center
+
+
+|
+
+.. centered:: **Emulator of Distributed Quantum Computing for HPC environments**
+
+
 Welcome to CUNQA's documentation!
 =================================
 
