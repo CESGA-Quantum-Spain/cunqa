@@ -6,22 +6,35 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 
-family = qraise(1, "01:00:00",  co_located = True)
-[qpu] = get_QPUs(co_located = True, family = family)
 
-c = CunqaCircuit(2, 2)
-c.h(0)
-c.measure(0, 0)
+try:
+    family = qraise(1, "01:00:00",  co_located = True)
+    [qpu] = get_QPUs(co_located = True, family = family)
 
-with c.cif(0) as cgates:
-    cgates.x(1)
 
-c.measure(0,0)
-c.measure(1,1)
+    # ---------------------------
+    # Circuit:
+    #  qc.q0   ─[H]───[M]───[M]─
+    #                  ‖     
+    #  qc.q1   ───────[X]───[M]─
+    # ---------------------------
+    qc = CunqaCircuit(2, 2)
+    qc.h(0)
+    qc.measure(0, 0)
 
-qjob = run(c, qpu, shots = 1024)
-counts = qjob.result.counts
+    with qc.cif(0) as cgates:
+        cgates.x(1)
 
-print("Counts: ", counts)
+    qc.measure(0,0)
+    qc.measure(1,1)
 
-qdrop(family)
+    qjob = run(qc, qpu, shots = 1024)
+    counts = qjob.result.counts
+
+    print("Counts: ", counts)
+
+    qdrop(family)
+
+except Exception as error:
+    qdrop(family)
+    raise error
