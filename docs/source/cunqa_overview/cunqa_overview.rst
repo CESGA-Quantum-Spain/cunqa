@@ -8,14 +8,14 @@ This section presents an overview of CUNQA, an emulator of Distributed Quantum C
 Virtual QPU
 ------------
 
-.. rubric:: What it is?
-
 A virtual QPU (vQPU) is a classical process running on a HPC environment with an allocated set of classical resources responsible for simulating the behaviour of a real QPU.
 
-.. image:: /_static/VirtualQPU.png
+.. figure:: /_static/VirtualQPU.png
     :alt: Virtual QPU
     :width: 60%
     :align: center
+
+    Virtual QPU
 
 
 .. rubric:: Made of two components
@@ -59,7 +59,7 @@ As a Distributed Quantum Computing emulator, CUNQA supports the three basic DQC 
 - :doc:`classical_comm`: interchange classical bits between vQPUs at execution time.
 - :doc:`quantum_comm`: implementation of teledata and telegate protocols.
 
-Each of the previous sections will show three basic things:
+Each of the previous sections will show:
 
 1. How to deploy an infrastructure with the corresponding schema.
 2. How to create and design circuits that fit that schema.

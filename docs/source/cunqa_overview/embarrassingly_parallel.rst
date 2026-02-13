@@ -1,6 +1,13 @@
 Embarrassingly Parallel
 ========================
 
+.. figure:: /_static/NoCommScheme.png
+    :alt: Embarrasingly parallel scheme
+    :width: 60%
+    :align: center
+
+    Embarrasingly parallel scheme
+
 As it was introduced, this scheme consists in the **classical offloading of quantum tasks** by mapping 
 circuits to the available QPUs. For this, there is no need of inter-QPU communications of any type.
 

@@ -85,6 +85,12 @@ Infrastructure options
     Path to an infrastructure description defining a set of QPUs.
     Optional.
 
+GPU execution
+~~~~~~~~~~~~~~~~~~~~~~
+``--gpu``
+    Enable GPU execution. The quantum simulation will be performed on GPU.
+
+
 Real QPU
 ~~~~~~~~~~~~~~~~~~~~~~
 ``--qmio``

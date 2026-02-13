@@ -1,5 +1,12 @@
 Classical Communications
-=======================
+=========================
+
+.. figure:: /_static/ClassicalCommScheme.png
+    :alt: Classical Communications scheme
+    :width: 60%
+    :align: center
+
+    Classical Communications scheme
 
 This is the **classical conterpart** of classical parallelization processes that **interchange information in execution time**,
 such as MPI.

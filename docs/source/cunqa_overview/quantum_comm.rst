@@ -2,6 +2,13 @@
 Quantum Communication
 ======================
 
+.. figure:: /_static/QuantumCommScheme.png
+    :alt: Quantum Communications Scheme
+    :width: 60%
+    :align: center
+
+    Quantum Communications Scheme
+    
 This is the one paradigm that does not have a classical counterpart, since it is purely **quantum distribution**.
 
 In this scheme quantum communication protocols such as **teledata** and **telegate** can be use to **share quantum entanglement** among the
