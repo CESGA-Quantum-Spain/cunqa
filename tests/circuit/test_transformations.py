@@ -29,7 +29,7 @@ class FakeQuantumControlContext:
 
     def __enter__(self):
         self._subcircuit = FakeCircuit(self.target_circuit.num_qubits, self.target_circuit.num_clbits)
-        return self._subcircuit, -1
+        return -1, self._subcircuit
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         rcontrol = {
@@ -60,6 +60,9 @@ class FakeCircuit:
         if isinstance(instrs, dict):
             instrs = [instrs]
         self.instructions.extend(instrs)
+
+    def add_cl_register(self, name, num_clbits):
+        self.num_clbits += num_clbits
 
     def expose(self, ctrl_qubit: int, target_circuit: "FakeCircuit"):
         self._expose_calls.append((ctrl_qubit, target_circuit.id))
