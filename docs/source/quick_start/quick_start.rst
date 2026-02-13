@@ -29,7 +29,7 @@ Once the vQPUs are deployed, we can design and execute quantum tasks:
     from cunqa.qpu import get_QPUs
 
     # List of deployed vQPUs
-    qpus  = get_QPUs(local=False) 
+    qpus  = get_QPUs(co_located=True)
 
     # Let's create a circuit to run in our QPUs
     from cunqa.circuit import CunqaCircuit
@@ -39,21 +39,23 @@ Once the vQPUs are deployed, we can design and execute quantum tasks:
     qc.cx(0,1)
     qc.measure_all()
 
+    qcs = [qc] * 4
+
     # Submitting the same circuit to all vQPUs
     from cunqa.qpu import run
 
-    qjobs = run(qc, qpus, shots = 1000) 
+    qjobs = run(qcs , qpus, shots = 1000)
 
     # Gathering results
     from cunqa.qjob import gather
-    
-    results = gather(qjobs) 
+
+    results = gather(qjobs)
 
     # Getting the counts
     counts_list = [result.counts for result in results]
 
     # Printing the counts
-    for counts in counts_list: 
+    for counts in counts_list:
         print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
 
 
