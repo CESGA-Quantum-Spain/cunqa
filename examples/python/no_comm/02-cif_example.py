@@ -1,31 +1,27 @@
 import os, sys
-# path to access c++ files
+# In order to import cunqa, we append to the search path the cunqa installation path.
+# In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 
-# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-# If GPU execution is desired, just add "gpu = True" as another qraise argument
-family = qraise(2, "00:10:00", simulator = "Aer",  co_located = True, partition = "ilk")
+family = qraise(1, "01:00:00",  co_located = True)
+[qpu] = get_QPUs(co_located = True, family = family)
 
-qpus  = get_QPUs(co_located = True, family = family)
+c = CunqaCircuit(2, 2)
+c.h(0)
+c.measure(0, 0)
 
-qc = CunqaCircuit(2, 2)
-qc.h(0)
-qc.measure(0, 0)
-
-with qc.cif(0) as cgates:
+with c.cif(0) as cgates:
     cgates.x(1)
 
-qc.measure(0,0)
-qc.measure(1,1)
+c.measure(0,0)
+c.measure(1,1)
 
-qpu = qpus[0]
-qjob = run(qc, qpu, shots = 1024)# non-blocking call
+qjob = run(c, qpu, shots = 1024)
 counts = qjob.result.counts
 
-print("Counts: \n\t", counts)
+print("Counts: ", counts)
 
-########## Drop the deployed QPUs #
 qdrop(family)
