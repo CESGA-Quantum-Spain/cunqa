@@ -16,7 +16,7 @@ represent both computation and communication in DQC scenarios.
 
 .. autoclass:: cunqa.circuit.core.CunqaCircuit
    :no-members:
-
+   
 Transformations
 ===============
 

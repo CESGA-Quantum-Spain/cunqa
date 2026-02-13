@@ -5,10 +5,13 @@ _submodules = [
     "core",
     "helpers",
     "ir",
-    "transformations"
+    "transformations",
+    "parameter"
 ]
 
 _lazy_symbols = {
+    "add": ("cunqa.circuit.transformations", "add"),
+    "union": ("cunqa.circuit.transformations", "union"),
     "hsplit": ("cunqa.circuit.transformations", "hsplit"),
     "to_ir": ("cunqa.circuit.ir", "to_ir"),
     "CunqaCircuit": ("cunqa.circuit.core", "CunqaCircuit"),

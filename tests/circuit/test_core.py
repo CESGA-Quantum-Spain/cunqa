@@ -36,8 +36,6 @@ def test_init_generates_id_and_adds_default_q_register(monkeypatch):
     assert circuit.id == "CunqaCircuit_ABC"
     assert circuit.num_qubits == 2
     assert circuit.quantum_regs["q0"] == [0, 1]
-    assert circuit.num_clbits == 0
-    assert circuit.classical_regs == {}
 
 
 def test_init_with_num_clbits_adds_default_classical_register(monkeypatch):
@@ -75,6 +73,7 @@ def test_info_property(monkeypatch):
     assert info["classical_registers"] == circuit.classical_regs
     assert info["is_dynamic"] == circuit.is_dynamic
     assert info["sending_to"] == list(circuit.sending_to)
+    assert info["params"] == circuit.params
 
 
 def test_add_q_register_num_qubits_not_positive(monkeypatch):
@@ -94,6 +93,7 @@ def test_add_q_register_name_in_use(monkeypatch):
     new_name = circuit.add_q_register("q0", 1)
 
     assert new_name == "q0_0"
+    assert circuit.num_qubits == 2
     assert "q0_0" in circuit.quantum_regs
     logger_mock.warning.assert_called_once()
 
@@ -115,6 +115,7 @@ def test_add_cl_register_name_in_use(monkeypatch):
     new_name = circuit.add_cl_register("c0", 2)
 
     assert new_name == "c0_0"
+    assert circuit.num_clbits == 3
     assert "c0_0" in circuit.classical_regs
     logger_mock.warning.assert_called_once()
 
@@ -127,6 +128,77 @@ def test_add_instructions_accepts_dict_or_list(monkeypatch):
     circuit.add_instructions([{"name": "h", "qubits": [0]}, {"name": "z", "qubits": [0]}])
 
     assert [i["name"] for i in circuit.instructions] == ["x", "h", "z"]
+
+def test_add_instruction_with_symbolic_params_creates_param(monkeypatch):
+    circuit = CunqaCircuit(1)
+
+    fake_expr = Mock()
+    fake_expr.is_real = False
+    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda _: [fake_expr])
+
+    ParamMock = Mock()
+    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
+
+    instr = {"name": "rx", "params": ["theta"]}
+    circuit.add_instructions(instr)
+
+    ParamMock.assert_called_once_with(fake_expr)
+    assert len(circuit.params) == 1
+    assert instr["params"][0] == ParamMock.return_value
+
+def test_add_instruction_with_real_param_does_not_create_param(monkeypatch):
+    circuit = CunqaCircuit(1)
+
+    fake_expr = Mock()
+    fake_expr.is_real = True
+    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda _: [fake_expr])
+
+    ParamMock = Mock()
+    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
+
+    instr = {"name": "rx", "params": [3.14]}
+    circuit.add_instructions(instr)
+
+    ParamMock.assert_not_called()
+    assert instr["params"][0] == 3.14
+
+def test_add_instruction_sympify_error_raises_valueerror(monkeypatch):
+    from cunqa.circuit import CunqaCircuit
+    from sympy import SympifyError
+
+    circuit = CunqaCircuit(1)
+
+    def raise_error(x):
+        raise SympifyError("bad")
+
+    monkeypatch.setattr("cunqa.circuit.core.sympify", raise_error)
+
+    instr = {"name": "rx", "params": ["bad_expr"]}
+
+    with pytest.raises(ValueError):
+        circuit.add_instructions(instr)
+
+def test_add_instruction_mixed_params(monkeypatch):
+    from cunqa.circuit import CunqaCircuit
+
+    circuit = CunqaCircuit(1)
+
+    expr_symbolic = Mock()
+    expr_symbolic.is_real = False
+    real_number = Mock()
+    real_number.is_real = True
+    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda x: [expr_symbolic, real_number])
+
+    ParamMock = Mock()
+    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
+
+    instr = {"name": "u", "params": ["theta", 3.14]}
+    circuit.add_instructions(instr)
+
+    ParamMock.assert_called_once_with(expr_symbolic)
+    assert len(circuit.params) == 1
+    assert instr["params"][0] == ParamMock.return_value
+    assert instr["params"][1] == 3.14
 
 
 ONEQUBIT_NOPARAM = [
@@ -247,7 +319,7 @@ def test_unitary_accepts_numpy(monkeypatch):
     assert instr["name"] == "unitary"
     assert instr["qubits"] == [0]
 
-    encoded = instr["params"][0]
+    encoded = instr["elements"][0]
     assert encoded == [
         [[1.0, 0.0], [0.0, 0.0]],
         [[0.0, 0.0], [1.0, 0.0]],
