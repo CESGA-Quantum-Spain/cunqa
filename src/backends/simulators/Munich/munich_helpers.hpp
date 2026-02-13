@@ -93,7 +93,7 @@ inline std::string quantum_task_to_Munich(const QuantumTask& quantum_task)
                     break;
                 //UNITARY
                 case constants::UNITARY:
-                    matrix = instruction.at("params").get<std::vector<std::vector<std::vector<std::vector<double>>>>>();
+                    matrix = instruction.at("elements").get<std::vector<std::vector<std::vector<std::vector<double>>>>>();
                     qasm_circt += gate_name + "(" + triple_vector_to_string(matrix[0]) + ") q[" + to_string(qubits[0]) + "];\n";
                     break;
                 // Non-parametric 2 qubit gates

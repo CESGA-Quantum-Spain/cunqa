@@ -17,40 +17,30 @@
 
 
 namespace {
+
 struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
     unsigned long zero_qubit = 0;
+    unsigned long zero_clbit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
-    std::stack<int> telep_meas;
 };
 
 struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
-    std::map<std::size_t, bool> creg, rcreg;
-    std::map<std::size_t, bool> cvalues;
+    std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<int>> qc_meas;
     bool ended = false;
-    cunqa::comm::ClassicalChannel* chan = nullptr;
 };
-}
 
-namespace cunqa {
-namespace sim {
 
-MaestroSimulatorAdapter::MaestroSimulatorAdapter() 
-{
-    maestroInstance = GetMaestroObject();
-}
-
-MaestroSimulatorAdapter::MaestroSimulatorAdapter(MaestroComputationAdapter& qc) : qc{qc} 
-{
-    maestroInstance = GetMaestroObject();
-}
-
-std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quantum_tasks, comm::ClassicalChannel* classical_channel)
+std::string execute_shot_(
+    void* simulator, 
+    const std::vector<cunqa::QuantumTask>& quantum_tasks, 
+    cunqa::comm::ClassicalChannel* classical_channel
+)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -60,6 +50,7 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
+        T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked = false;
@@ -78,153 +69,158 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
         const unsigned long int q[]{ G.n_qubits - 1, G.n_qubits - 2 };
 
 		ApplyReset(simulator, q, 2);
-        // Apply H to the first entanglement qubit
         ApplyH(simulator, G.n_qubits - 2);
-
-        // Apply a CX to the second one to generate an ent pair
         ApplyCX(simulator, G.n_qubits - 2, G.n_qubits - 1);
     };
 
-    std::function<void(TaskState&, const JSON&)> apply_next_instr = [&](TaskState& T, const JSON& instruction = {}) {
+    std::function<void(TaskState&, const cunqa::JSON&)> apply_next_instr = 
+        [&](TaskState& T, const cunqa::JSON& instruction = {}) 
+    {
 
         // This is added to be able to add instructions outside the main loop
-        const JSON& inst = instruction.empty() ? *T.it : instruction;
+        const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
 
-        if (inst.contains("conditional_reg")) {
-            auto v = inst.at("conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.creg[v[0]]) return;
-        } else if (inst.contains("remote_conditional_reg") && inst.at("name") != "recv") { 
-            auto v = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.rcreg[v[0]]) return;
-        }
-
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
-        auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        std::vector<int> qubits;
+        if (inst.contains("qubits"))
+            qubits = inst.at("qubits").get<std::vector<int>>();
+        auto inst_type = cunqa::constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
 
         switch (inst_type)
         {
-        case constants::MEASURE:
+        case cunqa::constants::MEASURE:
         {
-            auto clreg = inst.at("clreg").get<std::vector<std::uint64_t>>();
             const unsigned long int q[]{ qubits[0] + T.zero_qubit };
             const unsigned long long int measurement = Measure(simulator, q, 1);
-            G.cvalues[qubits[0] + T.zero_qubit] = (measurement == 1);
-            if (!clreg.empty())
-            {
-                G.creg[clreg[0]] = (measurement == 1);
-            }
+
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+            G.creg[clbits[0] + T.zero_clbit] = (measurement == 1);
             break;
         }
-        case constants::X:
+        case cunqa::constants::COPY:
+        {
+            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
+            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
+
+            if(l_clbits.size() != r_clbits.size())
+                throw std::runtime_error("The number of copied clbits and the number of clbits "
+                                         "copied on does not match.");
+
+            for (size_t i = 0; i < l_clbits.size(); ++i)
+                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+                
+            break;
+        }
+        case cunqa::constants::X:
             ApplyX(simulator, qubits[0] + T.zero_qubit);
             break;
-        case constants::Y:
+        case cunqa::constants::Y:
             ApplyY(simulator, qubits[0] + T.zero_qubit);
             break;
-        case constants::Z:
+        case cunqa::constants::Z:
             ApplyZ(simulator, qubits[0] + T.zero_qubit);
             break;
-        case constants::H:
+        case cunqa::constants::H:
             ApplyH(simulator, qubits[0] + T.zero_qubit);
             break;
-        case constants::SX:
+        case cunqa::constants::SX:
             ApplySX(simulator, qubits[0] + T.zero_qubit);
             break;
-        case constants::CX:
+        case cunqa::constants::CX:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCX(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
-        case constants::CY:
+        case cunqa::constants::CY:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCY(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
-        case constants::CZ:
+        case cunqa::constants::CZ:
         {
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCZ(simulator, control, qubits[1] + T.zero_qubit);
             break;
         }
-        case constants::ECR:
+        case cunqa::constants::ECR:
             // TODO
             break;
-        case constants::RX:
+        case cunqa::constants::RX:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             ApplyRx(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::RY:
+        case cunqa::constants::RY:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             ApplyRy(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::RZ:
+        case cunqa::constants::RZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             ApplyRz(simulator, qubits[0] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::CRX:
+        case cunqa::constants::CRX:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCRx(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::CRY:
+        case cunqa::constants::CRY:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCRy(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::CRZ:
+        case cunqa::constants::CRZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCRz(simulator, control, qubits[1] + T.zero_qubit, params[0]);
             break;
         }
-        case constants::C_IF_H:
-        case constants::C_IF_X:
-        case constants::C_IF_Y:
-        case constants::C_IF_Z:
-        case constants::C_IF_CX:
-        case constants::C_IF_CY:
-        case constants::C_IF_CZ:
-        case constants::C_IF_ECR:
-        case constants::C_IF_RX:
-        case constants::C_IF_RY:
-        case constants::C_IF_RZ:
-            // Managed by use
-            break;
-        case constants::SWAP:
+        case cunqa::constants::SWAP:
         {
             ApplySwap(simulator, qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit);
             break;
         }
-        case constants::MEASURE_AND_SEND:
+        case cunqa::constants::SEND:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            const unsigned long int q[]{ qubits[0] + T.zero_qubit };
-            int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
-            classical_channel->send_measure(measurement_as_int, endpoint[0]); 
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();  
+
+            for (const auto& clbit: clbits)
+                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
             break;
         }
         case cunqa::constants::RECV:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            auto conditional_reg = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-            int measurement = classical_channel->recv_measure(endpoint[0]);
-            G.rcreg[conditional_reg[0]] = (measurement == 1);
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+
+            for (const auto& clbit: clbits) {
+                int measurement = classical_channel->recv_measure(qpu_id);
+                G.creg[clbit + T.zero_clbit] = (measurement == 1);
+            }
             break;
         }
-        case constants::QSEND:
+        case cunqa::constants::CIF:
+        {
+            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
+            if (G.creg[clbits.at(0) + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.at("instructions")) {
+                    apply_next_instr(T, sub_inst);
+                }
+            }
+            break;
+        }
+        case cunqa::constants::QSEND:
         {
             //------------- Generate Entanglement ---------------
             ApplyH(simulator, G.n_qubits - 2);
@@ -252,7 +248,7 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
             Ts[inst.at("qpus")[0]].blocked = false;
             break;
         }
-        case constants::QRECV:
+        case cunqa::constants::QRECV:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
@@ -280,7 +276,7 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
 			ApplyReset(simulator, q, 1);
             break;
         }
-        case constants::EXPOSE:
+        case cunqa::constants::EXPOSE:
         {
             if (!T.cat_entangled) {
                 generate_entanglement_();
@@ -308,7 +304,7 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
             }
             break;
         }
-        case constants::RCONTROL:
+        case cunqa::constants::RCONTROL:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
                 T.blocked = true;
@@ -363,12 +359,29 @@ std::string execute_shot_(void* simulator, const std::vector<QuantumTask>& quant
     } // End one shot
 
     std::string result_bits(G.n_clbits, '0');
-    for (const auto &[bitIndex, value] : G.cvalues)
+    for (const auto &[bitIndex, value] : G.creg)
     {
         result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
     }
 
     return result_bits;
+}
+
+
+
+} // End of anonymous namespace
+
+namespace cunqa {
+namespace sim {
+
+MaestroSimulatorAdapter::MaestroSimulatorAdapter() 
+{
+    maestroInstance = GetMaestroObject();
+}
+
+MaestroSimulatorAdapter::MaestroSimulatorAdapter(MaestroComputationAdapter& qc) : qc{qc} 
+{
+    maestroInstance = GetMaestroObject();
 }
 
 JSON MaestroSimulatorAdapter::simulate(const Backend* backend)

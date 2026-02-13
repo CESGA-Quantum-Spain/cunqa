@@ -111,7 +111,12 @@ class QPU:
         """Name of the family to which the corresponding vQPU belongs."""
         return self._family
 
-    def execute(self, circuit_ir: dict, **run_parameters: Any) -> QJob:
+    def execute(
+        self, 
+        circuit_ir: dict, 
+        param_values: dict[str, Union[float, int]] = None, 
+        **run_parameters: Any
+    ) -> QJob:
         """
         Class method responsible of executing a circuit into the corresponding vQPU that this class 
         connects to. Possible instructions to add as `**run_parameters` are simulator dependant, 
@@ -122,7 +127,7 @@ class QPU:
             **run_parameters: any other simulation instructions.
         """
         qjob = QJob(self._qclient, self._device, circuit_ir, **run_parameters)
-        qjob.submit()
+        qjob.submit(param_values)
         logger.debug(f"Qjob submitted to QPU {self._id}.")
 
         return qjob
@@ -131,6 +136,7 @@ class QPU:
 def run(
         circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
+        param_values: dict[str, Union[float, int]] = None,
         **run_args: Any
     ) -> Union[list[QJob], QJob]:
     """
@@ -219,7 +225,7 @@ def run(
         circuit["id"] = correspondence[circuit["id"]]
 
     run_parameters = {k: v for k, v in run_args.items()}
-    qjobs = [qpu.execute(circuit, **run_parameters) for circuit, qpu in zip(circuits_ir, qpus)]
+    qjobs = [qpu.execute(circuit, param_values, **run_parameters) for circuit, qpu in zip(circuits_ir, qpus)]
 
     if len(circuits_ir) == 1:
         return qjobs[0]

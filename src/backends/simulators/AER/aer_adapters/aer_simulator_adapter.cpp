@@ -367,7 +367,7 @@ std::string execute_shot_(
     return result_bits;
 }
 
-}
+} // End of anonymous namespace
 
 namespace cunqa {
 namespace sim {

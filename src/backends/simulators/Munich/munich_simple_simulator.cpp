@@ -7,7 +7,6 @@
 #include <chrono>
 
 #include "CircuitSimulator.hpp"
-#include "StochasticNoiseSimulator.hpp"
 #include "ir/QuantumComputation.hpp"
 
 namespace cunqa {

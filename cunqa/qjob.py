@@ -26,6 +26,8 @@ from typing import  Optional, Any, Union
 from cunqa.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
+from sympy import Symbol
+from cunqa.circuit.parameter import encoder, Param
 from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
 
 class QJob:
@@ -63,7 +65,8 @@ class QJob:
     _device: dict
     _future: Union[FutureWrapper, QMIOFuture] 
     _result: Optional[Result]
-    _quantum_task: str
+    _quantum_task: dict
+    _params: list[Param]
 
     def __init__(
             self, 
@@ -76,6 +79,7 @@ class QJob:
         self._device = device
         self._circuit_id = circuit_ir["id"]
         self._cregisters = circuit_ir["classical_registers"]
+        self._params = circuit_ir["params"]
         self._updated = False
         self._future = None
         self._result = None
@@ -98,13 +102,13 @@ class QJob:
         else:
             logger.warning("Error when reading `run_parameters`, default were set.")
         
-        self._quantum_task = json.dumps({
+        self._quantum_task = {
             "config": run_config, 
             "instructions": circuit_ir["instructions"],
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
             "id": circuit_ir["id"]
-        })
+        }
       
         logger.debug("Qjob configured")
 
@@ -147,29 +151,48 @@ class QJob:
                                "been submitted.")
         return self._result
 
-    def submit(self) -> None:
+    def submit(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
+    ) -> None:
         """
         Asynchronous method to submit a job to the corresponding :py:class:`QClient`.
 
             >>> qjob = QJob(qclient, circuit_ir, **run_parameters)
             >>> qjob.submit() # Already has all the info of where and what to send
 
+        In case the circuit is parametric it needs to be called with the value of its free 
+        parameters set with the :py:attr:`param_values`.
+        
         .. note::
             Opposite to :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
             Once a job is submitted, the python program continues without waiting while  
             the corresponding server receives and simulates the circuit.
+        
+        param_values (dict | list): either a list of ordered parameters to assign to the 
+                                    parametrized circuit or a dictionary with keys being the 
+                                    free parameters' names and its values being its 
+                                    corresponding new values.
         """
         if self._future is not None:
             logger.error("QJob has already been submitted.")
         else:
-            try:
-                self._future = self._qclient.send_circuit(self._quantum_task)
-                logger.debug("Circuit was sent.")
-            except Exception as error:
-                raise RuntimeError((f"Some error occured when submitting the "
-                                    f"job [{type(error).__name__}]."))
+            if param_values is not None:
+                self.assign_parameters_(param_values)
             
-    def upgrade_parameters(self, parameters: list[Union[float, int]]) -> None:
+            self._future = self._qclient.send_circuit(
+                json.dumps(
+                    self._quantum_task,
+                    default=encoder
+                )
+            )
+            
+            logger.debug("Circuit was sent.")
+            
+    def upgrade_parameters(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
+    ) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
         First it checks weather the prior simulation's result was retrieved. If not, it is discarded,
@@ -188,35 +211,69 @@ class QJob:
             There are two ways of passing new parameters. First, as a **list** with the corresponding 
             values in the order of the gates in the circuit, in which case missing parameters will
             result in an error. On the other hand, as a **dict** where the keys are 
-            :py:class:`~cunqa.circuit.parameter.Variable` instances, which signify that the parameter
-            can vary, and the values the corresponding new value to that :py:class:`~cunqa.circuit.parameter.Variable`.
-            In this case not all parameters need to be updated - the ones not given keep their last 
-            value - but :py:class:`~cunqa.circuit.parameter.Variable` objects need to be given a value at 
+            :py:class:`~cunqa.circuit.parameter.CunqaParameter` instances, which signify that the 
+            parameter can vary, and the values the corresponding new value to that 
+            :py:class:`~cunqa.circuit.parameter.CunqaParameter`. In this case not all parameters 
+            need to be updated - the ones not given keep their last value - but 
+            :py:class:`~cunqa.circuit.parameter.CunqaParameter` objects need to be given a value at 
             least once with :py:meth:`CunqaCircuit.bind_parameters` or :py:meth:`upgrade_parameters`.
 
         Args:
-            parameters (list[float | int]): list of parameters to assign to the parametrized 
-            circuit.
+            param_values (dict | list): either a list of ordered parameters to assign to the 
+                                        parametrized circuit or a dictionary with keys being the 
+                                        free parameters' names and its values being its 
+                                        corresponding new values.
         """
 
         if self._result is None: 
             if self._future is not None:
-                self._future.get()
+                # TODO: Improve this by having a queue of results
+                logger.warning("You have not obtained the previous results. They will be discarded.")
+                self._future.get() # we get the previous result because if not it stays in queue
             else:
                 raise RuntimeError("No circuit was sent before calling update_parameters().")
 
-        if not len(parameters):
+        if not len(param_values):
             raise AttributeError("No parameter list has been provided to the upgrade_parameters "
                                  "method.")
 
+        self.assign_parameters_(param_values)
+              
         try:
-            message = """{{"params":{} }}""".format(parameters).replace("'", '"')
+            premessage = json.dumps(self._params, default=encoder)
+            message = """{{"params":{}}}""".format(premessage).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
             self._updated = False
         except Exception as error:
             logger.error(f"Some error occured when sending the new parameters to "
                          f"circuit {self._circuit_id} [{type(error).__name__}].")
             self._updated = True
+            
+    def assign_parameters_(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
+    ):
+        """Fuction responsible of assigning the values to the circuit parameter."""    
+        if isinstance(param_values, dict):
+            for param in self._params:
+                values_i = {k.name: param_values.get(k.name) 
+                            for k in param.variables 
+                            if param_values.get(k.name) is not None}
+
+                if len(values_i) != len(param.variables):
+                    if param.value is None:
+                        raise ValueError("Cannot update the param value and it is None, cannot execute.")
+                    else:
+                        logger.debug(f"{param} value remains the same due to lack of variables")
+                else:
+                    param.eval(values_i)
+        elif isinstance(param_values, list):
+            if len(param_values) != len(self._params):
+                raise ValueError("List of parameter values is not the same as the number of "
+                                 "parameters.")
+            else:
+                for param, value in zip(self._params, param_values):
+                    param.assign_value(value)
 
 
 def gather(qjobs: list[QJob]) -> list[Result]:

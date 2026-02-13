@@ -10,7 +10,7 @@ namespace constants{
 
 // This is constexpr because it is employed in __attribute__((constructor))
 // of the logger_client, that is initialized before main (therefore before
-// const std::string variables are initialized) 
+// const std::string parameters are initialized) 
 inline constexpr std::string_view CUNQA_PATH = "@CUNQA_PATH@";
 const std::string QPUS_FILEPATH = "@QPUS_FILEPATH@";
 const std::string COMM_FILEPATH = "@COMM_FILEPATH@";

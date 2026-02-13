@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         case murmur::hash("Maestro"):
         {
             LOGGER_DEBUG("Raising executor with Maestro.");
-            MaestroExecutor executor(family_name);
+            MaestroExecutor executor(n_qpus);
             executor.run();
             break;
         }

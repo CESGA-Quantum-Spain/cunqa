@@ -387,44 +387,25 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
 
         float time_taken;
         int n_qubits = quantum_task.config.at("num_qubits");
+        CircuitSimulator sim(std::move(mqt_circuit));
 
-        JSON noise_model_json = backend->config.at("noise_model");
-        if (!noise_model_json.empty()) {
-            const ApproximationInfo approx_info{noise_model_json["step_fidelity"], noise_model_json["approx_steps"], ApproximationInfo::FidelityDriven};
-            StochasticNoiseSimulator sim(std::move(mqt_circuit), approx_info, quantum_task.config["seed"], "APD", noise_model_json["noise_prob"],
-                                            noise_model_json["noise_prob_t1"], noise_model_json["noise_prob_multi"]);
+        auto start = std::chrono::high_resolution_clock::now();
+        // TODO: Change this to directly call the simulate without creating a new instance?
+        auto result = sim.simulate(quantum_task.config["shots"]);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        time_taken = duration.count();
 
-            auto start = std::chrono::high_resolution_clock::now();
-            auto result = sim.simulate(quantum_task.config["shots"]);
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            time_taken = duration.count();
-
-            if (!result.empty()) {
-                return {{"counts", result}, {"time_taken", time_taken}};
-            }
-            throw std::runtime_error("QASM format is not correct.");
-        } else {
-            CircuitSimulator sim(std::move(mqt_circuit));
-
-            auto start = std::chrono::high_resolution_clock::now();
-            // TODO: Change this to directly call the simulate without creating a new instance?
-            auto result = sim.simulate(quantum_task.config["shots"]);
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> duration = end - start;
-            time_taken = duration.count();
-
-            if (!result.empty()) {
-                return {{"counts", result}, {"time_taken", time_taken}};
-            }
-            throw std::runtime_error("QASM format is not correct.");
+        if (!result.empty()) {
+            return {{"counts", result}, {"time_taken", time_taken}};
         }
+        throw std::runtime_error("QASM format is not correct.");
     }
     catch (const std::exception &e)
     {
         // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
-        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }
     return {};
 }

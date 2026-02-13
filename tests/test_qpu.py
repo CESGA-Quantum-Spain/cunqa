@@ -23,7 +23,11 @@ def test_init_connects_when_endpoint_is_ok():
     with patch.object(qpu_mod, "QClient") as QClientMock:
         qclient_instance = Mock()
         QClientMock.return_value = qclient_instance
-        qpu = QPU(id=1, backend=backend, family="f", endpoint=endpoint)
+        qpu = QPU(id=1, 
+                  backend=backend, 
+                  device={"device_name": "CPU", "target_devices": []}, 
+                  family="f", 
+                  endpoint=endpoint)
     QClientMock.assert_called_once_with()
     qclient_instance.connect.assert_called_once_with(endpoint)
     assert qpu.id == 1
@@ -38,9 +42,31 @@ def test_init_raises_when_endpoint_is_bad():
         qclient_instance.connect.side_effect = ConnectionError("cannot connect")
         QClientMock.return_value = qclient_instance
         with pytest.raises(ConnectionError):
-            QPU(id=1, backend=backend, family="f", endpoint=endpoint)
+            QPU(id=1, 
+                backend=backend, 
+                device={"device_name": "CPU", "target_devices": []}, 
+                family="f", 
+                endpoint=endpoint)
     QClientMock.assert_called_once_with()
     qclient_instance.connect.assert_called_once_with(endpoint)
+
+def test_init_connects_with_qmioclient_when_device_is_qpu(monkeypatch):
+    backend = Mock()
+    endpoint = "tcp://endpoint"
+
+    qmio_instance = Mock()
+    monkeypatch.setattr(qpu_mod, "QMIOClient", Mock(return_value=qmio_instance))
+    monkeypatch.setattr(qpu_mod, "QClient", Mock())
+
+    QPU(
+        id=5,
+        backend=backend,
+        device={"device_name": "QPU", "target_devices": []},
+        family="fam",
+        endpoint=endpoint,
+    )
+
+    qmio_instance.connect.assert_called_once_with(endpoint)
 
 
 # ------------------------
@@ -56,9 +82,13 @@ def qpu(monkeypatch):
     QClientMock.return_value = qclient_instance
     monkeypatch.setattr(qpu_mod, "QJob", QClientMock)
 
-    return QPU(id=1, backend=backend, family="f", endpoint=endpoint)
+    return QPU(id=1, 
+               backend=backend, 
+               device={"device_name": "CPU", "target_devices": []}, 
+               family="f", 
+               endpoint=endpoint)
 
-def test_execute_creates_qjob_submits_and_returns(monkeypatch, qpu):
+def test_execute_creates_qjob_submits_and_returns_without_param(monkeypatch, qpu):
     circuit, run_parameters = {"some": "circuit"}, {}
 
     QJobMock = Mock(name="QJob")
@@ -68,36 +98,32 @@ def test_execute_creates_qjob_submits_and_returns(monkeypatch, qpu):
 
     result = qpu.execute(circuit, **run_parameters)
     
-    QJobMock.assert_called_once_with(qpu._qclient, circuit, **run_parameters)
-    qjob_instance.submit.assert_called_once_with()
+    QJobMock.assert_called_once_with(
+        qpu._qclient, 
+        {"device_name": "CPU", "target_devices": []},
+        circuit, 
+        **run_parameters
+    )
+    qjob_instance.submit.assert_called_once_with(None)
     assert result is qjob_instance
 
-def test_execute_reraises_if_qjob_creation_fails(monkeypatch, qpu):
-    circuit = {"some": "circuit"}
-
-    QJobMock = Mock(name="QJob")
-    QJobMock.side_effect = RuntimeError("boom")
-
-    monkeypatch.setattr(qpu_mod, "QJob", QJobMock)
-    with pytest.raises(RuntimeError, match="boom"):
-        qpu.execute(circuit)
-    
-    QJobMock.assert_called_once_with(qpu._qclient, circuit)
-
-def test_execute_reraises_if_qjob_submit_fails(monkeypatch, qpu):
-    circuit = {"some": "circuit"}
-
-    QJobMock = Mock(name="QJob")
-    qjob_instance = Mock(name="QJobInstance")
-    qjob_instance.submit.side_effect = RuntimeError("Failed to submit the job")
-    QJobMock.return_value = qjob_instance
+def test_execute_creates_qjob_and_submits_with_var_values(monkeypatch, qpu):
+    qjob_instance = Mock()
+    QJobMock = Mock(return_value=qjob_instance)
     monkeypatch.setattr(qpu_mod, "QJob", QJobMock)
 
-    with pytest.raises(RuntimeError, match="Failed to submit the job"):
-        qpu.execute(circuit)
-    
-    QJobMock.assert_called_once()
-    qjob_instance.submit.assert_called_once_with()
+    circuit, param_values = {"some": "circuit"}, {"theta": 1.0}
+    result = qpu.execute(circuit, param_values, shots=100)
+
+    QJobMock.assert_called_once_with(
+        qpu._qclient,
+        qpu._device,
+        circuit,
+        shots=100
+    )
+    qjob_instance.submit.assert_called_once_with(param_values)
+    assert result is qjob_instance
+
 
 # ------------------------
 # run tests
@@ -128,8 +154,8 @@ def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
     assert result == [job1, job2]
     assert to_ir_mock.call_args_list[0].args[0] == "c1"
     assert to_ir_mock.call_args_list[1].args[0] == "c2"
-    qpu1.execute.assert_called_once_with(c1_ir, shots=100, method="sv")
-    qpu2.execute.assert_called_once_with(c2_ir, shots=100, method="sv")
+    qpu1.execute.assert_called_once_with(c1_ir, None, shots=100, method="sv")
+    qpu2.execute.assert_called_once_with(c2_ir, None, shots=100, method="sv")
 
 def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     circuit = "c1"
@@ -145,7 +171,7 @@ def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     result = run(circuit, [qpu], shots=50)
 
     to_ir_mock.assert_called_once_with(circuit)
-    qpu.execute.assert_called_once_with(circuit_ir, shots=50)
+    qpu.execute.assert_called_once_with(circuit_ir, None, shots=50)
     assert result is job
 
 def test_run_raises_if_not_enough_qpus(monkeypatch):
@@ -189,7 +215,7 @@ def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
 
     logger_mock.warning.assert_called_once()
     assert "More QPUs provided than the number of circuits" in logger_mock.warning.call_args[0][0]
-    qpu1.execute.assert_called_once_with(circuit_ir)
+    qpu1.execute.assert_called_once_with(circuit_ir, None)
     qpu2.execute.assert_not_called()
     assert result is job1
 
@@ -222,7 +248,7 @@ def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch):
     assert circuit_ir["sending_to"] == [10]
     assert circuit_ir["id"] == 10
 
-    qpu.execute.assert_called_once_with(circuit_ir)
+    qpu.execute.assert_called_once_with(circuit_ir, None)
     assert result is job
 
 def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(monkeypatch):
@@ -250,6 +276,40 @@ def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(mon
 
     assert circuit_ir["sending_to"] == [7]
     assert circuit_ir["id"] == 7
+
+def test_run_passes_param_values_to_execute(monkeypatch):
+    circuit = "c1"
+    circuit_ir = {
+        "id": "c1",
+        "instructions": [],
+        "sending_to": []
+    }
+
+    qpu = Mock(name="QPU")
+    qpu.id = 42
+    job = Mock(name="QJob")
+    qpu.execute.return_value = job
+
+    monkeypatch.setattr(qpu_mod, "to_ir", Mock(return_value=circuit_ir))
+
+    param_values = {"theta": 3.14}
+
+    result = run(
+        circuit,
+        qpu,
+        param_values=param_values,
+        shots=200,
+        method="sv"
+    )
+    
+    qpu.execute.assert_called_once_with(
+        circuit_ir,
+        param_values,
+        shots=200,
+        method="sv"
+    )
+
+    assert result is job
 
 
 # ------------------------
@@ -524,6 +584,10 @@ def test_login_node_hpc(monkeypatch):
                 "backend": "backend-A",
                 "family": "fam-A",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-1", 
                     "endpoint": "tcp://node-1:1234", 
             }
@@ -545,6 +609,10 @@ def test_login_node_co_located(
                 "backend": "backend-A",
                 "family": "fam-A",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-1", 
                     "endpoint": "tcp://node-1:1234", 
                     "mode": "co_located"
@@ -562,6 +630,7 @@ def test_login_node_co_located(
     qpu_mock.assert_called_once_with(
         id="qpu-1",
         backend="backend-A",
+        device={"device_name": "QPU", "target_devices": ["QMIO"]}, 
         family="fam-A",
         endpoint="tcp://node-1:1234",
     )
@@ -576,12 +645,26 @@ def test_hpc_without_family_filter(
             "qpu-1": {
                 "backend": "backend-A",
                 "family": "fam-A",
-                "net": {"nodename": "node-1", "endpoint": "tcp://node-1:1234"},
+                "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
+                    "nodename": "node-1", 
+                    "endpoint": "tcp://node-1:1234"
+                },
             },
             "qpu-2": {
                 "backend": "backend-B",
                 "family": "fam-B",
-                "net": {"nodename": "node-2", "endpoint": "tcp://node-2:5678"},
+                "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
+                    "nodename": "node-2", 
+                    "endpoint": "tcp://node-2:5678"
+                },
             },
         },
     )
@@ -596,6 +679,7 @@ def test_hpc_without_family_filter(
     qpu_mock.assert_called_once_with(
         id="qpu-1",
         backend="backend-A",
+        device={"device_name": "QPU", "target_devices": ["QMIO"]}, 
         family="fam-A",
         endpoint="tcp://node-1:1234",
     )
@@ -610,7 +694,13 @@ def test_hpc_with_family_filter(
             "qpu-1": {
                 "backend": "backend-A",
                 "family": "fam-A",
-                "net": {"nodename": "node-1", "endpoint": "tcp://node-1:1234"},
+                "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
+                    "nodename": "node-1", 
+                    "endpoint": "tcp://node-1:1234"},
             }
         },
     )
@@ -631,6 +721,10 @@ def test_co_located_without_family_filter(
                 "backend": "backend-A",
                 "family": "fam-A",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-1",
                     "endpoint": "tcp://node-1:1234",
                     "mode": "hpc",
@@ -640,6 +734,10 @@ def test_co_located_without_family_filter(
                 "backend": "backend-B",
                 "family": "fam-B",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-2",
                     "endpoint": "tcp://node-2:5678",
                     "mode": "co_located",
@@ -649,6 +747,10 @@ def test_co_located_without_family_filter(
                 "backend": "backend-C",
                 "family": "fam-C",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-3",
                     "endpoint": "tcp://node-3:9999",
                     "mode": "hpc",
@@ -677,6 +779,10 @@ def test_co_located_with_family_filter(monkeypatch, qpu_mock):
                 "backend": "backend-A",
                 "family": "fam-A",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-1",
                     "endpoint": "tcp://node-1:1234",
                     "mode": "co_located",
@@ -686,6 +792,10 @@ def test_co_located_with_family_filter(monkeypatch, qpu_mock):
                 "backend": "backend-B",
                 "family": "fam-B",
                 "net": {
+                    "device": {
+                        "device_name": "QPU",
+                        "target_devices": ["QMIO"]
+                    },
                     "nodename": "node-1",
                     "endpoint": "tcp://node-1:5678",
                     "mode": "co_located",

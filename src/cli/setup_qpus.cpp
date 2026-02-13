@@ -74,8 +74,7 @@ int main(int argc, char *argv[])
             switch(murmur::hash(sim_arg)) {
                 case murmur::hash("Aer"): 
                     LOGGER_DEBUG("QPU going to turn on with AerSimpleSimulator.");
-                    turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, 
-                                                                                 name, family);
+                    turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family);
                     break;
                 case murmur::hash("Munich"):
                     LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");

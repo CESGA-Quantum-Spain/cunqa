@@ -35,8 +35,6 @@ int main(int argc, char* argv[])
             write_infrastructure_sbatch(sbatchFile, args);
         } else if (args.qmio) {
             write_qmio_sbatch(sbatchFile, args);
-        } else if (args.noise_properties.has_value() || args.fakeqmio.has_value()) {
-            write_noise_model_sbatch(sbatchFile, args);
         } else if (args.cc) {
             write_cc_sbatch(sbatchFile, args);
         } else if (args.qc) {
@@ -53,7 +51,7 @@ int main(int argc, char* argv[])
     sbatchFile.close();
 
     // Executing and deleting the file
-    std::system("sbatch qraise_sbatch_tmp.sbatch");
+    std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
     remove_tmp_files();
     
     

@@ -1,24 +1,11 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-import sys
-import os
-import shutil
-from pathlib import Path
-sys.path.insert(0, os.path.abspath('../..'))
-
-os.environ['CUNQA_PATH'] = ''
-os.environ['HOSTNAME'] = ''
-os.environ['QPUS_FILEPATH'] = ''
-os.environ['SLURMD_NODENAME'] = ''
-os.environ['SLURM_JOB_ID'] = ''
-os.environ['STORE'] = ''
+import os, sys
+import types
 
 project = 'CUNQA'
 copyright = '2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
 author = 'Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito'
+
+sys.path.insert(0, os.path.abspath('../..'))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -33,24 +20,23 @@ extensions = [
     "sphinx_inline_tabs"
 ]
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
-autosummary_generate = True
+os.environ['HOSTNAME'] = ''
+os.environ['SLURMD_NODENAME'] = ''
+os.environ['SLURM_JOB_ID'] = ''
+os.environ['STORE'] = ''
 
-autosummary_generate_overwrite = True
-
-
-autodoc_default_options = {
-    # "members": True,        # ← NO
-    "private-members": False,
-    "special-members": "",
-}
-autodoc_member_order = "bysource"
-autodocsumm_member_order = "bysource"
+mock_constants = types.ModuleType("cunqa.constants")
+mock_constants.LIBS_DIR = ""
+mock_constants.QPUS_FILEPATH = ""
+mock_constants.CUNQA_PATH = ""
+mock_constants.REMOTE_GATES = ""
+sys.modules["cunqa.constants"] = mock_constants
 
 autodoc_mock_imports = [
     'argparse',
-    'collections',
+    'collections', 
     'copy',
     'cunqa.constants',
     'cunqa.logger',
@@ -65,29 +51,14 @@ autodoc_mock_imports = [
     'load',
     'logging',
     'logger',
-    'numpy',
     'operator',
     'os',
     'random',
-    're',
     'string',
-    'subprocess',
-    'socket',
-    'symengine',
-    'sympy',
+    'subprocess', 
     'sys',
-    'threading',
     'time',
     'typing',
-    'zmq',
-    'pathlib',
-    'psutil',
-    'socket',
-    'pickle',
-    'psutil',
-    'threading',
-    'queue', 
-    'zmq'
 ]
 
 nbsphinx_execute = "never" # Never execute the Jupyter notebooks

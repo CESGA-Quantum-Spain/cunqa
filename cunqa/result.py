@@ -18,6 +18,9 @@
 """
 import logging
 import math
+import numpy as np
+
+from typing import  Union
 from cunqa.logger import logger
 from itertools import accumulate
 
@@ -38,7 +41,7 @@ class Result:
     id: str
     _registers: dict
     
-    def __init__(self, result: dict, circ_id: str, cl_registers: dict):
+    def __init__(self, result: dict, circ_id: str, registers: dict):
         """
         Initializes the Result class.
 
@@ -121,7 +124,7 @@ class Result:
     @property
     def time_taken(self) -> str:
         """
-        Time that the simulation took in seconds, since it is recieved at the virtual QPU until 
+        Time that the simulation took in seconds, since it is received at the virtual QPU until 
         it is finished.
 
             >>> result.time_taken
@@ -141,7 +144,10 @@ class Result:
         
     @property
     def statevector(self) -> Union[dict[np.array], np.array]:
-        """Statevector or dictionary of statevectors captured at the moment that `.save_state()` was performed on the circuit."""
+        """
+        Statevector or dictionary of statevectors captured at the moment that `.save_state()` was 
+        performed on the circuit.
+        """
         try:
             if ("results" in list(self._result.keys()) 
                 and "result_types" in self._result["results"][0]["metadata"] 
@@ -165,12 +171,11 @@ class Result:
                     statevector = np.array(statevector).view(np.complex128)
 
             else:
-                logger.error(f"Statevector not found, try using circuit.save_state() at some point before executing.")
-                raise ResultError
+                raise RuntimeError(f"Statevector not found, try using circuit.save_state() at some point before executing.")
+                
 
         except Exception as error:
-            logger.error(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
-            raise error
+            raise RuntimeError(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
         
         return statevector
 
@@ -192,12 +197,10 @@ class Result:
                     density_matrix = list(density_matrix.values())[0] # Extract the statevector if we only have one
 
             else:
-                logger.error(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
-                raise ResultError
+                raise RuntimeError(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
 
         except Exception as error:
-            logger.error(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
-            raise error
+            raise RuntimeError(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
         
         return density_matrix
     
