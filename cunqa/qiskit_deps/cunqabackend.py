@@ -190,6 +190,9 @@ class CunqaBackend(BackendV2):
         target.add_instruction(Measure(), { (q,): None for q in range(backend_json["n_qubits"]) })
 
         for gate in backend_json["basis_gates"]:
+
+            if gate == "measure":
+                continue
             
             gate_object = _get_gate(gate)
 
@@ -256,8 +259,6 @@ from qiskit.circuit.library import (U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UG
                                     CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, SXGate, SXdgGate, TGate, TdgGate,
                                     SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate,
                                     UnitaryGate, )
-
-from qiskit.circuit.library import 
 
 def _get_gate(name: str):
 
