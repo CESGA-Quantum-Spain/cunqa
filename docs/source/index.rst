@@ -1,25 +1,14 @@
-.. rst-class:: big-cunqa
+.. raw:: html
 
-CUNQA
-======
+   <h1 class=big-cunqa>CUNQA</h1>
+   <p style="text-align: center;"><strong>Emulator of Distributed Quantum Computing for HPC environments</strong></p>
 
-.. figure:: /_static/QuantumCommScheme.png
-   :alt: Quantum Communications scheme
-   :width: 50%
-   :align: center
-
-
-|
-
-.. centered:: **Emulator of Distributed Quantum Computing for HPC environments**
-
-
-Welcome to CUNQA's documentation!
-=================================
+Documentation
+=============
 
 **CUNQA** is a Python/C++ platform that emulates distributed quantum computing (DQC) architectures 
 on HPC environments. To achieve this, CUNQA defines the concept of a **virtual QPU (vQPU)**, which 
-is a  combination of classical resources and simulation software that, working together, simulate 
+is a combination of classical resources and simulation software that, working together, simulate 
 the appearance and operation of a real QPU. These vQPUs are responsible for executing the quantum 
 tasks defined by the user.
 
@@ -27,7 +16,8 @@ For these vQPUs to work, they require a management system. This system is writte
 for higher performance and better integration with the simulation libraries, most of which are also 
 written in this language. In addition to this management system, it was necessary to define an API 
 that allows the definition of quantum tasks and their subsequent submission to the vQPUs, providing
-an intuitive and convenient way of using the platform.
+an intuitive and convenient way of using the platform. The API was implemented in Python, as it 
+offers a more accessible and user-friendly entry point.
 
 This documentation will exclusively detail the parts of the library that are required by the user 
 to employ the platform which can be found in the :doc:`CUNQA reference <reference/reference>` 

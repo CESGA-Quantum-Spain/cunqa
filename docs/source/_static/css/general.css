@@ -1,3 +1,11 @@
+div.body p {
+  text-align: justify;
+}
+
+div.body li {
+  text-align: justify;
+}
+
 .admonition {
     box-shadow: 0 2px 8px rgba(31, 75, 153, 0.25);
 }

@@ -1,9 +1,9 @@
 Tools for DQC algorithms
 =========================
 
-See the following explanations of the :py:func:`~cunqa.circuit.transformations.add`, :py:func:`~cunqa.circuit.transformations.union`
-and :py:func:`~cunqa.circuit.transformations.hsplit` functions to understand how they empower the study
-of DQC algorithms.
+See the following explanations of the :py:func:`~cunqa.circuit.transformations.add`, 
+:py:func:`~cunqa.circuit.transformations.union` and :py:func:`~cunqa.circuit.transformations.hsplit` 
+functions to understand how they empower the study of DQC algorithms.
 
 .. tab:: add 
 
@@ -36,13 +36,12 @@ of DQC algorithms.
    simple circuits. 
 
    .. code-block:: python
-      :caption: Union of two quantum circuits.
 
-      c1 = CunqaCircuit(2, id = "circuit1")
+      c1 = CunqaCircuit(2, id="circuit1")
       c1.h(0)
       c1.cx(0,1)
 
-      c2 = CunqaCircuit(1, id = "circuit2")
+      c2 = CunqaCircuit(1, id="circuit2")
       c2.x(0)
 
       union_circuit = union([c1, c2])

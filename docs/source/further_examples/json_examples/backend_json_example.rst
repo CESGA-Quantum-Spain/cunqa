@@ -40,7 +40,7 @@ Here it is presented how to specify a backend using JSON. Supported simulators m
 
 **Noisy backend**
 
-The simplest way to specify a noisy backend is through a JSON file containing the desired noise properties in the format specified in :doc:`..noise_properties_example`. Then, internally it will be convert to the specific noise model format supported for the corresponding simulator.
+The simplest way to specify a noisy backend is through a JSON file containing the desired noise properties in the format specified in :doc:`noise_properties_example`. Then, internally it will be convert to the specific noise model format supported for the corresponding simulator.
 
 .. code-block:: json
 

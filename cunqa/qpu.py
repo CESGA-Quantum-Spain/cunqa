@@ -115,7 +115,7 @@ class QPU:
     def execute(
         self, 
         circuit_ir: dict, 
-        param_values: dict[str, Union[float, int]] = None, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
         **run_parameters: Any
     ) -> QJob:
         """
@@ -125,6 +125,10 @@ class QPU:
 
         Args:
             circuit_ir (dict): circuit IR to be simulated at the vQPU.
+            param_values (dict | list): either a list of ordered parameters to assign to the 
+                                        parametrized circuit or a dictionary with keys being the 
+                                        free parameters' names and its values being its 
+                                        corresponding new values.
             **run_parameters: any other simulation instructions.
         """
         qjob = QJob(self._qclient, self._device, circuit_ir, **run_parameters)
@@ -137,7 +141,7 @@ class QPU:
 def run(
         circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
-        param_values: dict[str, Union[float, int]] = None,
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
         **run_args: Any
     ) -> Union[list[QJob], QJob]:
     """
@@ -170,6 +174,10 @@ def run(
         circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
         qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the vQPUs in which 
                                                       the circuits want to be run.
+        param_values (dict | list): either a list of ordered parameters to assign to the 
+                                    parametrized circuit or a dictionary with keys being the 
+                                    free parameters' names and its values being its 
+                                    corresponding new values.
         run_args: any other run arguments and parameters.
     """
 

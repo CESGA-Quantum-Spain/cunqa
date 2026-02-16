@@ -11,12 +11,13 @@ As CUNQA supports the main three DQC schemes, this section will cover
 all of them by the following:
 
 - :doc:`basic_usage`: basic guide on how to use the CUNQA API.
-- :doc:`no_communications`: distributing quantum tasks without inter-QPU communications.
+- :doc:`no_communications` (also called embarrasingly parallel): distributing quantum tasks without 
+  inter-QPU communications.
 - :doc:`classical_communications`: send and receive classical bits between vQPUs.
 - :doc:`quantum_communications`: quantum communications through **teledata** and **telegate** protocols.
 
 All together, these topics provide a solid foundation for understanding the design principles and
-capabilities of CUNQA in distributed quantum computing scenarios.
+capabilities of CUNQA in DQC scenarios.
 
 .. toctree::
    :maxdepth: 1

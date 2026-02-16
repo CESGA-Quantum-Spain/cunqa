@@ -8,58 +8,110 @@ Once :ref:`installed <sec_installation>`, the basic CUNQA workflow can be summar
 3. **Execution:** send quantum tasks to vQPUs to be simulated.
 4. **Relinquish vQPUs:** free classical resources.
 
-To deploy the vQPUs we mainly use the :doc:`../reference/commands/qraise`
-bash command. The following example will deploy 4 vQPUs, for 1 hour and accessible from any HPC node:
+The following example will deploy 4 vQPUs, for 1 hour and accessible from any HPC node. To do this,
+there are two posible worflows: raising the vQPUs with a Python function or raising the vQPUs with 
+a bash command and get them in the Python program. 
 
-.. code-block:: bash
+.. tab:: Bash command
 
-    qraise -n 4 -t 01:00:00 --co-located
+    To deploy the vQPUs we use the :doc:`../reference/commands/qraise` Bash command.
 
+    .. code-block:: bash
 
-Once the vQPUs are deployed, we can design and execute quantum tasks:
+        qraise -n 4 -t 01:00:00 --co-located
 
-.. code-block:: python 
+    Once the vQPUs are deployed, we can design and execute quantum tasks:
 
-    import os, sys
+    .. code-block:: python 
 
-    # Adding path to access CUNQA module
-    sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+        import os, sys
 
-    # Let's get the raised QPUs
-    from cunqa.qpu import get_QPUs
+        # Adding path to access CUNQA module
+        sys.path.append(os.getenv("</your/cunqa/installation/path>"))
 
-    # List of deployed vQPUs
-    qpus  = get_QPUs(co_located=True)
+        # Gettting the raised QPUs
+        from cunqa.qpu import get_QPUs
 
-    # Let's create a circuit to run in our QPUs
-    from cunqa.circuit import CunqaCircuit
+        qpus  = get_QPUs(co_located=True)
 
-    qc = CunqaCircuit(num_qubits = 2)
-    qc.h(0)
-    qc.cx(0,1)
-    qc.measure_all()
+        # Creating a circuit to run in our QPUs
+        from cunqa.circuit import CunqaCircuit
 
-    # Submitting the same circuit to all vQPUs
-    from cunqa.qpu import run
+        qc = CunqaCircuit(num_qubits = 2)
+        qc.h(0)
+        qc.cx(0,1)
+        qc.measure_all()
 
-    qcs = [qc] * 4
-    qjobs = run(qcs , qpus, shots = 1000)
+        # Submitting the same circuit to all vQPUs
+        from cunqa.qpu import run
 
-    # Gathering results
-    from cunqa.qjob import gather
+        qcs = [qc] * 4
+        qjobs = run(qcs , qpus, shots = 1000)
 
-    results = gather(qjobs)
+        # Gathering results
+        from cunqa.qjob import gather
 
-    # Getting the counts
-    counts_list = [result.counts for result in results]
+        results = gather(qjobs)
 
-    # Printing the counts
-    for counts in counts_list:
-        print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+        # Getting and printing the counts
+        counts_list = [result.counts for result in results]
 
+        for counts in counts_list:
+            print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+    
+    It is a good practice to relinquish resources when the work is done. This is achieved by the :doc:`../reference/commands/qdrop` command:
 
-It is a good practice to relinquish resources when the work is done. This is achieved by the :doc:`../reference/commands/qdrop` command:
+    .. code-block:: bash
 
-.. code-block:: bash
+        qdrop --all
 
-    qdrop --all
+.. tab:: Python function
+    
+    In this case, the deployment and the design and execution of quantum tasks comes altogether.
+
+    .. code-block:: python 
+
+        import os, sys
+
+        # Adding path to access CUNQA module
+        sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+
+        # Raising the QPUs
+        from cunqa.qpu import qraise
+
+        family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
+
+        # Gettting the raised QPUs
+        from cunqa.qpu import get_QPUs
+
+        qpus  = get_QPUs(co_located=True)
+
+        # Creating a circuit to run in our QPUs
+        from cunqa.circuit import CunqaCircuit
+
+        qc = CunqaCircuit(num_qubits = 2)
+        qc.h(0)
+        qc.cx(0,1)
+        qc.measure_all()
+
+        # Submitting the same circuit to all vQPUs
+        from cunqa.qpu import run
+
+        qcs = [qc] * 4
+        qjobs = run(qcs , qpus, shots = 1000)
+
+        # Gathering results
+        from cunqa.qjob import gather
+
+        results = gather(qjobs)
+
+        # Getting and printing the counts
+        counts_list = [result.counts for result in results]
+
+        for counts in counts_list:
+            print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+        
+        # Relinquishing the resources
+        from cunqa.qpu import qdrop
+        
+        qdrop(family)

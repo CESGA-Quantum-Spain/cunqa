@@ -13,39 +13,40 @@ To get the source code, simply clone CUNQA repository:
    git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 
 .. warning::
-   If SSH cloning fails, you may not have properly linked your environment to GitHub. To do this, run the following commands:
+   If SSH cloning fails, you may not have properly linked your environment to GitHub. To do this, 
+   run the following commands:
 
    .. code-block:: console
       
       eval "$(ssh-agent -s)"
       ssh-add ~/.ssh/SSH_KEY
 
-   where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in the *~/.ssh* folder.
+   where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in 
+   the *~/.ssh* folder.
 
 
 Define STORE environment variable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-At build time, CUNQA will look at the ``STORE`` environment variable to set the root of the ``.cunqa`` folder where configuration files and logging files will be stored.
-So, if it is **not** defined by default on the environment, just run:
+At build time, CUNQA will look at the ``STORE`` environment variable to set the root of the 
+``.cunqa`` folder where configuration files and logging files will be stored. So, if it is **not** 
+defined by default on the environment, just run:
 
 .. code-block:: console
 
    export STORE=/path/to/your/store
 
+If you plan to compile CUNQA multiple times, we recommend adding this directive to your ``.bashrc`` 
+file to avoid potential issues.
 
 Dependencies
 ^^^^^^^^^^^^
 
-CUNQA has a set of dependencies. They are divided in three main groups:
+CUNQA has a set of dependencies, as any other platform. The versions here displayed are the ones 
+that have been employed in the development and, therefore, that are recommended. They are divided 
+in three main groups:
 
-- Must be installed before configuration.
-- Can be installed, but if they are not they will be by the configuration process.
-- They will be installed by the configuration process.
-
-From the first group, **the ones that must be installed**, the dependencies are the following. The 
-versions here displayed are the ones that have been employed in the development and, therefore, that 
-are recommended.
+- **Must be installed by the user** before configuration.
 
 .. code-block:: text
 
@@ -61,8 +62,9 @@ are recommended.
    Blas            -
    Lapack          -
 
-From the second group, **the ones that will be installed if they are not yet**, they are the next 
-ones.
+
+- **Can be installed by the user**, but if they are not they will be automatically installed by the 
+  configuration process.
 
 .. code-block:: text
 
@@ -73,7 +75,7 @@ ones.
    cppzmq          4.11.0
    CunqaSimulator  0.1.1
 
-And, finally, **the ones that will be installed**.
+- **Will be installed automatically** by the configuration process.
 
 .. code-block:: text
 
@@ -92,7 +94,7 @@ To build, compile, and install CUNQA, the three usual steps in a CMake project a
    cmake --build build/ --parallel $(nproc)
    cmake --install build/
 
-.. note::
+.. warning::
 
    If ``CMAKE_PREFIX_INSTALL`` is not provided, CUNQA will be installed where the environment variable ``HOME`` points.
 
@@ -105,7 +107,7 @@ To build, compile, and install CUNQA, the three usual steps in a CMake project a
       cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path -DAER_GPU=TRUE
 
 
-The user can also employ `Ninja <https://ninja-build.org/>`_ to perform this task.
+You can also employ `Ninja <https://ninja-build.org/>`_ to perform this task.
 
 .. code-block:: console
 
@@ -134,7 +136,7 @@ CESGA are available inside ``easybuild/`` folder.
 
 
 Uninstall
-^^^^^^^^^^
+^^^^^^^^^
 
 There has also been developed a Make directive to uninstall CUNQA if needed:
 

@@ -201,22 +201,18 @@ class QJob:
         Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, check out its 
         documentation for a extensive description.
 
+        There are two ways of passing new parameters. First, as a **list** with the corresponding 
+        values in the order of the gates in the circuit, in which case missing parameters will
+        result in an error. On the other hand, as a **dict** where the keys are the free 
+        parameters names and the values the corresponding new value to that free parameter. Not 
+        all parameters need to be updated, but they must have been given a value at 
+        least once, because its last value would be used.
+
         .. warning::
             Before sending the circuit or upgrading its parameters, the result of the prior job must be 
             called. It can be done manually, so that we can save it and obtain its information, or it 
             can be done automatically as in the example above, but be aware that once the 
             :py:meth:`upgrade_parameters` method is called, this result is discarded.
-
-        .. warning::
-            There are two ways of passing new parameters. First, as a **list** with the corresponding 
-            values in the order of the gates in the circuit, in which case missing parameters will
-            result in an error. On the other hand, as a **dict** where the keys are 
-            :py:class:`~cunqa.circuit.parameter.CunqaParameter` instances, which signify that the 
-            parameter can vary, and the values the corresponding new value to that 
-            :py:class:`~cunqa.circuit.parameter.CunqaParameter`. In this case not all parameters 
-            need to be updated - the ones not given keep their last value - but 
-            :py:class:`~cunqa.circuit.parameter.CunqaParameter` objects need to be given a value at 
-            least once with :py:meth:`CunqaCircuit.bind_parameters` or :py:meth:`upgrade_parameters`.
 
         Args:
             param_values (dict | list): either a list of ordered parameters to assign to the 

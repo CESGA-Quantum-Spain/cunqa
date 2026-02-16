@@ -84,6 +84,7 @@ html_css_files = [
     'css/general.css'
 ]
 
+html_title = "CUNQA"
 html_logo = "_static/logo_cesga_blanco.png"
 html_favicon = "_static/cunca.png"
 html_theme_options = { }

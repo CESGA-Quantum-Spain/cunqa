@@ -733,8 +733,7 @@ class CunqaCircuit:
         Class method to apply u1 gate to the given qubit.
 
         Args:
-            param (float | int | str): parameter for the parametric gate. String identifies a 
-                                       variable parameter (needs to be assigned) with the string label.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -809,7 +808,7 @@ class CunqaCircuit:
         Class method to apply p gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -839,7 +838,7 @@ class CunqaCircuit:
         Class method to apply rx gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -854,7 +853,7 @@ class CunqaCircuit:
         Class method to apply ry gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -869,7 +868,7 @@ class CunqaCircuit:
         Class method to apply rz gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -884,7 +883,7 @@ class CunqaCircuit:
         Class method to apply RotInvX gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -899,7 +898,7 @@ class CunqaCircuit:
         Class method to apply rRotInvY gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -914,7 +913,7 @@ class CunqaCircuit:
         Class method to apply RotInvZ gate to the given qubit.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
 
             qubit (int): qubit in which the gate is applied.
         """
@@ -931,7 +930,7 @@ class CunqaCircuit:
         Class method to apply rxx gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied.
         """
         self.add_instructions({
@@ -945,7 +944,7 @@ class CunqaCircuit:
         Class method to apply ryy gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied.
         """
         self.add_instructions({
@@ -959,7 +958,7 @@ class CunqaCircuit:
         Class method to apply rzz gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied.
         """
         self.add_instructions({
@@ -973,7 +972,7 @@ class CunqaCircuit:
         Class method to apply rzx gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied.
         """
         self.add_instructions({
@@ -987,8 +986,9 @@ class CunqaCircuit:
         Class method to apply cr gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
-            qubits (int): qubits in which the gate is applied, first one will be the control qubit and second one the target qubit.
+            param (float | int | str): parameter for the parametric gate.
+            qubits (int): qubits in which the gate is applied, first one will be the control qubit 
+                          and second one the target qubit.
         """
         self.add_instructions({
             "name":"cr",
@@ -1001,7 +1001,7 @@ class CunqaCircuit:
         Class method to apply crx gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied, first one will be the control qubit 
                           and second one the target qubit.
         """
@@ -1016,7 +1016,7 @@ class CunqaCircuit:
         Class method to apply cry gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied, first one will be the control qubit 
                           and second one the target qubit.
         """
@@ -1031,7 +1031,7 @@ class CunqaCircuit:
         Class method to apply crz gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied, first one will be the control qubit 
                           and second one the target qubit.
         """
@@ -1046,7 +1046,7 @@ class CunqaCircuit:
         Class method to apply cp gate to the given qubits.
 
         Args:
-            param (float | int): parameter for the parametric gate.
+            param (float | int | str): parameter for the parametric gate.
             qubits (int): qubits in which the gate is applied, first one will be the control qubit 
                           and second one the target qubit.
         """
@@ -1379,28 +1379,7 @@ class ClassicalControlContext:
         return False
 
 class QuantumControlContext:
-    """
-    Class to manage the controlled telegate operations from a circuit/virtual QPU to another.
-
-    An object of this class is returned by the :py:meth:`~cunqa.circuit.CunqaCircuit.expose` method.
-    Used as a context manager, it can be passed to controlled operations in order to implement 
-    telgate operations:
-
-        >>> with circuit_1.expose(0, circuit_2) as rqubit, subcircuit:
-        >>>     subcircuit.cx(rqubit, 0)
-    
-    Then, when the block ends, the :py:class:`QuantumControlContext` adds the propper "rcontrol" 
-    instruction to the target circuit.
-    """
     def __init__(self, control_circuit: 'CunqaCircuit', target_circuit: 'CunqaCircuit') -> int:
-        """Class constructor.
-        
-            Args:
-                control_circuit (~cunqa.circuit.CunqaCircuit): circuit which qubit is exposed.
-            
-                target_circuit (~cunqa.circuit.CunqaCircuit): circuit in which the instructions are 
-                implemented.
-        """
         self.control_circuit = control_circuit
         self.target_circuit = target_circuit
 

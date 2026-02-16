@@ -3,29 +3,19 @@ CUNQA overview
 
 This section presents an overview of CUNQA, an emulator of Distributed Quantum Computing (DQC) 
 architectures on HPC environments. Each of the architectures (or schemes) is built upon virtual 
-QPUs, their basic building blocks. To interact with a infrastructure, a custom circuit creation 
-interface was developed.
+QPUs, their basic building blocks.
 
 .. _sec_virtual_qpu:
 
 Virtual QPU
 ------------
 
-A virtual QPU (vQPU) is a classical process running on a HPC environment with an allocated set of 
-classical resources responsible for simulating the behaviour of a real QPU.
+A **virtual QPU (vQPU)** is a classical process running on a HPC environment with an allocated set of 
+classical resources responsible of simulating the behaviour of a real QPU. They are composed by two 
+parts:
 
-.. figure:: /_static/VirtualQPU.png
-    :alt: Virtual QPU
-    :width: 40%
-    :align: center
-
-    Virtual QPU
-
-
-.. rubric:: Made of two components
-
-- Server component: manages communication user-vQPU.
-- Simulator component: performs the actual execution.  Currently, the following simulators are 
+- **Server**: manages communication user-vQPU.
+- **Simulator**: performs the actual execution.  Currently, the following simulators are 
   available:
 
    - `AerSimulator <https://github.com/Qiskit/qiskit-aer/>`_
@@ -38,13 +28,11 @@ The modular structure of CUNQA allows the implementation of other simulators on 
 
 .. rubric:: How to deploy a vQPU?
 
-The deployment of vQPUs is made through the bash command :doc:`../reference/commands/qraise`. 
-Depending on the desired vQPU type, different argumets must be provided to the command. These 
-arguments will be explored inside the description of each of the :ref:`sec_dqc_schemes` below.
-
-.. note::
-   This :doc:`../reference/commands/qraise` Bash command also has a functionality-equivalent Python 
-   function called, also, :py:func:`~cunqa.qpu.qraise`.
+The deployment of vQPUs is made through the bash command :doc:`../reference/commands/qraise` or 
+through the Python function :py:func:`~cunqa.qpu.qraise`. Depending on the desired vQPU type, 
+different argumets must be provided to the command or to the function, depending on the one being 
+used. These arguments will be explored inside the description of each of the :ref:`sec_dqc_schemes` 
+below.
 
 .. rubric:: GPU support
 
@@ -54,18 +42,18 @@ compile time as discussed in the :doc:`../installation/getting_started` section.
 .. rubric:: Noisy simulations
 
 CUNQA allows the simulation of quantum circuits using a noise model, but **only with the 
-no-communication model and with the AER simultor**. Adding it to the other communication models is 
+no-communication model and with the AER simulator**. Adding it to the other communication models is 
 considered part of the future improvements. In order to do this, the vQPUs have to be deployed with 
 a valid noise model scheme. This is done with the aforementioned :doc:`../reference/commands/qraise` 
 Bash command or its Python function counterpart :py:func:`~cunqa.qpu.qraise`, with the first 
-accepting the flag `noise-properties` and the second the argument `noise_path`; both being the path 
+accepting the flag ``noise-properties`` and the second the argument ``noise_path``; both being the path 
 to a noise properties JSON file. The format of this JSON file is shown in 
 :doc:`../further_examples/json_examples/noise_properties_example`.
 
 Additionally, a vQPU with the noise model of `CESGA's QMIO quantum computer <https://www.cesga.es/infraestructuras/cuantica/>`_ 
-can be deployed, but only if CUNQA is being executed inside the CESGA infrastructure. This can be 
-done by employing the `fakeqmio` flag in the :doc:`../reference/commands/qraise` Bash command or 
-with `fakeqmio` argument in the :py:func:`~cunqa.qpu.qraise` Python function.
+can be deployed, but only if CUNQA is being executed inside the CESGA's infrastructure. This can be 
+done by employing the ``fakeqmio`` flag in the :doc:`../reference/commands/qraise` Bash command or 
+with ``fakeqmio`` argument in the :py:func:`~cunqa.qpu.qraise` Python function.
 
 .. _sec_quantum_circs:
 
@@ -87,7 +75,7 @@ corresponding :ref:`sec_dqc_schemes` section below.
 DQC schemes
 ------------
 
-As a Distributed Quantum Computing emulator, CUNQA supports the three basic DQC schemes:
+As a DQC emulator, CUNQA supports the three basic DQC schemes:
 
 - :doc:`embarrassingly_parallel`: classical distribution of quantum tasks with no communications 
   at all.
@@ -130,7 +118,7 @@ pieces and for dividing circuits into subcircuits:
    The function :py:func:`~cunqa.circuit.transformations.union` replaces distributed instructions 
    between the circuits for local ones, while :py:func:`~cunqa.circuit.transformations.hsplit` 
    replaces local 2-qubit operations that involve different subcircuits into distributed 
-   instructions.Indeed, :py:func:`~cunqa.circuit.transformations.union` is the **inverse** of 
+   instructions. Indeed, :py:func:`~cunqa.circuit.transformations.union` is the **inverse** of 
    :py:func:`~cunqa.circuit.transformations.hsplit`.
 
 
@@ -144,7 +132,7 @@ Check :doc:`tools_for_DQC` for detailed examples of these functions.
    :maxdepth: 1
    :hidden:
 
-      Add and Union <tools_for_DQC.rst>
+      add, union and hsplit <tools_for_DQC.rst>
    
 
 .. _sec_real_qpus:

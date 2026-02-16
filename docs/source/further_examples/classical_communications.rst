@@ -53,5 +53,3 @@ communication directives: socket libraries, MPI, etc.
 Examples can be made as complex as desired, just as the algorithms that use classical
 communications can be made more complex. Below we provide several more complex examples that use
 classical communications.
-
-**#TODO**

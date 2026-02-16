@@ -16,59 +16,66 @@ workload for each quantum node.
 
 **How to deploy**
 -----------------
-Within CUNQA, an insfrastructure of vQPUs which do not incorporate communications among them is launched as
+Within CUNQA, an insfrastructure of vQPUs which do not incorporate communications among them is 
+launched as follows. Note that the number of vQPUs and their maximum deployment time are the only 
+mandatory flags, for other additional options checkout :doc:`../reference/commands/qraise`. 
 
-.. code-block:: bash
+.. tab:: Bash command
 
-    qraise -n <num qpus> -t <max time> [OTHER]
+    .. code-block:: bash
 
-The number of vQPUs and their maximum deployment time are the only mandatory flags, for other additional options
-checkout :doc:`../reference/commands/qraise`. For a friendlier use, the Python API also incorporates the
-:py:func:`~cunqa.qpu.qraise` function.
+        qraise -n 4 -t 01:00:00 <max time> [OTHER]
 
-A useful feature is the :py:attr:`--family` flag. since it allows us to tag the infrastructure. If none is entered, family name
-will be the *SLURM job id* of the process in which the vQPUs live, shown right after they are lauched in the terminal or returned
-as a ``str`` by the Python function.
+.. tab:: Python function
+
+    .. code-block:: python
+
+        family = qraise(4, <max time>, [OTHER])
+
+An useful feature is the ``--family`` flag (and ``family`` attribute in Python), since it allows us to tag the set of vQPUs. If 
+none is entered, family name will be the *SLURM job id* of the process in which the vQPUs live, 
+shown right after they are lauched in the terminal or returned as a ``str`` by the Python function. 
+It is also recomended to use the ``--co-located`` flag (and ``co_located`` attribute in Python), as 
+it allows to access the vQPUs from every node, not just the one the vQPUs are being set up. In this 
+documentation we are going to consider that this flag is set.
 
 **Circuits design**
 ----------------------
-For quantum tasks ran in these scheme the limitation is that communications directives are
-not allowed since their are not available for the vQPUs.
-
 For instanciating :py:class:`~cunqa.circuit.core.CunqaCircuit` class we must provide the number of qubits
 and, if single-qubit measurements are intended to be done, number of classical bits
 
 .. code-block:: python
 
-    cunqacircuit = CunqaCirucit(num_qubits = 2, num_clbits = 2)
+    cunqacircuit = CunqaCirucit(num_qubits=2, num_clbits=2)
 
-Supported instructions are further explained at :py:class:`~cunqa.circuit.core.CunqaCircuit`.
-
+For quantum tasks ran in this scheme the limitation is that communications directives are not 
+allowed since their are not available for the vQPUs. Supported instructions, not only for this 
+scheme, are further explained at :py:class:`~cunqa.circuit.core.CunqaCircuit`.
 
 **Execution**
 --------------
-Once we obtain the :py:class:`~cunqa.qpu.QPU` objects through :py:func:`~cunqa.qpu.get_QPUs`,
-for classically distributing circuits, function :py:func:`~cunqa.qpu.run` is used. By providing
-the list of circuits and the list of :py:class:`~cunqa.qpu.QPU` objects we allow their mapping to the corresponding
-vQPUs:
+Once we obtain the :py:class:`~cunqa.qpu.QPU` objects through :py:func:`~cunqa.qpu.get_QPUs` 
+function :py:func:`~cunqa.qpu.run` is employed for executing them into the vQPUs. By providing
+the list of circuits and the list of :py:class:`~cunqa.qpu.QPU` objects we allow their mapping.
 
 .. code-block:: python 
 
-    qpus_list = get_QPUs()
+    qpus_list = get_QPUs(family=family, co_located=True)
 
-    qjobs = run(circuits_list, qpus_list, shots = 100)
+    qjobs = run(circuits_list, qpus_list, shots=1024)
 
-The output is a list of :py:class:`~cunqa.qjob.QJob` objects, each one associated to each quantum task. One can also
-input a single circuit instead of a list and it will be mapped to all vQPUs provided. Executions results can be obtained
-all together by the :py:func:`~cunqa.qjob.gather` function
+The output is a list of :py:class:`~cunqa.qjob.QJob` objects, each one associated to each quantum 
+task. One can also input a single circuit instead of a list and it will be mapped to all vQPUs 
+provided. Executions results can be obtained all together by the :py:func:`~cunqa.qjob.gather` 
+function.
 
 .. code-block:: python
 
     results = gather(qjobs)
 
-This call for the results is a blocking call, since both simulations runnng in parallel need to be done for the
-:py:class:`~cunqa.result.Result` objects to be returned. To access information such as time of simulation or output
-statistics there are class attributes:
+This call for the results is a blocking call, since all simulations running in parallel need to be 
+done for the :py:class:`~cunqa.result.Result` objects to be returned. To access information such as 
+time of simulation or output statistics there are class attributes, such as the shown below.
 
 .. code-block:: python
 
@@ -78,8 +85,8 @@ statistics there are class attributes:
 
 **Basic example**
 ------------------
-Next we show an example that contains all the steps for a embarrasingly parallel distribution. Further examples and use cases
-are listed in :doc:`../further_examples/further_examples`.
+Next, we show an example that contains all the steps for an embarrasingly parallel distribution. 
+Further examples and use cases are listed in :doc:`../further_examples/further_examples`.
 
 
 .. code-block:: python

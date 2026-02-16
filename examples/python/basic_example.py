@@ -1,37 +1,50 @@
 import os, sys
 
 # Adding path to access CUNQA module
-sys.path.append(os.getenv("HOME"))
+sys.path.append(os.getenv("</your/cunqa/installation/path>"))
 
-# Let's get the raised QPUs
-from cunqa.qpu import get_QPUs
+try: 
+    
+    # Raising the QPUs
+    from cunqa.qpu import qraise
 
-# List of deployed vQPUs
-qpus  = get_QPUs(co_located=True)
+    family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
 
-# Let's create a circuit to run in our QPUs
-from cunqa.circuit import CunqaCircuit
+    # Gettting the raised QPUs
+    from cunqa.qpu import get_QPUs
 
-qc = CunqaCircuit(num_qubits = 2)
-qc.h(0)
-qc.cx(0,1)
-qc.measure_all()
+    qpus  = get_QPUs(co_located=True)
 
-qcs = [qc] * 4
+    # Creating a circuit to run in our QPUs
+    from cunqa.circuit import CunqaCircuit
 
-# Submitting the same circuit to all vQPUs
-from cunqa.qpu import run
+    qc = CunqaCircuit(num_qubits = 2)
+    qc.h(0)
+    qc.cx(0,1)
+    qc.measure_all()
 
-qjobs = run(qcs , qpus, shots = 1000)
+    # Submitting the same circuit to all vQPUs
+    from cunqa.qpu import run
 
-# Gathering results
-from cunqa.qjob import gather
+    qcs = [qc] * 4
+    qjobs = run(qcs , qpus, shots = 1000)
 
-results = gather(qjobs)
+    # Gathering results
+    from cunqa.qjob import gather
 
-# Getting the counts
-counts_list = [result.counts for result in results]
+    results = gather(qjobs)
 
-# Printing the counts
-for counts in counts_list:
-    print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+    # Getting and printing the counts
+    counts_list = [result.counts for result in results]
+
+    for counts in counts_list:
+        print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+        
+    # Relinquishing the resources
+    from cunqa.qpu import qdrop
+    
+    qdrop(family)
+
+except Exception as error:
+    qdrop(family)
+    raise error
