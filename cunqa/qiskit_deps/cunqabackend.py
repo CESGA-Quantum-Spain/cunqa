@@ -172,7 +172,7 @@ class CunqaBackend(BackendV2):
 
     def _from_backend_json(self, backend_json):
         
-        if backend_json["name"] == "SimpleBackend":
+        if backend_json["name"] in ["SimpleBackend", "CCBackend", "QCBackend"]:
 
             target =  AerSimulator().target
         
