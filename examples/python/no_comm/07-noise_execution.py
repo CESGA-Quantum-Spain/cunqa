@@ -6,7 +6,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
 try:
-    #noise_path = "/mnt/netapp1/Store_CESGA/home/cesga/jvazquez/works/cunqa/examples/python/no_comm/Brisbane.json"
+    #noise_path = "complete/path/to/Brisbane.json"
     #family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_path=noise_path)
     family = qraise(4, "00:10:00", simulator="Aer", co_located=True, fakeqmio=True)
     qpus  = get_QPUs(co_located=True)

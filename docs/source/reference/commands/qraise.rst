@@ -60,6 +60,31 @@ Backend and simulation options
     Selects simulator responsible for running the simulations.
     Default: ``Aer``
 
+Noise model options
+~~~~~~~~~~~~~~~~~~~
+
+``--noise-prop, --noise-properties <string>``  
+    Path to the noise properties JSON file.  
+    Only supported when using the ``Aer`` simulator.
+
+``-fq, --fakeqmio <string>``  
+    Raise a FakeQmio backend from a calibration file.  
+    If no value is provided, the default calibration set ``last_calibrations`` is used.
+    It can only be used when executing in CESGA.
+
+``--no-thermal-relaxation``  
+    Deactivate thermal relaxation in FakeQmio.  
+    Default: ``false``
+
+``--no-readout-error``  
+    Deactivate readout error in FakeQmio.  
+    Default: ``false``
+
+``--no-gate-error``  
+    Deactivate gate error in FakeQmio.  
+    Default: ``false``
+
+
 Grouping and communication options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -77,13 +102,6 @@ Grouping and communication options
 
 ``--quantum_comm``
     Enable quantum communications between QPUs.
-
-Infrastructure options
-~~~~~~~~~~~~~~~~~~~~~~
-
-``--infrastructure <string>``
-    Path to an infrastructure description defining a set of QPUs.
-    Optional.
 
 GPU execution
 ~~~~~~~~~~~~~~~~~~~~~~

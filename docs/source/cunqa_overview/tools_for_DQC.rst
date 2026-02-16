@@ -48,7 +48,7 @@ of DQC algorithms.
       union_circuit = union([c1, c2])
 
 
-      Full example of the :py:func:`~cunqa.circuit.transformations.union` function:
+   Full example of the :py:func:`~cunqa.circuit.transformations.union` function:
 
    .. literalinclude:: ../../../examples/python/circuit_transformations/02-union.py
       :language: python

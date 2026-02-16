@@ -1,5 +1,5 @@
 Further examples
-==================
+================
 
 Here some examples will be displayed and explained in order to understand CUNQA 
 functionalities and purposes. Each subsection follows the structure outlined below:
