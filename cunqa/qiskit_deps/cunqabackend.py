@@ -9,9 +9,8 @@ from cunqa.backend import Backend
 
 from qiskit.providers import BackendV2
 from qiskit.providers import QubitProperties, BackendV2, Options
-from qiskit.circuit.library import ECRGate, IGate, Measure, RZXGate, RZGate, SXGate,ECRGate, XGate
+from qiskit.circuit.library import Measure
 from qiskit.transpiler import Target, InstructionProperties, TranspilerError
-from qiskit.circuit.library import UGate, CXGate, Measure
 from qiskit.circuit import Parameter
 
 
@@ -253,16 +252,19 @@ def _get_qubits_indexes(qubits_str):
 
 
 
-from qiskit.circuit.library.standard_gates import (U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UGate, CUGate, PhaseGate, RGate, RXGate, RYGate, RZGate, ECRGate,
-                                                   CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, SXGate, SXdgGate, TGate, TdgGate,
-                                                   SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate)
+from qiskit.circuit.library import (U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UGate, CUGate, PhaseGate, RGate, RXGate, RYGate, RZGate, ECRGate,
+                                    CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, SXGate, SXdgGate, TGate, TdgGate,
+                                    SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate,
+                                    UnitaryGate, )
+
+from qiskit.circuit.library import 
 
 def _get_gate(name: str):
 
     no_param_gate_map = {
         "id":  IGate,"x": XGate, "y": YGate,"z": ZGate,"h": HGate,"s":SGate,"sdg": SdgGate,"sx":  SXGate,"sxdg": SXdgGate,"t":   TGate,
         "tdg": TdgGate,  "swap": SwapGate,   "cx":  CXGate,  "cy":  CYGate,    "cz":  CZGate, "csx": CSXGate, "ccx": CCXGate,  # Toffoli
-        "ccz": CCZGate,"cswap": CSwapGate, "ecr":ECRGate
+        "ccz": CCZGate,"cswap": CSwapGate, "ecr":ECRGate, "unitary":UnitaryGate
     }
 
     param_gate_map = {
