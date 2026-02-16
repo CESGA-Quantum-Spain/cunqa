@@ -7,11 +7,10 @@ sys.path.append(os.getenv("HOME"))
 from cunqa.logger import logger
 from cunqa.backend import Backend
 
-from qiskit.providers import BackendV2
 from qiskit.providers import QubitProperties, BackendV2, Options
-from qiskit.circuit.library import ECRGate, IGate, Measure, RZXGate, RZGate, SXGate,ECRGate, XGate
+from qiskit_aer import AerSimulator
+from qiskit.circuit.library import Measure, UnitaryGate
 from qiskit.transpiler import Target, InstructionProperties, TranspilerError
-from qiskit.circuit.library import UGate, CXGate, Measure
 from qiskit.circuit import Parameter
 
 
@@ -173,38 +172,52 @@ class CunqaBackend(BackendV2):
 
     def _from_backend_json(self, backend_json):
         
-        target = Target(num_qubits = backend_json["n_qubits"])
+        if backend_json["name"] == "SimpleBackend":
 
-        if len(backend_json["coupling_map"]) == 0:
-            coupling_map = []
-            for i in range(backend_json["n_qubits"]):
-                for j in range(backend_json["n_qubits"]):
-                    if i != j:
-                        coupling_map.append([i,j])
-                    
-                    for k in range(backend_json["n_qubits"]):
-                        if k != j and k != i:
-                            coupling_map.append([i,j,k])
+            target =  AerSimulator().target
+        
         else:
-            coupling_map = backend_json["coupling_map"]
 
-        target.add_instruction(Measure(), { (q,): None for q in range(backend_json["n_qubits"]) })
+            target = Target(num_qubits = backend_json["n_qubits"])
 
-        for gate in backend_json["basis_gates"]:
-            
-            gate_object = _get_gate(gate)
-
-            if gate_object.num_qubits > 1:
-
-                inst_map = { tuple(couple): None for couple in coupling_map if len(couple) == gate_object.num_qubits}
-
+            if len(backend_json["coupling_map"]) == 0:
+                coupling_map = []
+                for i in range(backend_json["n_qubits"]):
+                    for j in range(backend_json["n_qubits"]):
+                        if i != j:
+                            coupling_map.append([i,j])
+                        
+                        for k in range(backend_json["n_qubits"]):
+                            if k != j and k != i:
+                                coupling_map.append([i,j,k])
             else:
-                inst_map = { (q,): None for q in range(backend_json["n_qubits"]) }
+                coupling_map = backend_json["coupling_map"]
 
-            target.add_instruction(gate_object, inst_map)
+            target.add_instruction(Measure(), { (q,): None for q in range(backend_json["n_qubits"]) })
+
+            for gate in backend_json["basis_gates"]:
+
+                if gate == "measure":
+                    continue
+
+                elif gate == "unitary":
+
+                    # target.add_instruction(UnitaryGate([[1,0],[0,1]]),{None:None})
+                    target.add_instruction(UnitaryGate([[1,0],[0,1]]),{None:None})
+                
+                else:
+                    gate_object = _get_gate(gate)
+
+                    if gate_object.num_qubits > 1:
+
+                        inst_map = { tuple(couple): None for couple in coupling_map if len(couple) == gate_object.num_qubits}
+
+                    else:
+                        inst_map = { (q,): None for q in range(backend_json["n_qubits"]) }
+
+                    target.add_instruction(gate_object, inst_map)
 
         self._target = target
-
 
     @classmethod
     def _default_options(cls):
