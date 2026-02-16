@@ -162,7 +162,7 @@ def test_transpiler_coupling_map_constraints(fakeqmio_backend):
             # Check only two-qubit gates
             if len(qubits) == 2:
                 # Sort qubit indices to match coupling map representation
-                qubit_pair = tuple(sorted(qc.find_bit(q).index for q in qubits))
+                qubit_pair = tuple(sorted(transpiled_qc.find_bit(q).index for q in qubits))
                 
                 # ASSERTIONS:    the qubit pair exists in the coupling map
                 assert qubit_pair in coupling_set, (
@@ -203,15 +203,10 @@ def test_transpiler_coupling_map_constraints(fakeqmio_backend):
         
         # Try different optimization levels
         for opt_level in range(4):
-
             transpiled_qc = transpiler(qc, fakeqmio_backend, opt_level=opt_level)
             
             # Check coupling map constraints
             check_two_qubit_gate_connectivity(transpiled_qc)
-
-
-
-
 
 def test_transpiler_routing_for_non_adjacent_qubits(fakeqmio_backend):
     """
@@ -241,7 +236,7 @@ def test_transpiler_routing_for_non_adjacent_qubits(fakeqmio_backend):
         
         # Collect all two-qubit gate interactions in the transpiled circuit
         two_qubit_interactions = [
-            tuple(sorted(qc.find_bit(q).index for q in qubits)) 
+            tuple(sorted(transpiled_qc.find_bit(q).index for q in qubits)) 
             for instruction, qubits, _ in transpiled_qc.data 
             if len(qubits) == 2
         ]
@@ -258,7 +253,6 @@ def test_transpiler_routing_for_non_adjacent_qubits(fakeqmio_backend):
                 is_routable_interaction(interaction, fakeqmio_backend.coupling_map)
                 for edge in coupling_set
             ), f"Interaction {interaction} is not routable"
-
 
 # Helper function for previous test
 def is_routable_interaction(interaction, coupling_map):
