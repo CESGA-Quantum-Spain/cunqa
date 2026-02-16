@@ -303,7 +303,9 @@ def qraise(n, t, *,
            n_nodes = None, 
            node_list = None, 
            qpus_per_node= None,
-           partition=None
+           partition=None,
+           gpu=False,
+           qmio=False
         ) -> str:
     """
     Raises vQPUs and returns the family name associated them. This function raises 
@@ -363,6 +365,10 @@ def qraise(n, t, *,
             command = command + f" --backend={str(backend)}"
         if partition is not None:
             command = command + f" --partition={str(partition)}"
+        if gpu:
+            command = command + f" --gpu"
+        if qmio:
+            command = command + f" --qmio"
 
         if not os.path.exists(QPUS_FILEPATH):
            with open(QPUS_FILEPATH, "w") as file:

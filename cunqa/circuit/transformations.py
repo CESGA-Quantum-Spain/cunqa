@@ -40,7 +40,7 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
             raise RuntimeError(f"Error: Incorrect hsplit of the circuit, {qubits_or_sections} does "
                                f"not add up to {num_qubits} qubits")
         Nsections = len(qubits_or_sections)
-        initial_qubits = [0] + list(np.cumsum(qubits_or_sections))
+        initial_qubits = [0] + [int(x) for x in np.cumsum(qubits_or_sections)]
 
     elif isinstance(qubits_or_sections, int):
         # indices_or_sections is a scalar, not a list.
@@ -50,10 +50,13 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
         Neach_section, extras = divmod(num_qubits, Nsections)
         section_sizes = (extras * [Neach_section + 1] +
                          (Nsections - extras) * [Neach_section])
-        initial_qubits = [0] + list(np.cumsum(section_sizes))
+        initial_qubits = [0] + [int(x) for x in np.cumsum(section_sizes)]
 
     def get_subcircuits(circuit, initial_qubits, Nsections):
         sub_circuits = []
+        measures = {}
+        clbits = {}
+        
         for i in range(Nsections):
             num_qubits_i = initial_qubits[i + 1] - initial_qubits[i]
             sub_circuits.append(CunqaCircuit(num_qubits_i, id= circuit.info["id"] + f"_{i}"))
@@ -66,8 +69,22 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
         for inst in circuit.instructions[:]:
             i = find_index(initial_qubits, inst["qubits"][0])
             sub_circuit = sub_circuits[i]
+            clbits[i] = []
+            measures[i] = []
+            
+            if inst["name"] == "measure":
+                # Measure and clbits processing
+                for b in inst["clbits"]:
+                    from bisect import bisect_left
 
-            if len(inst["qubits"]) == 1:
+                    b = int(b)
+                    pos = bisect_left(clbits[i], b)
+                    if pos == len(clbits[i]) or clbits[i][pos] != b:
+                        clbits[i].insert(pos, b)
+                    measures[i] = measures[i] + [inst]
+                inst["qubits"][0] -= initial_qubits[i]
+                sub_circuit.add_instructions([inst])
+            elif len(inst["qubits"]) == 1:
                 # One qubit gate
                 inst["qubits"][0] -= initial_qubits[i]
                 sub_circuit.add_instructions([inst])
@@ -91,6 +108,12 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
                     sub_circuit.add_instructions([inst])
             else:
                 raise ValueError("Three qubits gates cannot be partitioned.")
+        
+        if len(clbits):
+            for i, sub_circuit in enumerate(sub_circuits):
+                sub_circuit.add_cl_register(f"subcl_0", len(clbits[i]))
+                for j, measure_i, in enumerate(measures[i]):
+                    measure_i["clbits"] = [clbits[i].index(clbit) for clbit in measure_i["clbits"]]
         
         return sub_circuits 
     

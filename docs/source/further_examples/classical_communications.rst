@@ -31,7 +31,7 @@ comment on the code fragments whenever necessary.
     c2 = CunqaCircuit(2, 2, id="Second")
     c2.recv(0, sending_circuit = "First")
 
-    with c2.cif(0) as cgates:
+    with c2.cif(0) as cgates: 
         cgates.x(1)
     c2.measure(0,0)
     c2.measure(1,1)

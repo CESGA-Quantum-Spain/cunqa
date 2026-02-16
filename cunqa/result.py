@@ -280,13 +280,13 @@ class Result:
         # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
         else: 
             logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
-            if len(self._cl_registers) > 1:
-                logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
+            if len(self._registers) > 1:
+                logger.debug(f"Computing probabilities of a circuit with {len(self._registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
 
                 n = len(next(iter(self.counts.keys())).replace(" ", ""))
                 num_bitstrings = 2**n
                 if len(self.counts) != num_bitstrings:
-                    new_counts = {**_convert_counts({f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._cl_registers), **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                    new_counts = {**_convert_counts({f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._registers), **self.counts} # Python 3.7+ is needed to preserve first dict's order
                 else:
                     new_counts = self.counts
 

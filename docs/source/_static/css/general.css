@@ -8,3 +8,11 @@ table.wrap-table th {
   overflow-wrap: anywhere;          /* corta si hace falta */
   word-break: break-word;           /* fallback */
 }
+
+.big-cunqa {
+    text-align: center !important;
+    font-size: 3em !important; 
+    font-weight: bold !important;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
