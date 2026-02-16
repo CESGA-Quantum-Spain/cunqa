@@ -199,6 +199,9 @@ def run(
             for item in items
             for part in split(item)
         }
+    
+    if qpus is None:
+        raise ValueError(f"No QPUs were provided [{ValueError.__name__}].")
 
     if not isinstance(qpus, list):
         qpus = [qpus]
