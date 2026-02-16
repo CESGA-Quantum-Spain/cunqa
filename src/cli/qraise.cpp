@@ -12,6 +12,7 @@
 #include "utils/constants.hpp"
 #include "qraise/utils_qraise.hpp"
 #include "qraise/args_qraise.hpp"
+#include "qraise/noise_model_conf_qraise.hpp"
 #include "qraise/simple_conf_qraise.hpp"
 #include "qraise/cc_conf_qraise.hpp"
 #include "qraise/qc_conf_qraise.hpp"
@@ -35,6 +36,8 @@ int main(int argc, char* argv[])
             write_infrastructure_sbatch(sbatchFile, args);
         } else if (args.qmio) {
             write_qmio_sbatch(sbatchFile, args);
+        } else if (args.noise_properties.has_value() || args.fakeqmio.has_value()) {
+            write_noise_model_sbatch(sbatchFile, args);
         } else if (args.cc) {
             write_cc_sbatch(sbatchFile, args);
         } else if (args.qc) {

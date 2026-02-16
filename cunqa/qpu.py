@@ -51,6 +51,7 @@ class Backend(TypedDict):
     gates: list[str] #: Specific gates supported.
     n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
     name: str #: Name assigned to the Backend.
+    noise_path: str #: Path to the noise model json file gathering the noise instructions needed for the simulator.
     simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
     version: str #: Version of the Backend.
 
@@ -295,6 +296,7 @@ def qraise(n, t, *,
            quantum_comm = False,  
            simulator = None, 
            backend = None, 
+           noise_path = None, 
            fakeqmio = False, 
            family = None, 
            co_located = True, 
@@ -320,6 +322,8 @@ def qraise(n, t, *,
         simulator (str): name of the desired simulator to use. Default is `Aer 
                          <https://github.com/Qiskit/qiskit-aer>`_.
         backend (str): path to a file containing the backend information.
+        noise_path (str): Path to the noise properties json file, only supported for 
+                                simulator Aer. Default: None
         fakeqmio (bool): ``True`` for raising `n` vQPUs with FakeQmio backend. Only available 
                          at CESGA.
         family (str): name to identify the group of vQPUs raised.
@@ -339,6 +343,8 @@ def qraise(n, t, *,
     command = f"qraise -n {n} -t {t}"
 
     try:
+        if noise_path is not None:
+            command = command + f" --noise-properties={str(noise_path)}"
         if fakeqmio:
             command = command + " --fakeqmio"
         if classical_comm:

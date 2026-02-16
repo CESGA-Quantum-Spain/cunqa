@@ -35,6 +35,31 @@ using namespace std::string_literals;
 using namespace cunqa;
 using namespace cunqa::sim;
 
+std::string generate_noise_instructions(const JSON& back_path_json, const std::string& family)
+{
+    std::string backend_path;
+
+    if (back_path_json.contains("backend_path")){
+        LOGGER_DEBUG("backend_path provided");
+        backend_path=back_path_json.at("backend_path").get<std::string>();
+    } else {
+        LOGGER_DEBUG("No backend_path provided, defining backend from noise_properties.");
+        backend_path = "default";
+    }
+    std::string command("python "s + constants::INSTALL_PATH + "/cunqa/qiskit_deps/noise_instructions.py "s
+                                   + back_path_json.at("noise_properties_path").get<std::string>() + " "s
+                                   + backend_path + " "s
+                                   + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
+                                   + back_path_json.at("readout_error").get<std::string>() + " "s
+                                   + back_path_json.at("gate_error").get<std::string>() + " "s
+                                   + family + " "s
+                                   + back_path_json.at("fakeqmio").get<std::string>());
+                                   
+    LOGGER_DEBUG("Command: {}", command);
+    std::system(command.c_str());
+    return "";
+}
+
 template<typename Simulator, typename Config, typename BackendType>
 void turn_ON_QPU(
     const JSON& backend_json, const std::string& mode, 
@@ -63,7 +88,26 @@ int main(int argc, char *argv[])
     
     auto back_path_json = (argc == 6 ? JSON::parse(std::string(argv[5])) : JSON());
     JSON backend_json;
-    if (back_path_json.contains("backend_path")) {
+
+    if (back_path_json.contains("noise_properties_path")) {
+        std::string fpath = std::string(constants::CUNQA_PATH) + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
+
+        if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
+            generate_noise_instructions(back_path_json, family);
+            LOGGER_DEBUG("Correctly created tmp noise intructions file.");
+        } else {
+            int fd = open(fpath.c_str(), O_RDONLY);
+            while (fd == -1 || flock(fd, LOCK_SH) != 0) {
+                if (fd != -1) close(fd);
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                fd = open(fpath.c_str(), O_RDONLY);
+            }
+            close(fd);
+        }
+
+        std::ifstream f(fpath);
+        backend_json = JSON::parse(f);
+    } else if (back_path_json.contains("backend_path")) {
         std::ifstream f(back_path_json.at("backend_path").get<std::string>());
         backend_json = JSON::parse(f);
     }
