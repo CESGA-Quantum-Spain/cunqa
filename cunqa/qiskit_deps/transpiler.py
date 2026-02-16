@@ -100,10 +100,12 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
     
     # transpilation
     try:
+        
         qc_transpiled = transpile(qc, cunqabackend, initial_layout = initial_layout, optimization_level = opt_level, seed_transpiler = seed)
     
     except TranspilerError as error:
         logger.error(f"Some error occured with transpilation: {error} [TranspilerError]")
+        raise error
 
     except Exception as error:
         logger.error(f"Some error occurred with transpilation, please check that the target QPU is adequate for the provided circuit (enough number of qubits, simulator supports instructions, etc): {error} [{type(error).__name__}].")
