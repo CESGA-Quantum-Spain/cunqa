@@ -261,16 +261,14 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
 const std::vector<std::string> BASIS_GATES = {
     "unitary",
-    "measure",
-    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "sy", "sydg", "sz", "szdg", "t", "tdg", "p0", "p1",
-    "u1", "p", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz"
+    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
+    "u1", "p", "rx", "ry", "rz",
     "u2", "r",
     "u3", "u",
-    "ecr", "swap", "cx", "cy", "cz", "csx", "csy", "csz", "ct",
+    "ecr", "swap", "cx", "cy", "cz", "csx",
     "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
-    "cu2", "cr",
     "cu", "cu3",
-    "cecr", "cswap", "ccx", "ccy", "ccz", 
+    "cswap", "ccx", "ccz",
 };
 
 
