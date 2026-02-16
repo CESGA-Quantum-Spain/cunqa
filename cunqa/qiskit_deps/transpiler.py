@@ -107,7 +107,7 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
 
     except Exception as error:
         logger.error(f"Some error occurred with transpilation, please check that the target QPU is adequate for the provided circuit (enough number of qubits, simulator supports instructions, etc): {error} [{type(error).__name__}].")
-        raise SystemExit # User's level
+        raise error # User's level
 
     # converting to input format and returning
     if isinstance(circuit, QuantumCircuit):

@@ -172,9 +172,15 @@ def _qc_to_json(qc : 'QuantumCircuit') -> dict:
 
             elif instruction.operation.name == "unitary":
 
+                if isinstance(instruction.operation.params[0], list):
+                    unitary_params = instruction.operation.params[0]
+                else:
+                    # only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
+                    unitary_params = [[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.operation.params[0].tolist()]]
+
                 json_data["instructions"].append({"name":instruction.operation.name, 
                                                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                                "params":[[list(map(lambda z: [z.real, z.imag], row)) for row in instruction.operation.params[0].tolist()]] #only difference, it ensures that the matrix appears as a list, and converts a+bj to (a,b)
+                                                "params":unitary_params
                                                 })
                 
             elif instruction.operation.name == "if_else":

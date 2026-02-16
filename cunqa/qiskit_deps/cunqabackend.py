@@ -191,7 +191,7 @@ class CunqaBackend(BackendV2):
 
         for gate in backend_json["basis_gates"]:
 
-            if gate == "measure":
+            if gate == "measure" or gate == "unitary":
                 continue
             
             gate_object = _get_gate(gate)
@@ -265,7 +265,7 @@ def _get_gate(name: str):
     no_param_gate_map = {
         "id":  IGate,"x": XGate, "y": YGate,"z": ZGate,"h": HGate,"s":SGate,"sdg": SdgGate,"sx":  SXGate,"sxdg": SXdgGate,"t":   TGate,
         "tdg": TdgGate,  "swap": SwapGate,   "cx":  CXGate,  "cy":  CYGate,    "cz":  CZGate, "csx": CSXGate, "ccx": CCXGate,  # Toffoli
-        "ccz": CCZGate,"cswap": CSwapGate, "ecr":ECRGate, "unitary":UnitaryGate
+        "ccz": CCZGate,"cswap": CSwapGate, "ecr":ECRGate
     }
 
     param_gate_map = {
