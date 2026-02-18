@@ -9,7 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '0.3.1'
+version = '2.0.0'
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
 description = """ 
@@ -35,7 +35,6 @@ toolchain = {'name': 'GCC', 'version': 'system'}
 sources = ['%(name)s-%(version)s.tar.gz']
 
 builddependencies = [
-   ('FlexiBLAS', '3.3.0'),
    ('OpenMPI', '5.0.5'),
    ('Boost', '1.83.0'),
    ('pybind11', '2.12.0'),
