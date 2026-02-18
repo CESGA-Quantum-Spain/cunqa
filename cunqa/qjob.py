@@ -252,6 +252,7 @@ class QJob:
         """Fuction responsible of assigning the values to the circuit parameter."""    
         if isinstance(param_values, dict):
             for param in self._params:
+                # I filter the free parameters that are employed in the symbolic expression 
                 values_i = {k.name: param_values.get(k.name) 
                             for k in param.variables 
                             if param_values.get(k.name) is not None}

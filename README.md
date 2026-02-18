@@ -27,13 +27,6 @@
 
 <br>
 
-<p align="center">
-  <a href="https://cesga-quantum-spain.github.io/cunqa/">
-  <img width=30% src="https://img.shields.io/badge/documentation-black?style=for-the-badge&logo=read%20the%20docs" alt="Documentation">
-  </a>
-</p>
-
-
 <p>
     <div align="center">
       <a href="https://www.cesga.es/">
@@ -62,8 +55,17 @@
   <br> 
 </ul>
 
+## Documentation
+For a complete and exhaustive explanation and functionality showcase of CUNQA visit the [CUNQA documentation](https://cesga-quantum-spain.github.io/cunqa/).
+
+<p align="center">
+  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <img width=30% src="https://img.shields.io/badge/documentation-black?style=for-the-badge&logo=read%20the%20docs" alt="Documentation">
+  </a>
+</p>
+
 # Table of contents
-  - [INSTALLATION](#installation)
+  - [INSTALL](#install)
     - [Clone repository](#clone-repository)
     - [Define STORE environment variable](#clone-repository)
     - [Dependencies](#dependencies)
@@ -71,43 +73,51 @@
     - [Install as Lmod module](#install-as-lmod-module)
   - [UNINSTALL](#uninstall)
   - [RUN YOUR FIRST DISTRIBUTED PROGRAM](#run-your-first-distributed-program)
-    1. [`qraise`command](#1-qraisecommand)
-    2. [Python Program Example](#2-python-program-example)
-    3. [`qdrop` command](#3-qdrop-command)
+    - [PYTHON-BASH](#python-bash)
+    - [PYTHON-ONLY](#python-only)
   - [ACKNOWLEDGEMENTS](#acknowledgements)
 
-## Installation 
+## Install
+
 ### Clone repository
-It is important to say that, for ensuring a correct cloning of the repository, the SSH is the one preferred. In order to get this to work one has to do:
 
-```console
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/SSH_KEY
-```
- 
-Now, everything is set to get the source code. 
+To get the source code, simply clone the CUNQA repository:
 
-```console
+```bash
 git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 ```
 
-### Define STORE environment variable
-Before doing any kind of compilation, the user has to define the `STORE` environment variable in bash. This repository will be the root for the `.cunqa` folder, where CUNQA is going to store several runtime files (configuration files and logging files, mainly).
+> [!WARNING]
+> If SSH cloning fails, you may not have properly linked your environment to GitHub. To do this, run the following commands:
+>
+> ```bash
+> eval "$(ssh-agent -s)"
+> ssh-add ~/.ssh/SSH_KEY
+> ```
+>
+> where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in the `~/.ssh` folder.
 
-```console
+---
+
+### Define STORE environment variable
+
+At build time, CUNQA will look at the `STORE` environment variable to set the root of the `.cunqa` folder where configuration and logging files will be stored. If it is **not** defined in your environment, run:
+
+```bash
 export STORE=/path/to/your/store
 ```
 
+If you plan to compile CUNQA multiple times, we recommend adding this directive to your `.bashrc` file to avoid potential issues.
+
+---
+
 ### Dependencies
-CUNQA has a set of dependencies. They are divided in three main groups.
 
-- Must be installed before configuration.
-- Can be installed, but if they are not they will be by the configuration process.
-- They will be installed by the configuration process.
+CUNQA has a set of dependencies, as any other platform. The versions listed below are those used during development and are therefore recommended. They are divided into three main groups:
 
-From the first group, **the ones that must be installed**, the dependencies are the following. The versions here displayed are the ones that have been employed in the development and, therefore, that are recommended.
+#### Must be installed by the user before configuration
 
-```
+```text
 gcc             12.3.0
 qiskit          1.2.4
 CMake           3.21.0
@@ -121,9 +131,9 @@ Blas            -
 Lapack          -
 ```
 
-From the second group, **the ones that will be installed if they are not yet**, they are the next ones.
+#### Can be installed by the user (otherwise installed automatically during configuration)
 
-```
+```text
 nlohmann JSON   3.11.3
 spdlog          1.16.0
 MQT-DDSIM       1.24.0
@@ -132,194 +142,230 @@ cppzmq          4.11.0
 CunqaSimulator  0.1.1
 ```
 
-And, finally, **the ones that will be installed**.
-```
+#### Installed automatically during configuration
+
+```text
 argparse        -
 qiskit-aer      0.17.2 (modified version)
-``` 
+```
+
+---
 
 ### Configure, build and install
-Now, as with any other CMake project, it can be installed using the usual directives. The CMAKE_INSTALL_PREFIX variable should be defined or will be the HOME environment variable value. 
 
-```console
+To build, compile, and install CUNQA, follow the standard three-step CMake workflow:
+
+```bash
 cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
 cmake --build build/ --parallel $(nproc)
 cmake --install build/
 ```
 
-It is important to mention that the user can also employ [Ninja](https://ninja-build.org/) to perform this task.
+> [!WARNING]
+> If `CMAKE_PREFIX_INSTALL` is not provided, CUNQA will be installed in the directory pointed to by 
+the `HOME` environment variable.
 
-```console
+> [!NOTE] 
+> To enable GPU execution provided by AerSimulator, add the `-DAER_GPU=TRUE` flag at build time:
+>
+> ```bash
+> cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path -DAER_GPU=TRUE
+> ```
+
+You can also use [Ninja](https://ninja-build.org/) to perform this task:
+
+```bash
 cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
 ninja -C build/ -j $(nproc)
 cmake --install build/
 ```
 
-Alternatively, you can use the `configure.sh` file, but only after all the dependencies have been solved.
-```console
+Alternatively, you can use the `configure.sh` script, but only after all dependencies have been 
+resolved:
+
+```bash
 source configure.sh /your/installation/path
 ```
 
+---
+
 ### Install as Lmod module
-Cunqa is available as Lmod module in CESGA. To use it all you have to do is:
 
-- In QMIO: `module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi`
-- In FT3: `module load cesga/2022 gcc/system cunqa/0.3.1`
+CUNQA is available as an Lmod module at CESGA. To use it:
 
-If your HPC center is interested in using it this way, EasyBuild files employed to install it in CESGA are available inside `easybuild/` folder.
+- In QMIO:
+  ```bash
+  module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi
+  ```
 
-## Uninstall
-There has also been developed a Make directive to uninstall CUNQA if needed: 
+- In FT3:
+  ```bash
+  module load cesga/2022 gcc/system cunqa/0.3.1
+  ```
 
-1. If you installed using the standard way: `make uninstall`. 
+If your HPC center is interested in deploying it this way, the EasyBuild files used at CESGA are 
+available in the `easybuild/` folder.
 
-2. If you installed using Ninja: `ninja uninstall`.
+---
 
-Be sure to execute this command inside the `build/` directory in both cases. An alternative is using:
+### Uninstall
 
-```console
+A Make directive is available to uninstall CUNQA if needed:
+
+1. If installed using the standard method:
+   ```bash
+   make uninstall
+   ```
+
+2. If installed using Ninja:
+   ```bash
+   ninja uninstall
+   ```
+
+Be sure to execute these commands inside the `build/` directory in both cases.
+
+Alternatively, you can run:
+
+```bash
 cmake --build build/ --target uninstall
-``` 
+```
 
 to abstract from the installation method.
 
 ## Run your first distributed program
 
-Once **CUNQA** is installed, the basic workflow to use it is:
-1. Raise the desired QPUs with the command `qraise`.
-2. Run circuits on the QPUs:
-    - Connect to the QPUs through the python API.
-    - Define the circuits to execute.
-    - Execute the circuits on the QPUs.
-    - Obtain the results.
-3. Drop the raised QPUs with the command `qdrop`.
+To achieve this, you have two options: a Python–Bash workflow or a Python-only workflow. With the 
+first option, virtual QPUs (vQPUs) can be deployed from the terminal and the employed in the Python 
+executable, while the second allows to deploy, use, and drop the vQPUs within the Python program.
 
-### 1. `qraise` command
-The `qraise` command raises as many QPUs as desired. Each QPU can be configured by the user to have a personalized backend. There is a help FLAG with a quick guide of how this command works:
-```console
-qraise --help
-```
-1. The only two mandatory FLAGS of `qraise` are the **number of QPUs**, set up with `-n` or `--num_qpus` and the **maximum time** the QPUs will be raised, set up with `-t` or `--time`. 
-So, for instance, the command 
-```console 
-qraise -n 4 -t 01:20:30
-``` 
-will raise four QPUs during at most 1 hour, 20 minutes and 30 seconds. The time format is `hh:mm:ss`.
-> [!NOTE]  
-> By default, all the QPUs will be raised with [AerSimulator](https://github.com/Qiskit/qiskit-aer) as the background simulator and IdealAer as the background backend. That is, a backend of 32 qubits, all connected and without noise.
-2. The simulator and the backend configuration can be set by the user through `qraise` FLAGs:
+### Python-Bash
 
-**Set simulator:** 
-```console
-qraise -n 4 -t 01:20:30 --sim=Munich
-```
-The command above changes the default simulator by the [mqt-ddsim simulator](https://github.com/cda-tum/mqt-ddsim). Currently, **CUNQA** only allows two simulators: ``--sim=Aer`` and ``--sim=Munich``.
+To deploy the vQPUs we use the `qraise` Bash command.
 
-**Set FakeQmio:**
-```console
-qraise -n 4 -t 01:20:30 --fakeqmio=<path/to/calibrations/file>
-```
-The `--fakeqmio` FLAG raises the QPUs as simulated [QMIO](https://www.cesga.es/infraestructuras/cuantica/)s. If no `<path/to/calibrations/file>` is provided, last calibrations of de QMIO are used. With this FLAG, the background simulator is AerSimulator.
-
-**Set personalized backend:**
-```console
-qraise -n 4 -t 01:20:30 --backend=<path/to/backend/json>
-```
-The personalized backend has to be a *json* file with the following structure:
-```json
-{"backend":{"name": "BackendExample", "version": "0.0", "n_qubits": 32,"url": "", "is_simulator": true, "conditional": true, "memory": true, "max_shots": 1000000, "description": "", "basis_gates": [], "custom_instructions": "", "gates": [], "coupling_map": []}, "noise": {}}
-```
-> [!NOTE]
-> The "noise" key must be filled with a json with noise instructions supported by the chosen simulator.
-
-> [!IMPORTANT]  
-> Several `qraise` commands can be executed one after another to raise as many QPUs as desired, each one having its own configuration, independently of the previous ones. The `get_QPUs()` method presented in the section below will collect all the raised QPUs.
-
-### 2. Python Program Example
-Once the QPUs are raised, they are ready to execute any quantum circuit. The following script shows a basic workflow to run a circuit on a single QPU.
-
-> [!WARNING]
-> To execute the following python example it is needed  to load the [Qiskit](https://github.com/Qiskit/qiskit) module:
-
-In QMIO:
-```console 
-module load qmio/hpc gcc/12.3.0 qiskit/1.2.4-python-3.9.9
+```bash
+qraise -n 4 -t 01:00:00 --co-located
 ```
 
-In FT3:
-```console 
-module load cesga/2022 gcc/system qiskit/1.2.4
-```
+Once the vQPUs are deployed, we can design and execute quantum tasks:
 
+```python
+import os, sys
 
-```python 
-# Python Script Example
+# Adding path to access CUNQA module
+sys.path.append(os.getenv("</your/cunqa/installation/path>"))
 
-import os
-import sys
-
-# Adding pyhton folder path to detect modules
-sys.path.append(os.getenv("HOME"))
-
-# Let's get the raised QPUs
+# Gettting the raised QPUs
 from cunqa.qpu import get_QPUs
 
-qpus  = get_QPUs(local=False) # List of all raised QPUs
-for q in qpus:
-    print(f"QPU {q.id}, name: {q.backend.name}, backend: {q.backend.simulator}, version: {q.backend.version}.")
+qpus  = get_QPUs(co_located=True)
 
-# Let's create a circuit to run in our QPUs
-from qiskit import QuantumCircuit
+# Creating a circuit to run in our QPUs
+from cunqa.circuit import CunqaCircuit
 
-N_QUBITS = 2 # Number of qubits
-qc = QuantumCircuit(N_QUBITS)
+qc = CunqaCircuit(num_qubits = 2)
 qc.h(0)
 qc.cx(0,1)
 qc.measure_all()
 
-# Time to run
-qpu0 = qpus[0] # Select one of the raise QPUs
+# Submitting the same circuit to all vQPUs
+from cunqa.qpu import run
 
-job = qpu0.run(qc, transpile = True, shots = 1000) # Run the transpiled circuit
-result = job.result # Get the result of the execution
-counts = result.counts # Get the counts
+qcs = [qc] * 4
+qjobs = run(qcs , qpus, shots = 1000)
 
-print(f"Counts: {counts}" ) # {'00':546, '11':454}
+# Gathering results
+from cunqa.qjob import gather
+
+results = gather(qjobs)
+
+# Getting and printing the counts
+counts_list = [result.counts for result in results]
+
+for counts in counts_list:
+    print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
 ```
 
-> [!NOTE] 
-> It is not mandatory to run a *QuantumCircuit* from Qiskit. The `.run` method also supports *OpenQASM 2.0* with the following structure: 
-```json
-{"instructions":"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0], q[1];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];" , "num_qubits": 2, "num_clbits": 4, "quantum_registers": {"q": [0, 1]}, "classical_registers": {"c": [0, 1], "other_measure_name": [2], "meas": [3]}}
+It is a good practice to relinquish resources when the work is done. This is achieved by the `qdrop` 
+command:
 
-```
-
-and *json* format with the following structure: 
-```json
-{"instructions": [{"name": "h", "qubits": [0], "params": []},{"name": "cx", "qubits": [0, 1], "params": []}, {"name": "rx", "qubits": [0], "params": [0.39528385768119634]}, {"name": "measure", "qubits": [0], "memory": [0]}], "num_qubits": 2, "num_clbits": 4, "quantum_registers": {"q": [0, 1]}, "classical_registers": {"c": [0, 1], "other_measure_name": [2], "meas": [3]}}
-
-```
-### 3. `qdrop` command
-Once the work is finished, the raised QPUs should be dropped in order to not monopolize computational resources. 
-
-The `qdrop` command can be used to drop all the QPUs raised with a single `qraise` by passing the corresponding qraise `SLURM_JOB_ID`:
-```console 
-qdrop SLURM_JOB_ID
-```
-Note that the ```SLURM_JOB_ID``` can be obtained, for instance, executing the `squeue` command.
-
-To drop all the raised QPUs, just execute:
-```console 
+```bash
 qdrop --all
 ```
 
+
+### Python-only
+
+Here, the `qraise` and `qdrop` steps are integrated into the Python executable.
+
+```python
+import os, sys
+
+# Adding path to access CUNQA module
+sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+
+# Raising the QPUs
+from cunqa.qpu import qraise
+
+family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
+
+# Gettting the raised QPUs
+from cunqa.qpu import get_QPUs
+
+qpus  = get_QPUs(co_located=True)
+
+# Creating a circuit to run in our QPUs
+from cunqa.circuit import CunqaCircuit
+
+qc = CunqaCircuit(num_qubits = 2)
+qc.h(0)
+qc.cx(0,1)
+qc.measure_all()
+
+# Submitting the same circuit to all vQPUs
+from cunqa.qpu import run
+
+qcs = [qc] * 4
+qjobs = run(qcs , qpus, shots = 1000)
+
+# Gathering results
+from cunqa.qjob import gather
+
+results = gather(qjobs)
+
+# Getting and printing the counts
+counts_list = [result.counts for result in results]
+
+for counts in counts_list:
+    print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+
+# Relinquishing the resources
+from cunqa.qpu import qdrop
+
+qdrop(family)
+```
+
+
 ## Acknowledgements
-This work has been mainly funded by the project QuantumSpain, financed by the Ministerio de Transformación Digital y Función Pública of Spain’s Government through the project call QUANTUM ENIA – Quantum Spain project, and by the European Union through the Plan de Recuperación, Transformación y Resiliencia – NextGenerationEU within the framework of the Agenda España Digital 2026. J. Vázquez-Pérez was supported by the Axencia Galega de Innovación (Xunta de Galicia) through the Programa de axudas á etapa predoutoral (ED481A & IN606A).
+This work has been mainly funded by the project QuantumSpain, financed by the Ministerio de 
+Transformación Digital y Función Pública of Spain’s Government through the project call 
+QUANTUM ENIA – Quantum Spain project, and by the European Union through the Plan de Recuperación, 
+Transformación y Resiliencia – NextGenerationEU within the framework of the Agenda España 
+Digital 2026. J. Vázquez-Pérez was supported by the Axencia Galega de Innovación (Xunta de Galicia) 
+through the Programa de axudas á etapa predoutoral (ED481A & IN606A).
 
-Additionally, this research project was made possible through the access granted by the Galician Supercomputing Center (CESGA) to two key parts of its infrastructure. Firstly, its Qmio quantum computing infrastructure with funding from the European Union, through the Operational Programme Galicia 2014-2020 of ERDF_REACT EU, as part of theEuropean Union’s response to the COVID-19 pandemic. 
+Additionally, this research project was made possible through the access granted by the Galician 
+Supercomputing Center (CESGA) to two key parts of its infrastructure. Firstly, its Qmio quantum 
+computing infrastructure with funding from the European Union, through the Operational Programme 
+Galicia 2014-2020 of ERDF_REACT EU, as part of theEuropean Union’s response to the COVID-19 
+pandemic. 
 
-Secondly, The supercomputer FinisTerrae III and its permanent data storage system, which have been funded by the NextGeneration EU 2021 Recovery, Transformation and Resilience Plan, ICT2021-006904, and also from the Pluriregional Operational Programme of Spain 2014-2020 of the European Regional Development Fund (ERDF), ICTS-2019-02-CESGA3, and from the State Programme for the Promotion of Scientific and Technical Research of Excellence of the State
-Plan for Scientific and Technical Research and Innovation 2013-2016 State subprogramme for scientific and technical infrastructures and equipment of ERDF, CESG15-DE-3114.
+Secondly, The supercomputer FinisTerrae III and its permanent data storage system, which have been 
+funded by the NextGeneration EU 2021 Recovery, Transformation and Resilience Plan, ICT2021-006904, 
+and also from the Pluriregional Operational Programme of Spain 2014-2020 of the European Regional 
+Development Fund (ERDF), ICTS-2019-02-CESGA3, and from the State Programme for the Promotion of 
+Scientific and Technical Research of Excellence of the State Plan for Scientific and Technical 
+Research and Innovation 2013-2016 State subprogramme for scientific and technical infrastructures 
+and equipment of ERDF, CESG15-DE-3114.
 
 ## How to cite:
 
@@ -328,7 +374,13 @@ When citing the software, please cite the original CUNQA paper:
 ```bibtex
 @misc{vázquezpérez2025cunqadistributedquantumcomputing,
     title={CUNQA: a Distributed Quantum Computing emulator for HPC}, 
-    author={Jorge Vázquez-Pérez and Daniel Expósito-Patiño and Marta Losada and Álvaro Carballido and Andrés Gómez and Tomás F. Pena},
+    author={
+      Jorge Vázquez-Pérez and 
+      Daniel Expósito-Patiño and 
+      Marta Losada and 
+      Álvaro Carballido and 
+      Andrés Gómez and 
+      Tomás F. Pena},
     year={2025},
     eprint={2511.05209},
     archivePrefix={arXiv},
