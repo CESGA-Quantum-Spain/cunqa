@@ -1391,8 +1391,7 @@ class QuantumControlContext:
         instructions = []
         for instruction in self._subcircuit.instructions:
             if instruction["name"] in ["qsend", "qrecv", "expose", "recv"]:
-                raise RuntimeError("Remote operations, quantum or classical, are not allowed within "
-                                   "a telegate block.")
+                raise RuntimeError("Remote operations, quantum or classical, are not allowed within a telegate block.")
             instructions.append(instruction)
 
         rcontrol = {
