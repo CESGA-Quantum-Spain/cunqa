@@ -62,3 +62,12 @@ Example:
 ```
 test_run_passes_param_values_to_execute
 ```
+
+## Location and execution
+
+Tests are stored on the `tests` folder on the root directory of the CUNQA project. 
+To execute all tests, move to that directory and use the simple command
+```
+pytest
+```
+on an environment where pytest is installed.

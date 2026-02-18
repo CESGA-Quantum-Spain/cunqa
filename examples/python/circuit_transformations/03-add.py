@@ -1,7 +1,6 @@
 import os, sys
-
-home = os.getenv("HOME")
-sys.path.append(home)
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.qjob import gather
@@ -10,7 +9,7 @@ from cunqa.circuit.transformations import add
 from pprint import pprint
 
 # ---------------------------
-# Adquiring the resources
+# Acquiring the resources
 # ---------------------------
 family = qraise(1, "00:10:00", simulator="Aer", co_located=True)
 [qpu] = get_QPUs(co_located=True, family=family)
@@ -44,6 +43,6 @@ results = qjob.result
 print(f"\nResult after addition: {results.counts}\n")
 
 # ---------------------------
-# Relinquishing of the resources
+# Relinquishing resources
 # ---------------------------
 qdrop(family)

@@ -23,6 +23,7 @@ import re
 from typing import Union, Any, Optional, TypedDict
 from sympy import Symbol
 
+from sympy import Symbol
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient

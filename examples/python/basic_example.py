@@ -1,21 +1,21 @@
 import os, sys
 
 # Adding path to access CUNQA module
-sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+sys.path.append(os.getenv("HOME")) 
+# For custom CUNQA installation path, for instance if you are in an HPC center other than CESGA, use
+# sys.path.append("</your/cunqa/installation/path>")   
 
 try: 
     
-    # Raising the QPUs
+    # 1. Deploy 3 virtual QPUs
     from cunqa.qpu import qraise
+    family = qraise(3, "00:10:00", simulator="Aer", co_located=True)
 
-    family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
-
-    # Gettting the raised QPUs
+    #    Connect to the raised vQPUs
     from cunqa.qpu import get_QPUs
-
     qpus  = get_QPUs(co_located=True)
 
-    # Creating a circuit to run in our QPUs
+    # 2. Design a circuit to run in your vQPUs
     from cunqa.circuit import CunqaCircuit
 
     qc = CunqaCircuit(num_qubits = 2)
@@ -23,28 +23,25 @@ try:
     qc.cx(0,1)
     qc.measure_all()
 
-    # Submitting the same circuit to all vQPUs
+    # 3. Execute the same circuit on all 3 vQPUs
     from cunqa.qpu import run
+    qjobs = run([qc, qc, qc] , qpus, shots = 1000)
 
-    qcs = [qc] * 4
-    qjobs = run(qcs , qpus, shots = 1000)
-
-    # Gathering results
+    #    Gather results
     from cunqa.qjob import gather
-
     results = gather(qjobs)
 
-    # Getting and printing the counts
-    counts_list = [result.counts for result in results]
-
-    for counts in counts_list:
-        print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
+    #    Printing the counts
+    for result in results:
+        print(f"Counts: {result.counts}" ) # Format: {'00':546, '11':454}
         
-    # Relinquishing the resources
+    # 4. Relinquishing resources
     from cunqa.qpu import qdrop
-    
     qdrop(family)
 
 except Exception as error:
+    # 4. Relinquishing resources even if an error occurs
+    from cunqa.qpu import qdrop
     qdrop(family)
+
     raise error
