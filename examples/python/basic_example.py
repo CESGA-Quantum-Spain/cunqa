@@ -1,7 +1,7 @@
 import os, sys
 
 # Adding path to access CUNQA module
-sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+sys.path.append(os.getenv("HOME"))
 
 try: 
     

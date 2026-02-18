@@ -195,12 +195,13 @@ CUNQA is available as an Lmod module at CESGA. To use it:
 
 - In QMIO:
   ```bash
-  module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi
+  module load qmio/hpc gcc/12.3.0 cunqa/2.0.0-python-3.9.9-mpi
   ```
 
 - In FT3:
   ```bash
-  module load cesga/2022 gcc/system cunqa/0.3.1
+  module load cesga/2022 gcc/system cunqa/2.0.0 # without GPUs
+  module load cesga/2022 gcc/system cunqa/2.0.0-cuda-12.8.0 # with GPUs
   ```
 
 If your HPC center is interested in deploying it this way, the EasyBuild files used at CESGA are 
