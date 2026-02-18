@@ -20,7 +20,8 @@ import time
 import json
 import subprocess
 import re
-from typing import Union, Any, Optional
+from typing import Union, Any, Optional, TypedDict
+from sympy import Symbol
 
 from qiskit import QuantumCircuit
 
@@ -30,7 +31,6 @@ from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
 from cunqa.logger import logger
 from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
-from typing import TypedDict
 
 class Backend(TypedDict):
     """
@@ -115,7 +115,7 @@ class QPU:
     def execute(
         self, 
         circuit_ir: dict, 
-        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None,
         **run_parameters: Any
     ) -> QJob:
         """
@@ -141,7 +141,7 @@ class QPU:
 def run(
         circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
-        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None,
         **run_args: Any
     ) -> Union[list[QJob], QJob]:
     """

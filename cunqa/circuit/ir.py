@@ -65,7 +65,8 @@ def _(c: QuantumCircuit) -> dict:
         "num_qubits":sum([q.size for q in c.qregs]),
         "num_clbits": sum([c.size for c in c.cregs]),
         "quantum_registers": quantum_registers,
-        "classical_registers": classical_registers
+        "classical_registers": classical_registers, 
+        "params":[]
     }
 
     for instruction in c.data:
