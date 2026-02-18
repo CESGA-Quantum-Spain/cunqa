@@ -97,7 +97,13 @@ git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 >
 > where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in the `~/.ssh` folder.
 
+Now CUNQA must be built and installed. If you are installing CUNQA in an HPC center other than CESGA,
+you might need to solve some dependencies or manually define the installation path. If you are installing 
+it in CESGA, the steps in the next dropdown menu can be skipped.
+
 ---
+<details open>
+<summary>Generic HPC center steps</summary>
 
 ### Define STORE environment variable
 
@@ -108,8 +114,6 @@ export STORE=/path/to/your/store
 ```
 
 If you plan to compile CUNQA multiple times, we recommend adding this directive to your `.bashrc` file to avoid potential issues.
-
----
 
 ### Dependencies
 
@@ -148,6 +152,7 @@ CunqaSimulator  0.1.1
 argparse        -
 qiskit-aer      0.17.2 (modified version)
 ```
+</details>
 
 ---
 
