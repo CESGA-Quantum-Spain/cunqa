@@ -1,17 +1,17 @@
 import os, sys
 
-# Append path to access CUNQA installation
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-# Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
+# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
 family = qraise(2, "00:10:00", simulator="Maestro", quantum_comm=True, co_located = True)
 qpus   = get_QPUs(co_located=True, family = family)
 
-########## Circuits to run ##########
+# 2. Design circuits with distributed instructions between them
 # First circuit 
 cc_1 = CunqaCircuit(1, 1, id="First")
 cc_1.h(0)
@@ -25,7 +25,7 @@ cc_2.cx(0, 1)
 cc_2.measure(0,0)
 cc_2.measure(1,1)
 
-########## Distributed run ##########
+# 3. Execute distributed circuits on QPUs with quantum communications
 distr_jobs = run([cc_1, cc_2], qpus, shots=1024)
 
 # Collect the results
@@ -35,5 +35,5 @@ result_list = gather(distr_jobs)
 for i, result in enumerate(result_list):
     print(f"Counts {i} is {result.counts}")
 
-# Drop the deployed QPUs #
+# 4. Relinquish resources: drop the deployed QPUs 
 qdrop(family)

@@ -1,8 +1,8 @@
 import os, sys
 import numpy as np
 
-# Add path to CUNQA installation for importing cunqa
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.circuit import CunqaCircuit
 from cunqa.qpu import qraise, get_QPUs, run, qdrop

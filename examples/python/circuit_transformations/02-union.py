@@ -1,5 +1,6 @@
 import os, sys
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.qjob import gather
@@ -7,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.transformations import union
 
 # ---------------------------
-# Adquiring the resources
+# Acquiring resources
 # ---------------------------
 family_separated = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located=True)
 qpus_separated = get_QPUs(co_located=True, family=family_separated)
@@ -20,7 +21,7 @@ family_union = qraise(1, "00:10:00", simulator="Aer", co_located=True)
 # circuit1.q0: ─[H]──●──[M]─
 #                    $
 # circuit2.q0: ─────[X]─[M]─
-# Where $ represents the remoteness of the gate
+# Where $ represents the remote control of the gate
 # ---------------------------
 circuit1 = CunqaCircuit(1, id="circuit1") # adding ancilla
 circuit1.h(0)
@@ -41,7 +42,7 @@ print(f"\nResult before union: {results[0].counts}") # taking only the results f
                                                      # quantum communications
 
 # ---------------------------
-# Union of the circuits
+# Take the union of the circuits and execute it
 # union_circuit.q0: ─[H]──●──[M]─
 #                         |
 # union_circuit.q1: ─────[X]─[M]─
@@ -54,7 +55,7 @@ results = qjob.result
 print(f"Result after union: {results.counts}\n")
 
 # ---------------------------
-# Relinquishing of the resources
+# Relinquishing resources
 # ---------------------------
 qdrop(family_union)
 qdrop(family_separated)
