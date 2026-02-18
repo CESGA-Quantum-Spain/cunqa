@@ -1,7 +1,6 @@
 import os, sys
-
-home = os.getenv("HOME")
-sys.path.append(home)
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.qjob import gather
@@ -9,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.transformations import add
 
 # ---------------------------
-# Adquiring the resources
+# Acquiring the resources
 # ---------------------------
 family = qraise(2, "00:10:00", quantum_comm=True, simulator="Aer", co_located=True)
 qpus  = get_QPUs(co_located=True, family=family)
@@ -25,7 +24,7 @@ qpus  = get_QPUs(co_located=True, family=family)
 #                    $
 # circuit3.q0: ─────[X]──[M]───
 #
-# Where $ represents the remoteness of the gate
+# Where $ represents the remote control of the gate
 # ---------------------------
 
 circuit1 = CunqaCircuit(1, id = "circuit1")

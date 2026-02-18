@@ -24,7 +24,7 @@
 """
 
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend # simulator (qjob.py), para transpilar (qpu.py), instanciacion (qutils.py)
-from cunqa.backend import Backend
+from cunqa.qpu import Backend
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.converters import convert
 from cunqa.logger import logger

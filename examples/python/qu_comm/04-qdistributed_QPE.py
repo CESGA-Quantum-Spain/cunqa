@@ -6,19 +6,19 @@ import os, sys
 import numpy as np
 import time
 
-# Append path to access CUNQA installation
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-### Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
+# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
 def deploy_qpus(n_qpus, cores_per_qpu, mem_per_qpu, simulator = "Aer"):
     family = qraise(n_qpus, "10:00:00", simulator=simulator, quantum_comm = True, co_located = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
     return family
 
-### Create circuits modelling the QPE ###
+# 2. Design circuits modelling the QPE 
 def dist_QPE_rz_circuits(n_ancilla_qubits, angle_to_compute):
     ancilla_circuit  = CunqaCircuit(n_ancilla_qubits, id = "ancilla_circuit")
     register_circuit = CunqaCircuit(1, id = "register_circuit")
@@ -55,7 +55,7 @@ def dist_QPE_rz_circuits(n_ancilla_qubits, angle_to_compute):
     return [ancilla_circuit, register_circuit]
 
 
-### Distributed run ###
+# 3. Execute distributed QPE circuit on communicated QPUs
 def run_distributed_QPE(circuits, qpus_name, shots, seed = 1234):
 
     qpus_QPE  = get_QPUs(co_located = True, family = qpus_name)
@@ -68,7 +68,7 @@ def run_distributed_QPE(circuits, qpus_name, shots, seed = 1234):
 
     return result_list, elapsed_time
 
-#### Post-processing results to extract estimated phase ###
+# 4. Post-processing results to extract estimated phase 
 def get_estimated_angle(results):
     counts = results[0].counts
 
@@ -107,9 +107,9 @@ def dist_qpe_benchmarking(angles_list, n_ancilla_qubits, shots, cores_per_qpu, m
         with open(f"./dist_QPE_results.txt", "a") as f:
             f.write(result_data)
 
-        # Drop the deployed QPUs #
+        # 5. Drop the deployed QPUs #
         qdrop(qpus)
-        time.sleep(30)
+        time.sleep(10)
 
 
 if __name__ == "__main__":

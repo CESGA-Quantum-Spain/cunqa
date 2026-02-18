@@ -1,7 +1,6 @@
 import os, sys
-# In order to import cunqa, we append to the search path the cunqa installation path.
-# In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
@@ -46,5 +45,6 @@ try:
     qdrop(family_name)
 
 except Exception as error:
+    # 4. Release resources even if an error is raised
     qdrop(family_name)
     raise error
