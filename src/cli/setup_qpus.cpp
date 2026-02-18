@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     JSON backend_json;
 
     if (back_path_json.contains("noise_properties_path")) {
-        if (sim_arg == "Aer")
+        if (sim_arg != "Aer")
             throw std::runtime_error("Noise is only available with AER at the moment.");
         std::string fpath = std::string(constants::CUNQA_PATH) + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
 

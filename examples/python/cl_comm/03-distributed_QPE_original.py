@@ -8,15 +8,12 @@ import os, sys
 import math
 import numpy as np
 import time
-import statistics as st
-import random
 
 # path to access c++ files
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.qpu import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
-from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
 def print_results(result_list, angle):
@@ -156,7 +153,7 @@ def run_iterative_QPE(circuits, qpus_name, shots, seed = 1234):
 
     qpus_QPE  = get_QPUs(on_node = False, family = qpus_name)
     algorithm_starts = time.time()
-    distr_jobs = run_distributed(list(circuits.values()), qpus_QPE, shots=shots, seed=seed)
+    distr_jobs = run(list(circuits.values()), qpus_QPE, shots=shots, seed=seed)
     
     result_list = gather(distr_jobs)
     algorithm_ends = time.time()
