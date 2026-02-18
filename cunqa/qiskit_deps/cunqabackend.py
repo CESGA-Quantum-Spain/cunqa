@@ -5,7 +5,7 @@ import json
 
 sys.path.append(os.getenv("HOME"))
 from cunqa.logger import logger
-from cunqa.backend import Backend
+from cunqa.qpu import Backend
 
 from qiskit.providers import BackendV2
 from qiskit.providers import QubitProperties, BackendV2, Options

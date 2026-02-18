@@ -1,21 +1,18 @@
 import os, sys
 import numpy as np
 
-# path to access c++ files
+# Append path to access CUNQA installation
 sys.path.append(os.getenv("HOME"))
 
-from cunqa.qpu import get_QPUs, qraise, qdrop
+from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
-from cunqa.mappers import run_distributed
 from cunqa.qjob import gather
 
 # Raise QPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
 family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
-qpus  = get_QPUs(on_node=False, family = family)
+qpus   = get_QPUs(co_located = True, family = family)
 
-#qpus_QPE  = get_QPUs(on_node=False)
 ########## Circuits to run ##########
-########## First circuit ############
 cc_1 = CunqaCircuit(1, id="First")
 cc_2 = CunqaCircuit(1, id="Second")
 
@@ -24,29 +21,18 @@ cc_1.h(0)
 with cc_1.expose(0, cc_2) as (rqubit, subcircuit):
     subcircuit.cx(rqubit,0)
 
-
 cc_1.measure_all()
 cc_2.measure_all()
 
-
-
-########## List of circuits #########
-circs_QPE = [cc_1, cc_2]
-
-""" for circ in circs_QPE:
-    for c in circ.instructions:
-        print(c)
-    print() """
-
 ########## Distributed run ##########
-distr_jobs = run_distributed(circs_QPE, qpus, shots=100) 
+distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
 
-########## Collect the counts #######
+# Collect the results
 result_list = gather(distr_jobs)
 
-########## Print the counts #######
-for result in result_list:
-    print(result)
+# Print the counts
+for i, result in enumerate(result_list):
+    print(f"Counts {i} is {result.counts}")
 
-########## Drop the deployed QPUs #
+# Drop the deployed QPUs #
 qdrop(family)

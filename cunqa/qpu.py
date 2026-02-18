@@ -21,6 +21,7 @@ import json
 import subprocess
 import re
 from typing import Union, Any, Optional, TypedDict
+from sympy import Symbol
 
 from sympy import Symbol
 from qiskit import QuantumCircuit
@@ -30,7 +31,7 @@ from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
 from cunqa.logger import logger
-from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES 
+from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
 
 class Backend(TypedDict):
     """
