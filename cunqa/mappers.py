@@ -112,8 +112,6 @@ class QJobMapper:
             List of outputs of the function applied to the results of each job for the given 
             population.
         """
-        if (len(self.qjobs) != len(population)):
-            raise ValueError("The size of the popultion does not match the amount of qjobs")
         qjobs_ = []
         for qjob, params in zip(self.qjobs, population):
             qjob.upgrade_parameters(list(params))

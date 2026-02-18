@@ -202,7 +202,6 @@ class CunqaBackend(BackendV2):
 
                 elif gate == "unitary":
 
-                    # target.add_instruction(UnitaryGate([[1,0],[0,1]]),{None:None})
                     target.add_instruction(UnitaryGate([[1,0],[0,1]]),{None:None})
                 
                 else:
