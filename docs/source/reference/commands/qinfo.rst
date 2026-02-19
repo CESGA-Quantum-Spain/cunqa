@@ -25,6 +25,16 @@ Node selection options
 ``-m, --mynode``
     Info about the QPUs on the current node.
 
+
+Basic usage
+-----------
+
+Command that bring information about the vQPUs on a specific node:
+
+.. code-block:: bash
+
+   qinfo c7-13
+
 Notes
 -----
 

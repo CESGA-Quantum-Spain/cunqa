@@ -193,13 +193,13 @@ class QPUCircuitMapper:
         self.qpus = qpus
 
         # TODO: Check when parameters get updated
-        if isinstance(circuit, QuantumCircuit):
+        """ if isinstance(circuit, QuantumCircuit):
             self.circuit = circuit
         else:
             raise TypeError(f"Parametric circuit must be <class "
                             f"'qiskit.circuit.quantumcircuit.QuantumCircuit'>, but {type(circuit)} "
-                            f"was provided [{TypeError.__name__}].")
-        
+                            f"was provided [{TypeError.__name__}].") """
+        self.circuit = circuit
         self.run_parameters = run_parameters
 
     def __call__(self, func, population):
@@ -225,12 +225,29 @@ class QPUCircuitMapper:
         """
 
         qjobs = []
-        try:
-            for i, params in enumerate(population):
-                qpu = self.qpus[i % len(self.qpus)]
-                circuit_assembled = self.circuit.assign_parameters(params)
-                qjobs.append(run(circuit_assembled, qpu, **self.run_parameters))
-            results = gather(qjobs)
-            return [func(result) for result in results]
-        except QiskitError as error:
-            raise RuntimeError(f"Error while assigning parameters to Qiskit's QuantumCircuit: {error}.")
+        if isinstance(self.circuit, QuantumCircuit):
+            try:
+                for i, params in enumerate(population):
+                    qpu = self.qpus[i % len(self.qpus)]
+                    circuit_assembled = self.circuit.assign_parameters(params)
+                    qjobs.append(run(circuit_assembled, qpu, **self.run_parameters))
+                results = gather(qjobs)
+                return [func(result) for result in results]
+            except QiskitError as error:
+                raise RuntimeError(f"Error while assigning parameters to Qiskit's QuantumCircuit: {error}.")
+        elif isinstance(self.circuit, CunqaCircuit):
+            try:
+                for i, params in enumerate(population):
+                    qpu = self.qpus[i % len(self.qpus)]
+                    if not isinstance(params, list):
+                        try:
+                            params = params.tolist()
+                        except Exception as error:
+                            raise RuntimeError(f"Cannot convert {type(params)} to list.")
+                    qjobs.append(run(self.circuit, qpu, params, **self.run_parameters))
+                results = gather(qjobs)
+                return [func(result) for result in results]
+            except Exception as error:
+                raise RuntimeError(f"Error while assigning parameters to CUNQA's CunqaCircuit: {error}.")
+        else:
+            raise RuntimeError(f"QPUCircuitMapper does not support circuit {type(self.circuit)}.")
