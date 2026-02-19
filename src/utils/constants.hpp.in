@@ -134,7 +134,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
-    {"p", P},
     {"u1", U1},
     {"rotinvx", ROTINVX},
     {"rotinvy", ROTINVY},
@@ -169,16 +168,10 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
-    {"cp", CP},
-    {"cu1", CU1},
-
-    // TWO GATE THREE PARAM
-    {"cu2", CU2},
-    {"cr", CR},
-    {"cu", CU},
-    {"cu3", CU3},
 
     // TWO QUBIT THREE PARAM
+    {"cu2", CU2},
+    {"cr", CR},
     {"cu", CU},
     {"cu3", CU3},
 
@@ -208,16 +201,15 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
 const std::vector<std::string> BASIS_GATES = {
     "unitary",
-    "measure",
-    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "sy", "sydg", "sz", "szdg", "t", "tdg", "p0", "p1",
-    "u1", "p", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz"
+    "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
+    "u1", "p", "rx", "ry", "rz",
     "u2", "r",
     "u3", "u",
-    "ecr", "swap", "cx", "cy", "cz", "csx", "csy", "csz", "ct",
+    "ecr", "swap", "cx", "cy", "cz", "csx",
     "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
     "cu2", "cr",
     "cu", "cu3",
-    "cecr", "cswap", "ccx", "ccy", "ccz", 
+    "cswap", "ccx", "ccz",
 };
 
 

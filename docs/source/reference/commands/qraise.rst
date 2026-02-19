@@ -114,6 +114,16 @@ Real QPU
 ``--qmio``
     *Deploys* the real quantum computer QMIO located at CESGA's installations, allowing hybrid DQC infrastructures.
 
+
+Basic usage
+-----------
+
+Command that deploys 2 vQPUs with classical communications, for 10 minutes and accessible from any node:
+
+.. code-block:: bash
+
+   qraise -n 2 -t 00:10:00 --classical_comm --co-located
+
 Notes
 -----
 

@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
-from cunqa.qclient import write_on_file
+from cunqa.qclient import write_on_file, json_to_qasm2
 from cunqa.logger import logger
 
 try:
@@ -21,12 +21,8 @@ import threading
 from queue import Queue
 from typing import Optional
 
-
-#ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
-ZMQ_ENDPOINT = "tcp://127.0.0.0:8181"
+ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
 PREFERRED_NETWORK_IFACE = "ib"
-
-
 
 def _get_qmio_config(family : str, endpoint : str) -> str:
     qmio_backend_config = {
@@ -48,7 +44,11 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
         "net":{
             "endpoint":endpoint,
             "nodename":"c7-23",
-            "mode":"co_located"
+            "mode":"co_located",
+            "device":{
+                "device_name": "QPU",
+                "target_devices": ["QMIO"]
+            },
         },
         "family":family,
         "name":"QMIO"
@@ -89,9 +89,6 @@ def _get_IP(preferred_net_iface : Optional[str] = None) -> str:
         for name, ips in all_ifaces.items():
             return ips[0]
     
-def _IR_to_QASM(circuit_ir):
-    pass
-
 class QMIOLinker:
 
     message_queue : 'Queue'
@@ -121,6 +118,10 @@ class QMIOLinker:
         qmio_config = _get_qmio_config(family, self.endpoint)
         write_on_file(qmio_config, QPUS_FILEPATH, family)
 
+    def run(self):
+        """
+        This function will take advantage of the waiting times of QMIO executing
+        """
         recv_thread = threading.Thread(target = self.recv_data)
         compute_thread = threading.Thread(target = self.compute_result)
 
@@ -138,11 +139,11 @@ class QMIOLinker:
                 message = pickle.loads(ser_message)
                 if isinstance(message, dict) and ("params" in message):
                     self._last_quantum_task = _upgrade_parameters(self._last_quantum_task, message["params"])
-                    upgraded_qasm_circ = _IR_to_QASM(self._last_quantum_task[0])
+                    upgraded_qasm_circ = json_to_qasm2(json.dumps(self._last_quantum_task[0]))
                     quantum_task = (upgraded_qasm_circ, self._last_quantum_task[1])
                 else:
-                    self._last_quantum_task = message 
-                    qasm_circuit = _IR_to_QASM(message[0])
+                    self._last_quantum_task = message
+                    qasm_circuit = json_to_qasm2(json.dumps(message[0]))
                     quantum_task = (qasm_circuit, message[1])
                     
                 self.message_queue.put(quantum_task)
@@ -160,9 +161,9 @@ class QMIOLinker:
             try:
                 quantum_task = self.message_queue.get()
                 client_id = self.client_ids_queue.get()
-                #self.qmio_comm_socket.send_pyobj(quantum_task)
-                results = {"results": {"reg_measure":{"00":50,"11":50}}}
-                #results = self.qmio_comm_socket.recv_pyobj()
+                self.qmio_comm_socket.send_pyobj(quantum_task)
+                results = self.qmio_comm_socket.recv_pyobj()
+                logger.error(f"Result format: {results}")
                 ser_results = pickle.dumps(results)
                 self.client_comm_socket.send_multipart([client_id, ser_results])
             except zmq.ZMQError as e:
@@ -170,7 +171,7 @@ class QMIOLinker:
                 self.client_comm_socket.close()
                 self.qmio_comm_socket.close()
                 self.context.term()
-                sys.exit(f"Error computing result in QMIOLinker: {e}")
+                raise RuntimeError(f"Error computing result in QMIOLinker: {e}")
 
 
 if __name__ == "__main__":
@@ -178,3 +179,4 @@ if __name__ == "__main__":
         raise ValueError("No family name provided to QMIO linker")
 
     qmiolinker = QMIOLinker(sys.argv[1])
+    qmiolinker.run()

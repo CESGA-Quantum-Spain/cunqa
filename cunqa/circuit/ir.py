@@ -3,6 +3,8 @@ from functools import singledispatch
 import copy
 
 from qiskit import QuantumCircuit
+from qiskit.circuit import Parameter, ParameterExpression
+
 
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.helpers import generate_id
@@ -65,7 +67,8 @@ def _(c: QuantumCircuit) -> dict:
         "num_qubits":sum([q.size for q in c.qregs]),
         "num_clbits": sum([c.size for c in c.cregs]),
         "quantum_registers": quantum_registers,
-        "classical_registers": classical_registers
+        "classical_registers": classical_registers, 
+        "params":[]
     }
 
     for instruction in c.data:
@@ -80,12 +83,14 @@ def _(c: QuantumCircuit) -> dict:
 
         if instruction.operation.name == "barrier":
             pass
+
         elif instruction.operation.name == "measure":
             json_data["instructions"].append({
                 "name":instruction.operation.name,
                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                 "clbits":[classical_registers[k][b] for k,b in zip(clreg, bit)]
             })
+
         elif instruction.operation.name == "unitary":
             json_data["instructions"].append({
                 "name":instruction.operation.name, 
@@ -93,6 +98,7 @@ def _(c: QuantumCircuit) -> dict:
                 "params":[[list(map(lambda z: [z.real, z.imag], row)) 
                            for row in instruction.operation.params[0].tolist()]]
             })
+
         elif instruction.operation.name == "if_else":
             json_data["is_dynamic"] = True
 
@@ -113,20 +119,38 @@ def _(c: QuantumCircuit) -> dict:
                 sub_circuit.add_register(re)
 
             sub_instructions = to_ir(sub_circuit)["instructions"]
-            for sub_instruction in sub_instructions:
-                json_data["instructions"].append(sub_instruction)
-        elif (instruction.operation._condition != None):
-            if instruction.operation._condition[1] not in [1]:
-                raise ValueError("Only 1 is accepted as condition for classicaly controlled operations for the current version.")
 
-            json_data["is_dynamic"] = True
-            json_data["instructions"].append({"name":instruction.operation.name, 
-                                        "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                        "params":instruction.operation.params
-                                        })                
+            cc_instruction = {
+                "name": "cif",
+                "clbits": [classical_registers[k][b] for k,b in zip(clreg, bit)],
+                "instructions": sub_instructions
+                }
+            
+            json_data["instructions"].append(cc_instruction)
+
         else:
-            json_data["instructions"].append({"name":instruction.operation.name, 
-                                        "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                                        "params":instruction.operation.params
-                                        })
+
+            instruction_params = [str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param for param in instruction.operation.params]
+        
+            instruction = {"name":instruction.operation.name, 
+                           "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                           "params":instruction_params
+                          }
+            
+            if instruction.condition != None:
+
+                if instruction.operation._condition[1] not in [1]:
+                    raise ValueError("Only 1 is accepted as condition for classicaly controlled operations for the current version.")
+
+                cc_clbit = classical_registers[instruction.condition[0]._register.name][instruction.condition[0]._index]
+
+                json_data["is_dynamic"] = True
+                json_data["instructions"].append({"name":"cif",
+                                            "clbits":[cc_clbit],
+                                            "params":[instruction]
+                                            })
+            
+            else:
+                json_data["instructions"].append(instruction)
+
     return json_data

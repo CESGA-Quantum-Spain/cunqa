@@ -30,6 +30,17 @@ Target selection options
 ``--all``
     Drop all ``qraise`` jobs.
 
+
+Basic usage
+-----------
+
+Command that relinquish all deployed vQPUs:
+
+.. code-block:: bash
+
+   qdrop --all
+
+
 Notes
 -----
 

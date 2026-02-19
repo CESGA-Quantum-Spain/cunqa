@@ -5,7 +5,7 @@ No-communications scheme
 Ideal execution
 ===============
 Let's showcase here more advanced examples of the no-communication model that showcase a more complex
-use of CUNQA than the one displayed in the :doc:`basic_usage` one.
+use of CUNQA than the one displayed in the :doc:`../cunqa_overview/embarrassingly_parallel` section.
 
 .. nbgallery::
    notebooks/Multiple_circuits_execution.ipynb
@@ -17,6 +17,11 @@ developed. The usage of these two features can be seen in the following examples
 .. nbgallery::
    notebooks/Optimizers_I_upgrading_parameters.ipynb
    notebooks/Optimizers_II_mapping.ipynb
+
+Finally, we present an example of the local `iterative QPE <https://arxiv.org/abs/quant-ph/0610214>`_, so that the results obtained can be compared with the ones in :doc:`classical_communications` and :doc:`quantum_communications`.
+
+.. literalinclude:: ../../../examples/python/no_comm/05-iterative_QPE.py
+      :language: python
 
 Noisy execution
 ===============

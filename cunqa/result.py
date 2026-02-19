@@ -103,7 +103,7 @@ class Result:
                 {'001 11':23, '110 10':77}
         """
         if "qmio_results" in list(self._result.keys()): 
-            counts = self._result["qmio_results"]["reg_measure"] #TODO: More registers? 
+            counts = self._result["qmio_results"]["c"] #TODO: More registers? 
         elif "results" in list(self._result.keys()): # aer
             counts = self._result["results"][0]["data"]["counts"]
         elif "counts" in list(self._result.keys()): # munich and cunqa

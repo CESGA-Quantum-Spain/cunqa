@@ -2,9 +2,9 @@
 Code implementing a simple distribution variant of the QPE algorithm. 
 We use the telegate protocol to apply gates on a circuit that has the eigenvector from a circuit where the bits of the phase will be measured.
 """
+
 import os, sys
 import numpy as np
-import time
 
 # In order to import cunqa, we append to the search path the cunqa installation path
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
@@ -13,64 +13,67 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-def deploy_qpus(n_qpus, cores_per_qpu, mem_per_qpu, simulator = "Aer"):
-    family = qraise(n_qpus, "10:00:00", simulator=simulator, quantum_comm = True, co_located = True, cores = cores_per_qpu, mem_per_qpu = mem_per_qpu)
-    return family
+N_QPUS = 2
+CORES_PER_QPU = 4
+MEM_PER_QPU = 60 # in GB
+N_ANCILLA_QUBITS = 16
+N_REGISTER_QUBITS = 1
+PHASE_TO_COMPUTE = 1 / 2**12
 
-# 2. Design circuits modelling the QPE 
-def dist_QPE_rz_circuits(n_ancilla_qubits, angle_to_compute):
-    ancilla_circuit  = CunqaCircuit(n_ancilla_qubits, id = "ancilla_circuit")
-    register_circuit = CunqaCircuit(1, id = "register_circuit")
+shots = 10
+SEED = 18
+
+try:
+    # 1. Deploy vQPUs
+    family = qraise(N_QPUS, "10:00:00", 
+                    simulator="Aer",
+                    quantum_comm = True, 
+                    co_located = True, 
+                    cores = CORES_PER_QPU, 
+                    mem_per_qpu = MEM_PER_QPU)
+    qpus = get_QPUs(co_located = True, family = family)
+
+    # 2. Design circuits modelling the QPE 
+    ancilla_circuit  = CunqaCircuit(N_ANCILLA_QUBITS, id = "ancilla_circuit")
+    register_circuit = CunqaCircuit(N_REGISTER_QUBITS, id = "register_circuit")
 
     register_circuit.x(0) # Rz statevector
 
-    for i in range(n_ancilla_qubits):
+    for i in range(N_ANCILLA_QUBITS):
         ancilla_circuit.h(i)
 
-    for i in range(n_ancilla_qubits):
+    for i in range(N_ANCILLA_QUBITS):
         ### TELEGATE ###
-        with ancilla_circuit.expose(n_ancilla_qubits - 1 - i, register_circuit) as rcontrol:
-            param = (2**i) * angle_to_compute
-            register_circuit.crz(param, rcontrol, 0)
+        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as (rqubit, subcircuit):
+            param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE
+            subcircuit.crz(param, rqubit, 0)
 
     # Swap qubits
-    if (n_ancilla_qubits % 2) == 0:
-        swap_range = int(n_ancilla_qubits / 2)
+    if (N_ANCILLA_QUBITS % 2) == 0:
+        swap_range = int(N_ANCILLA_QUBITS / 2)
     else:
-        swap_range = int((n_ancilla_qubits - 1) / 2)
+        swap_range = int((N_ANCILLA_QUBITS - 1) / 2)
 
     for i in range(swap_range):
-        ancilla_circuit.swap(i, n_ancilla_qubits - 1 - i)
+        ancilla_circuit.swap(i, N_ANCILLA_QUBITS - 1 - i)
 
     # QFT dagger
-    for i in range(n_ancilla_qubits):
+    for i in range(N_ANCILLA_QUBITS):
         for j in range(i):
             angle  = (-np.pi) / (2**(i - j)) 
-            ancilla_circuit.crz(angle, n_ancilla_qubits - 1 - j, n_ancilla_qubits - 1 - i)
-        ancilla_circuit.h(n_ancilla_qubits - 1 - i)
+            ancilla_circuit.crz(angle, N_ANCILLA_QUBITS - 1 - j, N_ANCILLA_QUBITS - 1 - i)
+        ancilla_circuit.h(N_ANCILLA_QUBITS - 1 - i)
 
     ancilla_circuit.measure_all()
 
-    return [ancilla_circuit, register_circuit]
 
-
-# 3. Execute distributed QPE circuit on communicated QPUs
-def run_distributed_QPE(circuits, qpus_name, shots, seed = 1234):
-
-    qpus_QPE  = get_QPUs(co_located = True, family = qpus_name)
-    algorithm_starts = time.time()
-    distr_jobs = run(circuits, qpus_QPE, shots=shots, seed=seed)
-    
+    # 3. Execute distributed QPE circuit on communicated QPUs
+    distr_jobs = run([ancilla_circuit, register_circuit], qpus, shots=shots, seed=SEED)
     result_list = gather(distr_jobs)
-    algorithm_ends = time.time()
-    elapsed_time = algorithm_ends - algorithm_starts
+    
 
-    return result_list, elapsed_time
-
-# 4. Post-processing results to extract estimated phase 
-def get_estimated_angle(results):
-    counts = results[0].counts
+    # 4. Post-processing results to extract estimated phase 
+    counts = result_list[0].counts
 
     most_frequent_output = max(counts, key=counts.get)
     print(f"Most frequent output is {most_frequent_output}")
@@ -78,47 +81,15 @@ def get_estimated_angle(results):
     estimated_theta = 0.0
     for i, digit in enumerate(most_frequent_output):
         if digit == '1':
-            estimated_theta += 1 / (2 ** (i + 1))
+            estimated_theta += 1 / (2 ** (N_ANCILLA_QUBITS - i))
 
-    return estimated_theta
+    
+    print(f"Estimated angle: {estimated_theta}")
+    print(f"Real angle: {PHASE_TO_COMPUTE}")
 
-### Full algorithm ###
-def dist_qpe_benchmarking(angles_list, n_ancilla_qubits, shots, cores_per_qpu, mem_per_qpu, seed):
-    for angle in angles_list:
-        qpus = deploy_qpus(2, cores_per_qpu, mem_per_qpu)
-
-        circuits = dist_QPE_rz_circuits(n_ancilla_qubits, 2 * 2 * np.pi * angle) # The first 2 is because we are using Rz whose eigenvalue is exp(i*theta/2)
-        results, time_taken = run_distributed_QPE(circuits, qpus, shots, seed)
-        estimated_angle = get_estimated_angle(results)
-
-        # Write result data into a file
-        result_data = str({
-            "num_qpus":2,
-            "total_time":time_taken,
-            "n_ancilla_qubits":n_ancilla_qubits,
-            "cores_per_qpu":cores_per_qpu,
-            "mem_per_qpu":mem_per_qpu,
-            "shots":shots,
-            "input_theta":angle,
-            "estimated_theta": estimated_angle, 
-            "counts": results[0].counts
-        })
-        
-        with open(f"./dist_QPE_results.txt", "a") as f:
-            f.write(result_data)
-
-        # 5. Drop the deployed QPUs #
-        qdrop(qpus)
-        time.sleep(10)
-
-
-if __name__ == "__main__":
-    n_ancilla_qubits = 16
-    n_register_qubits = 1
-    angles_to_compute = [1 / 2**10, 1 / np.pi]   
-    shots = 10
-    cores_per_qpu = 4
-    mem_per_qpu = 60 # en GB
-    seed = 13
-
-    dist_qpe_benchmarking(angles_to_compute, n_ancilla_qubits, shots, cores_per_qpu, mem_per_qpu, seed)
+    # 5. Drop the deployed QPUs 
+    qdrop(family)
+except Exception as error:
+    # 5. Release resources even if an error is raised
+    qdrop(family)
+    raise error
