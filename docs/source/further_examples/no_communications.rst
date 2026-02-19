@@ -18,6 +18,12 @@ developed. The usage of these two features can be seen in the following examples
    notebooks/Optimizers_I_upgrading_parameters.ipynb
    notebooks/Optimizers_II_mapping.ipynb
 
+
+The following example shows how to obtain different statistics from :py:class:`~cunqa.qjob.QJob` results:
+
+.. nbgallery::
+   notebooks/Result_statistics.ipynb
+
 Finally, we present an example of the local `iterative QPE <https://arxiv.org/abs/quant-ph/0610214>`_, so that the results obtained can be compared with the ones in :doc:`classical_communications` and :doc:`quantum_communications`.
 
 .. literalinclude:: ../../../examples/python/no_comm/05-iterative_QPE.py
