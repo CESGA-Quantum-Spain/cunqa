@@ -4,8 +4,7 @@ from pathlib import Path
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
-from cunqa.qclient import write_on_file
-from cunqa.circuit import convert
+from cunqa.qclient import write_on_file, json_to_qasm2
 from cunqa.logger import logger
 
 try:
@@ -47,7 +46,11 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
         "net":{
             "endpoint":endpoint,
             "nodename":"c7-23",
-            "mode":"co_located"
+            "mode":"co_located",
+            "device":{
+                "device_name": "QPU",
+                "target_devices": ["QMIO"]
+            },
         },
         "family":family,
         "name":"QMIO"
@@ -137,11 +140,11 @@ class QMIOLinker:
                 message = pickle.loads(ser_message)
                 if isinstance(message, dict) and ("params" in message):
                     self._last_quantum_task = _upgrade_parameters(self._last_quantum_task, message["params"])
-                    upgraded_qasm_circ = convert(self._last_quantum_task[0], convert_to = "qasm")
+                    upgraded_qasm_circ = json_to_qasm2(json.dumps(self._last_quantum_task[0]))
                     quantum_task = (upgraded_qasm_circ, self._last_quantum_task[1])
                 else:
                     self._last_quantum_task = message 
-                    qasm_circuit = convert(message[0], convert_to = "qasm")
+                    qasm_circuit = json_to_qasm2(json.dumps(message[0]))
                     quantum_task = (qasm_circuit, message[1])
                     
                 self.message_queue.put(quantum_task)

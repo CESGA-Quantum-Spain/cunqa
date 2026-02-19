@@ -8,7 +8,8 @@ from cunqa.circuit import CunqaCircuit
 try:
     # 1. Deploy QMIO QPU
     family = qraise(1, "00:10:00", qmio = True)
-    qpus = get_QPUs(co_located = True)
+    print(f"Family: {family}")
+    qpus = get_QPUs(co_located = True, family = family)
     qmio = qpus[0]
 
 
@@ -22,7 +23,8 @@ try:
     circuit.h(0)
     circuit.cx(0,1)
     circuit.rz(1.555, 0)
-    circuit.measure_all()
+    circuit.measure(0, 0)
+    circuit.measure(1, 2)
 
     # 3. Execute circuit on QMIO
     qjob0 = run(circuit, qmio, shots = 100)

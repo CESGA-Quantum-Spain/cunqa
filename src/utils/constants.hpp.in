@@ -134,7 +134,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
-    {"p", P},
     {"u1", U1},
     {"rotinvx", ROTINVX},
     {"rotinvy", ROTINVY},
@@ -169,16 +168,10 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
-    {"cp", CP},
-    {"cu1", CU1},
-
-    // TWO GATE THREE PARAM
-    {"cu2", CU2},
-    {"cr", CR},
-    {"cu", CU},
-    {"cu3", CU3},
 
     // TWO QUBIT THREE PARAM
+    {"cu2", CU2},
+    {"cr", CR},
     {"cu", CU},
     {"cu3", CU3},
 

@@ -381,9 +381,9 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
     auto quantum_task = p_qca->quantum_tasks[0];
 
     // TODO: Change the format with the free functions
-    std::string circuit = quantum_task_to_Munich(quantum_task);
     try
     {   
+        std::string circuit = quantum_task_to_Munich(quantum_task);
         
         auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
 
