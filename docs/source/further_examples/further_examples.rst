@@ -10,7 +10,6 @@ functionalities and purposes. Each subsection follows the structure outlined bel
 As CUNQA supports the main three DQC schemes, this section will cover
 all of them by the following:
 
-- :doc:`basic_usage`: basic guide on how to use the CUNQA API.
 - :doc:`no_communications` (also called embarrasingly parallel): distributing quantum tasks without 
   inter-QPU communications.
 - :doc:`classical_communications`: send and receive classical bits between vQPUs.
@@ -23,7 +22,6 @@ capabilities of CUNQA in DQC scenarios.
    :maxdepth: 1
    :hidden:
    
-      CUNQA basic usage <basic_usage.rst>
       No-communications <no_communications.rst>
       Classical-communications <classical_communications.rst>
       Quantum-communications <quantum_communications.rst>

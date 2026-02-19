@@ -1,14 +1,12 @@
 """
-Contains the :py:class:`~cunqa.qpu.QPU` class and the functions to manage the virtual QPUs (vQPUs).
-For the first purpose two classes exist: :py:class:`~cunqa.qpu.QPU` and 
-:py:class:`~cunqa.qpu.Backend`, where the second is dependent on the first in the sense that the 
-:py:class:`~cunqa.qpu.Backend` class is used to hold the features of the vQPU. Additionally, there 
+Mainly contains the :py:class:`~cunqa.qpu.QPU` class and the functions to manage the virtual QPUs (vQPUs).
+The :py:class:`~cunqa.qpu.Backend` class is dependent on the :py:class:`~cunqa.qpu.QPU` class in the sense that the former is used to hold the features of the vQPU. Additionally, there 
 are four functions: :py:func:`~cunqa.qpu.get_QPUs`, :py:func:`~cunqa.qpu.qdrop`, 
 :py:func:`~cunqa.qpu.qraise`, and :py:func:`~cunqa.qpu.run`. We can divide this group of functions 
 into two subgroups:
 
-- :py:func:`~cunqa.qpu.qdrop` and :py:func:`~cunqa.qpu.qraise`, which are adaptations of the
-  ``qdrop`` and ``qraise`` bash commands to Python, respectively. This allows the use of these
+- :py:func:`~cunqa.qpu.qraise` and :py:func:`~cunqa.qpu.qdrop`, which are adaptations of the
+  ``qraise`` and ``qdrop`` bash commands to Python, respectively. This allows the use of these
   commands within the Python workflow.
 - :py:func:`~cunqa.qpu.get_QPUs` and :py:func:`~cunqa.qpu.run`, which are responsible for
   creating the :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs and for sending

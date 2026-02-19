@@ -15,7 +15,7 @@ from cunqa.qjob import gather
 
 # Global variables
 N_QPUS = 7                  # Determines the number of bits of the phase that will be computed
-ANGLE_TO_COMPUTE = 1/2**5 
+PHASE_TO_COMPUTE = 1/2**5 
 SHOTS = 1024
 SEED = 18                   # Set seed for reproducibility
 
@@ -23,11 +23,12 @@ try:
 
     # 1. QPU deployment
     family_name = qraise(N_QPUS, "03:00:00", classical_comm=True, co_located = True)
+    qpus  = get_QPUs(co_located = True, family = family_name)
 
     # 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation
     circuits = []
     for i in range(N_QPUS): 
-        theta = 2**(N_QPUS - i) * ANGLE_TO_COMPUTE 
+        theta = 2**(N_QPUS - i) * PHASE_TO_COMPUTE 
 
         circuits.append(CunqaCircuit(2, 2, id= f"cc_{i}"))
         circuits[i].h(0)
@@ -55,9 +56,8 @@ try:
         circuits[i].measure(1, 1)
 
     # 3. Execution
-    qpus_QPE  = get_QPUs(co_located = True, family = family_name)
     algorithm_starts = time.time()
-    distr_jobs = run(circuits, qpus_QPE, shots=SHOTS, seed=SEED)
+    distr_jobs = run(circuits, qpus, shots=SHOTS, seed=SEED)
     
     result_list = gather(distr_jobs)
     algorithm_ends = time.time()
@@ -80,12 +80,12 @@ try:
             exponent = i + 1
             estimated_theta += 1 / (2**exponent)
 
-    print(f"Estimated angle is {estimated_theta}, where the original angle was {ANGLE_TO_COMPUTE}.")
+    print(f"Estimated angle: {estimated_theta}")
+    print(f"Real angle: {PHASE_TO_COMPUTE}")
 
     # 5. Release resources
     qdrop(family_name)
 
 except Exception as error:
-    # 5. Release resources even if an error is raised
     qdrop(family_name)
     raise error

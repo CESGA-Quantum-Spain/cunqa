@@ -67,7 +67,6 @@ void QPU::recv_data_()
     while (true) {
         try {
             auto message = server->recv_data();
-            LOGGER_DEBUG("Circuit: {}", message);
             {
                 std::lock_guard<std::mutex> lock(queue_mutex_);
                 if (message.compare("CLOSE"s) == 0) {

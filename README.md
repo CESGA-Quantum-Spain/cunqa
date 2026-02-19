@@ -97,7 +97,13 @@ git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
 >
 > where *SSH_KEY* is the secure key that connects your environment with GitHub, usually stored in the `~/.ssh` folder.
 
+Now CUNQA must be built and installed. If you are installing CUNQA in an HPC center other than CESGA,
+you might need to solve some dependencies or manually define the installation path. If you are installing 
+it in CESGA, the steps in the next dropdown menu can be skipped.
+
 ---
+<details open>
+<summary>Generic HPC center steps</summary>
 
 ### Define STORE environment variable
 
@@ -108,8 +114,6 @@ export STORE=/path/to/your/store
 ```
 
 If you plan to compile CUNQA multiple times, we recommend adding this directive to your `.bashrc` file to avoid potential issues.
-
----
 
 ### Dependencies
 
@@ -148,6 +152,7 @@ CunqaSimulator  0.1.1
 argparse        -
 qiskit-aer      0.17.2 (modified version)
 ```
+</details>
 
 ---
 
@@ -195,12 +200,13 @@ CUNQA is available as an Lmod module at CESGA. To use it:
 
 - In QMIO:
   ```bash
-  module load qmio/hpc gcc/12.3.0 cunqa/0.3.1-python-3.9.9-mpi
+  module load qmio/hpc gcc/12.3.0 cunqa/2.0.0-python-3.9.9-mpi
   ```
 
 - In FT3:
   ```bash
-  module load cesga/2022 gcc/system cunqa/0.3.1
+  module load cesga/2022 gcc/system cunqa/2.0.0 # without GPUs
+  module load cesga/2022 gcc/system cunqa/2.0.0-cuda-12.8.0 # with GPUs
   ```
 
 If your HPC center is interested in deploying it this way, the EasyBuild files used at CESGA are 
