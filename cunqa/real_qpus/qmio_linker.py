@@ -25,6 +25,7 @@ ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER")
 PREFERRED_NETWORK_IFACE = "ib"
 
 def _get_qmio_config(family : str, endpoint : str) -> str:
+    SLURM_JOB_ID = os.getenv("SLURM_JOB_ID") 
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
@@ -51,6 +52,7 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
             },
         },
         "family":family,
+        "slurm_job_id":SLURM_JOB_ID,
         "name":"QMIO"
     }
 
@@ -160,6 +162,7 @@ class QMIOLinker:
         while checking_queue:
             try:
                 quantum_task = self.message_queue.get()
+                logger.warning(f"Quantum task: {quantum_task[0]}")
                 client_id = self.client_ids_queue.get()
                 self.qmio_comm_socket.send_pyobj(quantum_task)
                 results = self.qmio_comm_socket.recv_pyobj()
