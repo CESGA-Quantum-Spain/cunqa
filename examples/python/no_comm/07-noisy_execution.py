@@ -8,9 +8,8 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy noisy vQPUs
-    #noise_path = "complete/path/to/Brisbane.json"
-    #family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_path=noise_path)
-    family = qraise(4, "00:10:00", simulator="Aer", co_located=True, fakeqmio=True)
+    noise_path = "./noise_properties_example.json"
+    family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_path=noise_path)
     qpus  = get_QPUs(co_located=True)
 
     # 2. Design circuit as any other execution
@@ -19,7 +18,7 @@ try:
     qc.cx(0,1)
     qc.measure_all()
 
-    # 3. Execute circuit on noisy QPUs
+    # 3. Execution
     qcs = [qc] * 4
     qjobs = run(qcs , qpus, shots = 1000)
 
@@ -33,6 +32,5 @@ try:
     qdrop(family)
 
 except Exception as error:
-    # 4. Relinquish resources even if an error is raised
     qdrop(family)
     raise error

@@ -12,8 +12,8 @@ try:
     [qpu] = get_QPUs(co_located = True, family = family)
 
 
-    # ---------------------------
     # 2. Design circuit:
+    # ---------------------------
     #  qc.q0   ─[H]───[M]───[M]─
     #                  ‖     
     #  qc.q1   ───────[X]───[M]─
@@ -38,6 +38,5 @@ try:
     qdrop(family)
 
 except Exception as error:
-    # 4. Relinquish resources even if an error is raised
     qdrop(family)
     raise error

@@ -43,7 +43,6 @@ try:
     qdrop(family)
     
 except Exception as error:
-    # 4. Relinquish resources even if an error is raised
     qdrop(family)
     raise error
 
