@@ -67,60 +67,44 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
 
         if isinstance(circuit, QuantumCircuit):
             if initial_layout is not None and len(initial_layout) != circuit.num_qubits:
-                logger.error(f"initial_layout must be of the size of the circuit: {circuit.num_qubits} [{TypeError.__name__}].")
-                raise SystemExit # User's level
+                raise TypeError(f"initial_layout must be of the size of the circuit, {circuit.num_qubits}, while it is {len(initial_layout)}.")
             
             qc = circuit
 
         elif isinstance(circuit, CunqaCircuit):
-            if circuit.has_cc or circuit.has_qc:
-                logger.error(f"CunqaCircuit with distributed instructions was provided, transpilation is not avaliable at the moment. Make sure you are using a cunqasimulator backend, then transpilation is not necessary [{TypeError.__name__}].")
-                raise SystemExit
+            # if circuit.has_cc or circuit.has_qc:
+            #     raise TypeError(f"CunqaCircuit with distributed instructions was provided, for which transpilation is not avaliable at the moment.")
             
-            parameters_tracking = circuit.params
             qc = _from_ir_to_qc(circuit.info)
 
         elif isinstance(circuit, dict):
             if initial_layout is not None and len(initial_layout) != circuit['num_qubits']:
-                logger.error(f"initial_layout must be of the size of the circuit: {circuit['num_qubits']} [{TypeError.__name__}].")
-                raise SystemExit # User's level
-            
-            parameters_tracking = circuit["params"]
+                raise TypeError(f"initial_layout must be of the size of the circuit, {circuit.num_qubits}, while it is {len(initial_layout)}.")
             
             qc = _from_ir_to_qc(circuit)
 
         else:
-            logger.error(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, <class 'cunqa.circuit.core.CunqaCircuit'> or ir dict, but {type(circuit)} was provided [{TypeError.__name__}].")
-            raise SystemExit # User's level
+            raise TypeError(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, <class 'cunqa.circuit.core.CunqaCircuit'> or ir dict, but {type(circuit)} was provided.")
     
     except Exception as error:
-        logger.error(f"Some error occurred, please check sintax and logic of the resulting circuit [{type(error).__name__}]: {error}")
-        raise SystemExit # User's level
+        raise error 
         
     logger.debug("Circuit converted to QuantumCircuit.")
 
-    # backend check
-    if isinstance(backend, Backend):
-        cunqabackend = CunqaBackend(backend = backend)
-    else:
-        logger.error(f"backend must be <class 'cunqa.qpu.Backend'>, but {type(backend)} was provided [{TypeError.__name__}].")
-        raise SystemExit # User's level
-    
+
     # transpilation
     try:
+        cunqabackend = CunqaBackend(backend = backend)
         qc_transpiled = transpile(qc, cunqabackend, initial_layout = initial_layout, optimization_level = opt_level, seed_transpiler = seed)
     
     except TranspilerError as error:
-        logger.error(f"Some error occured with transpilation: {error} [TranspilerError]")
+        logger.error(f"Some error occured with transpilation.")
+        raise error
 
     except Exception as error:
         logger.error(f"Some error occurred with transpilation, please check that the target QPU is adequate for the provided circuit (enough number of qubits, simulator supports instructions, etc): {error} [{type(error).__name__}].")
-        raise SystemExit # User's level
-
-    if len(parameters_tracking) != 0:
-
-        qc_transpiled
-    
+        raise error 
+     
     
     # converting to input format and returning
 
@@ -128,23 +112,14 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
         return qc_transpiled
     
     elif isinstance(circuit, dict):
-        return to_ir(qc_transpiled, "dict")
+        return to_ir(qc_transpiled)
     
     elif isinstance(circuit, CunqaCircuit):
 
-        cunqac_transpiled = to_ir(qc_transpiled, "CunqaCircuit")
+        dict_transpiled = to_ir(qc_transpiled)
 
-        cunqac_transpiled._id = circuit._id + "_transpiled"
-        
-        assign_dict={}
-        for expr in parameters_tracking:
-            if isinstance(expr, dict):
-                if None in list(expr.values()):
-                    continue
-
-                assign_dict.update(expr)
-
-        cunqac_transpiled.assign_parameters(assign_dict)
+        cunqac_transpiled = CunqaCircuit(dict_transpiled["num_qubits"], dict_transpiled["num_clbits"], id = circuit._id + "_transpiled")
+        cunqac_transpiled.add_instructions(dict_transpiled["instructions"])
 
         return cunqac_transpiled
 
@@ -233,11 +208,11 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
                 qiskit_params.append(qiskit_paramexp)
 
-            elif type(param) == float or type(param) == int:
+            elif isinstance(param, float) or isinstance(param, int):
 
                 qiskit_params.append(param)
 
-            elif type(param) == dict:
+            elif isinstance(param, dict):
 
                 qiskit_cif_subcircs.append(_from_ir_to_qc({"instructions":[param],
                                                     "num_qubits":num_qubits,

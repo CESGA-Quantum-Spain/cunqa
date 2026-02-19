@@ -75,11 +75,11 @@ class TestCunqaBackend:
             "gates": [],
             "coupling_map": [],
             "simulator":"Aer",
-            "noise_properties_path":"/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
+            "noise_path":"/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
         }
         
 
-        backend = CunqaBackend(backend=cunqa.backend.Backend(cunqa.backend.BackendData(backend_json)))
+        backend = CunqaBackend(backend=cunqa.qpu.Backend(backend_json))
         
         assert hasattr(backend, '_target')
         assert backend.target.num_qubits == 32

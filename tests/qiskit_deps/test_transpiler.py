@@ -28,7 +28,7 @@ def fakeqmio_backend():
         "coupling_map": [[0,1],[2,1],[2,3],[4,3],[5,4],[6,3],[6,12],[7,0],[7,9],[9,10],[11,10],[11,12],[13,21],[14,11],[14,18],[15,8],[15,16],[18,17],[18,19],[20,19],[22,21],[22,31],[23,20],[23,30],[24,17],[24,27],[25,16],[25,26],[26,27],[28,27],[28,29],[30,29],[30,31]],
         "basis_gates": ["sx","x","rz","ecr"],
         "custom_instructions": "",
-        "noise_properties_path": "",
+        "noise_path": "",
         "gates": []
     })
 
@@ -45,7 +45,7 @@ def test_transpiler_quantum_circuit(fakeqmio_backend):
     
     # Check that the transpiled circuit has the correct type and doesn't exceed backend's qubit count
     assert isinstance(transpiled_qc, QuantumCircuit)
-    assert transpiled_qc.num_qubits <= fakeqmio_backend.n_qubits
+    assert transpiled_qc.num_qubits <= fakeqmio_backend["n_qubits"]
 
 def test_original_circuit_unaffected_by_transpiler(fakeqmio_backend):
     """Test that transpiling doesn't modify the circuit object that it transpiles, but rather returns a new circuit. """
@@ -78,7 +78,7 @@ def test_transpiler_initial_layout(fakeqmio_backend):
     transpiled_qc = transpiler(qc, fakeqmio_backend, initial_layout=valid_layout)
     
     assert isinstance(transpiled_qc, QuantumCircuit)
-    assert transpiled_qc.num_qubits <= fakeqmio_backend.n_qubits
+    assert transpiled_qc.num_qubits <= fakeqmio_backend["n_qubits"]
 
 def test_transpiler_basis_gates_conversion(fakeqmio_backend):
     """Test that gates are converted to backend's basis gates"""
@@ -94,7 +94,7 @@ def test_transpiler_basis_gates_conversion(fakeqmio_backend):
     
     # Check that only basis gates are used
     for instruction in transpiled_circ.instructions:
-        assert instruction["name"] in fakeqmio_backend.basis_gates
+        assert instruction["name"] in fakeqmio_backend["basis_gates"]
 
 def test_transpiler_optimization_levels(fakeqmio_backend):
     """Test different optimization levels with a realistic backend"""
@@ -108,7 +108,7 @@ def test_transpiler_optimization_levels(fakeqmio_backend):
         transpiled_qc = transpiler(qc, fakeqmio_backend, opt_level=opt_level)
         
         assert isinstance(transpiled_qc, QuantumCircuit)
-        assert transpiled_qc.num_qubits <= fakeqmio_backend.n_qubits
+        assert transpiled_qc.num_qubits <= fakeqmio_backend["n_qubits"]
 
 def test_transpiler_seed_reproducibility(fakeqmio_backend):
     """Test that transpilation with the same seed produces consistent results"""
@@ -138,7 +138,7 @@ def test_transpiler_large_circuit(fakeqmio_backend):
     
     assert isinstance(transpiled_qc, QuantumCircuit)
     # Check that the transpiled circuit doesn't exceed backend's qubit count
-    assert transpiled_qc.num_qubits <= fakeqmio_backend.n_qubits
+    assert transpiled_qc.num_qubits <= fakeqmio_backend["n_qubits"]
 
 
 
@@ -151,7 +151,7 @@ def test_transpiler_coupling_map_constraints(fakeqmio_backend):
     by checking that every two-qubit gate is between physically connected qubits
     """
     # Convert coupling map to a set of tuples for efficient lookup
-    coupling_set = set(tuple(sorted(edge)) for edge in fakeqmio_backend.coupling_map)
+    coupling_set = set(tuple(sorted(edge)) for edge in fakeqmio_backend["coupling_map"])
 
     def check_two_qubit_gate_connectivity(transpiled_qc):
         """
@@ -242,7 +242,7 @@ def test_transpiler_routing_for_non_adjacent_qubits(fakeqmio_backend):
         ]
         
         # Verify that all interactions are valid according to the coupling map
-        coupling_set = set(tuple(sorted(edge)) for edge in fakeqmio_backend.coupling_map)
+        coupling_set = set(tuple(sorted(edge)) for edge in fakeqmio_backend["coupling_map"])
         
         # Check that all two-qubit interactions are either:
         # 1. Directly in the coupling map, or
@@ -250,7 +250,7 @@ def test_transpiler_routing_for_non_adjacent_qubits(fakeqmio_backend):
         for interaction in two_qubit_interactions:
             assert any(
                 interaction == edge or 
-                is_routable_interaction(interaction, fakeqmio_backend.coupling_map)
+                is_routable_interaction(interaction, fakeqmio_backend["coupling_map"])
                 for edge in coupling_set
             ), f"Interaction {interaction} is not routable"
 

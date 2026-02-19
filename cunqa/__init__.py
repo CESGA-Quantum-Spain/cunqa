@@ -28,7 +28,6 @@ import importlib as _importlib
 _submodules = [
     "circuit",
     "qiskit_deps",
-    "backend",
     "qjob",
     "result",
     "qpu",

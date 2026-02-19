@@ -1,7 +1,7 @@
-import os
-import sys
+import os, sys
 import glob
 import json
+from typing import Any
 
 sys.path.append(os.getenv("HOME"))
 from cunqa.logger import logger
@@ -16,7 +16,7 @@ from qiskit.circuit import Parameter
 
 class CunqaBackend(BackendV2):
 
-    def __init__(self, noise_properties_json = None, backend = None, **kwargs):
+    def __init__(self, noise_properties_json: dict = None, backend: Backend = None, **kwargs: Any):
 
         if noise_properties_json is not None:
 
@@ -24,17 +24,17 @@ class CunqaBackend(BackendV2):
 
             self._from_noise_properties(noise_properties_json)
 
-        elif isinstance(backend, Backend):
+        elif backend is not None:
 
                 # instanciating base BackendV2
                 super().__init__(self,
-                                 name = backend.name,
-                                 description = backend.description)
+                                 name = backend["name"],
+                                 description = backend["description"])
 
                 # non-ideal backend, we get to gather noise_properties
-                if backend.noise_properties_path and backend.noise_properties_path.strip():
+                if backend["noise_path"] and backend["noise_path"].strip():
 
-                    with open(backend.noise_properties_path, "r") as file:
+                    with open(backend["noise_path"], "r") as file:
                         noise_properties_json = json.load(file)
 
                     self._from_noise_properties(noise_properties_json)
@@ -42,7 +42,7 @@ class CunqaBackend(BackendV2):
                 # ideal backend, we do not gather any noise_properties, so ideal target is built.
                 else:
 
-                    self._from_backend_json(backend_json=backend.__dict__)
+                    self._from_backend_json(backend_json=backend)
 
 
     def _from_noise_properties(self, noise_properties_json):

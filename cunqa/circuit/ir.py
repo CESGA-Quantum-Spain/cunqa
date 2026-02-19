@@ -132,10 +132,10 @@ def _(c: QuantumCircuit) -> dict:
 
             instruction_params = [str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param for param in instruction.operation.params]
         
-            instruction = {"name":instruction.operation.name, 
-                           "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                           "params":instruction_params
-                          }
+            instr = {"name":instruction.operation.name, 
+                     "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                     "params":instruction_params
+                    }
             
             if instruction.condition != None:
 
@@ -147,10 +147,10 @@ def _(c: QuantumCircuit) -> dict:
                 json_data["is_dynamic"] = True
                 json_data["instructions"].append({"name":"cif",
                                             "clbits":[cc_clbit],
-                                            "params":[instruction]
+                                            "params":[instr]
                                             })
             
             else:
-                json_data["instructions"].append(instruction)
+                json_data["instructions"].append(instr)
 
     return json_data
