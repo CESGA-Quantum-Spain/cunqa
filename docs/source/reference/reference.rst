@@ -1,6 +1,8 @@
 CUNQA reference
 ===============
-This section aims to explain in more depth the main components of CUNQA based on the following dichotomy: the **management** of the emulated infrastructure and the **interaction** with it. CUNQA manages the resources of a quantum infrastructure through a set of bash commands and provides an platform-user interaction through a Python API.
+This section will explain deeper the main components of CUNQA. As CUNQA manages the resources of a quantum infrastructure through a set of bash commands and provides an platform-user interaction through a Python API, this section is divided into two subsections: **resource management** and **Python API**.
+
+.. _subs-resource-management:
 
 Resource management
 --------------------
@@ -20,6 +22,10 @@ Three commands cover the quantum infrastructures management: ``qraise``, ``qdrop
         qraise <commands/qraise>
         qdrop <commands/qdrop>
         qinfo <commands/qinfo>
+
+
+.. _subs-python-api:
+
 
 Python API
 ----------
