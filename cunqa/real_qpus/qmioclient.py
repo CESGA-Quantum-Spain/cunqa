@@ -1,22 +1,17 @@
 import sys, os
-from pathlib import Path
-
 sys.path.append(os.getenv("HOME"))
-
-from cunqa.constants import LIBS_DIR
-from cunqa.logger import logger
-
-try:
-    sys.path.append(LIBS_DIR)
-except Exception:
-    pass
 
 import zmq
 import json
 import time
 from typing import Optional
 
+from cunqa.constants import LIBS_DIR
 
+try:
+    sys.path.append(LIBS_DIR)
+except Exception:
+    pass
 
 def _optimization_options_builder(
     optimization: int, optimization_backend: str = "Tket"
