@@ -23,6 +23,7 @@ try:
 
     # 1. QPU deployment
     family_name = qraise(N_QPUS, "03:00:00", classical_comm=True, co_located = True)
+    qpus  = get_QPUs(co_located = True, family = family_name)
 
     # 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation
     circuits = []
@@ -55,9 +56,8 @@ try:
         circuits[i].measure(1, 1)
 
     # 3. Execution
-    qpus_QPE  = get_QPUs(co_located = True, family = family_name)
     algorithm_starts = time.time()
-    distr_jobs = run(circuits, qpus_QPE, shots=SHOTS, seed=SEED)
+    distr_jobs = run(circuits, qpus, shots=SHOTS, seed=SEED)
     
     result_list = gather(distr_jobs)
     algorithm_ends = time.time()
@@ -87,6 +87,5 @@ try:
     qdrop(family_name)
 
 except Exception as error:
-    # 5. Release resources even if an error is raised
     qdrop(family_name)
     raise error

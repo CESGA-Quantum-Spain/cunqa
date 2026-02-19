@@ -12,8 +12,8 @@ try:
     qmio = qpus[0]
 
 
-    # ---------------------------
     # 2. Design circuit:
+    # ---------------------------
     #  circuit.q0   ─[H]────●───[RZ(1.555)]─[M]─
     #                  |     
     #  circuit.q1   ───────[X]──────────────[M]─
@@ -38,6 +38,5 @@ try:
     qdrop(family)
 
 except Exception as error:
-    # 4. Relinquish resources even if an error is raised
     qdrop(family)
     raise error

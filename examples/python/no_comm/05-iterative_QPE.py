@@ -33,13 +33,15 @@ x1 = np.pi
 x2 = np.pi
 
 try:
-    # 2. QPU deployment
+    # 1. Deploy vQPUs
     family = qraise(10, "00:10:00", simulator = "Aer", co_located = True)
     qpus  = get_QPUs(co_located = True, family = family)
 
-    ## 3. Execution
+    
     measure = []
     for k in range(BIT_PRECISION):
+
+        # 2. Circuit design
         power = 2**(BIT_PRECISION - 1 - k)
 
         phase = 0
@@ -55,7 +57,7 @@ try:
             "x2": x2
         }
         
-        
+        # 3. Execution 
         result = run(parametric_circuit, qpus[k%10], params, shots = 2000, seed = SEED).result
         counts = result.counts
 
@@ -77,6 +79,5 @@ try:
     qdrop(family)
 
 except Exception as error:
-    # 5. Release resources even if an error is raised
     qdrop(family)
     raise error
