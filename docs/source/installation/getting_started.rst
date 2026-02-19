@@ -69,8 +69,7 @@ it in CESGA, some steps can be skipped.
       Lapack          -
 
 
-   - **Can be installed by the user**, but if they are not they will be automatically installed by the 
-   configuration process.
+   - **Can be installed by the user**, but if they are not they will be automatically installed by the configuration process.
 
    .. code-block:: text
 
