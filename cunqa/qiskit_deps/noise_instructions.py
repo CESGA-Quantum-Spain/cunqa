@@ -29,6 +29,7 @@ def create_parser():
     
     return parser
 
+# TODO: actually implement this and use it. Avoid generating dependencies
 def validate_json_schema(json_data, schema_path):
     """
     Validate JSON data against a given schema.

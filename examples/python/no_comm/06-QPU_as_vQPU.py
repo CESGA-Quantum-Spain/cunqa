@@ -8,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 try:
     # 1. Deploy QMIO QPU
     family = qraise(1, "00:10:00", qmio = True)
-    qpus = get_QPUs(co_located = True)
+    qpus = get_QPUs(co_located = True, family = family)
     qmio = qpus[0]
 
 

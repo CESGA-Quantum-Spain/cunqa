@@ -34,7 +34,7 @@ x2 = np.pi
 
 try:
     # 1. Deploy vQPUs
-    family = qraise(10, "00:10:00", simulator = "Aer", co_located = True)
+    family = qraise(10, "00:10:00", simulator = "Munich", co_located = True)
     qpus  = get_QPUs(co_located = True, family = family)
 
     
