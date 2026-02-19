@@ -27,7 +27,7 @@ a bash command and get them in the Python program.
         import os, sys
 
         # Adding path to access CUNQA module
-        sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+        sys.path.append(os.getenv("</your/cunqa/installation/path>")) # os.getenv("HOME") at CESGA by default
 
         # Gettting the raised QPUs
         from cunqa.qpu import get_QPUs

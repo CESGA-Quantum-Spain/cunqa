@@ -22,23 +22,21 @@
         If the circuit is not transpiled, errors will not raise, but the output of the simulation will not be coherent.
     
 """
+from typing import Union
+from sympy import Symbol
+import copy
 
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend # simulator (qjob.py), para transpilar (qpu.py), instanciacion (qutils.py)
 from cunqa.qpu import Backend
+from cunqa.logger import logger
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
 from cunqa.circuit.ir import to_ir
-from cunqa.logger import logger
-import copy
-from sympy import Symbol
+
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
-
-from qiskit import QuantumCircuit
 from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, CircuitError, Parameter, ParameterExpression
-
-from typing import Union
 
 
 def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit']:
