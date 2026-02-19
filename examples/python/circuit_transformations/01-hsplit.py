@@ -1,5 +1,6 @@
 import os, sys
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.qjob import gather
@@ -7,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.transformations import hsplit
 
 # ---------------------------
-# Adquiring the resources
+# Acquiring resources
 # ---------------------------
 family_original = qraise(1, "00:10:00", simulator="Aer", co_located=True)
 [qpu_original]  = get_QPUs(co_located=True, family=family_original)
@@ -32,11 +33,11 @@ results = qjob.result
 print(f"\nResult before hsplit: {results.counts}")
 
 # ---------------------------
-# Original circuits created and executed
+# Split original circuit to create two communicated circuits, and execute them
 # circuit1.q0: ─[H]──●──[M]─
 #                    $
 # circuit2.q0: ─────[X]─[M]─
-# Where $ represents the remoteness of the gate
+# Where $ represents the remote control of the gate
 # ---------------------------
 [circuit1, circuit2] = hsplit(circuit, 2)
 
@@ -44,11 +45,10 @@ qjobs = run([circuit1, circuit2], qpus_separated, shots=1024)
 results = gather(qjobs)
 
 print(f"Result after split: {results[0].counts}\n") # taking only the results from the 0 circuit
-                                                    # because they both get the same due to 
-                                                    # quantum communications
+                                                    # as both are the same, due to entanglement
 
 # ---------------------------
-# Relinquishing of the resources
+# Relinquishing resources
 # ---------------------------
 qdrop(family_original)
 qdrop(family_separated)

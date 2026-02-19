@@ -13,7 +13,7 @@ else:
     sys.path.insert(0, HOME)
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.backend import Backend
+from cunqa.qpu import Backend
 from cunqa.qiskit_deps.transpiler import transpiler
 
 @pytest.fixture

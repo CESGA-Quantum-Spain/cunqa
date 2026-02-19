@@ -1,9 +1,6 @@
 import os, sys
-import numpy as np
-import matplotlib.pyplot as plt
-
-# path to access c++ files
-sys.path.append(os.getenv("HOME"))
+# In order to import cunqa, we append to the search path the cunqa installation path
+sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
@@ -91,5 +88,6 @@ try:
     qdrop(family_name)
 
 except Exception as error:
+    # 4. Release resources even if an error is raised
     qdrop(family_name)
     raise error

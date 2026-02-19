@@ -9,8 +9,8 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '0.3.1'
-local_pyversionsuffix = '-python-3.9.9'
+version = '2.0.0'
+local_pyversionsuffix = '-python-3.11.9'
 versionsuffix = '%s-mpi' % local_pyversionsuffix
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
@@ -38,8 +38,8 @@ toolchainopts = {'rpath': False}
 sources = ['%(name)s-%(version)s.tar.gz']
 
 builddependencies = [
-   ('FlexiBLAS', '3.3.0'),
-   ('Boost.Python', '1.85.0', local_pyversionsuffix),
+   ('OpenBLAS', '0.3.24'),
+   ('Boost', '1.85.0'),
    ('pybind11', '2.13.6', local_pyversionsuffix),
    ('CMake', '3.27.6')
 ]
@@ -61,7 +61,7 @@ modextrapaths = {
 }
 
 sanity_check_paths = {
-    'files': ['bin/qraise', 'bin/qdrop', 'bin/setup_qpus'],
+    'files': ['bin/qraise', 'bin/qdrop', 'bin/setup_qpus', 'bin/setup_executor'],
     'dirs': ['bin', 'lib'],
 }
 
