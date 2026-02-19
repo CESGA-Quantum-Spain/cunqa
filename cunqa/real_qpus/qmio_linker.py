@@ -1,7 +1,14 @@
 import sys, os
-from pathlib import Path
-
 sys.path.append(os.getenv("HOME"))
+
+import zmq
+import json
+import psutil
+import socket
+import pickle
+import threading
+from queue import Queue
+from typing import Optional
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
 from cunqa.qclient import write_on_file, json_to_qasm2
@@ -12,14 +19,6 @@ try:
 except Exception:
     pass
 
-import zmq
-import json
-import psutil
-import socket
-import pickle
-import threading
-from queue import Queue
-from typing import Optional
 
 ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
 PREFERRED_NETWORK_IFACE = "ib"
@@ -58,7 +57,11 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
 
     return json.dumps(qmio_config_json)
 
-def _upgrade_parameters(quantum_task : tuple[dict, dict], parameters : list[float]) -> tuple[dict, dict]:
+def _upgrade_parameters(
+    quantum_task : tuple[dict, dict], 
+    parameters : list[float]
+) -> tuple[dict, dict]:
+    
     param_counter = 0
     for inst in quantum_task[0]["instructions"]:
         name = inst["name"]
@@ -88,7 +91,7 @@ def _get_IP(preferred_net_iface : Optional[str] = None) -> str:
         ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith(preferred_net_iface)}
         return all_ifaces[next(iter(ifaces))][0]
     else:
-        for name, ips in all_ifaces.items():
+        for _, ips in all_ifaces.items():
             return ips[0]
     
 class QMIOLinker:
@@ -122,7 +125,7 @@ class QMIOLinker:
 
     def run(self):
         """
-        This function will take advantage of the waiting times of QMIO executing
+        This function will take advantage of the waiting times of QMIO executing.
         """
         recv_thread = threading.Thread(target = self.recv_data)
         compute_thread = threading.Thread(target = self.compute_result)
@@ -162,11 +165,9 @@ class QMIOLinker:
         while checking_queue:
             try:
                 quantum_task = self.message_queue.get()
-                logger.warning(f"Quantum task: {quantum_task[0]}")
                 client_id = self.client_ids_queue.get()
                 self.qmio_comm_socket.send_pyobj(quantum_task)
                 results = self.qmio_comm_socket.recv_pyobj()
-                logger.error(f"Result format: {results}")
                 ser_results = pickle.dumps(results)
                 self.client_comm_socket.send_multipart([client_id, ser_results])
             except zmq.ZMQError as e:

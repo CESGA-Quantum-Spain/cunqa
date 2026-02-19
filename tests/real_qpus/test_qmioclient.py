@@ -16,7 +16,7 @@ import cunqa.real_qpus.qmioclient as qmioclient_mod
 
 
 # -----------------------
-# Helpers puros
+# Helpers
 # -----------------------
 
 @pytest.mark.parametrize(
@@ -66,12 +66,8 @@ def test_config_builder_contains_expected_values():
 
     assert cfg["$data"]["repeats"] == 123
     assert cfg["$data"]["repetition_period"] == 0.5
-
-    # binary -> (2,2)
     assert cfg["$data"]["results_format"]["$data"]["format"]["$value"] == 2
     assert cfg["$data"]["results_format"]["$data"]["transforms"]["$value"] == 2
-
-    # optimization=2 -> opt_value 30
     assert cfg["$data"]["optimizations"]["$value"] == 30
 
 
@@ -88,12 +84,8 @@ def test_get_run_config_overrides_only_known_keys():
 
     assert cfg["$data"]["repeats"] == 10
     assert cfg["$data"]["repetition_period"] == 1.25
-
-    # raw -> (1,2)
     assert cfg["$data"]["results_format"]["$data"]["format"]["$value"] == 1
     assert cfg["$data"]["results_format"]["$data"]["transforms"]["$value"] == 2
-
-    # optimization=1 -> 18
     assert cfg["$data"]["optimizations"]["$value"] == 18
 
 
@@ -110,7 +102,6 @@ def test_qmiofuture_get_with_socket_returns_json_with_results_and_time(monkeypat
     sock = Mock()
     sock.recv_pyobj = Mock(return_value={"results": {"00": 7}})
 
-    # tiempo determinista
     monkeypatch.setattr(qmioclient_mod.time, "time_ns", Mock(return_value=3000))
 
     f = qmioclient_mod.QMIOFuture(socket=sock, start_time=1000)
@@ -188,7 +179,6 @@ def test_send_circuit_when_circuit_builds_run_config_and_sends_tuple(monkeypatch
     assert c._last_quantum_task is True
     get_run_config.assert_called_once_with(qt["config"])
     sock.send_pyobj.assert_called_once_with((qt, "CFGSTR"))
-
     assert future.socket is sock
     assert future.start_time == 222
 
