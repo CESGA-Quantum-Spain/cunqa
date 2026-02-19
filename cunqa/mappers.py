@@ -160,6 +160,7 @@ class QPUCircuitMapper:
     Attributes: 
         qpus (list[:py:class:`~cunqa.qpu.QPU`]): Objects linked to the virtual QPUs to wich the 
                                                  circuit is mapped.
+
         circuit (QuantumCircuit): Circuit to which parameters are assigned at the 
                                   :py:meth:`QPUCircuitMapper.__call__` method.
         run_parameters (Optional[Any]) : Any other run instructions needed for the simulation.
