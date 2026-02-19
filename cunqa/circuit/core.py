@@ -1096,12 +1096,16 @@ class CunqaCircuit:
         if (isinstance(matrix, np.ndarray) and 
             (matrix.shape[0] == matrix.shape[1]) and 
             (matrix.shape[0]%2 == 0)):
+            
             matrix = list(matrix)
+
         elif (isinstance(matrix, list) and 
               isinstance(matrix[0], list) and 
               all([len(matrix) == len(m) for m in matrix]) and 
               (len(matrix)%2 == 0)):
+            
             matrix = matrix
+
         else:
             raise ValueError(f"matrix must be a list of lists or <class 'numpy.ndarray'> of shape "
                              f"(2^n,2^n) [TypeError].")
