@@ -259,12 +259,12 @@ class Result:
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
-                    probs[k] =  np.diagonal(densmat, axis1=0).real[0]
+                    probs[k] =  np.diagonal(densmat, axis1=0).real[0].copy()
                 # Extract number of qubits from the lenght of one of the sets of probs
                 num_qubits = int(math.log2(next(iter(probs.values())).size)) 
 
             else:
-                probs =  np.diagonal(densmats, axis1=0).real[0]
+                probs =  np.diagonal(densmats, axis1=0).real[0].copy()
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
