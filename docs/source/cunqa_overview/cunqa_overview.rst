@@ -84,10 +84,10 @@ As a DQC emulator, CUNQA supports the three basic DQC schemes:
 
 Each of the previous sections will show:
 
-1. How to deploy an infrastructure with the corresponding schema.
-2. How to create and design circuits that fit that schema.
-3. How to execute the circuits in the infrastructure.
-4. A simple example.
+1. **How to deploy** an infrastructure with the corresponding schema.
+2. How to **create and design circuits** that fit that schema.
+3. **How to execute** the circuits in the infrastructure.
+4. A simple **example**.
 
 .. toctree::
    :maxdepth: 1
@@ -108,12 +108,12 @@ pieces and for dividing circuits into subcircuits:
 
 .. dropdown:: DQC: ``union``, ``add`` and ``hsplit``
 
-  - :py:func:`~cunqa.circuit.transformations.union`: combine circuits to produce another circuit with 
+  - :py:func:`~cunqa.circuit.transformations.union`: combines circuits to produce another circuit with 
     a larger set of qubits. For instance, given two circuits with `n` and `m` qubits, a circuit with 
     `n+m` qubits with the corresponding instructions on each register would be obtained.
-  - :py:func:`~cunqa.circuit.transformations.add`: sum two circuits to obtain a deeper circuit which 
+  - :py:func:`~cunqa.circuit.transformations.add`: sums two circuits to obtain a deeper circuit which 
     executes the instructions of the first summand and then those of the second summand.
-  - :py:func:`~cunqa.circuit.transformations.hsplit`: divide the set of qubits of a circuit into 
+  - :py:func:`~cunqa.circuit.transformations.hsplit`: divides the set of qubits of a circuit into 
     subcircuits. For instance, given a `n+m` qubit circuit, two circuits with `n` and `m` qubits 
     preserving the instructions would be obtained.
 
@@ -137,7 +137,7 @@ pieces and for dividing circuits into subcircuits:
 
         add, union and hsplit <tools_for_DQC.rst>
 
-Additionally, CUNQA provides convenient ways of implementing Variational Quantum Algorithms.
+Additionally, CUNQA provides convenient ways of improving the implementation of Variational Quantum Algorithms:
 
 .. dropdown:: VQAs: parameters and ``upgrade_parameters``
 
