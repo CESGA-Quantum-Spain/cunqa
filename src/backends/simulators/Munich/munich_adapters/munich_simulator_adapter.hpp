@@ -22,6 +22,11 @@ public:
     inline void initializeSimulationAdapter(std::size_t nQubits) { initializeSimulation(nQubits); }
     inline void applyOperationToStateAdapter(std::unique_ptr<qc::Operation>&& op) { applyOperationToState(op); }
     inline char measureAdapter(dd::Qubit i) { return measure(i); }
+    inline void resetStateAdapter(const int n_qubits) 
+    { 
+        qc::Targets target_qubits(n_qubits); 
+        reset(new qc::NonUnitaryOperation(target_qubits));
+    }
 
     JSON simulate(const Backend* backend);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);

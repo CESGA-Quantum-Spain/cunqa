@@ -223,8 +223,7 @@ std::string execute_shot_(
         case cunqa::constants::QSEND:
         {
             //------------- Generate Entanglement ---------------
-            ApplyH(simulator, G.n_qubits - 2);
-			ApplyCX(simulator, G.n_qubits - 2, G.n_qubits - 1);
+            generate_entanglement_();
             //----------------------------------------------------
 
             // CX to the entangled pair
@@ -329,7 +328,6 @@ std::string execute_shot_(
             G.qc_meas[T.id].push(measurement_as_int);
 
             Ts[inst.at("qpus")[0]].blocked = false;
-            size_t erased_elements = G.qc_meas.erase(inst.at("qpus")[0]); 
             break;
         }
         default:
