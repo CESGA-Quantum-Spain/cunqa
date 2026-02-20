@@ -140,21 +140,16 @@ def _apply_c_if(qc):
     # Best-effort helper for different Qiskit versions.
     # Returns True if a conditional instruction was added successfully.
     try:
-        qc.x(0).c_if(qc.cregs[0], 1)
+        qc.x(0).c_if(0, 1)
         return True
     except Exception:
         pass
-    try:
-        qc.x(0).c_if(qc.clbits[0], 1)
-        return True
-    except Exception:
-        return False
 
 
 def test_to_ir_quantumcircuit_classically_conditioned_gate_sets_dynamic(monkeypatch):
     monkeypatch.setattr(mod_ir, "generate_id", lambda: "GID")
 
-    qc = QuantumCircuit(1, 1)
+    qc = QuantumCircuit(1, 2)
 
     if not _apply_c_if(qc):
         pytest.skip("This Qiskit version does not support .c_if() in a compatible way.")
@@ -163,8 +158,9 @@ def test_to_ir_quantumcircuit_classically_conditioned_gate_sets_dynamic(monkeypa
 
     assert ir["is_dynamic"] is True
     assert len(ir["instructions"]) == 1
-    assert ir["instructions"][0]["name"] == "x"
-    assert ir["instructions"][0]["qubits"] == [0]
+    assert ir["instructions"][0]["name"] == "cif"
+    assert ir["instructions"][0]["instructions"][0]["name"] == "x"
+    assert ir["instructions"][0]["instructions"][0]["qubits"] == [0]
 
 
 def _build_if_else(qc):
@@ -199,4 +195,4 @@ def test_to_ir_quantumcircuit_if_else_without_else_is_supported(monkeypatch):
 
     # Your code should mark it as dynamic and inline the subcircuit instructions.
     assert ir["is_dynamic"] is True
-    assert any(instr["name"] == "x" for instr in ir["instructions"])
+    assert ir["instructions"][0]["instructions"][0]["name"] == "x"

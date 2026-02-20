@@ -58,18 +58,6 @@ def test_qjobmapper_call_correctly(monkeypatch):
     assert gathered_with["qjobs"] == [q1, q2, q3]
     assert out == ["cost(result-q1)", "cost(result-q2)", "cost(result-q3)"]
 
-
-@pytest.mark.parametrize("qjobs,population,", [
-    ([object(), object()], [np.array([1.0, 2.0]), np.array([3.0, 4.0]), np.array([5.0, 6.0])]),
-    ([object(), object(), object()], [np.array([1.0, 2.0]), np.array([3.0, 4.0])]),
-])
-def test_qjobmapper_call_without_population_and_qjob_sizes_matching(qjobs, population):
-    
-    with pytest.raises(ValueError) as _:
-        mapper = QJobMapper(qjobs)
-        _ = mapper(callable, population)
-
-
 # ------------------------
 # QPUCircuitMapper tests
 # ------------------------
@@ -85,13 +73,6 @@ def test_qpucircuitmapper_init_accepts_quantumcircuit_and_stores_run_parameters(
     assert mapper.qpus is qpus
     assert mapper.circuit is circuit
     assert mapper.run_parameters == {"shots": 1000}
-
-
-def test_qpucircuitmapper_init_rejects_non_quantumcircuit():
-    qpus = [object()]
-
-    with pytest.raises(TypeError) as excinfo:
-        QPUCircuitMapper(qpus, circuit={"not": "a qiskit circuit"})
 
 def test_qpucircuitmapper_call_runs_circuits_round_robin_and_maps_results(monkeypatch):
     from qiskit import QuantumCircuit

@@ -1,6 +1,7 @@
 """
-Mainly contains the :py:class:`~cunqa.qpu.QPU` class and the functions to manage the virtual QPUs (vQPUs).
-The :py:class:`~cunqa.qpu.Backend` class is dependent on the :py:class:`~cunqa.qpu.QPU` class in the sense that the former is used to hold the features of the vQPU. Additionally, there 
+Mainly contains the :py:class:`~cunqa.qpu.QPU` class and the functions to manage the virtual QPUs 
+(vQPUs). The :py:class:`~cunqa.qpu.Backend` class is dependent on the :py:class:`~cunqa.qpu.QPU` 
+class in the sense that the former is used to hold the features of the vQPU. Additionally, there 
 are four functions: :py:func:`~cunqa.qpu.get_QPUs`, :py:func:`~cunqa.qpu.qdrop`, 
 :py:func:`~cunqa.qpu.qraise`, and :py:func:`~cunqa.qpu.run`. We can divide this group of functions 
 into two subgroups:

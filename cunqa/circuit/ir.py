@@ -103,7 +103,7 @@ def _(c: QuantumCircuit) -> dict:
             json_data["is_dynamic"] = True
 
             if not any([sub_circuit is None for sub_circuit in instruction.operation.params]):
-                raise ValueError("if_else instruction with \'else\' case is not supported for the " \
+                raise ValueError("if_else instruction with \'else\' case is not supported for the "
                                  "current version.")
             else:
                 sub_circuit = [
@@ -112,7 +112,7 @@ def _(c: QuantumCircuit) -> dict:
                 ][0]
 
             if instruction.condition[1] not in [1]:
-                raise ValueError("Only 1 is accepted as condition for classicaly controlled " \
+                raise ValueError("Only 1 is accepted as condition for classicaly controlled "
                                  "operations for the current version.")
             
             for re in c.qregs:
@@ -130,24 +130,30 @@ def _(c: QuantumCircuit) -> dict:
 
         else:
 
-            instruction_params = [str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param for param in instruction.operation.params]
+            instruction_params = [
+                str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param 
+                for param in instruction.operation.params
+            ]
         
             instr = {"name":instruction.operation.name, 
                      "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                      "params":instruction_params
                     }
             
-            if instruction.condition != None:
+            if instruction.operation.condition != None:
 
                 if instruction.operation._condition[1] not in [1]:
-                    raise ValueError("Only 1 is accepted as condition for classicaly controlled operations for the current version.")
-
-                cc_clbit = classical_registers[instruction.condition[0]._register.name][instruction.condition[0]._index]
+                    raise ValueError("Only 1 is accepted as condition for classicaly controlled "
+                                     "operations for the current version.")
+                    
+                name = instruction.operation.condition[0]._register.name
+                index = instruction.operation.condition[0]._index
+                cc_clbit = classical_registers[name][index]
 
                 json_data["is_dynamic"] = True
                 json_data["instructions"].append({"name":"cif",
                                             "clbits":[cc_clbit],
-                                            "params":[instr]
+                                            "instructions":[instr]
                                             })
             
             else:

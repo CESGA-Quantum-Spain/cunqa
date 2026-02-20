@@ -194,12 +194,6 @@ class QPUCircuitMapper:
         self.qpus = qpus
 
         # TODO: Check when parameters get updated
-        """ if isinstance(circuit, QuantumCircuit):
-            self.circuit = circuit
-        else:
-            raise TypeError(f"Parametric circuit must be <class "
-                            f"'qiskit.circuit.quantumcircuit.QuantumCircuit'>, but {type(circuit)} "
-                            f"was provided [{TypeError.__name__}].") """
         self.circuit = circuit
         self.run_parameters = run_parameters
 

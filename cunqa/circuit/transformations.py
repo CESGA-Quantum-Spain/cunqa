@@ -123,8 +123,8 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
     Union of circuits (addition of qubits).
 
-    This function joins the qubits of several :py:class:`~cunqa.circuit.core.CunqaCircuit` objects. These circuits may 
-    be connected via communication directives which will be replaced as follows:
+    This function joins the qubits of several :py:class:`~cunqa.circuit.core.CunqaCircuit` objects. 
+    These circuits may be connected via communication directives which will be replaced as follows:
 
     - :py:meth:`~cunqa.circuit.core.CunqaCircuit.expose`. The gates applied remotely simply switch 
       to local operations.

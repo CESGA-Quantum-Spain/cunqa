@@ -100,13 +100,13 @@ Each of the previous sections will show:
 .. _sec_tools_for_dqc_algorithms:
 
 
-Tools for the study of algorithms: DQC and VQAs 
-------------------------------------------------
+Circuit Manipulation Techniques 
+--------------------------------
 Several circuit manipulation techniques have been implemented in CUNQA to empower the study of DQC 
 algorithms. In particular, the following functions are available for building circuits from smaller 
 pieces and for dividing circuits into subcircuits:
 
-.. dropdown:: DQC: ``union``, ``add`` and ``hsplit``
+.. dropdown:: Circuit Transformations: ``union``, ``add`` and ``hsplit``
 
   - :py:func:`~cunqa.circuit.transformations.union`: combines circuits to produce another circuit with 
     a larger set of qubits. For instance, given two circuits with `n` and `m` qubits, a circuit with 
@@ -139,7 +139,7 @@ pieces and for dividing circuits into subcircuits:
 
 Additionally, CUNQA provides convenient ways of improving the implementation of Variational Quantum Algorithms:
 
-.. dropdown:: VQAs: parameters and ``upgrade_parameters``
+.. dropdown:: Tools for VQAs: parameters and ``upgrade_parameters``
 
   Variational Quantum Algorithms require vast amounts of circuit evaluations for their optimization 
   processes, where the circuit structure remains constant and solely the parameters of certain gates
