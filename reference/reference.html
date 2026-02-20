@@ -1,0 +1,207 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CUNQA reference &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qraise" href="commands/qraise.html" />
+    <link rel="prev" title="Noise properties JSON" href="../further_examples/json_examples/noise_properties_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CUNQA reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resource-management">Resource management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands/qraise.html">    qraise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/qdrop.html">    qdrop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/qinfo.html">    qinfo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#python-api">Python API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.circuit.html">cunqa.circuit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CUNQA reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/reference.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cunqa-reference">
+<h1>CUNQA reference<a class="headerlink" href="#cunqa-reference" title="Link to this heading"></a></h1>
+<p>This section will explain deeper the main components of CUNQA. As CUNQA manages the resources of a quantum infrastructure through a set of bash commands and provides an platform-user interaction through a Python API, this section is divided into two subsections: <strong>resource management</strong> and <strong>Python API</strong>.</p>
+<section id="resource-management">
+<span id="subs-resource-management"></span><h2>Resource management<a class="headerlink" href="#resource-management" title="Link to this heading"></a></h2>
+<p>Three commands cover the quantum infrastructures management: <code class="docutils literal notranslate"><span class="pre">qraise</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code>, and <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="commands/qraise.html"><span class="doc">qraise</span></a>. Responsible for deploying the vQPUs to build
+DQC infrastructures.</p></li>
+<li><p><a class="reference internal" href="commands/qdrop.html"><span class="doc">qdrop</span></a>. Responsible for releasing the resources of vQPUs when they are no
+longer needed.</p></li>
+<li><p><a class="reference internal" href="commands/qinfo.html"><span class="doc">qinfo</span></a>. Built to obtain information about the available
+vQPUs.</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="python-api">
+<span id="subs-python-api"></span><h2>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h2>
+<p>The Python API handles two basic things: the interaction user-vQPU by sending and receiving quantum tasks and
+the actual design of quantum tasks.</p>
+<ul class="simple">
+<li><p>The module <a class="reference internal" href="api/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a> allows submitting quantum tasks and retrieving their result to one or several vQPUs by leveraging the tools provided by the <a class="reference internal" href="api/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a> and <a class="reference internal" href="api/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.result</span></code></a> modules.</p></li>
+<li><p>The design of circuits is handled by the module <a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">circuit</span></code></a>. This module contains a class called <a class="reference internal" href="api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> which contains the necessary directives to model a quantum task with and without communications. It also contains the submodule <a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit.transformations" title="cunqa.circuit.transformations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transformations</span></code></a>, a series of special directives to perform cuts and unions of different circuits.</p></li>
+</ul>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>Module</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a></p></td>
+<td><p>Contains the <a class="reference internal" href="api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class and the main
+functions interact with vQPUs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a></p></td>
+<td><p>Contains the class that defines and manages quantum jobs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.result</span></code></a></p></td>
+<td><p>Contains the <a class="reference internal" href="api/cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>, which contains the
+output of the executions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.mappers</span></code></a></p></td>
+<td><p>Contains map-like callables to distribute circuits among vQPUs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.circuit</span></code></a></p></td>
+<td><p>Quantum circuit abstraction for the <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> API.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../further_examples/json_examples/noise_properties_example.html" class="btn btn-neutral float-left" title="Noise properties JSON" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commands/qraise.html" class="btn btn-neutral float-right" title="qraise" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

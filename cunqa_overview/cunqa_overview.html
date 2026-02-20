@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CUNQA overview &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Embarrassingly Parallel" href="embarrassingly_parallel.html" />
+    <link rel="prev" title="Quick start" href="../quick_start/quick_start.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CUNQA overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#virtual-qpu">Virtual QPU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quantum-circuits">Quantum circuits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dqc-schemes">DQC schemes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="embarrassingly_parallel.html">   Embarrassingly parallel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classical_comm.html">   Classical communications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quantum_comm.html">   Quantum communications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#circuit-manipulation-techniques">Circuit Manipulation Techniques</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tools_for_DQC.html">    add, union and hsplit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tools_for_VQAs.html">    Parameters and upgrade_parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#real-qpus">Real QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CUNQA overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cunqa_overview/cunqa_overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cunqa-overview">
+<h1>CUNQA overview<a class="headerlink" href="#cunqa-overview" title="Link to this heading"></a></h1>
+<p>This section presents an overview of CUNQA, an emulator of Distributed Quantum Computing (DQC)
+architectures on HPC environments. Each of the architectures (or schemes) is built upon virtual
+QPUs, their basic building blocks.</p>
+<section id="virtual-qpu">
+<span id="sec-virtual-qpu"></span><h2>Virtual QPU<a class="headerlink" href="#virtual-qpu" title="Link to this heading"></a></h2>
+<p>A <strong>virtual QPU (vQPU)</strong> is a classical process running on a HPC environment with an allocated set of
+classical resources responsible of simulating the behaviour of a real QPU. They are composed by two
+parts:</p>
+<ul>
+<li><p><strong>Server</strong>: manages communication user-vQPU.</p></li>
+<li><p><strong>Simulator</strong>: performs the actual execution.  Currently, the following simulators are
+available:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Qiskit/qiskit-aer/">AerSimulator</a></p></li>
+<li><p><a class="reference external" href="https://github.com/munich-quantum-toolkit/ddsim">MQT-DDSIM</a></p></li>
+<li><p><a class="reference external" href="https://github.com/qulacs/qulacs">Qulacs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/QoroQuantum/maestro">Maestro</a></p></li>
+<li><p><a class="reference external" href="https://github.com/CESGA-Quantum-Spain/cunqasimulator">CunqaSimulator</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>The modular structure of CUNQA allows the implementation of other simulators on demand.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">How to deploy a vQPU?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">The deployment of vQPUs is made through the bash command <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> or
+through the Python function <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a>. Depending on the desired vQPU type,
+different argumets must be provided to the command or to the function, depending on the one being
+used. These arguments will be explored inside the description of each of the <a class="reference internal" href="#sec-dqc-schemes"><span class="std std-ref">DQC schemes</span></a>
+below.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">GPU support</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">We support the <strong>GPU</strong> execution provided by AerSimulator. This must be enabled at
+compile time as discussed in the <a class="reference internal" href="../installation/getting_started.html"><span class="doc">Installation</span></a> section.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Noisy simulations</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">CUNQA allows the simulation of quantum circuits using a noise model, but <strong>only with the
+no-communication model and with the AER simulator</strong>. Adding it to the other communication models is
+considered part of the future improvements. In order to do this, the vQPUs have to be deployed with
+a valid noise model scheme. This is done with the aforementioned <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a>
+Bash command or its Python function counterpart <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a>, with the first
+accepting the flag <code class="docutils literal notranslate"><span class="pre">noise-properties</span></code> and the second the argument <code class="docutils literal notranslate"><span class="pre">noise_properties_path</span></code>; both being the path
+to a noise properties JSON file. The format of this JSON file is shown in
+<a class="reference internal" href="../further_examples/json_examples/noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>.</p>
+<p class="sd-card-text">Additionally, a vQPU with the noise model of <a class="reference external" href="https://www.cesga.es/infraestructuras/cuantica/">CESGA’s QMIO quantum computer</a>
+can be deployed, but only if CUNQA is being executed inside the CESGA’s infrastructure. This can be
+done by employing the <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> flag in the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or
+with <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument in the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> Python function.</p>
+</div>
+</details></section>
+<section id="quantum-circuits">
+<span id="sec-quantum-circs"></span><h2>Quantum circuits<a class="headerlink" href="#quantum-circuits" title="Link to this heading"></a></h2>
+<p>As far as our knowledge extends, none of the most commonly used quantum circuit creation interfaces
+support the vQPU intercommunication instructions that we need to interact with CUNQA. Therefore,
+<a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> was implemented as the basic tool to define
+distributed circuits. Its communication instructions will be explored in detail in their
+corresponding <a class="reference internal" href="#sec-dqc-schemes"><span class="std std-ref">DQC schemes</span></a> section below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Apart from <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>, Qiskit QuantumCircuit and raw json
+instructions (see <a class="reference internal" href="../further_examples/json_examples/circuit_json_example.html"><span class="doc">Raw Quantum Circuit JSON</span></a>) are supported
+as circuit representations.</p>
+</div>
+</section>
+<section id="dqc-schemes">
+<span id="sec-dqc-schemes"></span><h2>DQC schemes<a class="headerlink" href="#dqc-schemes" title="Link to this heading"></a></h2>
+<p>As a DQC emulator, CUNQA supports the three basic DQC schemes:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="embarrassingly_parallel.html"><span class="doc">Embarrassingly Parallel</span></a>: classical distribution of quantum tasks with no communications
+at all.</p></li>
+<li><p><a class="reference internal" href="classical_comm.html"><span class="doc">Classical Communications</span></a>: interchange classical bits between vQPUs at execution time.</p></li>
+<li><p><a class="reference internal" href="quantum_comm.html"><span class="doc">Quantum Communication</span></a>: implementation of teledata and telegate protocols.</p></li>
+</ul>
+<p>Each of the previous sections will show:</p>
+<ol class="arabic simple">
+<li><p><strong>How to deploy</strong> an infrastructure with the corresponding schema.</p></li>
+<li><p>How to <strong>create and design circuits</strong> that fit that schema.</p></li>
+<li><p><strong>How to execute</strong> the circuits in the infrastructure.</p></li>
+<li><p>A simple <strong>example</strong>.</p></li>
+</ol>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="circuit-manipulation-techniques">
+<span id="sec-tools-for-dqc-algorithms"></span><h2>Circuit Manipulation Techniques<a class="headerlink" href="#circuit-manipulation-techniques" title="Link to this heading"></a></h2>
+<p>Several circuit manipulation techniques have been implemented in CUNQA to empower the study of DQC
+algorithms. In particular, the following functions are available for building circuits from smaller
+pieces and for dividing circuits into subcircuits:</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Circuit Transformations: <code class="docutils literal notranslate"><span class="pre">union</span></code>, <code class="docutils literal notranslate"><span class="pre">add</span></code> and <code class="docutils literal notranslate"><span class="pre">hsplit</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<ul class="simple">
+<li><p class="sd-card-text"><a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a>: combines circuits to produce another circuit with
+a larger set of qubits. For instance, given two circuits with <cite>n</cite> and <cite>m</cite> qubits, a circuit with
+<cite>n+m</cite> qubits with the corresponding instructions on each register would be obtained.</p></li>
+<li><p class="sd-card-text"><a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a>: sums two circuits to obtain a deeper circuit which
+executes the instructions of the first summand and then those of the second summand.</p></li>
+<li><p class="sd-card-text"><a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a>: divides the set of qubits of a circuit into
+subcircuits. For instance, given a <cite>n+m</cite> qubit circuit, two circuits with <cite>n</cite> and <cite>m</cite> qubits
+preserving the instructions would be obtained.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p class="sd-card-text">The function <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a> replaces distributed instructions
+between the circuits for local ones, while <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a>
+replaces local 2-qubit operations that involve different subcircuits into distributed
+instructions. Indeed, <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a> is the <strong>inverse</strong> of
+<a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a>.</p>
+</div>
+<p class="sd-card-text">These functions facilitate the inquiry into DQC algorithms as they can transform a set of
+communicated circuits into a single monolithic circuit (<code class="docutils literal notranslate"><span class="pre">union</span></code>), and conversely, split a circuit
+implementing a monolithic algorithm into several circuits to run in communicated QPUs (<code class="docutils literal notranslate"><span class="pre">hsplit</span></code>).</p>
+<p class="sd-card-text">Check <a class="reference internal" href="tools_for_DQC.html"><span class="doc">Tools for DQC algorithms</span></a> for detailed examples of these functions.</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</details><p>Additionally, CUNQA provides convenient ways of improving the implementation of Variational Quantum Algorithms:</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Tools for VQAs: parameters and <code class="docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">Variational Quantum Algorithms require vast amounts of circuit evaluations for their optimization
+processes, where the circuit structure remains constant and solely the parameters of certain gates
+change between evaluations. CUNQA facilitates working with these type of template circuits by its
+support for Parameters.</p>
+<p class="sd-card-text">Parameters are placeholders for the values that will be inserted on parametric gates at each evaluation.
+They can be single variables, say <cite>x</cite> or expressions with multpile variables like <cite>cos(2*x) + exp(z/2)</cite>.</p>
+<p class="sd-card-text">Parameters are inserted as a string in parametric gates to mark that its value will vary, and their value
+is given when executing. After running a parametric circuit, new parameters can be given for another
+evaluation using <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a>. If a value is not given to a
+certain variable, it will retain the value from last evaluation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit</span><span class="o">.</span><span class="n">rx</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">qubit</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Parameters are given values when running</span>
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">param_values</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">},</span> <span class="n">shots</span><span class="o">=</span> <span class="mi">1024</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+
+<span class="c1"># For another execution with new parameters, use QJob.upgrade_parameters()</span>
+<span class="n">new_result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">upgrade_parameters</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">result</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Check <a class="reference internal" href="tools_for_VQAs.html"><span class="doc">Parameters and upgrade_parameters</span></a> for a detailed example of the use of parameters.</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</details></section>
+<section id="real-qpus">
+<span id="sec-real-qpus"></span><h2>Real QPUs<a class="headerlink" href="#real-qpus" title="Link to this heading"></a></h2>
+<p>CUNQA also allows working with real quantum hardware. In particular, the
+<a class="reference external" href="https://www.cesga.es/infraestructuras/cuantica/">CESGA’s QMIO quantum computer</a> can be
+<em>deployed</em> alongside vQPUs to execute quantum tasks in a truly hybrid DQC infrastructure.
+Check <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> to see how to deploy the real QPU.</p>
+<p>CUNQA is constructed with the idea of, in the future, supporting real QPUs in a similar manner as
+vQPUs are nowadays.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../quick_start/quick_start.html" class="btn btn-neutral float-left" title="Quick start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="embarrassingly_parallel.html" class="btn btn-neutral float-right" title="Embarrassingly Parallel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

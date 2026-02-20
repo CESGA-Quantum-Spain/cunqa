@@ -1,6 +1,0 @@
-cunqa.circuit.circuit\_extensions.HorizontalDivisionError
-=========================================================
-
-.. currentmodule:: cunqa.circuit.circuit_extensions
-
-.. autoexception:: HorizontalDivisionError

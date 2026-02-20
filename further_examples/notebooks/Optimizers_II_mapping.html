@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paralelization for gradient-free optimizers: Differential Evolution &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Result Statistics in CUNQA" href="Result_statistics.html" />
+    <link rel="prev" title="Using the parameters update functionality" href="Optimizers_I_upgrading_parameters.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../further_examples.html">Further Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../no_communications.html">   No-communications</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../no_communications.html#ideal-execution">Ideal execution</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html">Using the parameters update functionality</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Paralelization for gradient-free optimizers: Differential Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Result_statistics.html">Result Statistics in CUNQA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../no_communications.html#noisy-execution">Noisy execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classical_communications.html">   Classical-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantum_communications.html">   Quantum-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json_examples/json_examples.html">   Raw JSON examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../further_examples.html">Further examples</a></li>
+          <li class="breadcrumb-item"><a href="../no_communications.html">No-communications scheme</a></li>
+      <li class="breadcrumb-item active">Paralelization for gradient-free optimizers: Differential Evolution</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/further_examples/notebooks/Optimizers_II_mapping.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Paralelization-for-gradient-free-optimizers:-Differential-Evolution">
+<h1>Paralelization for gradient-free optimizers: Differential Evolution<a class="headerlink" href="#Paralelization-for-gradient-free-optimizers:-Differential-Evolution" title="Link to this heading"></a></h1>
+<p>In this notebook, a more complex example is aimed. Here, a differential evolution optimization will be performed employing the vQPUs as accelerators of the quantum task of which the parameters are updated.</p>
+<p>As in the rest of the examples, all the imports are done and the vQPUs are raised. After this, they are brought to the program workflow in form of <code class="docutils literal notranslate"><span class="pre">QPU</span></code> instances.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">differential_evolution</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.mappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QJobMapper</span><span class="p">,</span> <span class="n">QPUCircuitMapper</span>
+
+<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;00:20:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span>  <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;simulator&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requested QPUs with command:
+        qraise -n 10 -t 00:20:00 --simulator=Aer --co-located
+QPUs ready to work ✅
+QPU 377561_2384905, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384906, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384907, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384908, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384909, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384910, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384911, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384912, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384913, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377561_2384914, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+</pre></div></div>
+</div>
+<p>In this example, the same ansatz, target distribution and distribution divergence measure is defined as in the parameters update feature example.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">):</span>
+    <span class="n">qc</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;phi_</span><span class="si">{</span><span class="n">p_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lam_</span><span class="si">{</span><span class="n">p_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">qubit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">qubit</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">qubit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qubits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">qc</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">qubit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">qc</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">):</span>
+    <span class="c1"># Define a normal distribution over the states</span>
+    <span class="n">num_states</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">num_qubits</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_states</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">std_dev</span> <span class="o">=</span> <span class="n">num_states</span> <span class="o">/</span> <span class="mi">4</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std_dev</span><span class="p">)</span>
+    <span class="n">target_probs</span> <span class="o">/=</span> <span class="n">target_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Normalize to make it a valid probability distribution</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="p">{</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;0</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s1">b&#39;</span><span class="p">):</span> <span class="n">target_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_states</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">target_dist</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">):</span>
+    <span class="c1"># Convert counts to probabilities</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">pdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;counts&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf</span><span class="p">[</span><span class="s2">&quot;counts&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_shots</span>
+
+    <span class="c1"># Create a dictionary for the obtained distribution</span>
+    <span class="n">obtained_dist</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">)[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="c1"># Ensure all states are present in the obtained distribution</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">target_dist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obtained_dist</span><span class="p">:</span>
+            <span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Convert distributions to lists for KL divergence calculation</span>
+    <span class="n">target_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">target_dist</span><span class="p">)]</span>
+    <span class="n">obtained_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">obtained_dist</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obtained_dist</span><span class="p">)]</span>
+
+    <span class="c1"># Calculate KL divergence</span>
+    <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">obtained_probs</span><span class="p">,</span> <span class="n">target_probs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kl_divergence</span>
+
+<span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">num_layers</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ansatz</span> <span class="o">=</span> <span class="n">hardware_efficient_ansatz</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+<span class="n">num_params</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_qubits</span> <span class="o">*</span> <span class="n">num_layers</span>
+
+<span class="n">pop</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_params</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_params</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_params</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>What changes is the cost function, that in this case will be the following.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+    <span class="n">target_dist</span> <span class="o">=</span> <span class="n">target_distribution</span><span class="p">(</span><span class="n">num_qubits</span><span class="p">)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+
+    <span class="k">return</span> <span class="n">KL_divergence</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">target_dist</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now, similar to the previous example, a <code class="docutils literal notranslate"><span class="pre">make_callback</span></code> function is defined in order to generate a callback function tailored to the mapper employed.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">make_callback</span><span class="p">(</span><span class="n">mapper</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">best_individual</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">convergence</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">i</span>
+        <span class="n">best_individual</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="p">[</span><span class="n">xk</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">callback</span><span class="p">,</span> <span class="n">energies</span>
+</pre></div>
+</div>
+</div>
+<section id="QJobMapper">
+<h2>QJobMapper<a class="headerlink" href="#QJobMapper" title="Link to this heading"></a></h2>
+<p>After all the previous steps, the optimization is ready to be performed. In this case, the mapper employed will be <code class="docutils literal notranslate"><span class="pre">QJobMapper</span></code>. This mapper takes a set of <code class="docutils literal notranslate"><span class="pre">QJobs</span></code> and uses the parameter update feature in each iteration.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">init_qjobs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">num_params</span><span class="p">):</span> <span class="c1"># we set pop=1 as the population size is pop*num_params</span>
+    <span class="n">qpu</span> <span class="o">=</span> <span class="n">qpus</span><span class="p">[</span><span class="n">i</span><span class="o">%</span><span class="k">len</span>(qpus)] # we select the qpu
+    <span class="n">init_qjobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="p">(</span><span class="n">ansatz</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_params</span><span class="p">)],</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
+
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">init_qjobs</span><span class="p">)</span>
+
+<span class="n">callback1</span><span class="p">,</span> <span class="n">energies1</span> <span class="o">=</span> <span class="n">make_callback</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span>
+<span class="n">result1</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span>
+                                <span class="n">bounds</span><span class="p">,</span>
+                                <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+                                <span class="n">workers</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">,</span>
+                                <span class="n">updating</span> <span class="o">=</span> <span class="s1">&#39;deferred&#39;</span><span class="p">,</span>
+                                <span class="n">strategy</span> <span class="o">=</span> <span class="s1">&#39;best1bin&#39;</span><span class="p">,</span>
+                                <span class="n">init</span> <span class="o">=</span> <span class="n">pop</span><span class="p">,</span>
+                                <span class="n">polish</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                <span class="n">callback</span><span class="o">=</span><span class="n">callback1</span>
+                               <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+<span class="ansi-yellow-fg">   warning: [qjob.py] You have not obtained the previous results. They will be discarded.
+</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+             message: Maximum number of iterations has been exceeded.
+             success: False
+                 fun: 0.20667795823664736
+                   x: [-1.802e-01 -1.348e+00 ... -1.992e+00  3.043e-01]
+                 nit: 1000
+                nfev: 36036
+          population: [[-1.802e-01 -1.348e+00 ... -1.992e+00  3.043e-01]
+                       [ 1.073e+00 -1.708e+00 ... -1.075e+00  9.150e-01]
+                       ...
+                       [ 1.922e+00  7.773e-01 ... -1.187e+00 -1.805e+00]
+                       [-7.132e-01  4.087e-01 ... -1.815e+00  2.353e-01]]
+ population_energies: [ 2.067e-01  2.392e-01 ...  2.599e-01  2.871e-01]
+</pre></div></div>
+</div>
+</section>
+<section id="QPUCircuitMapper">
+<h2>QPUCircuitMapper<a class="headerlink" href="#QPUCircuitMapper" title="Link to this heading"></a></h2>
+<p>In this case, instead of using the parameter update feature, it creates a circuit each time the mapper is called. But, as it can be seen, the employment of this mapper and the previous one is analogous.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span> <span class="o">=</span> <span class="n">QPUCircuitMapper</span><span class="p">(</span><span class="n">qpus</span><span class="p">,</span> <span class="n">ansatz</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">callback2</span><span class="p">,</span> <span class="n">energies2</span> <span class="o">=</span> <span class="n">make_callback</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span>
+<span class="n">result2</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span>
+                                <span class="n">bounds</span><span class="p">,</span>
+                                <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+                                <span class="n">workers</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">,</span>
+                                <span class="n">updating</span> <span class="o">=</span> <span class="s1">&#39;deferred&#39;</span><span class="p">,</span>
+                                <span class="n">strategy</span> <span class="o">=</span> <span class="s1">&#39;best1bin&#39;</span><span class="p">,</span>
+                                <span class="n">init</span> <span class="o">=</span> <span class="n">pop</span><span class="p">,</span>
+                                <span class="n">polish</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                <span class="n">callback</span><span class="o">=</span><span class="n">callback2</span>
+                               <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+             message: Maximum number of iterations has been exceeded.
+             success: False
+                 fun: 0.15722812798087116
+                   x: [ 2.837e-01 -2.515e+00 ...  1.825e+00  2.464e+00]
+                 nit: 1000
+                nfev: 36036
+          population: [[ 2.837e-01 -2.515e+00 ...  1.825e+00  2.464e+00]
+                       [-1.629e-01 -2.074e+00 ...  1.720e+00  1.163e+00]
+                       ...
+                       [-5.258e-01 -3.135e+00 ...  1.901e+00  2.088e+00]
+                       [-1.350e+00 -2.727e+00 ...  1.458e+00  2.012e+00]]
+ population_energies: [ 1.572e-01  2.595e-01 ...  2.511e-01  2.468e-01]
+</pre></div></div>
+</div>
+<section id="Comparison-between-QJobMapper-and-QPUCircuitMapper">
+<h3>Comparison between QJobMapper and QPUCircuitMapper<a class="headerlink" href="#Comparison-between-QJobMapper-and-QPUCircuitMapper" title="Link to this heading"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">result1</span><span class="o">.</span><span class="n">nit</span><span class="p">,</span> <span class="n">result1</span><span class="o">.</span><span class="n">nit</span><span class="p">),</span> <span class="n">energies1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (QJobMapper)&quot;</span><span class="p">)</span>
+<span class="n">upper_bound</span> <span class="o">=</span> <span class="n">result1</span><span class="o">.</span><span class="n">nit</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">result2</span><span class="o">.</span><span class="n">nit</span><span class="p">,</span> <span class="n">result2</span><span class="o">.</span><span class="n">nit</span><span class="p">),</span> <span class="n">energies2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimization path (QPUCircuitMapper)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">),</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cost&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n = </span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">, l = </span><span class="si">{</span><span class="n">num_layers</span><span class="si">}</span><span class="s2">, # params = </span><span class="si">{</span><span class="n">num_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/further_examples_notebooks_Optimizers_II_mapping_15_0.png" src="../../_images/further_examples_notebooks_Optimizers_II_mapping_15_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Removed job(s) with ID(s): <span class="ansi-green-intense-fg ansi-bold">377561 </span>
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: Paralelization of expectation value terms</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: Paralelization for gradient optimizers</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Optimizers_I_upgrading_parameters.html" class="btn btn-neutral float-left" title="Using the parameters update functionality" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Result_statistics.html" class="btn btn-neutral float-right" title="Result Statistics in CUNQA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

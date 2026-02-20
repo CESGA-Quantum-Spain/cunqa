@@ -1,6 +1,0 @@
-cunqa.circuit.circuit.get\_module
-=================================
-
-.. currentmodule:: cunqa.circuit.circuit
-
-.. autofunction:: get_module

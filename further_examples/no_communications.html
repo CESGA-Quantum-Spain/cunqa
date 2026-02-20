@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No-communications scheme &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-gallery.css?v=26227f6e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example for execution of multiple circuits in QPUs" href="notebooks/Multiple_circuits_execution.html" />
+    <link rel="prev" title="Further examples" href="further_examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="further_examples.html">Further Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">   No-communications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ideal-execution">Ideal execution</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/Multiple_circuits_execution.html">Example for execution of multiple circuits in QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/Optimizers_I_upgrading_parameters.html">Using the parameters update functionality</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/Optimizers_II_mapping.html">Paralelization for gradient-free optimizers: Differential Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/Result_statistics.html">Result Statistics in CUNQA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#noisy-execution">Noisy execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classical_communications.html">   Classical-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantum_communications.html">   Quantum-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json_examples/json_examples.html">   Raw JSON examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="further_examples.html">Further examples</a></li>
+      <li class="breadcrumb-item active">No-communications scheme</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/further_examples/no_communications.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="no-communications-scheme">
+<h1>No-communications scheme<a class="headerlink" href="#no-communications-scheme" title="Link to this heading"></a></h1>
+<section id="ideal-execution">
+<h2>Ideal execution<a class="headerlink" href="#ideal-execution" title="Link to this heading"></a></h2>
+<p>Let’s showcase here more advanced examples of the no-communication model that showcase a more complex
+use of CUNQA than the one displayed in the <a class="reference internal" href="../cunqa_overview/embarrassingly_parallel.html"><span class="doc">Embarrassingly Parallel</span></a> section.</p>
+<div class="toctree-wrapper compound">
+<div class="nbsphinx-gallery">
+<a class="reference internal" href="notebooks/Multiple_circuits_execution.html">
+  <div><img alt="" src="../_images/further_examples_notebooks_Multiple_circuits_execution_10_0.png"></div>
+  <div>Example for execution of multiple circuits in QPUs</div>
+</a>
+</div>
+</div>
+<p>For optimization algorithms, the <a class="reference internal" href="../reference/api/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mappers</span></code></a> submodule and the
+<a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method of the the <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> were
+developed. The usage of these two features can be seen in the following examples.</p>
+<div class="toctree-wrapper compound">
+<div class="nbsphinx-gallery">
+<a class="reference internal" href="notebooks/Optimizers_I_upgrading_parameters.html">
+  <div><img alt="" src="../_images/further_examples_notebooks_Optimizers_I_upgrading_parameters_21_0.png"></div>
+  <div>Using the parameters update functionality</div>
+</a>
+<a class="reference internal" href="notebooks/Optimizers_II_mapping.html">
+  <div><img alt="" src="../_images/further_examples_notebooks_Optimizers_II_mapping_15_0.png"></div>
+  <div>Paralelization for gradient-free optimizers: Differential Evolution</div>
+</a>
+</div>
+</div>
+<p>The following example shows how to obtain different statistics from <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> results:</p>
+<div class="toctree-wrapper compound">
+<div class="nbsphinx-gallery">
+<a class="reference internal" href="notebooks/Result_statistics.html">
+  <div><img alt="" src="../_images/further_examples_notebooks_Result_statistics_27_1.png"></div>
+  <div>Result Statistics in CUNQA</div>
+</a>
+</div>
+</div>
+<p>Finally, we present an example of the local <a class="reference external" href="https://arxiv.org/abs/quant-ph/0610214">iterative QPE</a>, so that the results obtained can be compared with the ones in <a class="reference internal" href="classical_communications.html"><span class="doc">Classical-communications scheme</span></a> and <a class="reference internal" href="quantum_communications.html"><span class="doc">Quantum-communications scheme</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>  
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">qdrop</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># 1. Circuit design</span>
+<span class="n">parametric_circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">rx</span><span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">rx</span><span class="p">(</span><span class="s2">&quot;x2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+
+<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">10</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
+<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mi">5</span> 
+<span class="n">SHOTS</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">BIT_PRECISION</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>                   <span class="c1"># Set seed for reproducibility</span>
+
+
+<span class="c1"># Parameters initial values</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># 1. Deploy vQPUs</span>
+    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Munich&quot;</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
+
+    
+    <span class="n">measure</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">BIT_PRECISION</span><span class="p">):</span>
+
+        <span class="c1"># 2. Circuit design</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">BIT_PRECISION</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+
+        <span class="n">phase</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">measure</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">phase</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="n">i</span><span class="p">)))</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">phase</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="n">power</span> <span class="o">*</span> <span class="n">theta</span><span class="p">,</span> 
+            <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="n">phase</span><span class="p">,</span> 
+            <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> 
+            <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2</span>
+        <span class="p">}</span>
+        
+        <span class="c1"># 3. Execution </span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">parametric_circuit</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="n">k</span><span class="o">%</span><span class="mi">10</span><span class="p">],</span> <span class="n">params</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">SEED</span><span class="p">)</span><span class="o">.</span><span class="n">result</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+
+        <span class="n">zeros</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">measure</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">zeros</span> <span class="o">&gt;</span> <span class="n">ones</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span> 
+                
+
+    <span class="c1"># 4. Post processing results</span>
+    <span class="n">estimation</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">measure</span><span class="p">):</span>
+        <span class="n">estimation</span> <span class="o">=</span> <span class="n">estimation</span> <span class="o">+</span> <span class="p">(</span><span class="n">l</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">BIT_PRECISION</span> <span class="o">-</span> <span class="n">j</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated angle: </span><span class="si">{</span><span class="n">estimation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+    <span class="c1"># 5. Release resources</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">error</span>
+</pre></div>
+</div>
+</section>
+<section id="noisy-execution">
+<h2>Noisy execution<a class="headerlink" href="#noisy-execution" title="Link to this heading"></a></h2>
+<p>The program scheme does not change one bit with the existing of noise in the vQPUs. It just changes
+the way these vQPUs are deployed, because they need to receive the path a JSON specifying the noise
+model properties.</p>
+<p>To do this, as it was explained in <a class="reference internal" href="../cunqa_overview/cunqa_overview.html"><span class="doc">CUNQA overview</span></a>, the
+<a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or its Python function counterpart
+<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> have to be employed with the flag <cite>noise-properties</cite>, in the first
+case, and with the argument <cite>noise_properties_path</cite>, in the second; with both being the path
+to a noise properties JSON file. The format of this JSON file is shown in
+<a class="reference internal" href="json_examples/noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>.</p>
+<div class="tab-set docutils">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--1">Bash command</label><div class="tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>-t<span class="w"> </span><span class="m">01</span>:00:00<span class="w"> </span>--co-located<span class="w"> </span>--noise-properties<span class="o">=</span><span class="s2">&quot;complete/path/to/noise.json&quot;</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--2">Python function</label><div class="tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">noise_properties_path</span><span class="o">=</span><span class="s2">&quot;complete/path/to/noise.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Moreover, as also described in <a class="reference internal" href="../cunqa_overview/cunqa_overview.html"><span class="doc">CUNQA overview</span></a>, it is possible to deploy a
+vQPU configured with the noise model of <a class="reference external" href="https://www.cesga.es/infraestructuras/cuantica/">CESGA’s QMIO quantum computer</a>,
+provided that CUNQA is running within the CESGA infrastructure. This setup can be enabled by using
+the <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> option in the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or by passing the
+<code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument to the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> Python function.</p>
+<div class="tab-set docutils">
+<input checked="True" class="tab-input" id="tab-set--1-input--1" name="tab-set--1" type="radio" /><label class="tab-label" for="tab-set--1-input--1">Bash command</label><div class="tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>-t<span class="w"> </span><span class="m">01</span>:00:00<span class="w"> </span>--co-located<span class="w"> </span>--fakeqmio
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--1-input--2" name="tab-set--1" type="radio" /><label class="tab-label" for="tab-set--1-input--2">Python function</label><div class="tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fakeqmio</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="further_examples.html" class="btn btn-neutral float-left" title="Further examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="notebooks/Multiple_circuits_execution.html" class="btn btn-neutral float-right" title="Example for execution of multiple circuits in QPUs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

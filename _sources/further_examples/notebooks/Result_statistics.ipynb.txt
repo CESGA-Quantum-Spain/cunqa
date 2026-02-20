@@ -1,0 +1,792 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "fee3e87c",
+   "metadata": {},
+   "source": [
+    "# Result Statistics in CUNQA"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4f23736d",
+   "metadata": {},
+   "source": [
+    "Accessing intermediate quantum states and measurement statistics is essential when developing and validating quantum algorithms. Being able to inspect the full state evolution and extract flexible probability representations allows deeper debugging, subsystem analysis, and verification of simulation methods within CUNQA."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ce3e0f6c",
+   "metadata": {},
+   "source": [
+    "First we must start by importing the neccessary functions and deploying the needed vQPUs. Note that the instructions introduced in this notebook are supported only by Aer simulator as of now."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "d4e46f6b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requested QPUs with command:\n",
+      "\tqraise -n 3 -t 00:30:00 --co-located\n",
+      "QPUs ready to work ✅\n",
+      "\n",
+      "QPU properties: \n",
+      "\t id: 379049_781905, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.\n",
+      "\n",
+      "QPU properties: \n",
+      "\t id: 379049_781906, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.\n",
+      "\n",
+      "QPU properties: \n",
+      "\t id: 379049_781907, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.\n"
+     ]
+    }
+   ],
+   "source": [
+    "import os, sys\n",
+    "import numpy as np\n",
+    "import math\n",
+    "\n",
+    "# In order to import cunqa, we append to the search path the cunqa installation path\n",
+    "sys.path.append(os.getenv(\"HOME\")) # HOME as install path is specific to CESGA\n",
+    "\n",
+    "from cunqa.circuit import CunqaCircuit\n",
+    "from cunqa.qpu import qraise, get_QPUs, run, qdrop\n",
+    "\n",
+    "# Auxiliar functions to print statevectors, density matrices and probability distributions\n",
+    "\n",
+    "def display_state(obj, decimals=6, tol=1e-12):\n",
+    "    arr = np.array(obj)\n",
+    "\n",
+    "    # Remove singleton dimensions (e.g. (4,1) or (4,4,1))\n",
+    "    arr = np.squeeze(arr)\n",
+    "\n",
+    "    # If it is a column vector, flatten it\n",
+    "    if arr.ndim == 2 and arr.shape[1] == 1:\n",
+    "        arr = arr.flatten()\n",
+    "\n",
+    "    # Remove very small numerical noise\n",
+    "    arr[np.abs(arr) < tol] = 0\n",
+    "\n",
+    "    return np.round(arr, decimals)\n",
+    "\n",
+    "def display_probabilities(probs, decimals=6, tol=1e-12):\n",
+    "    # Probabilities in the computational basis\n",
+    "\n",
+    "    probs = np.array(probs).copy()\n",
+    "    probs[np.abs(probs) < tol] = 0\n",
+    "    probs = np.round(probs, decimals)\n",
+    "\n",
+    "    num_qubits = int(math.log2(len(probs)))\n",
+    "\n",
+    "    print(\"State  |  Probability\")\n",
+    "    print(\"-\" * 24)\n",
+    "\n",
+    "    for i, p in enumerate(probs):\n",
+    "        bitstring = format(i, f\"0{num_qubits}b\")\n",
+    "        print(f\"|{bitstring}>  |  {p}\")\n",
+    "\n",
+    "\n",
+    "def display_per_qubit_probabilities(probs, decimals=6, tol=1e-12):\n",
+    "    probs = np.array(probs).copy()\n",
+    "    probs[np.abs(probs) < tol] = 0\n",
+    "    probs = np.round(probs, decimals)\n",
+    "\n",
+    "    print(\"Qubit  |  P(0)     P(1)\")\n",
+    "    print(\"-\" * 28)\n",
+    "    for i, (p0, p1) in enumerate(probs):\n",
+    "        print(f\"q{i}     |  {p0:<8} {p1}\")\n",
+    "\n",
+    "\n",
+    "def display_partial_probabilities(probs, partial=None, decimals=6, tol=1e-12):\n",
+    "\n",
+    "    print(\"State  |  Probability\")\n",
+    "    print(\"-\" * 24)\n",
+    "\n",
+    "    for bitstring, p in probs.items():\n",
+    "        if abs(p) < tol:\n",
+    "            p = 0\n",
+    "        p = round(p, decimals)\n",
+    "        print(f\"|{bitstring}>  |  {p}\")\n",
+    "\n",
+    "def display_partial_per_qubit_probabilities(probs, partial, decimals=6, tol=1e-12):\n",
+    "    probs = np.array(probs).copy()\n",
+    "    probs[np.abs(probs) < tol] = 0\n",
+    "    probs = np.round(probs, decimals)\n",
+    "\n",
+    "    print(f\"Qubit  |  P(0)     P(1)\")\n",
+    "    print(\"-\" * 28)\n",
+    "    for idx, (p0, p1) in zip(partial, probs):\n",
+    "        print(f\"q{idx}     |  {p0:<8} {p1}\")\n",
+    "\n",
+    "family = qraise(3, \"00:30:00\", co_located = True) #Important: Aer simulator\n",
+    "qpus   = get_QPUs(co_located = True)\n",
+    "\n",
+    "for qpu in qpus:\n",
+    "    print(f\"\\nQPU properties: \\n\\t id: {qpu.id}, backend: {qpu.backend['name']}, simulator: {qpu.backend['simulator']}, version: {qpu.backend['version']}.\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3626fa8e",
+   "metadata": {},
+   "source": [
+    "## Saving Quantum States\n",
+    "\n",
+    "CUNQA allows saving the quantum state during circuit execution using `save_state()` method at `CunqaCircuit`. The object returned depends on the simulation method used at runtime. When executed with the statevector method, the saved object corresponds to the full statevector. When executed with the density matrix method, the returned object represents the density matrix of the system.\n",
+    "\n",
+    "This enables inspecting the exact quantum state before measurement collapses it and allows comparing different physical simulation models without modifying the circuit definition."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f307c0e5",
+   "metadata": {},
+   "source": [
+    "We construct a simple test circuit to illustrate how states can be saved during execution:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "164789aa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "circ = CunqaCircuit(3)\n",
+    "circ.h(0)\n",
+    "circ.cx(0, 1)\n",
+    "circ.rz(np.pi/4, 2)\n",
+    "\n",
+    "# Saves the state. The state depends on the simulation method: it can be statevector, density matrix, ...\n",
+    "circ.save_state() \n",
+    "\n",
+    "circ.measure_all()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9b54fe4b",
+   "metadata": {},
+   "source": [
+    "It is important so include such instruction **before** measurements so the state does not collapse to the computational basis and we can recover all the information in the other bases."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "033ee157",
+   "metadata": {},
+   "source": [
+    "Now we execute the circuit with different simulation methods:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "767f734e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "qjob_vec     = run(circ, qpus[-1], method=\"statevector\")\n",
+    "qjob_densmat = run(circ, qpus[-2], method=\"density_matrix\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "156a287c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "We obtained the statevector \n",
+      "[0.653281-0.270598j 0.      +0.j       0.      +0.j\n",
+      " 0.653281-0.270598j 0.      +0.j       0.      +0.j\n",
+      " 0.      +0.j       0.      +0.j      ] \n",
+      "\n",
+      "and the density matrix \n",
+      "[[0.5+0.j 0. +0.j 0. +0.j 0.5+0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0.5+0.j 0. +0.j 0. +0.j 0.5+0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]\n",
+      " [0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j 0. +0.j]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "statevec = qjob_vec.result.statevector\n",
+    "densmat  = qjob_densmat.result.density_matrix\n",
+    "\n",
+    "print(f\"\\nWe obtained the statevector \\n{display_state(statevec)} \\n\\nand the density matrix \\n{display_state(densmat)}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7c542142",
+   "metadata": {},
+   "source": [
+    "Here we see both results corresponding to the same state but different representation."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c49f7ba6",
+   "metadata": {},
+   "source": [
+    "### Saving States at Multiple Points"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "12e93f44",
+   "metadata": {},
+   "source": [
+    "CUNQA supports saving the state at multiple points within the same circuit. When more than one state is stored, each call to `save_state()` must include a unique label. If two saved states share the same label, an error will be raised."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f2b8649f",
+   "metadata": {},
+   "source": [
+    "Now we construct a circuit that prepares a Bell pair state and then applies additional unitaries to modify it. Both the prepared Bell pair and the final state are extracted."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b36795d1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "circ_sev = CunqaCircuit(2)\n",
+    "circ.h(0)\n",
+    "circ.cx(0, 1)\n",
+    "\n",
+    "# First save_state instructin\n",
+    "circ_sev.save_state(label=\"After Bell pair\")\n",
+    "\n",
+    "circ.rxx(np.pi/6, 0, 1)\n",
+    "circ.rz(np.pi/4, 0)\n",
+    "\n",
+    "# Second save_state instruction\n",
+    "circ_sev.save_state(label=\"Final state\")\n",
+    "\n",
+    "circ_sev.measure_all()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "14b4027a",
+   "metadata": {},
+   "source": [
+    "Once again, they will be executed via both simulation methods:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0d546e09",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "qjob_vec_sev     = run(circ_sev, qpus[-1], method=\"statevector\")\n",
+    "qjob_densmat_sev = run(circ_sev, qpus[-2], method=\"density_matrix\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "75d6ea1f",
+   "metadata": {},
+   "source": [
+    "When multiple states are saved, the result object returns a dictionary whose keys correspond to the provided labels and whose values correspond to the quantum states at those specific points in the circuit:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fc882a29",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Statevectors:\n",
+      "After Bell pair:\n",
+      "[1.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      "\n",
+      "Final state:\n",
+      "[1.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      "\n",
+      "Density matrices:\n",
+      "After Bell pair:\n",
+      "[[1.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]]\n",
+      "\n",
+      "Final state:\n",
+      "[[1.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]\n",
+      " [0.+0.j 0.+0.j 0.+0.j 0.+0.j]]\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "statevecs_dict = qjob_vec_sev.result.statevector\n",
+    "densmats_dict  = qjob_densmat_sev.result.density_matrix\n",
+    "\n",
+    "print(\"\\nStatevectors:\")\n",
+    "for label, state in statevecs_dict.items():\n",
+    "    print(f\"{label}:\\n{display_state(state)}\\n\")\n",
+    "\n",
+    "print(\"Density matrices:\")\n",
+    "for label, state in densmats_dict.items():\n",
+    "    print(f\"{label}:\\n{display_state(state)}\\n\")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d6057fa5",
+   "metadata": {},
+   "source": [
+    "This functionality is especially useful for analyzing intermediate entanglement, debugging circuit evolution, and studying the dynamics of parametrized or variational circuits."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ee1cb5d9",
+   "metadata": {},
+   "source": [
+    "## Extracting Probabilities"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f8525846",
+   "metadata": {},
+   "source": [
+    "Probabilities can be extracted directly from the `Result` object of a `QJob`.\n",
+    "\n",
+    "If a state has been saved during execution, probabilities are computed exactly from that state. Otherwise, probabilities are estimated from measurement counts obtained after sampling.\n",
+    "\n",
+    "Let us compare the probabilities extracted on the three ways (from statevector, from density matrix or estimated from counts)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fb000d49",
+   "metadata": {},
+   "source": [
+    "We recover the example used in the previous section but without the `save_state()` instruction:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "0ee87e93",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "circ_no_state = CunqaCircuit(3)\n",
+    "\n",
+    "circ_no_state.h(0)\n",
+    "circ_no_state.cx(0, 1)\n",
+    "circ_no_state.rz(np.pi/4, 2)\n",
+    "\n",
+    "circ_no_state.measure_all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "fc93b007",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[33m\twarning: [qjob.py] No run parameters provided, default were set.\n",
+      "\u001b[0m\n"
+     ]
+    }
+   ],
+   "source": [
+    "qjob_sampling = run(circ_no_state, qpus[-3])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "63e669b9",
+   "metadata": {},
+   "source": [
+    "Now we can compare its output with the ones obtained before:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "18c9c2a2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Statevector probabilities:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|000>  |  0.5\n",
+      "|001>  |  0.0\n",
+      "|010>  |  0.0\n",
+      "|011>  |  0.5\n",
+      "|100>  |  0.0\n",
+      "|101>  |  0.0\n",
+      "|110>  |  0.0\n",
+      "|111>  |  0.0\n",
+      "\n",
+      "Density matrix probabilities:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|000>  |  0.5\n",
+      "|001>  |  0.0\n",
+      "|010>  |  0.0\n",
+      "|011>  |  0.5\n",
+      "|100>  |  0.0\n",
+      "|101>  |  0.0\n",
+      "|110>  |  0.0\n",
+      "|111>  |  0.0\n",
+      "\n",
+      "Sampling probabilities:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|000>  |  0.475586\n",
+      "|001>  |  0.0\n",
+      "|010>  |  0.0\n",
+      "|011>  |  0.524414\n",
+      "|100>  |  0.0\n",
+      "|101>  |  0.0\n",
+      "|110>  |  0.0\n",
+      "|111>  |  0.0\n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "probs_vec      = qjob_vec.result.probabilities()\n",
+    "probs_densmat  = qjob_densmat.result.probabilities()\n",
+    "probs_sampling = qjob_sampling.result.probabilities()\n",
+    "\n",
+    "print(\"\\nStatevector probabilities:\")\n",
+    "display_probabilities(probs_vec)\n",
+    "\n",
+    "print(\"\\nDensity matrix probabilities:\")\n",
+    "display_probabilities(probs_densmat)\n",
+    "\n",
+    "print(\"\\nSampling probabilities:\")\n",
+    "display_probabilities(probs_sampling)\n",
+    "\n",
+    "\n",
+    "import matplotlib.pyplot as plt\n",
+    "%matplotlib inline\n",
+    "n = len(probs_vec)\n",
+    "plt.figure()\n",
+    "plt.bar(np.arange(n) - 0.25, np.array(probs_vec), width=0.25, label=\"Statevector\")\n",
+    "plt.bar(np.arange(n), np.array(probs_densmat), width=0.25, label=\"Density Matrix\")\n",
+    "plt.bar(np.arange(n) + 0.25, np.array(probs_sampling), width=0.25, label=\"Sampling\")\n",
+    "\n",
+    "plt.grid(True)\n",
+    "plt.xlabel(\"Computational basis state index\")\n",
+    "plt.ylabel(\"Probability\")\n",
+    "plt.legend()\n",
+    "\n",
+    "plt.show()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "90281d71",
+   "metadata": {},
+   "source": [
+    "By default, probabilities correspond to full computational basis bitstrings and are ordered in ascending binary order. This makes it possible to directly compare exact probabilities obtained from the statevector or density matrix with sampling-based estimates."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8dd7162e",
+   "metadata": {},
+   "source": [
+    "### Per-Qubit Probabilities\n",
+    "Instead of full bitstring probabilities, it is often useful to compute marginal probabilities per qubit.\n",
+    "\n",
+    "In this case, by setting `per_qubit = True` the output provides the probability of measuring `0` and `1` for each individual qubit. Correlations between qubits are not preserved in this representation, since each qubit is considered independently.\n",
+    "\n",
+    "Per-qubit probabilities are useful for studying local observables, identifying bias or noise effects, and analyzing single-qubit behavior without focusing on global correlations."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "004a7669",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Per qubit probabilities with statevector:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.5      0.5\n",
+      "q1     |  0.5      0.5\n",
+      "q2     |  1.0      0.0\n",
+      "\n",
+      "Per qubit probabilities with density_matrix:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.5      0.5\n",
+      "q1     |  0.5      0.5\n",
+      "q2     |  1.0      0.0\n",
+      "\n",
+      "Per qubit probabilities with sampling:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.475586 0.524414\n",
+      "q1     |  0.475586 0.524414\n",
+      "q2     |  1.0      0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"\\nPer qubit probabilities with statevector:\")\n",
+    "display_per_qubit_probabilities(\n",
+    "    qjob_vec.result.probabilities(per_qubit=True)\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPer qubit probabilities with density_matrix:\")\n",
+    "display_per_qubit_probabilities(\n",
+    "    qjob_densmat.result.probabilities(per_qubit=True)\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPer qubit probabilities with sampling:\")\n",
+    "display_per_qubit_probabilities(\n",
+    "    qjob_sampling.result.probabilities(per_qubit=True)\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6910f74e",
+   "metadata": {},
+   "source": [
+    "### Partial Probabilities (Subsystem Marginalization)\n",
+    "\n",
+    "In many circuits, not all qubits are relevant for the final observable. Ancilla qubits or auxiliary registers may be introduced temporarily and should not appear in the final statistics.\n",
+    "\n",
+    "CUNQA allows marginalization over a selected subset of qubits. When using this option, bitstrings are reduced to the chosen indices, and the remaining qubits are marginalized out. The resulting probabilities correspond only to the subsystem of interest.\n",
+    "\n",
+    "This provides a convenient way to discard ancillas, analyze subsystems, and extract reduced statistics from larger circuits."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "51ce7e6e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Partial [0, 1] probabilities with statevector:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|00>  |  0.5\n",
+      "|01>  |  0\n",
+      "|10>  |  0\n",
+      "|11>  |  0.5\n",
+      "\n",
+      "Partial [0, 1] probabilities with density_matrix:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|00>  |  0.5\n",
+      "|01>  |  0\n",
+      "|10>  |  0\n",
+      "|11>  |  0.5\n",
+      "\n",
+      "Partial [0, 1] probabilities with sampling:\n",
+      "State  |  Probability\n",
+      "------------------------\n",
+      "|00>  |  0.475586\n",
+      "|01>  |  0\n",
+      "|10>  |  0\n",
+      "|11>  |  0.524414\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"\\nPartial [0, 1] probabilities with statevector:\")\n",
+    "display_partial_probabilities(\n",
+    "    qjob_vec.result.probabilities(partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPartial [0, 1] probabilities with density_matrix:\")\n",
+    "display_partial_probabilities(\n",
+    "    qjob_densmat.result.probabilities(partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPartial [0, 1] probabilities with sampling:\")\n",
+    "display_partial_probabilities(\n",
+    "    qjob_sampling.result.probabilities(partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aea99043",
+   "metadata": {},
+   "source": [
+    "### Combining Partial and Per-Qubit Options\n",
+    "\n",
+    "Both marginalization over selected qubits and per-qubit probabilities can be combined. In this case, the output provides marginal single-qubit probabilities restricted to the chosen subset.\n",
+    "\n",
+    "This allows flexible post-processing of measurement data and supports detailed subsystem analysis within CUNQA workflows."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "c46fdd55",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Partial [0, 1] per qubit probabilities with statevector:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.5      0.5\n",
+      "q1     |  0.5      0.5\n",
+      "\n",
+      "Partial [0, 1] per qubit probabilities with density_matrix:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.5      0.5\n",
+      "q1     |  0.5      0.5\n",
+      "\n",
+      "Partial [0, 1] per qubit probabilities with sampling:\n",
+      "Qubit  |  P(0)     P(1)\n",
+      "----------------------------\n",
+      "q0     |  0.475586 0.524414\n",
+      "q1     |  0.475586 0.524414\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"\\nPartial [0, 1] per qubit probabilities with statevector:\")\n",
+    "display_partial_per_qubit_probabilities(\n",
+    "    qjob_vec.result.probabilities(per_qubit=True, partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPartial [0, 1] per qubit probabilities with density_matrix:\")\n",
+    "display_partial_per_qubit_probabilities(\n",
+    "    qjob_densmat.result.probabilities(per_qubit=True, partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n",
+    "\n",
+    "print(\"\\nPartial [0, 1] per qubit probabilities with sampling:\")\n",
+    "display_partial_per_qubit_probabilities(\n",
+    "    qjob_sampling.result.probabilities(per_qubit=True, partial=[0, 1]),\n",
+    "    partial=[0, 1]\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f340f62c",
+   "metadata": {},
+   "source": [
+    "We demonstrated how CUNQA allows saving quantum states at different stages of a circuit and retrieving them under different simulation methods. We also showed how to extract probabilities in flexible ways, including per bitstring, per qubit, and over selected subsets of qubits.\n",
+    "\n",
+    "Finally, once execution is complete, `qdrop` must be called to properly release the allocated classical resources."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "cbbd34b9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Removed job(s) with ID(s): \u001b[1;32m379049 \u001b[0m\n"
+     ]
+    }
+   ],
+   "source": [
+    "qdrop(family)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

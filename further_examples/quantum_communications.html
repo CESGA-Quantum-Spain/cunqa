@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum-communications scheme &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Raw JSON examples" href="json_examples/json_examples.html" />
+    <link rel="prev" title="Classical-communications scheme" href="classical_communications.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="further_examples.html">Further Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="no_communications.html">   No-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classical_communications.html">   Classical-communications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">   Quantum-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json_examples/json_examples.html">   Raw JSON examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="further_examples.html">Further examples</a></li>
+      <li class="breadcrumb-item active">Quantum-communications scheme</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/further_examples/quantum_communications.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quantum-communications-scheme">
+<h1>Quantum-communications scheme<a class="headerlink" href="#quantum-communications-scheme" title="Link to this heading"></a></h1>
+<p>The quantum-communications directives, together with simple examples, are explained in the <a class="reference internal" href="../cunqa_overview/quantum_comm.html"><span class="doc">Quantum Communication</span></a> section.
+This section will present a couple of examples are presented to highlight the use of quantum communications.</p>
+<p>In this first example we present an example of distributed QPE, so that the results obtained can be compared with the ones in <a class="reference internal" href="no_communications.html"><span class="doc">No-communications scheme</span></a> and <a class="reference internal" href="classical_communications.html"><span class="doc">Classical-communications scheme</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Code implementing a simple distribution variant of the QPE algorithm. </span>
+<span class="sd">We use the telegate protocol to apply gates on a circuit that has the eigenvector from a circuit where the bits of the phase will be measured.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+
+<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CORES_PER_QPU</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MEM_PER_QPU</span> <span class="o">=</span> <span class="mi">60</span> <span class="c1"># in GB</span>
+<span class="n">N_ANCILLA_QUBITS</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">N_REGISTER_QUBITS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="mi">12</span>
+
+<span class="n">shots</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># 1. Deploy vQPUs</span>
+    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;10:00:00&quot;</span><span class="p">,</span> 
+                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
+                    <span class="n">quantum_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+                    <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+                    <span class="n">cores</span> <span class="o">=</span> <span class="n">CORES_PER_QPU</span><span class="p">,</span> 
+                    <span class="n">mem_per_qpu</span> <span class="o">=</span> <span class="n">MEM_PER_QPU</span><span class="p">)</span>
+    <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
+
+    <span class="c1"># 2. Design circuits modelling the QPE </span>
+    <span class="n">ancilla_circuit</span>  <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;ancilla_circuit&quot;</span><span class="p">)</span>
+    <span class="n">register_circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">N_REGISTER_QUBITS</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;register_circuit&quot;</span><span class="p">)</span>
+
+    <span class="n">register_circuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Rz statevector</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">):</span>
+        <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">):</span>
+        <span class="c1">### TELEGATE ###</span>
+        <span class="k">with</span> <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">register_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">):</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span>
+            <span class="n">subcircuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">rqubit</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Swap qubits</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">swap_range</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">swap_range</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">swap_range</span><span class="p">):</span>
+        <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">swap</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+
+    <span class="c1"># QFT dagger</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">angle</span>  <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">))</span> 
+            <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+
+    <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+
+    <span class="c1"># 3. Execute distributed QPE circuit on communicated QPUs</span>
+    <span class="n">distr_jobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">ancilla_circuit</span><span class="p">,</span> <span class="n">register_circuit</span><span class="p">],</span> <span class="n">qpus</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span>
+    <span class="n">result_list</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">distr_jobs</span><span class="p">)</span>
+    
+
+    <span class="c1"># 4. Post-processing results to extract estimated phase </span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">counts</span>
+
+    <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Most frequent output is </span><span class="si">{</span><span class="n">most_frequent_output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">estimated_theta</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">digit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">most_frequent_output</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">digit</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">estimated_theta</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span>
+
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated angle: </span><span class="si">{</span><span class="n">estimated_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 5. Drop the deployed QPUs </span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="c1"># 5. Release resources even if an error is raised</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">error</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classical_communications.html" class="btn btn-neutral float-left" title="Classical-communications scheme" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="json_examples/json_examples.html" class="btn btn-neutral float-right" title="Raw JSON examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

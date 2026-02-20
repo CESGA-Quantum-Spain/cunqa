@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cunqa.qpu &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cunqa.qjob" href="cunqa.qjob.html" />
+    <link rel="prev" title="qinfo" href="../commands/qinfo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qpu</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qpu.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qpu.QPU"><code class="docutils literal notranslate"><span class="pre">QPU</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#obtain-vqpus-and-send-jobs">Obtain vQPUs and send jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#commands-adapted-to-python">Commands adapted to Python</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+      <li class="breadcrumb-item active">cunqa.qpu</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/cunqa.qpu.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cunqa.qpu">
+<span id="cunqa-qpu"></span><h1>cunqa.qpu<a class="headerlink" href="#module-cunqa.qpu" title="Link to this heading"></a></h1>
+<p>Mainly contains the <a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class and the functions to manage the virtual QPUs
+(vQPUs). The <a class="reference internal" href="#cunqa.qpu.Backend" title="cunqa.qpu.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> class is dependent on the <a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a>
+class in the sense that the former is used to hold the features of the vQPU. Additionally, there
+are four functions: <a class="reference internal" href="#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>, <a class="reference internal" href="#cunqa.qpu.qdrop" title="cunqa.qpu.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop</span></code></a>,
+<a class="reference internal" href="#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a>, and <a class="reference internal" href="#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a>. We can divide this group of functions
+into two subgroups:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> and <a class="reference internal" href="#cunqa.qpu.qdrop" title="cunqa.qpu.qdrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">qdrop</span></code></a>, which are adaptations of the
+<code class="docutils literal notranslate"><span class="pre">qraise</span></code> and <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> bash commands to Python, respectively. This allows the use of these
+commands within the Python workflow.</p></li>
+<li><p><a class="reference internal" href="#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a> and <a class="reference internal" href="#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a>, which are responsible for
+creating the <a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the vQPUs and for sending
+quantum tasks to the specified vQPUs, respectively.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Backend</span></span><a class="headerlink" href="#cunqa.qpu.Backend" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.basis_gates">
+<span class="sig-name descname"><span class="pre">basis_gates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cunqa.qpu.Backend.basis_gates" title="Link to this definition"></a></dt>
+<dd><p>Native gates that the Backend accepts. If others are used, they must be translated into the native gates.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.coupling_map">
+<span class="sig-name descname"><span class="pre">coupling_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cunqa.qpu.Backend.coupling_map" title="Link to this definition"></a></dt>
+<dd><p>Defines the physical connectivity of the qubits, that is, which pairs are connected by two-qubit gates.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.custom_instructions">
+<span class="sig-name descname"><span class="pre">custom_instructions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.custom_instructions" title="Link to this definition"></a></dt>
+<dd><p>Any custom instructions that the Backend has defined.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.description" title="Link to this definition"></a></dt>
+<dd><p>Custom description of the Backend itself.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.gates">
+<span class="sig-name descname"><span class="pre">gates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cunqa.qpu.Backend.gates" title="Link to this definition"></a></dt>
+<dd><p>Specific gates supported.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.n_qubits">
+<span class="sig-name descname"><span class="pre">n_qubits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cunqa.qpu.Backend.n_qubits" title="Link to this definition"></a></dt>
+<dd><p>Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.name" title="Link to this definition"></a></dt>
+<dd><p>Name assigned to the Backend.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.noise_properties_path">
+<span class="sig-name descname"><span class="pre">noise_properties_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.noise_properties_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the noise model json file gathering the noise instructions needed for the simulator.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.simulator">
+<span class="sig-name descname"><span class="pre">simulator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.simulator" title="Link to this definition"></a></dt>
+<dd><p>Name of the simulator that simulates the circuits accordingly to the Backend.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.Backend.version">
+<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.Backend.version" title="Link to this definition"></a></dt>
+<dd><p>Version of the Backend.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.qpu.QPU">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.QPU" title="Link to this definition"></a></dt>
+<dd><p>Class that serves as representation of a vQPU for user interaction. This class contains the
+necessary data for connecting to the vQPU in order to send quantum tasks and obtain the results.
+This communication is performed through the <code class="xref py py-attr docutils literal notranslate"><span class="pre">QPU._qclient</span></code> attribute, which represents
+the connection between the Python and the C++ parts of CUNQA.</p>
+<p>The initialization of the class is normally done by the <a class="reference internal" href="#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>
+function, which loads the <cite>id</cite>, <cite>family</cite> and <cite>endpoint</cite>, and instanciates the <cite>backend</cite>
+objects. It could also be manually initialized by the user, but this is not recommended.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>)</p></li>
+<li><p><strong>backend</strong> (<a class="reference internal" href="#cunqa.qpu.Backend" title="cunqa.qpu.Backend"><em>Backend</em></a>)</p></li>
+<li><p><strong>device</strong> (<em>dict</em>)</p></li>
+<li><p><strong>family</strong> (<em>str</em>)</p></li>
+<li><p><strong>endpoint</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.QPU.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="w"> </span><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#cunqa.qpu.QPU.id" title="Link to this definition"></a></dt>
+<dd><p>ID string assigned to the object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.QPU.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><em class="property"><span class="w"> </span><span class="pre">:</span> <span class="pre">Backend</span></em><a class="headerlink" href="#cunqa.qpu.QPU.backend" title="Link to this definition"></a></dt>
+<dd><p>Object that provides the characteristics that the simulator at the vQPU uses to emulate a
+real device.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qpu.QPU.family">
+<span class="sig-name descname"><span class="pre">family</span></span><em class="property"><span class="w"> </span><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#cunqa.qpu.QPU.family" title="Link to this definition"></a></dt>
+<dd><p>Name of the family to which the corresponding vQPU belongs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="obtain-vqpus-and-send-jobs">
+<h2>Obtain vQPUs and send jobs<a class="headerlink" href="#obtain-vqpus-and-send-jobs" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.qpu.get_QPUs">
+<span class="sig-name descname"><span class="pre">get_QPUs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co_located</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.get_QPUs" title="Link to this definition"></a></dt>
+<dd><p>Returns <a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects corresponding to the vQPUs raised by the user. It
+will use the two args <cite>co_located</cite> and <cite>family</cite> to filter from all the QPUs available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>co_located</strong> (<em>bool</em>) – if <code class="docutils literal notranslate"><span class="pre">False</span></code>, filters by the vQPUs available at the local node.</p></li>
+<li><p><strong>family</strong> (<em>str</em>) – filters vQPUs by their family name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.qpu.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.run" title="Link to this definition"></a></dt>
+<dd><p>Function responsible of sending circuits to several vQPUs. Each circuit will be sent to each
+QPU in order, therefore, both lists should be the same size. If they are not, but the number of
+circuits is less than the numbers of QPUs, the circuit will get executed. In case the number of
+QPUs is less than the number of circuits an error will be raised. Usage example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit1</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>      <span class="c1"># Send bit 0 to circuit_2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">circuit2</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span> <span class="c1"># Receive bit from circuit_1 and apply a conditional x</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">],</span> <span class="n">qpus</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method will check if two circuits are related, i.e., if one of them was part of a
+transformation and the other is the result of a transformation. If this is true and a third
+circuit tries to communicate with them, an error will be raised. A detailed example can be
+seen in #TODO.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuits</strong> (<em>list</em><em>[</em><em>dict</em><em> | </em><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a><em> | </em><em>QuantumCircuit</em><em>] </em><em>| </em><em>dict</em><em> | </em><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a><em> | </em><em>QuantumCircuit</em>) – circuits to be run.</p></li>
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>] </em><em>| </em><a class="reference internal" href="#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a>) – QPU objects associated to the vQPUs in which
+the circuits want to be run.</p></li>
+<li><p><strong>param_values</strong> (<em>dict</em><em> | </em><em>list</em>) – either a list of ordered parameters to assign to the
+parametrized circuit or a dictionary with keys being the
+free parameters’ names and its values being its
+corresponding new values.</p></li>
+<li><p><strong>run_args</strong> (<em>Any</em>) – any other run arguments and parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><em>QJob</em></a>] | <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><em>QJob</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="commands-adapted-to-python">
+<h2>Commands adapted to Python<a class="headerlink" href="#commands-adapted-to-python" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.qpu.qraise">
+<span class="sig-name descname"><span class="pre">qraise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">classical_comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantum_comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_properties_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fakeqmio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co_located</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mem_per_qpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qpus_per_node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qmio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.qraise" title="Link to this definition"></a></dt>
+<dd><p>Raises vQPUs and returns the family name associated them. This function raises
+QPUs from the python API, which can also be done from terminal by <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – number of vQPUs to be raised.</p></li>
+<li><p><strong>t</strong> (<em>str</em>) – maximun time that the classical resources will be reserved for the job. Format:
+‘D-HH:MM:SS’.</p></li>
+<li><p><strong>classical_comm</strong> (<em>bool</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, vQPUs will allow classical communications.</p></li>
+<li><p><strong>quantum_comm</strong> (<em>bool</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, vQPUs will allow quantum communications.</p></li>
+<li><p><strong>simulator</strong> (<em>str</em>) – name of the desired simulator to use. Default is <a class="reference external" href="https://github.com/Qiskit/qiskit-aer">Aer</a>.</p></li>
+<li><p><strong>backend</strong> (<em>str</em>) – path to a file containing the backend information.</p></li>
+<li><p><strong>noise_properties_path</strong> (<em>str</em>) – Path to the noise properties json file, only supported for
+simulator Aer. Default: None</p></li>
+<li><p><strong>fakeqmio</strong> (<em>bool</em>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> for raising <cite>n</cite> vQPUs with FakeQmio backend. Only available
+at CESGA.</p></li>
+<li><p><strong>family</strong> (<em>str</em>) – name to identify the group of vQPUs raised.</p></li>
+<li><p><strong>co_located</strong> (<em>bool</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, <cite>co-located</cite> mode is set, otherwise <cite>hpc</cite> mode is set. In
+<cite>hpc</cite> mode, vQPUs can only be accessed from the node in which they
+are deployed. In <cite>co-located</cite> mode, they can be accessed from other
+nodes.</p></li>
+<li><p><strong>cores</strong> (<em>str</em>) – number of cores per vQPU, the total for the SLURM job will be
+<cite>n*cores</cite>.</p></li>
+<li><p><strong>mem_per_qpu</strong> (<em>str</em>) – memory to allocate for each vQPU in GB, format to use is “XXG”.</p></li>
+<li><p><strong>n_nodes</strong> (<em>str</em>) – number of nodes for the SLURM job.</p></li>
+<li><p><strong>node_list</strong> (<em>str</em>) – list of nodes in which the vQPUs will be deployed.</p></li>
+<li><p><strong>qpus_per_node</strong> (<em>str</em>) – sets the number of vQPUs deployed on each node.</p></li>
+<li><p><strong>partition</strong> (<em>str</em>) – partition of the nodes in which the QPUs are going to be executed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.qpu.qdrop">
+<span class="sig-name descname"><span class="pre">qdrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">families</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.qdrop" title="Link to this definition"></a></dt>
+<dd><p>Same functionality as the <cite>qdrop</cite> bash command, with the peculiarity that it only takes as
+argument the vQPU family names (and it does not accept the job ID as the bash command). This is
+done because the Python version of the <cite>qraise</cite> bash command returns only the family name.</p>
+<p>If no families are provided, all vQPUs deployed by the user will be dropped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>families</strong> (<em>str</em>) – family names of the groups of vQPUs to be dropped.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../commands/qinfo.html" class="btn btn-neutral float-left" title="qinfo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.qjob.html" class="btn btn-neutral float-right" title="cunqa.qjob" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

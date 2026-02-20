@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qraise &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="qdrop" href="qdrop.html" />
+    <link rel="prev" title="CUNQA reference" href="../reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#resource-management">Resource management</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">    qraise</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdrop.html">    qdrop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qinfo.html">    qinfo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#python-api">Python API</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+      <li class="breadcrumb-item active">qraise</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/commands/qraise.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qraise">
+<h1>qraise<a class="headerlink" href="#qraise" title="Link to this heading"></a></h1>
+<p>Raise one or more vQPUs with a well defined configuration.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command is used to deploy a set of virtual QPUs with a given configuration,
+including computational resources, backend selection, and communication capabilities.
+The raised vQPUs can subsequently be used to execute quantum circuits within the CUNQA
+framework.</p>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading"></a></h2>
+<section id="general-deployment-options">
+<h3>General deployment options<a class="headerlink" href="#general-deployment-options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-n,</span> <span class="pre">--num_qpus</span> <span class="pre">&lt;int&gt;</span></code></dt><dd><p>Number of QPUs to be raised.
+Default: <code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t,</span> <span class="pre">--time</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Time during which the QPUs will remain active.
+Default: empty string.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-c,</span> <span class="pre">--cores</span> <span class="pre">&lt;int&gt;</span></code></dt><dd><p>Number of CPU cores assigned to each QPU.
+Default: <code class="docutils literal notranslate"><span class="pre">2</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-p,</span> <span class="pre">--partition</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Partition requested for the QPUs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--mem-per-qpu</span> <span class="pre">&lt;int&gt;</span></code></dt><dd><p>Amount of memory (in GB) assigned to each QPU.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-N,</span> <span class="pre">--n_nodes</span> <span class="pre">&lt;int&gt;</span></code></dt><dd><p>Number of compute nodes used to deploy the QPUs.
+Default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--node_list</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>List of nodes where the QPUs will be deployed.
+Multiple nodes can be specified at a time.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--qpus_per_node</span> <span class="pre">&lt;int&gt;</span></code></dt><dd><p>Number of QPUs deployed on each node.</p>
+</dd>
+</dl>
+</section>
+<section id="backend-and-simulation-options">
+<h3>Backend and simulation options<a class="headerlink" href="#backend-and-simulation-options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-b,</span> <span class="pre">--backend</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Path to the backend configuration file.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-sim,</span> <span class="pre">--simulator</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Selects simulator responsible for running the simulations.
+Default: <code class="docutils literal notranslate"><span class="pre">Aer</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="noise-model-options">
+<h3>Noise model options<a class="headerlink" href="#noise-model-options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--noise-prop,</span> <span class="pre">--noise-properties</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Path to the noise properties JSON file.
+Only supported when using the <code class="docutils literal notranslate"><span class="pre">Aer</span></code> simulator.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-fq,</span> <span class="pre">--fakeqmio</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Raise a FakeQmio backend from a calibration file.
+If no value is provided, the default calibration set <code class="docutils literal notranslate"><span class="pre">last_calibrations</span></code> is used.
+It can only be used when executing in CESGA.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-thermal-relaxation</span></code></dt><dd><p>Deactivate thermal relaxation in FakeQmio.
+Default: <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-readout-error</span></code></dt><dd><p>Deactivate readout error in FakeQmio.
+Default: <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-gate-error</span></code></dt><dd><p>Deactivate gate error in FakeQmio.
+Default: <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="grouping-and-communication-options">
+<h3>Grouping and communication options<a class="headerlink" href="#grouping-and-communication-options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--family_name</span> <span class="pre">&lt;string&gt;</span></code></dt><dd><p>Name used to identify the group of QPUs that were raised together.
+Default: <code class="docutils literal notranslate"><span class="pre">default</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--co-located</span></code></dt><dd><p>Enable co-located mode.
+If set, the vQPU can be accesed from any node.
+Otherwise, the user can only access it from the node it is deployed on.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--classical_comm</span></code></dt><dd><p>Enable classical communications between QPUs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quantum_comm</span></code></dt><dd><p>Enable quantum communications between QPUs.</p>
+</dd>
+</dl>
+</section>
+<section id="gpu-execution">
+<h3>GPU execution<a class="headerlink" href="#gpu-execution" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--gpu</span></code></dt><dd><p>Enable GPU execution. The quantum simulation will be performed on GPU.</p>
+</dd>
+</dl>
+</section>
+<section id="real-qpu">
+<h3>Real QPU<a class="headerlink" href="#real-qpu" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--qmio</span></code></dt><dd><p><em>Deploys</em> the real quantum computer QMIO located at CESGA’s installations, allowing hybrid DQC infrastructures.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
+<p>Command that deploys 2 vQPUs with classical communications, for 10 minutes and accessible from any node:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>-t<span class="w"> </span><span class="m">00</span>:10:00<span class="w"> </span>--classical_comm<span class="w"> </span>--co-located
+</pre></div>
+</div>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Some options are backend- or simulator-specific and may not be supported in all execution
+environments.</p></li>
+<li><p>Invalid or incompatible combinations of options may result in an error at deployment time.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../reference.html" class="btn btn-neutral float-left" title="CUNQA reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qdrop.html" class="btn btn-neutral float-right" title="qdrop" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

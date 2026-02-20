@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classical-communications scheme &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quantum-communications scheme" href="quantum_communications.html" />
+    <link rel="prev" title="Result Statistics in CUNQA" href="notebooks/Result_statistics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="further_examples.html">Further Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="no_communications.html">   No-communications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">   Classical-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantum_communications.html">   Quantum-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json_examples/json_examples.html">   Raw JSON examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="further_examples.html">Further examples</a></li>
+      <li class="breadcrumb-item active">Classical-communications scheme</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/further_examples/classical_communications.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="classical-communications-scheme">
+<h1>Classical-communications scheme<a class="headerlink" href="#classical-communications-scheme" title="Link to this heading"></a></h1>
+<p>The classical-communications directives, together with simple examples, are explained in the <a class="reference internal" href="../cunqa_overview/classical_comm.html"><span class="doc">Classical Communications</span></a> section.
+This section will present a couple of examples are presented to highlight the use of classical communications.</p>
+<p>In this first example we present a cyclic exchange of classic bits between 3 circuits:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># 1. QPU deployment</span>
+
+    <span class="n">NUM_NODES</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># If GPU execution is desired, just add &quot;gpu = True&quot; as another qraise argument</span>
+    <span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">NUM_NODES</span><span class="p">,</span><span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Maestro&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">)</span>
+
+
+    <span class="c1"># 2. Circuit design</span>
+
+    <span class="c1"># We want to achieve the following scheme:</span>
+    <span class="c1"># --------------------------------------------------------</span>
+    <span class="c1">#                         ══════════════════</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#  circuit0.q0: ─────────[X]──────[M]─      ‖</span>
+    <span class="c1">#                                           ‖</span>
+    <span class="c1">#  circuit0.q1: ───[H]───[M]─────────       ‖</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#  circuit1.q0: ─────────[X]──────[M]─      ‖</span>
+    <span class="c1">#                                           ‖</span>
+    <span class="c1">#  circuit1.q1: ───[H]───[M]──────────      ‖</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#                         :                 ‖</span>
+    <span class="c1">#                         :                 ‖</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#  circuitn.q0: ─────────[X]──────[M]─      ‖</span>
+    <span class="c1">#                                           ‖</span>
+    <span class="c1">#  circuitn.q1: ───[H]───[M]──────────      ‖</span>
+    <span class="c1">#                         ‖                 ‖</span>
+    <span class="c1">#                         ══════════════════</span>
+    <span class="c1"># ----------------------------------------------------</span>
+
+    <span class="n">classcal_comms_circuits</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_NODES</span><span class="p">):</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="c1"># Here we prepare a superposition state at qubit 1, we measure and send its result to the next circuit</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">recving_circuit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NUM_NODES</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Here we recieve the bit sent by the prior circuit and use it for conditioning an x gate at qubit 0</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sending_circuit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">NUM_NODES</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">circuit</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="n">clbits</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
+            <span class="n">cgates</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Adding final measurement of que qubit after the x gate</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">classcal_comms_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+
+
+    <span class="c1"># 3. Execution</span>
+
+    <span class="c1"># The output bitstrings are &quot;switched&quot; in orther, clbit 0 corresponds to the last bit of the bitstring.</span>
+    <span class="c1"># We expect then for the first bit of a circuit&#39;s result to be equal to the last of the next circuit.</span>
+
+    <span class="c1"># If we set the execution to have more shots, this have to be checked as:</span>
+    <span class="c1">#</span>
+    <span class="c1">#   If, for circuit0 we have {&#39;(0)0&#39;: 5, &#39;10&#39;: 4, &#39;11&#39;: 1}, we see that there are 5 cases in which the first</span>
+    <span class="c1">#   qubit is `0`.</span>
+    <span class="c1">#</span>
+    <span class="c1">#   We spect output at circuit1 to have a total of 5 cases in which the second qubit is `0`, therefore:</span>
+    <span class="c1">#   {&#39;0(0)&#39;: 1, &#39;01&#39;: 3, &#39;1(0)&#39;: 4, &#39;11&#39;: 2} is correct since 1+4 = 5 .</span>
+
+    <span class="n">distr_jobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">classcal_comms_circuits</span><span class="p">,</span> <span class="n">qpus</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">results_list</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">distr_jobs</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results_list</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For circuit </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: &quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+
+    <span class="c1"># 4. Release classical resources</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="c1"># 4. Release resources even if an error is raised</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">error</span>
+</pre></div>
+</div>
+<p>In this second example we present the distributed <a class="reference external" href="https://arxiv.org/abs/quant-ph/0610214">iterative QPE</a> in several vQPUs. Compare with the QPE presented in <a class="reference internal" href="no_communications.html"><span class="doc">No-communications scheme</span></a> and <a class="reference internal" href="quantum_communications.html"><span class="doc">Quantum-communications scheme</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Code implementing the Iterative Quantum Phase Estimation (iQPE) algorithm with classical communications. To understand the algorithm without communications check:</span>
+<span class="sd">    - Original paper (here referred to as Iterative Phase Estimation Algorithm): https://arxiv.org/abs/quant-ph/0610214</span>
+<span class="sd">    - TalentQ explanation (in spanish): https://talentq-es.github.io/Fault-Tolerant-Algorithms/docs/Part_01_Fault-tolerant_Algorithms/Chapter_01_01_IPE_portada_myst.html</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+
+<span class="c1"># Global variables</span>
+<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">7</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
+<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mi">5</span> 
+<span class="n">SHOTS</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>                   <span class="c1"># Set seed for reproducibility</span>
+
+<span class="k">try</span><span class="p">:</span>
+
+    <span class="c1"># 1. QPU deployment</span>
+    <span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;03:00:00&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">)</span>
+
+    <span class="c1"># 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation</span>
+    <span class="n">circuits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">):</span> 
+        <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">N_QPUS</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span> 
+
+        <span class="n">circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">recv_id</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+  
+            <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sending_circuit</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">recv_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Gate conditioned by the received bit</span>
+            <span class="k">with</span> <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
+                <span class="n">cgates</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_QPUS</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+
+            <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">recving_circuit</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># 3. Execution</span>
+    <span class="n">algorithm_starts</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">distr_jobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuits</span><span class="p">,</span> <span class="n">qpus</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">SHOTS</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span>
+    
+    <span class="n">result_list</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">distr_jobs</span><span class="p">)</span>
+    <span class="n">algorithm_ends</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">algorithm_time</span> <span class="o">=</span> <span class="n">algorithm_ends</span> <span class="o">-</span> <span class="n">algorithm_starts</span>
+
+    <span class="c1"># 4. Post processing results</span>
+    <span class="n">counts_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">result_list</span><span class="p">:</span>
+        <span class="n">counts_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+    <span class="n">binary_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts_list</span><span class="p">:</span>
+        <span class="c1"># Extract the most frequent measurement (the best estimate of theta)</span>
+        <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+        <span class="n">binary_string</span> <span class="o">+=</span> <span class="n">most_frequent_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">estimated_theta</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">digit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">binary_string</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">digit</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">exponent</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">estimated_theta</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">exponent</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated angle: </span><span class="si">{</span><span class="n">estimated_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 5. Release resources</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">error</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="notebooks/Result_statistics.html" class="btn btn-neutral float-left" title="Result Statistics in CUNQA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quantum_communications.html" class="btn btn-neutral float-right" title="Quantum-communications scheme" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

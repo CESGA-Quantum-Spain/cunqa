@@ -1,6 +1,0 @@
-cunqa.circuit.converters.get\_module
-====================================
-
-.. currentmodule:: cunqa.circuit.converters
-
-.. autofunction:: get_module

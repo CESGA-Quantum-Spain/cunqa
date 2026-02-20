@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cunqa.result &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cunqa.mappers" href="cunqa.mappers.html" />
+    <link rel="prev" title="cunqa.qjob" href="cunqa.qjob.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.result</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.result.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+      <li class="breadcrumb-item active">cunqa.result</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/cunqa.result.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cunqa.result">
+<span id="cunqa-result"></span><h1>cunqa.result<a class="headerlink" href="#module-cunqa.result" title="Link to this heading"></a></h1>
+<p>Contains the <a class="reference internal" href="#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> class, which holds the output of the executions.</p>
+<p>Once we have submmited a <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>, for obtaining its results we call for its
+property <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">result</span></code></a>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="go">&lt;cunqa.result.Result object at XXXX&gt;</span>
+</pre></div>
+</div>
+<p>This object has two main attributes of interest: the counts distribution from the
+simulation and the time that the simulation took in seconds:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="go">{&#39;000&#39;:34, &#39;111&#39;:66}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="go">0.056</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.result.Result">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circ_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.result.Result" title="Link to this definition"></a></dt>
+<dd><p>Class to describe the result of a simulation.</p>
+<p>There are two main attributes, <a class="reference internal" href="#cunqa.result.Result.counts" title="cunqa.result.Result.counts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.counts</span></code></a> and <a class="reference internal" href="#cunqa.result.Result.time_taken" title="cunqa.result.Result.time_taken"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.time_taken</span></code></a>, common
+to every simulator available on the backends.Nevertheless, depending on the simulator used, more
+output data is provided. For checking all the information from the simulation as a <code class="docutils literal notranslate"><span class="pre">dict</span></code>,
+one can access the attribute <a class="reference internal" href="#cunqa.result.Result.result" title="cunqa.result.Result.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.result</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<em>dict</em>)</p></li>
+<li><p><strong>circ_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>registers</strong> (<em>dict</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.result.Result.counts">
+<span class="sig-name descname"><span class="pre">counts</span></span><a class="headerlink" href="#cunqa.result.Result.counts" title="Link to this definition"></a></dt>
+<dd><p>Counts distribution from the sampling of the simulation, format is
+<code class="docutils literal notranslate"><span class="pre">{&quot;&lt;bit</span> <span class="pre">string&gt;&quot;:&lt;number</span> <span class="pre">of</span> <span class="pre">counts</span> <span class="pre">as</span> <span class="pre">int&gt;}</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="go">{&#39;000&#39;:34, &#39;111&#39;:66}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the circuit sent has more than one classical register, bit strings corresponding to
+each one of them will be separated by blank spaces in the order they were added:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="go">{&#39;001 11&#39;:23, &#39;110 10&#39;:77}</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.result.Result.time_taken">
+<span class="sig-name descname"><span class="pre">time_taken</span></span><a class="headerlink" href="#cunqa.result.Result.time_taken" title="Link to this definition"></a></dt>
+<dd><p>Time that the simulation took in seconds, since it is received at the virtual QPU until
+it is finished.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="go">0.056</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.result.Result.result">
+<span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#cunqa.result.Result.result" title="Link to this definition"></a></dt>
+<dd><p>Dictionary with the whole output of the simulation. This output is presented as the raw
+product of the simulation, and so the <code class="docutils literal notranslate"><span class="pre">dict</span></code> format depends on the simulator used.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cunqa.qjob.html" class="btn btn-neutral float-left" title="cunqa.qjob" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.mappers.html" class="btn btn-neutral float-right" title="cunqa.mappers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

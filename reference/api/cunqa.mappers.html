@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cunqa.mappers &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cunqa.circuit" href="cunqa.circuit.html" />
+    <link rel="prev" title="cunqa.result" href="cunqa.result.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.mappers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.mappers.QJobMapper"><code class="docutils literal notranslate"><span class="pre">QJobMapper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper"><code class="docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+      <li class="breadcrumb-item active">cunqa.mappers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/cunqa.mappers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cunqa.mappers">
+<span id="cunqa-mappers"></span><h1>cunqa.mappers<a class="headerlink" href="#module-cunqa.mappers" title="Link to this heading"></a></h1>
+<p>Contains map-like callables to distribute circuits among vQPUS.</p>
+<p><strong>Variational Quantum Algorithms</strong> <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> require numerous executions of parametric cirucits,
+where in each step of the optimization process new parameters are assigned to them. This implies
+that, after parameters are updated, a new circuit must be created, transpiled and then sent to
+the quantum processor or simulator. For simplifying this process, we have
+<a class="reference internal" href="#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> and <a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> classes. Both classes are conceived to
+be used with Scipy optimizers <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> as the <em>workers</em> argument in global optimizers.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> takes a list of existing <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>
+objects, then, the class can be called passing a set of <strong>parameters</strong> and a <strong>cost function</strong>.
+This callable updates each existing <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object with such
+<strong>parameters</strong> through the <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method. Then, it
+gathers the results of the executions and returns the <strong>value of the cost function</strong> for each.</p></li>
+<li><p><a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper" title="cunqa.mappers.QPUCircuitMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPUCircuitMapper</span></code></a> is instanciated with a circuit and instructions for its
+execution, together with a list of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects. The difference
+with <a class="reference internal" href="#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a> is that here the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code> is mapped
+to each QPU, passing it the circuit with the given parameters assigned so that for this case
+several <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects are created.</p></li>
+</ul>
+<p>Examples utilizing both classes can be found in the <a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>.
+These examples focus on optimization of VQAs, using a global optimizer called
+Differential Evolution <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<p><em>References</em>:</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arXiv</a> .</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html">scipy.optimize documentation</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Differential Evolution initializes a population of inidividuals that evolve from
+generation to generation in order to collectively find the lowest value of a given cost
+function. This optimizer has shown great performance for VQAs
+[<a class="reference external" href="https://arxiv.org/abs/2303.12186">Reference</a>]. It is well implemented in Scipy through the
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution">scipy.optimize.differential_evolution</a>
+function.</p>
+</aside>
+</aside>
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.mappers.QJobMapper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QJobMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper" title="Link to this definition"></a></dt>
+<dd><p>Class to map the method <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> to a set of jobs sent to
+virtual QPUs.</p>
+<p>The core of the class is on its <a class="reference internal" href="#cunqa.mappers.QJobMapper.__call__" title="cunqa.mappers.QJobMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__</span></code></a> method, to which
+parameters that the method <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> takes are passed
+together with a cost function, so that a the value for this cost for each initial
+<a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is returned.</p>
+<p>An example is shown below, once we have a list of <a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects as
+<em>qjobs</em>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mapper</span> <span class="o">=</span> <span class="n">QJobMapper</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># defining the parameters set accordingly to the number of parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># of the circuit and the number of QJobs in the list.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># defining the cost function passed to the result of each QJob</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">cost_value</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cost_values</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">new_parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We intuitively see how convenient this class can be for optimization algorithms: one has a
+parametric circuit to which updated sets of parameters can be sent, getting back the value of the
+cost function. Examples applied to optimizations are shown at the
+<a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qjobs</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><em>QJob</em></a><em>]</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.mappers.QJobMapper.qjobs">
+<span class="sig-name descname"><span class="pre">qjobs</span></span><a class="headerlink" href="#cunqa.mappers.QJobMapper.qjobs" title="Link to this definition"></a></dt>
+<dd><p>list of objects to be mapped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.mappers.QJobMapper.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QJobMapper.__call__" title="Link to this definition"></a></dt>
+<dd><p>Callable method to map the function <em>func</em> to the results of assigning <em>population</em> to the
+given jobs. Regarding the <em>population</em>, each set of parameters will be assigned to each
+<a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object, so the list must have size (<em>N,p</em>), being <em>N</em> the
+lenght of <a class="reference internal" href="#cunqa.mappers.QJobMapper.qjobs" title="cunqa.mappers.QJobMapper.qjobs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">qjobs</span></code></a> and <em>p</em> the number of parameters in the
+circuit. Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>
+object and to return a value. For example, the function can evaluate the expected value of
+an observable from the output of the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>callable</em>) – function to be passed to the results of the jobs.</p></li>
+<li><p><strong>population</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>int</em><em> | </em><em>float</em><em>] </em><em>| </em><em>np.array</em><em>[</em><em>int</em><em> | </em><em>float</em><em>]</em><em>]</em>) – list of numpy vectors to</p></li>
+<li><p><strong>jobs.</strong> (<em>be mapped to the</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of outputs of the function applied to the results of each job for the given
+population.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPUCircuitMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper" title="Link to this definition"></a></dt>
+<dd><p>Class to map the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code> to a list of QPUs.</p>
+<p>The class is initialized with a list of <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects associated to the
+virtual QPUs that the optimization will require, together with the circuit and the simulation
+instructions needed for its execution.</p>
+<p>Then, its <a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="cunqa.mappers.QPUCircuitMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__</span></code></a> method takes a set of parameters
+as <em>population</em> to assign to the circuit. Each assembled circuit is sent to each virtual QPU
+with the instructions provided on the instatiation of the mapper. The method returns the value
+for the provided function <em>func</em> for the result of each simulation.</p>
+<p>Its use is pretty similar to <a class="reference internal" href="#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, though creating
+<a class="reference internal" href="cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects ahead is not needed.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Creating the mapper with the pre-defined parametric circuit and other simulation instructions.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mapper</span> <span class="o">=</span> <span class="n">QPUCircuitMapper</span><span class="p">(</span><span class="n">qpus</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Defining the parameters set according to the number of parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># of the circuit and the number of QJobs in the list.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Defining the cost function passed to the result of each QJob</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">cost_function</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">cost_value</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cost_values</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">new_parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For each call of the mapper, circuits are assembled, jobs are sent, results are gathered and
+cost values are calculated. Its implementation for optimization problems is shown at the
+<a class="reference external" href="https://cesga-quantum-spain.github.io/cunqa/_examples/Optimizers_II_mapping.html">Examples gallery</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qpus</strong> (<em>list</em><em>[</em><a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><em>QPU</em></a><em>]</em>)</p></li>
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>)</p></li>
+<li><p><strong>run_parameters</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.qpus">
+<span class="sig-name descname"><span class="pre">qpus</span></span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.qpus" title="Link to this definition"></a></dt>
+<dd><p>Objects linked to the virtual QPUs to wich the
+circuit is mapped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.circuit">
+<span class="sig-name descname"><span class="pre">circuit</span></span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.circuit" title="Link to this definition"></a></dt>
+<dd><p>Circuit to which parameters are assigned at the
+<a class="reference internal" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="cunqa.mappers.QPUCircuitMapper.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QPUCircuitMapper.__call__</span></code></a> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.run_parameters">
+<span class="sig-name descname"><span class="pre">run_parameters</span></span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.run_parameters" title="Link to this definition"></a></dt>
+<dd><p>Any other run instructions needed for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.mappers.QPUCircuitMapper.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.mappers.QPUCircuitMapper.__call__" title="Link to this definition"></a></dt>
+<dd><p>Callable method to map the function <em>func</em> to the results of the circuits sent to the given
+QPUs after assigning them <em>population</em>. Regarding the <em>population</em>, each set of parameters
+will be assigned to each circuit, so the list must have size (<em>N,p</em>), being <em>N</em> the lenght
+of <code class="xref py py-attr docutils literal notranslate"><span class="pre">qpus</span></code> and <em>p</em> the number of parameters in the circuit.
+Mainly, this is thought for the function to take a <a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> object
+and to return a value. For example, the function can evaluate the expected value of an
+observable from the output of the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>func</em>) – function to be mapped to the QPUs. It must take as argument a
+<a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> instance.</p></li>
+<li><p><strong>params</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>float</em><em> | </em><em>int</em><em>]</em><em>]</em>) – population of vectors to be mapped to the circuits
+sent to the QPUs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of the results of the function applied to the output of the circuits sent to the
+QPUs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cunqa.result.html" class="btn btn-neutral float-left" title="cunqa.result" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.circuit.html" class="btn btn-neutral float-right" title="cunqa.circuit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

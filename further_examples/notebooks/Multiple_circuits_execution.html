@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example for execution of multiple circuits in QPUs &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Using the parameters update functionality" href="Optimizers_I_upgrading_parameters.html" />
+    <link rel="prev" title="No-communications scheme" href="../no_communications.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../further_examples.html">Further Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../no_communications.html">   No-communications</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../no_communications.html#ideal-execution">Ideal execution</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Example for execution of multiple circuits in QPUs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optimizers_I_upgrading_parameters.html">Using the parameters update functionality</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optimizers_II_mapping.html">Paralelization for gradient-free optimizers: Differential Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Result_statistics.html">Result Statistics in CUNQA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../no_communications.html#noisy-execution">Noisy execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classical_communications.html">   Classical-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantum_communications.html">   Quantum-communications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json_examples/json_examples.html">   Raw JSON examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../further_examples.html">Further examples</a></li>
+          <li class="breadcrumb-item"><a href="../no_communications.html">No-communications scheme</a></li>
+      <li class="breadcrumb-item active">Example for execution of multiple circuits in QPUs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/further_examples/notebooks/Multiple_circuits_execution.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Example-for-execution-of-multiple-circuits-in-QPUs">
+<h1>Example for execution of multiple circuits in QPUs<a class="headerlink" href="#Example-for-execution-of-multiple-circuits-in-QPUs" title="Link to this heading"></a></h1>
+<p>In this notebook, some examples of simple execution without communications will be shown. The scheme followed is going to be the similar in every case, even for the most complex ones. First, the <code class="docutils literal notranslate"><span class="pre">cunqa</span></code> module imports will be done.</p>
+<div class="alert alert-block alert-warning"><p>Warning: The path to the cunqa module has to be added if cunqa is not in the PYTHONPATH list of directories. This is specially important for the ones that built CUNQA from source and are not using it as a LMOD module (in which case, if the installation was done correctly, cunqa module will be inside PYTHONPATH). As a default example, the path added is the $HOME path, but it should be adapted.</p>
+</div><div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># If this is not done before the cunqa module imports, it will fail to find them</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">gather</span><span class="p">,</span> <span class="n">qdrop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
+</pre></div>
+</div>
+</div>
+<section id="Small-circuit-example">
+<h2>Small circuit example<a class="headerlink" href="#Small-circuit-example" title="Link to this heading"></a></h2>
+<section id="Turning-ON-the-vQPUs">
+<h3>Turning ON the vQPUs<a class="headerlink" href="#Turning-ON-the-vQPUs" title="Link to this heading"></a></h3>
+<p>After the imports, we begin with the body of the program. First of all, the virtual QPUs (vQPUs) must be deployed. To achieve this there are two options:</p>
+<ol class="arabic simple">
+<li><p><strong>Using the ``qraise`` command</strong>.</p></li>
+<li><p><strong>Using the ``qraise()`` Python function</strong>.</p></li>
+</ol>
+<p>Both achieve the same: turning on the vQPUs. In fact, the <code class="docutils literal notranslate"><span class="pre">qraise()</span></code> Python function employs the <code class="docutils literal notranslate"><span class="pre">qraise</span></code> bash command to achieve this. The difference lies in the fact that the <code class="docutils literal notranslate"><span class="pre">qraise()</span></code> Python function integrates the resource management into the Python API worflow, while the <code class="docutils literal notranslate"><span class="pre">qraise</span></code> bash command needs to be executed before the workflow starts in order to have the QPUs raised beforehand.</p>
+<p>In order to make this example self-contained the <code class="docutils literal notranslate"><span class="pre">qraise</span></code> Python function will be employed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span>  <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="c1"># bash equivalent: qraise -n 2 -t 00:10:00 --sim Aer --co-located</span>
+
+<span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">QPUs properties:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;simulator&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requested QPUs with command:
+        qraise -n 2 -t 00:10:00 --simulator=Aer --co-located
+QPUs ready to work ✅
+
+QPUs properties:
+QPU 377618_294450, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+QPU 377618_294451, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+</pre></div></div>
+</div>
+<p>Two vQPUs were raised for ten minutes, without communications and employing the Aer simulator to execute the circuits. Moreover, the flag <code class="docutils literal notranslate"><span class="pre">co_located</span></code> was set to true, meaning that these vQPUs will run in a co-located scheme, i.e, they will be accesible from every node of the cluster.</p>
+<div class="alert alert-block alert-warning"><p>Warrning: If the co_located flag was not set to true, then the vQPUs will be available only if the user is inside the node they are deployed on (similar to how it works with actual GPUs).</p>
+</div><p>On the oher hand, the method <code class="docutils literal notranslate"><span class="pre">get_QPUs()</span></code> accesses the information of the raised vQPUs and instantiates one <code class="docutils literal notranslate"><span class="pre">QPU</span></code> object for each. This <code class="docutils literal notranslate"><span class="pre">QPU</span></code> instance possesses the information of its related vQPU and, also, a connection to it. This way, this object is the one responsible of sending the circuit to get it executed.</p>
+</section>
+<section id="Designing-the-circuit">
+<h3>Designing the circuit<a class="headerlink" href="#Designing-the-circuit" title="Link to this heading"></a></h3>
+<p>There are three options for designing the circuit:</p>
+<ul class="simple">
+<li><p><strong>``CunqaCircuit``</strong>.</p></li>
+<li><p><strong>``QuantumCircuit``</strong> (from Qiskit).</p></li>
+<li><p><strong>``json``</strong>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">CunqaCircuit</span></code> is designed to be similar to the <code class="docutils literal notranslate"><span class="pre">QuantumCircuit</span></code> but allowing communication instructions. This is done to reduce the learning curve, recognizing the fact that <code class="docutils literal notranslate"><span class="pre">QuantumCircuit</span></code> is a well stablished API inside quantum computation programmers.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">json</span></code> format is used as an intermediate representation (IR). It is a much less human-understandable format employed to send the information to the vQPUs, but it can be directly used (as the complex example will show).</p>
+<p>But because in this example communication directives are not employed, the <code class="docutils literal notranslate"><span class="pre">QuantumCircuit</span></code> class from Qiskit is employed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.circuit.library</span><span class="w"> </span><span class="kn">import</span> <span class="n">QFT</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># number of qubits</span>
+
+<span class="n">qc</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">qc</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">qc</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="n">qc</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QFT</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QFT</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">inverse</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">qc</span><span class="o">.</span><span class="n">draw</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="word-wrap: normal;white-space: pre;background: #fff0;line-height: 1.1;font-family: &quot;Courier New&quot;,Courier,monospace">        ┌───┐┌──────┐┌───────┐ ░ ┌─┐
+   q_0: ┤ X ├┤0     ├┤0      ├─░─┤M├────────────
+        └───┘│      ││       │ ░ └╥┘┌─┐
+   q_1: ─────┤1     ├┤1      ├─░──╫─┤M├─────────
+             │      ││       │ ░  ║ └╥┘┌─┐
+   q_2: ─────┤2 QFT ├┤2 IQFT ├─░──╫──╫─┤M├──────
+        ┌───┐│      ││       │ ░  ║  ║ └╥┘┌─┐
+   q_3: ┤ X ├┤3     ├┤3      ├─░──╫──╫──╫─┤M├───
+        ├───┤│      ││       │ ░  ║  ║  ║ └╥┘┌─┐
+   q_4: ┤ X ├┤4     ├┤4      ├─░──╫──╫──╫──╫─┤M├
+        └───┘└──────┘└───────┘ ░  ║  ║  ║  ║ └╥┘
+meas: 5/══════════════════════════╩══╩══╩══╩══╩═
+                                  0  1  2  3  4 </pre></div>
+</div>
+</section>
+<section id="Executing-the-circuit-in-the-vQPUs">
+<h3>Executing the circuit in the vQPUs<a class="headerlink" href="#Executing-the-circuit-in-the-vQPUs" title="Link to this heading"></a></h3>
+<p>It is time to execute and display the results by following these steps:</p>
+<ol class="arabic">
+<li><p>Calling the <code class="docutils literal notranslate"><span class="pre">run</span></code> function with: the circuit, the QPU and the run parameters. This method will return a <code class="docutils literal notranslate"><span class="pre">qjob.QJob</span></code> object.</p>
+<div class="alert alert-block alert-info"><p>Note: The <code class="docutils literal notranslate"><span class="pre">run()</span></code> function is asynchronous.</p>
+</div></li>
+<li><p>To get the results of the simulation, the property <code class="docutils literal notranslate"><span class="pre">QJob.result</span></code> is called, returning a <code class="docutils literal notranslate"><span class="pre">Result</span></code> object that stores the execution information. Depending on the simulator, there will be more or less information.</p></li>
+<li><div class="alert alert-block alert-info"><p>Note: This is a synchronous method, blocking the execution until the vQPU retrieves the results obtained.</p>
+</div></li>
+<li><p>From the <code class="docutils literal notranslate"><span class="pre">Result</span></code> object obtained, the counts dictionary can be obtained by accessing the <code class="docutils literal notranslate"><span class="pre">Result.counts</span></code> property. Another property independent from the simulator is <code class="docutils literal notranslate"><span class="pre">Result.time_taken</span></code>, that stores the time spent in the simulation in seconds.</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">qpus</span><span class="p">):</span>
+
+    <span class="c1"># 1)</span>
+    <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">qc</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span><span class="o">.</span><span class="n">decompose</span><span class="p">(),</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="c1"># non-blocking call</span>
+
+    <span class="c1"># 2)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span> <span class="c1"># bloking call</span>
+
+    <span class="c1"># 3)</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+    <span class="n">counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_histogram</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">plot_histogram</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">bar_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qpus</span><span class="p">))])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/further_examples_notebooks_Multiple_circuits_execution_10_0.png" src="../../_images/further_examples_notebooks_Multiple_circuits_execution_10_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Complex-circuit-example">
+<h2>Complex circuit example<a class="headerlink" href="#Complex-circuit-example" title="Link to this heading"></a></h2>
+<p>The following circuit is more complex than the previous one: it has 15 qubits and 10 intermediate measurements. The execution of this circuit is far more expensive than the previous one, as all its shots are executed in only one QPU, i.e., sequentially.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># impoting from examples/circuits/</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;circuits/circuit_15qubits_10layers.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">circuit</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span> <span class="c1"># bloking call</span>
+<span class="n">time</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
+<span class="n">counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: Time taken: </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-yellow-fg">   warning: [ir.py] Circuit is already in IR format, returning it as is.
+</span>
+Result: Time taken: 20.09280778 s.
+</pre></div></div>
+</div>
+<p>This cost that this circuit has allows us to really display how CUNQA parallelizes the execution of the circuits when sending to the different vQPUs available. So, just as in the previous example, the circuit is executed in every vQPU available.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">qjobs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">qpus</span><span class="p">)</span>
+
+<span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
+    <span class="n">qjobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">))</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span> <span class="c1"># this is a bloking call</span>
+<span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time taken to run </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> circuits in parallel: </span><span class="si">{</span><span class="n">tack</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tick</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Time of each execution:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For QJob </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, time taken: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-yellow-fg">   warning: [ir.py] Circuit is already in IR format, returning it as is.
+</span>
+<span class="ansi-yellow-fg">   warning: [ir.py] Circuit is already in IR format, returning it as is.
+</span>
+Time taken to run 2 circuits in parallel: 20.766820907592773 s.
+
+Time of each execution:
+For QJob 0, time taken: 20.749891593 s.
+For QJob 1, time taken: 20.213398957 s.
+
+Removed job(s) with ID(s): <span class="ansi-green-intense-fg ansi-bold">377618 </span>
+</pre></div></div>
+</div>
+<p>The results show how the time taken is (approximately) the same as the previous execution even though the number of the shots executed has been multiplied by the number of the vQPUs available (in this case, duplicated).</p>
+<p>So it can be confirmed that <strong>the circuits were run in parallel</strong>.</p>
+<p>Moreover, the <code class="docutils literal notranslate"><span class="pre">qdrop()</span></code> Python function is called at the end of the program to drop the vQPUs, as they will not be used further. This relinquishes the classical resources employed in the execution of the vQPUs. Just as with the <code class="docutils literal notranslate"><span class="pre">qraise()</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop()</span></code> possesses a bash command counterpart that performs the same functionality.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../no_communications.html" class="btn btn-neutral float-left" title="No-communications scheme" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Optimizers_I_upgrading_parameters.html" class="btn btn-neutral float-right" title="Using the parameters update functionality" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

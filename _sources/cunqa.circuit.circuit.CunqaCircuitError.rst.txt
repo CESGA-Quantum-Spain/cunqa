@@ -1,6 +1,0 @@
-cunqa.circuit.circuit.CunqaCircuitError
-=======================================
-
-.. currentmodule:: cunqa.circuit.circuit
-
-.. autoexception:: CunqaCircuitError

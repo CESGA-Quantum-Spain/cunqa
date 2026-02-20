@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cunqa.qjob &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cunqa.result" href="cunqa.result.html" />
+    <link rel="prev" title="cunqa.qpu" href="cunqa.qpu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qjob</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.QJob"><code class="docutils literal notranslate"><span class="pre">QJob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.gather"><code class="docutils literal notranslate"><span class="pre">gather</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+      <li class="breadcrumb-item active">cunqa.qjob</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/cunqa.qjob.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cunqa.qjob">
+<span id="cunqa-qjob"></span><h1>cunqa.qjob<a class="headerlink" href="#module-cunqa.qjob" title="Link to this heading"></a></h1>
+<p>Contains objects that define and manage quantum emulation jobs. The core of this module is the
+class <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>. These objects are created when a quantum job is sent to a
+vQPU, as a return of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> function:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">)</span>
+<span class="go">&lt;cunqa.qjob.QJob object at XXXXXXXX&gt;</span>
+</pre></div>
+</div>
+<p>In this method, after the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> instance is created, the circuit is
+submitted for simulation at the vQPU. <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is the bridge between sending a
+circuit with instructions and receiving the results.</p>
+<p>Another functionality described in the submodule is the function <a class="reference internal" href="#cunqa.qjob.gather" title="cunqa.qjob.gather"><code class="xref py py-func docutils literal notranslate"><span class="pre">gather</span></code></a>,
+which receives a list of <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects and returns their results as
+<a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> objects.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob_1</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit_1</span><span class="p">,</span> <span class="n">qpu_1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qjob_2</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit_2</span><span class="p">,</span> <span class="n">qpu_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gather</span><span class="p">([</span><span class="n">qjob_1</span><span class="p">,</span> <span class="n">qjob_2</span><span class="p">])</span>
+<span class="go">[&lt;cunqa.result.Result object at XXXXXXXX&gt;, &lt;cunqa.result.Result object at XXXXXXXX&gt;]</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit_ir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
+<dd><p>Class to handle jobs sent to vQPUs. A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output
+of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method. The quantum job not only contains the circuit to
+be simulated, but also simulation instructions and information of the vQPU to which the job
+is sent. This class has a main attribute: <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code></a> which stores the information
+about the execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qclient</strong> (<em>cunqa.qclient.QClient</em><em> | </em><em>QMIOClient</em>)</p></li>
+<li><p><strong>device</strong> (<em>dict</em>)</p></li>
+<li><p><strong>circuit_ir</strong> (<em>dict</em>)</p></li>
+<li><p><strong>run_parameters</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.result">
+<span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#cunqa.qjob.QJob.result" title="Link to this definition"></a></dt>
+<dd><p>Result of the job. If no error occured during simulation, a <a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>
+object is retured.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">qpu</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+<span class="go">{&#39;00&#39;: 524, &#39;11&#39;: 500}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since to obtain the result the simulation has to be finished, this method is a blocking
+call, which means that the program will be blocked until the <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> has
+recieved from the corresponding server the outcome of the job. The result is not sent
+from the server to the <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> until this method is called.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Because of how the client-server comunication is built, the user must be careful and call
+for the results in the same order in which the jobs where submited. If the order is not
+respected, no errors would be raised but results will not correspond to the job -
+a mix up would happen. This is because the server follows the FIFO rule (<em>First in
+first out</em>): if we want to receive the second result, the first one has to be out.</p>
+</div>
+</dd></dl>
+
+<p>But first, in order to be able to call the attribute <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code></a>, it is necessary to
+submit the job for execution. To do so, we will use the method <a class="reference internal" href="#cunqa.qjob.QJob.submit" title="cunqa.qjob.QJob.submit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QJob.submit</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.submit">
+<span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.submit" title="Link to this definition"></a></dt>
+<dd><p>Asynchronous method to submit a job to the corresponding <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span> <span class="o">=</span> <span class="n">QJob</span><span class="p">(</span><span class="n">qclient</span><span class="p">,</span> <span class="n">circuit_ir</span><span class="p">,</span> <span class="o">**</span><span class="n">run_parameters</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qjob</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span> <span class="c1"># Already has all the info of where and what to send</span>
+</pre></div>
+</div>
+<p>In case the circuit is parametric it needs to be called with the value of its free
+parameters set with the <code class="xref py py-attr docutils literal notranslate"><span class="pre">param_values</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Opposite to <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">result</span></code></a>, this is a non-blocking call.
+Once a job is submitted, the python program continues without waiting while
+the corresponding server receives and simulates the circuit.</p>
+</div>
+<dl class="simple">
+<dt>param_values (dict | list): either a list of ordered parameters to assign to the</dt><dd><p>parametrized circuit or a dictionary with keys being the
+free parameters’ names and its values being its
+corresponding new values.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_values</strong> (<em>dict</em><em>[</em><em>Symbol</em><em>, </em><em>float</em><em> | </em><em>int</em><em>] </em><em>| </em><em>list</em><em>[</em><em>float</em><em> | </em><em>int</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>But the objective of the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> class is not only to retrieve the result. It also
+allows an easy updating of the quantum task sent without the need of resend the whole circuit.
+This is really useful, especially working with variational quantum algorithms (VQAs) <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, which
+need to change the parameters of the gates in a circuit as they are optimized in each iteration.
+This parameter update is done using the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
+<span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
+<dd><p>Method to upgrade the parameters in a previously submitted job of parametric circuit.
+First it checks weather the prior simulation’s result was retrieved. If not, it is discarded,
+and the new set of parameters is sent to the server to be reassigned to the circuit for
+simulation. This method can be used on a loop, carefully saving the intermediate results.
+Also, this method is used by the class <a class="reference internal" href="cunqa.mappers.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, check out its
+documentation for a extensive description.</p>
+<p>There are two ways of passing new parameters. First, as a <strong>list</strong> with the corresponding
+values in the order of the gates in the circuit, in which case missing parameters will
+result in an error. On the other hand, as a <strong>dict</strong> where the keys are the free
+parameters names and the values the corresponding new value to that free parameter. Not
+all parameters need to be updated, but they must have been given a value at
+least once, because its last value would be used.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Before sending the circuit or upgrading its parameters, the result of the prior job must be
+called. It can be done manually, so that we can save it and obtain its information, or it
+can be done automatically as in the example above, but be aware that once the
+<a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method is called, this result is discarded.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_values</strong> (<em>dict</em><em> | </em><em>list</em>) – either a list of ordered parameters to assign to the
+parametrized circuit or a dictionary with keys being the
+free parameters’ names and its values being its
+corresponding new values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><em>References</em>:</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/2012.09265">Variational Quantum Algorithms arXiv</a> .</p>
+</aside>
+</aside>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cunqa.qjob.gather">
+<span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.gather" title="Link to this definition"></a></dt>
+<dd><p>Function to get the results of several <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
+<p>Once the jobs are running:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a blocking call, results will be called sequentialy in . Since they are being run
+simultaneously, even if the first one on the list takes the longest, when it finishes the
+rest would have been done, so just the small overhead from calling them will be added.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Since this is mainly a for loop, the order must be respected when submiting jobs to the
+same vQPU.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qjobs</strong> (<em>list</em><em>[</em><a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><em>QJob</em></a><em>]</em>) – list of objects to get the result from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of <a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><em>Result</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cunqa.qpu.html" class="btn btn-neutral float-left" title="cunqa.qpu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cunqa.result.html" class="btn btn-neutral float-right" title="cunqa.result" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

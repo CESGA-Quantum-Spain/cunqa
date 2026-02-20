@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tools for DQC algorithms &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parameters and upgrade_parameters" href="tools_for_VQAs.html" />
+    <link rel="prev" title="Quantum Communication" href="quantum_comm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cunqa_overview.html">CUNQA overview</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#virtual-qpu">Virtual QPU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#quantum-circuits">Quantum circuits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#dqc-schemes">DQC schemes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cunqa_overview.html#circuit-manipulation-techniques">Circuit Manipulation Techniques</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">    add, union and hsplit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tools_for_VQAs.html">    Parameters and upgrade_parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#real-qpus">Real QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="cunqa_overview.html">CUNQA overview</a></li>
+      <li class="breadcrumb-item active">Tools for DQC algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cunqa_overview/tools_for_DQC.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tools-for-dqc-algorithms">
+<h1>Tools for DQC algorithms<a class="headerlink" href="#tools-for-dqc-algorithms" title="Link to this heading"></a></h1>
+<p>See the following explanations of the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a>,
+<a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a> and <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a>
+functions to understand how they empower the study of DQC algorithms.</p>
+<div class="tab-set docutils">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--1">add</label><div class="tab-content docutils">
+<p>The function <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a> takes an iterable of circuits as input and returns a circuit
+that has the instructions of each circuit of the iterable in order. Its purpose is to build circuits modularly from simple parts.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As communications greatly depend on the order of execution, adding circuits does not mesh well with communications.
+In particular, if two circuits that communicate with eachother were <em>added</em>, execution would stall as the circuit would wait
+to communicate with the next subcircuit, which wouldn’t respond until execution progressed, waiting indefinitely.</p>
+<p>For this reason, if two circuits on the iterable contain comunications between them, an <strong>exception</strong> would be raised.</p>
+</div>
+<p>The <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a> function can be used to avoid redundant code, for example when creating a circuit for the Grover algorithm:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grover_circuit</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">oracle</span><span class="p">,</span> <span class="n">diffusor</span><span class="p">]</span> <span class="o">*</span> <span class="n">repeat_times</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Full example of the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit.transformations</span><span class="w"> </span><span class="kn">import</span> <span class="n">add</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Acquiring the resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">[</span><span class="n">qpu</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Original circuits are:</span>
+<span class="c1">#</span>
+<span class="c1">#    | circuit1 | circuit2 |</span>
+<span class="c1"># q0:|   ─[H]─  |   ──●──  |</span>
+<span class="c1">#    |          |     |    |</span>
+<span class="c1"># q1:|          |   ─[X]─  |</span>
+<span class="c1"># </span>
+<span class="c1"># And, then, added_circuit is a Bell pair:</span>
+<span class="c1">#</span>
+<span class="c1"># added_circuit.q0: ─[H]──●──[M]─</span>
+<span class="c1">#                         |</span>
+<span class="c1"># added_circuit.q1: ─────[X]─[M]─</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
+<span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+<span class="n">circuit2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">added_circuit</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">])</span>
+<span class="n">added_circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">added_circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">)</span><span class="c1"># non-blocking call</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result after addition: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Relinquishing resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--2">union</label><div class="tab-content docutils">
+<p>Given two circuits with <em>n</em> and <em>m</em> qubits, their union returns a circuit with <em>n + m</em> qubits, where the operations of the former are applied to the first <em>n</em> qubits and those of the latter
+are applied to the last <em>m</em> qubits. If originally there were distributed instructions between the circuits, they would be replaced by local ones. In the following example we observe the union of two
+simple circuits.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit1&quot;</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">c2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+<span class="n">c2</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">union_circuit</span> <span class="o">=</span> <span class="n">union</span><span class="p">([</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Full example of the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit.transformations</span><span class="w"> </span><span class="kn">import</span> <span class="n">union</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Acquiring resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">qpus_separated</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_separated</span><span class="p">)</span>
+
+<span class="n">family_union</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">[</span><span class="n">qpu_union</span><span class="p">]</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_union</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Original circuits created and executed</span>
+<span class="c1"># circuit1.q0: ─[H]──●──[M]─</span>
+<span class="c1">#                    $</span>
+<span class="c1"># circuit2.q0: ─────[X]─[M]─</span>
+<span class="c1"># Where $ represents the remote control of the gate</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
+<span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">circuit1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">):</span>
+    <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="n">circuit2</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">],</span> <span class="n">qpus_separated</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result before union: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># taking only the results from the 0 circuit</span>
+                                                     <span class="c1"># because they both get the same due to </span>
+                                                     <span class="c1"># quantum communications</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Take the union of the circuits and execute it</span>
+<span class="c1"># union_circuit.q0: ─[H]──●──[M]─</span>
+<span class="c1">#                         |</span>
+<span class="c1"># union_circuit.q1: ─────[X]─[M]─</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">union_circuit</span> <span class="o">=</span> <span class="n">union</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">])</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">union_circuit</span><span class="p">,</span> <span class="n">qpu_union</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span><span class="c1"># non-blocking call</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result after union: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Relinquishing resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family_union</span><span class="p">)</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family_separated</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--3" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--3">hsplit</label><div class="tab-content docutils">
+<p>The function <cite>hsplit</cite> divides the set of qubits of a circuit into subcircuits, preserving the instructions and substituing local 2-qubit gates by distributed gates if they involve qubits from different subcircuits. The name <cite>hspit</cite> stands for <em>horizontal split</em>, as in the conventional way to visually represent a circuit one would have to draw a horizontal line to separate the qubits of the circuit in two subsets.</p>
+<p>To divide a circuit <cite>circuit_to_divide</cite>, one should provide an additional argument that determines how the circuits should be divided. This argument can be a <strong>list with the number of qubits for each subcircuit</strong> (the lenght of the list determines the number of subcircuits), or an <strong>int specifying the number of subcircuits</strong>, which would get an equal number of qubits except possibly the last one, which would get the remainder if the number of qubits is not cleanly divided by the int provided.</p>
+<p>Basic syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># List with the number of qubits per subcircuit</span>
+<span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">]</span> <span class="o">=</span> <span class="n">hsplit</span><span class="p">(</span><span class="n">circuit_to_divide</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+
+<span class="c1"># Int specifying the number of resulting subcircuits</span>
+<span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">]</span> <span class="o">=</span> <span class="n">hsplit</span><span class="p">(</span><span class="n">circuit_to_divide</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In particular, it could be checked that <cite>union</cite> and <cite>hsplit</cite> are inverses of eachother:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># New circuit equivalent to circ is returned</span>
+<span class="n">union</span><span class="p">(</span><span class="n">hsplit</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="c1"># New circuits equal to circ1 and circ2 are returned</span>
+<span class="n">hsplit</span><span class="p">(</span><span class="n">union</span><span class="p">(</span><span class="n">circ1</span><span class="p">,</span> <span class="n">circ2</span><span class="p">),</span> <span class="p">[</span><span class="n">circ1</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">,</span> <span class="n">circ2</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Full example of the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit.transformations</span><span class="w"> </span><span class="kn">import</span> <span class="n">hsplit</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Acquiring resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">family_original</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">[</span><span class="n">qpu_original</span><span class="p">]</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_original</span><span class="p">)</span>
+
+<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">qpus_separated</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_separated</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Original circuit</span>
+<span class="c1"># union_circuit.q0: ─[H]──●──[M]─</span>
+<span class="c1">#                         |</span>
+<span class="c1"># union_circuit.q1: ─────[X]─[M]─</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit&quot;</span><span class="p">)</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+
+<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu_original</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># non-blocking call</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result before hsplit: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Split original circuit to create two communicated circuits, and execute them</span>
+<span class="c1"># circuit1.q0: ─[H]──●──[M]─</span>
+<span class="c1">#                    $</span>
+<span class="c1"># circuit2.q0: ─────[X]─[M]─</span>
+<span class="c1"># Where $ represents the remote control of the gate</span>
+<span class="c1"># ---------------------------</span>
+<span class="p">[</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">]</span> <span class="o">=</span> <span class="n">hsplit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">],</span> <span class="n">qpus_separated</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result after split: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># taking only the results from the 0 circuit</span>
+                                                    <span class="c1"># as both are the same, due to entanglement</span>
+
+<span class="c1"># ---------------------------</span>
+<span class="c1"># Relinquishing resources</span>
+<span class="c1"># ---------------------------</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family_original</span><span class="p">)</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family_separated</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quantum_comm.html" class="btn btn-neutral float-left" title="Quantum Communication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tools_for_VQAs.html" class="btn btn-neutral float-right" title="Parameters and upgrade_parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,6 +1,0 @@
-cunqa.qutils.nodes\_with\_QPUs
-==============================
-
-.. currentmodule:: cunqa.qutils
-
-.. autofunction:: nodes_with_QPUs

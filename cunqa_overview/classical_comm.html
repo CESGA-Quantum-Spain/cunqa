@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classical Communications &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=a8ff9168" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quantum Communication" href="quantum_comm.html" />
+    <link rel="prev" title="Embarrassingly Parallel" href="embarrassingly_parallel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cunqa_overview.html">CUNQA overview</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#virtual-qpu">Virtual QPU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#quantum-circuits">Quantum circuits</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cunqa_overview.html#dqc-schemes">DQC schemes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="embarrassingly_parallel.html">   Embarrassingly parallel</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">   Classical communications</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-deploy"><strong>How to deploy</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circuits-design"><strong>Circuits design</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#execution"><strong>Execution</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basic-example"><strong>Basic example</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="quantum_comm.html">   Quantum communications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#circuit-manipulation-techniques">Circuit Manipulation Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cunqa_overview.html#real-qpus">Real QPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="cunqa_overview.html">CUNQA overview</a></li>
+      <li class="breadcrumb-item active">Classical Communications</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cunqa_overview/classical_comm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="classical-communications">
+<h1>Classical Communications<a class="headerlink" href="#classical-communications" title="Link to this heading"></a></h1>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/ClassicalCommScheme.png"><img alt="Classical Communications scheme" src="../_images/ClassicalCommScheme.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Classical Communications scheme</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>This model extends the embarrassingly parallel approach by allowing processes to exchange
+<strong>classical information during execution</strong>, similarly to how MPI programs operate in classical
+HPC environments.</p>
+<p>In the context of quantum circuits, this communication is achieved by transmitting classical bits
+obtained from measurement outcomes. This enables the use of received bits to perform classically
+conditioned operations. In other words, if the value of a remote bit is <code class="docutils literal notranslate"><span class="pre">1</span></code>, specific quantum
+operations are applied to the designated local qubits.</p>
+<section id="how-to-deploy">
+<h2><strong>How to deploy</strong><a class="headerlink" href="#how-to-deploy" title="Link to this heading"></a></h2>
+<p>To lauch a set of vQPUs incorporating classical communications among them, you must use the flag
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">--classical-comm</span></code> when deploying.</p>
+<div class="tab-set docutils">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--1">Bash command</label><div class="tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span>&lt;num<span class="w"> </span>qpus&gt;<span class="w"> </span>-t<span class="w"> </span>&lt;max<span class="w"> </span>time&gt;<span class="w"> </span>--classical-comm<span class="w"> </span><span class="o">[</span>OTHER<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--2">Python function</label><div class="tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&lt;</span><span class="nb">max</span> <span class="n">time</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="p">[</span><span class="n">OTHER</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The above command line launches vQPUs with all-to-all classical communications connectivity. For
+additional options in the Bash command checkout <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a>, and check
+<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> for the Python function. Again, it is recomended to use the
+<code class="docutils literal notranslate"><span class="pre">--co-located</span></code> flag (and <code class="docutils literal notranslate"><span class="pre">co_located</span></code> attribute in Python), as it allows to access the vQPUs
+from every node, not just the one the vQPUs are being set up. In this documentation we are going
+to consider that this flag is set.</p>
+</section>
+<section id="circuits-design">
+<h2><strong>Circuits design</strong><a class="headerlink" href="#circuits-design" title="Link to this heading"></a></h2>
+<p>In order to classically condition local operations with remote bits, we must first implement the
+communication of such bits. With this purpose, <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> class
+incorporates the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.send" title="cunqa.circuit.core.CunqaCircuit.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send</span></code></a> and
+<a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.recv" title="cunqa.circuit.core.CunqaCircuit.recv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recv</span></code></a> class methods; and these steps must be followed:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>Creating</strong> both <strong>circuits</strong> and adding the desired operations on them:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_clbits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_clbits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+
+<span class="n">circuit_2</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If no <em>id</em> is not provided, it will be generated and accesed by the class attribute
+<a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.id" title="cunqa.circuit.core.CunqaCircuit.id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>Measuring and <strong>sending</strong> a classical bit from <code class="docutils literal notranslate"><span class="pre">circuit_1</span></code> and <strong>receiving</strong> it at
+<code class="docutils literal notranslate"><span class="pre">circuit_2</span></code>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit_1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">qubit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clbit</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">clbits</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">recving_circuit</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+
+<span class="n">circuit_2</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">clbits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sending_circuit</span><span class="o">=</span><span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>At <code class="docutils literal notranslate"><span class="pre">circuit_2</span></code> we receive the bit and store it at possition <code class="docutils literal notranslate"><span class="pre">1</span></code> of the local classical register.</p>
+<p>3. <strong>Classically controlling a quantum operation</strong> employing the <code class="xref py py-meth docutils literal notranslate"><span class="pre">cif</span></code>
+method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">circuit_2</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="n">clbits</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">subcircuit</span><span class="p">:</span>
+    <span class="n">subcircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We use the outcome stored at clbit <code class="docutils literal notranslate"><span class="pre">1</span></code> to classically control a <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.x" title="cunqa.circuit.core.CunqaCircuit.x"><code class="xref py py-meth docutils literal notranslate"><span class="pre">x</span></code></a>
+gate at qubit <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</div></blockquote>
+</section>
+<section id="execution">
+<h2><strong>Execution</strong><a class="headerlink" href="#execution" title="Link to this heading"></a></h2>
+<p>We obtain the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects associated to the displayed vQPUs with
+<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>, as a common step between the three models. It is important that
+those allow classical communications—i.e., that the aforementioned <code class="docutils literal notranslate"><span class="pre">classical-comm</span></code> flag was
+set—, otherwise an error will be raised.</p>
+<p>For the distribution, function <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> is used. By providing
+the list of circuits and the list of <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects we allow their mapping to the corresponding
+vQPUs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qpus_list</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">distributed_qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit_1</span><span class="p">,</span> <span class="n">circuit_2</span><span class="p">],</span> <span class="n">qpus_list</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can call for the results by the <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.gather" title="cunqa.qjob.gather"><code class="xref py py-func docutils literal notranslate"><span class="pre">gather</span></code></a> function, passing the list of
+<a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">distributed_qjobs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a blocking call, since here the function waits both executions to be done. Simulation times
+and output statistics can be accessed by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">times_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+
+<span class="n">counts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="basic-example">
+<h2><strong>Basic example</strong><a class="headerlink" href="#basic-example" title="Link to this heading"></a></h2>
+<p>Here we show an example on a classical communication performed from one circuit to another to classically control a quantum
+operation. Further examples and use cases are listed in <a class="reference internal" href="../further_examples/further_examples.html"><span class="doc">Further examples</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path.</span>
+<span class="c1"># In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
+
+<span class="c1"># 1. QPU deployment</span>
+
+<span class="c1"># If GPU execution is desired, just add &quot;gpu = True&quot; as another qraise argument</span>
+<span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="s2">&quot;qpus_class_comms&quot;</span><span class="p">)</span>
+<span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 2. Circuit design with classical communications directives</span>
+
+<span class="n">circuit_1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+<span class="n">circuit_2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">recving_circuit</span> <span class="o">=</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span>
+<span class="n">circuit_1</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">circuit_2</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sending_circuit</span> <span class="o">=</span> <span class="s2">&quot;circuit_1&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">circuit_2</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">subcircuit</span><span class="p">:</span>
+    <span class="n">subcircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">circuit_2</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># 3. Execution</span>
+
+<span class="n">distributed_qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit_1</span><span class="p">,</span> <span class="n">circuit_2</span><span class="p">],</span> <span class="n">qpus</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">distributed_qjobs</span><span class="p">)</span>
+<span class="n">counts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">counts</span><span class="p">,</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">counts_list</span><span class="p">,</span> <span class="n">qpus</span><span class="p">):</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts from vQPU </span><span class="si">{</span><span class="n">qpu</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 4. Release classical resources</span>
+<span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="embarrassingly_parallel.html" class="btn btn-neutral float-left" title="Embarrassingly Parallel" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quantum_comm.html" class="btn btn-neutral float-right" title="Quantum Communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

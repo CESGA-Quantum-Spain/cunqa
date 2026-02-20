@@ -1,6 +1,0 @@
-cunqa.circuit.parameter.variables
-=================================
-
-.. currentmodule:: cunqa.circuit.parameter
-
-.. autofunction:: variables
