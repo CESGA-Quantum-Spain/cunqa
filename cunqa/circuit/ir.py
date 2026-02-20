@@ -137,17 +137,17 @@ def _(c: QuantumCircuit) -> dict:
                      "params":instruction_params
                     }
             
-            if instruction.condition != None:
+            if instruction.operation.condition != None:
 
                 if instruction.operation._condition[1] not in [1]:
                     raise ValueError("Only 1 is accepted as condition for classicaly controlled operations for the current version.")
 
-                cc_clbit = classical_registers[instruction.condition[0]._register.name][instruction.condition[0]._index]
+                cc_clbit = classical_registers[instruction.operation.condition[0]._register.name][instruction.operation.condition[0]._index]
 
                 json_data["is_dynamic"] = True
                 json_data["instructions"].append({"name":"cif",
                                             "clbits":[cc_clbit],
-                                            "params":[instr]
+                                            "instructions":[instr]
                                             })
             
             else:

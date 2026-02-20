@@ -23,11 +23,9 @@
     
 """
 from typing import Union
-from sympy import Symbol
 import copy
 
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend # simulator (qjob.py), para transpilar (qpu.py), instanciacion (qutils.py)
-from cunqa.qpu import Backend
 from cunqa.logger import logger
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
