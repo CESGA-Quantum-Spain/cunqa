@@ -35,15 +35,17 @@ class CunqaCircuit:
 
         * - Unitary operations
           - Single-qubit gates
-          - :py:meth:`id`, :py:meth:`x`, :py:meth:`y`, :py:meth:`z`, :py:meth:`h`, :py:meth:`s`, :py:meth:`sdg`,
-            :py:meth:`sx`, :py:meth:`sxdg`, :py:meth:`t`, :py:meth:`tdg`, :py:meth:`u1`, :py:meth:`u2`, :py:meth:`u3`,
-            :py:meth:`u`, :py:meth:`p`, :py:meth:`r`, :py:meth:`rx`, :py:meth:`ry`, :py:meth:`rz`
+          - :py:meth:`id`, :py:meth:`x`, :py:meth:`y`, :py:meth:`z`, :py:meth:`h`, :py:meth:`s`, 
+            :py:meth:`sdg`, :py:meth:`sx`, :py:meth:`sxdg`, :py:meth:`t`, :py:meth:`tdg`, 
+            :py:meth:`u1`, :py:meth:`u2`, :py:meth:`u3`, :py:meth:`u`, :py:meth:`p`, :py:meth:`r`, 
+            :py:meth:`rx`, :py:meth:`ry`, :py:meth:`rz`
 
         * - 
           - Two-qubit gates
-          - :py:meth:`swap`, :py:meth:`cx`, :py:meth:`cy`, :py:meth:`cz`, :py:meth:`csx`, :py:meth:`cp`, :py:meth:`cu`,
-            :py:meth:`cu1`, :py:meth:`cu3`, :py:meth:`rxx`, :py:meth:`ryy`, :py:meth:`rzz`, :py:meth:`rzx`,
-            :py:meth:`crx`, :py:meth:`cry`, :py:meth:`crz`, :py:meth:`ecr`
+          - :py:meth:`swap`, :py:meth:`cx`, :py:meth:`cy`, :py:meth:`cz`, :py:meth:`csx`, 
+            :py:meth:`cp`, :py:meth:`cu`, :py:meth:`cu1`, :py:meth:`cu3`, :py:meth:`rxx`, 
+            :py:meth:`ryy`, :py:meth:`rzz`, :py:meth:`rzx`, :py:meth:`crx`, :py:meth:`cry`, 
+            :py:meth:`crz`, :py:meth:`ecr`
 
         * - 
           - Three-qubit gates
@@ -705,7 +707,8 @@ class CunqaCircuit:
         Class method to apply cecr gate to the given qubits.
 
         Args:
-            qubits (int): qubits in which the gate is applied, first one will be control qubit and second one target qubit.
+            qubits (int): qubits in which the gate is applied, first one will be control qubit and 
+                          second one target qubit.
         """
         self.add_instructions({
             "name":"cecr",
@@ -1216,7 +1219,8 @@ class CunqaCircuit:
 
     def send(self, clbits: Union[int, list[int]], recving_circuit: Union[str, 'CunqaCircuit']) -> None:
         """
-        Class method to send a bit (previously measured from a qubit) from the current circuit to a remote one. 
+        Class method to send a bit (previously measured from a qubit) from the current circuit to a 
+        remote one. 
         
         Args:
 
@@ -1330,8 +1334,8 @@ class CunqaCircuit:
                                                  qubit is used.
         
         Returns:
-            A :py:class:`QuantumControlContext` object to manage remotly controlled operations in the given 
-            circuit.
+            A :py:class:`QuantumControlContext` object to manage remotly controlled operations in 
+            the given circuit.
 
         Usage example:
 
@@ -1395,7 +1399,8 @@ class QuantumControlContext:
         instructions = []
         for instruction in self._subcircuit.instructions:
             if instruction["name"] in ["qsend", "qrecv", "expose", "recv"]:
-                raise RuntimeError("Remote operations, quantum or classical, are not allowed within a telegate block.")
+                raise RuntimeError("Remote operations, quantum or classical, are not allowed "
+                                   "within a telegate block.")
             instructions.append(instruction)
 
         rcontrol = {

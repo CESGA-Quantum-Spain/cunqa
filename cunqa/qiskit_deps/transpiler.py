@@ -1,13 +1,16 @@
 """
-    Holds the :py:func:`~cunqa.qiskit_deps.transpile.transpiler` function that translates circuit instructions into native instructions that a certain virtual QPU understands.
+    Holds the :py:func:`~cunqa.qiskit_deps.transpile.transpiler` function that translates circuit 
+    instructions into native instructions that a certain virtual QPU understands.
 
-    It is important and it is assumed that the circuit that is sent to the virtual QPU for its simulation is transplated into the propper native gates
-    and adapted to te backend's topology.
+    It is important and it is assumed that the circuit that is sent to the virtual QPU for its 
+    simulation is transplated into the propper native gates and adapted to te backend's topology.
 
-    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`, :py:class:`qiskit.QuantumCircuit` or json ``dict``,
-    :py:mod:`cunqa` provides two alternatives for transpiling it accordingly to a certain virtual QPU's backend:
+    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`, 
+    :py:class:`qiskit.QuantumCircuit` or json ``dict``, :py:mod:`cunqa` provides two alternatives 
+    for transpiling it accordingly to a certain virtual QPU's backend:
 
-        - When submmiting the circuit, set `transpile` as ``True`` and provide the rest of transpilation instructions:
+        - When submmiting the circuit, set `transpile` as ``True`` and provide the rest of 
+          transpilation instructions:
 
             >>> qpu.run(circuit, transpile = True, ...)
 
@@ -19,14 +22,16 @@
             >>> qpu.run(circuit_transpiled)
 
     .. warning::
-        If the circuit is not transpiled, errors will not raise, but the output of the simulation will not be coherent.
+        If the circuit is not transpiled, errors will not raise, but the output of the simulation 
+        will not be coherent.
     
 """
 from typing import Union
 import copy
 
-from cunqa.qiskit_deps.cunqabackend import CunqaBackend # simulator (qjob.py), para transpilar (qpu.py), instanciacion (qutils.py)
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.logger import logger
+from cunqa.qpu import Backend
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
 from cunqa.circuit.ir import to_ir
@@ -34,28 +39,44 @@ from cunqa.circuit.ir import to_ir
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
-from qiskit.circuit import QuantumRegister, ClassicalRegister, CircuitInstruction, Instruction, Qubit, Clbit, CircuitError, Parameter, ParameterExpression
+from qiskit.circuit import (
+    QuantumRegister, 
+    ClassicalRegister, 
+    CircuitInstruction, 
+    Instruction, 
+    Qubit, 
+    Clbit, 
+    Parameter, 
+    ParameterExpression
+)
 
 
-def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = None) -> Union['CunqaCircuit', dict, 'QuantumCircuit']:
+def transpiler(
+    circuit: Union[dict, QuantumCircuit, CunqaCircuit], 
+    backend: Backend, 
+    opt_level: int = 1, 
+    initial_layout: list[int] = None, 
+    seed: int = None
+) -> Union[CunqaCircuit, dict, QuantumCircuit]:
     """
     Function to transpile a circuit according to a given :py:class:`~cunqa.qpu.QPU`.
     The circuit is returned in the same format as it was originally.
 
-    Transpilation instructions are `opt_level`, which defines how optimal is the transpilation, default is ``1``; `initial_layout`
-    specifies the set of "real" qubits to which the quantum registers of the circuit are assigned.
-    These instructions are associated to the `qiskit.transpiler.compiler.transpile <https://quantum.cloud.ibm.com/docs/api/qiskit/1.2/compiler#qiskit.compiler.transpile>`_,
+    Transpilation instructions are `opt_level`, which defines how optimal is the transpilation, 
+    default is ``1``; `initial_layout` specifies the set of "real" qubits to which the quantum 
+    registers of the circuit are assigned. These instructions are associated to the 
+    `qiskit.transpiler.compiler.transpile <https://quantum.cloud.ibm.com/docs/api/qiskit/1.2/compiler#qiskit.compiler.transpile>`_,
     since it is used in the process.
 
     Args:
-        circuit (dict | qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit): circuit to be transpiled.
-
+        circuit (dict | qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit): circuit to be 
+                                                                              transpiled.
         backend (~cunqa.qpu.Backend): backend which transpilation will be done respect to.
-
-        opt_level (int): optimization level for creating the `qiskit.transpiler.passmanager.StagedPassManager`. Default set to 1.
-
-        initial_layout (list[int]): initial position of virtual qubits on physical qubits for transpilation, lenght must be equal to the number of qubits in the circuit.
-    
+        opt_level (int): optimization level for creating the 
+                         `qiskit.transpiler.passmanager.StagedPassManager`. Default set to 1.
+        initial_layout (list[int]): initial position of virtual qubits on physical qubits for 
+                                    transpilation, lenght must be equal to the number of qubits in 
+                                    the circuit.
         seed (int): transpilation seed.
     """
 
@@ -65,24 +86,29 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
 
         if isinstance(circuit, QuantumCircuit):
             if initial_layout is not None and len(initial_layout) != circuit.num_qubits:
-                raise TypeError(f"initial_layout must be of the size of the circuit, {circuit.num_qubits}, while it is {len(initial_layout)}.")
+                raise TypeError(f"initial_layout must be of the size of the circuit, "
+                                f"{circuit.num_qubits}, while it is {len(initial_layout)}.")
             
             qc = circuit
 
         elif isinstance(circuit, CunqaCircuit):
             # if circuit.has_cc or circuit.has_qc:
-            #     raise TypeError(f"CunqaCircuit with distributed instructions was provided, for which transpilation is not avaliable at the moment.")
+            #     raise TypeError(f"CunqaCircuit with distributed instructions was provided, for ""
+            #                     f"which transpilation is not avaliable at the moment.")
             
             qc = _from_ir_to_qc(circuit.info)
 
         elif isinstance(circuit, dict):
             if initial_layout is not None and len(initial_layout) != circuit['num_qubits']:
-                raise TypeError(f"initial_layout must be of the size of the circuit, {circuit.num_qubits}, while it is {len(initial_layout)}.")
+                raise TypeError(f"initial_layout must be of the size of the circuit, "
+                                f"{circuit.num_qubits}, while it is {len(initial_layout)}.")
             
             qc = _from_ir_to_qc(circuit)
 
         else:
-            raise TypeError(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, <class 'cunqa.circuit.core.CunqaCircuit'> or ir dict, but {type(circuit)} was provided.")
+            raise TypeError(f"Circuit must be <class 'qiskit.circuit.quantumcircuit.QuantumCircuit'>, "
+                            f"<class 'cunqa.circuit.core.CunqaCircuit'> or ir dict, but "
+                            f"{type(circuit)} was provided.")
     
     except Exception as error:
         raise error 
@@ -93,14 +119,22 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
     # transpilation
     try:
         cunqabackend = CunqaBackend(backend = backend)
-        qc_transpiled = transpile(qc, cunqabackend, initial_layout = initial_layout, optimization_level = opt_level, seed_transpiler = seed)
+        qc_transpiled = transpile(
+            qc, 
+            cunqabackend, 
+            initial_layout=initial_layout, 
+            optimization_level=opt_level, 
+            seed_transpiler=seed
+        )
     
     except TranspilerError as error:
         logger.error(f"Some error occured with transpilation.")
         raise error
 
     except Exception as error:
-        logger.error(f"Some error occurred with transpilation, please check that the target QPU is adequate for the provided circuit (enough number of qubits, simulator supports instructions, etc): {error} [{type(error).__name__}].")
+        logger.error(f"Some error occurred with transpilation, please check that the target QPU is "
+                     f"adequate for the provided circuit (enough number of qubits, simulator "
+                     f"supports instructions, etc): {error} [{type(error).__name__}].")
         raise error 
      
     
@@ -116,21 +150,32 @@ def transpiler(circuit, backend, opt_level = 1, initial_layout = None, seed = No
 
         dict_transpiled = to_ir(qc_transpiled)
 
-        cunqac_transpiled = CunqaCircuit(dict_transpiled["num_qubits"], dict_transpiled["num_clbits"], id = circuit._id + "_transpiled")
+        cunqac_transpiled = CunqaCircuit(
+            dict_transpiled["num_qubits"], 
+            dict_transpiled["num_clbits"], 
+            id=circuit._id + "_transpiled"
+        )
         cunqac_transpiled.add_instructions(dict_transpiled["instructions"])
 
         return cunqac_transpiled
 
 
 
-SUPPORTED_QISKIT_OPERATIONS = {'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset'}
+SUPPORTED_QISKIT_OPERATIONS = {
+    'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 
+    'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 
+    'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 
+    'if_else', 'barrier', 'reset'
+}
 
 
 def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
     """
-    Function to transform a circuit from CUNQA's intermidiate representation to :py:class:`qiskit.QuantumCircuit`.
+    Function to transform a circuit from CUNQA's intermidiate representation to 
+    :py:class:`qiskit.QuantumCircuit`.
 
-    Instructions refering to communication directives are not yet supported for :py:class:`qiskit.QuantumCircuit`.
+    Instructions refering to communication directives are not yet supported for 
+    :py:class:`qiskit.QuantumCircuit`.
 
     Args:
         circuit_dict (dict): circuit instructions to be transformed.
@@ -148,7 +193,9 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         classical_registers = circuit_dict['classical_registers']
 
     except KeyError as error:
-        logger.error(f"Circuit json not correct, requiered keys must be: 'instructions', 'num_qubits', 'num_clbits', 'quantum_resgisters' and 'classical_registers' [{type(error).__name__}].")
+        logger.error(f"Circuit json not correct, requiered keys must be: 'instructions', "
+                     f"'num_qubits', 'num_clbits', 'quantum_resgisters' and 'classical_registers' "
+                     f"[{type(error).__name__}].")
         raise error
         
     qc = QuantumCircuit()
@@ -168,7 +215,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
 
     # processing instructions
-
     for instruction in copy.deepcopy(instructions):
 
         instruction_name = instruction['name']
@@ -177,7 +223,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         instruction_params = instruction.get("params", [])
 
         # instanciating instruction's classical and quantum bits
-
         qiskit_Clbit = []; qiskit_Qubit = []
 
         if (instruction_clbits is not None) and (len(instruction_clbits) != 0):
@@ -194,7 +239,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
                         qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
 
         # processing params: Param, value or instructions for subcircuits in cif instruction
-
         qiskit_params = []; qiskit_cif_subcircs = []
 
         for param in instruction_params:
@@ -224,7 +268,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
 
         # processing of the instruction itself
-
         if  instruction_name == "measure":
 
             for qubit,clbit in zip(instruction_qubits, instruction_clbits):

@@ -5,6 +5,7 @@ import zmq
 import json
 import time
 from typing import Optional
+import socket
 
 from cunqa.constants import LIBS_DIR
 
@@ -14,7 +15,8 @@ except Exception:
     pass
 
 def _optimization_options_builder(
-    optimization: int, optimization_backend: str = "Tket"
+    optimization: int, 
+    optimization_backend: str = "Tket"
 ) -> int:
     """
     Builds the optimization options for the backend.
@@ -103,6 +105,7 @@ def _config_builder(
         config_str (str): json-string object that is sent and loaded in the
             server side
     """
+    
     inlineResultsProcessing, resultsFormatting = _results_format_builder(res_format)
     opt_value = _optimization_options_builder(optimization=optimization)
     config = {
@@ -159,7 +162,7 @@ def _get_run_config(run_config : dict) -> str:
 
 
 class QMIOFuture:
-    def __init__(self, socket = None, start_time = None, error = None):
+    def __init__(self, socket: socket.socket = None, start_time: int = None, error: str = None):
         self.socket = socket
         self.start_time = start_time
         self.error = error
@@ -188,11 +191,11 @@ class QMIOClient:
         self.context = zmq.Context()
         self._last_quantum_task = False
 
-    def connect(self, linker_endpoint : str) -> None:
+    def connect(self, linker_endpoint: str) -> None:
         self.socket = self.context.socket(zmq.DEALER)
         self.socket.connect(linker_endpoint)
 
-    def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
+    def send_circuit(self, quantum_task_str: str) -> QMIOFuture:
 
         quantum_task = json.loads(quantum_task_str)
         if "params" in quantum_task: 
@@ -219,7 +222,8 @@ class QMIOClient:
 
     def send_parameters(self, parameters : str) -> 'QMIOFuture':
         if not self._last_quantum_task:
-            future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update its parameters")
+            future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update "
+                                              "its parameters")
             return future_error
         return self.send_circuit(parameters)
 

@@ -88,7 +88,8 @@ def _list_interfaces(ipv4_only=True):
 def _get_IP(preferred_net_iface : Optional[str] = None) -> str:
     all_ifaces = _list_interfaces()
     if preferred_net_iface != None:
-        ifaces = {name: ips for name, ips in all_ifaces.items() if name.startswith(preferred_net_iface)}
+        ifaces = {name: ips for name, ips in all_ifaces.items() 
+                  if name.startswith(preferred_net_iface)}
         return all_ifaces[next(iter(ifaces))][0]
     else:
         for _, ips in all_ifaces.items():

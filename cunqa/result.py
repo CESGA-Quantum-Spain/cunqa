@@ -96,8 +96,8 @@ class Result:
                 {'000':34, '111':66}
 
         .. note::
-            If the circuit sent has more than one classical register, bit strings corresponding to each 
-            one of them will be separated by blank spaces in the order they were added:
+            If the circuit sent has more than one classical register, bit strings corresponding to 
+            each one of them will be separated by blank spaces in the order they were added:
 
                 >>> result.counts
                 {'001 11':23, '110 10':77}
@@ -171,18 +171,23 @@ class Result:
                     statevector = np.array(statevector).view(np.complex128)
 
             else:
-                raise RuntimeError(f"Statevector not found, try using circuit.save_state() at some point before executing.")
+                raise RuntimeError(f"Statevector not found, try using circuit.save_state() at some "
+                                   f"point before executing.")
                 
 
         except Exception as error:
-            raise RuntimeError(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
+            raise RuntimeError(f"Some error occured with Statevector "
+                               f"[{type(error).__name__}]: {error}.")
         
         return statevector
 
 
     @property
     def density_matrix(self) -> Union[dict[np.array], np.array]:
-        """Density matrix or dictionary of density matrices captured at the moment that `.save_state()` was performed on a circuit runned with `method = density_matrix` on AER."""
+        """
+        Density matrix or dictionary of density matrices captured at the moment that `.save_state()` 
+        was performed on a circuit runned with `method = density_matrix` on AER.
+        """
         try:
             if ("results" in list(self._result.keys()) 
                 and "result_types" in self._result["results"][0]["metadata"] 
@@ -197,14 +202,20 @@ class Result:
                     density_matrix = list(density_matrix.values())[0] # Extract the statevector if we only have one
 
             else:
-                raise RuntimeError(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
+                raise RuntimeError(f"Density Matrix not found, try using circuit.save_state() "
+                                   f"before executing with Aer.")
 
         except Exception as error:
-            raise RuntimeError(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
+            raise RuntimeError(f"Some error occured with Density Matrix "
+                               f"[{type(error).__name__}]: {error}.")
         
         return density_matrix
     
-    def probabilities(self, per_qubit: bool = False, partial: list[int] = None) -> Union[dict[np.array],  np.array]:
+    def probabilities(
+        self, 
+        per_qubit: bool = False, 
+        partial: list[int] = None
+    ) -> Union[dict[np.array],  np.array]:
         """
         Extracts probabilities from result information. If we have statevector or density matrix 
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
@@ -277,16 +288,21 @@ class Result:
             
             return probs
 
-        # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
+        # Get frequencies from counts as estimation of probabilities if state is not available
         else: 
-            logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
+            logger.debug(f"Estimating probabilities from the available counts. First ten counts: "
+                         f"{ {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
             if len(self._registers) > 1:
-                logger.debug(f"Computing probabilities of a circuit with {len(self._registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
+                logger.debug(f"Computing probabilities of a circuit with {len(self._registers)} "
+                             f"classical registers. Lenght of probabilities may not correspond "
+                             f"with 2^num_qubits.")
 
                 n = len(next(iter(self.counts.keys())).replace(" ", ""))
                 num_bitstrings = 2**n
                 if len(self.counts) != num_bitstrings:
-                    new_counts = {**_convert_counts({f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._registers), **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                    new_counts = {**_convert_counts({
+                        f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._registers), **self.counts
+                    }
                 else:
                     new_counts = self.counts
 
@@ -317,7 +333,9 @@ class Result:
             num_qubits = len(next(iter(self.counts.keys())))
             num_bitstrings = 2**num_qubits
             if len(self.counts) != num_bitstrings:
-                new_counts = {**{f"{i:0{num_qubits}b}": 0 for i in range(num_bitstrings)}, **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                new_counts = {
+                    **{f"{i:0{num_qubits}b}": 0 for i in range(num_bitstrings)}, **self.counts
+                }
 
             else:
                 new_counts = self.counts
@@ -366,7 +384,8 @@ def _divide(string: str, lengths: "list[int]") -> str:
 def _convert_counts(counts: dict, cl_registers: dict) -> dict:
 
     """
-    Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the division of the bit strings.
+    Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the 
+    division of the bit strings.
 
     Args:
     --------
@@ -376,7 +395,8 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
 
     Return:
     --------
-    Counts dictionary with keys as binary string correctly separated with spaces accordingly to the classical registers.
+    Counts dictionary with keys as binary string correctly separated with spaces accordingly to 
+    the classical registers.
     """
 
     if isinstance(cl_registers, dict):
@@ -416,7 +436,8 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
         short_bitstring_probs (np.array, dict[np.array]): set of probabilities per sub-bitstring
     """
-    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
+    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from 
+    # right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
     if partial is None:
         partial = [num_qubits - 1 - i for i in range(num_qubits)]
     else:
@@ -432,22 +453,28 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
             for k, probs_k in probs.items():
 
                 new_probs[k] = np.zeros((len(partial), 2))
-                # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+                # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
+                # the binary order, thus the base_ten_bitstring
                 for base_ten_bitstring, prob in enumerate(probs_k):
                     for i, i_qubit in enumerate(partial):
-
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
-                        new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
-                                                            # is determined by the zero or one on the bitstring
+                        
+                        # extract whether i have a zero or a one on position i_qubit of the bitstring
+                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) 
+                        # for each qubit, i have a two element list with prob of one and prob of 
+                        # zero. Which element should be updated is determined by the zero or one 
+                        # on the bitstring
+                        new_probs[k][i, zero_one] += prob 
 
         else: # probs is an array
             new_probs = np.zeros((len(partial), 2))
 
-            # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+            # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
+            # the binary order, thus the base_ten_bitstring
             for base_ten_bitstring, prob in enumerate(probs):
                 for i, i_qubit in enumerate(partial):
 
-                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                    #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
                     new_probs[i, zero_one] += prob
         
         return new_probs
@@ -458,18 +485,26 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
             short_bitstring_probs = {}
             for k, probs_k in probs.items():
 
-                short_bitstring_probs[k] = {format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 for  bitstring_ten in range(2**short_num_qubits)}
+                short_bitstring_probs[k] = {
+                    format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
+                    for bitstring_ten in range(2**short_num_qubits)
+                }
                 for base_ten_bitstring, prob in enumerate(probs_k):
 
-                    shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                    shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
+                                                          for i in partial])
                     short_bitstring_probs[k][shortened_bitstring] += prob
 
         elif isinstance(probs, np.ndarray):        
 
-            short_bitstring_probs = {format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 for bitstring_ten in range(2**short_num_qubits)}
+            short_bitstring_probs = {
+                format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
+                for bitstring_ten in range(2**short_num_qubits)
+            }
             for base_ten_bitstring, prob in enumerate(probs):
 
-                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
+                                                      for i in partial])
                 short_bitstring_probs[shortened_bitstring] += prob
 
         return short_bitstring_probs

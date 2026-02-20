@@ -56,8 +56,17 @@ class CunqaBackend(BackendV2):
         qubits_properties = []
         for k,q in qubits.items():
             # TODO: check if key is the correct format q[i]
-            qubits_properties.append(QubitProperties(t1=q["T1 (s)"],t2=q["T2 (s)"],frequency=q["Drive Frequency (Hz)"]))
-            readout_errors[(_get_qubit_index(k),)] = InstructionProperties(duration=q["Readout duration (s)"], error = 1-q["Readout fidelity (RB)"])
+            qubits_properties.append(
+                QubitProperties(
+                    t1=q["T1 (s)"],
+                    t2=q["T2 (s)"],
+                    frequency=q["Drive Frequency (Hz)"]
+                )
+            )
+            readout_errors[(_get_qubit_index(k),)] = InstructionProperties(
+                duration=q["Readout duration (s)"], 
+                error = 1-q["Readout fidelity (RB)"]
+            )
         
         logger.debug(f"{self._num_qubits} qubits properties loaded from noise_properties_json.")
 
@@ -92,17 +101,23 @@ class CunqaBackend(BackendV2):
         for qubit,gates_dict in noise_properties_json["Q1Gates"].items():
             for gate, gate_properties in gates_dict.items():
                 try:
-                    single_qubit_gates[gate][1][(_get_qubit_index(qubit),)]  = InstructionProperties(duration = gate_properties["Gate duration (s)"], error = 1- gate_properties["Fidelity(RB)"] )
+                    single_qubit_gates[gate][1][(_get_qubit_index(qubit),)]  = InstructionProperties(
+                        duration = gate_properties["Gate duration (s)"], 
+                        error = 1- gate_properties["Fidelity(RB)"] 
+                    )
 
                 except ValueError as error:
-                    logger.warning(f"Qubit {qubit} does not have the right sintax [{type(error).__name__}].")
+                    logger.warning(f"Qubit {qubit} does not have the right sintax "
+                                   f"[{type(error).__name__}].")
                     logger.warning("Instruction will be ignored.")
-                    # because gate will be ignored, we delete it from noise_properties_json and single_qubit_gates dict
+                    # because gate will be ignored, we delete it from noise_properties_json and 
+                    # single_qubit_gates dict
                     gates_dict.pop(gate)
                     single_qubit_gates.pop(gate)
 
                 except Exception as error:
-                    logger.error(f"Some error occured while adding instruction for gate {gate} in qubit {qubit[2:-1]}: {error} [{type(error).__name__}].")
+                    logger.error(f"Some error occured while adding instruction for gate {gate} in "
+                                 f"qubit {qubit[2:-1]}: {error} [{type(error).__name__}].")
                     raise SystemExit # User's level
 
         
@@ -138,19 +153,27 @@ class CunqaBackend(BackendV2):
             for gate, gate_properties in gates_dict.items():
                 try:
                     if _get_qubits_indexes(qubits) != [gate_properties["Control"],gate_properties["Target"]]:
-                        logger.warning(f"Inconsistency in control and target qubits for gate {gate}({_get_qubits_indexes(qubits)}!={[gate_properties['Control'],gate_properties['Target']]}), instruction will be added for qubits {[gate_properties['Control'],gate_properties['Target']]}.")
+                        logger.warning(f"Inconsistency in control and target qubits for gate "
+                                       f"{gate}({_get_qubits_indexes(qubits)}!={[gate_properties['Control'],gate_properties['Target']]}), "
+                                       f"instruction will be added for qubits {[gate_properties['Control'],gate_properties['Target']]}.")
 
-                    two_qubit_gates[gate][1][(gate_properties["Control"],gate_properties["Target"],)]  = InstructionProperties(duration = gate_properties["Duration (s)"], error = 1- gate_properties["Fidelity(RB)"] )
+                    two_qubit_gates[gate][1][(gate_properties["Control"],gate_properties["Target"],)] = InstructionProperties(
+                        duration = gate_properties["Duration (s)"], 
+                        error = 1- gate_properties["Fidelity(RB)"] 
+                    )
 
                 except ValueError as error:
-                    logger.warning(f"Qubits {qubits} do not have the right sintax [{type(error).__name__}].")
+                    logger.warning(f"Qubits {qubits} do not have the right sintax "
+                                   f"[{type(error).__name__}].")
                     logger.warning("Instruction will be ignored.")
-                    # because gate will be ignored, we delete it from noise_properties_json and single_qubit_gates dict
+                    # because gate will be ignored, we delete it from noise_properties_json and 
+                    # single_qubit_gates dict
                     gates_dict.pop(gate)
                     two_qubit_gates.pop(gate)
 
                 except Exception as error:
-                    logger.error(f"Some error occured while adding instruction for gate {gate} in qubit {_get_qubits_indexes(qubits)}: {error}.")
+                    logger.error(f"Some error occured while adding instruction for gate {gate} in "
+                                 f"qubit {_get_qubits_indexes(qubits)}: {error}.")
                     raise SystemExit # User's level
 
 
@@ -209,7 +232,8 @@ class CunqaBackend(BackendV2):
 
                     if gate_object.num_qubits > 1:
 
-                        inst_map = { tuple(couple): None for couple in coupling_map if len(couple) == gate_object.num_qubits}
+                        inst_map = {tuple(couple): None for couple in coupling_map 
+                                    if len(couple) == gate_object.num_qubits}
 
                     else:
                         inst_map = { (q,): None for q in range(backend_json["n_qubits"]) }
@@ -265,22 +289,27 @@ def _get_qubits_indexes(qubits_str):
 
 
 
-from qiskit.circuit.library.standard_gates import (U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UGate, CUGate, PhaseGate, RGate, RXGate, RYGate, RZGate, ECRGate,
-                                                   CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, SXGate, SXdgGate, TGate, TdgGate,
-                                                   SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate)
+from qiskit.circuit.library.standard_gates import (
+    U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UGate, CUGate, PhaseGate, RGate, RXGate, RYGate, 
+    RZGate, ECRGate, CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, 
+    SXGate, SXdgGate, TGate, TdgGate, SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, 
+    CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate)
 
 def _get_gate(name: str):
 
     no_param_gate_map = {
-        "id":  IGate,"x": XGate, "y": YGate,"z": ZGate,"h": HGate,"s":SGate,"sdg": SdgGate,"sx":  SXGate,"sxdg": SXdgGate,"t":   TGate,
-        "tdg": TdgGate,  "swap": SwapGate,   "cx":  CXGate,  "cy":  CYGate,    "cz":  CZGate, "csx": CSXGate, "ccx": CCXGate,  # Toffoli
-        "ccz": CCZGate,"cswap": CSwapGate, "ecr":ECRGate
+        "id": IGate, "x": XGate, "y": YGate, "z": ZGate, "h": HGate, "s": SGate, "sdg": SdgGate,
+        "sx": SXGate, "sxdg": SXdgGate, "t": TGate, "tdg": TdgGate, "swap": SwapGate, "cx": CXGate,
+        "cy":  CYGate, "cz": CZGate, "csx": CSXGate, "ccx": CCXGate, "ccz": CCZGate, 
+        "cswap": CSwapGate, "ecr":ECRGate
     }
 
     param_gate_map = {
-        "u1":  (U1Gate, 1), "u2":  (U2Gate, 2),"u3":  (U3Gate, 3), "cu1": (CU1Gate, 1), "cu3": (CU3Gate, 3), "u":   (UGate, 3), "cu":  (CUGate, 4), "p":   (PhaseGate, 1),  # u1(λ) se mapea a PhaseGate(λ)
-        "r":   (RGate, 2), "rx":  (RXGate, 1), "ry":  (RYGate, 1), "rz":  (RZGate, 1),  "crx": (CRXGate, 1), "cry": (CRYGate, 1), "crz": (CRZGate, 1),
-        "rxx": (RXXGate, 1), "ryy": (RYYGate, 1),"rzz": (RZZGate, 1),"rzx": (RZXGate, 1), "cp": (CPhaseGate, 1)
+        "u1": (U1Gate, 1), "u2": (U2Gate, 2),"u3": (U3Gate, 3), "cu1": (CU1Gate, 1), 
+        "cu3": (CU3Gate, 3), "u": (UGate, 3), "cu": (CUGate, 4), "p": (PhaseGate, 1),
+        "r": (RGate, 2), "rx": (RXGate, 1), "ry": (RYGate, 1), "rz": (RZGate, 1), 
+        "crx": (CRXGate, 1), "cry": (CRYGate, 1), "crz": (CRZGate, 1), "rxx": (RXXGate, 1), 
+        "ryy": (RYYGate, 1),"rzz": (RZZGate, 1),"rzx": (RZXGate, 1), "cp": (CPhaseGate, 1)
     }
 
     gate_name = name.lower()
