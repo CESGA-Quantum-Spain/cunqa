@@ -24,15 +24,6 @@ struct ClassicalChannel::Impl
         LOGGER_DEBUG("Communication channel with MPI configured.");
     }
 
-    Impl(const std::string& id)
-    {
-        MPI_Init(NULL, NULL);
-        MPI_Comm_size(MPI_COMM_WORLD, &(mpi_size));
-        MPI_Comm_rank(MPI_COMM_WORLD, &(mpi_rank));
-    
-        LOGGER_DEBUG("Communication channel with MPI configured.");
-    }
-
     ~Impl() = default;
 
     void send(const int& measurement, const std::string& target)
@@ -70,44 +61,28 @@ struct ClassicalChannel::Impl
     }
 };
 
-
-
-ClassicalChannel::ClassicalChannel() : pimpl_{std::make_unique<Impl>()}
-{
-    endpoint = std::to_string(pimpl_->mpi_rank);
-}
-
-ClassicalChannel::ClassicalChannel(const std::string& id) : pimpl_{std::make_unique<Impl>(id)}
-{
+ClassicalChannel::ClassicalChannel(const std::string& qpu_id) : 
+    qpu_id{qpu_id},
+    pimpl_{std::make_unique<Impl>(qpu_id)} 
+{ 
     endpoint = std::to_string(pimpl_->mpi_rank);
 }
 
 ClassicalChannel::~ClassicalChannel() = default;
 
 
-void ClassicalChannel::publish(const std::string& suffix)
+void ClassicalChannel::publish()
 {
-    JSON communications_endpoint = 
+    JSON endpoint = 
     {
-        {"communications_endpoint", endpoint}
+        {"endpoint", endpoint}
     };
-    write_on_file(communications_endpoint, constants::COMM_FILEPATH, suffix);
+    write_on_file(endpoint, constants::COMM_FILEPATH, qpu_id);
 }
 
-void ClassicalChannel::connect(const std::string& endpoint, const std::string& id) 
+void connect(const std::string& qpu_id)
 {
     LOGGER_DEBUG("connect(const std::string& endpoint, const std::string& id) not implemented for MPI");
-}
-
-void ClassicalChannel::connect(const std::string& endpoint, const bool force_endpoint)
-{
-    LOGGER_DEBUG("connect(const std::string& endpoint, const bool force_endpoint) not implemented for MPI");
-}
-
-void ClassicalChannel::connect(const std::vector<std::string>& endpoints, const bool force_endpoint) 
-{
-    LOGGER_DEBUG("connect(const std::vector<std::string>& endpoints, const bool force_endpoint) not implemented for MPI");
-
 }
 
 void ClassicalChannel::send_info(const std::string& data, const std::string& target)

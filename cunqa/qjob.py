@@ -1,563 +1,279 @@
 """
-    Contains objects that define and manage quantum emulation jobs.
+    Contains objects that define and manage quantum emulation jobs. The core of this module is the 
+    class :py:class:`~cunqa.qjob.QJob`. These objects are created when a quantum job is sent to a 
+    vQPU, as a return of the :py:func:`~cunqa.qpu.run` function:
 
-    The core of this module is the class :py:class:`~cunqa.qjob.QJob`. These objects are created when a quantum job
-    is sent to a virtual QPU, as a return of the :py:meth:`~cunqa.qpu.QPU.run` method:
-
-        >>> qpu.run(circuit)
+        >>> run(circuit, qpu)
         <cunqa.qjob.QJob object at XXXXXXXX>
         
-    Once it is created, the circuit is being simulated at the virtual QPU.
-    :py:class:`QJob` is the bridge between sending a circuit with instructions and recieving the results.
-    Because of this, usually one wants to save this output in a variable:
+    In this method, after the :py:class:`~cunqa.qjob.QJob` instance is created, the circuit is 
+    submitted for simulation at the vQPU. :py:class:`QJob` is the bridge between sending a 
+    circuit with instructions and receiving the results.
 
-        >>> qjob = qpu.run(circuit)
+    Another functionality described in the submodule is the function :py:func:`~cunqa.qjob.gather`, 
+    which receives a list of :py:class:`~QJob` objects and returns their results as 
+    :py:class:`~cunqa.result.Result` objects.
 
-    Another functionality described in the submodule is the function :py:func:`~gather`, 
-    which recieves a list of :py:class:`~QJob` objects and returns their results as :py:class:`~cunqa.result.Result`
-    objects.
-
-        >>> qjob_1 = qpu_1.run(circuit_1)
-        >>> qjob_2 = qpu_2.run(circuit_2)
-        >>> results = gather([qjob_1, qjob_2])
-    
-    For further information on sending and gathering quantum jobs, chekout the `Examples Galery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-
-
+        >>> qjob_1 = run(circuit_1, qpu_1)
+        >>> qjob_2 = run(circuit_2, qpu_2)
+        >>> gather([qjob_1, qjob_2])
+        [<cunqa.result.Result object at XXXXXXXX>, <cunqa.result.Result object at XXXXXXXX>]
     """
 
-from typing import  Union, Any
 import json
-from typing import  Optional, Union, Any
-from qiskit import QuantumCircuit
-from qiskit.qasm2.exceptions import QASM2Error
-from qiskit.exceptions import QiskitError
+from typing import  Optional, Any, Union
 
-from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.converters import convert, _registers_dict
 from cunqa.logger import logger
-from cunqa.backend import Backend
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
+from sympy import Symbol
+from cunqa.circuit.parameter import encoder, Param
 from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
-
-
-class QJobError(Exception):
-    """Exception for error during job submission to virtual QPUs."""
-    pass
 
 class QJob:
     """
-    Class to handle jobs sent to virtual QPUs.
+    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output 
+    of the :py:meth:`~cunqa.qpu.run` method. The quantum job not only contains the circuit to 
+    be simulated, but also simulation instructions and information of the vQPU to which the job 
+    is sent. This class has a main attribute: :py:attr:`QJob.result` which stores the information 
+    about the execution. 
 
-    A :py:class:`QJob` object is created as the output of the :py:meth:`~cunqa.qpu.QPU.run` method.
-    The quantum job not only contains the circuit to be simulated, but also simulation instructions and information of the virtual QPU to which the job is sent.
+    .. autoattribute:: result
 
-    One would want to save the :py:class:`QJob` resulting from sending a circuit in a variable.
-    Let's say we want to send a circuit to a QPU and get the result and the time taken for the simulation:
+    But first, in order to be able to call the attribute :py:attr:`QJob.result`, it is necessary to 
+    submit the job for execution. To do so, we will use the method :py:meth:`QJob.submit`.
 
-        >>> qjob = qpu.run(circuit)
-        >>> result = qjob.result
-        >>> print(result)
-        <cunqa.result.Result object at XXXXXXXX>
-        >>> time_taken = qjob.time_taken
-        >>> print(time_taken)
-        0.876
+    .. automethod:: submit
 
-    Note that the `time_taken` is expressed in seconds. More instructions on obtaining data from :py:class:`~cunqa.result.Result`
-    objects can be found on its documentation.
+    But the objective of the :py:class:`QJob` class is not only to retrieve the result. It also 
+    allows an easy updating of the quantum task sent without the need of resend the whole circuit. 
+    This is really useful, especially working with variational quantum algorithms (VQAs) [#]_, which 
+    need to change the parameters of the gates in a circuit as they are optimized in each iteration. 
+    This parameter update is done using the :py:meth:`~QJob.upgrade_parameters` method.
 
-    Handling QJobs sent to the same QPU
-    ====================================
-    Let's say we are sending two different jobs to the same QPU.
-    This would not result on a parallelization, each QPU can only execute one simulation at the time.
-    When a virtual QPU recieves a job while simulating one, it would wait in line untill the earlier finishes.
-    Because of how the client-server comunication is built, we must be careful and call for the results in the same order in which the jobs where submited.
-    The correct workflow would be:
+    .. automethod:: upgrade_parameters
 
-        >>> qjob_1 = qpu.run(circuit_1)
-        >>> qjob_2 = qpu.run(circuit_2)
-        >>> result_1 = qjob_1.result
-        >>> result_2 = qjob_2.result
-
-    This is because the server follows the rule FIFO (*First in first out*), if we want to recieve the second result,
-    the first one has to be out.
-
-    .. warning::
-        In the case in which the order is not respected, everything would work, but results will not correspond
-        to the job. A mix up would happen.
-
-    Handling QJobs sent to different QPUs
-    =====================================
-    Here we can have parallelization since we are working with more than one virtual QPU.
-    Let's send two circuits to two different QPUs:
-
-        >>> qjob_1 = qpu_1.run(circuit_1)
-        >>> qjob_2 = qpu_2.run(circuit_2)
-        >>> result_1 = qjob_1.result
-        >>> result_2 = qjob_2.result
-
-    This way, when we send the first job, then inmediatly the sencond one is sent, because :py:meth:`~cunqa.qpu.QPU.run` does not wait
-    for the simulation to finish. In this manner, both jobs are being run in both QPUs simultaneously! Here we do not need to perserve the order,
-    since jobs are managed by different :py:class:`QClient` objects, there can be no mix up.
-
-    In fact, the function :py:func:`~cunqa.qjob.gather` is designed for recieving a list of qjobs and return the results; therefore, let's say
-    we have a list of circuits that we want to submit to a group of QPUs:
-
-        >>> qjobs = []
-        >>> for circuit, qpu in zip(circuits, qpus):
-        >>> ... qjob = qpu.run(circuit)
-        >>> ... qjobs.append(qjob)
-        >>> results = gather(qjobs)
-
-    In this workflow, all circuits are sent to each QPU an simulated at the same time. Then, when calling for the results, the program is blocked
-    waiting for all of them to finish. Other examples of classical parallelization of quantum simulation taks can be found at the
-    `Examples Gellery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-
-    .. note::
-        The function :py:func:`~cunqa.qjob.gather` can also handle :py:class:`~QJob` objects sent to the same virtual QPU, but the order must
-        be perserved in the list provided.
-
-
-    Upgrading parameters from QJobs
-    ===============================
-
-    In some ocassion, especially working with variational quantum algorithms (VQAs) [#]_, they need of changing the parameters of the gates in a circuit
-    arises. These parameters are optimzied in order to get the circuit to output a result that minimizes a problem. In this minimization process,
-    parameters are updated on each iteration (in general).
-    
-    Our first thought can be to update the parameters, build a new circuit with them and send
-    it to the QPU. Nevertheless, since the next circuit will have the same data but for the value of the parameters in the gates, a lot of information
-    is repeated, so :py:mod:`~cunqa` has a more efficient and simple way to handle this cases: a method to send to the QPU a list with the new parameters
-    to be assigned to the circuit, :py:meth:`~QJob.upgrade_parameters`.
-
-    Let's see a simple example: creating a parametric circuit and uptading its parameters:
-
-        >>> # building the parametric circuit
-        >>> circuit = CunqaCircuit(3)
-        >>> circuit.ry(0.25, 0)
-        >>> circuit.rx(0.5, 1)
-        >>> circuit.p(0.98, 2)
-        >>> circuit.measure_all()
-        >>> # sending the circuit to a virtual QPU
-        >>> qjob = qpu.run(circuit)
-        >>> # defining the new set of parameters
-        >>> new_parameters = [1,1,0]
-        >>> # upgrading the parameters of the job
-        >>> qjob.upgrade_parameters(new_parameters)
-        >>> result = qjob.result
-
-    From this simple workflow, we can build loops that update parameters according to some rules, or by a optimizator, and upgrade the circuit until
-    some stoping criteria is fulfilled.
-
-    .. warning::
-        Before sending the circuit or upgrading its parameters, the result of the prior job must be called. It can be done manually, so that we can
-        save it and obtain its information, or it can be done automatically as in the example above, but be aware that once the :py:meth:`upgrade_parameters`
-        method is called, this result is discarded.
-
-    References:
-    ~~~~~~~~~~~
+    *References*:
 
     .. [#] `Variational Quantum Algorithms arXiv <https://arxiv.org/abs/2012.09265>`_ .
 
 
     """
-    _backend: 'Backend' 
-    _qclient: Union['QClient', 'QMIOClient'] #: Client linked to the server that listens at the virtual QPU.
+    qclient: Union[QClient, QMIOClient]
+    _circuit_id: str
     _updated: bool
-    _future: Union['FutureWrapper', 'QMIOFuture'] 
-    _result: Optional['Result']
-    _circuit_id: str 
     _device: dict
-    _sending_to: "list[str]"
-    _is_dynamic: bool
-    _has_cc: bool
-    _has_qc: bool
+    _future: Union[FutureWrapper, QMIOFuture] 
+    _result: Optional[Result]
+    _quantum_task: dict
+    _params: list[Param]
 
-    def __init__(self, qclient: Union['QClient', 'QMIOClient'], device: dict, backend: 'Backend', circuit: Union[dict, 'CunqaCircuit', 'QuantumCircuit', str], **run_parameters: Any):
-        """
-        Initializes the :py:class:`QJob` class.
+    def __init__(
+            self, 
+            qclient: Union[QClient, QMIOClient], 
+            device: dict, 
+            circuit_ir: dict, 
+            **run_parameters: Any
+    ):
+        self._qclient = qclient
+        self._device = device
+        self._circuit_id = circuit_ir["id"]
+        self._cregisters = circuit_ir["classical_registers"]
+        self._params = circuit_ir["params"]
+        self._updated = False
+        self._future = None
+        self._result = None
 
-        Possible instructions to add as `**run_parameters` can be: *shots*, *method*, *parameter_binds*, *meas_level*, ...
-        For further information, check :py:meth:`~cunqa.qpu.QPU.run` method.
+        run_config = {
+            "shots": 1024, 
+            "method":"automatic", 
+            "avoid_parallelization": False,
+            "num_clbits": circuit_ir["num_clbits"], 
+            "num_qubits": circuit_ir["num_qubits"], 
+            "seed": 123123,
+            "device": self._device
+        }
 
-        .. warning::
-
-            At this point, *circuit* is asumed to be translated into the native gates of the *backend*.
-            Otherwise, simulation will fail and an error will be returned as the result.
-            For further details, checkout :py:mod:`~cunqa.transpile`.
-
-        Args:
-            qclient (QClient): client linked to the server that listens at the virtual QPU.
-
-            backend (~cunqa.backend.Backend): gathers necessary information about the simulator.
-
-            circ (qiskit.QuantumCircuit | dict | ~cunqa.circuit.CunqaCircuit): circuit to be run.
-
-            **run_parameters : any other simulation instructions.
-
-        """
-
-        self._backend: 'Backend' = backend
-        self._qclient: Union['QClient', 'QMIOClient'] = qclient
-        self._updated: bool = False
-        self._future: Union['FutureWrapper', 'QMIOFuture'] = None
-        self._result: Optional['Result'] = None
-        self._circuit_id: str = ""
-        self.device: dict = device
-
-        self._convert_circuit(circuit)
-        self._configure(**run_parameters)
-        logger.debug("Qjob correctly configured")
+        if (run_parameters == None) or (len(run_parameters) == 0):
+            logger.warning("No run parameters provided, default were set.")
+        elif (type(run_parameters) == dict): 
+            for k,v in run_parameters.items():
+                run_config[k] = v
+        else:
+            logger.warning("Error when reading `run_parameters`, default were set.")
+        
+        self._quantum_task = {
+            "config": run_config, 
+            "instructions": circuit_ir["instructions"],
+            "sending_to": circuit_ir["sending_to"],
+            "is_dynamic": circuit_ir["is_dynamic"],
+            "id": circuit_ir["id"]
+        }
+      
+        logger.debug("Qjob configured")
 
     @property
-    def result(self) -> 'Result':
+    def result(self) -> Result:
         """
-        Result of the job.
-        If no error occured during simulation, a :py:class:`~cunqa.result.Result` object is retured.
-        Otherwise, :py:class:`~cunqa.result.ResultError` will be raised.
+        Result of the job. If no error occured during simulation, a :py:class:`~cunqa.result.Result` 
+        object is retured.
+
+            >>> qjob = qpu.run(circuit)
+            >>> result = qjob.result
+            >>> print(result.counts)
+            {'00': 524, '11': 500}
 
         .. note::
-            Since to obtain the result the simulation has to be finished, this method is a blocking call,
-            which means that the program will be blocked until the :py:class:`QClient` has recieved from
-            the corresponding server the outcome of the job.
-            The result is not sent from the server to the :py:class:`QClient` until this method is called.
+            Since to obtain the result the simulation has to be finished, this method is a blocking 
+            call, which means that the program will be blocked until the :py:class:`QClient` has 
+            recieved from the corresponding server the outcome of the job. The result is not sent 
+            from the server to the :py:class:`QClient` until this method is called.
+        
+        .. warning::
+            Because of how the client-server comunication is built, the user must be careful and call 
+            for the results in the same order in which the jobs where submited. If the order is not 
+            respected, no errors would be raised but results will not correspond to the job -
+            a mix up would happen. This is because the server follows the FIFO rule (*First in 
+            first out*): if we want to receive the second result, the first one has to be out.
 
         """
-        try:
-            if self._future is not None and self._future.valid():
-                if self._result is not None:
-                    if not self._updated: # if the result was already obtained, we only call the server if an update was done
-                        res = self._future.get()
-                        self._result = Result(json.loads(res), circ_id=self._circuit_id, cl_registers=self._cregisters)
-                        self._updated = True
-                    else:
-                        pass
-                else:
-                    res = self._future.get()
-                    self._result = Result(json.loads(res), self._circuit_id, cl_registers=self._cregisters)
-                    self._updated = True
-            else:
-                logger.debug(f"self._future is None or non-valid, None is returned.")
-                return
-
-            if self._result is not None:
-                if not self._updated: # if the result was already obtained, we only call the server if an update was done
-                    res = self._future.get()
-                    self._result = Result(json.loads(res), circ_id=self._circuit_id, registers=self._cregisters)
-                    self._updated = True
-                else:
-                    pass
-            else:
+        if self._future is not None:
+            if (self._result is not None and not self._updated) or (self._result is None):
                 res = self._future.get()
-                self._result = Result(json.loads(res), self._circuit_id, registers=self._cregisters)
+                self._result = Result(
+                    json.loads(res), 
+                    circ_id=self._circuit_id, 
+                    registers=self._cregisters
+                )
                 self._updated = True
-                
-        except Exception as error:
-                logger.error(f"Error while reading the results {error}")
-                raise SystemExit # User's level
-
+        else:
+            raise RuntimeError("self._future is None which means that the QJob has not "
+                               "been submitted.")
         return self._result
 
-    @property
-    def time_taken(self) -> str:
-        """
-        Time that the job took.
-        """
-
-        if self._future is None or not self._future.valid():
-            logger.error(f"No QJob submited [{QJobError.__name__}].")
-            raise SystemExit # User's level
-
-        if self._result is None:
-            logger.error(f"QJob not finished [{QJobError.__name__}].")
-            raise SystemExit # User's level
-
-        try:
-            return self._result.time_taken
-        except AttributeError:
-            logger.warning("Time taken not available.")
-            return ""
-        
-
-    def submit(self) -> None:
+    def submit(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None
+    ) -> None:
         """
         Asynchronous method to submit a job to the corresponding :py:class:`QClient`.
 
+            >>> qjob = QJob(qclient, circuit_ir, **run_parameters)
+            >>> qjob.submit() # Already has all the info of where and what to send
+
+        In case the circuit is parametric it needs to be called with the value of its free 
+        parameters set with the :py:attr:`param_values`.
+        
         .. note::
-            Differently from :py:meth:`~QJob.result`, this is a non-blocking call.
-            Once a job is summited, there is no wait, the python program continues at the same time that
-            the corresponding server recieves and simualtes the circuit.
+            Opposite to :py:attr:`~cunqa.qjob.QJob.result`, this is a non-blocking call.
+            Once a job is submitted, the python program continues without waiting while  
+            the corresponding server receives and simulates the circuit.
+        
+        param_values (dict | list): either a list of ordered parameters to assign to the 
+                                    parametrized circuit or a dictionary with keys being the 
+                                    free parameters' names and its values being its 
+                                    corresponding new values.
         """
         if self._future is not None:
-            logger.warning("QJob has already been submitted.")
-            return
-        
-        try:
-            self._future = self._qclient.send_circuit(self._execution_config)
-            logger.debug("Circuit was sent.")
-        except Exception as error:
-            logger.error(f"Some error occured when submitting the job [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
+            logger.error("QJob has already been submitted.")
+        else:
+            if param_values is not None:
+                self.assign_parameters_(param_values)
             
-    def upgrade_parameters(self, parameters: Union[dict[Union[float, int]], list[Union[float, int]]], shots: int = None) -> None:
+            self._future = self._qclient.send_circuit(
+                json.dumps(
+                    self._quantum_task,
+                    default=encoder
+                )
+            )
+            
+            logger.debug("Circuit was sent.")
+            
+    def upgrade_parameters(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
+    ) -> None:
         """
-        Method to upgrade the parameters in a previously submitted parametric circuit job.
-        The function checks wether the previous result was retrieved or not. If it wasn't the method 
-        retrieves and discards it, so the next result is that of the updated parameters. Then 
-        the new set of parameters is sent to the server to be reasigned to the circuit for simulation.
+        Method to upgrade the parameters in a previously submitted job of parametric circuit.
+        First it checks weather the prior simulation's result was retrieved. If not, it is discarded,
+        and the new set of parameters is sent to the server to be reassigned to the circuit for 
+        simulation. This method can be used on a loop, carefully saving the intermediate results. 
+        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, check out its 
+        documentation for a extensive description.
 
-        Examples of usage are shown above and on the `Examples Gallery <https://cesga-quantum-spain.github.io/cunqa/examples_gallery.html>`_.
-        More information can be found on the codumentation of :py:class:`~cunqa.mappers.QJobMapper`, which uses extensively :py:meth:`~cunqa.qjob.QJob.upgrade_parameters`.
+        There are two ways of passing new parameters. First, as a **list** with the corresponding 
+        values in the order of the gates in the circuit, in which case missing parameters will
+        result in an error. On the other hand, as a **dict** where the keys are the free 
+        parameters names and the values the corresponding new value to that free parameter. Not 
+        all parameters need to be updated, but they must have been given a value at 
+        least once, because its last value would be used.
 
         .. warning::
-            There are two possible inputs for this method. First a list with new values for **ALL** parametric gates of the circuit
-            given in the order that the gates were performed. If the number of parameters is less than the number of parametric 
-            gates in the circuit, an error will occur at the virtual QPU, on the other hand, if more parameters are provided, 
-            they will be used only up to the number of parametric gates.
-
-            The other option is to provide a dictionary with keys the Variable parameters of the circuit that we wish to
-            update with its corresponding new value. Any Variable not updated will retain its previous value. If Variables
-            not present in the circuit are passed they are ignored.
-            
+            Before sending the circuit or upgrading its parameters, the result of the prior job must be 
+            called. It can be done manually, so that we can save it and obtain its information, or it 
+            can be done automatically as in the example above, but be aware that once the 
+            :py:meth:`upgrade_parameters` method is called, this result is discarded.
 
         Args:
-            parameters (dict | list): either a list of ordered parameters to assign to the parametrized circuit or
-                                      a dictionary with keys the Variables to update and the corresponding new values.
-            shots (int): int determining the new number of shots if it needs to be updated.
-           
+            param_values (dict | list): either a list of ordered parameters to assign to the 
+                                        parametrized circuit or a dictionary with keys being the 
+                                        free parameters' names and its values being its 
+                                        corresponding new values.
         """
 
-        if self._result is None:
-            self._future.get()
-            
-        ############ Process entries ############
-        if isinstance(parameters, dict):
-            if not all([isinstance((witness:= v), (int, float)) for v in parameters.values()]):
-                logger.error(f"All parameters must be int or float but {type(witness)} was given.")
-                raise SystemExit
-            try:
-                self._current_params = [
-                        {**d, **{k: parameters[k] for k in parameters if k in d}} 
-                        if isinstance(d, dict) 
-                        else d
-                        for d in self._current_params
-                    ]
-                
-                premessage = [
-                        self._param_expressions[i].evalf(subs=p)
-                        if isinstance(p, dict) 
-                        else p 
-                        for i, p in enumerate(self._current_params)
-                    ]
-                    
-            except Exception as error:
-                logger.error(f"Error while upgrading parameters, check that the correct number of parameters was given.\n Error: {error}")
-                raise SystemExit
+        if self._result is None: 
+            if self._future is not None:
+                # TODO: Improve this by having a queue of results
+                logger.warning("You have not obtained the previous results. They will be discarded.")
+                self._future.get() # we get the previous result because if not it stays in queue
+            else:
+                raise RuntimeError("No circuit was sent before calling update_parameters().")
 
-        elif isinstance(parameters, list):
-            premessage = parameters
+        if not len(param_values):
+            raise AttributeError("No parameter list has been provided to the upgrade_parameters "
+                                 "method.")
 
-        else:
-            logger.error(f"Parameters must be dict or list, but {type(parameters)} was provided.")  
-            raise SystemExit
-        
-
-        if shots is None:
-            shots = json.loads(self._execution_config)["config"]["shots"]
-
-        ########### Format message and send parameters to C++ ###########
+        self.assign_parameters_(param_values)
+              
         try:
-            message = """{{"params":{}, "shots": {} }}""".format(premessage, shots).replace("'", '"')
+            premessage = json.dumps(self._params, default=encoder)
+            message = """{{"params":{}}}""".format(premessage).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
-
+            self._updated = False
         except Exception as error:
-            logger.error(f"Some error occured when sending the new parameters to circuit {self._circuit_id} [{error}].")
-            raise SystemExit # User's level
+            logger.error(f"Some error occured when sending the new parameters to "
+                         f"circuit {self._circuit_id} [{type(error).__name__}].")
+            self._updated = True
+            
+    def assign_parameters_(
+        self, 
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
+    ):
+        """Fuction responsible of assigning the values to the circuit parameter."""    
+        if isinstance(param_values, dict):
+            for param in self._params:
+                # I filter the free parameters that are employed in the symbolic expression 
+                values_i = {k.name: param_values.get(k.name) 
+                            for k in param.variables 
+                            if param_values.get(k.name) is not None}
 
-        self._updated = False # We indicate that new results will come, in order to call server
-
-    def _convert_circuit(self, circuit: Union[str, dict, 'CunqaCircuit', 'QuantumCircuit']) -> None:
-
-        try:
-            if isinstance(circuit, dict):
-
-                logger.debug("A circuit dict was provided.")
-
-                self.num_qubits = circuit["num_qubits"]
-                self.num_clbits = circuit["num_clbits"]
-                self._cregisters = circuit["classical_registers"]
-                self._qregisters = circuit["quantum_registers"]
-                if "sending_to" in circuit:
-                    self._sending_to = circuit["sending_to"]
+                if len(values_i) != len(param.variables):
+                    if param.value is None:
+                        raise ValueError("Cannot update the param value and it is None, cannot execute.")
+                    else:
+                        logger.debug(f"{param} value remains the same due to lack of variables")
                 else:
-                    self._sending_to = []
-                if "has_cc" in circuit:
-                    self._has_cc = circuit["has_cc"]
-                    self._is_dynamic = True
-                elif "has_qc" in circuit:
-                    self._has_qc = circuit["has_qc"]
-                    self._is_dynamic = True
-                elif "is_dynamic" in circuit:
-                    self._is_dynamic = circuit["is_dynamic"]
-                else:
-                    self._is_dynamic = False
-                    self._has_cc = False
-
-                if "param_expressions" in circuit and "current_params" in circuit:
-                    self._param_expressions = circuit["param_expressions"]
-                    self._current_params = circuit["current_params"]
-
-                logger.debug("Translation to dict not necessary...")
-
-                # might explode for handmade dicts not design for ditributed execution
-                self._circuit_id = circuit["id"]
-                instructions = circuit['instructions']
-            
-
-            elif isinstance(circuit, CunqaCircuit):
-
-                logger.debug("A CunqaCircuit was provided.")
-
-                self.num_qubits = circuit.num_qubits
-                self.num_clbits = circuit.num_clbits
-                self._cregisters = circuit.classical_regs
-                self._qregisters = circuit.quantum_regs
-                self._circuit_id = circuit._id
-                self._sending_to = circuit.sending_to
-                self._is_dynamic = circuit.is_dynamic
-                self._has_cc = circuit.has_cc
-                self._has_qc = circuit.has_qc
-
-                if circuit.is_parametric:
-                    self._param_expressions = circuit.param_expressions
-                    self._current_params = circuit.current_params
-                
-                
-                logger.debug("Translating to dict from CunqaCircuit...")
-
-                instructions = circuit.instructions
-
-
-            elif isinstance(circuit, QuantumCircuit):
-
-                logger.debug("A QuantumCircuit was provided.")
-
-                self.num_qubits = circuit.num_qubits
-                self.num_clbits = sum([c.size for c in circuit.cregs])
-                self._cregisters = _registers_dict(circuit)[1]
-                self._qregisters = _registers_dict(circuit)[0]
-                self._sending_to = []
-
-                logger.debug("Translating to dict from QuantumCircuit...")
-
-                circuit_json = convert(circuit, "dict")
-                instructions = circuit_json["instructions"]
-                self._is_dynamic = circuit_json["is_dynamic"]
-                self._has_cc = False
-                self.has_qc = False
-
-            elif isinstance(circuit, str):
-
-                logger.debug("A QASM2 circuit was provided.")
-
-                qc_from_qasm = QuantumCircuit.from_qasm_str(circuit)
-
-                self.num_qubits = qc_from_qasm.num_qubits
-                self._cregisters = _registers_dict(qc_from_qasm)[1]
-                self._cregisters = _registers_dict(qc_from_qasm)[0]
-                self.num_clbits = sum(len(k) for k in self._cregisters.values())
-                self._cregisters = _registers_dict(qc_from_qasm)[1]
-                # TODO: ¿self.circuit_id?
-                self._sending_to = []
-
-                logger.debug("Translating to dict from QASM2 string...")
-
-                circuit_json = convert(qc_from_qasm, "dict")
-                instructions = circuit_json["instructions"]
-                self._is_dynamic = circuit_json["is_dynamic"]
-                self._has_cc = False
-                self._has_qc = False
-
+                    param.eval(values_i)
+        elif isinstance(param_values, list):
+            if len(param_values) != len(self._params):
+                raise ValueError("List of parameter values is not the same as the number of "
+                                 "parameters.")
             else:
-                logger.error(f"Circuit must be dict, <class 'cunqa.circuit.CunqaCircuit'> or QASM2 str, but {type(circuit)} was provided [{TypeError.__name__}].")
-                raise QJobError # I capture the error in QPU.run() when creating the job
-
-            self._circuit = instructions            
-            
-        except KeyError as error:
-            logger.error(f"Format of the circuit dict not correct, couldn't find 'num_clbits', 'classical_registers' or 'instructions' [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-
-        except QASM2Error as error:
-            logger.error(f"Error while translating to QASM2 [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-    
-        except QiskitError as error:
-            logger.error(f"Format of the circuit not correct  [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-    
-        except Exception as error:
-            logger.error(f"Some error occured with the circuit dict provided [{type(error).__name__}].")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-
-    def _configure(self, **run_parameters: Any) -> None:
-        # configuration
-        try:
-            # config dict
-            run_config = {
-                "shots": 1024, 
-                "method":"automatic", 
-                "avoid_parallelization": False,
-                "num_clbits": self.num_clbits, 
-                "num_qubits": self.num_qubits, 
-                "seed": 123123,
-                "device": self.device,
-                }
-
-            if (run_parameters == None) or (len(run_parameters) == 0):
-                logger.debug("No run parameters provided, default were set.")
-                pass
-            elif (type(run_parameters) == dict): 
-                for k,v in run_parameters.items():
-                    run_config[k] = v
-            else:
-                logger.warning("Error when reading `run_parameters`, default were set.")
-            
-            exec_config = {
-                "id": self._circuit_id,
-                "config": run_config, 
-                "instructions": self._circuit,
-                "num_qubits": self.num_qubits,
-                "num_clbits": self.num_clbits,
-                "classical_registers":self._cregisters,
-                "quantum_registers":self._qregisters,
-                "sending_to": self._sending_to,
-                "is_dynamic": self._is_dynamic,
-                "has_cc": self._has_cc
-                #,"has_qc": self._has_qc # Not needed in C++ 
-            }
-            
-            try:
-                self._execution_config = json.dumps(exec_config)
-
-            except Exception as error:
-                logger.error(f"Some error occured during serialization of instructions, please check if all Variables are assigned: {error} [{type(error).__name__}]")
-                raise error # Capture this at __init__()
-            
-            logger.debug("QJob created.")
-
-        except KeyError as error:
-            logger.error(f"Format of the cirucit not correct, couldn't find 'instructions' [{type(error).__name__}]\n {error}.")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-        
-        except Exception as error:
-            logger.error(f"Some error occured when generating configuration for the simulation:[{type(error).__name__}]\n {error}.")
-            raise QJobError # I capture the error in QPU.run() when creating the job
-        
+                for param, value in zip(self._params, param_values):
+                    param.assign_value(value)
 
 
-def gather(qjobs: "list['QJob']") -> "list['Result']":
+def gather(qjobs: list[QJob]) -> list[Result]:
     """
         Function to get the results of several :py:class:`QJob` objects.
 
@@ -565,12 +281,13 @@ def gather(qjobs: "list['QJob']") -> "list['Result']":
 
             >>> results = gather(qjobs)
 
-        This is a blocking call, results will be called sequentialy in . Since they are being run simultaneously,
-        even if the first one on the list takes the longest, when it finishes the rest would have been done, so
-        just the small overhead from calling them will be added.
+        This is a blocking call, results will be called sequentialy in . Since they are being run 
+        simultaneously, even if the first one on the list takes the longest, when it finishes the 
+        rest would have been done, so just the small overhead from calling them will be added.
 
         .. warning::
-            Since this is mainly a for loop, the order must be respected when submiting jobs to the same virtual QPU.
+            Since this is mainly a for loop, the order must be respected when submiting jobs to the 
+            same vQPU.
 
         Args:
             qjobs (list[QJob]): list of objects to get the result from.
@@ -578,16 +295,8 @@ def gather(qjobs: "list['QJob']") -> "list['Result']":
         Return:
             List of :py:class:`~cunqa.result.Result` objects.
     """
-    if isinstance(qjobs, list):
-        if not all([isinstance(q, QJob) for q in qjobs]):
-            logger.error(f"Objects of the list must be <class 'qjob.QJob'> [{TypeError.__name__}].")
-            raise SystemExit # User's level
-        
-        return [q.result for q in qjobs]
-            
-    elif isinstance(qjobs, QJob):
-        return qjobs.result
 
-    else:
-        logger.error(f"qjobs must be list, but {type(qjobs)} was provided [{TypeError.__name__}].")
-        raise SystemError # User's level
+    if(qjobs):
+        return [q.result for q in qjobs]
+    else: 
+        raise AttributeError("qjobs in gather cannot be none.")    

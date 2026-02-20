@@ -8,62 +8,61 @@
 #include <thread>
 #include <functional>
 
+#include "StochasticNoiseSimulator.hpp"
+
 #include "quantum_task.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
 
 #include "logger.hpp"
 
 using namespace qc;
-using namespace cunqa;
 
 namespace {
 const std::unordered_map<int, OpType> MUNICH_INSTRUCTIONS_MAP = {
     // MEASURE
-    {constants::MEASURE, OpType::Measure},
+    {cunqa::constants::MEASURE, OpType::Measure},
 
     // ONE GATE NO PARAM
-    {constants::ID, OpType::I},
-    {constants::X, OpType::X},
-    {constants::Y, OpType::Y},
-    {constants::Z, OpType::Z},
-    {constants::H, OpType::H},
-    {constants::SX, OpType::SX},
+    {cunqa::constants::ID, OpType::I},
+    {cunqa::constants::X, OpType::X},
+    {cunqa::constants::Y, OpType::Y},
+    {cunqa::constants::Z, OpType::Z},
+    {cunqa::constants::H, OpType::H},
+    {cunqa::constants::SX, OpType::SX},
 
     // ONE GATE PARAM
-    {constants::RX, OpType::RX},
-    {constants::RY, OpType::RY},
-    {constants::RZ, OpType::RZ},
+    {cunqa::constants::RX, OpType::RX},
+    {cunqa::constants::RY, OpType::RY},
+    {cunqa::constants::RZ, OpType::RZ},
 
     // TWO GATE NO PARAM
-    {constants::CX, OpType::X},
-    {constants::CY, OpType::Y},
-    {constants::CZ, OpType::Z},
-    {constants::SWAP, OpType::SWAP},
-    {constants::ECR, OpType::ECR},
+    {cunqa::constants::CX, OpType::X},
+    {cunqa::constants::CY, OpType::Y},
+    {cunqa::constants::CZ, OpType::Z},
+    {cunqa::constants::SWAP, OpType::SWAP},
+    {cunqa::constants::ECR, OpType::ECR},
 
     // TWO GATE PARAM
-    {constants::CRX, OpType::RX},
-    {constants::CRY, OpType::RY},
-    {constants::CRZ, OpType::RZ}
+    {cunqa::constants::CRX, OpType::RX},
+    {cunqa::constants::CRY, OpType::RY},
+    {cunqa::constants::CRZ, OpType::RZ}
 };
 
 struct TaskState {
     std::string id;
-    JSON::const_iterator it, end;
+    cunqa::JSON::const_iterator it, end;
     int zero_qubit = 0;
+    int zero_clbit = 0;
     bool finished = false;
     bool blocked = false;
     bool cat_entangled = false;
-    std::stack<int> telep_meas; // !!!!!!
 };
 
 struct GlobalState {
     int n_qubits = 0, n_clbits = 0;
-    std::map<std::size_t, bool> creg, rcreg;
-    std::map<std::size_t, bool> cvalues;
+    std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<int>> qc_meas;
     bool ended = false;
-    comm::ClassicalChannel* chan = nullptr;
 };
 
 } // End of anonymous namespace
@@ -71,7 +70,10 @@ struct GlobalState {
 namespace cunqa {
 namespace sim {
 
-std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask> &quantum_tasks, comm::ClassicalChannel *classical_channel)
+std::string MunichSimulatorAdapter::execute_shot_(
+    const std::vector<QuantumTask> &quantum_tasks, 
+    comm::ClassicalChannel *classical_channel
+)
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
@@ -81,6 +83,7 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
+        T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked = false;
@@ -98,48 +101,43 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
     initializeSimulationAdapter(G.n_qubits);
 
     auto generate_entanglement_ = [&]() {
-
-        // Apply H to the first entanglement qubit
         auto std_op1 = std::make_unique<StandardOperation>(G.n_qubits - 2, OpType::H);
         applyOperationToStateAdapter(std::move(std_op1));
-
-        // Apply a CX to the second one to generate an ent pair
         Control control(G.n_qubits - 2);
         auto std_op2 = std::make_unique<StandardOperation>(control, G.n_qubits - 1, OpType::X);
         applyOperationToStateAdapter(std::move(std_op2));
     };
 
-    std::function<void(TaskState&, const JSON&)> apply_next_instr = [&](TaskState& T, const JSON& instruction = {}) {
-
-        // This is added to be able to add instructions outside the main loop
-        
+    std::function<void(TaskState&, const JSON&)> apply_next_instr = 
+        [&](TaskState& T, const JSON& instruction = {}) 
+    {
         const JSON& inst = instruction.empty() ? *T.it : instruction;
-        //LOGGER_DEBUG("INSTRUCCIÓN: {}", inst.dump());
 
-        // Check if the ifs below are really needed
-        if (inst.contains("conditional_reg")) {
-            auto v = inst.at("conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.creg[v[0]]) return;
-        } else if (inst.contains("remote_conditional_reg") && inst.at("name") != "recv") { // TODO: Cambiar el nombre para el recv y para el resto
-            auto v = inst.at("remote_conditional_reg").get<std::vector<std::uint64_t>>();
-            if (!G.rcreg[v[0]]) return;
-        }
-
-        std::vector<int> qubits = inst.at("qubits").get<std::vector<int>>();
-
+        std::vector<int> qubits;
+        if (inst.contains("qubits"))
+            qubits = inst.at("qubits").get<std::vector<int>>();
         auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
         
         switch (inst_type) {
         case constants::MEASURE:
         {
-
             char char_measurement = measureAdapter(qubits[0] + T.zero_qubit);
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+            G.creg[clbits[0] + T.zero_clbit] = (char_measurement == '1');
+            break;
+        }
+        case constants::COPY:
+        {
+            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
+            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
 
-            std::vector<int> clbits = inst.at("clbits").get<std::vector<int>>();
+            if(l_clbits.size() != r_clbits.size())
+                throw std::runtime_error("The number of copied clbits and the number of clbits "
+                                         "copied on does not match.");
 
-            G.cvalues[clbits[0] + T.zero_qubit] = (char_measurement == '1');
-            G.creg[clbits[0]] = (char_measurement == '1');
-
+            for (size_t i = 0; i < l_clbits.size(); ++i)
+                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+                
             break;
         }
         case constants::X:
@@ -188,21 +186,34 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
-        case constants::MEASURE_AND_SEND:
+        case constants::SEND:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            char char_measurement = measureAdapter(qubits[0] + T.zero_qubit);
-            int measurement = char_measurement - '0';
-            classical_channel->send_measure(measurement, endpoint[0]);
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();   
+
+            for (const auto& clbit: clbits)
+                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
             break;
         }
         case constants::RECV:
         {
-            auto endpoint = inst.at("qpus").get<std::vector<std::string>>();
-            auto conditional_reg = inst.at("remote_conditional_reg").get<std::vector<size_t>>();
-            int measurement = classical_channel->recv_measure(endpoint[0]);
-            G.rcreg[conditional_reg[0]] = (measurement == 1);
-            LOGGER_DEBUG("El índice {} tiene valor {}", conditional_reg[0], G.rcreg[conditional_reg[0]]);
+            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
+            auto clbits = inst.at("clbits").get<std::vector<int>>();
+
+            for (const auto& clbit: clbits) {
+                int measurement = classical_channel->recv_measure(qpu_id);
+                G.creg[clbit + T.zero_clbit] = (measurement == 1);
+            }
+            break;
+        }
+        case cunqa::constants::CIF:
+        {
+            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
+            if (G.creg[clbits.at(0) + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.at("instructions")) {
+                    apply_next_instr(T, sub_inst);
+                }
+            }
             break;
         }
         case constants::QSEND:
@@ -355,7 +366,7 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
 
     // result is a map from the cbit index to the Boolean value
     std::string result_bits(G.n_clbits, '0');
-    for (const auto &[bitIndex, value] : G.cvalues)
+    for (const auto &[bitIndex, value] : G.creg)
     {
         result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
     }
@@ -363,17 +374,16 @@ std::string CircuitSimulatorAdapter::execute_shot_(const std::vector<QuantumTask
     return result_bits;
 }
 
-
-JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
+JSON MunichSimulatorAdapter::simulate(const Backend* backend)
 {
     LOGGER_DEBUG("Munich usual simulation");
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
     auto quantum_task = p_qca->quantum_tasks[0];
 
     // TODO: Change the format with the free functions
-    std::string circuit = quantum_task_to_Munich(quantum_task);
     try
     {   
+        std::string circuit = quantum_task_to_Munich(quantum_task);
         
         auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
 
@@ -409,7 +419,6 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
             time_taken = duration.count();
 
             if (!result.empty()) {
-                LOGGER_DEBUG("Result non empty");
                 return {{"counts", result}, {"time_taken", time_taken}};
             }
             throw std::runtime_error("QASM format is not correct.");
@@ -419,12 +428,12 @@ JSON CircuitSimulatorAdapter::simulate(const Backend* backend)
     {
         // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
-        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent and/or of the noise model."}};
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }
-    return {};
+    return {}; // To avoid no-return warning
 }
 
-JSON CircuitSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
+JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
 {
     LOGGER_DEBUG("Munich dynamic simulation");
     // TODO: Avoid the static casting?

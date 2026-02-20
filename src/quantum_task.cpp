@@ -44,34 +44,7 @@ void QuantumTask::update_circuit(const std::string& quantum_task)
         config = quantum_task_json.at("config").get<JSON>();
         sending_to = (quantum_task_json.contains("sending_to") ? quantum_task_json.at("sending_to").get<std::vector<std::string>>() : no_communications);
         is_dynamic = ((quantum_task_json.contains("is_dynamic")) ? quantum_task_json.at("is_dynamic").get<bool>() : false);
-        has_cc = ((quantum_task_json.contains("has_cc")) ? quantum_task_json.at("has_cc").get<bool>() : false);
         id = quantum_task_json.at("id");
-
-        if (has_cc) {
-            std::ifstream communications_file(constants::COMM_FILEPATH); 
-            // TODO: Manage behaviour when file is not well opened
-
-            JSON communications;
-            communications_file >> communications;
-
-            for (auto& instruction : circuit) {
-                std::string name = instruction.at("name").get<std::string>();
-                if (instruction.contains("qpus")) {
-                    std::vector<std::string> qpuid = instruction.at("qpus").get<std::vector<std::string>>();  
-                    JSON qpu_communications = communications.at(qpuid[0]).get<JSON>();
-                    std::string communications_endpoint = qpu_communications.contains("executor_endpoint") ? qpu_communications.at("executor_endpoint").get<std::string>() : qpu_communications.at("communications_endpoint").get<std::string>();
-                    instruction.at("qpus") = {communications_endpoint};
-                }
-            }
-            std::vector<std::string> aux_connects_with = sending_to;
-            int counter = 0;
-            for (auto& qpuid : aux_connects_with) {
-                JSON qpu = communications.at(qpuid).get<JSON>();
-                sending_to[counter] = qpu.at("communications_endpoint").get<std::string>();
-                counter++;
-            }
-        }
-
     } else if (quantum_task_json.contains("params"))
         update_params_(quantum_task_json.at("params"));
 }

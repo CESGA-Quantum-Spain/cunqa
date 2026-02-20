@@ -8,8 +8,7 @@ namespace sim {
 
 class QulacsExecutor {
 public:
-    QulacsExecutor();
-    QulacsExecutor(const std::string& group_id);
+    QulacsExecutor(const std::size_t& n_qpus);
     ~QulacsExecutor() = default;
 
     void run();

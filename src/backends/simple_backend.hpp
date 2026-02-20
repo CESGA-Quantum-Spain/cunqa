@@ -55,7 +55,6 @@ struct SimpleConfig {
             {"gates", obj.gates},
             {"noise_model", obj.noise_path},
             {"noise_properties_path", obj.noise_properties_path}
-            // removed noise_properties and noise_model keys because this function is thought to be only used for writting in qpus.json
         };
     }
     

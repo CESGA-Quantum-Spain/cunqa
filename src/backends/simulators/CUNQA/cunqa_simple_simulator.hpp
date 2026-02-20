@@ -14,8 +14,7 @@ class CunqaSimpleSimulator final : public SimulatorStrategy<SimpleBackend>
 {
 public:
     CunqaSimpleSimulator() = default;
-    CunqaSimpleSimulator(const std::string& group_id) {};
-    ~CunqaSimpleSimulator() = default;
+    ~CunqaSimpleSimulator() override;
 
     inline std::string get_name() const override {return "CunqaSimulator";}
 

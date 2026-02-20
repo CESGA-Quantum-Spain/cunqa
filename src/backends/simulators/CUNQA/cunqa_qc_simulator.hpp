@@ -15,16 +15,13 @@ class CunqaQCSimulator final : public SimulatorStrategy<QCBackend>
 {
 public:
     CunqaQCSimulator();
-    CunqaQCSimulator(const std::string& group_id);
     ~CunqaQCSimulator() = default;
 
     inline std::string get_name() const override {return "CunqaSimulator";}
-
     JSON execute(const QCBackend& backend, const QuantumTask& quantumtask) override; 
 
 private:
-    void write_executor_endpoint(const std::string endpoint, const std::string& group_id = "");
-
+    std::string executor_id;
     comm::ClassicalChannel classical_channel;
 };
 

@@ -11,8 +11,7 @@ public:
     JSON circuit;
     JSON config;
     std::vector<std::string> sending_to;
-    bool is_dynamic = false; // C_IF gates & Classical Communications
-    bool has_cc = false; // Classical Communications
+    bool is_dynamic = false; // C_IF gates & Communications
     std::string id;
 
     QuantumTask() = default;

@@ -1,25 +1,22 @@
 import sys, os
-from pathlib import Path
-
 sys.path.append(os.getenv("HOME"))
 
+import zmq
+import json
+import time
+from typing import Optional
+import socket
+
 from cunqa.constants import LIBS_DIR
-from cunqa.logger import logger
 
 try:
     sys.path.append(LIBS_DIR)
 except Exception:
     pass
 
-import zmq
-import json
-import time
-from typing import Optional
-
-
-
 def _optimization_options_builder(
-    optimization: int, optimization_backend: str = "Tket"
+    optimization: int, 
+    optimization_backend: str = "Tket"
 ) -> int:
     """
     Builds the optimization options for the backend.
@@ -27,24 +24,17 @@ def _optimization_options_builder(
     This helper function ensures that the optimization is not dependent on QAT.
     Currently, only Tket optimization is supported.
 
-    Parameters
-    ----------
-    optimization : int
-        The optimization level to use.
-    optimization_backend : str, default="Tket"
-        The optimization backend to use. Currently, only Tket is supported.
+    Args:
+        optimization (int): The optimization level to use.
+        optimization_backend (str, default="Tket"): The optimization backend to use. 
+                                                    Currently, only Tket is supported.
 
-    Returns
-    -------
-    int
-        The optimization value understood by the control server.
+    Returns:
+        (int): The optimization value understood by the control server.
 
     Raises:
-    -------
-        TypeError
-            If asked for a not valid optimization backend
-        ValueError
-            If asked for a not valid optimization level
+        (TypeError)  If given an invalid optimization backend
+        (ValueError) If given an invalid optimization level
 
     """
     if optimization_backend != "Tket":
@@ -67,26 +57,21 @@ def _results_format_builder(res_format: str = "binary_count") -> tuple[int, int]
     This function returns the InlineResultsProcessing and ResultFormatting integers
     to be used as input for the configuration builder.
 
-    Parameters
-    ----------
-    res_format : str, default="binary_count"
-        The format in which the results will be processed.
-        Possible values are:
+    Args:
+        res_format  (str, default="binary_count"):
+            The format in which the results will be processed.
+            Possible values are:
 
-        - "binary_count": Returns a count of each instance of measured qubit registers. Switches result format to raw.
-        - "binary": Returns results as a binary string.
-        - "raw": Returns raw results.
-        - "squash_binary_result_arrays": Squashes binary result list into a singular bit string. Switches results to binary.
+            - "binary_count": Returns a count of each instance of measured qubit registers. Switches result format to raw.
+            - "binary": Returns results as a binary string.
+            - "raw": Returns raw results.
+            - "squash_binary_result_arrays": Squashes binary result list into a singular bit string. Switches results to binary.
 
-    Returns
-    -------
-    tuple of int
-        A tuple containing two integers: InlineResultsProcessing and ResultsFormatting.
+    Returns:
+        (tuple[int]): A tuple containing two integers: InlineResultsProcessing and ResultsFormatting.
 
-    Raises
-    ------
-    KeyError
-        If the provided `res_format` is not a valid result format.
+    Raises:
+        (KeyError) If the provided `res_format` is not a valid result format.
     """
     match = {
         "binary_count": {"InlineResultsProcessing": 1, "ResultsFormatting": 3},
@@ -109,18 +94,18 @@ def _config_builder(
     Builds a config json object from options. Non qat-dependent
 
     Args:
-        shots: int : Number of shots
-        repetition_period: float : Duration of the circuit execution window.
+        shots (int): Number of shots
+        repetition_period (float): Duration of the circuit execution window.
             Include relaxation time
-        optimization: int : 0, 1, 2. Optimization level defined and processed
+        optimization (int): 0, 1, 2. Optimization level defined and processed
             in server side
-        res_format: str : binary_count(default), raw, binary,
-            squash_binary_arrays. Result formatting defined and applied in
-            server side.
+        res_format (str): binary_count(default), raw, binary, squash_binary_arrays. 
+            Result formatting defined and applied in server side.
     Returns:
-        config_str: str : json-string object that is sent and loaded in the
+        config_str (str): json-string object that is sent and loaded in the
             server side
     """
+    
     inlineResultsProcessing, resultsFormatting = _results_format_builder(res_format)
     opt_value = _optimization_options_builder(optimization=optimization)
     config = {
@@ -177,7 +162,7 @@ def _get_run_config(run_config : dict) -> str:
 
 
 class QMIOFuture:
-    def __init__(self, socket = None, start_time = None, error = None):
+    def __init__(self, socket: socket.socket = None, start_time: int = None, error: str = None):
         self.socket = socket
         self.start_time = start_time
         self.error = error
@@ -206,11 +191,11 @@ class QMIOClient:
         self.context = zmq.Context()
         self._last_quantum_task = False
 
-    def connect(self, linker_endpoint : str) -> None:
+    def connect(self, linker_endpoint: str) -> None:
         self.socket = self.context.socket(zmq.DEALER)
         self.socket.connect(linker_endpoint)
 
-    def send_circuit(self, quantum_task_str : str) -> 'QMIOFuture':
+    def send_circuit(self, quantum_task_str: str) -> QMIOFuture:
 
         quantum_task = json.loads(quantum_task_str)
         if "params" in quantum_task: 
@@ -237,7 +222,8 @@ class QMIOClient:
 
     def send_parameters(self, parameters : str) -> 'QMIOFuture':
         if not self._last_quantum_task:
-            future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update its parameters")
+            future_error = QMIOFuture(error = "ERROR. A parametric circuit must be sent to update "
+                                              "its parameters")
             return future_error
         return self.send_circuit(parameters)
 

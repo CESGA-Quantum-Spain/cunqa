@@ -10,7 +10,7 @@ namespace constants{
 
 // This is constexpr because it is employed in __attribute__((constructor))
 // of the logger_client, that is initialized before main (therefore before
-// const std::string variables are initialized) 
+// const std::string parameters are initialized) 
 inline constexpr std::string_view CUNQA_PATH = "@CUNQA_PATH@";
 const std::string QPUS_FILEPATH = "@QPUS_FILEPATH@";
 const std::string COMM_FILEPATH = "@COMM_FILEPATH@";
@@ -21,6 +21,7 @@ enum INSTRUCTIONS {
     UNITARY,
 
     MEASURE,
+    COPY,
 
     ID,
     X,
@@ -88,37 +89,8 @@ enum INSTRUCTIONS {
 
     CU,
 
-    C_IF_X,
-    C_IF_Y,
-    C_IF_Z,
-    C_IF_H,
-    C_IF_SX,
-    C_IF_RX,
-    C_IF_RY,
-    C_IF_RZ,
-    C_IF_P,
-    C_IF_U,
-    C_IF_U1,
-    C_IF_CX,
-    C_IF_CY,
-    C_IF_CZ,
-    C_IF_CRX,
-    C_IF_CRY,
-    C_IF_CRZ,
-    C_IF_CP,
-    C_IF_CU,
-    C_IF_CU1,
-    C_IF_CU3,
-    C_IF_ECR,
-    C_IF_SWAP,
-    C_IF_RXX,
-    C_IF_RYY,
-    C_IF_RZZ,
-    C_IF_RZX,
-    C_IF_CECR,
-    C_IF_CSWAP,
-
-    MEASURE_AND_SEND,
+    CIF,
+    SEND,
     RECV,
     QSEND,
     QRECV,
@@ -134,6 +106,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // MEASURE
     {"measure", MEASURE},
+    {"copy", COPY},
 
     // ONE QUBIT NO PARAM
     {"id", ID},
@@ -161,7 +134,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
-    {"p", P},
     {"u1", U1},
     {"rotinvx", ROTINVX},
     {"rotinvy", ROTINVY},
@@ -196,16 +168,10 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
-    {"cp", CP},
-    {"cu1", CU1},
-
-    // TWO GATE THREE PARAM
-    {"cu2", CU2},
-    {"cr", CR},
-    {"cu", CU},
-    {"cu3", CU3},
 
     // TWO QUBIT THREE PARAM
+    {"cu2", CU2},
+    {"cr", CR},
     {"cu", CU},
     {"cu3", CU3},
 
@@ -216,37 +182,11 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"cecr", CECR},
     {"cswap", CSWAP},
 
-    //CLASSICAL CONTROLLED GATES
-    {"c_if_x", C_IF_X},
-    {"c_if_y", C_IF_Y},
-    {"c_if_z", C_IF_Z},
-    {"c_if_h", C_IF_H},
-    {"c_if_sx", C_IF_H},
-    {"c_if_rx", C_IF_SX},
-    {"c_if_ry", C_IF_RY},
-    {"c_if_rz", C_IF_RZ},
-    {"c_if_p", C_IF_P},
-    {"c_if_u", C_IF_U},
-    {"c_if_u1", C_IF_U1},
-    {"c_if_cx", C_IF_CX},
-    {"c_if_cy", C_IF_CY},
-    {"c_if_cz", C_IF_CZ},
-    {"c_if_cp", C_IF_CP},
-    {"c_if_cu", C_IF_CU},
-    {"c_if_cu1", C_IF_CU1},
-    {"c_if_cu3", C_IF_CU3},
-    {"c_if_ecr", C_IF_ECR},
-    {"c_if_swap", C_IF_SWAP},
-    {"c_if_rxx", C_IF_RXX},
-    {"c_if_ryy", C_IF_RYY},
-    {"c_if_rzz", C_IF_RZZ},
-    {"c_if_rzx", C_IF_RZX},
-    {"c_if_cerc", C_IF_CECR},
-    {"c_if_cswap", C_IF_CSWAP},
-
+    // CLASSICAL IF
+    {"cif", CIF},
 
     // SEND CLASSICAL QUBIT
-    {"measure_and_send", MEASURE_AND_SEND},
+    {"send", SEND},
     {"recv", RECV},
 
     // REMOTE CONTROLLED GATES

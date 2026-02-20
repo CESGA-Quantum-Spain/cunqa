@@ -8,8 +8,7 @@ namespace sim {
 
 class CunqaExecutor {
 public:
-    CunqaExecutor();
-    CunqaExecutor(const std::string& group_id);
+    CunqaExecutor(const std::size_t& n_qpus);
     ~CunqaExecutor() = default;
 
     void run();

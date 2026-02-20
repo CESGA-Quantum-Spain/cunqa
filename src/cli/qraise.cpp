@@ -54,9 +54,9 @@ int main(int argc, char* argv[])
     sbatchFile.close();
 
     // Executing and deleting the file
-    std::system("sbatch qraise_sbatch_tmp.sbatch");
+    std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
     remove_tmp_files();
     
     
-    return 0;
+    return EXIT_SUCCESS;
 }
