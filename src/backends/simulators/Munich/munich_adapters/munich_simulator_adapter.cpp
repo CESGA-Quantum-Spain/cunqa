@@ -98,9 +98,17 @@ std::string MunichSimulatorAdapter::execute_shot_(
     if (size(quantum_tasks) > 1)
         G.n_qubits += 2;
 
-    initializeSimulationAdapter(G.n_qubits);
-
     auto generate_entanglement_ = [&]() {
+        int meas1 = measureAdapter(G.n_qubits - 1) - '0';
+        int meas2 = measureAdapter(G.n_qubits - 2) - '0';
+        if (meas1) {
+            auto x_op = std::make_unique<StandardOperation>(G.n_qubits - 1, OpType::X);
+            applyOperationToStateAdapter(std::move(x_op));
+        }
+        if (meas2) {
+            auto x_op = std::make_unique<StandardOperation>(G.n_qubits - 2, OpType::X);
+            applyOperationToStateAdapter(std::move(x_op));
+        }   
         auto std_op1 = std::make_unique<StandardOperation>(G.n_qubits - 2, OpType::H);
         applyOperationToStateAdapter(std::move(std_op1));
         Control control(G.n_qubits - 2);
@@ -145,17 +153,19 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::Z:
         case constants::H:
         case constants::SX:
+        {
+            std::unique_ptr<StandardOperation> simple_gate;
+            simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            applyOperationToStateAdapter(std::move(simple_gate));
+            break;
+        }
         case constants::RX:
         case constants::RY:
         case constants::RZ:
         {
             std::unique_ptr<StandardOperation> simple_gate;
-            if (inst.contains("params")) {
-                auto params = inst.at("params").get<std::vector<double>>();
-                simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
-            } else {
-                simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
-            }
+            auto params = inst.at("params").get<std::vector<double>>();
+            simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
             applyOperationToStateAdapter(std::move(simple_gate));
             break;
         }
@@ -171,7 +181,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::CY:
         case constants::CZ:
         {
-            Control control(qubits[0] + T.zero_qubit);
+            int ctrl = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            Control control(ctrl);
             auto two_gate = std::make_unique<StandardOperation>(control, qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(two_gate));
             break;
@@ -181,7 +192,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::CRZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            Control control(qubits[0] + T.zero_qubit);
+            int ctrl = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            Control control(ctrl);
             auto two_gate = std::make_unique<StandardOperation>(control, qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
             applyOperationToStateAdapter(std::move(two_gate));
             break;
@@ -304,9 +316,11 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 G.qc_meas[inst.at("qpus")[0]].pop();
 
                 if (meas) {
-                    auto z = std::make_unique<StandardOperation>(G.n_qubits - 1, OpType::Z);
+                    auto z = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, OpType::Z);
                     applyOperationToStateAdapter(std::move(z));
                 }
+
+                T.cat_entangled = false;
             }
             break;
         }
@@ -441,10 +455,21 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
     std::map<std::string, std::size_t> meas_counter;
 
     auto shots = p_qca->quantum_tasks[0].config.at("shots").get<std::size_t>();
-    auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < shots; i++)
+
+    unsigned long n_qubits = 0;
+    for (auto &quantum_task : p_qca->quantum_tasks)
     {
+        n_qubits += quantum_task.config.at("num_qubits").get<unsigned long>();
+    }
+    if (size(p_qca->quantum_tasks) > 1)
+        n_qubits += 2;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    initializeSimulationAdapter(n_qubits);
+    for (std::size_t i = 0; i < shots; i++)
+    {   
         meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel)]++;
+        resetStateAdapter(n_qubits);
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();
