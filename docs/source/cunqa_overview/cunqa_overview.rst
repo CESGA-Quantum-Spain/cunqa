@@ -46,7 +46,7 @@ The modular structure of CUNQA allows the implementation of other simulators on 
   considered part of the future improvements. In order to do this, the vQPUs have to be deployed with 
   a valid noise model scheme. This is done with the aforementioned :doc:`../reference/commands/qraise` 
   Bash command or its Python function counterpart :py:func:`~cunqa.qpu.qraise`, with the first 
-  accepting the flag ``noise-properties`` and the second the argument ``noise_path``; both being the path 
+  accepting the flag ``noise-properties`` and the second the argument ``noise_properties_path``; both being the path 
   to a noise properties JSON file. The format of this JSON file is shown in 
   :doc:`../further_examples/json_examples/noise_properties_example`.
 

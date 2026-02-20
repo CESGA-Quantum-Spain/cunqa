@@ -32,9 +32,9 @@ class CunqaBackend(BackendV2):
                                  description = backend["description"])
 
                 # non-ideal backend, we get to gather noise_properties
-                if backend["noise_path"] and backend["noise_path"].strip():
+                if backend["noise_properties_path"] and backend["noise_properties_path"].strip():
 
-                    with open(backend["noise_path"], "r") as file:
+                    with open(backend["noise_properties_path"], "r") as file:
                         noise_properties_json = json.load(file)
 
                     self._from_noise_properties(noise_properties_json)

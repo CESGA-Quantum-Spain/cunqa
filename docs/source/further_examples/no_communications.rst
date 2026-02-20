@@ -38,7 +38,7 @@ model properties.
 To do this, as it was explained in :doc:`../cunqa_overview/cunqa_overview`, the 
 :doc:`../reference/commands/qraise` Bash command or its Python function counterpart 
 :py:func:`~cunqa.qpu.qraise` have to be employed with the flag `noise-properties`, in the first 
-case, and with the argument `noise_path`, in the second; with both being the path 
+case, and with the argument `noise_properties_path`, in the second; with both being the path 
 to a noise properties JSON file. The format of this JSON file is shown in 
 :doc:`../further_examples/json_examples/noise_properties_example`.
 
@@ -52,7 +52,7 @@ to a noise properties JSON file. The format of this JSON file is shown in
 
     .. code-block:: python
 
-        family = qraise(4, "01:00:00", co_located=True, noise_path="complete/path/to/noise.json")
+        family = qraise(4, "01:00:00", co_located=True, noise_properties_path="complete/path/to/noise.json")
 
 Moreover, as also described in :doc:`../cunqa_overview/cunqa_overview`, it is possible to deploy a 
 vQPU configured with the noise model of `CESGA's QMIO quantum computer <https://www.cesga.es/infraestructuras/cuantica/>`_, 
