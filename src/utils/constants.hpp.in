@@ -207,7 +207,6 @@ const std::vector<std::string> BASIS_GATES = {
     "u3", "u",
     "ecr", "swap", "cx", "cy", "cz", "csx",
     "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
-    "cu2", "cr",
     "cu", "cu3",
     "cswap", "ccx", "ccz",
 };
