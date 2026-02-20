@@ -14,3 +14,5 @@ sphinx-mdinclude
 autodocsumm
 sphinx-toolbox
 qiskit==1.2.4
+ipython
+sphinx-inline-tabs
