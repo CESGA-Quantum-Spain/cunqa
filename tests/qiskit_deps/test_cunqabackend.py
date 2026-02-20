@@ -1,8 +1,8 @@
 import sys, os
 import pytest
 import copy
-from unittest.mock import Mock, patch
-from qiskit.providers.backend import BackendV2
+import json
+from unittest.mock import mock_open, patch
 from qiskit.circuit.library import XGate, CXGate
 from qiskit.circuit import Parameter
 from qiskit.transpiler import Target
@@ -17,6 +17,37 @@ else:
     
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend, _get_qubit_index, _get_qubits_indexes, _get_gate
 import cunqa
+
+def _fake_noise_properties(num_qubits: int = 32) -> dict:
+    qubits = {
+        f"q[{i}]": {
+            "T1 (s)": 1e-4,
+            "T2 (s)": 5e-5,
+            "Drive Frequency (Hz)": 5e9,
+            "Readout duration (s)": 1e-4,
+            "Readout fidelity (RB)": 0.95,
+        }
+        for i in range(num_qubits)
+    }
+
+    q1gates = {f"q[{i}]": {"x": {"Gate duration (s)": 5e-5, "Fidelity(RB)": 0.99}} for i in range(num_qubits)}
+
+    q2gates = {
+        "0-1": {
+            "cx": {"Control": 0, "Target": 1, "Duration (s)": 1e-4, "Fidelity(RB)": 0.95}
+        }
+    }
+
+    return {"Qubits": qubits, "Q1Gates": q1gates, "Q2Gates(RB)": q2gates}
+
+
+@pytest.fixture(autouse=True)
+def mock_open_noise_properties_file():
+    data = json.dumps(_fake_noise_properties(32))
+    m = mock_open(read_data=data)
+
+    with patch("cunqa.qiskit_deps.cunqabackend.open", m):
+        yield
 
 class TestCunqaBackend:
     @pytest.fixture
