@@ -33,6 +33,13 @@ jobs:
                 pass
           class FutureWrapper:
               pass
+
+          def write_on_file(a, b, c):
+            pass
+          def qasm2_to_json(a):
+            pass
+          def json_to_qasm2(a):
+            pass
           PY
       - name: Copy constants.py.in into constants.py
         run:
