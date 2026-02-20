@@ -1,6 +1,7 @@
 name: Deploy Sphinx Docs to GitHub Pages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main  # or master, depending on your default branch
