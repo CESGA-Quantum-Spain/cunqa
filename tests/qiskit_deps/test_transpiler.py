@@ -1,8 +1,6 @@
 import os, sys
-from unittest.mock import Mock, patch, mock_open
 import copy
 import pytest
-from qiskit import QuantumCircuit
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -11,6 +9,8 @@ if IN_GITHUB_ACTIONS:
 else:
     HOME = os.getenv("HOME")
     sys.path.insert(0, HOME)
+
+from qiskit import QuantumCircuit
 
 from cunqa.circuit import CunqaCircuit
 from cunqa.qpu import Backend
@@ -28,7 +28,7 @@ def fakeqmio_backend():
         "coupling_map": [[0,1],[2,1],[2,3],[4,3],[5,4],[6,3],[6,12],[7,0],[7,9],[9,10],[11,10],[11,12],[13,21],[14,11],[14,18],[15,8],[15,16],[18,17],[18,19],[20,19],[22,21],[22,31],[23,20],[23,30],[24,17],[24,27],[25,16],[25,26],[26,27],[28,27],[28,29],[30,29],[30,31]],
         "basis_gates": ["sx","x","rz","ecr"],
         "custom_instructions": "",
-        "noise_path": "",
+        "noise_properties_path": "",
         "gates": []
     })
 

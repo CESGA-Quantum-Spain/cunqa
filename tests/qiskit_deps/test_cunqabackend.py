@@ -1,13 +1,20 @@
 import sys, os
 import pytest
-import copy, logging
+import copy
 from unittest.mock import Mock, patch
 from qiskit.providers.backend import BackendV2
 from qiskit.circuit.library import XGate, CXGate
 from qiskit.circuit import Parameter
 from qiskit.transpiler import Target
 
-sys.path.append(os.getenv("HOME"))
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+if IN_GITHUB_ACTIONS:
+    sys.path.insert(0, os.getcwd())
+else:
+    HOME = os.getenv("HOME")
+    sys.path.insert(0, HOME)
+    
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend, _get_qubit_index, _get_qubits_indexes, _get_gate
 import cunqa
 
@@ -75,7 +82,7 @@ class TestCunqaBackend:
             "gates": [],
             "coupling_map": [],
             "simulator":"Aer",
-            "noise_path":"/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
+            "noise_properties_path":"/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
         }
         
 

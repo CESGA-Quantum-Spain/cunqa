@@ -8,7 +8,14 @@ import pytest
 import tempfile
 from unittest.mock import patch, mock_open, MagicMock
 
-sys.path.append(os.getenv("HOME"))
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+if IN_GITHUB_ACTIONS:
+    sys.path.insert(0, os.getcwd())
+else:
+    HOME = os.getenv("HOME")
+    sys.path.insert(0, HOME)
+    
 import cunqa.qiskit_deps.noise_instructions as noise_instr
 
 @pytest.fixture
