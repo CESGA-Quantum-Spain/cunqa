@@ -418,7 +418,12 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
     
     return new_counts
 
-def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, partial: Union[None, list[int]], num_qubits: int):
+def _recombine_probs(
+    probs: Union[dict[np.array], np.array], 
+    per_qubit: bool, 
+    partial: Union[None, list[int]], 
+    num_qubits: int
+):
     """
     Modifies the probabilities per bitstring to obtain either probabilities per qubit or per 
     sub-bitstrings, were the indexes of the qubits to be kept are specified in `partial`. The per
