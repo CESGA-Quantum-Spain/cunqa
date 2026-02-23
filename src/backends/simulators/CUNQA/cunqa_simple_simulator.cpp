@@ -6,6 +6,8 @@
 namespace cunqa {
 namespace sim {
 
+CunqaSimpleSimulator::~CunqaSimpleSimulator() = default;
+
 JSON CunqaSimpleSimulator::execute([[maybe_unused]] const SimpleBackend& backend, const QuantumTask& quantum_task)
 {
     CunqaComputationAdapter cunqa_ca(quantum_task);

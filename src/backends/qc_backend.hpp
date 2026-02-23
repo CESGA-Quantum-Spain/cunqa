@@ -23,9 +23,6 @@ struct QCConfig {
     std::vector<std::string> basis_gates = constants::BASIS_GATES;
     std::string custom_instructions;
     std::vector<std::string> gates;
-    JSON noise_model = {};
-    std::string noise_properties_path;
-    std::string noise_path;
 
     friend void from_json(const JSON& j, QCConfig &obj)
     {
@@ -37,9 +34,6 @@ struct QCConfig {
         j.at("basis_gates").get_to(obj.basis_gates);
         j.at("custom_instructions").get_to(obj.custom_instructions);
         j.at("gates").get_to(obj.gates);
-        j.at("noise_model").get_to(obj.noise_model);
-        j.at("noise_properties_path").get_to(obj.noise_properties_path);
-        j.at("noise_path").get_to(obj.noise_path);
     }
 
     friend void to_json(JSON& j, const QCConfig& obj)
@@ -52,9 +46,7 @@ struct QCConfig {
             {"coupling_map", obj.coupling_map},
             {"basis_gates", obj.basis_gates}, 
             {"custom_instructions", obj.custom_instructions},
-            {"gates", obj.gates},
-            {"noise_model", obj.noise_path},
-            {"noise_properties_path", obj.noise_properties_path}
+            {"gates", obj.gates}
         };
     }
     
@@ -69,14 +61,12 @@ public:
         simulator_{std::move(simulator)}
     { 
         config = qc_config;
-        config["noise_model"] = qc_config.noise_model; // Not in to_json() to avoid the writing on qpus.json
     }
 
     QCBackend(QCBackend& qc_backend) = default;
 
     inline JSON execute(const QuantumTask& quantum_task) const override
     {
-        LOGGER_DEBUG("Let's execute.");
         return simulator_->execute(*this, quantum_task);
     }
 

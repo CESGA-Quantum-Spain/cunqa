@@ -1,0 +1,22 @@
+.rst-content p.image {
+    margin-bottom: 1.5em !important; 
+    display: block;
+}
+
+.rst-content .figure {
+    margin-bottom: 1.5em !important;
+}
+
+.nbgallery,
+.nbsphinx-gallery,
+.sphx-glr-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nbgallery > *,
+.nbsphinx-gallery > *,
+.sphx-glr-thumbnails > * {
+  float: none !important;
+}

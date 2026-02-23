@@ -1,0 +1,40 @@
+{% extends "!layout.html" %}
+
+
+{% block sidebartitle %}
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="{{ pathto('index') }}">{{ project }}</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        {% for version in versions %}
+          <option value="{{ pathto('', 1) }}../{{ version.name }}/"
+            {% if version.name == current_version %}selected{% endif %}
+          >
+            {{ version.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>-->
+  </div>
+
+{% endblock %}
+
+
+{% block navigation %}
+  {{ super() }}
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="{{ pathto('_static/logo_cesga_blanco.png', 1) }}" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="{{ pathto('_static/QuantumSpain_logo_white.png', 1) }}" alt="Quantum Spain">
+    </a>
+  </div>
+{% endblock %}

@@ -7,7 +7,7 @@ set(LIB_NAME "qclient")
 pybind11_add_module(${LIB_NAME} bindings.cpp)
 
 target_include_directories(${LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
-target_link_libraries(${LIB_NAME} PRIVATE client json) #${GNUTLS_LIB} ${SODIUM_LIB} bsd)
+target_link_libraries(${LIB_NAME} PRIVATE client json)
 
 install(TARGETS ${LIB_NAME} DESTINATION cunqa)
 

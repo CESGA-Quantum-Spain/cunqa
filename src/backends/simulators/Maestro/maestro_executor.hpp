@@ -8,8 +8,7 @@ namespace sim {
 
 class MaestroExecutor {
 public:
-    MaestroExecutor();
-    MaestroExecutor(const std::string& group_id);
+    MaestroExecutor(const std::size_t& n_qpus);
     ~MaestroExecutor() = default;
 
     void run();

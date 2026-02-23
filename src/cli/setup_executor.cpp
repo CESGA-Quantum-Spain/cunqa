@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include "qpu.hpp"
 #include "backends/simulators/CUNQA/cunqa_executor.hpp"
@@ -16,57 +17,53 @@
 #include "logger.hpp"
 
 using namespace std::string_literals;
-
 using namespace cunqa::sim;
 
 int main(int argc, char *argv[])
 {
     std::string sim_arg;
-    std::string family_name;
+    std::size_t n_qpus;
     if (argc == 3) {
         sim_arg = argv[1];
-        family_name = argv[2]; 
+        n_qpus = static_cast<size_t>(std::stoull(argv[2]));
     } else {
         LOGGER_ERROR("Passing incorrect number of arguments.");
         return EXIT_FAILURE;
     }
 
-    if (family_name == "default")
-        family_name = std::getenv("SLURM_JOB_ID");
-
     switch(murmur::hash(sim_arg)) {
         case murmur::hash("Aer"): 
         {
             LOGGER_DEBUG("Raising executor with Aer.");
-            AerExecutor executor(family_name);
+            AerExecutor executor(n_qpus);
             executor.run();
             break;
         }
         case murmur::hash("Munich"):
         {
             LOGGER_DEBUG("Raising executor with Munich.");
-            MunichExecutor executor(family_name);
+            MunichExecutor executor(n_qpus);
             executor.run();
             break;
         }
         case murmur::hash("Cunqa"):
         {
             LOGGER_DEBUG("Raising executor with Cunqa.");
-            CunqaExecutor executor(family_name);
+            CunqaExecutor executor(n_qpus);
             executor.run();
             break;
         }
         case murmur::hash("Maestro"):
         {
             LOGGER_DEBUG("Raising executor with Maestro.");
-            MaestroExecutor executor(family_name);
+            MaestroExecutor executor(n_qpus);
             executor.run();
             break;
         }
         case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
-            QulacsExecutor executor(family_name);
+            QulacsExecutor executor(n_qpus);
             executor.run();
             break;
         }

@@ -163,12 +163,11 @@ bool write_simple_run_command(std::ofstream& sbatchFile, const CunqaArgs& args)
             LOGGER_DEBUG("Qraise with no communications and personalized backend. \n");
             backend_path = std::string(args.backend.value());
             backend = R"({"backend_path":")" + backend_path + R"("})" ;
-            subcommand = mode + " no_comm " + std::string(args.family_name) + " " + std::string(args.simulator) + " \'" + backend + "\'" "\n";
+            subcommand = mode + " no_comm " + args.family_name + " " + args.simulator + " \'" + backend + "\'" "\n";
             run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
         }
     } else {
-        LOGGER_DEBUG("No backend provided");
-        subcommand = mode + " no_comm " + std::string(args.family_name) + " " + std::string(args.simulator) + "\n";
+        subcommand = mode + " no_comm " + args.family_name + " " + args.simulator + "\n";
         run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
     }
 

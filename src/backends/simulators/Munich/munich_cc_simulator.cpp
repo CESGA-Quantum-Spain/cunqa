@@ -6,27 +6,25 @@
 
 #include "utils/constants.hpp"
 
+using namespace std::string_literals;
+
+
 namespace cunqa {
 namespace sim {
 
-MunichCCSimulator::MunichCCSimulator()
+MunichCCSimulator::MunichCCSimulator() : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
 {
     classical_channel.publish();
 };
 
-MunichCCSimulator::MunichCCSimulator(const std::string& group_id)
-{
-    classical_channel.publish(group_id);
-};
-
 JSON MunichCCSimulator::execute([[maybe_unused]] const CCBackend& backend, const QuantumTask& quantum_task)
 {
-    std::vector<std::string> connect_with = quantum_task.sending_to;
-    classical_channel.connect(connect_with, false);
+    for(const auto& qpu_id: quantum_task.sending_to)
+        classical_channel.connect(qpu_id);
     
     auto p_qca = std::make_unique<QuantumComputationAdapter>(quantum_task);
-    CircuitSimulatorAdapter csa(std::move(p_qca));
-
+    MunichSimulatorAdapter csa(std::move(p_qca));
     if (quantum_task.is_dynamic) {
         return csa.simulate(&classical_channel);
     } else {

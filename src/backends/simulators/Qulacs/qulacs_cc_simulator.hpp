@@ -14,7 +14,6 @@ namespace sim {
 class QulacsCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     QulacsCCSimulator();
-    QulacsCCSimulator(const std::string& group_id);
     ~QulacsCCSimulator() = default;
 
     inline std::string get_name() const override {return "QulacsSimulator";}

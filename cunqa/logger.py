@@ -1,19 +1,15 @@
 import logging
 import sys
 
-# Códigos de colores ANSI
-RESET = "\033[0m"              # Restablece el color al predeterminado
-RED = "\033[31m"                # Rojo para ERROR
-YELLOW = "\033[33m"             # Amarillo para WARNING
-BLUE = "\033[34m"               # Azul para DEBUG
-GREEN = "\033[32m"              # Verde para INFO
-BRIGHT_RED = "\033[31m\033[1m"  # Rojo brillante para CRITICAL
+RESET = "\033[0m"          
+RED = "\033[31m"               
+YELLOW = "\033[33m"     
+BLUE = "\033[34m"               
+GREEN = "\033[32m"              
+BRIGHT_RED = "\033[31m\033[1m" 
 
 class ColoredFormatter(logging.Formatter):
-    """Formatter que añade colores, convierte niveles a minúsculas y añade
-    ruta completa del archivo y línea para errores."""
 
-    # Mapeo de niveles a colores
     LEVEL_COLOR = {
         logging.DEBUG: BLUE,
         logging.INFO: GREEN,
@@ -43,8 +39,8 @@ class ColoredFormatter(logging.Formatter):
 
         return message
 
-logger = logging.getLogger('mi_logger_coloreado')
-logger.setLevel(logging.WARN)  # Establece el nivel mínimo de log
+logger = logging.getLogger('custom_logger')
+logger.setLevel(logging.WARN)
 logger.propagate = False
 logger.handlers.clear()
 

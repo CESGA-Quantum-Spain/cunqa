@@ -12,58 +12,30 @@
 #include "utils/constants.hpp"
 #include "logger.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-MaestroExecutor::MaestroExecutor() : classical_channel{"executor"}
+MaestroExecutor::MaestroExecutor(const std::size_t& n_qpus) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
 {
-    std::string filename = std::string(std::getenv("STORE")) + "/.cunqa/communications.json";
-    std::ifstream in(filename);
-
-    if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file in MaestroExecutor.");
-    }
-
-    JSON j;
-    if (in.peek() != std::ifstream::traits_type::eof())
-        in >> j;
-    in.close();
-
-    std::string job_id = std::getenv("SLURM_JOB_ID");
-
-    for (const auto& [key, value]: j.items()) {
-        if (key.rfind(job_id, 0) == 0) {
-            auto qpu_endpoint = value["communications_endpoint"].get<std::string>();
-            qpu_ids.push_back(qpu_endpoint);
-            classical_channel.connect(qpu_endpoint);
-            classical_channel.send_info(classical_channel.endpoint, qpu_endpoint);
+    JSON ids;
+    do {
+        JSON whole_ids = read_file(constants::COMM_FILEPATH);
+        for (const auto& [key, value] : whole_ids.items()) {
+            if(std::string(std::getenv("SLURM_JOB_ID")) == key.substr(0, key.find('_')))
+                ids[key] = value;
         }
+    } while (ids.size() != n_qpus);
+
+    for (const auto& [key, _]: ids.items()) {
+        qpu_ids.push_back(key);
+        classical_channel.publish();
+        classical_channel.connect(key);
+        classical_channel.send_info("ready", key);
     }
 };
-
-MaestroExecutor::MaestroExecutor(const std::string& group_id) : classical_channel{"executor"}
-{
-    std::ifstream in(constants::COMM_FILEPATH);
-
-    if (!in.is_open()) {
-        throw std::runtime_error("Error opening the communications file in MaestroExecutor.");
-    }
-
-    JSON j;
-    if (in.peek() != std::ifstream::traits_type::eof())
-        in >> j;
-    in.close();
-
-    for (const auto& [key, value]: j.items()) {
-        if (key.rfind(group_id) == key.size() - group_id.size()) {
-            auto qpu_endpoint = value["communications_endpoint"].get<std::string>();
-            qpu_ids.push_back(qpu_endpoint);
-            classical_channel.connect(qpu_endpoint);
-            classical_channel.send_info(classical_channel.endpoint, qpu_endpoint);
-        }
-    }
-};
-
 
 void MaestroExecutor::run()
 {

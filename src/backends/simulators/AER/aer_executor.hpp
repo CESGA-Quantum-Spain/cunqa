@@ -8,8 +8,7 @@ namespace sim {
 
 class AerExecutor {
 public:
-    AerExecutor();
-    AerExecutor(const std::string& group_id);
+    AerExecutor(const std::size_t& n_qpus);
     ~AerExecutor() = default;
 
     void run();

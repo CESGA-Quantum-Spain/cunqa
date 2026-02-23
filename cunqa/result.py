@@ -1,65 +1,47 @@
 """
-    Contains the :py:class:`~cunqa.result.Result` class, which gathers the information about the output of a simulations, also other functions
-    to manage them.
+    Contains the :py:class:`~cunqa.result.Result` class, which holds the output of the executions.
 
-    Once we have submmited a :py:class:`~cunqa.qjob.QJob`, for obtaining its results we call for its propperty :py:attr:`QJob.result`:
+    Once we have submmited a :py:class:`~cunqa.qjob.QJob`, for obtaining its results we call for its 
+    property :py:attr:`~cunqa.qjob.QJob.result`:
 
         >>> qjob.result
         <cunqa.result.Result object at XXXX>
     
-    This object has two main attributes for out interest: the counts distribution from the simulation and the time that the simulation took in seconds:
+    This object has two main attributes of interest: the counts distribution from the 
+    simulation and the time that the simulation took in seconds:
 
         >>> result = qjob.result
         >>> result.counts
         {'000':34, '111':66}
         >>> result.time_taken
         0.056
-    
-
 """
 import logging
 import math
-from cunqa.logger import logger
-from typing import Union, Optional
 import numpy as np
 
-class ResultError(Exception):
-    """Exception for error received from a simulation."""
-    pass
+from typing import  Union
+from cunqa.logger import logger
+from itertools import accumulate
 
 class Result:
     """
-    Class to describe the result of a simulation.
+    Class to describe the result of a simulation. 
 
-    It has two main attributes:
+    There are two main attributes, :py:attr:`Result.counts` and :py:attr:`Result.time_taken`, common
+    to every simulator available on the backends.Nevertheless, depending on the simulator used, more
+    output data is provided. For checking all the information from the simulation as a ``dict``, 
+    one can access the attribute :py:attr:`Result.result`.
 
-    - :py:attr:`Result.counts` : returns the distribution of counts from the sampling of the simulation.
-
-            >>> result.counts
-            {'000':34, '111':66}
-
-    .. note::
-        If the circuit sent has more than one classical register, bit strings corresponding to each one of them will be separated
-        by blank spaces in the order they were added:
-
-            >>> result.counts
-            {'001 11':23, '110 10':77}
-    
-    - :py:attr:`Result.time_taken` : the time that the simulation took.
-
-            >>> result.time_taken
-            0.056
-
-    Nevertheless, depending on the simulator used, more output data is provided. For checking all the information from the simulation as a ``dict``, one can
-    access the attribute :py:attr:`Result.result`.
-
-    If an error occurs at the simulation, an exception will be raised at the pyhton program, :py:exc:`ResultError`.
+    .. autoattribute:: counts
+    .. autoattribute:: time_taken
+    .. autoattribute:: result
     """
     _result: dict
-    _id: str
-    _cl_registers: dict
+    id: str
+    _registers: dict
     
-    def __init__(self, result: dict, circ_id: str, cl_registers: dict):
+    def __init__(self, result: dict, circ_id: str, registers: dict):
         """
         Initializes the Result class.
 
@@ -68,92 +50,104 @@ class Result:
 
             circ_id (str): circuit identificator.
 
-            cl_registers (dict): dictionary specifying the classical registers defined for the circuit. This is neccessary for the correct formating of the counts bit strings.
+            registers (dict): dictionary specifying the classical registers defined for the circuit. 
+            This is neccessary for the correct formating of the counts bit strings.
         """
 
         self._result = {}
-        self._id = circ_id
-        self._cl_registers = cl_registers
+        self.id = circ_id
+        self._registers = registers
         
         if result is None or len(result) == 0:
-            logger.warning(f"Empty object passed, result is {None} [{ValueError.__name__}].")
-        
+            raise ValueError(f"Empty object passed, result is {None}.")
         elif "ERROR" in result:
-            #logger.debug(f"Result received: {result}\n")
             message = result["ERROR"]
-            logger.error(f"Error during simulation, please check availability of QPUs, run arguments syntax and circuit syntax: {message}")
-            raise ResultError
-        
+            raise RuntimeError(f"Error during simulation, please check availability of QPUs, run "
+                               f"arguments syntax and circuit syntax: {message}")
         else:
-            #logger.debug(f"Result received: {result}\n")
             self._result = result
-        
-        #logger.debug("Results correctly loaded.")
 
 
     # TODO: Use length of counts to justify time_taken (ms) at the end of the line.
     def __str__(self):
-        RED = "\033[31m"
         YELLOW = "\033[33m"
         RESET = "\033[0m"   
         GREEN = "\033[32m"
-        if self._result != None:
-            return f"{YELLOW}{self._id}:{RESET} {'{'}counts: {self.counts}, \n\t time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n"
-        else:
-            return "{}"
+        return (f"{YELLOW}{self.id}:{RESET} {'{'}counts: {self.counts}, \n\t "
+               f"time_taken: {GREEN}{self.time_taken} s{RESET}{'}'}\n")
 
 
     @property
     def result(self) -> dict:
-        """Raw output of the simulation, the ``dict`` format depends on the simulator used."""
+        """
+        Dictionary with the whole output of the simulation. This output is presented as the raw 
+        product of the simulation, and so the ``dict`` format depends on the simulator used.
+        """
         return self._result
     
 
     @property
     def counts(self) -> dict:
-        """Counts distribution from the sampling of the simulation, format is ``{"<bit string>":<number of counts as int>}``."""
-        try:
-            if "qmio_results" in list(self._result.keys()): 
-                counts = self._result["qmio_results"]["reg_measure"] #TODO: More registers? 
-            elif "results" in list(self._result.keys()): # aer
-                counts = self._result["results"][0]["data"]["counts"]
-            elif "counts" in list(self._result.keys()): # munich and cunqa
-                counts = self._result["counts"]
-            else:
-                logger.error(f"Some error occured with counts.")
-                raise ResultError
-            
-            if len(self._cl_registers) > 1:
-                counts = _convert_counts(counts, self._cl_registers)
+        """
+        Counts distribution from the sampling of the simulation, format is 
+        ``{"<bit string>":<number of counts as int>}``.
 
-        except Exception as error:
-            logger.error(f"Some error occured with counts [{type(error).__name__}]: {error}.")
-            raise error
+                >>> result.counts
+                {'000':34, '111':66}
+
+        .. note::
+            If the circuit sent has more than one classical register, bit strings corresponding to 
+            each one of them will be separated by blank spaces in the order they were added:
+
+                >>> result.counts
+                {'001 11':23, '110 10':77}
+        """
+        if "qmio_results" in list(self._result.keys()): 
+            counts = self._result["qmio_results"]["c"] #TODO: More registers? 
+        elif "results" in list(self._result.keys()): # aer
+            counts = self._result["results"][0]["data"]["counts"]
+        elif "counts" in list(self._result.keys()): # munich and cunqa
+            counts = self._result["counts"]
+        else:
+            raise RuntimeError(f"The result format is unknown: no counts in it.")
         
-        return counts
+        if len(self._registers) == 1:
+            return counts
+
+        lengths = [len(reg) for reg in self._registers.values()]
+        if not lengths:
+            return counts
+        cuts = (0, *accumulate(lengths))
+        return {' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
+                count for bitstring, count in counts.items()}
 
     @property
     def time_taken(self) -> str:
-        """Time that the simulation took in seconds, since it is recieved at the virtual QPU until it is finished."""
-        try:
-            if "qmio_results" in list(self._result.keys()):
-                time = self._result["time_taken"]
-                return time
-            if "results" in list(self._result.keys()): # aer
-                time = self._result["results"][0]["time_taken"]
-                return time
-            elif "counts" in list(self._result.keys()): # munich and cunqa
-                time = self._result["time_taken"]          
-                return time
-            else:
-                raise ResultError
-        except Exception as error:
-            logger.error(f"Some error occured with time taken [{type(error).__name__}]: {error}.")
-            raise error
+        """
+        Time that the simulation took in seconds, since it is received at the virtual QPU until 
+        it is finished.
+
+            >>> result.time_taken
+            0.056
+        """
+        if "qmio_results" in list(self._result.keys()):
+            time = self._result["time_taken"]
+            return time
+        elif "results" in list(self._result.keys()): # aer
+            time = self._result["results"][0]["time_taken"]
+            return time
+        elif "counts" in list(self._result.keys()): # munich and cunqa
+            time = self._result["time_taken"]          
+            return time
+        else:
+            raise RuntimeError(f"The result format is unknown: no time_taken in it.")
         
     @property
     def statevector(self) -> Union[dict[np.array], np.array]:
-        """Statevector or dictionary of statevectors captured at the moment that `.save_state()` was performed on the circuit."""
+        """
+        Statevector or dictionary of statevectors captured at the moment that `.save_state()` was 
+        performed on the circuit.
+        """
         try:
             if ("results" in list(self._result.keys()) 
                 and "result_types" in self._result["results"][0]["metadata"] 
@@ -177,18 +171,23 @@ class Result:
                     statevector = np.array(statevector).view(np.complex128)
 
             else:
-                logger.error(f"Statevector not found, try using circuit.save_state() at some point before executing.")
-                raise ResultError
+                raise RuntimeError(f"Statevector not found, try using circuit.save_state() at some "
+                                   f"point before executing.")
+                
 
         except Exception as error:
-            logger.error(f"Some error occured with Statevector [{type(error).__name__}]: {error}.")
-            raise error
+            raise RuntimeError(f"Some error occured with Statevector "
+                               f"[{type(error).__name__}]: {error}.")
         
         return statevector
 
+
     @property
     def density_matrix(self) -> Union[dict[np.array], np.array]:
-        """Density matrix or dictionary of density matrices captured at the moment that `.save_state()` was performed on a circuit runned with `method = density_matrix` on AER."""
+        """
+        Density matrix or dictionary of density matrices captured at the moment that `.save_state()` 
+        was performed on a circuit runned with `method = density_matrix` on AER.
+        """
         try:
             if ("results" in list(self._result.keys()) 
                 and "result_types" in self._result["results"][0]["metadata"] 
@@ -203,16 +202,20 @@ class Result:
                     density_matrix = list(density_matrix.values())[0] # Extract the statevector if we only have one
 
             else:
-                logger.error(f"Density Matrix not found, try using circuit.save_state() before executing with Aer.")
-                raise ResultError
+                raise RuntimeError(f"Density Matrix not found, try using circuit.save_state() "
+                                   f"before executing with Aer.")
 
         except Exception as error:
-            logger.error(f"Some error occured with Density Matrix [{type(error).__name__}]: {error}.")
-            raise error
+            raise RuntimeError(f"Some error occured with Density Matrix "
+                               f"[{type(error).__name__}]: {error}.")
         
         return density_matrix
     
-    def probabilities(self, per_qubit: bool = False, partial: list[int] = None) -> Union[dict[np.array],  np.array]:
+    def probabilities(
+        self, 
+        per_qubit: bool = False, 
+        partial: list[int] = None
+    ) -> Union[dict[np.array],  np.array]:
         """
         Extracts probabilities from result information. If we have statevector or density matrix 
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
@@ -267,12 +270,12 @@ class Result:
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
-                    probs[k] =  np.diagonal(densmat, axis1=0).real[0]
+                    probs[k] =  np.diagonal(densmat, axis1=0).real[0].copy()
                 # Extract number of qubits from the lenght of one of the sets of probs
                 num_qubits = int(math.log2(next(iter(probs.values())).size)) 
 
             else:
-                probs =  np.diagonal(densmats, axis1=0).real[0]
+                probs =  np.diagonal(densmats, axis1=0).real[0].copy()
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
@@ -285,16 +288,21 @@ class Result:
             
             return probs
 
-        # Get frequencies from counts as estimation of probabilities if state is not available ---------------------
+        # Get frequencies from counts as estimation of probabilities if state is not available
         else: 
-            logger.debug(f"Estimating probabilities from the available counts. First ten counts: { {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
-            if len(self._cl_registers) > 1:
-                logger.debug(f"Computing probabilities of a circuit with {len(self._cl_registers)} classical registers. Lenght of probabilities may not correspond with 2^num_qubits.")
+            logger.debug(f"Estimating probabilities from the available counts. First ten counts: "
+                         f"{ {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
+            if len(self._registers) > 1:
+                logger.debug(f"Computing probabilities of a circuit with {len(self._registers)} "
+                             f"classical registers. Lenght of probabilities may not correspond "
+                             f"with 2^num_qubits.")
 
                 n = len(next(iter(self.counts.keys())).replace(" ", ""))
                 num_bitstrings = 2**n
                 if len(self.counts) != num_bitstrings:
-                    new_counts = {**_convert_counts({f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._cl_registers), **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                    new_counts = {**_convert_counts({
+                        f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._registers), **self.counts
+                    }
                 else:
                     new_counts = self.counts
 
@@ -325,7 +333,9 @@ class Result:
             num_qubits = len(next(iter(self.counts.keys())))
             num_bitstrings = 2**num_qubits
             if len(self.counts) != num_bitstrings:
-                new_counts = {**{f"{i:0{num_qubits}b}": 0 for i in range(num_bitstrings)}, **self.counts} # Python 3.7+ is needed to preserve first dict's order
+                new_counts = {
+                    **{f"{i:0{num_qubits}b}": 0 for i in range(num_bitstrings)}, **self.counts
+                }
 
             else:
                 new_counts = self.counts
@@ -374,7 +384,8 @@ def _divide(string: str, lengths: "list[int]") -> str:
 def _convert_counts(counts: dict, cl_registers: dict) -> dict:
 
     """
-    Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the division of the bit strings.
+    Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the 
+    division of the bit strings.
 
     Args:
     --------
@@ -384,7 +395,8 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
 
     Return:
     --------
-    Counts dictionary with keys as binary string correctly separated with spaces accordingly to the classical registers.
+    Counts dictionary with keys as binary string correctly separated with spaces accordingly to 
+    the classical registers.
     """
 
     if isinstance(cl_registers, dict):
@@ -406,8 +418,12 @@ def _convert_counts(counts: dict, cl_registers: dict) -> dict:
     
     return new_counts
 
-
-def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, partial: Union[None, list[int]], num_qubits: int):
+def _recombine_probs(
+    probs: Union[dict[np.array], np.array], 
+    per_qubit: bool, 
+    partial: Union[None, list[int]], 
+    num_qubits: int
+):
     """
     Modifies the probabilities per bitstring to obtain either probabilities per qubit or per 
     sub-bitstrings, were the indexes of the qubits to be kept are specified in `partial`. The per
@@ -425,7 +441,8 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
         new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
         short_bitstring_probs (np.array, dict[np.array]): set of probabilities per sub-bitstring
     """
-    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
+    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from 
+    # right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
     if partial is None:
         partial = [num_qubits - 1 - i for i in range(num_qubits)]
     else:
@@ -441,22 +458,28 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
             for k, probs_k in probs.items():
 
                 new_probs[k] = np.zeros((len(partial), 2))
-                # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+                # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
+                # the binary order, thus the base_ten_bitstring
                 for base_ten_bitstring, prob in enumerate(probs_k):
                     for i, i_qubit in enumerate(partial):
-
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) # extract wether i have a zero or a one on position i_qubit of the bitstring
-                        new_probs[k][i, zero_one] += prob # for each qubit, i have a two element list with prob of one and prob of zero. Which element should be updated
-                                                            # is determined by the zero or one on the bitstring
+                        
+                        # extract whether i have a zero or a one on position i_qubit of the bitstring
+                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) 
+                        # for each qubit, i have a two element list with prob of one and prob of 
+                        # zero. Which element should be updated is determined by the zero or one 
+                        # on the bitstring
+                        new_probs[k][i, zero_one] += prob 
 
         else: # probs is an array
             new_probs = np.zeros((len(partial), 2))
 
-            # We assume that the bitstring probabilities are ordered from 0000 to 1111 following the binary order, thus the base_ten_bitstring
+            # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
+            # the binary order, thus the base_ten_bitstring
             for base_ten_bitstring, prob in enumerate(probs):
                 for i, i_qubit in enumerate(partial):
 
-                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                    #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
+                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
                     new_probs[i, zero_one] += prob
         
         return new_probs
@@ -467,19 +490,26 @@ def _recombine_probs(probs: Union[dict[np.array], np.array], per_qubit: bool, pa
             short_bitstring_probs = {}
             for k, probs_k in probs.items():
 
-                short_bitstring_probs[k] = {format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 for  bitstring_ten in range(2**short_num_qubits)}
+                short_bitstring_probs[k] = {
+                    format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
+                    for bitstring_ten in range(2**short_num_qubits)
+                }
                 for base_ten_bitstring, prob in enumerate(probs_k):
 
-                    shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                    shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
+                                                          for i in partial])
                     short_bitstring_probs[k][shortened_bitstring] += prob
 
         elif isinstance(probs, np.ndarray):        
 
-            short_bitstring_probs = {format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 for bitstring_ten in range(2**short_num_qubits)}
+            short_bitstring_probs = {
+                format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
+                for bitstring_ten in range(2**short_num_qubits)
+            }
             for base_ten_bitstring, prob in enumerate(probs):
 
-                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] for i in partial])
+                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
+                                                      for i in partial])
                 short_bitstring_probs[shortened_bitstring] += prob
 
         return short_bitstring_probs
-

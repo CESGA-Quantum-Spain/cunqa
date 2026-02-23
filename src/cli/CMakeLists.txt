@@ -72,7 +72,7 @@ target_link_directories(setup_qmio PRIVATE "${ZMQ_BINARY_DIR}/lib")
 target_include_directories(setup_qmio PRIVATE )
 install(TARGETS setup_qmio DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-# Epilog tool erase_key and noise models
+# Epilog tool erase_key
 add_executable(erase_key erase_key.cpp)
 target_link_libraries(erase_key PRIVATE json)
 install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")

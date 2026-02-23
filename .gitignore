@@ -109,7 +109,6 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/source/examples
 
 # PyBuilder
 .pybuilder/
@@ -318,3 +317,7 @@ hybrid_qc-cc.py
 distr_Grover.py
 QFT.py
 qraise_*
+.nfs*
+modulos.sh
+modules.sh
+jup.out

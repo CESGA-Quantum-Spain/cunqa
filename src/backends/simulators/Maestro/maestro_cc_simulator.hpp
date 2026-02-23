@@ -14,7 +14,6 @@ namespace sim {
 class MaestroCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     MaestroCCSimulator();
-    MaestroCCSimulator(const std::string& group_id);
     ~MaestroCCSimulator() = default;
 
     inline std::string get_name() const override {return "MaestroSimulator";}

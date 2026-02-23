@@ -5,9 +5,6 @@
 namespace cunqa {
 namespace sim {
 
-// Simple AerSimulator
-AerSimpleSimulator::~AerSimpleSimulator() = default;
-
 JSON AerSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask& quantum_task) 
 {
     AerComputationAdapter aer_ca(quantum_task);

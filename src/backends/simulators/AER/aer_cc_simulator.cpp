@@ -2,24 +2,22 @@
 #include "aer_adapters/aer_computation_adapter.hpp"
 #include "aer_adapters/aer_simulator_adapter.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-AerCCSimulator::AerCCSimulator()
+AerCCSimulator::AerCCSimulator() : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
 {
     classical_channel.publish();
-};
-
-AerCCSimulator::AerCCSimulator(const std::string& group_id)
-{
-    classical_channel.publish(group_id);
 };
 
 // Distributed AerSimulator
 JSON AerCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {
-    std::vector<std::string> connect_with = quantum_task.sending_to;
-    classical_channel.connect(connect_with, false);
+    for(const auto& qpu_id: quantum_task.sending_to)
+        classical_channel.connect(qpu_id);
 
     AerComputationAdapter aer_ca(quantum_task);
     AerSimulatorAdapter aer_sa(aer_ca);

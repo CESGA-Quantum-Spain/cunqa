@@ -173,8 +173,7 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 
         run_command =  "srun --exclusive  -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
         // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
-        run_command += "sleep 1\n";
-        run_command +=  "srun --exclusive  -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G setup_executor " + args.simulator + " " + args.family_name + "\n";
+        run_command +=  "srun --exclusive  -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G setup_executor " + args.simulator + " " + std::to_string(args.n_qpus) + "\n";
     } else {
 #if !COMPILATION_FOR_GPU
         LOGGER_ERROR("CUNQA was not compiled with GPU support.");
@@ -186,7 +185,7 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
         run_command =  "srun --exclusive  -n " + std::to_string(args.n_qpus) + " -c 1 --mem-per-cpu=1G --gres=gpu:0 --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand + " &\n";
         // This is done to avoid run conditions in the IP publishing of the QPUs for the executor
         run_command += "sleep 1\n";
-        run_command +=  "srun --exclusive -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --gres=gpu:1 setup_executor " + args.simulator + " " + args.family_name + "\n";
+        run_command +=  "srun --exclusive -n 1 -c " + std::to_string(simulator_n_cores) + " --mem=" + std::to_string(simulator_memory) + "G --gres=gpu:1 setup_executor " + args.simulator + " " + std::to_string(args.n_qpus) + "\n";
     }
 #endif //USE_ZMQ_BTW_QPU
 

@@ -12,10 +12,8 @@ namespace sim {
 
 class AerSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
-
     AerSimpleSimulator() = default;
-    AerSimpleSimulator(const std::string& group_id) {};
-    ~AerSimpleSimulator() override;
+    ~AerSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "AerSimulator";} 
     JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;

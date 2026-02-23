@@ -157,10 +157,10 @@ bool write_cc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
     if (args.backend.has_value()) {
         backend_path = std::string(args.backend.value());
         backend = R"({"backend_path":")" + backend_path + R"("})" ;
-        subcommand = mode + " cc " + std::string(args.family_name) + " " + std::string(args.simulator) + " \'" + backend + "\'" "\n";
+        subcommand = mode + " cc " + args.family_name + " " + args.simulator + " \'" + backend + "\'\n";
         LOGGER_DEBUG("Qraise with classical communications and personalized CunqaSimulator backend. \n");
     } else {
-        subcommand = mode + " cc " + std::string(args.family_name) + " " + std::string(args.simulator) + "\n";
+        subcommand = mode + " cc " + args.family_name + " " + args.simulator + "\n";
         LOGGER_DEBUG("Qraise with classical communications and default CunqaSimulator backend. \n");
     }
 

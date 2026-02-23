@@ -2,24 +2,22 @@
 #include "maestro_adapters/maestro_computation_adapter.hpp"
 #include "maestro_adapters/maestro_simulator_adapter.hpp"
 
+using namespace std::string_literals;
+
 namespace cunqa {
 namespace sim {
 
-MaestroCCSimulator::MaestroCCSimulator()
+MaestroCCSimulator::MaestroCCSimulator() : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
 {
     classical_channel.publish();
-};
-
-MaestroCCSimulator::MaestroCCSimulator(const std::string& group_id)
-{
-    classical_channel.publish(group_id);
 };
 
 // Distributed MaestroSimulator
 JSON MaestroCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {
-    std::vector<std::string> connect_with = quantum_task.sending_to;
-    classical_channel.connect(connect_with, false);
+    for(const auto& qpu_id: quantum_task.sending_to)
+        classical_channel.connect(qpu_id);
 
     MaestroComputationAdapter maestro_ca(quantum_task);
     MaestroSimulatorAdapter maestro_sa(maestro_ca);

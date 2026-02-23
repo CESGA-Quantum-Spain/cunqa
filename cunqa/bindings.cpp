@@ -5,6 +5,7 @@
 
 #include "comm/client.hpp"
 #include "utils/helpers/qasm2_to_json.hpp"
+#include "utils/helpers/json_to_qasm2.hpp"
 #include "json.hpp"
  
 namespace py = pybind11;
@@ -44,6 +45,11 @@ PYBIND11_MODULE(qclient, m) {
 
     m.def("qasm2_to_json", [](const std::string& circuit_qasm) {
         return qasm2_to_json(circuit_qasm).dump();
+    });
+    m.def("json_to_qasm2", [](const std::string& circuit_str) {
+        JSON circuit_json = JSON::parse(circuit_str);
+
+        return json_to_qasm2(circuit_json["instructions"], circuit_json["config"]);
     });
 
 }

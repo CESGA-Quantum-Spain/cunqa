@@ -14,7 +14,6 @@ class MaestroSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     MaestroSimpleSimulator() = default;
-    MaestroSimpleSimulator(const std::string& group_id) {};
     ~MaestroSimpleSimulator() override;
 
     inline std::string get_name() const override {return "MaestroSimulator";} 

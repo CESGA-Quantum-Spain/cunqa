@@ -55,7 +55,7 @@ endif()
 
 if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.13.6-python-3.11.9/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
-  find_package(Python 3.11.9 EXACT COMPONENTS Interpreter Development)
+  find_package(Python 3.9.9 COMPONENTS Interpreter Development)
   find_package(pybind11 2.13 REQUIRED)
   set(PYBIND11_PYTHON_VERSION 3.11 CACHE STRING "")
 elseif(${SYSTEM_NAME} STREQUAL "FT3")
@@ -346,7 +346,7 @@ FetchContent_Declare(
 set(USE_PYTHON OFF CACHE BOOL "" FORCE)
 set(BUILD_QULACS_WITH_MPI OFF)
 if(BUILD_QULACS_WITH_MPI)
-  #set(CXX_COMPILER "mpic++" CACHE STRING "" FORCE) # Warning!
+  set(CXX_COMPILER "mpic++" CACHE STRING "" FORCE) # Warning!
   set(USE_MPI ON CACHE BOOL "" FORCE)
 endif()
 FetchContent_MakeAvailable(qulacs)
@@ -360,7 +360,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURR
 
 add_subdirectory(src)
 add_subdirectory(cunqa)
-add_subdirectory(examples)
 
 # uninstall target
 if(NOT TARGET uninstall)

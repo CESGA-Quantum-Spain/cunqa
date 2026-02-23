@@ -29,6 +29,7 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     sbatchFile << "\n\n";
 
+    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
     sbatchFile << "EPILOG_PATH=" << std::string(cunqa::constants::CUNQA_PATH) << "/epilog.sh\n";
 
     sbatchFile << "\n\n";
