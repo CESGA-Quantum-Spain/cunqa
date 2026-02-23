@@ -36,7 +36,7 @@ General deployment options
 ``-p, --partition <string>``
     Partition requested for the QPUs.
 
-``--mem-per-qpu <int>``
+``--mem_per_qpu <int>``
     Amount of memory (in GB) assigned to each QPU.
 
 ``-N, --n_nodes <int>``
@@ -63,7 +63,7 @@ Backend and simulation options
 Noise model options
 ~~~~~~~~~~~~~~~~~~~
 
-``--noise-prop, --noise-properties <string>``  
+``--noise_prop, --noise_properties <string>``  
     Path to the noise properties JSON file.  
     Only supported when using the ``Aer`` simulator.
 
@@ -72,15 +72,15 @@ Noise model options
     If no value is provided, the default calibration set ``last_calibrations`` is used.
     It can only be used when executing in CESGA.
 
-``--no-thermal-relaxation``  
+``--no_thermal_relaxation``  
     Deactivate thermal relaxation in FakeQmio.  
     Default: ``false``
 
-``--no-readout-error``  
+``--no_readout_error``  
     Deactivate readout error in FakeQmio.  
     Default: ``false``
 
-``--no-gate-error``  
+``--no_gate_error``  
     Deactivate gate error in FakeQmio.  
     Default: ``false``
 
@@ -92,7 +92,7 @@ Grouping and communication options
     Name used to identify the group of QPUs that were raised together.
     Default: ``default``
 
-``--co-located``
+``--co_located``
     Enable co-located mode.
     If set, the vQPU can be accesed from any node.
     Otherwise, the user can only access it from the node it is deployed on.
@@ -122,7 +122,7 @@ Command that deploys 2 vQPUs with classical communications, for 10 minutes and a
 
 .. code-block:: bash
 
-   qraise -n 2 -t 00:10:00 --classical_comm --co-located
+   qraise -n 2 -t 00:10:00 --classical_comm --co_located
 
 Notes
 -----

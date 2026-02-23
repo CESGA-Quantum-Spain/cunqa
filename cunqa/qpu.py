@@ -353,7 +353,7 @@ def qraise(n, t, *,
 
     try:
         if noise_properties_path is not None:
-            command = command + f" --noise-properties={str(noise_properties_path)}"
+            command = command + f" --noise_properties={str(noise_properties_path)}"
         if fakeqmio:
             command = command + " --fakeqmio"
         if classical_comm:
@@ -365,11 +365,11 @@ def qraise(n, t, *,
         if family is not None:
             command = command + f" --family_name={str(family)}"
         if co_located:
-            command = command + " --co-located"
+            command = command + " --co_located"
         if cores is not None:
             command = command + f" --cores={str(cores)}"
         if mem_per_qpu is not None:
-            command = command + f" --mem-per-qpu={str(mem_per_qpu)}G"
+            command = command + f" --mem_per_qpu={str(mem_per_qpu)}G"
         if n_nodes is not None:
             command = command + f" --n_nodes={str(n_nodes)}"
         if node_list is not None:

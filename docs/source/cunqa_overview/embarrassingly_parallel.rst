@@ -35,7 +35,7 @@ mandatory flags, for other additional options checkout :doc:`../reference/comman
 An useful feature is the ``--family`` flag (and ``family`` attribute in Python), since it allows us to tag the set of vQPUs. If 
 none is entered, family name will be the *SLURM job id* of the process in which the vQPUs live, 
 shown right after they are lauched in the terminal or returned as a ``str`` by the Python function. 
-It is also recomended to use the ``--co-located`` flag (and ``co_located`` attribute in Python), as 
+It is also recomended to use the ``--co_located`` flag (and ``co_located`` attribute in Python), as 
 it allows to access the vQPUs from every node, not just the one the vQPUs are being set up. In this 
 documentation we are going to consider that this flag is set.
 

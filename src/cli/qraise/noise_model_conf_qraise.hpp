@@ -48,7 +48,7 @@ bool write_noise_model_resources(std::ofstream& sbatchFile, const CunqaArgs& arg
     }
 
     if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
-        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
+        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem_per_qpu or increase the cores-per-qpu.");
     }
 
     if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {

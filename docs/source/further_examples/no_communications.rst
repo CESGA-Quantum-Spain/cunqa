@@ -37,7 +37,7 @@ model properties.
 
 To do this, as it was explained in :doc:`../cunqa_overview/cunqa_overview`, the 
 :doc:`../reference/commands/qraise` Bash command or its Python function counterpart 
-:py:func:`~cunqa.qpu.qraise` have to be employed with the flag `noise-properties`, in the first 
+:py:func:`~cunqa.qpu.qraise` have to be employed with the flag `noise_properties`, in the first 
 case, and with the argument `noise_properties_path`, in the second; with both being the path 
 to a noise properties JSON file. The format of this JSON file is shown in 
 :doc:`../further_examples/json_examples/noise_properties_example`.
@@ -46,7 +46,7 @@ to a noise properties JSON file. The format of this JSON file is shown in
 
     .. code-block:: bash
 
-        qraise -n 4 -t 01:00:00 --co-located --noise-properties="complete/path/to/noise.json"
+        qraise -n 4 -t 01:00:00 --co_located --noise_properties="complete/path/to/noise.json"
 
 .. tab:: Python function
 
@@ -64,7 +64,7 @@ the ``fakeqmio`` option in the :doc:`../reference/commands/qraise` Bash command 
 
     .. code-block:: bash
 
-        qraise -n 4 -t 01:00:00 --co-located --fakeqmio
+        qraise -n 4 -t 01:00:00 --co_located --fakeqmio
 
 .. tab:: Python function
 

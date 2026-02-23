@@ -354,7 +354,7 @@ def test_qraise_builds_command_and_returns_job_id_without_family(monkeypatch):
         n, t,
         classical_comm=True,
         quantum_comm=False,
-        co_located=False,   # ensures that --co-located is NOT added
+        co_located=False,   # ensures that --co_located is NOT added
     )
 
     (cmd_str,), cmd_kwargs = run_mock.call_args_list[0]
@@ -362,7 +362,7 @@ def test_qraise_builds_command_and_returns_job_id_without_family(monkeypatch):
     assert f"qraise -n {n} -t {t}" in cmd_str
     assert "--classical_comm" in cmd_str
     assert "--quantum_comm" not in cmd_str
-    assert "--co-located" not in cmd_str
+    assert "--co_located" not in cmd_str
 
     (squeue_cmd,), squeue_kwargs = run_mock.call_args_list[1]
     assert squeue_cmd[:3] == ["squeue", "-h", "-j"]
@@ -410,15 +410,15 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     assert "--simulator=aer_sim" in cmd_str
     assert "--backend=/path/to/backend.json" in cmd_str
     assert "--family_name=my_family" in cmd_str
-    assert "--co-located" in cmd_str
+    assert "--co_located" in cmd_str
     assert "--cores=8" in cmd_str
-    assert "--mem-per-qpu=16G" in cmd_str
+    assert "--mem_per_qpu=16G" in cmd_str
     assert "--n_nodes=3" in cmd_str
     assert "--node_list=node01,node02" in cmd_str
     assert "--qpus_per_node=2" in cmd_str
     assert cmd_str == (f"qraise -n {2} -t {t} --fakeqmio --classical_comm --quantum_comm "
-                       f"--simulator=aer_sim --family_name={family} --co-located --cores=8 "
-                       f"--mem-per-qpu=16G --n_nodes=3 --node_list=node01,node02 --qpus_per_node=2 "
+                       f"--simulator=aer_sim --family_name={family} --co_located --cores=8 "
+                       f"--mem_per_qpu=16G --n_nodes=3 --node_list=node01,node02 --qpus_per_node=2 "
                        f"--backend=/path/to/backend.json --partition=partition1")
     assert result == family
 

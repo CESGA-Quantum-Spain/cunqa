@@ -38,7 +38,7 @@ To lauch a set of vQPUs incorporating classical communications among them, you m
 The above command line launches vQPUs with all-to-all classical communications connectivity. For 
 additional options in the Bash command checkout :doc:`../reference/commands/qraise`, and check 
 :py:func:`~cunqa.qpu.qraise` for the Python function. Again, it is recomended to use the 
-``--co-located`` flag (and ``co_located`` attribute in Python), as it allows to access the vQPUs 
+``--co_located`` flag (and ``co_located`` attribute in Python), as it allows to access the vQPUs 
 from every node, not just the one the vQPUs are being set up. In this documentation we are going 
 to consider that this flag is set.
 

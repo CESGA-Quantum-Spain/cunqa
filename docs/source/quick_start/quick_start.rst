@@ -18,7 +18,7 @@ a bash command and get them in the Python program.
 
     .. code-block:: bash
 
-        qraise -n 4 -t 01:00:00 --co-located
+        qraise -n 4 -t 01:00:00 --co_located
 
     Once the vQPUs are deployed, we can design and execute quantum tasks:
 
