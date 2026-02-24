@@ -73,15 +73,15 @@ Noise model options
     It can only be used when executing in CESGA.
 
 ``--no-thermal-relaxation``  
-    Deactivate thermal relaxation in FakeQmio.  
+    Deactivate thermal relaxation in a noisy backend.  
     Default: ``false``
 
 ``--no-readout-error``  
-    Deactivate readout error in FakeQmio.  
+    Deactivate readout error in a noisy backend.  
     Default: ``false``
 
 ``--no-gate-error``  
-    Deactivate gate error in FakeQmio.  
+    Deactivate gate error in a noisy backend.  
     Default: ``false``
 
 
