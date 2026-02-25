@@ -155,7 +155,7 @@ def test_to_ir_quantumcircuit_classically_conditioned_gate_sets_dynamic(monkeypa
         pytest.skip("This Qiskit version does not support .c_if() in a compatible way.")
 
     ir = mod_ir.to_ir(qc)
-
+    
     assert ir["is_dynamic"] is True
     assert len(ir["instructions"]) == 1
     assert ir["instructions"][0]["name"] == "cif"

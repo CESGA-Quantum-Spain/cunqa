@@ -306,6 +306,9 @@ def qraise(n, t, *,
            simulator = None, 
            backend = None, 
            noise_properties_path = None, 
+           no_thermal_relaxation = False,
+           no_readout_error = False,
+           no_gate_error = False,
            fakeqmio = False, 
            family = None, 
            co_located = True, 
@@ -333,6 +336,9 @@ def qraise(n, t, *,
         backend (str): path to a file containing the backend information.
         noise_properties_path (str): Path to the noise properties json file, only supported for 
                                 simulator Aer. Default: None
+        no_thermal_relaxation (bool): if ``True``, deactivate thermal relaxation in a noisy backend. Default: ``false``
+        no_readout_error (bool): if ``True``, deactivate readout error in a noisy backend. Default: ``false``
+        no_gate_error (bool): if ``True``, deactivate gate error in a noisy backend. Default: ``false``
         fakeqmio (bool): ``True`` for raising `n` vQPUs with FakeQmio backend. Only available 
                          at CESGA.
         family (str): name to identify the group of vQPUs raised.
@@ -354,6 +360,12 @@ def qraise(n, t, *,
     try:
         if noise_properties_path is not None:
             command = command + f" --noise-properties={str(noise_properties_path)}"
+        if no_thermal_relaxation:
+            command = command + " --no-termal-relaxation"
+        if no_readout_error:
+            command = command + " --no-readout-error"
+        if no_gate_error:
+            command = command + " --no-gate-error"
         if fakeqmio:
             command = command + " --fakeqmio"
         if classical_comm:
@@ -381,9 +393,9 @@ def qraise(n, t, *,
         if partition is not None:
             command = command + f" --partition={str(partition)}"
         if gpu:
-            command = command + f" --gpu"
+            command = command + " --gpu"
         if qmio:
-            command = command + f" --qmio"
+            command = command + " --qmio"
 
         if not os.path.exists(QPUS_FILEPATH):
            with open(QPUS_FILEPATH, "w") as file:

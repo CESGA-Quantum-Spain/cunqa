@@ -11,12 +11,9 @@ else:
 
 import pytest
 import numpy as np
-from unittest.mock import Mock
-
-# Adjust this import to your real module path.
-from cunqa.circuit.core import CunqaCircuit, QuantumControlContext
-
-import cunqa.circuit.core as circuit_mod
+import sympy
+from unittest.mock import Mock, patch
+from cunqa.circuit.parameter import Param
 
 @pytest.fixture(autouse=True)
 def _reset_class_state():
@@ -27,6 +24,177 @@ def _reset_class_state():
     CunqaCircuit._ids = set()
     CunqaCircuit._communicated = {}
 
+# Do add_instructions tests before importing CunqaCircuit globally to avoid Mock-isinstance problems
+def test_add_single_instruction_no_params():
+    """Test adding a single instruction with no parameters"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "x"}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert circuit.instructions[0] == instr
+    assert len(circuit.params) == 0
+
+
+def test_add_single_instruction_with_param_object():
+    """Test adding instruction where params are already Param objects"""
+    circuit = CunqaCircuit(1)
+    param = Param(sympy.Symbol('theta'))
+    instr = {"name": "u", "params": [param]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 1
+    # Should be a deep copy, not the same object
+    assert circuit.params[0] is not param
+    assert str(circuit.params[0].expr) == str(param.expr)
+
+
+def test_add_single_instruction_with_symbolic_param():
+    """Test adding instruction with symbolic string parameter"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": ["theta"]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 1
+    assert isinstance(instr["params"][0], Param)
+    assert str(instr["params"][0].expr) == "theta"
+
+
+def test_add_single_instruction_with_numeric_param():
+    """Test adding instruction with numeric parameter"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": [3.14]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 0
+    assert instr["params"][0] == 3.14
+
+
+def test_add_instruction_mixed_symbolic_and_numeric():
+    """Test adding instruction with mixed symbolic and numeric parameters"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": ["theta", 3.14, "phi"]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 2
+    assert isinstance(instr["params"][0], Param)
+    assert instr["params"][1] == 3.14
+    assert isinstance(instr["params"][2], Param)
+
+
+def test_add_instruction_empty_params():
+    """Test adding instruction with empty params list"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "x", "params": []}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 0
+
+
+def test_add_multiple_instructions():
+    """Test adding multiple instructions at once"""
+    circuit = CunqaCircuit(1)
+    instrs = [
+        {"name": "x"},
+        {"name": "u", "params": ["theta"]},
+        {"name": "y", "params": [1.57]}
+    ]
+    
+    circuit.add_instructions(instrs)
+    
+    assert len(circuit.instructions) == 3
+    assert len(circuit.params) == 1
+    assert isinstance(instrs[1]["params"][0], Param)
+
+
+def test_add_instruction_invalid_expression():
+    """Test that invalid symbolic expressions raise ValueError"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": ["not a valid expression!!!"]}
+    
+    with pytest.raises(ValueError, match="cannot be converted to symbolic expression"):
+        circuit.add_instructions(instr)
+
+
+def test_add_instruction_with_expression_object():
+    """Test adding instruction with sympy expression"""
+    circuit = CunqaCircuit(1)
+    theta = sympy.Symbol('theta')
+    expr = theta + 1
+    instr = {"name": "u", "params": [expr]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.instructions) == 1
+    assert len(circuit.params) == 1
+    assert isinstance(instr["params"][0], Param)
+
+
+def test_add_instruction_modifies_original_dict():
+    """Test that add_instructions modifies the original instruction dict"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": ["theta", 3.14]}
+    original_params = instr["params"].copy()
+    
+    circuit.add_instructions(instr)
+    
+    # The original instruction dict should be modified
+    assert instr["params"] != original_params
+    assert isinstance(instr["params"][0], Param)
+    assert instr["params"][1] == 3.14
+
+
+def test_add_multiple_instructions_preserves_order():
+    """Test that multiple instructions are added in order"""
+    circuit = CunqaCircuit(1)
+    instrs = [
+        {"name": "x"},
+        {"name": "y"},
+        {"name": "z"}
+    ]
+    
+    circuit.add_instructions(instrs)
+    
+    assert [i["name"] for i in circuit.instructions] == ["x", "y", "z"]
+
+
+def test_add_instruction_param_deep_copy():
+    """Test that existing Param objects are deep copied"""
+    circuit = CunqaCircuit(1)
+    param = Param(sympy.Symbol('theta'))
+    instr = {"name": "u", "params": [param]}
+    
+    circuit.add_instructions(instr)
+    
+    # The param in circuit.params should be a different object
+    assert circuit.params[0] is not param
+    # But should have the same expression
+    assert str(circuit.params[0].expr) == str(param.expr)
+
+
+def test_add_instruction_complex_expression():
+    """Test adding instruction with complex symbolic expression"""
+    circuit = CunqaCircuit(1)
+    instr = {"name": "u", "params": ["theta + pi/2"]}
+    
+    circuit.add_instructions(instr)
+    
+    assert len(circuit.params) == 1
+    assert isinstance(instr["params"][0], Param)
+
+from cunqa.circuit.core import CunqaCircuit, QuantumControlContext
+import cunqa.circuit.core as circuit_mod
 
 def test_init_generates_id_and_adds_default_q_register(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "ABC")
@@ -118,88 +286,6 @@ def test_add_cl_register_name_in_use(monkeypatch):
     assert circuit.num_clbits == 3
     assert "c0_0" in circuit.classical_regs
     logger_mock.warning.assert_called_once()
-
-
-def test_add_instructions_accepts_dict_or_list(monkeypatch):
-    monkeypatch.setattr(circuit_mod, "generate_id", lambda: "INS")
-
-    circuit = CunqaCircuit(1)
-    circuit.add_instructions({"name": "x", "qubits": [0]})
-    circuit.add_instructions([{"name": "h", "qubits": [0]}, {"name": "z", "qubits": [0]}])
-
-    assert [i["name"] for i in circuit.instructions] == ["x", "h", "z"]
-
-def test_add_instruction_with_symbolic_params_creates_param(monkeypatch):
-    circuit = CunqaCircuit(1)
-
-    fake_expr = Mock()
-    fake_expr.is_real = False
-    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda _: [fake_expr])
-
-    ParamMock = Mock()
-    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
-
-    instr = {"name": "rx", "params": ["theta"]}
-    circuit.add_instructions(instr)
-
-    ParamMock.assert_called_once_with(fake_expr)
-    assert len(circuit.params) == 1
-    assert instr["params"][0] == ParamMock.return_value
-
-def test_add_instruction_with_real_param_does_not_create_param(monkeypatch):
-    circuit = CunqaCircuit(1)
-
-    fake_expr = Mock()
-    fake_expr.is_real = True
-    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda _: [fake_expr])
-
-    ParamMock = Mock()
-    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
-
-    instr = {"name": "rx", "params": [3.14]}
-    circuit.add_instructions(instr)
-
-    ParamMock.assert_not_called()
-    assert instr["params"][0] == 3.14
-
-def test_add_instruction_sympify_error_raises_valueerror(monkeypatch):
-    from cunqa.circuit import CunqaCircuit
-    from sympy import SympifyError
-
-    circuit = CunqaCircuit(1)
-
-    def raise_error(x):
-        raise SympifyError("bad")
-
-    monkeypatch.setattr("cunqa.circuit.core.sympify", raise_error)
-
-    instr = {"name": "rx", "params": ["bad_expr"]}
-
-    with pytest.raises(ValueError):
-        circuit.add_instructions(instr)
-
-def test_add_instruction_mixed_params(monkeypatch):
-    from cunqa.circuit import CunqaCircuit
-
-    circuit = CunqaCircuit(1)
-
-    expr_symbolic = Mock()
-    expr_symbolic.is_real = False
-    real_number = Mock()
-    real_number.is_real = True
-    monkeypatch.setattr("cunqa.circuit.core.sympify", lambda x: [expr_symbolic, real_number])
-
-    ParamMock = Mock()
-    monkeypatch.setattr("cunqa.circuit.core.Param", ParamMock)
-
-    instr = {"name": "u", "params": ["theta", 3.14]}
-    circuit.add_instructions(instr)
-
-    ParamMock.assert_called_once_with(expr_symbolic)
-    assert len(circuit.params) == 1
-    assert instr["params"][0] == ParamMock.return_value
-    assert instr["params"][1] == 3.14
-
 
 ONEQUBIT_NOPARAM = [
     ("i",       (0,), {"name": "id",    "qubits": [0]}),

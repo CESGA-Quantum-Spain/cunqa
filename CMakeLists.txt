@@ -329,6 +329,7 @@ FetchContent_Declare(
     GIT_REPOSITORY "git@github.com:QoroQuantum/maestro.git"
     GIT_TAG "a4d54721a718189362a4a9c8329d7211b662a8f9"
 )
+set(BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(maestro)
 
 target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")

@@ -69,7 +69,7 @@ std::string execute_shot_(
         int meas1 = executor.apply_measure({G.n_qubits - 1});
         int meas2 = executor.apply_measure({G.n_qubits - 2});
         if (meas1) executor.apply_gate("x", {G.n_qubits - 1});
-        if (meas2) executor.apply_gate("x", {G.n_qubits - 1});
+        if (meas2) executor.apply_gate("x", {G.n_qubits - 2});
         executor.apply_gate("h", {G.n_qubits - 2});
         executor.apply_gate("cx", {G.n_qubits - 2, G.n_qubits - 1});
     };

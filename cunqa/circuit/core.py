@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import copy
 from typing import Union, Optional
 from sympy.core.sympify import sympify, SympifyError
 
@@ -243,37 +244,46 @@ class CunqaCircuit:
 
     def add_instructions(self, instructions: Union[dict, list[dict]]):
         """
-        Class method to add an instruction to the CunqaCircuit. 
+        Class method to add one or multiple instructions to the CunqaCircuit. 
 
         Args:
-            instruction (dict | list[dist]): instruction to be added.
+            instructions (dict | list[dist]): instruction(s) to be added.
         """
-        
-        if "params" in instructions:
+        def handle_params(instruction):
+            if "params" in instruction and len(instruction["params"]) != 0:
+                if not any([isinstance(p, Param) for p in instruction["params"]]):
+                    # Converting the string to a symbolic expression
+                    try:
+                        exprs = sympify(instruction["params"])
+                    except SympifyError:
+                        raise ValueError(f"Expression {instruction['params']} cannot be converted to "
+                                        f"symbolic expression.")
+                    
+                    # Adding to the instruction the Param object or a real number depending on the specified
+                    # (if real, the parameter will not be changed)
+                    new_list = []
+                    for expr, param in zip(exprs, instruction["params"]):
+                        if not expr.is_real:
+                            new_param = Param(expr)
+                            self.params.append(new_param)
+                            new_list.append(new_param)
+                        else:
+                            new_list.append(param)
+                    instruction["params"] = new_list
+
+                else: # There is at least a param on intruction["params"]
+                    for p in instruction["params"]:
+                        if isinstance(p, Param):
+                            # Copy needed for circuit transformations to avoid aliasing
+                            self.params.append(copy.deepcopy(p))
+
             
-            # Converting the string to a symbolic expression
-            try:
-                exprs = sympify(instructions["params"])
-            except SympifyError:
-                raise ValueError(f"Expression {instructions['params']} cannot be converted to "
-                                 f"symbolic expression.")
-            
-            # Adding to the instruction the Param object or a real number depending on the specified
-            # (if real, the parameter will not be changed)
-            new_list = []
-            for expr, param in zip(exprs, instructions["params"]):
-                if not expr.is_real:
-                    new_param = Param(expr)
-                    self.params.append(new_param)
-                    new_list.append(new_param)
-                else:
-                    new_list.append(param)
-            instructions["params"] = new_list
-            
-        if (isinstance(instructions, dict)):
+        if isinstance(instructions, dict):
+            handle_params(instructions)
             self.instructions.append(instructions)
         else:
             for instr in instructions:
+                handle_params(instr)
                 self.instructions.append(instr)
                     
     def add_q_register(self, name: str, num_qubits: int):
