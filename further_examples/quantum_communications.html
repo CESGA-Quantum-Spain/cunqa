@@ -133,9 +133,9 @@ This section will present a couple of examples are presented to highlight the us
 <span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">CORES_PER_QPU</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">MEM_PER_QPU</span> <span class="o">=</span> <span class="mi">60</span> <span class="c1"># in GB</span>
-<span class="n">N_ANCILLA_QUBITS</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">N_ANCILLA_QUBITS</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">N_REGISTER_QUBITS</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="mi">12</span>
+<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="mi">3</span>
 
 <span class="n">shots</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>
@@ -143,11 +143,15 @@ This section will present a couple of examples are presented to highlight the us
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># 1. Deploy vQPUs</span>
     <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;10:00:00&quot;</span><span class="p">,</span> 
-                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
+                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Cunqa&quot;</span><span class="p">,</span>
                     <span class="n">quantum_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">cores</span> <span class="o">=</span> <span class="n">CORES_PER_QPU</span><span class="p">,</span> 
                     <span class="n">mem_per_qpu</span> <span class="o">=</span> <span class="n">MEM_PER_QPU</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
 
     <span class="c1"># 2. Design circuits modelling the QPE </span>
@@ -191,6 +195,7 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="c1"># 4. Post-processing results to extract estimated phase </span>
     <span class="n">counts</span> <span class="o">=</span> <span class="n">result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">counts</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Most frequent output is </span><span class="si">{</span><span class="n">most_frequent_output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

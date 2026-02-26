@@ -166,6 +166,10 @@ list or a dict. Note that variables that are not given a new value keep the prev
     <span class="c1"># 1. Deploy QPU</span>
     <span class="c1"># If GPU execution is desired, just add &quot;gpu = True&quot; as another qraise argument</span>
     <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span>  <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="n">qpu</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
 
     <span class="c1"># ---------------------------</span>

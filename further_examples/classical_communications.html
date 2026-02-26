@@ -130,6 +130,10 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="c1"># If GPU execution is desired, just add &quot;gpu = True&quot; as another qraise argument</span>
     <span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">NUM_NODES</span><span class="p">,</span><span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Maestro&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">)</span>
 
 
@@ -227,27 +231,29 @@ This section will present a couple of examples are presented to highlight the us
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
 
 <span class="c1"># Global variables</span>
-<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">7</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
-<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mi">5</span> 
+<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">16</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
+<span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mi">5</span>
 <span class="n">SHOTS</span> <span class="o">=</span> <span class="mi">1024</span>
 <span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>                   <span class="c1"># Set seed for reproducibility</span>
 
 <span class="k">try</span><span class="p">:</span>
-
     <span class="c1"># 1. QPU deployment</span>
-    <span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;03:00:00&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;03:00:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">classical_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">)</span>
 
     <span class="c1"># 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation</span>
     <span class="n">circuits</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">):</span> 
-        <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">N_QPUS</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span> 
+        <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">N_QPUS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
 
         <span class="n">circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        
 
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
             <span class="n">param</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
@@ -263,7 +269,6 @@ This section will present a couple of examples are presented to highlight the us
 
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_QPUS</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-
             <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">recving_circuit</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -285,13 +290,12 @@ This section will present a couple of examples are presented to highlight the us
     <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts_list</span><span class="p">:</span>
         <span class="c1"># Extract the most frequent measurement (the best estimate of theta)</span>
         <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
-        <span class="n">binary_string</span> <span class="o">+=</span> <span class="n">most_frequent_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">binary_string</span> <span class="o">+=</span> <span class="n">most_frequent_output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">estimated_theta</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">digit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">binary_string</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">digit</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
-            <span class="n">exponent</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">estimated_theta</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">exponent</span><span class="p">)</span>
+            <span class="n">estimated_theta</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated angle: </span><span class="si">{</span><span class="n">estimated_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

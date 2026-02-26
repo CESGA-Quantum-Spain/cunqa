@@ -179,13 +179,13 @@ developed. The usage of these two features can be seen in the following examples
 <span class="n">parametric_circuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">parametric_circuit</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="n">parametric_circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">parametric_circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
 
-<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">10</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
+<span class="n">N_QPUS</span> <span class="o">=</span> <span class="mi">8</span>                  <span class="c1"># Determines the number of bits of the phase that will be computed</span>
 <span class="n">PHASE_TO_COMPUTE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mi">5</span> 
 <span class="n">SHOTS</span> <span class="o">=</span> <span class="mi">1024</span>
-<span class="n">BIT_PRECISION</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">BIT_PRECISION</span> <span class="o">=</span> <span class="n">N_QPUS</span>
 <span class="n">SEED</span> <span class="o">=</span> <span class="mi">18</span>                   <span class="c1"># Set seed for reproducibility</span>
 
 
@@ -196,7 +196,11 @@ developed. The usage of these two features can be seen in the following examples
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># 1. Deploy vQPUs</span>
-    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Munich&quot;</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="n">qpus</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
 
     
