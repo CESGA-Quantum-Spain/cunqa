@@ -28,6 +28,7 @@ import importlib as _importlib
 _submodules = [
     "circuit",
     "qiskit_deps",
+    "netqmpi_adapter",
     "qjob",
     "result",
     "qpu",
@@ -38,7 +39,11 @@ _lazy_symbols = {
     "get_QPUs": ("cunqa.qpu", "get_QPUs"),
     "qraise": ("cunqa.qpu", "qraise"),
     "qdrop": ("cunqa.qpu", "qdrop"),
-    "gather": ("cunqa.qjob", "gather")
+    "gather": ("cunqa.qjob", "gather"),
+    "BackendAdapter": ("cunqa.netqmpi_adapter", "BackendAdapter"),
+    "QMPIComm": ("cunqa.netqmpi_adapter", "QMPIComm"),
+    "CUNQAComm": ("cunqa.netqmpi_adapter", "CUNQAComm"),
+    "NetQASMComm": ("cunqa.netqmpi_adapter", "NetQASMComm"),
 }
 
 __all__ = _submodules + list(_lazy_symbols.keys()) + ["__version__"]

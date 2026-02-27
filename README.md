@@ -73,9 +73,48 @@ For a complete and exhaustive explanation and functionality showcase of CUNQA vi
     - [Install as Lmod module](#install-as-lmod-module)
   - [UNINSTALL](#uninstall)
   - [RUN YOUR FIRST DISTRIBUTED PROGRAM](#run-your-first-distributed-program)
+  - [NETQMPI ADAPTER (CUNQA + NETQASM)](#netqmpi-adapter-cunqa--netqasm)
     - [PYTHON-BASH](#python-bash)
     - [PYTHON-ONLY](#python-only)
   - [ACKNOWLEDGEMENTS](#acknowledgements)
+
+
+## NetQMPI adapter (CUNQA + NetQASM)
+
+This repository now includes a lightweight adapter layer for integrating NetQMPI-style communication with CUNQA and NetQASM as interchangeable backends.
+
+Main components are exposed in `cunqa.netqmpi_adapter`:
+
+- `BackendAdapter`: backend selector/factory (`"cunqa"` or `"netqasm"`).
+- `QMPIComm`: common communication facade (`MPI_Init`, `QMPI_Init`, `send`, `recv`, `barrier`, `finalize`).
+- `CUNQAComm` and `NetQASMComm`: backend wrappers around user-provided communication callables.
+
+Minimal usage example:
+
+```python
+from cunqa import BackendAdapter, QMPIComm
+
+def send_fn(payload, dst, tag):
+    ...
+
+def recv_fn(src, tag):
+    ...
+
+adapter = BackendAdapter.from_name(
+    "cunqa",
+    send_fn=send_fn,
+    recv_fn=recv_fn,
+)
+
+comm = QMPIComm(adapter)
+comm.MPI_Init()
+comm.QMPI_Init()
+comm.send({"x": 1}, dst=1, tag=0)
+msg = comm.recv(src=1, tag=0)
+comm.finalize()
+```
+
+This structure follows the adapter architecture where NetQMPI code targets a common communicator while backend-specific logic is delegated to CUNQA/NetQASM adapters.
 
 ## Install
 
