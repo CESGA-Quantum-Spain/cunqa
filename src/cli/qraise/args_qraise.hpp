@@ -13,7 +13,7 @@ struct CunqaArgs : public argparse::Args
     std::string& time                                   = kwarg("t,time", "Time for the QPUs to be raised.").set_default("");
     int& cores_per_qpu                                  = kwarg("c,cores", "Number of cores per QPU.").set_default(2);
     std::optional<std::string>& partition               = kwarg("p,partition", "Partition requested for the QPUs.");
-    std::optional<int>& mem_per_qpu                     = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.");
+    std::optional<int>& mem_per_qpu                     = kwarg("mem,mem-per-qpu", "Memory given to each QPU in GB.").set_default(15);
     std::optional<std::size_t>& number_of_nodes         = kwarg("N,n_nodes", "Number of nodes.").set_default(1);
     std::optional<std::vector<std::string>>& node_list  = kwarg("node_list", "List of nodes where the QPUs will be deployed.").multi_argument(); 
     std::optional<int>& qpus_per_node                   = kwarg("qpuN,qpus_per_node", "Number of qpus in each node.");

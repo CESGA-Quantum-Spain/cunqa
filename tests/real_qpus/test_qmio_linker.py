@@ -24,9 +24,9 @@ os.environ.setdefault("ZMQ_SERVER", "tcp://127.0.0.1:5555")
 
 def test_get_qmio_config_contains_family_endpoint_and_backend():
     cfg = qmio_linked_mod._get_qmio_config("famA", "tcp://1.2.3.4:7777")
-    assert isinstance(cfg, str)
-    assert '"family": "famA"' in cfg
-    assert '"endpoint": "tcp://1.2.3.4:7777"' in cfg
+    assert isinstance(cfg, dict)
+    assert cfg["family"] == "famA"
+    assert cfg["net"]["endpoint"] == "tcp://1.2.3.4:7777"
 
 
 def test_upgrade_parameters_updates_only_rz_instructions():
@@ -110,10 +110,12 @@ def test_init_binds_connects_writes_config(monkeypatch):
     monkeypatch.setattr(qmio_linked_mod.zmq, "Context", Mock(return_value=context))
 
     monkeypatch.setattr(qmio_linked_mod, "_get_IP", Mock(return_value="10.1.2.3"))
-    monkeypatch.setattr(qmio_linked_mod, "_get_qmio_config", Mock(return_value='{"cfg":1}'))
-    write_on_file = Mock()
-    monkeypatch.setattr(qmio_linked_mod, "write_on_file", write_on_file)
+    monkeypatch.setattr(qmio_linked_mod, "_get_qmio_config", Mock(return_value={"cfg":1}))
+    write_json = Mock()
+    monkeypatch.setattr(qmio_linked_mod, "write_json", write_json)
     monkeypatch.setattr(qmio_linked_mod, "ZMQ_ENDPOINT", "tcp://127.0.0.1:5555")
+    monkeypatch.setenv("SLURM_JOB_ID", "393219")
+    monkeypatch.setenv("SLURM_TASK_PID", "7")
 
     linker = qmio_linked_mod.QMIOLinker("famX")
 
@@ -122,7 +124,7 @@ def test_init_binds_connects_writes_config(monkeypatch):
     assert linker.port == 43210
     assert linker.endpoint == "tcp://10.1.2.3:43210"
     req_socket.connect.assert_called_once_with("tcp://127.0.0.1:5555")
-    write_on_file.assert_called_once_with('{"cfg":1}', qmio_linked_mod.QPUS_FILEPATH, "famX")
+    write_json.assert_called_once_with(qmio_linked_mod.QPUS_FILEPATH, {"393219_7": {"cfg":1}})
 
 
 def test_run_starts_two_threads(monkeypatch):
@@ -245,7 +247,6 @@ def test_compute_result_sends_task_receives_result_and_replies(monkeypatch):
     sent = linker.client_comm_socket.send_multipart.call_args[0][0]
     assert sent[0] == b"CID3"
     assert pickle.loads(sent[1]) == {"counts": {"0": 1}}
-
 
 def test_compute_result_on_zmq_error_closes_sockets_terms_context_and_raises_runtimeerror(monkeypatch):
     linker = _make_linker_without_init()

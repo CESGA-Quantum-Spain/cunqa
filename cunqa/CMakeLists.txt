@@ -1,6 +1,7 @@
 add_subdirectory(circuit)
 add_subdirectory(qiskit_deps)
 add_subdirectory(real_qpus)
+add_subdirectory(utils)
 
 set(LIB_NAME "qclient")
 

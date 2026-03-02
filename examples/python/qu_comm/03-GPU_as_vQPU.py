@@ -12,34 +12,43 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-# 1. Deploy vQPUs and retrieve them using get_QPUs
-# The number of cores must match the ones given in the warning at https://cesga-docs.gitlab.io/ft3-user-guide/gpu_nodes.html#nvidia-a100
-# Number of cores should be modified if more QPUs are requested
-family = qraise(3, "00:10:00", cores = 8, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
-qpus   = get_QPUs(on_node=False)
+try:
+    # 1. Deploy vQPUs and retrieve them using get_QPUs
+    # The number of cores must match the ones given in the warning at https://cesga-docs.gitlab.io/ft3-user-guide/gpu_nodes.html#nvidia-a100
+    # Number of cores should be modified if more QPUs are requested
+    family = qraise(3, "00:10:00", cores = 8, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
+except Exception as error:
+    raise error
 
-# 2. Design circuits with distributed instructions between them
-circuit1 = CunqaCircuit(2, id = "circuit1") 
-circuit2 = CunqaCircuit(1, id = "circuit2")
-circuit3 = CunqaCircuit(1, id = "circuit3") # blank circuit to match QPU number
+try:
+    qpus = get_QPUs(on_node=False)
 
-circuit1.h(0)
-circuit1.cx(0,1)
-circuit1.qsend(1, "circuit2")# this qubit that is sent is reset
-circuit2.qrecv(0, "circuit1")
+    # 2. Design circuits with distributed instructions between them
+    circuit1 = CunqaCircuit(2, id = "circuit1") 
+    circuit2 = CunqaCircuit(1, id = "circuit2")
+    circuit3 = CunqaCircuit(1, id = "circuit3") # blank circuit to match QPU number
 
-circuit1.measure_all()
-circuit2.measure_all()
+    circuit1.h(0)
+    circuit1.cx(0,1)
+    circuit1.qsend(1, "circuit2")# this qubit that is sent is reset
+    circuit2.qrecv(0, "circuit1")
 
-# 3. Execute distributed circuits on QPUs with quantum communications and GPU enabled
-qjobs = run([circuit1, circuit2, circuit3], qpus, shots = 100)
+    circuit1.measure_all()
+    circuit2.measure_all()
 
-# Collect the results
-results = gather(qjobs)
+    # 3. Execute distributed circuits on QPUs with quantum communications and GPU enabled
+    qjobs = run([circuit1, circuit2, circuit3], qpus, shots = 100)
 
-# Print the counts
-for result in [results[0], results[1]]:
-    print(f"Counts is {result.counts}")
+    # Collect the results
+    results = gather(qjobs)
 
-# 4. Relinquish resources: drop the deployed QPUs 
-qdrop(family)
+    # Print the counts
+    for result in [results[0], results[1]]:
+        print(f"Counts is {result.counts}")
+
+    # 4. Relinquish resources: drop the deployed QPUs 
+    qdrop(family)
+
+except Exception as error:
+    qdrop(family)
+    raise error

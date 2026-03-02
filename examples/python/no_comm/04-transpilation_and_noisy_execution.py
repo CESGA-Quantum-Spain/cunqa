@@ -13,6 +13,10 @@ try:
     noise_properties_path = file_dir + "/noise_properties_example.json"
     
     family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_properties_path=noise_properties_path)
+except Exception as error:
+    raise error
+
+try:
     qpus  = get_QPUs(co_located=True)
 
     # 2. Design circuit as any other execution

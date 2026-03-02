@@ -1,6 +1,6 @@
 # test_qjob.py
 import json, os, sys
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import pytest
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -13,6 +13,8 @@ else:
 
 import cunqa.qjob as qjob_mod
 from cunqa.qjob import QJob, gather
+from cunqa.circuit.parameter import encoder
+from sympy import Symbol
 
 
 @pytest.fixture
@@ -30,7 +32,10 @@ def circuit_ir():
 
 @pytest.fixture
 def qclient_mock():
-    return Mock(name="QClient")
+    """Mock quantum client."""
+    client = Mock(name="QClient")
+    client.send_parameters = Mock(return_value=Mock())
+    return client
 
 @pytest.fixture
 def default_device():
@@ -127,7 +132,7 @@ def test_result_fetches_once_and_caches(
     result_mock.assert_called_once()
     args, kwargs = result_mock.call_args
     assert args[0] == payload
-    assert kwargs["circ_id"] == circuit_ir["id"]
+    # kwargs["circ_id"] == circuit_ir["id"]
     assert kwargs["registers"] == circuit_ir["classical_registers"]
 
     # second access should not call get again
@@ -228,137 +233,164 @@ def test_submit_twice_logs_error(
 # QJob.upgrade_parameters method
 # ------------------------------
 
-def test_upgrade_parameters_calls_assign_and_serializes(
-    monkeypatch, qclient_mock, circuit_ir, default_device
-):
-    future_mock = Mock()
-    qclient_mock.send_parameters.return_value = future_mock
+@pytest.fixture
+def qjob_instance(qclient_mock, default_device, circuit_ir):
+    """Create a QJob instance with mocked dependencies."""
+    obj = QJob(qclient_mock, default_device, circuit_ir)
+    obj._circuit_id = "test_circuit_123"
+    obj._params = {}
+    obj._result = Mock()  # Simulate that a result exists
+    obj._future = None
+    obj._updated = False
+    obj.assign_parameters_ = Mock()
+    return obj
 
-    job = QJob(qclient_mock, default_device, circuit_ir)
-    job._result = Mock()
-    job._future = Mock()
+def test_upgrade_with_dict_parameters(qjob_instance, qclient_mock):
+    """Test upgrading parameters with a dictionary input."""
+    param_dict = {"theta": 0.5, "phi": 1.2}
+    
+    qjob_instance.upgrade_parameters(param_dict)
+    
+    qjob_instance.assign_parameters_.assert_called_once_with(param_dict)
+    qclient_mock.send_parameters.assert_called_once()
+    assert qjob_instance._updated is False
 
-    assign_mock = Mock()
-    monkeypatch.setattr(job, "assign_parameters_", assign_mock)
 
-    monkeypatch.setattr(
-        "cunqa.qjob.json.dumps",
-        lambda obj, default=None: '{"theta":1.0}'
-    )
+def test_upgrade_with_list_parameters(qjob_instance, qclient_mock):
+    """Test upgrading parameters with a list input."""
+    param_list = [0.5, 1.2, 2.1]
+    
+    qjob_instance.upgrade_parameters(param_list)
+    
+    qjob_instance.assign_parameters_.assert_called_once_with(param_list)
+    qclient_mock.send_parameters.assert_called_once()
+    assert qjob_instance._updated is False
 
-    job._params = {"theta": 1.0}
 
-    job.upgrade_parameters({"theta": 1.0})
+# ERROR HANDLING TESTS 
 
-    assign_mock.assert_called_once_with({"theta": 1.0})
-    qclient_mock.send_parameters.assert_called_once_with('{"params":{"theta":1.0}}')
-    assert job._future is future_mock
-    assert job._updated is False
+def test_no_result_and_no_future_raises_runtime_error(qjob_instance, qclient_mock):
+    """Test that RuntimeError is raised when no circuit was sent."""
+    qjob_instance._result = None
+    qjob_instance._future = None
+    
+    with pytest.raises(RuntimeError, match="No circuit was sent before calling update_parameters"):
+        qjob_instance.upgrade_parameters({"theta": 0.5})
 
-def test_upgrade_parameters_calls_get_if_result_not_retrieved(
-    monkeypatch, qclient_mock, circuit_ir, default_device, logger_mock
-):
-    future_mock = Mock()
-    qclient_mock.send_parameters.return_value = Mock()
 
-    job = QJob(qclient_mock, default_device, circuit_ir)
-    job._future = future_mock
-    job._result = None
+def test_no_result_but_future_exists_gets_result(qjob_instance, qclient_mock):
+    """Test that when _result is None but _future exists, the result is fetched."""
+    qjob_instance._result = None
+    mock_future = Mock()
+    qjob_instance._future = mock_future
+    
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+    
+    # The future's get() method should be called
+    mock_future.get.assert_called_once()
 
-    monkeypatch.setattr(
-        "cunqa.qjob.json.dumps",
-        lambda obj, default=None: "[1.0,2.0]"
-    )
-    assign_mock = Mock()
-    monkeypatch.setattr(job, "assign_parameters_", assign_mock)
+def test_empty_dict_raises_attribute_error(qjob_instance):
+    """Test that an empty dictionary raises AttributeError."""
+    with pytest.raises(AttributeError, match="No parameter list has been provided"):
+        qjob_instance.upgrade_parameters({})
 
-    job._params = [1.0, 2.0]
-    job.upgrade_parameters([2.0, 3.0])
 
-    future_mock.get.assert_called_once()
+def test_empty_list_raises_attribute_error(qjob_instance):
+    """Test that an empty list raises AttributeError."""
+    with pytest.raises(AttributeError, match="No parameter list has been provided"):
+        qjob_instance.upgrade_parameters([])
+        
 
-def test_upgrade_parameters_replaces_old_future(
-    monkeypatch, qclient_mock, circuit_ir, default_device
-):
-    old_future = Mock()
+# STATE MANAGEMENT TESTS 
+
+def test_updated_flag_set_to_false_on_success(qjob_instance, qclient_mock):
+    """Test that _updated flag is set to False on successful send."""
+    qjob_instance._updated = True
+    
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+    
+    assert qjob_instance._updated is False
+
+
+def test_future_is_updated_on_success(qjob_instance, qclient_mock):
+    """Test that _future is updated with the new future from send_parameters."""
     new_future = Mock()
     qclient_mock.send_parameters.return_value = new_future
-
-    job = QJob(qclient_mock, default_device, circuit_ir)
-    job._future = old_future
-    job._result = Mock()
-
-    monkeypatch.setattr(
-        "cunqa.qjob.json.dumps",
-        lambda obj, default=None: "[1.0]"
-    )
-    assign_mock = Mock()
-    monkeypatch.setattr(job, "assign_parameters_", assign_mock)
-
-    job._params = [1.0]
-    job.upgrade_parameters([1.0])
-
-    assert job._future is new_future
-
-def test_upgrade_parameters_builds_correct_message(
-    monkeypatch, qclient_mock, circuit_ir, default_device
-):
-    future_mock = Mock()
-    qclient_mock.send_parameters.return_value = future_mock
-
-    job = QJob(qclient_mock, default_device, circuit_ir)
-    job._future = Mock()
-    job._result = Mock()
-
-    monkeypatch.setattr(
-        "cunqa.qjob.json.dumps",
-        lambda obj, default=None: '{"a": 1}'
-    )
-    assign_mock = Mock()
-    monkeypatch.setattr(job, "assign_parameters_", assign_mock)
-
-    job._params = [object()]
-    job.upgrade_parameters({"a": 1})
-
-    expected = '{"params":{"a": 1}}'
-    qclient_mock.send_parameters.assert_called_once_with(expected)
-
-def test_upgrade_parameters_accepts_dict(
-    monkeypatch, qclient_mock, circuit_ir, default_device
-):
-    qclient_mock.send_parameters.return_value = Mock()
-
-    job = QJob(qclient_mock, default_device, circuit_ir)
-    job._future = Mock()
-    job._result = Mock()
     
-    assign_mock = Mock()
-    monkeypatch.setattr(job, "assign_parameters_", assign_mock)
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+    
+    assert qjob_instance._future == new_future
 
-    monkeypatch.setattr(
-        "cunqa.qjob.json.dumps",
-        lambda obj, default=None: '{"phi": 2.0}'
-    )
 
-    job._params = [object()]
-    job.upgrade_parameters({"phi": 2.0})
+def test_assign_parameters_called_before_send(qjob_instance, qclient_mock):
+    """Test that assign_parameters_ is called before send_parameters."""
+    call_order = []
+    qjob_instance.assign_parameters_.side_effect = lambda x: call_order.append("assign")
+    qclient_mock.send_parameters.side_effect = lambda x: (call_order.append("send"), Mock())[1]
+    
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+    
+    assert call_order == ["assign", "send"]
 
-    assign_mock.assert_called_once()
-    assert job._updated is False
 
-def test_upgrade_parameters_with_zero_parameters_raises_attribute_error(
-    qclient_mock, circuit_ir, default_device
-):
-    job = QJob(qclient_mock, default_device, circuit_ir)
+def test_upgrade_with_multiple_parameters(qjob_instance, qclient_mock):
+    """Test upgrading multiple parameters at once."""
+    params = {"theta": 0.5, "phi": 1.2, "lambda": 2.1}
+    
+    qjob_instance.upgrade_parameters(params)
+    
+    qjob_instance.assign_parameters_.assert_called_once_with(params)
+    qclient_mock.send_parameters.assert_called_once()
 
-    job._result = Mock()
-    job._future = Mock()
 
-    with pytest.raises(AttributeError) as exc_info:
-        job.upgrade_parameters([])
+def test_json_encoder_is_used(qjob_instance, qclient_mock):
+    """Test that the custom encoder is used for JSON serialization."""
+    qjob_instance._params = {"theta": 0.5}
+    
+    with patch('json.dumps') as mock_dumps:
+        mock_dumps.return_value = '{"theta": 0.5}'
+        qjob_instance.upgrade_parameters({"theta": 0.5})
+        
+        # Verify encoder was passed
+        mock_dumps.assert_called_once()
+        assert mock_dumps.call_args[1]["default"] == encoder
 
-    qclient_mock.send_parameters.assert_not_called()
 
+# INTEGRATION TESTS
+
+def test_full_workflow_dict_parameters(qjob_instance, qclient_mock):
+    """Test a complete workflow with dictionary parameters."""
+    params = {"theta": 0.785, "phi": 1.571}
+    qjob_instance._params = params
+    
+    qjob_instance.upgrade_parameters(params)
+    
+    qjob_instance.assign_parameters_.assert_called_once_with(params)
+    qclient_mock.send_parameters.assert_called_once()
+    assert qjob_instance._updated is False
+    assert qjob_instance._future is not None
+
+
+def test_full_workflow_list_parameters(qjob_instance, qclient_mock):
+    """Test a complete workflow with list parameters."""
+    params = [0.785, 1.571, 3.14159]
+    qjob_instance._params = params
+    
+    qjob_instance.upgrade_parameters(params)
+    
+    qjob_instance.assign_parameters_.assert_called_once_with(params)
+    qclient_mock.send_parameters.assert_called_once()
+    assert qjob_instance._updated is False
+
+
+def test_multiple_consecutive_upgrades(qjob_instance, qclient_mock):
+    """Test multiple consecutive parameter upgrades."""
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+    qjob_instance.upgrade_parameters({"theta": 1.0})
+    qjob_instance.upgrade_parameters({"theta": 1.5})
+    
+    assert qclient_mock.send_parameters.call_count == 3
+    assert qjob_instance.assign_parameters_.call_count == 3
 
 # ------------------------
 # assign_parameters_

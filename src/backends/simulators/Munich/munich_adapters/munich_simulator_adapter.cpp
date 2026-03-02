@@ -120,6 +120,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         [&](TaskState& T, const JSON& instruction = {}) 
     {
         const JSON& inst = instruction.empty() ? *T.it : instruction;
+        std::string inst_name = inst.at("name").get<std::string>();
 
         std::vector<int> qubits;
         if (inst.contains("qubits"))
@@ -172,7 +173,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::ECR:
         case constants::SWAP:
         {
-            qc::Targets targets = {static_cast<unsigned int>(G.n_qubits - 1), static_cast<unsigned int>(qubits[0] + T.zero_qubit)};
+            qc::Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
             auto two_gate = std::make_unique<qc::StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(two_gate));
             break;
@@ -326,14 +327,14 @@ std::string MunichSimulatorAdapter::execute_shot_(
         }
         case constants::RCONTROL:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
                 T.blocked = true;
                 return;
             }
 
             int meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
-
+            
             if (meas2) {
                 auto x = std::make_unique<StandardOperation>(G.n_qubits - 1, OpType::X);
                 applyOperationToStateAdapter(std::move(x));
@@ -349,7 +350,9 @@ std::string MunichSimulatorAdapter::execute_shot_(
             int result = measureAdapter(G.n_qubits - 1) - '0';
             G.qc_meas[T.id].push(result);
 
+
             Ts[inst.at("qpus")[0]].blocked = false;
+            T.blocked = false;
             break;
         }
         default:
@@ -465,11 +468,10 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel)
         n_qubits += 2;
 
     auto start = std::chrono::high_resolution_clock::now();
-    initializeSimulationAdapter(n_qubits);
     for (std::size_t i = 0; i < shots; i++)
     {   
+        initializeSimulationAdapter(n_qubits);
         meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel)]++;
-        resetStateAdapter(n_qubits);
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();

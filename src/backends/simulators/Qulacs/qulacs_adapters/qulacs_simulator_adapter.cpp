@@ -372,7 +372,7 @@ std::string execute_shot_(
         }
         case cunqa::constants::RCONTROL:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
                 T.blocked = true;
                 return;
             }
@@ -394,6 +394,7 @@ std::string execute_shot_(
             G.qc_meas[T.id].push(result);
 
             Ts[inst.at("qpus")[0]].blocked = false;
+            T.blocked = false;
             break;
         }
         default:
@@ -438,6 +439,7 @@ namespace sim {
 
 JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
 {
+    LOGGER_DEBUG("Qulacs usual simulation");
     try {
         auto quantum_task = qc.quantum_tasks[0];
 
@@ -456,10 +458,6 @@ JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
-
-        for (auto& sample : samples) {
-            std::cout << sample << ", \n";
-        }
 
         JSON counts = convert_to_counts(samples, n_qubits);
 
@@ -482,6 +480,7 @@ JSON QulacsSimulatorAdapter::simulate(const Backend* backend)
 
 JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
+    LOGGER_DEBUG("Qulacs dynamic simulation");
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();

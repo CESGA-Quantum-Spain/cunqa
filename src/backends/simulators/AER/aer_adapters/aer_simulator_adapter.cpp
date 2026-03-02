@@ -82,6 +82,7 @@ std::string execute_shot_(
         [&](TaskState& T, const cunqa::JSON& instruction = {}) 
     {
         const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
+        std::string inst_name = inst.at("name").get<std::string>();
 
         std::vector<int> qubits;
         if (inst.contains("qubits"))
@@ -229,7 +230,9 @@ std::string execute_shot_(
         {
             // state->flush_ops();
             //------------- Generate Entanglement ---------------
-            generate_entanglement_();
+            state->apply_h(G.n_qubits - 2);
+            state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
+            //generate_entanglement_();
             //----------------------------------------------------
 
             // CX to the entangled pair
@@ -306,7 +309,7 @@ std::string execute_shot_(
         case cunqa::constants::RCONTROL:
         {
             // state->flush_ops();
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
                 T.blocked = true;
                 return;
             }
@@ -328,6 +331,7 @@ std::string execute_shot_(
             G.qc_meas[T.id].push(result);
 
             Ts[inst.at("qpus")[0]].blocked = false;
+            T.blocked = false;
             break;
         }
         default:
@@ -429,7 +433,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     }
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
-
+    
     reg_t qubit_ids;
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)

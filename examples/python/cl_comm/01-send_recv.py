@@ -11,6 +11,10 @@ try:
 
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
     family_name = qraise(2, "01:00:00", classical_comm=True, co_located=True, family = "qpus_class_comms")
+except Exception as error:
+    raise error
+
+try:
     qpus = get_QPUs(family = family_name, co_located=True)
 
     # 2. Circuit design with classical communications directives

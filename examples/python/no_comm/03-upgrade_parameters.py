@@ -6,11 +6,15 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 
 import numpy as np
-
+green_txt = '\033[92m'; reset = '\033[0m'
 try:
     # 1. Deploy QPU
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
     family = qraise(1, "00:10:00",  co_located = True)
+except Exception as error:
+    raise error
+
+try:
     qpu = get_QPUs(co_located = True, family = family)
 
     # ---------------------------
@@ -22,26 +26,26 @@ try:
     #  circ_upgrade.q2   ─[RX(z)]──────────[M]─
     # ---------------------------
     circ_upgrade = CunqaCircuit(3)
-    circ_upgrade.rx("cos(x)", 0)
+    circ_upgrade.rx("pi*cos(x)", 0)
     circ_upgrade.rx("y", 1)
     circ_upgrade.rx("z", 2)
     circ_upgrade.measure_all()
 
     # 3. Execute circuit
     qjob = run(circ_upgrade, qpu, param_values={"x": np.pi, "y": 0, "z": 0}, shots=1024)
-    print(f"Result 0: {qjob.result.counts}")
+    print(f"{green_txt}Result 0: {qjob.result.counts}{reset}")
 
     # Upgrade with dicts
-    qjob.upgrade_parameters({"x": 0, "y": 0, "z": 0})
-    print(f"Result 1: {qjob.result.counts}")
+    qjob.upgrade_parameters({"x": np.pi/2, "y": 0, "z": 0})
+    print(f"{green_txt}Result 1: {qjob.result.counts}{reset}")
 
     # Upgrade with a dict with only some of the Variables (previous values are preserved)
-    qjob.upgrade_parameters({"x": 0, "y": np.pi})
-    print(f"Result 2: {qjob.result.counts}")
+    qjob.upgrade_parameters({"y": np.pi})
+    print(f"{green_txt}Result 2: {qjob.result.counts}{reset}")
 
-    # Now with a list
+    # Now with a list (in the order in which the parameters where added to the circuit)
     qjob.upgrade_parameters([0, 0, np.pi])
-    print(f"Result 3: {qjob.result.counts}")
+    print(f"{green_txt}Result 3: {qjob.result.counts}{reset}")
 
     # 4. Relinquish resources
     qdrop(family)

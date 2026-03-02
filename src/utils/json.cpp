@@ -22,10 +22,12 @@ namespace {
         return fd;
     }
 
-    struct flock lock(const int& fd)
+    enum class LockMode { Read, Write };
+
+    struct flock lock(const int& fd, const LockMode& mode)
     {
         struct flock fl;
-        fl.l_type = F_WRLCK;
+        fl.l_type = (mode == LockMode::Write) ? F_WRLCK : F_RDLCK;
         fl.l_whence = SEEK_SET;
         fl.l_start = 0;
         fl.l_len = 0; // Lock entire file
@@ -43,7 +45,6 @@ namespace {
             perror("fsync");
         }
 
-        // 8. Unlock and close
         fl.l_type = F_UNLCK;
         if (fcntl(fd, F_SETLK, &fl) == -1)
             perror("fcntl - unlock");
@@ -103,7 +104,7 @@ JSON read_file(const std::string &filename)
     int fd = -1;
     try {
         fd = open_file(filename);
-        auto fl = lock(fd);
+        auto fl = lock(fd, LockMode::Read);
         auto j = read_json(fd);
         unlock(fd, fl);
         close(fd);
@@ -123,7 +124,7 @@ void write_on_file(JSON local_data, const std::string &filename, const std::stri
     int fd = -1;
     try {
         fd = open_file(filename);
-        auto fl = lock(fd);
+        auto fl = lock(fd, LockMode::Write);
         auto j = read_json(fd);
         
         j[id] = local_data;
@@ -144,7 +145,7 @@ void remove_from_file(const std::string &filename, const std::string &rm_key)
     int fd = -1;
     try {
         fd = open_file(filename);
-        auto fl = lock(fd);
+        auto fl = lock(fd, LockMode::Write);
         auto j = read_json(fd);
 
         // Filter: keep entries which JOB_ID is not the one attached 

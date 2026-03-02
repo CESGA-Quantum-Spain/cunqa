@@ -11,7 +11,6 @@ elseif(USE_ZMQ_BTW_QPU)
 endif()
 if (COMPILATION_FOR_GPU)
     target_compile_definitions(${QRAISE_NAME} PUBLIC GPU_ARCH=${GPU_ARCH} 
-                                         MAX_GPUS_PER_NODE=${MAX_GPUS_PER_NODE}
                                          COMPILATION_FOR_GPU=1)
 else()
     target_compile_definitions(${QRAISE_NAME} PUBLIC COMPILATION_FOR_GPU=0)

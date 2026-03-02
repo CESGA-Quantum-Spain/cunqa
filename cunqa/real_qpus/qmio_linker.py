@@ -11,7 +11,8 @@ from queue import Queue
 from typing import Optional
 
 from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
-from cunqa.qclient import write_on_file, json_to_qasm2
+from cunqa.utils import write_json
+from cunqa.qclient import json_to_qasm2
 from cunqa.logger import logger
 
 try:
@@ -20,10 +21,10 @@ except Exception:
     pass
 
 
-ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER") 
+ZMQ_ENDPOINT = os.getenv("ZMQ_SERVER")
 PREFERRED_NETWORK_IFACE = "ib"
 
-def _get_qmio_config(family : str, endpoint : str) -> str:
+def _get_qmio_config(family : str, endpoint : str) -> dict:
     SLURM_JOB_ID = os.getenv("SLURM_JOB_ID") 
     qmio_backend_config = {
         "name":"QMIOBackend",
@@ -55,7 +56,7 @@ def _get_qmio_config(family : str, endpoint : str) -> str:
         "name":"QMIO"
     }
 
-    return json.dumps(qmio_config_json)
+    return qmio_config_json
 
 def _upgrade_parameters(
     quantum_task : tuple[dict, dict], 
@@ -121,8 +122,10 @@ class QMIOLinker:
         self.qmio_comm_socket = self.context.socket(zmq.REQ)
         self.qmio_comm_socket.connect(ZMQ_ENDPOINT)
 
+        name = f"{os.getenv('SLURM_JOB_ID')}_{os.getenv('SLURM_TASK_PID')}"
         qmio_config = _get_qmio_config(family, self.endpoint)
-        write_on_file(qmio_config, QPUS_FILEPATH, family)
+        payload = {name: qmio_config}
+        write_json(QPUS_FILEPATH, payload)
 
     def run(self):
         """

@@ -14,27 +14,29 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
 # Global variables
-N_QPUS = 7                  # Determines the number of bits of the phase that will be computed
-PHASE_TO_COMPUTE = 1/2**5 
+N_QPUS = 16                  # Determines the number of bits of the phase that will be computed
+PHASE_TO_COMPUTE = 1/2**5
 SHOTS = 1024
 SEED = 18                   # Set seed for reproducibility
 
 try:
-
     # 1. QPU deployment
-    family_name = qraise(N_QPUS, "03:00:00", classical_comm=True, co_located = True)
+    family_name = qraise(N_QPUS, "03:00:00", simulator="Aer", classical_comm=True, co_located = True)
+except Exception as error:
+    raise error
+
+try:
     qpus  = get_QPUs(co_located = True, family = family_name)
 
     # 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation
     circuits = []
     for i in range(N_QPUS): 
-        theta = 2**(N_QPUS - i) * PHASE_TO_COMPUTE 
+        theta = 2**(N_QPUS - 1 - i) * PHASE_TO_COMPUTE * 2 * np.pi
 
         circuits.append(CunqaCircuit(2, 2, id= f"cc_{i}"))
         circuits[i].h(0)
         circuits[i].x(1)
         circuits[i].crz(theta, 0, 1)
-        
 
         for j in range(i):
             param = -np.pi * 2**(-j - 1)
@@ -50,7 +52,6 @@ try:
 
         circuits[i].measure(0, 0)
         for j in range(N_QPUS - i - 1):
-
             circuits[i].send(0, recving_circuit = f"cc_{i + j + 1}")
 
         circuits[i].measure(1, 1)
@@ -72,13 +73,12 @@ try:
     for counts in counts_list:
         # Extract the most frequent measurement (the best estimate of theta)
         most_frequent_output = max(counts, key=counts.get)
-        binary_string += most_frequent_output[0]
+        binary_string += most_frequent_output[1]
 
     estimated_theta = 0.0
     for i, digit in enumerate(reversed(binary_string)):
         if digit == '1':
-            exponent = i + 1
-            estimated_theta += 1 / (2**exponent)
+            estimated_theta += 1 / (2**i)
 
     print(f"Estimated angle: {estimated_theta}")
     print(f"Real angle: {PHASE_TO_COMPUTE}")

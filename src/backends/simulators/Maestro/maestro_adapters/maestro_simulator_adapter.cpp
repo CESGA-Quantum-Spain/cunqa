@@ -7,6 +7,7 @@
 
 #include "utils/constants.hpp"
 #include "utils/helpers/reverse_bitstring.hpp"
+#include "utils/helpers/json_to_qasm2.hpp"
 
 #include "maestro_simulator_adapter.hpp"
 #include "maestrolib/Interface.h"
@@ -305,7 +306,7 @@ std::string execute_shot_(
         }
         case cunqa::constants::RCONTROL:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
                 T.blocked = true;
                 return;
             }
@@ -328,6 +329,7 @@ std::string execute_shot_(
             G.qc_meas[T.id].push(measurement_as_int);
 
             Ts[inst.at("qpus")[0]].blocked = false;
+            T.blocked = false;
             break;
         }
         default:
@@ -481,7 +483,7 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
         }
 
         char* result = SimpleExecute(simulatorHandle, circuit_json.dump().c_str(), run_config_json.dump().c_str());
-
+        
         if (result)
         {
             JSON maestro_result = JSON::parse(result);

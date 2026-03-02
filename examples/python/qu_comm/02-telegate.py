@@ -8,31 +8,40 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
-qpus   = get_QPUs(co_located = True, family = family)
+try:
+    # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
+    family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
+except Exception as error:
+    raise error
 
-# 2. Design circuits with distributed instructions between them
-cc_1 = CunqaCircuit(1, id="First")
-cc_2 = CunqaCircuit(1, id="Second")
+try:
+    qpus   = get_QPUs(co_located = True, family = family)
 
-cc_1.h(0)
+    # 2. Design circuits with distributed instructions between them
+    cc_1 = CunqaCircuit(1, id="First")
+    cc_2 = CunqaCircuit(1, id="Second")
 
-with cc_1.expose(0, cc_2) as (rqubit, subcircuit):
-    subcircuit.cx(rqubit,0)
+    cc_1.h(0)
 
-cc_1.measure_all()
-cc_2.measure_all()
+    with cc_1.expose(0, cc_2) as (rqubit, subcircuit):
+        subcircuit.cx(rqubit,0)
 
-# 3. Execute distributed circuits on QPUs with quantum communications
-distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
+    cc_1.measure_all()
+    cc_2.measure_all()
 
-# Collect the results
-result_list = gather(distr_jobs)
+    # 3. Execute distributed circuits on QPUs with quantum communications
+    distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
 
-# Print the counts
-for i, result in enumerate(result_list):
-    print(f"Counts {i} is {result.counts}")
+    # Collect the results
+    result_list = gather(distr_jobs)
 
-# 4. Relinquish resources: drop the deployed QPUs 
-qdrop(family)
+    # Print the counts
+    for i, result in enumerate(result_list):
+        print(f"Counts {i} is {result.counts}")
+
+    # 4. Relinquish resources: drop the deployed QPUs 
+    qdrop(family)
+
+except Exception as error:
+    qdrop(family)
+    raise error

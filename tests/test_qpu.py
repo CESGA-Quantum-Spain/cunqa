@@ -246,7 +246,7 @@ def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch):
     assert "circuits" not in remote_instr
 
     assert circuit_ir["sending_to"] == [10]
-    assert circuit_ir["id"] == 10
+    assert circuit_ir["id"][1] == 10
 
     qpu.execute.assert_called_once_with(circuit_ir, None)
     assert result is job
@@ -275,7 +275,7 @@ def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(mon
     assert "qpus" not in original_instr
 
     assert circuit_ir["sending_to"] == [7]
-    assert circuit_ir["id"] == 7
+    assert circuit_ir["id"][1] == 7
 
 def test_run_passes_param_values_to_execute(monkeypatch):
     circuit = "c1"
@@ -327,6 +327,7 @@ def _subprocess_run_side_effect_ok(job_id="12345"):
         if kwargs.get("shell", False):  # qraise call
             proc = Mock()
             proc.stdout = f"{job_id};my_cluster\n" #this is what "sbatch --parsable" returns
+            proc.returncode = 0
             return proc
         # squeue calls
         proc = Mock()
@@ -487,23 +488,24 @@ def test_qraise_retries_on_jsondecodeerror_until_valid_json(monkeypatch):
 def test_qraise_raises_runtimeerror_on_subprocess_error(monkeypatch):
     n, t = 1, "00:05:00"
 
-    error = qpu_mod.subprocess.CalledProcessError(
+    # Simula que el comando falla (sin check=True)
+    completed = qpu_mod.subprocess.CompletedProcess(
+        args="qraise",
         returncode=1,
-        cmd="qraise",
+        stdout="",
         stderr="boom",
     )
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
     monkeypatch.setattr("builtins.open", mock_open())
 
-    run_mock = Mock(side_effect=error)
+    run_mock = Mock(return_value=completed)
     monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
 
     with pytest.raises(RuntimeError) as excinfo:
         qraise(n, t)
 
     msg = str(excinfo.value)
-    assert "An error was encoutered while qraising" in msg
     assert "boom" in msg
 
 

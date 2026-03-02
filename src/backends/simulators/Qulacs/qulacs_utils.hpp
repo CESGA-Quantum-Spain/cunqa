@@ -19,7 +19,6 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, JSON& circuit_json)
 {
     for (const auto& instruction : circuit_json) {
         std::string name = instruction.at("name").get<std::string>();
-        LOGGER_DEBUG("instruction_name: {}", name);
 
         auto inst_type = constants::INSTRUCTIONS_MAP.at(instruction.at("name").get<std::string>());
         std::vector<UINT> qubits = instruction.at("qubits").get<std::vector<UINT>>();

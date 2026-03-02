@@ -11,8 +11,11 @@ from cunqa.circuit import CunqaCircuit
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
-    family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
+    family = qraise(2, "00:10:00", simulator = "Maestro", co_located = True)
+except Exception as error:
+    raise error
 
+try:
     qpus  = get_QPUs(co_located = True, family = family)
 
     # ---------------------------

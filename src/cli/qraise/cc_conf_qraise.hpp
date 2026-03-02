@@ -14,54 +14,35 @@ using namespace cunqa;
 
 bool write_cc_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
-    sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
-    sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-    sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
+    sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus) << "\n";
+    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu) << "\n";
+    sbatchFile << "#SBATCH -N " << std::to_string(args.number_of_nodes.value()) << "\n";
     
-    if(args.partition.has_value())
+    if(args.partition.has_value()) {
         sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+    }
     
     if (args.qpus_per_node.has_value()) {
-        if (args.n_qpus < args.qpus_per_node) {
-            LOGGER_ERROR("Less QPUs than qpus_per_node");
-            return false;
-        } else {
-            sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";
-        }
+        sbatchFile << "#SBATCH --ntasks-per-node=" << std::to_string(args.qpus_per_node.value()) << "\n";
     }
     
     if (args.node_list.has_value()) {
-        if (args.number_of_nodes.value() != args.node_list.value().size()) {
-            LOGGER_ERROR("Different number of node names than total nodes");
-            return false;
-        } else {
-            sbatchFile << "#SBATCH --nodelist=";
-            int comma = 0;
-            for (auto& node_name : args.node_list.value()) {
-                if (comma > 0 ) {
-                    sbatchFile << ",";
-                }
-                sbatchFile << node_name;
-                comma++;
+        sbatchFile << "#SBATCH --nodelist=";
+        int comma = 0;
+        for (auto& node_name : args.node_list.value()) {
+            if (comma > 0 ) {
+                sbatchFile << ",";
             }
-            sbatchFile << "\n";
+            sbatchFile << node_name;
+            comma++;
         }
+        sbatchFile << "\n";
     }
 
-    if (args.mem_per_qpu.has_value() && (args.mem_per_qpu.value()/args.cores_per_qpu > DEFAULT_MEM_PER_CORE)) {
-        LOGGER_ERROR("Too much memory per QPU. Please, decrease the mem-per-qpu or increase the cores-per-qpu.");
-    }
-
-    if (args.mem_per_qpu.has_value() && check_mem_format(args.mem_per_qpu.value())) {
+    if (args.mem_per_qpu.has_value()) {
         int mem_per_cpu = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
-        sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
-    } else if (args.mem_per_qpu.has_value() && !check_mem_format(args.mem_per_qpu.value())) {
-        LOGGER_ERROR("Memory format is incorrect, must be: xG (where x is the number of Gigabytes).");
-        return false;
-    } else if (!args.mem_per_qpu.has_value()) {
-        int mem_per_core = DEFAULT_MEM_PER_CORE;
-        sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_core << "G\n";
-    } 
+        sbatchFile << "#SBATCH --mem-per-cpu=" << std::to_string(mem_per_cpu) << "G\n";
+    }
     
     return true;
 }
@@ -78,29 +59,29 @@ bool write_cc_gpu_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
         return false;
     }
 
-    if (args.n_qpus > MAX_GPUS_PER_NODE) {
-        LOGGER_ERROR("Node with GPU_ARCH = {} only supports {} QPU", std::to_string(GPU_ARCH), std::to_string(MAX_GPUS_PER_NODE));
-        return false;
-    }
+    sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus) << "\n";
+
 #if GPU_ARCH == 75
-    sbatchFile << "#SBATCH --ntasks=" << args.n_qpus << "\n";
     sbatchFile << "#SBATCH --gres=gpu:t4\n";
     if(args.partition.has_value()) {
         sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
     } else {
         sbatchFile << "#SBATCH -p viz\n";
     }
-    sbatchFile << "#SBATCH -c " << args.cores_per_qpu << "\n";
-    sbatchFile << "#SBATCH --mem=" << args.n_qpus * args.cores_per_qpu * DEFAULT_MEM_PER_CORE << "G\n";
 #elif GPU_ARCH == 80
-    int mem_per_qpu = args.mem_per_qpu.has_value() ? args.mem_per_qpu.value() : DEFAULT_MEM_PER_CORE * args.cores_per_qpu; 
-    int mem = mem_per_qpu * args.n_qpus;
-        
     sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus) << "\n";
     sbatchFile << "#SBATCH --gres=gpu:a100:" << std::to_string(args.n_qpus) << "\n";
-    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu) << "\n";
-    sbatchFile << "#SBATCH --mem=" << std::to_string(mem) << "G\n";
+    if(args.partition.has_value()) {
+        sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
+    }
 #endif // GPU_ARCH
+
+    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu) << "\n";
+    if (args.mem_per_qpu.has_value()) {
+        int mem_per_core = (args.mem_per_qpu.value()/args.cores_per_qpu != 0) ? args.mem_per_qpu.value()/args.cores_per_qpu : 1;
+        int total_mem = args.n_qpus * args.cores_per_qpu * mem_per_core;
+        sbatchFile << "#SBATCH --mem=" << std::to_string(total_mem) << "G\n";
+    }
 #endif //COMPILATION_FOR_GPU
 
     return true;
@@ -124,12 +105,7 @@ bool write_cc_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
         }
     }
 
-    if (check_time_format(args.time))
-        sbatchFile << "#SBATCH --time=" << args.time << "\n";
-    else {
-        LOGGER_ERROR("Incorrect time format");
-        return false;
-    }
+    sbatchFile << "#SBATCH --time=" << args.time << "\n";
 
     //sbatchFile << "#SBATCH --profile=all\n";   // Enable comprehensive profiling
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";

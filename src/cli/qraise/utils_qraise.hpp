@@ -15,25 +15,6 @@
 namespace fs = std::filesystem;
 
 
-constexpr int DEFAULT_MEM_PER_CORE = 15;
-
-bool check_time_format(const std::string& time)
-{
-    std::regex format_hours_minutes_seconds("^(\\d+):(\\d{2}):(\\d{2})$");
-    std::regex format_days_hours("^(\\d+)-(\\d{1,2})$");
-    std::regex format_days_hours_minutes_seconds("^(\\d+)-(\\d{1,2}):(\\d{2}):(\\d{2})$");
-    
-    return std::regex_match(time, format_hours_minutes_seconds) || std::regex_match(time, format_days_hours) || std::regex_match(time, format_days_hours_minutes_seconds);   
-}
-
-bool check_mem_format(const int& mem) 
-{
-    std::string mem_str = std::to_string(mem) + "G";
-    std::regex format("^(\\d{1,4})G$");
-    
-    return std::regex_match(mem_str, format);
-}
-
 bool exists_family_name(const std::string& family, const std::string& info_path)
 {
     std::ifstream file(info_path);
@@ -67,11 +48,12 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
     }
 }
 
-int compute_needed_n_tasks(const int& cores_per_qpu){
-
-}
-
-void remove_tmp_files(const std::string directory = "./")
+void remove_tmp_files(const std::string filepath = "")
 {
-    std::system("rm qraise_sbatch_tmp.sbatch");
+    if (!filepath.empty()) {
+        std::string rmv_cmd = "rm " + filepath;
+        std::system(rmv_cmd.c_str());
+    } else {
+        std::system("rm qraise_sbatch_tmp.sbatch");
+    }
 }

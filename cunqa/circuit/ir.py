@@ -7,7 +7,7 @@ from qiskit.circuit import Parameter, ParameterExpression
 
 
 from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.helpers import generate_id
+from cunqa.utils import generate_id
 from cunqa.logger import logger
 
 SUPPORTED_QISKIT_OPERATIONS = {

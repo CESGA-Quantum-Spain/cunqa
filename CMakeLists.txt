@@ -24,7 +24,6 @@ message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 # GPU MACROS
 set(COMPILATION_FOR_GPU FALSE)
 set(GPU_ARCH "")
-set(MAX_GPUS_PER_NODE "")
 
 # Check that $STORE exists
 if(NOT DEFINED ENV{STORE})
@@ -89,6 +88,9 @@ function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
         GIT_TAG        ${TAG}
     )
     FetchContent_MakeAvailable(${PACKAGE_NAME})
+    set(${PACKAGE_NAME}_POPULATED "${${PACKAGE_NAME}_POPULATED}" PARENT_SCOPE)
+    set(${PACKAGE_NAME}_SOURCE_DIR "${${PACKAGE_NAME}_SOURCE_DIR}" PARENT_SCOPE)
+    set(${PACKAGE_NAME}_BINARY_DIR "${${PACKAGE_NAME}_BINARY_DIR}" PARENT_SCOPE)
   else()
     message(STATUS "Found package ${PACKAGE_NAME}: ${PACKAGE_NAME}_DIR = ${${PACKAGE_NAME}_DIR}")
   endif()
@@ -164,17 +166,17 @@ find_or_fetch_package(
 )
 
 # -- pyzmq -----------------------------------------------------------
-set(ZMQ_PREFIX "${libzmq_BINARY_DIR}" CACHE PATH "ZMQ_PREFIX" FORCE)
-set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}/lib")
+set(ZeroMQ_DIR "${libzmq_BINARY_DIR}" CACHE PATH "Path to ZeroMQConfig.cmake" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}")
 
 FetchContent_Declare(
     pyzmq
     GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
-    GIT_TAG        "main"
+    GIT_TAG        "v27.1.0"
 )
 FetchContent_MakeAvailable(pyzmq)
-install(DIRECTORY  "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq")
-install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq/backend/cython")
+install(DIRECTORY "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq")
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq/backend/cython")
 
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
@@ -182,8 +184,8 @@ install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_LIBDIR}/zmq/backend/cython")
 find_or_fetch_package(
   cunqasimulator
   "git@github.com:CESGA-Quantum-Spain/cunqasimulator.git"
-  "0.1.1"
-  "v0.1.1"
+  "0.1.2"
+  "v0.1.2"
 )
 
 # =====================================================================
@@ -238,7 +240,6 @@ if (DEFINED AER_GPU)
   # Hopper                 H100                   90
   
   set(GPU_ARCH 80)
-  set(MAX_GPUS_PER_NODE 8) # Dependent on GPU_ARCH and CLUSTER
   set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 20)
@@ -340,8 +341,8 @@ install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 # =====================================================================
 FetchContent_Declare(
     qulacs
-    GIT_REPOSITORY "git@github.com:usendon/usendon_qulacs.git"
-    GIT_TAG "228f617b9e31007b54488f467c031ebbf07efcdb"
+    GIT_REPOSITORY "git@github.com:usendon/qulacs.git"
+    GIT_TAG "6065d9ac8d30bd8a16b41b1e93776968ecc5b6d4"
 )
 
 set(USE_PYTHON OFF CACHE BOOL "" FORCE)

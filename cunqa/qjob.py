@@ -101,13 +101,13 @@ class QJob:
                 run_config[k] = v
         else:
             logger.warning("Error when reading `run_parameters`, default were set.")
-        
+
         self._quantum_task = {
             "config": run_config, 
             "instructions": circuit_ir["instructions"],
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
-            "id": circuit_ir["id"]
+            "id": circuit_ir["id"][1]
         }
       
         logger.debug("Qjob configured")
@@ -142,7 +142,7 @@ class QJob:
                 res = self._future.get()
                 self._result = Result(
                     json.loads(res), 
-                    circ_id=self._circuit_id, 
+                    circ_id=self._circuit_id[0], 
                     registers=self._cregisters
                 )
                 self._updated = True

@@ -9,6 +9,10 @@ from cunqa.circuit import CunqaCircuit
 try:
     # 1. Deploy vQPUs
     family = qraise(1, "01:00:00",  co_located = True)
+except Exception as error:
+    raise error
+
+try:
     [qpu] = get_QPUs(co_located = True, family = family)
 
 

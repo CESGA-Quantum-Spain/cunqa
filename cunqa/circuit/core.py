@@ -7,7 +7,7 @@ import copy
 from typing import Union, Optional
 from sympy.core.sympify import sympify, SympifyError
 
-from cunqa.circuit.helpers import generate_id
+from cunqa.utils import generate_id
 from cunqa.circuit.parameter import Param
 
 from cunqa.logger import logger
@@ -251,40 +251,48 @@ class CunqaCircuit:
         """
         def handle_params(instruction):
             if "params" in instruction and len(instruction["params"]) != 0:
-                if not any([isinstance(p, Param) for p in instruction["params"]]):
-                    # Converting the string to a symbolic expression
-                    try:
-                        exprs = sympify(instruction["params"])
-                    except SympifyError:
-                        raise ValueError(f"Expression {instruction['params']} cannot be converted to "
-                                        f"symbolic expression.")
-                    
-                    # Adding to the instruction the Param object or a real number depending on the specified
-                    # (if real, the parameter will not be changed)
-                    new_list = []
-                    for expr, param in zip(exprs, instruction["params"]):
-                        if not expr.is_real:
-                            new_param = Param(expr)
-                            self.params.append(new_param)
-                            new_list.append(new_param)
-                        else:
-                            new_list.append(param)
-                    instruction["params"] = new_list
-
-                else: # There is at least a param on intruction["params"]
+                if any([isinstance(p, Param) for p in instruction["params"]]):
                     for p in instruction["params"]:
+                        new_params = []
                         if isinstance(p, Param):
                             # Copy needed for circuit transformations to avoid aliasing
-                            self.params.append(copy.deepcopy(p))
+                            new_param = copy.deepcopy(p);  new_params.append(new_param)
+                            self.params.append(new_param)
 
+                    new_instr = copy.deepcopy(instruction)
+                    new_instr["params"] = new_params
+
+                    return new_instr
+
+                
+                # Converting the string to a symbolic expression
+                try:
+                    exprs = sympify(instruction["params"])
+                except SympifyError:
+                    raise ValueError(f"Expression {instruction['params']} cannot be converted to "
+                                    f"symbolic expression.")
+                
+                # Adding to the instruction the Param object or a real number depending on the specified
+                # (if real, the parameter will not be changed)
+                new_list = []
+                for expr, param in zip(exprs, instruction["params"]):
+                    if not expr.is_real:
+                        new_param = Param(expr)
+                        self.params.append(new_param)
+                        new_list.append(new_param)
+                    else:
+                        new_list.append(param)
+                instruction["params"] = new_list
             
+            return instruction
+
         if isinstance(instructions, dict):
-            handle_params(instructions)
-            self.instructions.append(instructions)
+            new_instr = handle_params(instructions)
+            self.instructions.append(new_instr)
         else:
             for instr in instructions:
-                handle_params(instr)
-                self.instructions.append(instr)
+                new_instr = handle_params(instr)
+                self.instructions.append(new_instr)
                     
     def add_q_register(self, name: str, num_qubits: int):
         """

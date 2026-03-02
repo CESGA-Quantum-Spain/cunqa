@@ -69,10 +69,6 @@ void write_infrastructure_sbatch(std::ofstream& sbatchFile, const CunqaArgs& arg
     }
     
     int n_nodes = std::ceil(total_number_of_cores/64.0);
-    if (!check_time_format(args.time)) {
-        LOGGER_ERROR("Time format is incorrect, must be: xx:xx:xx.");
-        return;
-    }
 
     LOGGER_DEBUG("Just before writing");
     sbatchFile << "#!/bin/bash\n\n";

@@ -13,6 +13,10 @@ try:
 
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
     family_name = qraise(NUM_NODES,"00:10:00", simulator="Maestro", classical_comm=True, co_located = True)
+except Exception as error:
+    raise error
+
+try:
     qpus = get_QPUs(co_located = True, family = family_name)
 
 

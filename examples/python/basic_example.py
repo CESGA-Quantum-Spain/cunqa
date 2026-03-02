@@ -6,12 +6,14 @@ sys.path.append(os.getenv("HOME"))
 # sys.path.append("</your/cunqa/installation/path>")   
 
 try: 
-    
     # 1. Deploy 3 virtual QPUs
     from cunqa.qpu import qraise
     family = qraise(3, "00:10:00", simulator="Aer", co_located=True)
+except Exception as error:
+    raise error
 
-    #    Connect to the raised vQPUs
+try:
+    # Connect to the raised vQPUs
     from cunqa.qpu import get_QPUs
     qpus  = get_QPUs(co_located=True)
 

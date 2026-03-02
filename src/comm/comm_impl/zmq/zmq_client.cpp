@@ -37,7 +37,6 @@ struct Client::Impl {
         try {
             zmq::message_t message(data.begin(), data.end());
             socket_.send(message, zmq::send_flags::none);
-            LOGGER_DEBUG("Circuit sent: {}", data);
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error sending the circuit: {}", e.what());
         }

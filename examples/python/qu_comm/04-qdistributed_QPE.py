@@ -16,9 +16,9 @@ from cunqa.qjob import gather
 N_QPUS = 2
 CORES_PER_QPU = 4
 MEM_PER_QPU = 60 # in GB
-N_ANCILLA_QUBITS = 16
+N_ANCILLA_QUBITS = 10
 N_REGISTER_QUBITS = 1
-PHASE_TO_COMPUTE = 1 / 2**12
+PHASE_TO_COMPUTE = 1 / 2**3
 
 shots = 10
 SEED = 18
@@ -26,11 +26,15 @@ SEED = 18
 try:
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "10:00:00", 
-                    simulator="Aer",
+                    simulator="Cunqa",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 
                     mem_per_qpu = MEM_PER_QPU)
+except Exception as error:
+    raise error
+
+try:
     qpus = get_QPUs(co_located = True, family = family)
 
     # 2. Design circuits modelling the QPE 
@@ -74,6 +78,7 @@ try:
 
     # 4. Post-processing results to extract estimated phase 
     counts = result_list[0].counts
+    print(f"Counts: {counts}")
 
     most_frequent_output = max(counts, key=counts.get)
     print(f"Most frequent output is {most_frequent_output}")
