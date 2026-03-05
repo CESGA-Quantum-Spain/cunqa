@@ -275,7 +275,7 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
         elif instruction_name == "unitary":
 
-            qc.unitary(instruction.get("elements", []), qiskit_Qubit)
+            qc.unitary(instruction.get("matrix", []), qiskit_Qubit)
 
         elif instruction_name == "cif":
 

@@ -245,15 +245,10 @@ std::string execute_shot_(
         }
         case cunqa::constants::CCX:
         {
-            std::vector<unsigned long> ctrls;
-            for (int i = 0; i < qubits.size() - 1; i++) {
-                if (qubits[i] == -1) {
-                    ctrls[i] = G.n_qubits - 1;
-                } else {
-                    ctrls[i] = qubits[i];
-                }
+            for (int i = 0; i < qubits.size(); i++) {
+                qubits[i] = (qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit;
             }
-            ApplyCCX(simulator, ctrls[0], ctrls[1], qubits[1] + T.zero_qubit);
+            ApplyCCX(simulator, qubits[0], qubits[1], qubits[2]);
             break;
         }
         case cunqa::constants::CSWAP:
@@ -267,6 +262,14 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
             ApplyCU(simulator, control, qubits[0] + T.zero_qubit, params[0], params[1], params[2], params[3]);
+            break;
+        }
+        case constants::RESET:
+        {
+            std::vector<unsigned long int> uliqubits(
+                qubits.begin(), qubits.end()
+            );
+		    ApplyReset(simulator, uliqubits.data(), qubits.size());
             break;
         }
         case cunqa::constants::SEND:
@@ -319,8 +322,10 @@ std::string execute_shot_(
             int aux_meas = static_cast<int>(Measure(simulator, q2, 1));
             G.qc_meas[T.id].push(aux_meas);
 
-            const unsigned long int q3[]{ G.n_qubits - 2, qubits[0] + T.zero_qubit };
-            ApplyReset(simulator, q3, 2);
+            if (measurement_as_int) {
+                const unsigned long int q3[]{ qubits[0] + T.zero_qubit };
+                ApplyReset(simulator, q3, 1);
+            }
 
             // Unlock QRECV
             Ts[inst.at("qpus")[0]].blocked = false;
@@ -350,8 +355,6 @@ std::string execute_shot_(
             // Swap the value to the desired qubit
             ApplySwap(simulator, G.n_qubits - 1, qubits[0] + T.zero_qubit);
 
-            const unsigned long int q[]{ G.n_qubits - 1 };
-			ApplyReset(simulator, q, 1);
             break;
         }
         case cunqa::constants::EXPOSE:

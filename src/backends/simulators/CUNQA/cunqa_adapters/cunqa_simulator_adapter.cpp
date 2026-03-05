@@ -67,9 +67,13 @@ std::string execute_shot_(
 
     auto generate_entanglement_ = [&]() {
         int meas1 = executor.apply_measure({G.n_qubits - 1});
+        if (meas1) {
+            executor.apply_gate("x", {G.n_qubits - 1});
+        } 
         int meas2 = executor.apply_measure({G.n_qubits - 2});
-        if (meas1) executor.apply_gate("x", {G.n_qubits - 1});
-        if (meas2) executor.apply_gate("x", {G.n_qubits - 2});
+        if (meas2) {
+            executor.apply_gate("x", {G.n_qubits - 2});
+        }
         executor.apply_gate("h", {G.n_qubits - 2});
         executor.apply_gate("cx", {G.n_qubits - 2, G.n_qubits - 1});
     };
@@ -192,16 +196,12 @@ std::string execute_shot_(
             executor.apply_gate("h", {qubits[0] + T.zero_qubit});
 
             int result = executor.apply_measure({qubits[0] + T.zero_qubit});
-            int communication_result = executor.apply_measure({G.n_qubits - 2});
 
             G.qc_meas[T.id].push(result);
-            G.qc_meas[T.id].push(communication_result);
-            //Reset
+            G.qc_meas[T.id].push(executor.apply_measure({G.n_qubits - 2}));
+
             if (result) {
                 executor.apply_gate("x", {qubits[0] + T.zero_qubit});
-            }
-            if (communication_result) {
-                executor.apply_gate("x", {G.n_qubits - 2});
             }
 
             // Unlock QRECV
@@ -231,11 +231,6 @@ std::string execute_shot_(
 
             // Swap the value to the desired qubit
             executor.apply_gate("swap", {G.n_qubits - 1, qubits[0] + T.zero_qubit});
-            //Reset
-            int communcation_result = executor.apply_measure({G.n_qubits - 1});
-            if (communcation_result) {
-                executor.apply_gate("x", {G.n_qubits - 1});
-            }
             break;
         }
         case cunqa::constants::EXPOSE:

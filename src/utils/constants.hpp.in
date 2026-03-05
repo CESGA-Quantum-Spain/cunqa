@@ -117,17 +117,16 @@ enum INSTRUCTIONS {
     CRY,
     CRZ,
     CP,
-    CPTP,
     CU1,
     RXX,
     RYY,
     RZZ,
     RZX,
-    XXMYY,
-    XXPYY,
 
     CU2,
     CR,
+    XXMYY,
+    XXPYY,
 
     CU3,
 
@@ -265,18 +264,17 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"cry", CRY},
     {"crz", CRZ},
     {"cp", CP},
-    {"cptp", CPTP},
     {"cu1", CU1},
     {"rxx", RXX},
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
-    {"xxmyy", XXMYY},
-    {"xxpyy", XXPYY},
 
     // TWO QUBIT TWO PARAM
     {"cu2", CU2},
     {"cr", CR},
+    {"xxmyy", XXMYY},
+    {"xxpyy", XXPYY},
 
     // TWO QUBIT THREE PARAM
     {"cu3", CU3},
