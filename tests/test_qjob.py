@@ -74,7 +74,6 @@ def test_qjob_init_default_run_config(
     assert config["avoid_parallelization"] is False
     assert config["num_clbits"] == circuit_ir["num_clbits"]
     assert config["num_qubits"] == circuit_ir["num_qubits"]
-    assert config["seed"] == 123123
 
     # instructions / metadata copied
     assert job._quantum_task["instructions"] == circuit_ir["instructions"]

@@ -12,7 +12,7 @@ try:
     NUM_NODES = 3
 
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
-    family_name = qraise(NUM_NODES,"00:10:00", simulator="Maestro", classical_comm=True, co_located = True)
+    family_name = qraise(NUM_NODES,"00:10:00", simulator="Aer", classical_comm=True, co_located = True)
 except Exception as error:
     raise error
 
@@ -80,7 +80,7 @@ try:
     #   We spect output at circuit1 to have a total of 5 cases in which the second qubit is `0`, therefore:
     #   {'0(0)': 1, '01': 3, '1(0)': 4, '11': 2} is correct since 1+4 = 5 .
 
-    distr_jobs = run(classcal_comms_circuits, qpus, shots=1)
+    distr_jobs = run(classcal_comms_circuits, qpus, shots=100)
 
     results_list = gather(distr_jobs)
 

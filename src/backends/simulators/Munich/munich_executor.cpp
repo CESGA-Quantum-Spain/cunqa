@@ -55,7 +55,6 @@ void MunichExecutor::run()
 
         auto qc = std::make_unique<QuantumComputationAdapter>(quantum_tasks);
         MunichSimulatorAdapter simulator(std::move(qc));
-        LOGGER_DEBUG("Vamos a llamar al simulate del adapter");
         auto result = simulator.simulate(&classical_channel);
         
         // TODO: transform results to give each qpu its results

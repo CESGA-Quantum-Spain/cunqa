@@ -2,8 +2,6 @@
 #include "munich_adapters/munich_simulator_adapter.hpp"
 #include "munich_adapters/quantum_computation_adapter.hpp"
 
-#include "munich_helpers.hpp"
-
 #include <chrono>
 
 #include "CircuitSimulator.hpp"
