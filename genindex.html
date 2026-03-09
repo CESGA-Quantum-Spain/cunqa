@@ -113,6 +113,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -145,6 +146,10 @@
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.transformations.add">add() (in module cunqa.circuit.transformations)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.amplitudedampingnoise">amplitudedampingnoise() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
@@ -152,11 +157,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend">Backend (class in cunqa.qpu)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.QPU.backend">backend (QPU attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend.basis_gates">basis_gates (Backend attribute)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.bitflipnoise">bitflipnoise() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -170,6 +177,10 @@
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.ccz">ccz() (CunqaCircuit method)</a>
 </li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cecr">cecr() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.ch">ch() (CunqaCircuit method)</a>
+</li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cif">cif() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.mappers.html#cunqa.mappers.QPUCircuitMapper.circuit">circuit (QPUCircuitMapper attribute)</a>
@@ -182,17 +193,35 @@
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cp">cp() (CunqaCircuit method)</a>
 </li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cr">cr() (CunqaCircuit method)</a>
+</li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.crx">crx() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cry">cry() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.crz">crz() (CunqaCircuit method)</a>
 </li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cs">cs() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.csdg">csdg() (CunqaCircuit method)</a>
+</li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cswap">cswap() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.csx">csx() (CunqaCircuit method)</a>
 </li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.csxdg">csxdg() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.ct">ct() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cu">cu() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cu1">cu1() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cu2">cu2() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cu3">cu3() (CunqaCircuit method)</a>
 </li>
       <li>
     cunqa.circuit
@@ -201,8 +230,6 @@
         <li><a href="reference/api/cunqa.circuit.html#module-cunqa.circuit">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cunqa.circuit.transformations
 
@@ -254,6 +281,14 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.dcx">dcx() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.dephasingnoise">dephasingnoise() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.depolarizingnoise">depolarizingnoise() (CunqaCircuit method)</a>
+</li>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend.description">description (Backend attribute)</a>
 </li>
   </ul></td>
@@ -275,6 +310,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.QPU.family">family (QPU attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.fusedswap">fusedswap() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -316,6 +355,8 @@
         <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.QPU.id">(QPU attribute)</a>
 </li>
       </ul></li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.independentxznoise">independentxznoise() (CunqaCircuit method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.info">info (CunqaCircuit attribute)</a>
@@ -323,6 +364,16 @@
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.instructions">instructions (CunqaCircuit attribute)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.is_dynamic">is_dynamic (CunqaCircuit attribute)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.iswap">iswap() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.k">k() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -352,6 +403,14 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.multicontrol">multicontrol() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.multipauli">multipauli() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.multipaulirotation">multipaulirotation() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
@@ -376,6 +435,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.p">p() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.p0">p0() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.p1">p1() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -415,6 +480,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.r">r() (CunqaCircuit method)</a>
 </li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.randomunitary">randomunitary() (CunqaCircuit method)</a>
+</li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.recv">recv() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.reset">reset() (CunqaCircuit method)</a>
@@ -427,10 +494,16 @@
         <li><a href="reference/api/cunqa.result.html#cunqa.result.Result.result">(Result attribute)</a>
 </li>
       </ul></li>
-      <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.run">run() (in module cunqa.qpu)</a>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.rotinvx">rotinvx() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.rotinvy">rotinvy() (CunqaCircuit method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.rotinvz">rotinvz() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.run">run() (in module cunqa.qpu)</a>
+</li>
       <li><a href="reference/api/cunqa.mappers.html#cunqa.mappers.QPUCircuitMapper.run_parameters">run_parameters (QPUCircuitMapper attribute)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.rx">rx() (CunqaCircuit method)</a>
@@ -461,17 +534,25 @@
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sending_to">sending_to (CunqaCircuit attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend.simulator">simulator (Backend attribute)</a>
 </li>
       <li><a href="reference/api/cunqa.qjob.html#cunqa.qjob.QJob.submit">submit() (QJob method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.swap">swap() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sx">sx() (CunqaCircuit method)</a>
 </li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sxdg">sxdg() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sy">sy() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sydg">sydg() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.sz">sz() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.szdg">szdg() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -481,11 +562,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.t">t() (CunqaCircuit method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.tdg">tdg() (CunqaCircuit method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.result.html#cunqa.result.Result.time_taken">time_taken (Result attribute)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.twoqubitdepolarizingnoise">twoqubitdepolarizingnoise() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -515,10 +598,14 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend.version">version (Backend attribute)</a>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.v">v() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.vdg">vdg() (CunqaCircuit method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend.version">version (Backend attribute)</a>
+</li>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.transformations.vsplit">vsplit() (in module cunqa.circuit.transformations)</a>
 </li>
   </ul></td>
@@ -528,6 +615,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.x">x() (CunqaCircuit method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.xxmyy">xxmyy() (CunqaCircuit method)</a>
+</li>
+      <li><a href="reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.xxpyy">xxpyy() (CunqaCircuit method)</a>
 </li>
   </ul></td>
 </tr></table>

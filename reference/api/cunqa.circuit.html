@@ -155,50 +155,89 @@ and remote communication primitives.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Unitary operations</p></td>
-<td><p>Single-qubit gates</p></td>
-<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.id" title="cunqa.circuit.core.CunqaCircuit.id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">id</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.x" title="cunqa.circuit.core.CunqaCircuit.x"><code class="xref py py-meth docutils literal notranslate"><span class="pre">x</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.y" title="cunqa.circuit.core.CunqaCircuit.y"><code class="xref py py-meth docutils literal notranslate"><span class="pre">y</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.z" title="cunqa.circuit.core.CunqaCircuit.z"><code class="xref py py-meth docutils literal notranslate"><span class="pre">z</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.h" title="cunqa.circuit.core.CunqaCircuit.h"><code class="xref py py-meth docutils literal notranslate"><span class="pre">h</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.s" title="cunqa.circuit.core.CunqaCircuit.s"><code class="xref py py-meth docutils literal notranslate"><span class="pre">s</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sdg" title="cunqa.circuit.core.CunqaCircuit.sdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sx" title="cunqa.circuit.core.CunqaCircuit.sx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sxdg" title="cunqa.circuit.core.CunqaCircuit.sxdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sxdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.t" title="cunqa.circuit.core.CunqaCircuit.t"><code class="xref py py-meth docutils literal notranslate"><span class="pre">t</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.tdg" title="cunqa.circuit.core.CunqaCircuit.tdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tdg</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u1" title="cunqa.circuit.core.CunqaCircuit.u1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u1</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u2" title="cunqa.circuit.core.CunqaCircuit.u2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u2</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u3" title="cunqa.circuit.core.CunqaCircuit.u3"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u3</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u" title="cunqa.circuit.core.CunqaCircuit.u"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.p" title="cunqa.circuit.core.CunqaCircuit.p"><code class="xref py py-meth docutils literal notranslate"><span class="pre">p</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.r" title="cunqa.circuit.core.CunqaCircuit.r"><code class="xref py py-meth docutils literal notranslate"><span class="pre">r</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rx" title="cunqa.circuit.core.CunqaCircuit.rx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ry" title="cunqa.circuit.core.CunqaCircuit.ry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ry</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rz" title="cunqa.circuit.core.CunqaCircuit.rz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rz</span></code></a></p></td>
+<td><p>Single-qubit gates with no parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.id" title="cunqa.circuit.core.CunqaCircuit.id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">id</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.x" title="cunqa.circuit.core.CunqaCircuit.x"><code class="xref py py-meth docutils literal notranslate"><span class="pre">x</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.y" title="cunqa.circuit.core.CunqaCircuit.y"><code class="xref py py-meth docutils literal notranslate"><span class="pre">y</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.z" title="cunqa.circuit.core.CunqaCircuit.z"><code class="xref py py-meth docutils literal notranslate"><span class="pre">z</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.h" title="cunqa.circuit.core.CunqaCircuit.h"><code class="xref py py-meth docutils literal notranslate"><span class="pre">h</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.s" title="cunqa.circuit.core.CunqaCircuit.s"><code class="xref py py-meth docutils literal notranslate"><span class="pre">s</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sdg" title="cunqa.circuit.core.CunqaCircuit.sdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sx" title="cunqa.circuit.core.CunqaCircuit.sx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sxdg" title="cunqa.circuit.core.CunqaCircuit.sxdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sxdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sy" title="cunqa.circuit.core.CunqaCircuit.sy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sydg" title="cunqa.circuit.core.CunqaCircuit.sydg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sydg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.sz" title="cunqa.circuit.core.CunqaCircuit.sz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.szdg" title="cunqa.circuit.core.CunqaCircuit.szdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">szdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.t" title="cunqa.circuit.core.CunqaCircuit.t"><code class="xref py py-meth docutils literal notranslate"><span class="pre">t</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.tdg" title="cunqa.circuit.core.CunqaCircuit.tdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.p0" title="cunqa.circuit.core.CunqaCircuit.p0"><code class="xref py py-meth docutils literal notranslate"><span class="pre">p0</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.p1" title="cunqa.circuit.core.CunqaCircuit.p1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">p1</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.v" title="cunqa.circuit.core.CunqaCircuit.v"><code class="xref py py-meth docutils literal notranslate"><span class="pre">v</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.vdg" title="cunqa.circuit.core.CunqaCircuit.vdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">vdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.k" title="cunqa.circuit.core.CunqaCircuit.k"><code class="xref py py-meth docutils literal notranslate"><span class="pre">k</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p>Two-qubit gates</p></td>
-<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.swap" title="cunqa.circuit.core.CunqaCircuit.swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">swap</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cx" title="cunqa.circuit.core.CunqaCircuit.cx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cy" title="cunqa.circuit.core.CunqaCircuit.cy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cz" title="cunqa.circuit.core.CunqaCircuit.cz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.csx" title="cunqa.circuit.core.CunqaCircuit.csx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">csx</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cp" title="cunqa.circuit.core.CunqaCircuit.cp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cp</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cu" title="cunqa.circuit.core.CunqaCircuit.cu"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">cu1</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">cu3</span></code>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rxx" title="cunqa.circuit.core.CunqaCircuit.rxx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rxx</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ryy" title="cunqa.circuit.core.CunqaCircuit.ryy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ryy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rzz" title="cunqa.circuit.core.CunqaCircuit.rzz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rzx" title="cunqa.circuit.core.CunqaCircuit.rzx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.crx" title="cunqa.circuit.core.CunqaCircuit.crx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cry" title="cunqa.circuit.core.CunqaCircuit.cry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cry</span></code></a>,
-<a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.crz" title="cunqa.circuit.core.CunqaCircuit.crz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ecr" title="cunqa.circuit.core.CunqaCircuit.ecr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ecr</span></code></a></p></td>
+<td><p>Single-qubit gates with one parameter</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u1" title="cunqa.circuit.core.CunqaCircuit.u1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u1</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.p" title="cunqa.circuit.core.CunqaCircuit.p"><code class="xref py py-meth docutils literal notranslate"><span class="pre">p</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rx" title="cunqa.circuit.core.CunqaCircuit.rx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ry" title="cunqa.circuit.core.CunqaCircuit.ry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ry</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rz" title="cunqa.circuit.core.CunqaCircuit.rz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rotinvx" title="cunqa.circuit.core.CunqaCircuit.rotinvx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rotinvx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rotinvy" title="cunqa.circuit.core.CunqaCircuit.rotinvy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rotinvy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rotinvz" title="cunqa.circuit.core.CunqaCircuit.rotinvz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rotinvz</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td></td>
-<td><p>Three-qubit gates</p></td>
-<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccx" title="cunqa.circuit.core.CunqaCircuit.ccx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccy" title="cunqa.circuit.core.CunqaCircuit.ccy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccz" title="cunqa.circuit.core.CunqaCircuit.ccz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cswap" title="cunqa.circuit.core.CunqaCircuit.cswap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cswap</span></code></a></p></td>
+<td><p>Single-qubit gates with two parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u2" title="cunqa.circuit.core.CunqaCircuit.u2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u2</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.r" title="cunqa.circuit.core.CunqaCircuit.r"><code class="xref py py-meth docutils literal notranslate"><span class="pre">r</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p>Multi-qubit gates</p></td>
-<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.unitary" title="cunqa.circuit.core.CunqaCircuit.unitary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unitary</span></code></a></p></td>
+<td><p>Single-qubit gates with three parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u3" title="cunqa.circuit.core.CunqaCircuit.u3"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u3</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Local non-unitary operations</p></td>
+<tr class="row-even"><td></td>
+<td><p>Single-qubit gates with four parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.u" title="cunqa.circuit.core.CunqaCircuit.u"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Two-qubit gates with no parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.swap" title="cunqa.circuit.core.CunqaCircuit.swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">swap</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.iswap" title="cunqa.circuit.core.CunqaCircuit.iswap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iswap</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.fusedswap" title="cunqa.circuit.core.CunqaCircuit.fusedswap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fusedswap</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cx" title="cunqa.circuit.core.CunqaCircuit.cx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cy" title="cunqa.circuit.core.CunqaCircuit.cy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cz" title="cunqa.circuit.core.CunqaCircuit.cz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ch" title="cunqa.circuit.core.CunqaCircuit.ch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ch</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.csx" title="cunqa.circuit.core.CunqaCircuit.csx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">csx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.csxdg" title="cunqa.circuit.core.CunqaCircuit.csxdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">csxdg</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">csy</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">csz</span></code>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cs" title="cunqa.circuit.core.CunqaCircuit.cs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cs</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.csdg" title="cunqa.circuit.core.CunqaCircuit.csdg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">csdg</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ecr" title="cunqa.circuit.core.CunqaCircuit.ecr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ecr</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ct" title="cunqa.circuit.core.CunqaCircuit.ct"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ct</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.dcx" title="cunqa.circuit.core.CunqaCircuit.dcx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dcx</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Two-qubit gates with one parameter</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cu1" title="cunqa.circuit.core.CunqaCircuit.cu1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu1</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cp" title="cunqa.circuit.core.CunqaCircuit.cp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cp</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.crx" title="cunqa.circuit.core.CunqaCircuit.crx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cry" title="cunqa.circuit.core.CunqaCircuit.cry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cry</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.crz" title="cunqa.circuit.core.CunqaCircuit.crz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rxx" title="cunqa.circuit.core.CunqaCircuit.rxx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rxx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ryy" title="cunqa.circuit.core.CunqaCircuit.ryy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ryy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rzz" title="cunqa.circuit.core.CunqaCircuit.rzz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.rzx" title="cunqa.circuit.core.CunqaCircuit.rzx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rzx</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Two-qubit gates with two parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cu2" title="cunqa.circuit.core.CunqaCircuit.cu2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu2</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cr" title="cunqa.circuit.core.CunqaCircuit.cr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cr</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.xxmyy" title="cunqa.circuit.core.CunqaCircuit.xxmyy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xxmyy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.xxpyy" title="cunqa.circuit.core.CunqaCircuit.xxpyy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xxpyy</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Two-qubit gates with three parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cu3" title="cunqa.circuit.core.CunqaCircuit.cu3"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu3</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Two-qubit gates with four parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cu" title="cunqa.circuit.core.CunqaCircuit.cu"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cu</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Three-qubit gates with no parameters</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccx" title="cunqa.circuit.core.CunqaCircuit.ccx"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccx</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccy" title="cunqa.circuit.core.CunqaCircuit.ccy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccy</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.ccz" title="cunqa.circuit.core.CunqaCircuit.ccz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ccz</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cswap" title="cunqa.circuit.core.CunqaCircuit.cswap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cswap</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cecr" title="cunqa.circuit.core.CunqaCircuit.cecr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cecr</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Multicontrol gates with no parameters</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">mcx</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcy</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcz</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcsx</span></code></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Multicontrol gates with one parameter</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">mcu1</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcp</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcphase</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcrx</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcry</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcrz</span></code></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Multicontrol gates with two parameters</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">mcu2</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">mcr</span></code></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Multicontrol gates with three parameters</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">mcu3</span></code></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Multicontrol gates with four parameters</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">mcu</span></code></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Special gates</p></td>
+<td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.unitary" title="cunqa.circuit.core.CunqaCircuit.unitary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unitary</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.randomunitary" title="cunqa.circuit.core.CunqaCircuit.randomunitary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">randomunitary</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">diagonal</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">multiplexer</span></code>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.multipauli" title="cunqa.circuit.core.CunqaCircuit.multipauli"><code class="xref py py-meth docutils literal notranslate"><span class="pre">multipauli</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.multipaulirotation" title="cunqa.circuit.core.CunqaCircuit.multipaulirotation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">multipaulirotation</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">sparsematrix</span></code>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.amplitudedampingnoise" title="cunqa.circuit.core.CunqaCircuit.amplitudedampingnoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">amplitudedampingnoise</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.bitflipnoise" title="cunqa.circuit.core.CunqaCircuit.bitflipnoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bitflipnoise</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.dephasingnoise" title="cunqa.circuit.core.CunqaCircuit.dephasingnoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dephasingnoise</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.depolarizingnoise" title="cunqa.circuit.core.CunqaCircuit.depolarizingnoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">depolarizingnoise</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.independentxznoise" title="cunqa.circuit.core.CunqaCircuit.independentxznoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">independentxznoise</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.twoqubitdepolarizingnoise" title="cunqa.circuit.core.CunqaCircuit.twoqubitdepolarizingnoise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">twoqubitdepolarizingnoise</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Local non-unitary operations</p></td>
 <td><p>Local non-unitary operations</p></td>
 <td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.cif" title="cunqa.circuit.core.CunqaCircuit.cif"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cif</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.measure" title="cunqa.circuit.core.CunqaCircuit.measure"><code class="xref py py-meth docutils literal notranslate"><span class="pre">measure</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.measure_all" title="cunqa.circuit.core.CunqaCircuit.measure_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">measure_all</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.reset" title="cunqa.circuit.core.CunqaCircuit.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Remote operations</p></td>
+<tr class="row-even"><td><p>Remote operations</p></td>
 <td><p>Classical communication</p></td>
 <td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.send" title="cunqa.circuit.core.CunqaCircuit.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.recv" title="cunqa.circuit.core.CunqaCircuit.recv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recv</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td></td>
+<tr class="row-odd"><td></td>
 <td><p>Quantum communication</p></td>
 <td><p><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.qsend" title="cunqa.circuit.core.CunqaCircuit.qsend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qsend</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.qrecv" title="cunqa.circuit.core.CunqaCircuit.qrecv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qrecv</span></code></a>, <a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit.expose" title="cunqa.circuit.core.CunqaCircuit.expose"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expose</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
-<li><p><strong>num_clbits</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>)</p></li>
-<li><p><strong>id</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
-</ul>
-</dd>
-</dl>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.id">
 <span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="w"> </span><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.id" title="Link to this definition"></a></dt>
@@ -253,25 +292,29 @@ and remote communication primitives.</p>
 <dd><p>Set of circuit ids to which the current circuit is sending measurement outcomes or qubits.</p>
 </dd></dl>
 
+</section>
 <section id="operations">
 <h2>Operations<a class="headerlink" href="#operations" title="Link to this heading"></a></h2>
 <section id="classical-communication-directives">
 <h3>Classical communication directives<a class="headerlink" href="#classical-communication-directives" title="Link to this heading"></a></h3>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Classical communication directives</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.send">
 <span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recving_circuit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.send" title="Link to this definition"></a></dt>
-<dd><p>Class method to send a bit (previously measured from a qubit) from the current circuit to a
+<dd><p class="sd-card-text">Class method to send a bit (previously measured from a qubit) from the current circuit to a
 remote one.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>clbits</strong> (<em>int</em>) – bits to be sent.</p></li>
-<li><p><strong>recving_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object to which the
+<li><p class="sd-card-text"><strong>clbits</strong> (<em>int</em>) – bits to be sent.</p></li>
+<li><p class="sd-card-text"><strong>recving_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object to which the
 bit is sent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p class="sd-card-text">None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -279,39 +322,43 @@ bit is sent.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.recv">
 <span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sending_circuit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.recv" title="Link to this definition"></a></dt>
-<dd><p>Class method to receive a bit (previously measured from a qubit) from a remote circuit into
+<dd><p class="sd-card-text">Class method to receive a bit (previously measured from a qubit) from a remote circuit into
 a classical register of the receiving circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – indexes of the cl registers where the bits will be stored.</p></li>
-<li><p><strong>sending_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object from which the
+<li><p class="sd-card-text"><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – indexes of the cl registers where the bits will be stored.</p></li>
+<li><p class="sd-card-text"><strong>sending_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object from which the
 bit is sent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p class="sd-card-text">None</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
+</div>
+</details></section>
 <section id="quantum-communication-directives">
 <h3>Quantum communication directives<a class="headerlink" href="#quantum-communication-directives" title="Link to this heading"></a></h3>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Quantum communication directives</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.qsend">
 <span class="sig-name descname"><span class="pre">qsend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recving_circuit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.qsend" title="Link to this definition"></a></dt>
-<dd><p>Class method to send a qubit from the current circuit to another one.</p>
+<dd><p class="sd-card-text">Class method to send a qubit from the current circuit to another one.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be sent.</p></li>
-<li><p><strong>recving_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit to which the qubit is
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit to be sent.</p></li>
+<li><p class="sd-card-text"><strong>recving_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit to which the qubit is
 sent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p class="sd-card-text">None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -319,16 +366,16 @@ sent.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.qrecv">
 <span class="sig-name descname"><span class="pre">qrecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_circuit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.qrecv" title="Link to this definition"></a></dt>
-<dd><p>Class method to receive a qubit from a remote circuit into an ancilla qubit.</p>
+<dd><p class="sd-card-text">Class method to receive a qubit from a remote circuit into an ancilla qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – ancilla to which the received qubit is assigned.</p></li>
-<li><p><strong>control_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit from which the qubit is received.</p></li>
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – ancilla to which the received qubit is assigned.</p></li>
+<li><p class="sd-card-text"><strong>control_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit from which the qubit is received.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p class="sd-card-text">None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -336,68 +383,39 @@ sent.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.expose">
 <span class="sig-name descname"><span class="pre">expose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_circuit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.expose" title="Link to this definition"></a></dt>
-<dd><p>Class method to expose a qubit from the current circuit to another one for a telegate
+<dd><p class="sd-card-text">Class method to expose a qubit from the current circuit to another one for a telegate
 operation. The exposed qubit will be used at the target circuit as the control qubit in
 controlled operations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubit</strong> (<em>int</em>) – qubit to be exposed.</p></li>
-<li><p><strong>target_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object where the exposed
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit to be exposed.</p></li>
+<li><p class="sd-card-text"><strong>target_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object where the exposed
 qubit is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumControlContext</span></code> object to manage remotly controlled operations in
+<dd class="field-even"><p class="sd-card-text">A <code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumControlContext</span></code> object to manage remotly controlled operations in
 the given circuit.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>QuantumControlContext</em></p>
+<dd class="field-odd"><p class="sd-card-text"><em>QuantumControlContext</em></p>
 </dd>
 </dl>
-<p>Usage example:</p>
+<p class="sd-card-text">Usage example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">origin_circ</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">:</span>
     <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
 
-</section>
+</div>
+</details></section>
 <section id="non-unitary-operations">
 <h3>Non-unitary operations<a class="headerlink" href="#non-unitary-operations" title="Link to this heading"></a></h3>
-<dl class="py method">
-<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cif">
-<span class="sig-name descname"><span class="pre">cif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cif" title="Link to this definition"></a></dt>
-<dd><p>Method for implementing a gate conditioned to a classical measurement. The control qubit
-provided is measured, if it’s 1 the gate provided is applied to the given qubits. In order
-to do this,  <code class="docutils literal notranslate"><span class="pre">cif</span></code> context manager is introduced, which enables a more expressive and
-readable way to define classically controlled blocks:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">c</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">c</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-<span class="k">with</span> <span class="n">c</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
-    <span class="n">cgates</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>In this example, the operations defined inside the <code class="docutils literal notranslate"><span class="pre">cif</span></code> block are executed only if the
-value of classical bit 0 is equal to 1. Currently, this construct does not support an
-explicit <em>else</em> branch. This design decision is based on the observation that none of the
-reviewed algorithms or protocols require such functionality. Support for an <em>else</em> branch
-may be added in future versions if needed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – clbits employed as the condition.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>ClassicalControlContext</em></p>
-</dd>
-</dl>
-</dd></dl>
-
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
 <summary class="sd-summary-title sd-card-header">
-<span class="sd-summary-text">All non-unitary operations</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<span class="sd-summary-text">Non-unitary operations</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.measure_all">
 <span class="sig-name descname"><span class="pre">measure_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.measure_all" title="Link to this definition"></a></dt>
@@ -440,28 +458,40 @@ measurement in the given classical bits.</p>
 </dl>
 </dd></dl>
 
-</div>
-</details></section>
-<section id="unitary-operations">
-<h3>Unitary operations<a class="headerlink" href="#unitary-operations" title="Link to this heading"></a></h3>
 <dl class="py method">
-<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.unitary">
-<span class="sig-name descname"><span class="pre">unitary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.unitary" title="Link to this definition"></a></dt>
-<dd><p>Class method to apply a unitary gate created from an unitary matrix provided.</p>
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cif">
+<span class="sig-name descname"><span class="pre">cif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cif" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Method for implementing a gate conditioned to a classical measurement. The control qubit
+provided is measured, if it’s 1 the gate provided is applied to the given qubits. In order
+to do this,  <code class="docutils literal notranslate"><span class="pre">cif</span></code> context manager is introduced, which enables a more expressive and
+readable way to define classically controlled blocks:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">c</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
+    <span class="n">cgates</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sd-card-text">In this example, the operations defined inside the <code class="docutils literal notranslate"><span class="pre">cif</span></code> block are executed only if the
+value of classical bit 0 is equal to 1. Currently, this construct does not support an
+explicit <em>else</em> branch. This design decision is based on the observation that none of the
+reviewed algorithms or protocols require such functionality. Support for an <em>else</em> branch
+may be added in future versions if needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>matrix</strong> (<em>list</em><em> | </em><em>numpy.ndarray</em>) – unitary operator in matrix form to be applied to the
-given qubits.</p></li>
-<li><p><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
-</ul>
+<dd class="field-odd"><p class="sd-card-text"><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – clbits employed as the condition.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p class="sd-card-text"><em>ClassicalControlContext</em></p>
 </dd>
 </dl>
 </dd></dl>
 
+</div>
+</details></section>
+<section id="unitary-operations">
+<h3>Unitary operations<a class="headerlink" href="#unitary-operations" title="Link to this heading"></a></h3>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Single-qubit gates</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
@@ -592,6 +622,62 @@ given qubits.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.sy">
+<span class="sig-name descname"><span class="pre">sy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.sy" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply sy gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.sydg">
+<span class="sig-name descname"><span class="pre">sydg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.sydg" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply sydg gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.sz">
+<span class="sig-name descname"><span class="pre">sz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.sz" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply sz gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.szdg">
+<span class="sig-name descname"><span class="pre">szdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.szdg" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply szdg gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.t">
 <span class="sig-name descname"><span class="pre">t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.t" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply t gate to the given qubit.</p>
@@ -609,6 +695,76 @@ given qubits.</p></li>
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.tdg">
 <span class="sig-name descname"><span class="pre">tdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.tdg" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply tdg gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.p0">
+<span class="sig-name descname"><span class="pre">p0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.p0" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply P0 gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.p1">
+<span class="sig-name descname"><span class="pre">p1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.p1" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply P1 gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.v">
+<span class="sig-name descname"><span class="pre">v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.v" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply v gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.vdg">
+<span class="sig-name descname"><span class="pre">vdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.vdg" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply vdg gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.k">
+<span class="sig-name descname"><span class="pre">k</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.k" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply k gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p>
@@ -778,6 +934,57 @@ given qubits.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.rotinvx">
+<span class="sig-name descname"><span class="pre">rotinvx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.rotinvx" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply rotinvx gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.rotinvy">
+<span class="sig-name descname"><span class="pre">rotinvy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.rotinvy" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply rotinvy gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.rotinvz">
+<span class="sig-name descname"><span class="pre">rotinvz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.rotinvz" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply rotinvz gate to the given qubit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
 <summary class="sd-summary-title sd-card-header">
@@ -789,6 +996,48 @@ given qubits.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.iswap">
+<span class="sig-name descname"><span class="pre">iswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.iswap" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply iswap gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.fusedswap">
+<span class="sig-name descname"><span class="pre">fusedswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.fusedswap" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply fusedswap gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.ecr">
+<span class="sig-name descname"><span class="pre">ecr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.ecr" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply ecr gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p class="sd-card-text">None</p>
@@ -842,6 +1091,21 @@ second one target qubit.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.ch">
+<span class="sig-name descname"><span class="pre">ch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.ch" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply ch gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.csx">
 <span class="sig-name descname"><span class="pre">csx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.csx" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply csx gate to the given qubits.</p>
@@ -857,16 +1121,13 @@ second one target qubit.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cp">
-<span class="sig-name descname"><span class="pre">cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cp" title="Link to this definition"></a></dt>
-<dd><p class="sd-card-text">Class method to apply cp gate to the given qubits.</p>
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.csxdg">
+<span class="sig-name descname"><span class="pre">csxdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.csxdg" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply csxdg gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
-<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
-and second one the target qubit.</p></li>
-</ul>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p class="sd-card-text">None</p>
@@ -875,19 +1136,58 @@ and second one the target qubit.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cu">
-<span class="sig-name descname"><span class="pre">cu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cu" title="Link to this definition"></a></dt>
-<dd><p class="sd-card-text">Class method to apply cu gate to the given qubits.</p>
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cs">
+<span class="sig-name descname"><span class="pre">cs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cs" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cs gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
-<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
-<li><p class="sd-card-text"><strong>lam</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
-<li><p class="sd-card-text"><strong>gamma</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
-<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied, first one will be the
-control qubit and second one the target qubit.</p></li>
-</ul>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.csdg">
+<span class="sig-name descname"><span class="pre">csdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.csdg" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply csdg gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.ct">
+<span class="sig-name descname"><span class="pre">ct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.ct" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply ct gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.dcx">
+<span class="sig-name descname"><span class="pre">dcx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.dcx" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply dcx gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p class="sd-card-text">None</p>
@@ -964,6 +1264,24 @@ control qubit and second one the target qubit.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cr">
+<span class="sig-name descname"><span class="pre">cr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cr" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cr gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.crx">
 <span class="sig-name descname"><span class="pre">crx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.crx" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply crx gate to the given qubits.</p>
@@ -1018,12 +1336,132 @@ and second one the target qubit.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.ecr">
-<span class="sig-name descname"><span class="pre">ecr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.ecr" title="Link to this definition"></a></dt>
-<dd><p class="sd-card-text">Class method to apply ecr gate to the given qubits.</p>
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cp">
+<span class="sig-name descname"><span class="pre">cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cp" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cp gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cu1">
+<span class="sig-name descname"><span class="pre">cu1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cu1" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cu1 gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – parameter for the parametric gate.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cu2">
+<span class="sig-name descname"><span class="pre">cu2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cu2" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cu2 gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cu3">
+<span class="sig-name descname"><span class="pre">cu3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cu3" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cu3 gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>lam</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cu">
+<span class="sig-name descname"><span class="pre">cu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cu" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cu gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>lam</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>gamma</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied, first one will be the
+control qubit and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.xxmyy">
+<span class="sig-name descname"><span class="pre">xxmyy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.xxmyy" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply XX - YY gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.xxpyy">
+<span class="sig-name descname"><span class="pre">xxpyy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.xxpyy" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply XX + YY gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>theta</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em>) – angle.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be the control qubit
+and second one the target qubit.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p class="sd-card-text">None</p>
@@ -1090,6 +1528,21 @@ the following one will be target qubit.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cecr">
+<span class="sig-name descname"><span class="pre">cecr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cecr" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply cecr gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits in which the gate is applied, first one will be control qubit and
+second one target qubit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cswap">
 <span class="sig-name descname"><span class="pre">cswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cswap" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply cswap gate to the given qubits.</p>
@@ -1105,8 +1558,224 @@ the following one will be target qubit.</p>
 </dd></dl>
 
 </div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Multicontrol gates</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.multicontrol">
+<span class="sig-name descname"><span class="pre">multicontrol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_gate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ctrl_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.multicontrol" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a multicontrolled gate to the given qubits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>base_gate</strong> (<em>str</em>) – name of the gate to convert to multicontrolled.</p></li>
+<li><p class="sd-card-text"><strong>num_ctrl_qubits</strong> (<em>int</em>) – number of qubits that control the gate.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied, first num_ctrl_qubits will be</p></li>
+<li><p class="sd-card-text"><strong>qubits.</strong> (<em>the control qubits and the remaining the target</em>)</p></li>
+<li><p class="sd-card-text"><strong>params</strong> (<em>list</em><em>[</em><em>float</em><em> | </em><em>int</em><em> | </em><em>Parameter</em><em>]</em>) – list of parameters for the gate.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p class="sd-card-text">This instructions is currently only supported for Aer simulator.</p>
+</div>
+</dd></dl>
+
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3 sd-fade-in-slide-down">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Special gates</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.unitary">
+<span class="sig-name descname"><span class="pre">unitary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.unitary" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a unitary gate created from an unitary matrix provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>matrix</strong> (<em>list</em><em> | </em><em>numpy.ndarray</em>) – unitary operator in matrix form to be applied to the
+given qubits.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.randomunitary">
+<span class="sig-name descname"><span class="pre">randomunitary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.randomunitary" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a randomunitary gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.multipauli">
+<span class="sig-name descname"><span class="pre">multipauli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pauli_id_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.multipauli" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a multipauli gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>pauli_id_list</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – list of Pauli ids.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.multipaulirotation">
+<span class="sig-name descname"><span class="pre">multipaulirotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_id_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.multipaulirotation" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a multipaulirotation gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>param</strong> (<em>float</em>) – parameter</p></li>
+<li><p class="sd-card-text"><strong>pauli_id_list</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – list of Pauli ids.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.amplitudedampingnoise">
+<span class="sig-name descname"><span class="pre">amplitudedampingnoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.amplitudedampingnoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a amplitudedampingnoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.bitflipnoise">
+<span class="sig-name descname"><span class="pre">bitflipnoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.bitflipnoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a bitflipnoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.dephasingnoise">
+<span class="sig-name descname"><span class="pre">dephasingnoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.dephasingnoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a dephasingnoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.depolarizingnoise">
+<span class="sig-name descname"><span class="pre">depolarizingnoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.depolarizingnoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a depolarizingnoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.independentxznoise">
+<span class="sig-name descname"><span class="pre">independentxznoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.independentxznoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a independentxznoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.twoqubitdepolarizingnoise">
+<span class="sig-name descname"><span class="pre">twoqubitdepolarizingnoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.twoqubitdepolarizingnoise" title="Link to this definition"></a></dt>
+<dd><p class="sd-card-text">Class method to apply a twoqubitdepolarizingnoise gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>prob</strong> (<em>float</em>) – probability.</p></li>
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>int</em>) – qubits to which the unitary operator will be applied.</p></li>
+<li><p class="sd-card-text"><strong>seed</strong> (<em>None</em><em> | </em><em>int</em>) – seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p class="sd-card-text">None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </details></section>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
+<li><p><strong>num_clbits</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>id</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <section id="module-cunqa.circuit.transformations">
