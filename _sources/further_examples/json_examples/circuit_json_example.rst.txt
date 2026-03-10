@@ -10,7 +10,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"simple_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
@@ -26,14 +26,15 @@ Raw Quantum Circuit JSON
       {
         "name":"measure",
         "qubits":[1]
-      },
-    }, 
+      }
+    ], 
     "num_qubits": 2,
     "num_clbits": 2,
     "classical_registers": [0, 1],
     "quantum_registers": [0, 1],  
     "is_dynamic":false, 
-    "sending_to":[]
+    "sending_to":[],
+    "params":[]
   }
 
 **Classical Communications example**
@@ -42,7 +43,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"sender_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
@@ -56,32 +57,34 @@ Raw Quantum Circuit JSON
         "clbits":[0],
         "circuits":["receiver_circuit"]
       }
-    }, 
+    ], 
     "num_qubits": 1,
     "num_clbits": 1,
     "classical_registers": [0],
     "quantum_registers": [0],  
     "is_dynamic":true, 
-    "sending_to":["receiver_circuit"]
+    "sending_to":["receiver_circuit"],
+    "params":[]
   }
 
 .. code-block:: json
 
   {
     "id":"receiver_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"recv",
         "clbits":[0],
         "circuits":["sender_circuit"]
       }
-    }, 
+    ], 
     "num_qubits": 1,
     "num_clbits": 1,
     "classical_registers": [0],
     "quantum_registers": [0],  
     "is_dynamic":true, 
-    "sending_to":[]
+    "sending_to":[],
+    "params":[]
   }
 
 **Quantum Communications example**
@@ -90,7 +93,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"qsender_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
@@ -103,20 +106,21 @@ Raw Quantum Circuit JSON
       {"name":"measure",
         "qubits":[0]
       }
-    }, 
+    ], 
     "num_qubits": 1,
     "num_clbits": 1,
     "classical_registers": [0],
     "quantum_registers": [0],  
     "is_dynamic":true, 
-    "sending_to":[]
+    "sending_to":[],
+    "params":[]
   }
 
 .. code-block:: json
 
   {
     "id":"qreceiver_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"qrecv",
         "qubits":[0],
@@ -126,11 +130,12 @@ Raw Quantum Circuit JSON
         "name":"measure",
         "qubits":[0]
       }
-    }, 
+    ], 
     "num_qubits": 1,
     "num_clbits": 1,
     "classical_registers": [0],
     "quantum_registers": [0],  
     "is_dynamic":true, 
-    "sending_to":[]
+    "sending_to":[],
+    "params":[]
   }

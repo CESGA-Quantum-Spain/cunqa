@@ -121,7 +121,7 @@
 <p><strong>Simple example</strong></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;simple_circuit&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;h&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
@@ -137,21 +137,22 @@
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">1</span><span class="p">]</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">  </span><span class="p">},</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[],</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p><strong>Classical Communications example</strong></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;sender_circuit&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;h&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
@@ -165,38 +166,40 @@
 <span class="w">      </span><span class="nt">&quot;clbits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;receiver_circuit&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[</span><span class="s2">&quot;receiver_circuit&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[</span><span class="s2">&quot;receiver_circuit&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;receiver_circuit&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;recv&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;clbits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;sender_circuit&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[],</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p><strong>Quantum Communications example</strong></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;qsender_circuit&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;h&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
@@ -209,19 +212,20 @@
 <span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[],</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;qrecv&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
@@ -231,13 +235,14 @@
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;classical_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;quantum_registers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[],</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
