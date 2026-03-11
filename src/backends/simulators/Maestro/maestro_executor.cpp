@@ -55,7 +55,7 @@ void MaestroExecutor::run()
 
         MaestroComputationAdapter qc(quantum_tasks);
         MaestroSimulatorAdapter maestro_sa(qc);
-        auto result = maestro_sa.simulate(&classical_channel);
+        auto result = maestro_sa.simulate(&classical_channel, true);
         
         // TODO: transform results to give each qpu its results
         std::string result_str = result.dump();

@@ -56,7 +56,7 @@ void AerExecutor::run()
 
         AerComputationAdapter qc(quantum_tasks);
         AerSimulatorAdapter aer_sa(qc);
-        auto result = aer_sa.simulate(&classical_channel);
+        auto result = aer_sa.simulate(&classical_channel, true);
         
         // TODO: transform results to give each qpu its results
         std::string result_str = result.dump();

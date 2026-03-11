@@ -18,7 +18,7 @@ public:
     QulacsSimulatorAdapter(QulacsComputationAdapter& qc) : qc{qc} {}
 
     JSON simulate(const Backend* backend);
-    JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
+    JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 
     QulacsComputationAdapter qc;
 

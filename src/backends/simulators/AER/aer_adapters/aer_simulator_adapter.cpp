@@ -1,6 +1,7 @@
 
 #include <unordered_map>
 #include <stack>
+#include <queue>
 #include <chrono>
 #include <functional>
 #include <cstdlib>
@@ -24,6 +25,23 @@
 
 namespace {
 
+struct LocalCCIDs {
+    std::string sendr;
+    std::string recvr;
+
+    bool operator==(const LocalCCIDs& other) const {
+        return sendr == other.sendr && recvr == other.recvr;
+    }
+}; // Struct to mimic classical communications when vQPUs deployed with quantum communications
+
+struct LocalIDsHash {
+    std::size_t operator()(const LocalCCIDs& local_cc_ids) const noexcept {
+        std::size_t h1 = std::hash<std::string>{}(local_cc_ids.sendr);
+        std::size_t h2 = std::hash<std::string>{}(local_cc_ids.recvr);
+        return h1 ^ (h2 << 1);
+    }
+};
+
 struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
@@ -38,6 +56,7 @@ struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<uint_t>> qc_meas;
+    std::unordered_map<LocalCCIDs, std::queue<uint_t>, LocalIDsHash> local_cc_queue; // To mimic classical communications when executing with quantum communications
     bool ended = false;
 };
 
@@ -45,7 +64,8 @@ struct GlobalState {
 std::string execute_shot_(
     AER::AerState* state, 
     const std::vector<cunqa::QuantumTask>& quantum_tasks, 
-    cunqa::comm::ClassicalChannel* classical_channel
+    cunqa::comm::ClassicalChannel* classical_channel,
+    const bool allows_qc
 )
 {
     std::unordered_map<std::string, TaskState> Ts;
@@ -343,8 +363,19 @@ std::string execute_shot_(
             auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
             auto clbits = inst.at("clbits").get<std::vector<int>>();   
 
-            for (const auto& clbit: clbits)
-                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
+            if (allows_qc) {
+                LocalCCIDs local_cc_ids = {
+                    .sendr = T.id, 
+                    .recvr = Ts[qpu_id].id
+                };  
+                for (auto& clbit : clbits) {
+                    G.local_cc_queue[local_cc_ids].push(G.creg[clbit + T.zero_clbit]);
+                }
+            } else {
+                for (const auto& clbit: clbits) {
+                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
+                }
+            }
             break;
         }
         case cunqa::constants::RECV:
@@ -352,10 +383,27 @@ std::string execute_shot_(
             auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
             auto clbits = inst.at("clbits").get<std::vector<int>>();
 
-            state->flush_ops(); // Execute operations to empty the buffer 
-            for (const auto& clbit: clbits) {
-                int measurement = classical_channel->recv_measure(qpu_id);
-                G.creg[clbit + T.zero_clbit] = (measurement == 1);
+            if (allows_qc) {
+                LocalCCIDs local_cc_ids = {
+                    .sendr = Ts[qpu_id].id, 
+                    .recvr = T.id
+                };
+                if (G.local_cc_queue.contains(local_cc_ids) && !G.local_cc_queue.at(local_cc_ids).empty()) {
+                    state->flush_ops(); // Execute operations to empty the buffer 
+                    for (const auto& clbit: clbits) {
+                        G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
+                        G.local_cc_queue.at(local_cc_ids).pop();
+                    }
+                    T.blocked = false;
+                } else {
+                    T.blocked = true;
+                }   
+            } else {
+                state->flush_ops(); // Execute operations to empty the buffer 
+                for (const auto& clbit: clbits) {
+                    int measurement = classical_channel->recv_measure(qpu_id);
+                    G.creg[clbit + T.zero_clbit] = (measurement == 1);
+                }
             }
             break;
         }
@@ -553,7 +601,7 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
     return {};
 }
 
-JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
+JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, const bool allows_qc)
 {
     LOGGER_DEBUG("Aer dynamic simulation");
 
@@ -562,7 +610,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
-    AER::AerState state; // Before: AER::AerState* state = new AER::AerState();
+    AER::AerState state;
     std::string sim_method = (method == "automatic") ? "statevector" : method;
     std::string device = qc.quantum_tasks[0].config.at("device")["device_name"];
     state.configure("method", sim_method);
@@ -587,15 +635,13 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
         state.initialize();
         /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
         state.set_target_gpus(target_gpus);
-        meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
+        meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc)]++;
         state.clear();
     } // End all shots
     
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
-
-    //delete state;
 
     JSON result_json = {
         {"counts", meas_counter},
