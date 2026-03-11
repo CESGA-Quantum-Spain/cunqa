@@ -48,7 +48,7 @@ builddependencies = [
 dependencies = [
     ('Python', '3.11.9'),
 #   ('ZeroMQ', '4.3.4', local_pyversionsuffix),
-    ('nlohmann_json', '3.11.3'),
+    ('nlohmann_json', '3.12.0'),
     ('Qiskit', '1.2.4', versionsuffix),
 ]
 

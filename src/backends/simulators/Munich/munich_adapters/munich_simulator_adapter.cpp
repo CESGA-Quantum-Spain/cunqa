@@ -1,6 +1,5 @@
 
 #include "munich_simulator_adapter.hpp"
-#include "munich_helpers.hpp"
 
 #include <unordered_map>
 #include <stack>
@@ -12,92 +11,11 @@
 
 #include "quantum_task.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
-
 #include "logger.hpp"
 
 using namespace qc;
 
 namespace {
-const std::unordered_map<int, OpType> MUNICH_INSTRUCTIONS_MAP = {
-    // MEASURE
-    {cunqa::constants::MEASURE, OpType::Measure},
-
-    // ONE QUBIT NO PARAM
-    {cunqa::constants::ID, OpType::I},
-    {cunqa::constants::X, OpType::X},
-    {cunqa::constants::Y, OpType::Y},
-    {cunqa::constants::Z, OpType::Z},
-    {cunqa::constants::H, OpType::H},
-    {cunqa::constants::S, OpType::S},
-    {cunqa::constants::SDG, OpType::Sdg},
-    {cunqa::constants::SX, OpType::SX},
-    {cunqa::constants::SXDG, OpType::SXdg},
-    {cunqa::constants::T, OpType::T},
-    {cunqa::constants::TDG, OpType::Tdg},
-    {cunqa::constants::V, OpType::V},
-    {cunqa::constants::VDG, OpType::Vdg},
-
-    // ONE QUBIT ONE PARAM
-    {cunqa::constants::RX, OpType::RX},
-    {cunqa::constants::RY, OpType::RY},
-    {cunqa::constants::RZ, OpType::RZ},
-    {cunqa::constants::GLOBALP, OpType::GPhase},
-    {cunqa::constants::P, OpType::P},
-    {cunqa::constants::U1, OpType::P},
-
-    // ONE QUBIT TWO PARAM
-    {cunqa::constants::U2, OpType::U2},
-
-    // ONE QUBIT THREE PARAM 
-    {cunqa::constants::U3, OpType::U},
-
-    // TWO QUBIT NO PARAM
-    {cunqa::constants::CX, OpType::X},
-    {cunqa::constants::CY, OpType::Y},
-    {cunqa::constants::CZ, OpType::Z},
-    {cunqa::constants::CH, OpType::H},
-    {cunqa::constants::CSX, OpType::SX},
-    {cunqa::constants::CS, OpType::S},
-    {cunqa::constants::CSDG, OpType::Sdg},
-    {cunqa::constants::SWAP, OpType::SWAP},
-    {cunqa::constants::ISWAP, OpType::iSWAP},
-    {cunqa::constants::ECR, OpType::ECR},
-    {cunqa::constants::DCX, OpType::DCX},
-
-    // TWO QUBIT ONE PARAM
-    {cunqa::constants::CU1, OpType::P},
-    {cunqa::constants::CP, OpType::P},
-    {cunqa::constants::CRX, OpType::RX},
-    {cunqa::constants::CRY, OpType::RY},
-    {cunqa::constants::CRZ, OpType::RZ},
-    {cunqa::constants::RXX, OpType::RXX},
-    {cunqa::constants::RYY, OpType::RYY},
-    {cunqa::constants::RZZ, OpType::RZZ},
-    {cunqa::constants::RZX, OpType::RZX},
-    {cunqa::constants::XXMYY, OpType::XXminusYY},
-    {cunqa::constants::XXPYY, OpType::XXplusYY},
-
-    // TWO QUBITS TWO PARAMS
-    {cunqa::constants::CU2, OpType::U2},
-
-    // TWO QUBITS THREE PARAMS
-    {cunqa::constants::CU3, OpType::U},
-
-    // THREE QUBITS NO PARAMS
-    {cunqa::constants::CSWAP, OpType::SWAP},
-    
-    // MULTICONTROLED NO PARAM
-    {cunqa::constants::MCX, OpType::X},
-
-    // MULTICONTROLED PARAM
-    {cunqa::constants::MCP, OpType::P},
-
-    // SPECIAL
-    {cunqa::constants::RESET, OpType::Reset},
-    {cunqa::constants::BARRIER, OpType::Barrier},
-
-
-};
 
 struct TaskState {
     std::string id;
@@ -238,8 +156,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::ISWAP:
         case constants::DCX:
         {
-            qc::Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
-            auto two_gate = std::make_unique<qc::StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
+            auto two_gate = std::make_unique<StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
@@ -266,8 +184,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::XXPYY:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            qc::Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
-            auto two_gate = std::make_unique<qc::StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
+            Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
+            auto two_gate = std::make_unique<StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
@@ -519,14 +437,15 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
     // TODO: Change the format with the free functions
     try
     {   
-        std::string circuit = quantum_task_to_Munich(quantum_task);
-        
-        auto mqt_circuit = std::make_unique<QuantumComputation>(std::move(QuantumComputation::fromQASM(circuit)));
-
-        float time_taken;
-        int n_qubits = quantum_task.config.at("num_qubits");
+        size_t n_qubits = quantum_task.config.at("num_qubits");
+        size_t n_clbits = quantum_task.config.at("num_clbits");
         size_t seed = quantum_task.config.contains("seed") ? quantum_task.config.at("seed").get<size_t>() : 0;
 
+        auto mqt_circuit = std::make_unique<QuantumComputation>(n_qubits, n_clbits, seed); 
+
+        quantum_task_to_mqt_circuit(quantum_task.circuit, *mqt_circuit);
+        
+        float time_taken;
         JSON noise_model_json = backend->config.at("noise_model");
         if (!noise_model_json.empty()) {
             LOGGER_DEBUG("Noise model execution");
@@ -541,7 +460,6 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
             time_taken = duration.count();
 
             if (!result.empty()) {
-                LOGGER_DEBUG("Result non empty");
                 return {{"counts", result}, {"time_taken", time_taken}};
             }
             throw std::runtime_error("QASM format is not correct.");

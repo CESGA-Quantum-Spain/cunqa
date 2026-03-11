@@ -55,7 +55,6 @@ struct Server::Impl {
             rid_queue_.pop();
             
             socket_.send(message, zmq::send_flags::none);
-            //LOGGER_DEBUG("Sent result: {}", result);
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error sending result: {}", e.what());
             throw;

@@ -10,7 +10,7 @@ try:
     # 1. QPU deployment
 
     # If GPU execution is desired, just add "gpu = True" as another qraise argument
-    family_name = qraise(2, "01:00:00", classical_comm=True, co_located=True, family = "qpus_class_comms")
+    family_name = qraise(2, "00:10:00", simulator = "Aer", classical_comm=True, co_located=True, family = "qpus_class_comms")
 except Exception as error:
     raise error
 

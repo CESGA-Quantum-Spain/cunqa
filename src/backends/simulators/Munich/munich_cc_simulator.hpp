@@ -7,8 +7,6 @@
 #include "backends/simulators/simulator_strategy.hpp"
 #include "classical_channel/classical_channel.hpp"
 
-#include "munich_helpers.hpp"
-
 #include "utils/json.hpp"
 
 namespace cunqa {

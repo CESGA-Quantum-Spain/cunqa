@@ -9,7 +9,7 @@
 namespace cunqa {
 namespace sim {
 
-class MunichSimulatorAdapter : public CircuitSimulator<dd::DDPackageConfig>
+class MunichSimulatorAdapter : public CircuitSimulator
 {
 public:
 

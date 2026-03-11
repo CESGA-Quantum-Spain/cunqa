@@ -114,7 +114,7 @@ std::string execute_shot_(
             break;
         }
         case cunqa::constants::X:
-            state->apply_x(qubits[0] + T.zero_qubit);
+            state->apply_mcx({qubits[0] + T.zero_qubit});
             break;
         case cunqa::constants::Y:
             state->apply_y(qubits[0] + T.zero_qubit);
@@ -343,8 +343,9 @@ std::string execute_shot_(
             auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
             auto clbits = inst.at("clbits").get<std::vector<int>>();   
 
-            for (const auto& clbit: clbits)
+            for (const auto& clbit: clbits) {
                 classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
+            }
             break;
         }
         case cunqa::constants::RECV:
@@ -535,6 +536,9 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
         circuits.push_back(std::make_shared<Circuit>(circuit));
 
         JSON run_config_json(aer_quantum_task.config);
+        if (quantum_task.config.contains("seed")) {
+            run_config_json["seed_simulator"] = quantum_task.config.at("seed");
+        }
         Config aer_config(run_config_json);
         Noise::NoiseModel noise_model(backend->config.at("noise_model"));
 
@@ -568,7 +572,9 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     state.configure("method", sim_method);
     state.configure("device", device);
     state.configure("precision", "double");
-    state.configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
+    if (qc.quantum_tasks[0].config.contains("seed")) {
+        state.configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
+    }
     reg_t target_gpus = (device == "GPU") ? qc.quantum_tasks[0].config.at("device")["target_devices"].get<reg_t>() : reg_t();
 
     unsigned long n_qubits = 0;

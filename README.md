@@ -124,7 +124,7 @@ CUNQA has a set of dependencies, as any other platform. The versions listed belo
 ```text
 gcc             12.3.0
 qiskit          1.2.4
-CMake           3.21.0
+CMake           3.24.0
 python          3.9 (recommended 3.11)
 pybind11        2.7 (recommended 2.12)
 MPI             3.1
@@ -138,7 +138,7 @@ Lapack          -
 #### Can be installed by the user (otherwise installed automatically during configuration)
 
 ```text
-nlohmann JSON   3.11.3
+nlohmann JSON   3.12.0
 spdlog          1.16.0
 MQT-DDSIM       1.24.0
 libzmq          4.3.5
