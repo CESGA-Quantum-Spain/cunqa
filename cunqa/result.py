@@ -17,11 +17,13 @@
         0.056
 """
 import logging
+import copy
 import math
 import numpy as np
 
 from typing import  Union
 from cunqa.logger import logger
+from cunqa.counts_and_probs import counts_to_probs, recombine_probs, marginalize_counts # Implemented on C++ for speed
 from itertools import accumulate
 
 class Result:
@@ -114,7 +116,8 @@ class Result:
         if len(self._registers) == 1:
             return counts
 
-        lengths = [len(reg) for reg in self._registers.values()]
+        # reversed to keep the order of counts keys
+        lengths = [len(reg) for reg in reversed(self._registers.values())]
         if not lengths:
             return counts
         cuts = (0, *accumulate(lengths))
@@ -214,16 +217,41 @@ class Result:
     def probabilities(
         self, 
         per_qubit: bool = False, 
-        partial: list[int] = None
-    ) -> Union[dict[np.array],  np.array]:
+        partial: list[int] = None,
+        sep_registers: bool = False,
+        estimate: bool = False
+    ) -> Union[dict[np.ndarray],  np.ndarray]:
         """
         Extracts probabilities from result information. If we have statevector or density matrix 
         exact probabilities are obtained, otherwise frequencies are calculated from counts.
 
+        .. note:: 
+            
+            If several states (statevector or density matrix) are saved, a dict with keys the
+            state labels and values the probability arrays is returned.
+
+        Args:
+            per_qubit (bool): selects probabilities per bitstring (False) or per qubit (True).
+                              If True, an array with the probability of "1" for each qubit in
+                              descending qubit index is returned. Default: False.
+            partial (list[int]): list of indices of significant qubits. If given, probabilities are
+                                 marginalized w/ respect to those qubits. Good for excluding ancillae.
+            sep_registers (bool): if True, a separate probs array is returned for each cl_register
+                                  on the estimation from counts mode. If additionally the partial 
+                                  option is desired, it should be of type list[list[int]] 
+                                  or behave analogously. Default: False
+            estimate (bool): if True, probabilities are estimated from counts regardless of the 
+                             presence of statevector or density matrix to pull them from. Default: False
+
         Returns:
-            probs (dict, np.array): probabilities per bitstring found on counts. The probabilities are
-                                    returned on an array unless multiple cl_registers are found, 
-                                    in which case a dict is returned instead. Probs include zero probabilities.
+            probs (dict, np.ndarray): probabilities per bitstring or per qubit. Order is as follows:
+                                      - Per bitstring: probability on each position is associated to
+                                        the corresponding bitstring in ascending binary order, ie
+                                        for 2 qubits ["00", "01", "10", "11"].
+                                      - Per qubit: probability of "1" for each qubit in order of
+                                        descending index
+                                      Same order for partial in both cases.  
+                                     
         """
         # Temporarily disable logging
         logging.disable(logging.CRITICAL)
@@ -242,11 +270,11 @@ class Result:
         except Exception:
             pass
         
-        # Logging will be re-enabled after this block
+        # Logging re-enabled 
         logging.disable(logging.NOTSET)
 
         # Statevector
-        if there_is_statevec:
+        if (there_is_statevec and not estimate):
             logger.debug("Extracting probabilities from statevector.")
             if isinstance(statevecs, dict):
                 probs={}
@@ -260,17 +288,21 @@ class Result:
                 num_qubits= int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
+                if isinstance(statevecs, dict):
+                    for k, prob in probs.values():
+                        probs[k] = recombine_probs(prob, per_qubit, partial, num_qubits)
+                else:
+                    probs = recombine_probs(probs, per_qubit, partial, num_qubits)
 
             return probs
 
         # Density matrix
-        elif there_is_densmat:
+        elif (there_is_densmat and not estimate):
             logger.debug("Extracting probabilities from density_matrix.")
             if isinstance(densmats, dict):
                 probs = {}
                 for k, densmat in densmats.items():
-                    probs[k] =  np.diagonal(densmat, axis1=0).real[0].copy()
+                    probs[k] = np.diagonal(densmat, axis1=0).real[0].copy()
                 # Extract number of qubits from the lenght of one of the sets of probs
                 num_qubits = int(math.log2(next(iter(probs.values())).size)) 
 
@@ -279,57 +311,63 @@ class Result:
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                probs = _recombine_probs(probs, per_qubit, partial, num_qubits)
-
-            # TODO: check qiskit options so that the returned density matrix is actually a density matrix
-            if isinstance(densmats, dict):
-                for k in probs.keys():
-                    probs[k] /= sum([int(v) for v in self.counts.values()])
+                if isinstance(statevecs, dict):
+                    for k, prob in probs.values():
+                        probs[k] = recombine_probs(prob, per_qubit, partial, num_qubits)
+                else:
+                    probs = recombine_probs(probs, per_qubit, partial, num_qubits)
             
             return probs
 
-        # Get frequencies from counts as estimation of probabilities if state is not available
+        # State not available: estimate probabilities from count frequencies
         else: 
             logger.debug(f"Estimating probabilities from the available counts. First ten counts: "
                          f"{ {k: self.counts[k] for k in list(self.counts.keys())[:10]} }")
+            
             if len(self._registers) > 1:
-                logger.debug(f"Computing probabilities of a circuit with {len(self._registers)} "
-                             f"classical registers. Lenght of probabilities may not correspond "
-                             f"with 2^num_qubits.")
+                logger.warning(f"Computing probabilities of a circuit with {len(self._registers)} "
+                               f"classical registers. Lenght of probabilities may not correspond "
+                               f"with 2^num_qubits.")
 
+                if sep_registers:
+
+                    lengths = [len(reg) for reg in reversed(self._registers.values())]
+                    registers_probs = copy.deepcopy(self._registers)
+                    for counts_reg, register_name in zip(marginalize_counts(self.counts, lengths), reversed(self._registers.keys())):
+                        n = len(next(iter(counts_reg.keys())))
+                        # Add zero counts if necessary
+                        if len(counts_reg) != 2**n:
+                            counts_reg = {**{f"{i:0{n}b}": 0 for i in range(2**n)}, **counts_reg}
+
+                        registers_probs[register_name] = counts_to_probs(counts_reg)
+
+                    if (per_qubit or partial is not None):
+                        for key, value, partial_i in zip(registers_probs.items(), partial):
+                            registers_probs[key] = recombine_probs(value, per_qubit, partial_i, num_qubits= math.log2(value.size()))
+
+                    return registers_probs
+
+                # All registers together
                 n = len(next(iter(self.counts.keys())).replace(" ", ""))
                 num_bitstrings = 2**n
+
                 if len(self.counts) != num_bitstrings:
-                    new_counts = {**_convert_counts({
-                        f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, self._registers), **self.counts
-                    }
+                    new_counts = {
+                        **{f"{i:0{n}b}": 0 for i in range(num_bitstrings)}, 
+                        **{key.strip(): value for key, value in self.counts.items()}
+                        }
                 else:
                     new_counts = self.counts
 
-                probs = {}
-                numpy_counts = np.array(list(new_counts.values()))
-                all_shots = np.sum(numpy_counts)
+                probs = counts_to_probs(new_counts)
 
-                probs_array = numpy_counts/all_shots
                 if (per_qubit or partial is not None):
-                    probs_array = _recombine_probs(probs_array, per_qubit, partial, num_qubits= n)
-
-                if not per_qubit and partial is None:
-                    for k, v in zip(new_counts.keys(), probs_array):
-                        probs[k] = v
-
-                elif per_qubit:
-                    if partial is None:
-                        partial = list(range(n))
-
-                    for k, v in zip(partial, probs_array):
-                        probs[k] = v
-                elif partial is not None:
-                    probs = probs_array
+                    probs = recombine_probs(probs, per_qubit, partial, num_qubits = n)
 
                 return probs
             
-            # If not all bitstrings are present, add them with count 0 (Consistent with state vector and density matrix methods)
+            # Case with one register
+            # If not all bitstrings are present, add them with count 0 (consistent with state vector and density matrix methods)
             num_qubits = len(next(iter(self.counts.keys())))
             num_bitstrings = 2**num_qubits
             if len(self.counts) != num_bitstrings:
@@ -340,176 +378,9 @@ class Result:
             else:
                 new_counts = self.counts
 
-            numpy_counts = np.array(list(new_counts.values()))
-            all_shots = np.sum(numpy_counts)
-
-            probs = numpy_counts/all_shots
+            probs = counts_to_probs(new_counts)
 
             if (per_qubit or partial is not None):
-                    probs = _recombine_probs(probs, per_qubit, partial, num_qubits= num_qubits)
+                    probs = recombine_probs(probs, per_qubit, partial, num_qubits= num_qubits)
 
             return probs
-    
-
-def _divide(string: str, lengths: "list[int]") -> str:
-    """
-    Divides a string of bits in groups of given lenghts separated by spaces.
-
-    Args:
-        string (str): string that we want to divide.
-
-        lengths (list[int]): lenghts of the resulting strings in which the original one is divided.
-
-    Return:
-        A new string in which the resulting groups are separated by spaces.
-
-    """
-
-    parts = []
-    init = 0
-    try:
-        if len(lengths) == 0:
-            return string
-        else:
-            for length in lengths:
-                parts.append(string[init:init + length])
-                init += length
-            return ' '.join(parts)
-    
-    except Exception as error:
-        logger.error(f"Something failed with division of string [{error.__name__}].")
-        raise SystemExit # User's level
-
-
-def _convert_counts(counts: dict, cl_registers: dict) -> dict:
-
-    """
-    Funtion to convert counts wirtten in hexadecimal format to binary strings and that applies the 
-    division of the bit strings.
-
-    Args:
-    --------
-    counts (dict): dictionary of counts to apply the conversion.
-
-    cl_registers (dict): dictionary of classical registers.
-
-    Return:
-    --------
-    Counts dictionary with keys as binary string correctly separated with spaces accordingly to 
-    the classical registers.
-    """
-
-    if isinstance(cl_registers, dict):
-        # getting lenghts of bits for the different cl_registers
-        lengths = []
-        for v in cl_registers.values():
-            lengths.append(len(v))
-    else:
-        logger.error(f"regsters must be dict, but {type(cl_registers)} was provided [TypeError].")
-        raise ResultError # I capture this error in QJob.result()
-    
-    if isinstance(counts, dict):
-        new_counts = {}
-        for k,v in counts.items():
-            new_counts[_divide(k, lengths)] = v
-    else:
-        logger.error(f"counts must be dict, but {type(cl_registers)} was provided [TypeError].")
-        raise ResultError # I capture this error in QJob.result()
-    
-    return new_counts
-
-def _recombine_probs(
-    probs: Union[dict[np.array], np.array], 
-    per_qubit: bool, 
-    partial: Union[None, list[int]], 
-    num_qubits: int
-):
-    """
-    Modifies the probabilities per bitstring to obtain either probabilities per qubit or per 
-    sub-bitstrings, were the indexes of the qubits to be kept are specified in `partial`. The per
-    qubit option also admits a subset of qubits given by partial.
-
-    Args:
-        probs (np.array, dict[np.array]): one or more (dict case) set of probabilities per bitstring
-        per_qubit (bool): if True the probabilities are converted to per qubit probabilities.
-        partial (None, list[int]): list of indexes of the qubits that should be kept.
-         On the per bitstring case these will determine the total probability space. 
-         Good for excluding ancillae.
-        num_qubits (int): number of qubits that determines the lenght of the bitstrings
-
-    Returns:
-        new_probs (np.array, dict[np.array]): probabilities or list of probabilities per qubit
-        short_bitstring_probs (np.array, dict[np.array]): set of probabilities per sub-bitstring
-    """
-    # Reverse indexes in partial as the bitstring results are big-endian, that is, ordered from 
-    # right to left. This way qubits bitstring "011" would correspond to indexes 2, 1, 0
-    if partial is None:
-        partial = [num_qubits - 1 - i for i in range(num_qubits)]
-    else:
-        partial = [num_qubits - 1 - i for i in partial]
-
-    if per_qubit:
-        logger.debug("Entering per_qubit calculation.")
-        
-        short_num_qubits = len(partial)
-        if isinstance(probs, dict): # get a dict with probability arrays as values
-
-            new_probs = {}
-            for k, probs_k in probs.items():
-
-                new_probs[k] = np.zeros((len(partial), 2))
-                # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
-                # the binary order, thus the base_ten_bitstring
-                for base_ten_bitstring, prob in enumerate(probs_k):
-                    for i, i_qubit in enumerate(partial):
-                        
-                        # extract whether i have a zero or a one on position i_qubit of the bitstring
-                        zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit]) 
-                        # for each qubit, i have a two element list with prob of one and prob of 
-                        # zero. Which element should be updated is determined by the zero or one 
-                        # on the bitstring
-                        new_probs[k][i, zero_one] += prob 
-
-        else: # probs is an array
-            new_probs = np.zeros((len(partial), 2))
-
-            # We assume that the bitstring probabilities are ordered from 0000 to 1111 following 
-            # the binary order, thus the base_ten_bitstring
-            for base_ten_bitstring, prob in enumerate(probs):
-                for i, i_qubit in enumerate(partial):
-
-                    #extract wether there is a "0" or "1" in i_qubit on the binary bitstring, eg 8 -> 1000 which on position 2 has a 0
-                    zero_one = int(format(base_ten_bitstring, f"0{num_qubits}b")[i_qubit])
-                    new_probs[i, zero_one] += prob
-        
-        return new_probs
-    
-    else: # per_qubit is False, want probabilities of partial bitstrings
-        short_num_qubits = len(partial)
-        if isinstance(probs, dict): # get a dict with probability arrays as values
-            short_bitstring_probs = {}
-            for k, probs_k in probs.items():
-
-                short_bitstring_probs[k] = {
-                    format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
-                    for bitstring_ten in range(2**short_num_qubits)
-                }
-                for base_ten_bitstring, prob in enumerate(probs_k):
-
-                    shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
-                                                          for i in partial])
-                    short_bitstring_probs[k][shortened_bitstring] += prob
-
-        elif isinstance(probs, np.ndarray):        
-
-            short_bitstring_probs = {
-                format(bitstring_ten, f"0{short_num_qubits}b"): 0.0 
-                for bitstring_ten in range(2**short_num_qubits)
-            }
-            for base_ten_bitstring, prob in enumerate(probs):
-
-                shortened_bitstring = ''.join([format(base_ten_bitstring, f"0{num_qubits}b")[i] 
-                                                      for i in partial])
-                short_bitstring_probs[shortened_bitstring] += prob
-
-        return short_bitstring_probs

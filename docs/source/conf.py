@@ -39,6 +39,7 @@ autodoc_mock_imports = [
     'collections', 
     'copy',
     'cunqa.constants',
+    'cunqa.counts_and_probs',
     'cunqa.logger',
     'cunqa.qclient',
     'dateutil',

@@ -5,12 +5,21 @@ add_subdirectory(utils)
 
 set(LIB_NAME "qclient")
 
+# QClient pybind module
 pybind11_add_module(${LIB_NAME} bindings.cpp)
 
 target_include_directories(${LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
 target_link_libraries(${LIB_NAME} PRIVATE client json)
 
 install(TARGETS ${LIB_NAME} DESTINATION cunqa)
+
+# counts_and_probs pybind module
+pybind11_add_module(counts_and_probs bindings.cpp)
+
+target_include_directories(counts_and_probs PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
+target_link_libraries(counts_and_probs PRIVATE client json)
+
+install(TARGETS counts_and_probs DESTINATION cunqa)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/constants.py.in"

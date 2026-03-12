@@ -11,6 +11,12 @@ using namespace std::literals;
 std::shared_ptr<spdlog::logger> logger;
 
 __attribute__((constructor)) void initializeLogger() {
+    // Check if logger already exists
+    auto existing_logger = spdlog::get("client_logger");
+    if (existing_logger) {
+        logger = existing_logger;
+        return;
+    }
     // QClient logger initialization
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     console_sink->set_level(spdlog::level::warn);
