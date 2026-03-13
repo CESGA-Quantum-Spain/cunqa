@@ -42,7 +42,7 @@ Raw Quantum Circuit JSON
       }
     },
     "is_dynamic":false, 
-    "sending_to":[],
+    "sending_to":[]
   }
 
 **Classical Communications example**
@@ -79,7 +79,7 @@ Raw Quantum Circuit JSON
       }
     },
     "is_dynamic":true, 
-    "sending_to":["receiver_circuit"],
+    "sending_to":["receiver_circuit"]
   }
 
 .. code-block:: json
@@ -105,7 +105,7 @@ Raw Quantum Circuit JSON
       }
     },
     "is_dynamic":true, 
-    "sending_to":[],
+    "sending_to":[]
   }
 
 **Quantum Communications example**
@@ -142,7 +142,7 @@ Raw Quantum Circuit JSON
       }
     },
     "is_dynamic":true, 
-    "sending_to":[],
+    "sending_to":[]
   }
 
 .. code-block:: json
@@ -173,5 +173,5 @@ Raw Quantum Circuit JSON
       }
     },
     "is_dynamic":true, 
-    "sending_to":[],
+    "sending_to":[]
   }
