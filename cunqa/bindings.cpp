@@ -62,7 +62,15 @@ PYBIND11_MODULE(counts_and_probs, m) {
                 partial.has_value() ? &partial.value() : nullptr
             );
             // Conversion to numpy array
-            return py::array_t<double>(result.size(), result.data());
+            if (per_qubit) {
+                // Reshape to (2, num_qubits) for per_qubit case
+                int size = result.size() / 2;
+                std::vector<size_t> shape = {static_cast<size_t>(size), 2};
+                return py::array_t<double>(shape, result.data());
+            } else {
+                // Return as 1D array for partial case
+                return py::array_t<double>(result.size(), result.data());
+            }
         },
         py::arg("counts"),
         py::arg("per_qubit") = false,
@@ -92,7 +100,15 @@ PYBIND11_MODULE(counts_and_probs, m) {
                 num_qubits
             );
             // Conversion to numpy array
-            return py::array_t<double>(result.size(), result.data());
+            if (per_qubit) {
+                // Reshape to (2, num_qubits) for per_qubit case
+                int short_num_qubits = result.size() / 2;
+                std::vector<size_t> shape = {static_cast<size_t>(short_num_qubits), 2};
+                return py::array_t<double>(shape, result.data());
+            } else {
+                // Return as 1D array for partial case
+                return py::array_t<double>(result.size(), result.data());
+            }
         },
         py::arg("probs"),
         py::arg("per_qubit"),

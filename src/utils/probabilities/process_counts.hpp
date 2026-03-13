@@ -88,7 +88,7 @@ std::vector<double> recombineProbs(
 
     if (per_qubit) {
         int short_num_qubits = partial.size();
-        std::vector<std::vector<double>> new_probs(short_num_qubits, std::vector<double>(2, 0.0));
+        std::vector<double> new_probs(2 * short_num_qubits, 0.0);
 
         // Iterate through all bitstrings
         for (int base_ten_bitstring = 0; base_ten_bitstring < static_cast<int>(probs.size()); ++base_ten_bitstring) {
@@ -99,16 +99,11 @@ std::vector<double> recombineProbs(
                 int i_qubit = partial[i];
                 // Extract bit at position i_qubit using bitwise operation
                 int zero_one = (base_ten_bitstring >> i_qubit) & 1;
-                new_probs[i][zero_one] += prob;
+                new_probs[i * 2 + zero_one] += prob;
             }
         }
-
-        // Flatten result for return
-        std::vector<double> result;
-        for (const auto& row : new_probs) {
-            result.insert(result.end(), row.begin(), row.end());
-        }
-        return result;
+        
+        return new_probs;
 
     } else {
         // Probabilities of partial bitstrings

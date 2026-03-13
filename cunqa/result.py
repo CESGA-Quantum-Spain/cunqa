@@ -232,8 +232,9 @@ class Result:
 
         Args:
             per_qubit (bool): selects probabilities per bitstring (False) or per qubit (True).
-                              If True, an array with the probability of "1" for each qubit in
-                              descending qubit index is returned. Default: False.
+                              If True, an 2D (num_qubits x 2)-array with the probability of 
+                              "0" and "1" for each qubit as rows, where the qubit index 
+                              decreases with row index, is returned. Default: False.
             partial (list[int]): list of indices of significant qubits. If given, probabilities are
                                  marginalized w/ respect to those qubits. Good for excluding ancillae.
             sep_registers (bool): if True, a separate probs array is returned for each cl_register
@@ -248,9 +249,10 @@ class Result:
                                       - Per bitstring: probability on each position is associated to
                                         the corresponding bitstring in ascending binary order, ie
                                         for 2 qubits ["00", "01", "10", "11"].
-                                      - Per qubit: probability of "1" for each qubit in order of
-                                        descending index
-                                      Same order for partial in both cases.  
+                                      - Per qubit: probability of "0" and "1" for each qubit 
+                                        where qubit 0 is the last row and the qubit index increases 
+                                        as row index decreases.
+                                      Partial preserves these orders in both cases.  
                                      
         """
         # Temporarily disable logging
