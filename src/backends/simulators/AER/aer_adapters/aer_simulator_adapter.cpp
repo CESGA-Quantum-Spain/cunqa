@@ -553,23 +553,17 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
     return {};
 }
 
+AER::AerState get_configured_aer_state(const JSON& config);
 JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
 {
     LOGGER_DEBUG("Aer dynamic simulation");
 
     std::map<std::string, std::size_t> meas_counter;
     
-    auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
-    std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
-
-    AER::AerState state; // Before: AER::AerState* state = new AER::AerState();
-    std::string sim_method = (method == "automatic") ? "statevector" : method;
-    std::string device = qc.quantum_tasks[0].config.at("device")["device_name"];
-    state.configure("method", sim_method);
-    state.configure("device", device);
-    state.configure("precision", "double");
-    state.configure("seed_simulator", std::to_string(qc.quantum_tasks[0].config.at("seed").get<int>()));
-    reg_t target_gpus = (device == "GPU") ? qc.quantum_tasks[0].config.at("device")["target_devices"].get<reg_t>() : reg_t();
+    JSON qt_config = qc.quantum_tasks[0].config;
+    auto shots = qt_config.at("shots").get<std::size_t>();
+    std::string device = qt_config.at("device")["device_name"];
+    reg_t target_gpus = (device == "GPU") ? qt_config.at("device")["target_devices"].get<reg_t>() : reg_t();
 
     unsigned long n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks)
@@ -579,10 +573,45 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
     
-    reg_t qubit_ids;
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < shots; i++)
-    {
+#ifdef OPENMP_IN_QC
+    if (size(qc.quantum_tasks) > 1) { // Quantum communications 
+        #pragma omp parallel
+        {
+            std::map<std::string, std::size_t> local_counter;
+
+            AER::AerState state = get_configured_aer_state(qt_config);
+
+            #pragma omp for
+            for (std::size_t i = 0; i < shots; i++) {
+                reg_t qubit_ids = state.allocate_qubits(n_qubits);
+                state.initialize();
+                /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
+                state.set_target_gpus(target_gpus);
+                local_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
+                state.clear();
+            }
+
+            #pragma omp critical
+            for (auto& [key, val] : local_counter)
+                meas_counter[key] += val;
+        }
+    } else { // As if OPENMP_IN_QC not enabled
+        AER::AerState state = get_configured_aer_state(qt_config);
+        reg_t qubit_ids;
+        for (std::size_t i = 0; i < shots; i++) {
+            qubit_ids = state.allocate_qubits(n_qubits);
+            state.initialize();
+            /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
+            state.set_target_gpus(target_gpus);
+            meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
+            state.clear();
+        } // End all shots
+    }
+#else
+    AER::AerState state = get_configured_aer_state(qt_config);
+    reg_t qubit_ids;
+    for (std::size_t i = 0; i < shots; i++) {
         qubit_ids = state.allocate_qubits(n_qubits);
         state.initialize();
         /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
@@ -590,17 +619,33 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
         meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel)]++;
         state.clear();
     } // End all shots
-    
+#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    //delete state;
 
     JSON result_json = {
         {"counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
+}
+
+AER::AerState get_configured_aer_state(const JSON& config)
+{
+    AER::AerState state;
+
+    std::string method = config.at("method").get<std::string>();
+    std::string sim_method = (method == "automatic") ? "statevector" : method;
+    std::string device = config.at("device")["device_name"];
+    state.configure("method", sim_method);
+    state.configure("device", device);
+    state.configure("precision", "double");
+    if (config.contains("seed")) {
+        state.configure("seed_simulator", std::to_string(config.at("seed").get<int>()));
+    }
+
+    return state;
 }
 
 } // End of sim namespace

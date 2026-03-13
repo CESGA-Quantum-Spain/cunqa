@@ -370,15 +370,44 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
 
-    Executor executor(n_qubits);
+
     auto start = std::chrono::high_resolution_clock::now();
+#ifdef OPENMP_IN_QC
+    if (size(qc.quantum_tasks) > 1) { // Quantum communications 
+        #pragma omp parallel
+        {
+            std::map<std::string, std::size_t> local_counter;
+            
+            Executor executor(n_qubits);
+
+            #pragma omp for
+            for (std::size_t i = 0; i < shots; i++) {
+                local_counter[execute_shot_(executor, qc.quantum_tasks, classical_channel)]++;
+                executor.restart_statevector();
+            }
+
+            #pragma omp critical
+            for (auto& [key, val] : local_counter)
+                meas_counter[key] += val;
+        }
+    } else { // As if OPENMP_IN_QC not enabled
+        Executor executor(n_qubits);
+        for (int i = 0; i < shots; i++)
+        {
+            meas_counter[execute_shot_(executor, qc.quantum_tasks, classical_channel)]++;
+            executor.restart_statevector();
+            
+        } // End all shots
+    }
+#else
+    Executor executor(n_qubits);
     for (int i = 0; i < shots; i++)
     {
         meas_counter[execute_shot_(executor, qc.quantum_tasks, classical_channel)]++;
         executor.restart_statevector();
         
     } // End all shots
-
+#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();

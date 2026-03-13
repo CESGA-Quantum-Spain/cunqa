@@ -656,7 +656,6 @@ JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
-    std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
     unsigned long n_qubits = 0;
     for (auto &quantum_task : qc.quantum_tasks) {
@@ -666,13 +665,39 @@ JSON QulacsSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
     if (size(qc.quantum_tasks) > 1)
         n_qubits += 2;
 
-    QuantumState state(n_qubits);
-
     auto start = std::chrono::high_resolution_clock::now();
+#ifdef OPENMP_IN_QC
+    if (size(qc.quantum_tasks) > 1) { // Quantum communications 
+        #pragma omp parallel
+        {
+            std::map<std::string, std::size_t> local_counter;
+            
+            QuantumState state(n_qubits);
+
+            #pragma omp for
+            for (std::size_t i = 0; i < shots; i++) {
+                local_counter[execute_shot_(state, qc.quantum_tasks, classical_channel)]++;
+                state.set_zero_state();
+            }
+
+            #pragma omp critical
+            for (auto& [key, val] : local_counter)
+                meas_counter[key] += val;
+        }
+    } else { // As if OPENMP_IN_QC not enabled
+        QuantumState state(n_qubits);
+        for (std::size_t i = 0; i < shots; i++) {
+            meas_counter[execute_shot_(state, qc.quantum_tasks, classical_channel)]++;
+            state.set_zero_state();
+        } // End all shots
+    }
+#else
+    QuantumState state(n_qubits);
     for (std::size_t i = 0; i < shots; i++) {
         meas_counter[execute_shot_(state, qc.quantum_tasks, classical_channel)]++;
         state.set_zero_state();
     } // End all shots
+#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();

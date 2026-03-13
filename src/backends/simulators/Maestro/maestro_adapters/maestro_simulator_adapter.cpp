@@ -671,6 +671,45 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         simulationType = 0; // statevector
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
+#ifdef OPENMP_IN_QC
+    if (size(qc.quantum_tasks) > 1) { // Quantum communications 
+        #pragma omp parallel
+        {
+            std::map<std::string, std::size_t> local_counter;
+            
+            auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+            auto simulator = GetSimulator(simulatorHandle); // Not error handling
+
+            #pragma omp for
+            for (std::size_t i = 0; i < shots; i++) {
+                AllocateQubits(simulator, n_qubits);
+                InitializeSimulator(simulator);
+                local_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
+                ClearSimulator(simulator);
+            }
+
+            #pragma omp critical
+            for (auto& [key, val] : local_counter)
+                meas_counter[key] += val;
+        }
+    } else { // As if OPENMP_IN_QC not enabled
+        auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+        if (simulatorHandle == 0) {
+            LOGGER_ERROR("Error creating the Maestro Simulator.");
+            return {{"ERROR", "Unable to create the Maestro Simulator."}};
+        }
+        auto simulator = GetSimulator(simulatorHandle);
+
+        for (std::size_t i = 0; i < shots; i++)
+        {
+            AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
+            InitializeSimulator(simulator);
+            meas_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
+            ClearSimulator(simulator);
+        } // End all shots
+    }
+#else
     auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
     if (simulatorHandle == 0) {
         LOGGER_ERROR("Error creating the Maestro Simulator.");
@@ -678,7 +717,6 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
     }
     auto simulator = GetSimulator(simulatorHandle);
 
-    auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {
         AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
@@ -686,6 +724,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         meas_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
         ClearSimulator(simulator);
     } // End all shots
+#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();

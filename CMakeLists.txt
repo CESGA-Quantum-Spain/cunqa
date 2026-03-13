@@ -105,6 +105,12 @@ endfunction()
 set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+option(OPENMP_IN_QC "Enable OpenMP parallelization for quantum communications in some simulator adapters" ON)
+if(OPENMP_IN_QC)
+    message(STATUS "OpenMP for QC enabled")
+endif()
+
+
 # =====================================================================
 #  NLOHMANN JSON - json management library
 # =====================================================================

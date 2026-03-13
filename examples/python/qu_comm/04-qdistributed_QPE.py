@@ -20,13 +20,13 @@ N_ANCILLA_QUBITS = 10
 N_REGISTER_QUBITS = 1
 PHASE_TO_COMPUTE = 1 / 2**3
 
-shots = 100
+shots = 10000
 SEED = 18
 
 try:
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
-                    simulator="Aer",
+                    simulator="Qulacs",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 
@@ -79,6 +79,7 @@ try:
     # 4. Post-processing results to extract estimated phase 
     counts = result_list[0].counts
     print(f"Counts: {counts}")
+    print(f"Time taken: {result_list[0].time_taken}")
 
     most_frequent_output = max(counts, key=counts.get)
     print(f"Most frequent output is {most_frequent_output}")
