@@ -291,7 +291,7 @@ class Result:
 
             if (per_qubit or partial is not None):
                 if isinstance(statevecs, dict):
-                    for k, prob in probs.values():
+                    for k, prob in probs.items():
                         probs[k] = recombine_probs(prob, per_qubit, partial, num_qubits)
                 else:
                     probs = recombine_probs(probs, per_qubit, partial, num_qubits)
@@ -313,8 +313,8 @@ class Result:
                 num_qubits = int(math.log2(probs.size))
 
             if (per_qubit or partial is not None):
-                if isinstance(statevecs, dict):
-                    for k, prob in probs.values():
+                if isinstance(densmats, dict):
+                    for k, prob in probs.items():
                         probs[k] = recombine_probs(prob, per_qubit, partial, num_qubits)
                 else:
                     probs = recombine_probs(probs, per_qubit, partial, num_qubits)
