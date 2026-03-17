@@ -20,25 +20,41 @@ public:
     // Constructors
     QuantumComputationAdapter() = default;
     QuantumComputationAdapter(const QuantumTask& quantum_task) : 
-        QuantumComputation(quantum_task.config.at("num_qubits").get<std::size_t>(), quantum_task.config.at("num_clbits").get<std::size_t>()),
+        QuantumComputation(quantum_task.config.at("num_qubits").get<size_t>(), quantum_task.config.at("num_clbits").get<size_t>()),
         quantum_tasks{quantum_task}
-    { }
+    { 
+        n_qubits = quantum_task.config.at("num_qubits").get<size_t>();
+    }
     QuantumComputationAdapter(const std::vector<QuantumTask>& quantum_tasks) : 
         QuantumComputation(get_num_qubits_(quantum_tasks), get_num_clbits_(quantum_tasks)),
         quantum_tasks{quantum_tasks}
-    { }
+    { 
+        n_qubits = get_num_qubits_(quantum_tasks);
+    }
 
     std::vector<QuantumTask> quantum_tasks;
+    size_t n_qubits;
 
 private:
 
     std::size_t get_num_qubits_(const std::vector<QuantumTask>& quantum_tasks) 
     {
-        size_t num_qubits = 0;
-        for(const auto& quantum_task: quantum_tasks) {
-            num_qubits += quantum_task.config.at("num_qubits").get<std::size_t>();
+        size_t tmp_n_qubits;
+        for (auto& quantum_task : quantum_tasks) {
+            tmp_n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
         }
-        return num_qubits + 2;
+
+        if (quantum_tasks[0].config.contains("n_communication_qubits")) {
+            size_t n_comm_qubits = quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
+            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
+                n_comm_qubits++;
+            }
+            tmp_n_qubits += n_comm_qubits;
+        } else {
+            tmp_n_qubits += 2;
+        }
+
+        return tmp_n_qubits; 
     }
 
     std::size_t get_num_clbits_(const std::vector<QuantumTask>& quantum_tasks) 

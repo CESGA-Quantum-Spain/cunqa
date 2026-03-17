@@ -26,7 +26,7 @@ SEED = 18
 try:
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
-                    simulator="Aer",
+                    simulator="Munich",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 
