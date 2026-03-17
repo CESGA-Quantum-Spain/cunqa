@@ -20,13 +20,13 @@ N_ANCILLA_QUBITS = 10
 N_REGISTER_QUBITS = 1
 PHASE_TO_COMPUTE = 1 / 2**3
 
-shots = 10000
+shots = 100
 SEED = 18
 
 try:
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
-                    simulator="Munich",
+                    simulator="Aer",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 

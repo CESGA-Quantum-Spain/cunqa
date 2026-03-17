@@ -42,13 +42,23 @@ struct LocalIDsHash {
     }
 };
 
+struct CommunicationQubitsPair {
+    int q0;
+    int q1;
+    bool idle = true;
+    std::string sendr_qpu; // QSEND and EXPOSE
+    std::string recvr_qpu; // QRECV and RCONTROL
+};
+
 struct TaskState {
     std::string id;
     cunqa::JSON::const_iterator it, end;
     unsigned long zero_qubit = 0;
     unsigned long zero_clbit = 0;
     bool finished = false;
-    bool blocked = false;
+    bool blocked_by_teledata = false;
+    bool blocked_by_telegate = false;
+    bool blocked_by_cc = false;
     bool cat_entangled = false;
 };
 
@@ -56,16 +66,36 @@ struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::stack<uint_t>> qc_meas;
+    std::unordered_map<std::string, CommunicationQubitsPair> communication_pairs;
     std::unordered_map<LocalCCIDs, std::queue<uint_t>, LocalIDsHash> local_cc_queue; // To mimic classical communications when executing with quantum communications
     bool ended = false;
 };
+
+std::string find_idle_communication_pair(GlobalState& G)
+{
+    for (auto& [key, comm_pair] : G.communication_pairs) {
+        if (comm_pair.idle) {
+            comm_pair.idle = false;
+            return key;
+        } 
+    }
+    return "NOIDLEPAIRS";
+}
+
+std::string find_my_communication_pair(const GlobalState& G, const std::string& sendr, const std::string recvr)
+{
+    for (auto& [key, comm_pair] : G.communication_pairs) {
+        if (comm_pair.sendr_qpu == sendr && comm_pair.recvr_qpu == recvr) return key;
+    }
+}
 
 
 std::string execute_shot_(
     AER::AerState* state, 
     const std::vector<cunqa::QuantumTask>& quantum_tasks, 
     cunqa::comm::ClassicalChannel* classical_channel,
-    const bool allows_qc
+    const bool allows_qc,
+    const size_t& n_comm_qubits
 )
 {
     std::unordered_map<std::string, TaskState> Ts;
@@ -79,7 +109,9 @@ std::string execute_shot_(
         T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
-        T.blocked = false;
+        T.blocked_by_teledata = false;
+        T.blocked_by_telegate = false;
+        T.blocked_by_cc = false;
         T.finished = false;
         Ts[quantum_task.id] = T;
         
@@ -87,20 +119,33 @@ std::string execute_shot_(
         G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
     }
     
-    // Here we add the two communication qubits
-    if (size(quantum_tasks) > 1)
-        G.n_qubits += 2;
+    // Here we add the communication qubits
+    if (n_comm_qubits != 0) {
+        G.n_qubits += n_comm_qubits;
+        for (int i = 0; i < n_comm_qubits; i+=2) {
+            CommunicationQubitsPair cqp = {
+                .q0 = G.n_qubits - n_comm_qubits + i,
+                .q1 = G.n_qubits - n_comm_qubits + i + 1
+            };
+            G.communication_pairs[std::to_string(i)] = cqp;
+        }
+    }
 
     auto generate_entanglement_ = [&]() {
-        state->apply_reset({G.n_qubits - 1});
-        state->apply_reset({G.n_qubits - 2});
-        state->apply_h(G.n_qubits - 2);
-        state->apply_mcx({G.n_qubits - 2, G.n_qubits - 1});
+        std::string key = find_idle_communication_pair(G);
+        if (key != "NOIDLEPAIRS") {
+            state->apply_reset({G.communication_pairs[key].q1});
+            state->apply_reset({G.communication_pairs[key].q0});
+            state->apply_h(G.communication_pairs[key].q0);
+            state->apply_mcx({G.communication_pairs[key].q0, G.communication_pairs[key].q1});
+        }
+
+        return key;
     };
 
 
-    std::function<void(TaskState&, const cunqa::JSON&)> apply_next_instr = 
-        [&](TaskState& T, const cunqa::JSON& instruction = {}) 
+    std::function<void(TaskState&, const cunqa::JSON&, const std::string&)> apply_next_instr = 
+        [&](TaskState& T, const cunqa::JSON& instruction = {}, const std::string comm_pair_key = "") 
     {
         const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
         std::string inst_name = inst.at("name").get<std::string>();
@@ -177,26 +222,26 @@ std::string execute_shot_(
         }
         case cunqa::constants::CX:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_mcx({control, qubits[1] + T.zero_qubit});
             break;
         }
         case cunqa::constants::CY:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_mcy({control, qubits[1] + T.zero_qubit});
             break;
         }
         case cunqa::constants::CZ:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_mcz({control, qubits[1] + T.zero_qubit});
             break;
         }
         case cunqa::constants::CRX:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_mcrx({control, qubits[1] + T.zero_qubit}, params[0]);
             break;
         }
@@ -210,14 +255,14 @@ std::string execute_shot_(
         case cunqa::constants::CRZ:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_mcrz({control, qubits[1] + T.zero_qubit}, params[0]);
             break;
         }
         case cunqa::constants::CU:
         {
             auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
+            unsigned long control = (qubits[0] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[0] + T.zero_qubit;
             state->apply_cu({control, qubits[1] + T.zero_qubit}, params[0], params[1], params[2], params[3]);
             break;
         }
@@ -230,7 +275,7 @@ std::string execute_shot_(
         {
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcx(unsigned_qubits);
             break;
@@ -239,7 +284,7 @@ std::string execute_shot_(
         {
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcy(unsigned_qubits);
             break;
@@ -248,7 +293,7 @@ std::string execute_shot_(
         {
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcz(unsigned_qubits);
             break;
@@ -257,7 +302,7 @@ std::string execute_shot_(
         {
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcsx(unsigned_qubits);
             break;
@@ -267,7 +312,7 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcphase(unsigned_qubits, params[0]);
             break;
@@ -277,7 +322,7 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcrx(unsigned_qubits, params[0]);
             break;
@@ -287,7 +332,7 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcry(unsigned_qubits, params[0]);
             break;
@@ -297,7 +342,7 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcrz(unsigned_qubits, params[0]);
             break;
@@ -307,7 +352,7 @@ std::string execute_shot_(
             auto params = inst.at("params").get<std::vector<double>>();
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcu(unsigned_qubits, params[0], params[1], params[2], params[3]);
             break;
@@ -316,7 +361,7 @@ std::string execute_shot_(
         {
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_mcswap(unsigned_qubits);
             break;
@@ -336,7 +381,7 @@ std::string execute_shot_(
             matrix<complex_t> aer_matrix(dim, dim, matrix_data.data());
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_unitary(unsigned_qubits, aer_matrix);
             break;
@@ -348,7 +393,7 @@ std::string execute_shot_(
             cunqa::sim::convert_cunqadiagonal_to_aerdiagonal(cunqa_diagonal, aer_diagonal);
             reg_t unsigned_qubits;
             for (size_t i = 0; i < qubits.size(); i++) {
-                unsigned_qubits.push_back((qubits[i] == -1) ? G.n_qubits - 1 : qubits[i] + T.zero_qubit);
+                unsigned_qubits.push_back((qubits[i] == -1) ? G.communication_pairs[comm_pair_key].q1 : qubits[i] + T.zero_qubit);
             }
             state->apply_diagonal_matrix(unsigned_qubits, aer_diagonal);
             break;
@@ -394,9 +439,9 @@ std::string execute_shot_(
                         G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
                         G.local_cc_queue.at(local_cc_ids).pop();
                     }
-                    T.blocked = false;
+                    T.blocked_by_cc = false;
                 } else {
-                    T.blocked = true;
+                    T.blocked_by_cc = true;
                 }   
             } else {
                 state->flush_ops(); // Execute operations to empty the buffer 
@@ -412,43 +457,50 @@ std::string execute_shot_(
             const auto& clbits = inst.at("clbits").get<std::vector<int>>();
             if (G.creg[clbits.at(0) + T.zero_clbit]) {
                 for(const auto& sub_inst: inst.at("instructions")) {
-                    apply_next_instr(T, sub_inst);
+                    apply_next_instr(T, sub_inst, "");
                 }
             }
             break;
         }
         case cunqa::constants::QSEND:
         {
-            // state->flush_ops();
-            //------------- Generate Entanglement ---------------
-            generate_entanglement_();
-            //----------------------------------------------------
+            std::string key = generate_entanglement_();
+            if (key == "NOIDLEPAIRS") {
+                T.blocked_by_teledata = true;
+                return;
+            }
+            T.blocked_by_teledata = false;
 
             // CX to the entangled pair
-            state->apply_mcx({qubits[0] + T.zero_qubit, G.n_qubits - 2});
+            state->apply_mcx({qubits[0] + T.zero_qubit, G.communication_pairs[key].q0});
 
             // H to the sent qubit
             state->apply_h(qubits[0] + T.zero_qubit);
 
             uint_t result = state->apply_measure({qubits[0] + T.zero_qubit});
             G.qc_meas[T.id].push(result);
-            G.qc_meas[T.id].push(state->apply_measure({G.n_qubits - 2}));
+            G.qc_meas[T.id].push(state->apply_measure({G.communication_pairs[key].q0}));
 
             if (result) {
                 state->apply_reset({qubits[0] + T.zero_qubit});
             }
 
             // Unlock QRECV
-            Ts[inst.at("qpus")[0]].blocked = false;
+            Ts[inst.at("qpus")[0]].blocked_by_teledata = false;
+
+            // Update communication pair
+            G.communication_pairs[key].sendr_qpu = T.id;
+            G.communication_pairs[key].recvr_qpu = inst.at("qpus")[0].get<std::string>();
+
             break;
         }
         case cunqa::constants::QRECV:
         {
-            // state->flush_ops();
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
-                T.blocked = true;
+                T.blocked_by_teledata = true;
                 return;
             }
+            if (T.blocked_by_teledata) return;
 
             // Receive the measurements from the sender
             std::size_t meas1 = G.qc_meas[inst.at("qpus")[0]].top();
@@ -456,33 +508,44 @@ std::string execute_shot_(
             std::size_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
 
+            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id);
+
             // Apply, conditioned to the measurement, the X and Z gates
             if (meas1) {
-                state->apply_x(G.n_qubits - 1);
+                state->apply_x(G.communication_pairs[key].q1);
             }
             if (meas2) {
-                state->apply_z(G.n_qubits - 1);
+                state->apply_z(G.communication_pairs[key].q1);
             }
 
             // Swap the value to the desired qubit
-            state->apply_mcswap({G.n_qubits - 1, qubits[0] + T.zero_qubit});
+            state->apply_mcswap({G.communication_pairs[key].q1, qubits[0] + T.zero_qubit});
+
+            G.communication_pairs[key].idle = true;
             break;
         }
         case cunqa::constants::EXPOSE:
         {
-            // state->flush_ops();
             if (!T.cat_entangled) {
-                generate_entanglement_();
+                std::string key = generate_entanglement_();
+                if (key == "NOIDLEPAIRS") {
+                    T.blocked_by_telegate = true;
+                    return;
+                }
 
                 // CX to the entangled pair
-                state->apply_mcx({qubits[0] + T.zero_qubit, G.n_qubits - 2});
+                state->apply_mcx({qubits[0] + T.zero_qubit, G.communication_pairs[key].q0});
 
-                uint_t result = state->apply_measure({G.n_qubits - 2});
+                uint_t result = state->apply_measure({G.communication_pairs[key].q0});
 
                 G.qc_meas[T.id].push(result);
                 T.cat_entangled = true;
-                T.blocked = true;
-                Ts[inst.at("qpus")[0]].blocked = false;
+                T.blocked_by_telegate = true;
+                Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+
+                // Update communication pair
+                G.communication_pairs[key].sendr_qpu = T.id;
+                G.communication_pairs[key].recvr_qpu = inst.at("qpus")[0].get<std::string>();
                 return;
             } else {
                 uint_t meas = G.qc_meas[inst.at("qpus")[0]].top();
@@ -493,35 +556,40 @@ std::string execute_shot_(
                 }
 
                 T.cat_entangled = false;
+
+                std::string key = find_my_communication_pair(G, T.id, inst.at("qpus")[0]);
+                G.communication_pairs[key].idle = true;
             }
             break;
         }
         case cunqa::constants::RCONTROL:
         {
-            // state->flush_ops();
             if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
-                T.blocked = true;
+                T.blocked_by_telegate = true;
                 return;
             }
+            if (T.blocked_by_telegate) return;
 
             uint_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
 
+            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id);
+
             if (meas2) {
-                state->apply_mcx({G.n_qubits - 1});
+                state->apply_mcx({G.communication_pairs[key].q1});
             }
 
             for(const auto& sub_inst: inst.at("instructions")) {
-                apply_next_instr(T, sub_inst);
+                apply_next_instr(T, sub_inst, key);
             }
 
-            state->apply_h(G.n_qubits - 1);
+            state->apply_h(G.communication_pairs[key].q1);
 
-            uint_t result = state->apply_measure({G.n_qubits - 1});
+            uint_t result = state->apply_measure({G.communication_pairs[key].q1});
             G.qc_meas[T.id].push(result);
 
-            Ts[inst.at("qpus")[0]].blocked = false;
-            T.blocked = false;
+            Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+            T.blocked_by_telegate = false;
             break;
         }
         default:
@@ -536,14 +604,14 @@ std::string execute_shot_(
         {
             if (T.finished)
                 continue;
-            else if(T.blocked) {
+            else if (T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc) {
                 G.ended = false;
                 continue;
             }
 
-            apply_next_instr(T, {});
+            apply_next_instr(T, {}, "");
 
-            if (!T.blocked)
+            if (!(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc))
                 ++T.it;
 
             if (T.it != T.end)
@@ -616,13 +684,24 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, co
     std::string device = qt_config.at("device")["device_name"];
     reg_t target_gpus = (device == "GPU") ? qt_config.at("device")["target_devices"].get<reg_t>() : reg_t();
 
-    unsigned long n_qubits = 0;
-    for (auto &quantum_task : qc.quantum_tasks)
-    {
-        n_qubits += quantum_task.config.at("num_qubits").get<unsigned long>();
+    size_t n_qubits = 0;
+    for (auto& quantum_task : qc.quantum_tasks) {
+        n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
     }
-    if (size(qc.quantum_tasks) > 1)
-        n_qubits += 2;
+    
+    size_t n_comm_qubits = 0;
+    if (qc.quantum_tasks.size() > 1) { // Quantum Communications 
+        if (qc.quantum_tasks[0].config.contains("n_communication_qubits")) {
+            n_comm_qubits = qc.quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
+            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
+                n_comm_qubits++;
+            }
+        } else {
+            n_comm_qubits = 2;
+        }
+
+        n_qubits += n_comm_qubits;
+    }    
     
     auto start = std::chrono::high_resolution_clock::now();
 #ifdef OPENMP_IN_QC
@@ -639,7 +718,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, co
                 state.initialize();
                 /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
                 state.set_target_gpus(target_gpus);
-                local_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc)]++;
+                local_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc, n_comm_qubits)]++;
                 state.clear();
             }
 
@@ -655,7 +734,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, co
             state.initialize();
             /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
             state.set_target_gpus(target_gpus);
-            meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc)]++;
+            meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc, n_comm_qubits)]++;
             state.clear();
         } // End all shots
     }
@@ -667,7 +746,7 @@ JSON AerSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, co
         state.initialize();
         /* WARNING. The "set_target_gpus" method is particular of CUNQA-Aer fork. Comment it if you are using another Aer version. */
         state.set_target_gpus(target_gpus);
-        meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc)]++;
+        meas_counter[execute_shot_(&state, qc.quantum_tasks, classical_channel, allows_qc, n_comm_qubits)]++;
         state.clear();
     } // End all shots
 #endif

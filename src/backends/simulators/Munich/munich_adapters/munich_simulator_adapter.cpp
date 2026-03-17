@@ -49,7 +49,9 @@ struct TaskState {
     int zero_qubit = 0;
     int zero_clbit = 0;
     bool finished = false;
-    bool blocked = false;
+    bool blocked_by_teledata = false;
+    bool blocked_by_telegate = false;
+    bool blocked_by_cc = false;
     bool cat_entangled = false;
 };
 
@@ -90,7 +92,8 @@ namespace sim {
 std::string MunichSimulatorAdapter::execute_shot_(
     const std::vector<QuantumTask> &quantum_tasks, 
     comm::ClassicalChannel *classical_channel,
-    const bool allows_qc
+    const bool allows_qc,
+    const size_t& n_comm_qubits
 )
 {
     std::unordered_map<std::string, TaskState> Ts;
@@ -104,7 +107,9 @@ std::string MunichSimulatorAdapter::execute_shot_(
         T.zero_clbit = G.n_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
-        T.blocked = false;
+        T.blocked_by_teledata = false;
+        T.blocked_by_telegate = false;
+        T.blocked_by_cc = false;
         T.finished = false;
         Ts[quantum_task.id] = T;
         
@@ -113,11 +118,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
     }
     
     // Here we add the communication qubits
-    if (quantum_tasks[0].config.contains("n_communication_qubits")) {
-        size_t n_comm_qubits = quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
-        if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
-            n_comm_qubits++;
-        }
+    if (n_comm_qubits != 0) {
         G.n_qubits += n_comm_qubits;
         for (int i = 0; i < n_comm_qubits; i+=2) {
             CommunicationQubitsPair cqp = {
@@ -126,13 +127,6 @@ std::string MunichSimulatorAdapter::execute_shot_(
             };
             G.communication_pairs[std::to_string(i)] = cqp;
         }
-    } else {
-        G.n_qubits += 2;
-        CommunicationQubitsPair cqp = {
-            .q0 = G.n_qubits - 2,
-            .q1 = G.n_qubits - 1,
-        };
-        G.communication_pairs["0"] = cqp;
     }
 
     auto generate_entanglement_ = [&]() {
@@ -154,19 +148,15 @@ std::string MunichSimulatorAdapter::execute_shot_(
             Control control(G.communication_pairs[key].q0);
             auto std_op2 = std::make_unique<StandardOperation>(control, G.communication_pairs[key].q1, OpType::X);
             applyOperationToStateAdapter(std::move(std_op2));
-
-            return key;
-        
-        } else {
-            return (std::string)"NOIDLEPAIRS";
         }
+
+        return key;
     };
 
     std::function<void(TaskState&, const JSON&, const std::string&)> apply_next_instr = 
         [&](TaskState& T, const JSON& instruction = {}, const std::string comm_pair_key = "") 
     {
         const JSON& inst = instruction.empty() ? *T.it : instruction;
-        std::string inst_name = inst.at("name").get<std::string>();
 
         std::vector<int> qubits;
         if (inst.contains("qubits"))
@@ -351,9 +341,9 @@ std::string MunichSimulatorAdapter::execute_shot_(
                         G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
                         G.local_cc_queue.at(local_cc_ids).pop();
                     }
-                    T.blocked = false;
+                    T.blocked_by_cc = false;
                 } else {
-                    T.blocked = true;
+                    T.blocked_by_cc = true;
                 }
                 
             } else {
@@ -378,9 +368,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
         {
             std::string key = generate_entanglement_();
             if (key == "NOIDLEPAIRS") {
-                T.blocked = true;
+                T.blocked_by_teledata = true;
                 return;
             }
+            T.blocked_by_teledata = false;
             
             // CX to the entangled pair
             Control control(qubits[0] + T.zero_qubit);
@@ -404,18 +395,21 @@ std::string MunichSimulatorAdapter::execute_shot_(
             }
 
             // Unlock QRECV
-            Ts[inst.at("qpus")[0]].blocked = false;
+            Ts[inst.at("qpus")[0]].blocked_by_teledata = false;
+
             // Update communication pair
             G.communication_pairs[key].sendr_qpu = T.id;
             G.communication_pairs[key].recvr_qpu = inst.at("qpus")[0].get<std::string>();
+
             break;
         }
         case constants::QRECV:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0])) {
-                T.blocked = true;
+                T.blocked_by_teledata = true;
                 return;
             }
+            if (T.blocked_by_teledata) return;
 
             // Receive the measurements from the sender
             int meas1 = G.qc_meas[inst.at("qpus")[0]].top();
@@ -448,7 +442,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             if (!T.cat_entangled) {
                 std::string key = generate_entanglement_();
                 if (key == "NOIDLEPAIRS") {
-                    T.blocked = true;
+                    T.blocked_by_telegate = true;
                     return;
                 }
 
@@ -461,8 +455,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
 
                 G.qc_meas[T.id].push(result);
                 T.cat_entangled = true;
-                T.blocked = true;
-                Ts[inst.at("qpus")[0]].blocked = false;
+                T.blocked_by_telegate = true;
+                Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+
+                // Update communication pair
                 G.communication_pairs[key].sendr_qpu = T.id;
                 G.communication_pairs[key].recvr_qpu = inst.at("qpus")[0].get<std::string>();
                 return;
@@ -485,9 +481,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::RCONTROL:
         {
             if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
-                T.blocked = true;
+                T.blocked_by_telegate = true;
                 return;
             }
+            if (T.blocked_by_telegate) return;
 
             int meas2 = G.qc_meas[inst.at("qpus")[0]].top();
             G.qc_meas[inst.at("qpus")[0]].pop();
@@ -510,8 +507,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
             G.qc_meas[T.id].push(result);
 
 
-            Ts[inst.at("qpus")[0]].blocked = false;
-            T.blocked = false;
+            Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+            T.blocked_by_telegate = false;
             break;
         }
         default:
@@ -526,14 +523,14 @@ std::string MunichSimulatorAdapter::execute_shot_(
         {
             if (T.finished)
                 continue;
-            else if(T.blocked) {
+            else if (T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc) {
                 G.ended = false;
                 continue;
             }
 
             apply_next_instr(T, {}, "");
 
-            if (!T.blocked)
+            if (!(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc))
                 ++T.it;
 
             if (T.it != T.end)
@@ -619,7 +616,6 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     // TODO: Avoid the static casting?
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
     std::map<std::string, std::size_t> meas_counter;
-    LOGGER_DEBUG("n_qubits: {}", std::to_string(p_qca->n_qubits));
 
     auto shots = p_qca->quantum_tasks[0].config.at("shots").get<std::size_t>();
 
@@ -627,7 +623,7 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     for (std::size_t i = 0; i < shots; i++)
     {   
         initializeSimulationAdapter(p_qca->n_qubits);
-        meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel, allows_qc)]++;
+        meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();

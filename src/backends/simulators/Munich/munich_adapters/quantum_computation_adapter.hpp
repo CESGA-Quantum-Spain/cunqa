@@ -30,10 +30,12 @@ public:
         quantum_tasks{quantum_tasks}
     { 
         n_qubits = get_num_qubits_(quantum_tasks);
+        n_comm_qubits = get_num_comm_qubits_(quantum_tasks);
     }
 
     std::vector<QuantumTask> quantum_tasks;
     size_t n_qubits;
+    size_t n_comm_qubits = 0;
 
 private:
 
@@ -64,6 +66,19 @@ private:
             num_clbits += quantum_task.config.at("num_clbits").get<std::size_t>();
         }
         return num_clbits;
+    }
+
+    std::size_t get_num_comm_qubits_(const std::vector<QuantumTask>& quantum_tasks) 
+    {
+        if (quantum_tasks[0].config.contains("n_communication_qubits")) {
+            size_t n_comm_qubits = quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
+            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
+                n_comm_qubits++;
+            }
+            return n_comm_qubits;
+        } else {
+            return 2;
+        }
     }
 
 };
