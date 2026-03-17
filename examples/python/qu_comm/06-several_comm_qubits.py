@@ -9,7 +9,7 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
+    family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
 except Exception as error:
     raise error
 

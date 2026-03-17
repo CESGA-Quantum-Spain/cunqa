@@ -41,6 +41,7 @@ struct CommunicationQubitsPair {
     bool idle = true;
     std::string sendr_qpu; // QSEND and EXPOSE
     std::string recvr_qpu; // QRECV and RCONTROL
+    std::string qcomm_protocol;
 };
 
 struct TaskState {
@@ -58,7 +59,8 @@ struct TaskState {
 struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg;
-    std::unordered_map<std::string, std::stack<int>> qc_meas;
+    std::unordered_map<std::string, std::stack<int>> qc_meas_td;
+    std::unordered_map<std::string, std::stack<int>> qc_meas_tg;
     std::unordered_map<std::string, CommunicationQubitsPair> communication_pairs;
     std::unordered_map<LocalCCIDs, std::queue<int>, LocalIDsHash> local_cc_queue; // To mimic classical communications when executing with quantum communications
     bool ended = false;
@@ -75,10 +77,10 @@ std::string find_idle_communication_pair(GlobalState& G)
     return "NOIDLEPAIRS";
 }
 
-std::string find_my_communication_pair(const GlobalState& G, const std::string& sendr, const std::string recvr)
+std::string find_my_communication_pair(const GlobalState& G, const std::string& sendr, const std::string recvr, const std::string qcomm_protocol)
 {
     for (auto& [key, comm_pair] : G.communication_pairs) {
-        if (comm_pair.sendr_qpu == sendr && comm_pair.recvr_qpu == recvr) return key;
+        if (comm_pair.sendr_qpu == sendr && comm_pair.recvr_qpu == recvr && comm_pair.qcomm_protocol == qcomm_protocol) return key;
     }
 }
 
@@ -400,6 +402,7 @@ std::string execute_shot_(
                 return;
             }
             T.blocked_by_teledata = false;
+            G.communication_pairs[key].qcomm_protocol = "teledata";
 
             // CX to the entangled pair
             ApplyCX(simulator, qubits[0] + T.zero_qubit, G.communication_pairs[key].q0);
@@ -409,11 +412,11 @@ std::string execute_shot_(
 
             const unsigned long int q1[]{ qubits[0] + T.zero_qubit };
             int measurement_as_int = static_cast<int>(Measure(simulator, q1, 1));
-            G.qc_meas[T.id].push(measurement_as_int);
+            G.qc_meas_td[T.id].push(measurement_as_int);
 
             const unsigned long int q2[]{ G.communication_pairs[key].q0 };
             int aux_meas = static_cast<int>(Measure(simulator, q2, 1));
-            G.qc_meas[T.id].push(aux_meas);
+            G.qc_meas_td[T.id].push(aux_meas);
 
             if (measurement_as_int) {
                 const unsigned long int q3[]{ qubits[0] + T.zero_qubit };
@@ -431,19 +434,19 @@ std::string execute_shot_(
         }
         case cunqa::constants::QRECV:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas_td.contains(inst.at("qpus")[0])) {
                 T.blocked_by_teledata = true;
                 return;
             }
             if (T.blocked_by_teledata) return;
 
             // Receive the measurements from the sender
-            std::size_t meas1 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
-            std::size_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
+            std::size_t meas1 = G.qc_meas_td[inst.at("qpus")[0]].top();
+            G.qc_meas_td[inst.at("qpus")[0]].pop();
+            std::size_t meas2 = G.qc_meas_td[inst.at("qpus")[0]].top();
+            G.qc_meas_td[inst.at("qpus")[0]].pop();
 
-            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id);
+            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id, "teledata");
 
             // Apply, conditioned to the measurement, the X and Z gates
             if (meas1) {
@@ -467,6 +470,7 @@ std::string execute_shot_(
                     T.blocked_by_telegate = true;
                     return;
                 }
+                G.communication_pairs[key].qcomm_protocol = "telegate";
 
                 // CX to the entangled pair
                 ApplyCX(simulator, qubits[0] + T.zero_qubit, G.communication_pairs[key].q0);
@@ -474,7 +478,7 @@ std::string execute_shot_(
                 const unsigned long int q[]{ G.communication_pairs[key].q0 };
                 int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
 
-                G.qc_meas[T.id].push(measurement_as_int);
+                G.qc_meas_tg[T.id].push(measurement_as_int);
                 T.cat_entangled = true;
                 T.blocked_by_telegate = true;
                 Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
@@ -484,8 +488,8 @@ std::string execute_shot_(
                 G.communication_pairs[key].recvr_qpu = inst.at("qpus")[0].get<std::string>();
                 return;
             } else {
-                int meas = G.qc_meas[inst.at("qpus")[0]].top();
-                G.qc_meas[inst.at("qpus")[0]].pop();
+                int meas = G.qc_meas_tg[inst.at("qpus")[0]].top();
+                G.qc_meas_tg[inst.at("qpus")[0]].pop();
 
                 if (meas) {
                     ApplyZ(simulator, qubits[0] + T.zero_qubit);
@@ -493,23 +497,23 @@ std::string execute_shot_(
 
                 T.cat_entangled = false;
 
-                std::string key = find_my_communication_pair(G, T.id, inst.at("qpus")[0]);
+                std::string key = find_my_communication_pair(G, T.id, inst.at("qpus")[0], "telegate");
                 G.communication_pairs[key].idle = true;
             }
             break;
         }
         case cunqa::constants::RCONTROL:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
+            if (!G.qc_meas_tg.contains(inst.at("qpus")[0]) || G.qc_meas_tg[inst.at("qpus")[0]].empty()) {
                 T.blocked_by_telegate = true;
                 return;
             }
             if (T.blocked_by_telegate) return;
 
-            int meas2 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
+            int meas2 = G.qc_meas_tg[inst.at("qpus")[0]].top();
+            G.qc_meas_tg[inst.at("qpus")[0]].pop();
 
-            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id);
+            std::string key = find_my_communication_pair(G, inst.at("qpus")[0], T.id, "telegate");
 
             if (meas2) {
                 ApplyX(simulator, G.communication_pairs[key].q1);
@@ -523,7 +527,7 @@ std::string execute_shot_(
 
             const unsigned long int q[]{ G.communication_pairs[key].q1 };
             int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
-            G.qc_meas[T.id].push(measurement_as_int);
+            G.qc_meas_tg[T.id].push(measurement_as_int);
 
             Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
             T.blocked_by_telegate = false;
