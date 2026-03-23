@@ -95,8 +95,8 @@ struct CommunicationQubitsPair {
 struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg;
-    std::unordered_map<std::string, std::stack<UINT>> qc_meas_td;
-    std::unordered_map<std::string, std::stack<UINT>> qc_meas_tg;
+    std::unordered_map<std::string, std::queue<UINT>> qc_meas_td;
+    std::unordered_map<std::string, std::queue<UINT>> qc_meas_tg;
     std::vector<CommunicationQubitsPair> communication_pairs;
     std::unordered_map<LocalCCIDs, std::queue<UINT>, LocalIDsHash> local_cc_queue; // To mimic classical communications when executing with quantum communications
     bool ended = false;
@@ -108,11 +108,17 @@ std::vector<int> find_idle_communication_pairs(GlobalState& G, const size_t n_pa
     size_t count = 0;
     for (int index = 0; index < G.communication_pairs.size() && count < n_pairs; index++) {
         if (G.communication_pairs[index].idle) {
-            G.communication_pairs[index].idle = false;
             indices_idle_pairs.push_back(index);
             count++;
         } 
     } 
+
+    if (count < n_pairs) 
+        return std::vector<int>();
+
+    for (const auto& index : indices_idle_pairs) {
+        G.communication_pairs[index].idle = false;
+    }
 
     return indices_idle_pairs;
 }
@@ -651,16 +657,15 @@ std::string execute_shot_(
         }
         case cunqa::constants::QRECV:
         {
-            if (!G.qc_meas_td.contains(inst.at("qpus")[0])) {
+            if (!G.qc_meas_td.contains(inst.at("qpus")[0]) || G.qc_meas_td[inst.at("qpus")[0]].empty()) {
                 T.blocked_by_teledata = true;
                 return;
             }
-            if (T.blocked_by_teledata) return;
 
             // Receive the measurements from the sender
-            std::size_t meas1 = G.qc_meas_td[inst.at("qpus")[0]].top();
+            std::size_t meas1 = G.qc_meas_td[inst.at("qpus")[0]].front();
             G.qc_meas_td[inst.at("qpus")[0]].pop();
-            std::size_t meas2 = G.qc_meas_td[inst.at("qpus")[0]].top();
+            std::size_t meas2 = G.qc_meas_td[inst.at("qpus")[0]].front();
             G.qc_meas_td[inst.at("qpus")[0]].pop();
 
             std::vector<int> indices = find_my_communication_pairs(G, inst.at("qpus")[0], T.id, "teledata", 1);
@@ -713,7 +718,7 @@ std::string execute_shot_(
                 return;
             } else {
                 for (int i = 0; i < qubits.size(); i++) {
-                    UINT meas = G.qc_meas_tg[inst.at("qpus")[0]].top();
+                    UINT meas = G.qc_meas_tg[inst.at("qpus")[0]].front();
                     G.qc_meas_tg[inst.at("qpus")[0]].pop();
 
                     if (meas) {
@@ -741,7 +746,7 @@ std::string execute_shot_(
             std::vector<int> indices = find_my_communication_pairs(G, inst.at("qpus")[0], T.id, "telegate");
 
             for (auto& index : indices) {
-                UINT meas2 = G.qc_meas_tg[inst.at("qpus")[0]].top();
+                UINT meas2 = G.qc_meas_tg[inst.at("qpus")[0]].front();
                 G.qc_meas_tg[inst.at("qpus")[0]].pop();
 
                 if (meas2) {

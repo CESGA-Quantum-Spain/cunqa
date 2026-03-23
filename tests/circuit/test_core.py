@@ -408,19 +408,56 @@ def test_twoqubit_param_gates(method, args, expected):
 
     assert circuit.instructions[-1] == expected
 
+MULTICONTROL_GATES = [
+    ("mcx",   (0, 1, 2),                   {"name": "mcx",   "qubits": [0, 1, 2]}),
+    ("mcy",   (0, 1, 2),                   {"name": "mcy",   "qubits": [0, 1, 2]}),
+    ("mcz",   (0, 1, 2),                   {"name": "mcz",   "qubits": [0, 1, 2]}),
+    ("mcsx",  (0, 1, 2),                   {"name": "mcsx",  "qubits": [0, 1, 2]}),
+    ("mcp",   (1.0, 0, 1, 2),              {"name": "mcp",   "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcrx",  (1.0, 0, 1, 2),              {"name": "mcrx",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcry",  (1.0, 0, 1, 2),              {"name": "mcry",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcrz",  (1.0, 0, 1, 2),              {"name": "mcrz",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcu1",  (1.0, 0, 1, 2),              {"name": "mcu1",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcu2",  (1.0, 2.0, 0, 1, 2),         {"name": "mcu2",  "qubits": [0, 1, 2], "params": [1.0, 2.0]}),
+    ("mcu3",  (1.0, 2.0, 3.0, 0, 1, 2),    {"name": "mcu3",  "qubits": [0, 1, 2], "params": [1.0, 2.0, 3.0]}),
+    ("mcu",   (1.0, 2.0, 3.0, 4.0, 0, 1, 2), {"name": "mcu", "qubits": [0, 1, 2], "params": [1.0, 2.0, 3.0, 4.0]}),
+]
+
+@pytest.mark.parametrize("method, args, expected", MULTICONTROL_GATES)
+def test_multicontrol_gates(method, args, expected):
+    circuit = CunqaCircuit(3)
+    getattr(circuit, method)(*args)
+
+    assert circuit.instructions[-1] == expected
+
 SPECIAL_GATES = [
+    ("unitary", ([[1.0 + 0.0j, 0.0 + 0.0j], [0.0 + 0.0j, 1.0 + 0.0j]], 0),
+        {
+            "name": "unitary",
+            "qubits": [0],
+            "matrix": [[
+                [[1.0, 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [1.0, 0.0]],
+            ]],
+        },
+    ),
     ("randomunitary",              (0,1,),                   {"name": "randomunitary",             "qubits": [0,1]}),
-    ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[1.0,1.0],[0.0,-1.0]]}),
+    ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[[1.0,1.0],[0.0,-1.0]]]}),
     ("multipauli",                 ([1,2,3],0,),             {"name": "multipauli",                "qubits": [0],  "pauli_id_list":[1,2,3]}),
     ("multipaulirotation",         (1.0,[1,2,3],0,),         {"name": "multipaulirotation",        "qubits": [0],  "params":[1.0], "pauli_id_list":[1,2,3]}),
     ("amplitudedampingnoise",      (1.0,0,1,),               {"name": "amplitudedampingnoise",     "qubits": [0,1],"params":[1.0]}),
     ("bitflipnoise",               (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
-    ("dephasingnoise",             (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
-    ("depolarizingnoise",          (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
-    ("independentxznoise",         (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
+    ("dephasingnoise",             (1.0,0,),                 {"name": "dephasingnoise",            "qubits": [0],  "params":[1.0]}),
+    ("depolarizingnoise",          (1.0,0,),                 {"name": "depolarizingnoise",         "qubits": [0],  "params":[1.0]}),
+    ("independentxznoise",         (1.0,0,),                 {"name": "independentxznoise",        "qubits": [0],  "params":[1.0]}),
     ("twoqubitdepolarizingnoise",  (1.0,0,1,),               {"name": "twoqubitdepolarizingnoise", "qubits": [0,1],"params":[1.0]}),
-
 ]
+@pytest.mark.parametrize("method, args, expected", SPECIAL_GATES)
+def test_twoqubit_param_gates(method, args, expected):
+    circuit = CunqaCircuit(2)
+    getattr(circuit, method)(*args)
+
+    assert circuit.instructions[-1] == expected
 
 def test_unitary_accepts_numpy(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "UNIT")
@@ -565,7 +602,7 @@ def test_quantum_control_context_adds_rcontrol_to_target():
     control = CunqaCircuit(1, id="CTRL")
     target = CunqaCircuit(1, id="TGT")
 
-    with control.expose(0, target) as (rqubit, subcircuit):
+    with control.expose(0, target) as ([rqubit], subcircuit):
         assert rqubit == -1
         subcircuit.x(0)
 
