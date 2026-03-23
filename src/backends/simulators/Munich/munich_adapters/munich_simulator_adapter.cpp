@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+#include <optional>
 
 #include "StochasticNoiseSimulator.hpp"
 
@@ -17,6 +18,7 @@
 using namespace qc;
 
 namespace {
+using namespace cunqa;
 
 struct LocalCCIDs {
     std::string sendr;
@@ -45,10 +47,9 @@ struct CommunicationQubitsPair {
     int label;
 };
 
-
 struct TaskState {
     std::string id;
-    cunqa::JSON::const_iterator it, end;
+    std::vector<constants::CUNQAInstruction>::const_iterator it, end;
     int zero_qubit = 0;
     int zero_clbit = 0;
     bool finished = false;
@@ -113,10 +114,11 @@ std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::st
 
 namespace cunqa {
 namespace sim {
+using namespace constants;
 
 
 std::string MunichSimulatorAdapter::execute_shot_(
-    const std::vector<QuantumTask> &quantum_tasks, 
+    const std::vector<StructuredQuantumTask>& st_qtasks, 
     comm::ClassicalChannel *classical_channel,
     const bool allows_qc,
     const size_t& n_comm_qubits
@@ -124,23 +126,22 @@ std::string MunichSimulatorAdapter::execute_shot_(
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
-
-    for (auto &quantum_task : quantum_tasks)
-    {
+    
+    for (auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
         T.zero_clbit = G.n_clbits;
-        T.it = quantum_task.circuit.begin();
-        T.end = quantum_task.circuit.end();
+        T.it = quantum_task.instructions.begin();
+        T.end = quantum_task.instructions.end();
         T.blocked_by_teledata = false;
         T.blocked_by_telegate = false;
         T.blocked_by_cc = false;
         T.finished = false;
         Ts[quantum_task.id] = T;
         
-        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
+        G.n_qubits += quantum_task.n_qubits;
+        G.n_clbits += quantum_task.n_clbits;
     }
     
     // Here we add the communication qubits
@@ -181,35 +182,27 @@ std::string MunichSimulatorAdapter::execute_shot_(
         return indices;
     };
 
-    std::function<void(TaskState&, const JSON&, const std::vector<int>)> apply_next_instr = 
-        [&](TaskState& T, const JSON& instruction = {}, const std::vector<int> comm_indices = {}) 
+    std::function<void(TaskState&, const std::optional<constants::CUNQAInstruction>&, const std::vector<int>)> apply_next_instr = 
+        [&](TaskState& T, const std::optional<constants::CUNQAInstruction>& instruction = std::nullopt, const std::vector<int> comm_indices = {}) 
     {
-        const JSON& inst = instruction.empty() ? *T.it : instruction;
-
-        std::vector<int> qubits;
-        if (inst.contains("qubits"))
-            qubits = inst.at("qubits").get<std::vector<int>>();
-        auto inst_type = constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        const CUNQAInstruction inst = !instruction.has_value() ? *T.it : instruction.value();
+        auto inst_type = INSTRUCTIONS_MAP.at(inst.name);
         
         switch (inst_type) {
         case constants::MEASURE:
         {
-            char char_measurement = measureAdapter(qubits[0] + T.zero_qubit);
-            auto clbits = inst.at("clbits").get<std::vector<int>>();
-            G.creg[clbits[0] + T.zero_clbit] = (char_measurement == '1');
+            char char_measurement = measureAdapter(inst.qubits[0] + T.zero_qubit);
+            G.creg[inst.clbits[0] + T.zero_clbit] = (char_measurement == '1');
             break;
         }
         case constants::COPY:
         {
-            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
-            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
-
-            if(l_clbits.size() != r_clbits.size())
+            if(inst.l_clbits.size() != inst.r_clbits.size())
                 throw std::runtime_error("The number of copied clbits and the number of clbits "
                                          "copied on does not match.");
 
-            for (size_t i = 0; i < l_clbits.size(); ++i)
-                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+            for (size_t i = 0; i < inst.l_clbits.size(); ++i)
+                G.creg[inst.l_clbits[i] + T.zero_clbit] = G.creg[inst.r_clbits[i] + T.zero_clbit];
                 
             break;
         }
@@ -227,7 +220,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::V:
         case constants::VDG:
         {
-            auto simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            auto simple_gate = std::make_unique<StandardOperation>(inst.qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(simple_gate));
             break;
         }
@@ -241,8 +234,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::U3:
         case constants::U:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
-            auto simple_gate = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
+            auto simple_gate = std::make_unique<StandardOperation>(inst.qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), inst.params);
             applyOperationToStateAdapter(std::move(simple_gate));
             break;
         }
@@ -251,7 +243,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::ISWAP:
         case constants::DCX:
         {
-            Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
+            Targets targets = {static_cast<unsigned int>(inst.qubits[0] + T.zero_qubit), static_cast<unsigned int>(inst.qubits[1] + T.zero_qubit)};
             auto two_gate = std::make_unique<StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(two_gate));
             break;
@@ -266,18 +258,18 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::CSWAP:
         {
             int ctrl;
-            if (qubits[0] < 0) {
+            if (inst.qubits[0] < 0) {
                 for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == qubits[0]) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
                         ctrl = G.communication_pairs[index].q1;
                         break;
                     }
                 }
             } else {
-                ctrl = qubits[0] + T.zero_qubit;
+                ctrl = inst.qubits[0] + T.zero_qubit;
             } 
             Control control(ctrl);
-            auto two_gate = std::make_unique<StandardOperation>(control, qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            auto two_gate = std::make_unique<StandardOperation>(control, inst.qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
@@ -288,9 +280,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::XXMYY:
         case constants::XXPYY:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
-            Targets targets = {static_cast<unsigned int>(qubits[0] + T.zero_qubit), static_cast<unsigned int>(qubits[1] + T.zero_qubit)};
-            auto two_gate = std::make_unique<StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
+            Targets targets = {static_cast<unsigned int>(inst.qubits[0] + T.zero_qubit), static_cast<unsigned int>(inst.qubits[1] + T.zero_qubit)};
+            auto two_gate = std::make_unique<StandardOperation>(targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type), inst.params);
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
@@ -303,59 +294,59 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::CU3:
         case constants::CU:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
             int ctrl;
-            if (qubits[0] < 0) {
+            if (inst.qubits[0] < 0) {
                 for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == qubits[0]) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
                         ctrl = G.communication_pairs[index].q1;
                         break;
                     }
                 }
             } else {
-                ctrl = qubits[0] + T.zero_qubit;
+                ctrl = inst.qubits[0] + T.zero_qubit;
             }
             Control control(ctrl);
-            auto two_gate = std::make_unique<StandardOperation>(control, qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
+            auto two_gate = std::make_unique<StandardOperation>(control, inst.qubits[1] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), inst.params);
             applyOperationToStateAdapter(std::move(two_gate));
             break;
         }
         case constants::MCX:
         {
-            for (size_t i = 0; i < qubits.size(); i++) {
-                if (qubits[i] < 0) {
+            std::vector<int> tmp_qubits;
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
-                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == qubits[i]) {
-                            qubits[i] = G.communication_pairs[index].q1;
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    qubits[i] = qubits[i] + T.zero_qubit;
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
-            Controls controls(qubits.begin(), qubits.end() - 1);
-            auto mc_gate = std::make_unique<StandardOperation>(controls, qubits[qubits.size() - 1], MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            Controls controls(tmp_qubits.begin(), tmp_qubits.end() - 1);
+            auto mc_gate = std::make_unique<StandardOperation>(controls, tmp_qubits[tmp_qubits.size() - 1], MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(mc_gate));
             break;
         }
         case constants::MCP:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
-            for (size_t i = 0; i < qubits.size(); i++) {
-                if (qubits[i] < 0) {
+            std::vector<int> tmp_qubits;
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
-                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == qubits[i]) {
-                            qubits[i] = G.communication_pairs[index].q1;
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    qubits[i] = qubits[i] + T.zero_qubit;
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
-            Controls controls(qubits.begin(), qubits.end() - 1);
-            auto mc_gate = std::make_unique<StandardOperation>(controls, qubits[qubits.size() - 1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params);
+            Controls controls(tmp_qubits.begin(), tmp_qubits.end() - 1);
+            auto mc_gate = std::make_unique<StandardOperation>(controls, tmp_qubits[tmp_qubits.size() - 1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), inst.params);
             applyOperationToStateAdapter(std::move(mc_gate));
             break;
         }
@@ -368,42 +359,36 @@ std::string MunichSimulatorAdapter::execute_shot_(
         }
         case constants::BARRIER:
         {
-            auto barrier = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            auto barrier = std::make_unique<StandardOperation>(inst.qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
             applyOperationToStateAdapter(std::move(barrier));
             break;
         }
         case constants::SEND:
         {
-            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbits = inst.at("clbits").get<std::vector<int>>();   
-
             if (allows_qc) {
                 LocalCCIDs local_cc_ids = {
                     .sendr = T.id, 
-                    .recvr = Ts[qpu_id].id
+                    .recvr = Ts[inst.qpus[0]].id
                 }; 
-                for (auto& clbit : clbits) {
+                for (auto& clbit : inst.clbits) {
                     G.local_cc_queue[local_cc_ids].push(G.creg[clbit + T.zero_clbit]);
                 }
             } else {
-                for (const auto& clbit: clbits) {
-                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
+                for (const auto& clbit: inst.clbits) {
+                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], inst.qpus[0]);
                 }
             }
             break;
         }
         case constants::RECV:
         {
-            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbits = inst.at("clbits").get<std::vector<int>>();
-
             if (allows_qc) {
                 LocalCCIDs local_cc_ids = {
-                    .sendr = Ts[qpu_id].id, 
+                    .sendr = Ts[inst.qpus[0]].id, 
                     .recvr = T.id
                 };
                 if (G.local_cc_queue.contains(local_cc_ids) && !G.local_cc_queue.at(local_cc_ids).empty()) {
-                    for (const auto& clbit: clbits) {
+                    for (const auto& clbit: inst.clbits) {
                         G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
                         G.local_cc_queue.at(local_cc_ids).pop();
                     }
@@ -413,18 +398,17 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 }
                 
             } else {
-                for (const auto& clbit: clbits) {
-                    int measurement = classical_channel->recv_measure(qpu_id);
+                for (const auto& clbit: inst.clbits) {
+                    int measurement = classical_channel->recv_measure(inst.qpus[0]);
                     G.creg[clbit + T.zero_clbit] = (measurement == 1);
                 }
             }
             break;
         }
-        case cunqa::constants::CIF:
+        case constants::CIF:
         {
-            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
-            if (G.creg[clbits.at(0) + T.zero_clbit]) {
-                for(const auto& sub_inst: inst.at("instructions")) {
+            if (G.creg[inst.clbits[0] + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }
             }
@@ -442,15 +426,15 @@ std::string MunichSimulatorAdapter::execute_shot_(
             G.communication_pairs[index].qcomm_protocol = "teledata";
             
             // CX to the entangled pair
-            Control control(qubits[0] + T.zero_qubit);
+            Control control(inst.qubits[0] + T.zero_qubit);
             auto x = std::make_unique<StandardOperation>(control, G.communication_pairs[index].q0, OpType::X);
             applyOperationToStateAdapter(std::move(x));
 
             // H to the sent qubit
-            auto h = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, OpType::H);
+            auto h = std::make_unique<StandardOperation>(inst.qubits[0] + T.zero_qubit, OpType::H);
             applyOperationToStateAdapter(std::move(h));
 
-            int result = measureAdapter(qubits[0] + T.zero_qubit) - '0';
+            int result = measureAdapter(inst.qubits[0] + T.zero_qubit) - '0';
 
             G.qc_meas_td[T.id].push(result);
             G.qc_meas_td[T.id].push(measureAdapter(G.communication_pairs[index].q0) - '0');
@@ -458,33 +442,33 @@ std::string MunichSimulatorAdapter::execute_shot_(
             // We reset to 0 the qubit sent and the EPR (we cannot use the reset op in DD)
             if (result)
             {
-                auto reset_teleported = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, OpType::X);
+                auto reset_teleported = std::make_unique<StandardOperation>(inst.qubits[0] + T.zero_qubit, OpType::X);
                 applyOperationToStateAdapter(std::move(reset_teleported));
             }
 
             // Unlock QRECV
-            Ts[inst.at("qpus")[0]].blocked_by_teledata = false;
+            Ts[inst.qpus[0]].blocked_by_teledata = false;
 
             // Update communication pair
             G.communication_pairs[index].sendr_qpu = T.id;
-            G.communication_pairs[index].recvr_qpu = inst.at("qpus")[0].get<std::string>();
+            G.communication_pairs[index].recvr_qpu = inst.qpus[0];
 
             break;
         }
         case constants::QRECV:
         {
-            if (!G.qc_meas_td.contains(inst.at("qpus")[0]) || G.qc_meas_td[inst.at("qpus")[0]].empty()) {
+            if (!G.qc_meas_td.contains(inst.qpus[0]) || G.qc_meas_td[inst.qpus[0]].empty()) {
                 T.blocked_by_teledata = true;
                 return;
             }
 
             // Receive the measurements from the sender
-            int meas1 = G.qc_meas_td[inst.at("qpus")[0]].front();
-            G.qc_meas_td[inst.at("qpus")[0]].pop();
-            int meas2 = G.qc_meas_td[inst.at("qpus")[0]].front();
-            G.qc_meas_td[inst.at("qpus")[0]].pop();
+            int meas1 = G.qc_meas_td[inst.qpus[0]].front();
+            G.qc_meas_td[inst.qpus[0]].pop();
+            int meas2 = G.qc_meas_td[inst.qpus[0]].front();
+            G.qc_meas_td[inst.qpus[0]].pop();
 
-            std::vector<int> indices = find_my_communication_pairs(G, inst.at("qpus")[0], T.id, "teledata", 1);
+            std::vector<int> indices = find_my_communication_pairs(G, inst.qpus[0], T.id, "teledata", 1);
             int index = indices[0];
 
             // Apply, conditioned to the measurement, the X and Z gates
@@ -498,7 +482,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             }
 
             // Swap the value to the desired qubit
-            Targets targets = {static_cast<unsigned int>(G.communication_pairs[index].q1), static_cast<unsigned int>(qubits[0] + T.zero_qubit)};
+            Targets targets = {static_cast<unsigned int>(G.communication_pairs[index].q1), static_cast<unsigned int>(inst.qubits[0] + T.zero_qubit)};
             auto swap = std::make_unique<StandardOperation>(targets, OpType::SWAP);
             applyOperationToStateAdapter(std::move(swap));
 
@@ -508,7 +492,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         case constants::EXPOSE:
         {
             if (!T.cat_entangled) {
-                std::vector<int> indices = generate_entanglement_(qubits.size());
+                std::vector<int> indices = generate_entanglement_(inst.qubits.size());
                 if (indices.empty()) {
                     T.blocked_by_telegate = true;
                     return;
@@ -521,7 +505,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 
 
                     // CX to the entangled pair
-                    Control control(qubits[qid] + T.zero_qubit);
+                    Control control(inst.qubits[qid] + T.zero_qubit);
                     auto cx = std::make_unique<StandardOperation>(control, G.communication_pairs[index].q0, OpType::X);
                     applyOperationToStateAdapter(std::move(cx));
 
@@ -530,29 +514,29 @@ std::string MunichSimulatorAdapter::execute_shot_(
                     G.qc_meas_tg[T.id].push(result);
                     T.cat_entangled = true;
                     T.blocked_by_telegate = true;
-                    Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+                    Ts[inst.qpus[0]].blocked_by_telegate = false;
 
                     // Update communication pair
                     G.communication_pairs[index].sendr_qpu = T.id;
-                    G.communication_pairs[index].recvr_qpu = inst.at("qpus")[0].get<std::string>();
+                    G.communication_pairs[index].recvr_qpu = inst.qpus[0];
 
                     qid++;
                 }
                 return;
             } else {
-                for (int i = 0; i < qubits.size(); i++) {
-                    int meas = G.qc_meas_tg[inst.at("qpus")[0]].front();
-                    G.qc_meas_tg[inst.at("qpus")[0]].pop();
+                for (int i = 0; i < inst.qubits.size(); i++) {
+                    int meas = G.qc_meas_tg[inst.qpus[0]].front();
+                    G.qc_meas_tg[inst.qpus[0]].pop();
 
                     if (meas) {
-                        auto z = std::make_unique<StandardOperation>(qubits[i] + T.zero_qubit, OpType::Z);
+                        auto z = std::make_unique<StandardOperation>(inst.qubits[i] + T.zero_qubit, OpType::Z);
                         applyOperationToStateAdapter(std::move(z));
                     }
                 }
 
                 T.cat_entangled = false;
 
-                std::vector<int> indices = find_my_communication_pairs(G, T.id, inst.at("qpus")[0], "telegate", qubits.size());
+                std::vector<int> indices = find_my_communication_pairs(G, T.id, inst.qpus[0], "telegate", inst.qubits.size());
                 for (auto& index : indices) {
                     G.communication_pairs[index].idle = true;
                 }
@@ -561,16 +545,16 @@ std::string MunichSimulatorAdapter::execute_shot_(
         }
         case constants::RCONTROL:
         {
-            if (!G.qc_meas_tg.contains(inst.at("qpus")[0]) || G.qc_meas_tg[inst.at("qpus")[0]].empty()) {
+            if (!G.qc_meas_tg.contains(inst.qpus[0]) || G.qc_meas_tg[inst.qpus[0]].empty()) {
                 T.blocked_by_telegate = true;
                 return;
             }
 
-            std::vector<int> indices = find_my_communication_pairs(G, inst.at("qpus")[0], T.id, "telegate");
+            std::vector<int> indices = find_my_communication_pairs(G, inst.qpus[0], T.id, "telegate");
             
             for (auto& index : indices) {
-                int meas2 = G.qc_meas_tg[inst.at("qpus")[0]].front();
-                G.qc_meas_tg[inst.at("qpus")[0]].pop();
+                int meas2 = G.qc_meas_tg[inst.qpus[0]].front();
+                G.qc_meas_tg[inst.qpus[0]].pop();
 
                 if (meas2) {
                     auto x = std::make_unique<StandardOperation>(G.communication_pairs[index].q1, OpType::X);
@@ -579,7 +563,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             }
 
 
-            for(const auto& sub_inst: inst.at("instructions")) {
+            for(const auto& sub_inst: inst.instructions) {
                 apply_next_instr(T, sub_inst, indices);
             }
 
@@ -592,12 +576,12 @@ std::string MunichSimulatorAdapter::execute_shot_(
             }
 
 
-            Ts[inst.at("qpus")[0]].blocked_by_telegate = false;
+            Ts[inst.qpus[0]].blocked_by_telegate = false;
             T.blocked_by_telegate = false;
             break;
         }
         default:
-            std::cerr << "Instruction not suported!" << "\n";
+            std::cerr << "Instruction not suported!\nInstruction that failed: " << inst.name << "\n";
         } // End switch
     };
 
@@ -613,7 +597,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 continue;
             }
 
-            apply_next_instr(T, {}, {});
+            apply_next_instr(T, std::nullopt, {});
 
             if (!(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc))
                 ++T.it;
@@ -689,7 +673,7 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
     catch (const std::exception &e)
     {
         // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Munich simulator: {}", quantum_task.circuit.dump());
+        LOGGER_ERROR("Error executing the circuit in the Munich simulator.");
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }
     return {}; // To avoid no-return warning
@@ -704,11 +688,16 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
 
     auto shots = p_qca->quantum_tasks[0].config.at("shots").get<std::size_t>();
 
+    std::vector<StructuredQuantumTask> st_qtasks;
+    for (auto& quantum_task : p_qca->quantum_tasks) {
+        st_qtasks.push_back(from_quantum_task_to_structuredqtask(quantum_task));
+    }
+
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {   
         initializeSimulationAdapter(p_qca->n_qubits);
-        meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
+        meas_counter[execute_shot_(st_qtasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();

@@ -1168,7 +1168,7 @@ class CunqaCircuit:
             "qubits":[*qubits]
         })
 
-    def fusedswap(self, *qubits: int) -> None:
+    def fusedswap(self, block_size: int, *qubits: int) -> None:
         """
         Class method to apply fusedswap gate to the given qubits.
 
@@ -1177,7 +1177,8 @@ class CunqaCircuit:
         """
         self.add_instructions({
             "name":"fusedswap",
-            "qubits":[*qubits]
+            "qubits":[*qubits],
+            "block_size":[block_size]
         })
 
     def ecr(self, *qubits: int) -> None:

@@ -14,12 +14,6 @@ using namespace AER;
 
 namespace {
 
-using CunqaAerComplex = std::vector<double>;
-using CunqaAerDiagonalMatrix = std::vector<CunqaAerComplex>;
-using CunqaAerRow = std::vector<CunqaAerComplex>;
-using CunqaAerMatrix = std::vector<CunqaAerRow>;
-using AerComplexVector = std::vector<complex_t>;
-
 const std::vector<std::string> AER_CONFIG_KEYS = {
     "shots",
     "method",
@@ -96,7 +90,7 @@ const std::vector<std::string> AER_CONFIG_KEYS = {
 namespace cunqa {
 namespace sim {
 
-QuantumTask quantum_task_to_AER(const QuantumTask& quantum_task)
+JSON quantum_task_to_AER(QuantumTask& quantum_task)
 {
     JSON new_config;
     // Generic Aer configuration options
@@ -134,14 +128,15 @@ QuantumTask quantum_task_to_AER(const QuantumTask& quantum_task)
     }
 
     //JSON Object because if not it generates an array
+    for (auto& instruction : quantum_task.circuit) {
+        instruction = JSON::parse(std::regex_replace(instruction.dump(), std::regex("clbits"), "memory"));
+    }
     JSON new_circuit = {
         {"config", new_config},
-        {"instructions", JSON::parse(std::regex_replace(
-                        std::regex_replace(quantum_task.circuit.dump(), std::regex("clbits"), "memory"),
-                        std::regex("matrix"), "params"))}
+        {"instructions", quantum_task.circuit}
     };
 
-    return QuantumTask(new_circuit, new_config);
+    return new_circuit;
 }
 
 
@@ -189,7 +184,7 @@ void convert_standard_results_Aer(JSON& res, const int& num_clbits)
 }
 
 
-inline void convert_cunqadiagonal_to_aerdiagonal(const CunqaAerDiagonalMatrix& cunqa_diagonal, cvector_t& aer_diagonal)
+inline void convert_cunqadiagonal_to_aerdiagonal(const CUNQADiagonalMatrix& cunqa_diagonal, cvector_t& aer_diagonal)
 {
     for (auto& z : cunqa_diagonal) {
         std::complex<double> complex = z[0] + std::complex<double>(0, z[1]);
@@ -197,7 +192,7 @@ inline void convert_cunqadiagonal_to_aerdiagonal(const CunqaAerDiagonalMatrix& c
     }
 }
 
-inline void convert_cunqa_matrix_to_complex_vector(const CunqaAerMatrix& cunqa_matrix, AerComplexVector& matrix_data)
+inline void convert_cunqa_matrix_to_complex_vector(const CUNQAMatrix& cunqa_matrix, CUNQAComplexVector& matrix_data)
 {
     for (auto& row : cunqa_matrix) {
         for (auto& z : row) {
