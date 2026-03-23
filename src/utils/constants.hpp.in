@@ -148,7 +148,6 @@ enum INSTRUCTIONS {
     MCZ,
     MCSX,
 
-    MCPHASE,
     MCRX,
     MCRY,
     MCRZ,
@@ -302,7 +301,6 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"mcsx", MCSX},
 
     // MULTICONTROLED ONE QUBIT ONE PARAM
-    {"mcphase", MCPHASE},
     {"mcrx", MCRX},
     {"mcry", MCRY},
     {"mcrz", MCRZ},
@@ -352,7 +350,7 @@ const std::vector<std::string> AER_BASIS_GATES = {
     "cu3", "cu", 
     "ccx", "ccz",  "cswap", 
     "mcx", "mcy", "mcz", "mcsx",  
-    "mcp", "mcphase", "mcu1", "mcrx", "mcry", "mcrz", 
+    "mcp", "mcu1", "mcrx", "mcry", "mcrz", 
     "mcu2", "mcr",
     "mcu3",
     "mcswap", 

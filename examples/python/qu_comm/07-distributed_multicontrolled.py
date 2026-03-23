@@ -9,7 +9,7 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
+    family = qraise(2, "00:10:00", simulator="Maestro", quantum_comm=True, co_located = True)
 except Exception as error:
     raise error
 
@@ -19,29 +19,21 @@ try:
     # 2. Design circuits with distributed instructions between them
     # First circuit 
     cc_1 = CunqaCircuit(2, 2, id="First")
+    cc_2 = CunqaCircuit(1, 1, id="Second")
+
+
     cc_1.h(0)
-    cc_1.qsend(qubit = 0, recving_circuit = "Second")
-    cc_1.measure(0,0)
-    
-    # Second circuit 
-    cc_2 = CunqaCircuit(3, 3, id="Second")
-    cc_2.qrecv(qubit = 0, control_circuit = "First")
-    cc_2.cx(0, 1)
-    cc_2.measure(0,0)
-    cc_2.measure(1,1)
-
     cc_1.h(1)
+
+    with cc_1.expose([0, 1], cc_2) as ([rqubit0, rqubit1], subcircuit):
+        subcircuit.mcx(rqubit0, rqubit1, 0)
+
+    cc_1.measure(0,0)
     cc_1.measure(1,1)
-    cc_1.send(1, recving_circuit = "Second")
-
-    cc_2.recv(2, sending_circuit = "First")
-    with cc_2.cif(2) as cgates:
-        cgates.x(2)
-
-    cc_2.measure(2,2)
+    cc_2.measure(0,0)
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2], qpus, shots=1024)
+    distr_jobs = run([cc_1, cc_2], qpus, shots=1000, n_communication_qubits = 5)
 
     # Collect the results
     result_list = gather(distr_jobs)

@@ -35,7 +35,8 @@ private:
     std::string execute_shot_(
         const std::vector<QuantumTask>& quantum_tasks, 
         comm::ClassicalChannel* classical_channel,
-        const bool allows_qc
+        const bool allows_qc,
+        const size_t& n_comm_qubits
     );
     
 };

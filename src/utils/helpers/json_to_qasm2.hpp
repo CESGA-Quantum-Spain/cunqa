@@ -195,7 +195,6 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 break;
             }
             // 1 parametric 1 qubit multicontroled
-            case constants::MCPHASE:
             case constants::MCRX:
             case constants::MCRY:
             case constants::MCRZ:

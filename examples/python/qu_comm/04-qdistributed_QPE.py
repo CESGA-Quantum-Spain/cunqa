@@ -20,7 +20,7 @@ N_ANCILLA_QUBITS = 10
 N_REGISTER_QUBITS = 1
 PHASE_TO_COMPUTE = 1 / 2**3
 
-shots = 10000
+shots = 100
 SEED = 18
 
 try:
