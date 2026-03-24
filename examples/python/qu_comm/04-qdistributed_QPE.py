@@ -26,7 +26,7 @@ SEED = 18
 try:
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
-                    simulator="Aer",
+                    simulator="Maestro",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 
@@ -48,7 +48,7 @@ try:
 
     for i in range(N_ANCILLA_QUBITS):
         ### TELEGATE ###
-        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as (rqubit, subcircuit):
+        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as ([rqubit], subcircuit):
             param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE
             subcircuit.crz(param, rqubit, 0)
 

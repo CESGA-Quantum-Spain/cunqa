@@ -320,7 +320,6 @@ def test_onequbit_noparam_gates(method, args, expected):
 TWOQUBIT_NOPARAM = [
     ("swap",      (0,1,), {"name": "swap",      "qubits": [0,1]}),
     ("iswap",     (0,1,), {"name": "iswap",     "qubits": [0,1]}),
-    ("fusedswap", (0,1,), {"name": "fusedswap", "qubits": [0,1]}),
     ("ecr",       (0,1,), {"name": "ecr",       "qubits": [0,1]}),
     ("cx",        (0,1,), {"name": "cx",        "qubits": [0,1]}),
     ("cy",        (0,1,), {"name": "cy",        "qubits": [0,1]}),
@@ -443,6 +442,7 @@ SPECIAL_GATES = [
     ),
     ("randomunitary",              (0,1,),                   {"name": "randomunitary",             "qubits": [0,1]}),
     ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[[1.0,1.0],[0.0,-1.0]]]}),
+    ("fusedswap",                  (3,0,1),                  {"name": "fusedswap",                 "qubits": [0,1],"block_size":[3]}),
     ("multipauli",                 ([1,2,3],0,),             {"name": "multipauli",                "qubits": [0],  "pauli_id_list":[1,2,3]}),
     ("multipaulirotation",         (1.0,[1,2,3],0,),         {"name": "multipaulirotation",        "qubits": [0],  "params":[1.0], "pauli_id_list":[1,2,3]}),
     ("amplitudedampingnoise",      (1.0,0,1,),               {"name": "amplitudedampingnoise",     "qubits": [0,1],"params":[1.0]}),

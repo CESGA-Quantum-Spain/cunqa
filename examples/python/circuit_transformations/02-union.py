@@ -28,7 +28,7 @@ circuit1.h(0)
 
 circuit2 = CunqaCircuit(1, id="circuit2")
 
-with circuit1.expose(0, circuit2) as (rqubit, subcircuit):
+with circuit1.expose(0, circuit2) as ([rqubit], subcircuit):
     subcircuit.cx(rqubit,0)
 
 circuit1.measure_all()

@@ -9,7 +9,7 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
+    family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
 except Exception as error:
     raise error
 
@@ -25,7 +25,7 @@ try:
     cc_1.h(0)
     cc_1.h(1)
     cc_1.qsend(qubit = 0, recving_circuit = "Second")
-    with cc_1.expose(1, cc_2) as (rqubit, subcircuit):
+    with cc_1.expose(1, cc_2) as ([rqubit], subcircuit):
         subcircuit.cx(rqubit, 2)
     cc_1.measure(0,0)
     cc_1.measure(1,1)
