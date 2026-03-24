@@ -108,7 +108,7 @@ must be followed.
 
         .. code-block:: python
 
-            with circuit_1.expose(qubit=0, target_circuit="circuit_2") as rqubit, subcircuit:
+            with circuit_1.expose(qubit=0, target_circuit="circuit_2") as ([rqubit], subcircuit):
                 subcircuit.cx(rqubit, 1)
 
         This way, qubit ``0`` at ``circuit_1`` is participating in the 
@@ -235,7 +235,7 @@ Further examples and use cases are listed in :doc:`../further_examples/further_e
 
 
             # -------------------------- Telegate! -------------------------
-            with circuit_1.expose(1, "circuit_2") as (rqubit, subcircuit):
+            with circuit_1.expose(1, "circuit_2") as ([rqubit], subcircuit):
                 subcircuit.cx(rqubit, 0)
             # --------------------------------------------------------------
 

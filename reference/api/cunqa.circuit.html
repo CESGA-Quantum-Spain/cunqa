@@ -388,8 +388,7 @@ controlled operations.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em><em> | </em><em>list</em>) – qubit to be exposed.</p></li>
-<li><p class="sd-card-text"><strong>target_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object where the exposed
-qubit is used.</p></li>
+<li><p class="sd-card-text"><strong>target_circuit</strong> (<em>str</em><em> | </em><a class="reference internal" href="#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><em>CunqaCircuit</em></a>) – id of the circuit or circuit object where the exposed qubit is used.</p></li>
 <li><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>int</em>)</p></li>
 </ul>
 </dd>
@@ -402,7 +401,7 @@ the given circuit.</p>
 </dd>
 </dl>
 <p class="sd-card-text">Usage example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">origin_circ</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">origin_circ</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="p">([</span><span class="n">rqubit</span><span class="p">],</span> <span class="n">subcircuit</span><span class="p">):</span>
     <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -419,18 +418,15 @@ the given circuit.</p>
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.save_state">
 <span class="sig-name descname"><span class="pre">save_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pershot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_method_'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.save_state" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Instruction to save the state of the circuit simulation at the particular moment the
-instruction is executed.
-:param pershot: determines wether the state is stored separatedly for each shot or</p>
-<blockquote>
-<div><p class="sd-card-text">averaged. Default: False</p>
-</div></blockquote>
+instruction is executed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>pershot</strong> (<em>bool</em>) – determines wether the state is stored separatedly for each shot or
+averaged. Default: False</p></li>
 <li><p class="sd-card-text"><strong>label</strong> (<em>str</em>) – key for the state in the result dict. Used to distinguish two states saved.
 Default: ‘_method_’, which appears in the result as the name of the
 simulation method selected.</p></li>
-<li><p class="sd-card-text"><strong>pershot</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1042,11 +1038,14 @@ may be added in future versions if needed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.fusedswap">
-<span class="sig-name descname"><span class="pre">fusedswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.fusedswap" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fusedswap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_size</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.fusedswap" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply fusedswap gate to the given qubits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – qubits in which the gate is applied.</p></li>
+<li><p class="sd-card-text"><strong>block_size</strong> (<em>int</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p class="sd-card-text">None</p>

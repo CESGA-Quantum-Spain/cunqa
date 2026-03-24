@@ -149,7 +149,7 @@ This section will present a couple of examples are presented to highlight the us
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># 1. Deploy vQPUs</span>
     <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> 
-                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
+                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Maestro&quot;</span><span class="p">,</span>
                     <span class="n">quantum_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">cores</span> <span class="o">=</span> <span class="n">CORES_PER_QPU</span><span class="p">,</span> 
@@ -171,7 +171,7 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">):</span>
         <span class="c1">### TELEGATE ###</span>
-        <span class="k">with</span> <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">register_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">register_circuit</span><span class="p">)</span> <span class="k">as</span> <span class="p">([</span><span class="n">rqubit</span><span class="p">],</span> <span class="n">subcircuit</span><span class="p">):</span>
             <span class="n">param</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span>
             <span class="n">subcircuit</span><span class="o">.</span><span class="n">crz</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">rqubit</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 

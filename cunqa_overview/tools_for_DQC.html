@@ -238,7 +238,7 @@ simple circuits.</p>
 
 <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="n">circuit1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">):</span>
+<span class="k">with</span> <span class="n">circuit1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">)</span> <span class="k">as</span> <span class="p">([</span><span class="n">rqubit</span><span class="p">],</span> <span class="n">subcircuit</span><span class="p">):</span>
     <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">circuit1</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>

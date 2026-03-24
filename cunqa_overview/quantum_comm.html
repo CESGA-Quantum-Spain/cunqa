@@ -215,7 +215,7 @@ other QPU. We notice that a requirement is for the QPUs to <strong>share a Bell 
 control context provided by the <a class="reference internal" href="../reference/api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.expose" title="cunqa.circuit.core.CunqaCircuit.expose"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expose</span></code></a> method
 that returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumControlContext</span></code> for representing the
 remote qubit and a subcircuit to which the controlled instructions are applied:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">qubit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_circuit</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">qubit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_circuit</span><span class="o">=</span><span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="p">([</span><span class="n">rqubit</span><span class="p">],</span> <span class="n">subcircuit</span><span class="p">):</span>
     <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -332,7 +332,7 @@ Further examples and use cases are listed in <a class="reference internal" href=
 
 
 <span class="c1"># -------------------------- Telegate! -------------------------</span>
-<span class="k">with</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">):</span>
+<span class="k">with</span> <span class="n">circuit_1</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;circuit_2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="p">([</span><span class="n">rqubit</span><span class="p">],</span> <span class="n">subcircuit</span><span class="p">):</span>
     <span class="n">subcircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">rqubit</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="c1"># --------------------------------------------------------------</span>
 
