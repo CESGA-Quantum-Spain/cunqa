@@ -570,8 +570,7 @@ class CunqaCircuit:
         
         Args:
             qubit (int | list): qubit to be exposed.
-            target_circuit (str | CunqaCircuit): id of the circuit or circuit object where the exposed 
-                                                 qubit is used.
+            target_circuit (str | CunqaCircuit): id of the circuit or circuit object where the exposed qubit is used.
         
         Returns:
             A :py:class:`QuantumControlContext` object to manage remotly controlled operations in 
@@ -581,7 +580,7 @@ class CunqaCircuit:
 
         .. code-block:: python
 
-            with origin_circ.expose(0, target_circuit) as rqubit, subcircuit:
+            with origin_circ.expose(0, target_circuit) as ([rqubit], subcircuit):
                 subcircuit.cx(rqubit, 1)
             
         """ 
@@ -610,6 +609,7 @@ class CunqaCircuit:
         """
         Instruction to save the state of the circuit simulation at the particular moment the 
         instruction is executed.
+
         Args:
             pershot (bool): determines wether the state is stored separatedly for each shot or 
                             averaged. Default: False
