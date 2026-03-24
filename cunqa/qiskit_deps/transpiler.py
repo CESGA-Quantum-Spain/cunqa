@@ -36,7 +36,6 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
 from cunqa.circuit.ir import to_ir
 
-from qiskit_aer.library.save_instructions import SaveState
 from qiskit_aer.library import default_qubits
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
