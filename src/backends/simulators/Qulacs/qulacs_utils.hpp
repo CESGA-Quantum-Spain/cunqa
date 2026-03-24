@@ -16,8 +16,6 @@
 
 namespace cunqa {
 namespace sim {
-using namespace constants;
-
 
 inline ComplexMatrix cunqamatrix_to_qulacsdensematrix(const CUNQAMatrix& cunqa_matrix)
 {
@@ -75,154 +73,154 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const JSON& circuit_j
 
         switch (inst_type)
         {
-        case MEASURE:
+        case constants::MEASURE:
             break;
-        case X:
+        case constants::X:
             circuit.add_X_gate(qubits[0]);
             break;
-        case Y:
+        case constants::Y:
             circuit.add_Y_gate(qubits[0]);
             break;
-        case Z:
+        case constants::Z:
             circuit.add_Z_gate(qubits[0]);
             break;
-        case H:
+        case constants::H:
             circuit.add_H_gate(qubits[0]);
             break;
-        case S:
+        case constants::S:
             circuit.add_S_gate(qubits[0]);
             break;
-        case SDG:
+        case constants::SDG:
             circuit.add_Sdag_gate(qubits[0]);
             break;
-        case T:
+        case constants::T:
             circuit.add_T_gate(qubits[0]);
             break;
-        case TDG:
+        case constants::TDG:
             circuit.add_Tdag_gate(qubits[0]);
             break;
-        case SX:
+        case constants::SX:
             circuit.add_sqrtX_gate(qubits[0]);
             break;
-        case SXDG:
+        case constants::SXDG:
             circuit.add_sqrtXdag_gate(qubits[0]);
             break;
-        case SY:
+        case constants::SY:
             circuit.add_sqrtY_gate(qubits[0]);
             break;
-        case SYDG:
+        case constants::SYDG:
             circuit.add_sqrtYdag_gate(qubits[0]);
             break;
-        case P0:
+        case constants::P0:
             circuit.add_P0_gate(qubits[0]);
             break;
-        case P1:
+        case constants::P1:
             circuit.add_P1_gate(qubits[0]);
             break;
-        case U1: 
+        case constants::U1: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_U1_gate(qubits[0], params[0]);
             break;
         }
-        case RX: 
+        case constants::RX: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RX_gate(qubits[0], params[0]);
             break;
         }
-        case RY: 
+        case constants::RY: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RY_gate(qubits[0], params[0]);
             break;
         }
-        case RZ: 
+        case constants::RZ: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RZ_gate(qubits[0], params[0]);
             break;
         }
-        case ROTINVX: 
+        case constants::ROTINVX: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotInvX_gate(qubits[0], params[0]);
             break;
         }
-        case ROTINVY: 
+        case constants::ROTINVY: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotInvY_gate(qubits[0], params[0]);
             break;
         }
-        case ROTINVZ: 
+        case constants::ROTINVZ: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotInvZ_gate(qubits[0], params[0]);
             break;
         }
-        case ROTX: 
+        case constants::ROTX: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotX_gate(qubits[0], params[0]);
             break;
         }
-        case ROTY: 
+        case constants::ROTY: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotY_gate(qubits[0], params[0]);
             break;
         }
-        case ROTZ: 
+        case constants::ROTZ: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_RotZ_gate(qubits[0], params[0]);
             break;
         }
-        case U2: 
+        case constants::U2: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_U2_gate(qubits[0], params[0], params[1]);
             break;
         }
-        case U3: 
+        case constants::U3: 
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             circuit.add_U3_gate(qubits[0], params[0], params[1], params[2]);
             break;
         }
-        case CX:
+        case constants::CX:
             circuit.add_CNOT_gate(qubits[0], qubits[1]);
             break;
-        case CZ:
+        case constants::CZ:
             circuit.add_CZ_gate(qubits[0], qubits[1]);
             break;
-        case ECR:
+        case constants::ECR:
             circuit.add_ECR_gate(qubits[0], qubits[1]);
             break;
-        case SWAP:
+        case constants::SWAP:
             circuit.add_SWAP_gate(qubits[0], qubits[1]);
             break;
-        case FUSEDSWAP:
+        case constants::FUSEDSWAP:
         {
             auto block_size = instruction.at("block_size").get<UINT>();
             circuit.add_FusedSWAP_gate(qubits[0], qubits[1], block_size);
             break;
         }
-        case MULTIPAULI:
+        case constants::MULTIPAULI:
         {
             auto pauli_id_list = instruction.at("pauli_id_list").get<std::vector<unsigned int>>();
             circuit.add_multi_Pauli_gate(qubits, pauli_id_list);
             break;
         }
-        case MULTIPAULIROTATION:
+        case constants::MULTIPAULIROTATION:
         {
             auto params = instruction.at("params").get<std::vector<double>>();
             auto pauli_id_list = instruction.at("pauli_id_list").get<std::vector<unsigned int>>();
             circuit.add_multi_Pauli_rotation_gate(qubits, pauli_id_list, params[0]);
             break;
         }
-        case cunqa::UNITARY:
+        case constants::UNITARY:
         {
             auto cunqa_matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()[0];
             ComplexMatrix qulacs_matrix = cunqa::sim::cunqamatrix_to_qulacsdensematrix(cunqa_matrix);
@@ -234,7 +232,7 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const JSON& circuit_j
             }
             break;
         }
-        case cunqa::RANDOMUNITARY:
+        case constants::RANDOMUNITARY:
         {
             if (instruction.contains("seed")) {
                 auto seed = instruction.at("seed").get<unsigned int>();
