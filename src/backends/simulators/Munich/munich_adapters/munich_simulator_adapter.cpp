@@ -187,6 +187,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
     {
         const CUNQAInstruction inst = !instruction.has_value() ? *T.it : instruction.value();
         auto inst_type = INSTRUCTIONS_MAP.at(inst.name);
+
         
         switch (inst_type) {
         case constants::MEASURE:

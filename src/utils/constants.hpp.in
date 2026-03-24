@@ -502,6 +502,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case MCSX:
         case MCSWAP:
         case BARRIER:
+        case RESET:
         {
             cunqa_instruction = {
                 .name = instruction_name,
@@ -566,6 +567,15 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             };
             break;
         }
+        case MULTIPAULI:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .pauli_id_list = instruction.at("pauli_id_list").get<std::vector<unsigned int>>()
+            };
+            break;
+        }
         case MULTIPAULIROTATION:
         {
             cunqa_instruction = {
@@ -576,73 +586,49 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             };
             break;
         }
-        case RESET:
-        {
-            break;
-        }
         case UNITARY:
+        case SPARSEMATRIX:
         {
-            //TODO
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()
+            };
             break;
         }
         case DIAGONAL:
         {
-            //TODO
-            break;
-        }
-        case MULTIPLEXER:
-        {
-            //TODO
-            break;
-        }
-        case MULTIPAULI:
-        {
-            //TODO
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .diagonal = instruction.at("matrix").get<std::vector<CUNQADiagonalMatrix>>()
+            };
             break;
         }
         case AMPLITUDEDAMPINGNOISE:
-        {
-            //TODO
-            break;
-        }
         case BITFLIPNOISE:
-        {
-            //TODO
-            break;
-        }
-        case DENSEMATRIX:
-        {
-            //TODO
-            break;
-        }
         case DEPHASINGNOISE:
-        {
-            //TODO
-            break;
-        }
         case DEPOLARIZINGNOISE:
-        {
-            //TODO
-            break;
-        }
         case INDEPENDENTXZNOISE:
+        case TWOQUBITDEPOLARIZINGNOISE:
         {
-            //TODO
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .params = instruction.at("params").get<std::vector<double>>(),
+                .seed = seed
+            };
             break;
         }
         case RANDOMUNITARY:
         {
-            //TODO
-            break;
-        }
-        case SPARSEMATRIX:
-        {
-            //TODO
-            break;
-        }
-        case TWOQUBITDEPOLARIZINGNOISE:
-        {
-            //TODO
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .seed = seed
+            };
             break;
         }
         case COPY:
@@ -654,6 +640,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             };
             break;
         }
+        case SEND:
         case RECV:
         {
             cunqa_instruction = {
