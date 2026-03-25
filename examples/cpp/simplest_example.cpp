@@ -23,8 +23,7 @@ std::string circuit1 = R"(
         "classical_registers": {"measure": [0, 1, 2, 3, 4]}, 
         "quantum_registers":   {"q0": [0, 1, 2, 3, 4]}, 
         "sending_to": [], 
-        "is_dynamic": false, 
-        "has_cc": false
+        "is_dynamic": false
     }
 )";
 

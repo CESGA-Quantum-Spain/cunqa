@@ -55,7 +55,7 @@ void CunqaExecutor::run()
 
         CunqaComputationAdapter qc(quantum_tasks);
         CunqaSimulatorAdapter cunqa_sa(qc);
-        auto result = cunqa_sa.simulate(&classical_channel);
+        auto result = cunqa_sa.simulate(&classical_channel, true);
         
         // TODO: transform results to give each qpu its results
         std::string result_str = result.dump();

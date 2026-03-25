@@ -16,7 +16,7 @@ public:
     MaestroCCSimulator();
     ~MaestroCCSimulator() = default;
 
-    inline std::string get_name() const override {return "MaestroSimulator";}
+    inline std::string get_name() const override {return "Maestro";}
     JSON execute(const CCBackend& backend, const QuantumTask& circuit) override;
 
 private:

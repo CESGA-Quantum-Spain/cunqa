@@ -1,9 +1,11 @@
 
 #include <unordered_map>
 #include <stack>
+#include <queue>
 #include <chrono>
 #include <functional>
 #include <cstdlib>
+#include <optional>
 
 #include "utils/constants.hpp"
 #include "utils/helpers/reverse_bitstring.hpp"
@@ -15,325 +17,672 @@
 #include "logger.hpp"
 
 
-
-
 namespace {
+using namespace cunqa;
+
+struct LocalCCIDs {
+    std::string sendr;
+    std::string recvr;
+
+    bool operator==(const LocalCCIDs& other) const {
+        return sendr == other.sendr && recvr == other.recvr;
+    }
+}; // Struct to mimic classical communications when vQPUs deployed with quantum communications
+
+struct LocalIDsHash {
+    std::size_t operator()(const LocalCCIDs& local_cc_ids) const noexcept {
+        std::size_t h1 = std::hash<std::string>{}(local_cc_ids.sendr);
+        std::size_t h2 = std::hash<std::string>{}(local_cc_ids.recvr);
+        return h1 ^ (h2 << 1);
+    }
+};
+
+struct CommunicationQubitsPair {
+    int q0;
+    int q1;
+    bool idle = true;
+    std::string sendr_qpu; // QSEND and EXPOSE
+    std::string recvr_qpu; // QRECV and RCONTROL
+    std::string qcomm_protocol;
+    int label;
+};
 
 struct TaskState {
     std::string id;
-    cunqa::JSON::const_iterator it, end;
+    std::vector<constants::CUNQAInstruction>::const_iterator it, end;
     unsigned long zero_qubit = 0;
     unsigned long zero_clbit = 0;
     bool finished = false;
-    bool blocked = false;
+    bool blocked_by_teledata = false;
+    bool blocked_by_telegate = false;
+    bool blocked_by_cc = false;
     bool cat_entangled = false;
 };
 
 struct GlobalState {
     unsigned long n_qubits = 0, n_clbits = 0;
     std::map<std::size_t, bool> creg;
-    std::unordered_map<std::string, std::stack<int>> qc_meas;
+    std::unordered_map<std::string, std::queue<int>> qc_meas_td;
+    std::unordered_map<std::string, std::queue<int>> qc_meas_tg;
+    std::vector<CommunicationQubitsPair> communication_pairs;
+    std::unordered_map<LocalCCIDs, std::queue<int>, LocalIDsHash> local_cc_queue; // To mimic classical communications when executing with quantum communications
     bool ended = false;
 };
+
+std::vector<int> find_idle_communication_pairs(GlobalState& G, const size_t n_pairs)
+{
+    std::vector<int> indices_idle_pairs;
+    size_t count = 0;
+    for (int index = 0; index < G.communication_pairs.size() && count < n_pairs; index++) {
+        if (G.communication_pairs[index].idle) {
+            indices_idle_pairs.push_back(index);
+            count++;
+        } 
+    } 
+
+    if (count < n_pairs) 
+        return std::vector<int>();
+
+    for (const auto& index : indices_idle_pairs) {
+        G.communication_pairs[index].idle = false;
+    }
+
+    return indices_idle_pairs;
+}
+
+std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::string& sendr, const std::string recvr, const std::string qcomm_protocol, size_t n_pairs = 0)
+{
+    std::vector<int> comm_pairs;
+    size_t count = 0;
+    if (n_pairs == 0) n_pairs = G.communication_pairs.size();
+    for (int index = 0; index < G.communication_pairs.size(); index++) {
+        if (count == n_pairs) return comm_pairs;
+        if (!G.communication_pairs[index].idle &&
+            G.communication_pairs[index].sendr_qpu == sendr && 
+            G.communication_pairs[index].recvr_qpu == recvr &&
+            G.communication_pairs[index].qcomm_protocol == qcomm_protocol) {
+                comm_pairs.push_back(index);
+                count++;
+        } 
+    } 
+
+    return comm_pairs;
+}
 
 
 std::string execute_shot_(
     void* simulator, 
-    const std::vector<cunqa::QuantumTask>& quantum_tasks, 
-    cunqa::comm::ClassicalChannel* classical_channel
+    const std::vector<StructuredQuantumTask>& st_qtasks, 
+    cunqa::comm::ClassicalChannel* classical_channel,
+    const bool allows_qc, 
+    const size_t& n_comm_qubits
 )
 {
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
 
-    for (auto &quantum_task : quantum_tasks)
-    {
+    for (auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
         T.zero_qubit = G.n_qubits;
         T.zero_clbit = G.n_clbits;
-        T.it = quantum_task.circuit.begin();
-        T.end = quantum_task.circuit.end();
-        T.blocked = false;
+        T.it = quantum_task.instructions.begin();
+        T.end = quantum_task.instructions.end();
+        T.blocked_by_teledata = false;
+        T.blocked_by_telegate = false;
+        T.blocked_by_cc = false;
         T.finished = false;
         Ts[quantum_task.id] = T;
         
-        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
+        G.n_qubits += quantum_task.n_qubits;
+        G.n_clbits += quantum_task.n_clbits;
     }
     
-    // Here we add the two communication qubits
-    if (size(quantum_tasks) > 1)
-        G.n_qubits += 2;
+    // Here we add the communication qubits
+    if (n_comm_qubits != 0) {
+        G.n_qubits += n_comm_qubits;
+        for (int i = 0; i < n_comm_qubits; i+=2) {
+            CommunicationQubitsPair cqp = {
+                .q0 = G.n_qubits - n_comm_qubits + i,
+                .q1 = G.n_qubits - n_comm_qubits + i + 1
+            };
+            G.communication_pairs.push_back(cqp);
+        }
+    }
 
-    auto generate_entanglement_ = [&]() {
-        const unsigned long int q[]{ G.n_qubits - 1, G.n_qubits - 2 };
+    auto generate_entanglement_ = [&](const size_t n_pairs) {
+        std::vector<int> indices = find_idle_communication_pairs(G, n_pairs);
 
-		ApplyReset(simulator, q, 2);
-        ApplyH(simulator, G.n_qubits - 2);
-        ApplyCX(simulator, G.n_qubits - 2, G.n_qubits - 1);
+        if (!indices.empty()) {
+            for (auto& index : indices) {
+                const unsigned long int q[]{ G.communication_pairs[index].q1, G.communication_pairs[index].q0 };
+                ApplyReset(simulator, q, 2);
+                ApplyH(simulator, G.communication_pairs[index].q0);
+                ApplyCX(simulator, G.communication_pairs[index].q0, G.communication_pairs[index].q1);
+            }
+        } 
+
+        return indices;
     };
 
-    std::function<void(TaskState&, const cunqa::JSON&)> apply_next_instr = 
-        [&](TaskState& T, const cunqa::JSON& instruction = {}) 
+    std::function<void(TaskState&, const std::optional<constants::CUNQAInstruction>&, const std::vector<int>)> apply_next_instr = 
+        [&](TaskState& T, const std::optional<constants::CUNQAInstruction>& instruction = std::nullopt, const std::vector<int> comm_indices = {}) 
     {
 
-        // This is added to be able to add instructions outside the main loop
-        const cunqa::JSON& inst = instruction.empty() ? *T.it : instruction;
-
-        std::vector<int> qubits;
-        if (inst.contains("qubits"))
-            qubits = inst.at("qubits").get<std::vector<int>>();
-        auto inst_type = cunqa::constants::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        const CUNQAInstruction inst = !instruction.has_value() ? *T.it : instruction.value();
+        auto inst_type = INSTRUCTIONS_MAP.at(inst.name);
 
         switch (inst_type)
         {
-        case cunqa::constants::MEASURE:
+        case constants::MEASURE:
         {
-            const unsigned long int q[]{ qubits[0] + T.zero_qubit };
+            const unsigned long int q[]{ inst.qubits[0] + T.zero_qubit };
             const unsigned long long int measurement = Measure(simulator, q, 1);
 
-            auto clbits = inst.at("clbits").get<std::vector<int>>();
-            G.creg[clbits[0] + T.zero_clbit] = (measurement == 1);
+            G.creg[inst.clbits[0] + T.zero_clbit] = (measurement == 1);
             break;
         }
-        case cunqa::constants::COPY:
+        case constants::COPY:
         {
-            auto l_clbits = inst.at("l_clbits").get<std::vector<int>>();
-            auto r_clbits = inst.at("r_clbits").get<std::vector<int>>();
-
-            if(l_clbits.size() != r_clbits.size())
+            if(inst.l_clbits.size() != inst.r_clbits.size())
                 throw std::runtime_error("The number of copied clbits and the number of clbits "
                                          "copied on does not match.");
 
-            for (size_t i = 0; i < l_clbits.size(); ++i)
-                G.creg[l_clbits[i] + T.zero_clbit] = G.creg[r_clbits[i] + T.zero_clbit];
+            for (size_t i = 0; i < inst.l_clbits.size(); ++i)
+                G.creg[inst.l_clbits[i] + T.zero_clbit] = G.creg[inst.r_clbits[i] + T.zero_clbit];
                 
             break;
         }
-        case cunqa::constants::X:
-            ApplyX(simulator, qubits[0] + T.zero_qubit);
+        case constants::X:
+            ApplyX(simulator, inst.qubits[0] + T.zero_qubit);
             break;
-        case cunqa::constants::Y:
-            ApplyY(simulator, qubits[0] + T.zero_qubit);
+        case constants::Y:
+            ApplyY(simulator, inst.qubits[0] + T.zero_qubit);
             break;
-        case cunqa::constants::Z:
-            ApplyZ(simulator, qubits[0] + T.zero_qubit);
+        case constants::Z:
+            ApplyZ(simulator, inst.qubits[0] + T.zero_qubit);
             break;
-        case cunqa::constants::H:
-            ApplyH(simulator, qubits[0] + T.zero_qubit);
+        case constants::H:
+            ApplyH(simulator, inst.qubits[0] + T.zero_qubit);
             break;
-        case cunqa::constants::SX:
-            ApplySX(simulator, qubits[0] + T.zero_qubit);
+        case constants::S:
+            ApplyS(simulator, inst.qubits[0] + T.zero_qubit);
             break;
-        case cunqa::constants::CX:
+        case constants::SDG:
+            ApplySDG(simulator, inst.qubits[0] + T.zero_qubit);
+            break;
+        case constants::T:
+            ApplyT(simulator, inst.qubits[0] + T.zero_qubit);
+            break;
+        case constants::TDG:
+            ApplyTDG(simulator, inst.qubits[0] + T.zero_qubit);
+            break;
+        case constants::SX:
+            ApplySX(simulator, inst.qubits[0] + T.zero_qubit);
+            break;
+        case constants::K:
+            ApplyK(simulator, inst.qubits[0] + T.zero_qubit);
+            break;
+        case constants::P:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCX(simulator, control, qubits[1] + T.zero_qubit);
+            ApplyP(simulator, inst.qubits[0] + T.zero_qubit, inst.params[0]);
             break;
         }
-        case cunqa::constants::CY:
+        case constants::RX:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCY(simulator, control, qubits[1] + T.zero_qubit);
+            ApplyRx(simulator, inst.qubits[0] + T.zero_qubit, inst.params[0]);
             break;
         }
-        case cunqa::constants::CZ:
+        case constants::RY:
         {
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCZ(simulator, control, qubits[1] + T.zero_qubit);
+            ApplyRy(simulator, inst.qubits[0] + T.zero_qubit, inst.params[0]);
             break;
         }
-        case cunqa::constants::ECR:
+        case constants::RZ:
+        {
+            ApplyRz(simulator, inst.qubits[0] + T.zero_qubit, inst.params[0]);
+            break;
+        }
+        case constants::U:
+        {
+            ApplyU(simulator, inst.qubits[0] + T.zero_qubit, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
+            break;
+        }
+        case constants::CX:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCX(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CY:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCY(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CZ:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCZ(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CH:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCH(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CSX:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCSX(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CSXDG:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCSXDG(simulator, control, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::SWAP:
+        {
+            ApplySwap(simulator, inst.qubits[0] + T.zero_qubit, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::ECR:
             // TODO
             break;
-        case cunqa::constants::RX:
+        case constants::CP:
         {
-            auto params = inst.at("params").get<std::vector<double>>();
-            ApplyRx(simulator, qubits[0] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::RY:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            ApplyRy(simulator, qubits[0] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::RZ:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            ApplyRz(simulator, qubits[0] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::CRX:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCRx(simulator, control, qubits[1] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::CRY:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCRy(simulator, control, qubits[1] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::CRZ:
-        {
-            auto params = inst.at("params").get<std::vector<double>>();
-            unsigned long control = (qubits[0] == -1) ? G.n_qubits - 1 : qubits[0] + T.zero_qubit;
-            ApplyCRz(simulator, control, qubits[1] + T.zero_qubit, params[0]);
-            break;
-        }
-        case cunqa::constants::SWAP:
-        {
-            ApplySwap(simulator, qubits[0] + T.zero_qubit, qubits[1] + T.zero_qubit);
-            break;
-        }
-        case cunqa::constants::SEND:
-        {
-            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbits = inst.at("clbits").get<std::vector<int>>();  
-
-            for (const auto& clbit: clbits)
-                classical_channel->send_measure(G.creg[clbit + T.zero_clbit], qpu_id);
-            break;
-        }
-        case cunqa::constants::RECV:
-        {
-            auto qpu_id = inst.at("qpus").get<std::vector<std::string>>()[0];
-            auto clbits = inst.at("clbits").get<std::vector<int>>();
-
-            for (const auto& clbit: clbits) {
-                int measurement = classical_channel->recv_measure(qpu_id);
-                G.creg[clbit + T.zero_clbit] = (measurement == 1);
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
             }
+            ApplyCP(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
             break;
         }
-        case cunqa::constants::CIF:
+        case constants::CRX:
         {
-            const auto& clbits = inst.at("clbits").get<std::vector<int>>();
-            if (G.creg[clbits.at(0) + T.zero_clbit]) {
-                for(const auto& sub_inst: inst.at("instructions")) {
-                    apply_next_instr(T, sub_inst);
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCRx(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
+            break;
+        }
+        case constants::CRY:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCRy(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
+            break;
+        }
+        case constants::CRZ:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCRz(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
+            break;
+        }
+        case constants::CCX:
+        {
+            std::vector<int> tmp_qubits;
+            for (int i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[0] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCCX(simulator, tmp_qubits[0], tmp_qubits[1], tmp_qubits[2]);
+            break;
+        }
+        case constants::CSWAP:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCSwap(simulator, control, inst.qubits[1] + T.zero_qubit, inst.qubits[2] + T.zero_qubit);
+            break;
+        }
+        case constants::CU:
+        {
+            unsigned long control;
+            if (inst.qubits[0] < 0) {
+                for (auto& index : comm_indices) {
+                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
+                        control = G.communication_pairs[index].q1;
+                        break;
+                    }
+                }
+            } else {
+                control = inst.qubits[0] + T.zero_qubit;
+            }
+            ApplyCU(simulator, control, inst.qubits[0] + T.zero_qubit, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
+            break;
+        }
+        case constants::RESET:
+        {
+            std::vector<unsigned long int> uliqubits(
+                inst.qubits.begin(), inst.qubits.end()
+            );
+		    ApplyReset(simulator, uliqubits.data(), inst.qubits.size());
+            break;
+        }
+        case constants::SEND:
+        {
+            if (allows_qc) {
+                LocalCCIDs local_cc_ids = {
+                    .sendr = T.id, 
+                    .recvr = Ts[inst.qpus[0]].id
+                };  
+                for (auto& clbit : inst.clbits) {
+                    G.local_cc_queue[local_cc_ids].push(G.creg[clbit + T.zero_clbit]);
+                }
+            } else {
+                for (const auto& clbit: inst.clbits) {
+                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], inst.qpus[0]);
                 }
             }
             break;
         }
-        case cunqa::constants::QSEND:
+        case constants::RECV:
         {
-            //------------- Generate Entanglement ---------------
-            generate_entanglement_();
-            //----------------------------------------------------
-
-            // CX to the entangled pair
-            ApplyCX(simulator, qubits[0] + T.zero_qubit, G.n_qubits - 2);
-
-            // H to the sent qubit
-            ApplyH(simulator, qubits[0] + T.zero_qubit);
-
-            const unsigned long int q1[]{ qubits[0] + T.zero_qubit };
-            int measurement_as_int = static_cast<int>(Measure(simulator, q1, 1));
-            G.qc_meas[T.id].push(measurement_as_int);
-
-            const unsigned long int q2[]{ G.n_qubits - 2 };
-            int aux_meas = static_cast<int>(Measure(simulator, q2, 1));
-            G.qc_meas[T.id].push(aux_meas);
-
-            const unsigned long int q3[]{ G.n_qubits - 2, qubits[0] + T.zero_qubit };
-            ApplyReset(simulator, q3, 2);
-
-            // Unlock QRECV
-            Ts[inst.at("qpus")[0]].blocked = false;
+            if (allows_qc) {
+                LocalCCIDs local_cc_ids = {
+                    .sendr = Ts[inst.qpus[0]].id, 
+                    .recvr = T.id
+                };
+                if (G.local_cc_queue.contains(local_cc_ids) && !G.local_cc_queue.at(local_cc_ids).empty()) {
+                    for (const auto& clbit: inst.clbits) {
+                        G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
+                        G.local_cc_queue.at(local_cc_ids).pop();
+                    }
+                    T.blocked_by_cc = false;
+                } else {
+                    T.blocked_by_cc = true;
+                }
+            } else {
+                for (const auto& clbit: inst.clbits) {
+                    int measurement = classical_channel->recv_measure(inst.qpus[0]);
+                    G.creg[clbit + T.zero_clbit] = (measurement == 1);
+                }
+            }
             break;
         }
-        case cunqa::constants::QRECV:
+        case constants::CIF:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0])) {
-                T.blocked = true;
+            const auto& clbits = inst.clbits;
+            if (G.creg[inst.clbits[0] + T.zero_clbit]) {
+                for(const auto& sub_inst: inst.instructions) {
+                    apply_next_instr(T, sub_inst, {});
+                }
+            }
+            break;
+        }
+        case constants::QSEND:
+        {
+            std::vector<int> indices = generate_entanglement_(1);
+            if (indices.empty()) {
+                T.blocked_by_teledata = true;
                 return;
             }
+            T.blocked_by_teledata = false;
+            int index = indices[0];
+            G.communication_pairs[index].qcomm_protocol = "teledata";
+
+            // CX to the entangled pair
+            ApplyCX(simulator, inst.qubits[0] + T.zero_qubit, G.communication_pairs[index].q0);
+
+            // H to the sent qubit
+            ApplyH(simulator, inst.qubits[0] + T.zero_qubit);
+
+            const unsigned long int q1[]{ inst.qubits[0] + T.zero_qubit };
+            int measurement_as_int = static_cast<int>(Measure(simulator, q1, 1));
+            G.qc_meas_td[T.id].push(measurement_as_int);
+
+            const unsigned long int q2[]{ G.communication_pairs[index].q0 };
+            int aux_meas = static_cast<int>(Measure(simulator, q2, 1));
+            G.qc_meas_td[T.id].push(aux_meas);
+
+            if (measurement_as_int) {
+                const unsigned long int q3[]{ inst.qubits[0] + T.zero_qubit };
+                ApplyReset(simulator, q3, 1);
+            }
+
+            // Unlock QRECV
+            Ts[inst.qpus[0]].blocked_by_teledata = false;
+
+            // Update communication pair
+            G.communication_pairs[index].sendr_qpu = T.id;
+            G.communication_pairs[index].recvr_qpu = inst.qpus[0];
+
+            break;
+        }
+        case constants::QRECV:
+        {
+            if (!G.qc_meas_td.contains(inst.qpus[0]) || G.qc_meas_td[inst.qpus[0]].empty()) {
+                T.blocked_by_teledata = true;
+                return;
+            }
+            if (T.blocked_by_teledata) return;
 
             // Receive the measurements from the sender
-            std::size_t meas1 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
-            std::size_t meas2 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
+            std::size_t meas1 = G.qc_meas_td[inst.qpus[0]].front();
+            G.qc_meas_td[inst.qpus[0]].pop();
+            std::size_t meas2 = G.qc_meas_td[inst.qpus[0]].front();
+            G.qc_meas_td[inst.qpus[0]].pop();
+
+            std::vector<int> indices = find_my_communication_pairs(G, inst.qpus[0], T.id, "teledata", 1);
+            int index = indices[0];
 
             // Apply, conditioned to the measurement, the X and Z gates
             if (meas1) {
-                ApplyX(simulator, G.n_qubits - 1);
+                ApplyX(simulator, G.communication_pairs[index].q1);
             }
             if (meas2) {
-                ApplyZ(simulator, G.n_qubits - 1);
+                ApplyZ(simulator, G.communication_pairs[index].q1);
             }
 
             // Swap the value to the desired qubit
-            ApplySwap(simulator, G.n_qubits - 1, qubits[0] + T.zero_qubit);
+            ApplySwap(simulator, G.communication_pairs[index].q1, inst.qubits[0] + T.zero_qubit);
 
-            const unsigned long int q[]{ G.n_qubits - 1 };
-			ApplyReset(simulator, q, 1);
+            G.communication_pairs[index].idle = true;
             break;
         }
-        case cunqa::constants::EXPOSE:
+        case constants::EXPOSE:
         {
             if (!T.cat_entangled) {
-                generate_entanglement_();
+                std::vector<int> indices = generate_entanglement_(inst.qubits.size());
+                if (indices.empty()) {
+                    T.blocked_by_telegate = true;
+                    return;
+                }
 
-                // CX to the entangled pair
-                ApplyCX(simulator, qubits[0] + T.zero_qubit, G.n_qubits - 2);
+                int qid = 0;
+                for (auto& index : indices) {
+                    G.communication_pairs[index].qcomm_protocol = "telegate";
+                    G.communication_pairs[index].label = -(qid + 1);
 
-                const unsigned long int q[]{ G.n_qubits - 2 };
-                int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
+                    // CX to the entangled pair
+                    ApplyCX(simulator, inst.qubits[qid] + T.zero_qubit, G.communication_pairs[index].q0);
 
-                G.qc_meas[T.id].push(measurement_as_int);
-                T.cat_entangled = true;
-                T.blocked = true;
-                Ts[inst.at("qpus")[0]].blocked = false;
+                    const unsigned long int q[]{ G.communication_pairs[index].q0 };
+                    int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
+
+                    G.qc_meas_tg[T.id].push(measurement_as_int);
+                    T.cat_entangled = true;
+                    T.blocked_by_telegate = true;
+                    Ts[inst.qpus[0]].blocked_by_telegate = false;
+
+                    // Update communication pair
+                    G.communication_pairs[index].sendr_qpu = T.id;
+                    G.communication_pairs[index].recvr_qpu = inst.qpus[0];
+
+                    qid++;
+                }
                 return;
             } else {
-                int meas = G.qc_meas[inst.at("qpus")[0]].top();
-                G.qc_meas[inst.at("qpus")[0]].pop();
+                for (int i = 0; i < inst.qubits.size(); i++) {
+                    int meas = G.qc_meas_tg[inst.qpus[0]].front();
+                    G.qc_meas_tg[inst.qpus[0]].pop();
 
-                if (meas) {
-                    ApplyZ(simulator, qubits[0] + T.zero_qubit);
+                    if (meas) {
+                        ApplyZ(simulator, inst.qubits[0] + T.zero_qubit);
+                    }
                 }
 
                 T.cat_entangled = false;
+
+                std::vector<int> indices = find_my_communication_pairs(G, T.id, inst.qpus[0], "telegate", inst.qubits.size());
+                for (auto& index : indices) {
+                    G.communication_pairs[index].idle = true;
+                }
             }
             break;
         }
-        case cunqa::constants::RCONTROL:
+        case constants::RCONTROL:
         {
-            if (!G.qc_meas.contains(inst.at("qpus")[0]) || G.qc_meas[inst.at("qpus")[0]].empty()) {
-                T.blocked = true;
+            if (!G.qc_meas_tg.contains(inst.qpus[0]) || G.qc_meas_tg[inst.qpus[0]].empty()) {
+                T.blocked_by_telegate = true;
                 return;
             }
+            if (T.blocked_by_telegate) return;
 
-            int meas2 = G.qc_meas[inst.at("qpus")[0]].top();
-            G.qc_meas[inst.at("qpus")[0]].pop();
+            std::vector<int> indices = find_my_communication_pairs(G, inst.qpus[0], T.id, "telegate");
+            
+            for (auto& index : indices) {
+                int meas2 = G.qc_meas_tg[inst.qpus[0]].front();
+                G.qc_meas_tg[inst.qpus[0]].pop();
 
-            if (meas2) {
-                ApplyX(simulator, G.n_qubits - 1);
+                if (meas2) {
+                    ApplyX(simulator, G.communication_pairs[index].q1);
+                }
             }
 
-            for(const auto& sub_inst: inst.at("instructions")) {
-                apply_next_instr(T, sub_inst);
+            for(const auto& sub_inst: inst.instructions) {
+                apply_next_instr(T, sub_inst, indices);
             }
 
-            ApplyH(simulator, G.n_qubits - 1);
+            for (auto& index : indices) {
+                ApplyH(simulator, G.communication_pairs[index].q1);
 
-            const unsigned long int q[]{ G.n_qubits - 1 };
-            int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
-            G.qc_meas[T.id].push(measurement_as_int);
+                const unsigned long int q[]{ G.communication_pairs[index].q1 };
+                int measurement_as_int = static_cast<int>(Measure(simulator, q, 1));
+                G.qc_meas_tg[T.id].push(measurement_as_int);
+            }
 
-            Ts[inst.at("qpus")[0]].blocked = false;
-            T.blocked = false;
+            Ts[inst.qpus[0]].blocked_by_telegate = false;
+            T.blocked_by_telegate = false;
             break;
         }
         default:
-            std::cerr << "Instruction not suported!" << "\n" << "Instruction that failed: " << inst.dump(4) << "\n";
+            std::cerr << "Instruction not suported!\nInstruction that failed: " << inst.name << "\n";
         } // End switch
     };
 
@@ -342,12 +691,16 @@ std::string execute_shot_(
         G.ended = true;
         for (auto& [id, T]: Ts)
         {
-            if (T.finished || T.blocked)
+            if (T.finished)
                 continue;
+            else if(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc) {
+                G.ended = false;
+                continue;
+            }
 
-            apply_next_instr(T, {});
+            apply_next_instr(T, std::nullopt, {});
 
-            if (!T.blocked)
+            if (!(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc))
                 ++T.it;
 
             if (T.it != T.end)
@@ -511,20 +864,33 @@ JSON MaestroSimulatorAdapter::simulate(const Backend* backend)
     return {};
 }
 
-JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel)
+JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, const bool allows_qc)
 {
     LOGGER_DEBUG("Maestro dynamic simulation");
     std::map<std::string, std::size_t> meas_counter;
     
     auto shots = qc.quantum_tasks[0].config.at("shots").get<std::size_t>();
 
-    unsigned long n_qubits = 0;
-    for (auto &quantum_task : qc.quantum_tasks)
-    {
-        n_qubits += quantum_task.config.at("num_qubits").get<unsigned long>();
+    std::vector<StructuredQuantumTask> st_qtasks;
+    size_t n_qubits = 0;
+    for (auto& quantum_task : qc.quantum_tasks) {
+        st_qtasks.push_back(from_quantum_task_to_structuredqtask(quantum_task));
+        n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
     }
-    if (size(qc.quantum_tasks) > 1)
-        n_qubits += 2;
+
+    size_t n_comm_qubits = 0;
+    if (qc.quantum_tasks.size() > 1) { // Quantum Communications 
+        if (qc.quantum_tasks[0].config.contains("n_communication_qubits")) {
+            n_comm_qubits = qc.quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
+            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
+                n_comm_qubits++;
+            }
+        } else {
+            n_comm_qubits = 2;
+        }
+
+        n_qubits += n_comm_qubits;
+    }
 
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
     // is qcsim or gpu specified?
@@ -586,6 +952,45 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         simulationType = 0; // statevector
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
+#ifdef OPENMP_IN_QC
+    if (size(qc.quantum_tasks) > 1) { // Quantum communications 
+        #pragma omp parallel
+        {
+            std::map<std::string, std::size_t> local_counter;
+            
+            auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+            auto simulator = GetSimulator(simulatorHandle); // Not error handling
+
+            #pragma omp for
+            for (std::size_t i = 0; i < shots; i++) {
+                AllocateQubits(simulator, n_qubits);
+                InitializeSimulator(simulator);
+                local_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+                ClearSimulator(simulator);
+            }
+
+            #pragma omp critical
+            for (auto& [key, val] : local_counter)
+                meas_counter[key] += val;
+        }
+    } else { // As if OPENMP_IN_QC not enabled
+        auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+        if (simulatorHandle == 0) {
+            LOGGER_ERROR("Error creating the Maestro Simulator.");
+            return {{"ERROR", "Unable to create the Maestro Simulator."}};
+        }
+        auto simulator = GetSimulator(simulatorHandle);
+
+        for (std::size_t i = 0; i < shots; i++)
+        {
+            AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
+            InitializeSimulator(simulator);
+            meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+            ClearSimulator(simulator);
+        } // End all shots
+    }
+#else
     auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
     if (simulatorHandle == 0) {
         LOGGER_ERROR("Error creating the Maestro Simulator.");
@@ -593,14 +998,14 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
     }
     auto simulator = GetSimulator(simulatorHandle);
 
-    auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {
         AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
         InitializeSimulator(simulator);
-        meas_counter[execute_shot_(simulator, qc.quantum_tasks, classical_channel)]++;
+        meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
         ClearSimulator(simulator);
     } // End all shots
+#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();

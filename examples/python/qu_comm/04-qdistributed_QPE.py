@@ -25,8 +25,8 @@ SEED = 18
 
 try:
     # 1. Deploy vQPUs
-    family = qraise(N_QPUS, "10:00:00", 
-                    simulator="Aer",
+    family = qraise(N_QPUS, "00:10:00", 
+                    simulator="Maestro",
                     quantum_comm = True, 
                     co_located = True, 
                     cores = CORES_PER_QPU, 
@@ -48,7 +48,7 @@ try:
 
     for i in range(N_ANCILLA_QUBITS):
         ### TELEGATE ###
-        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as (rqubit, subcircuit):
+        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as ([rqubit], subcircuit):
             param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE
             subcircuit.crz(param, rqubit, 0)
 
@@ -79,6 +79,7 @@ try:
     # 4. Post-processing results to extract estimated phase 
     counts = result_list[0].counts
     print(f"Counts: {counts}")
+    print(f"Time taken: {result_list[0].time_taken}")
 
     most_frequent_output = max(counts, key=counts.get)
     print(f"Most frequent output is {most_frequent_output}")

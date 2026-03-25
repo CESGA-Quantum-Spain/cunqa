@@ -8,6 +8,8 @@
 #include "logger.hpp"
 #include "args_qraise.hpp"
 
+
+namespace {
 using namespace cunqa;
 
 
@@ -145,13 +147,13 @@ bool write_noise_model_run_command(std::ofstream& sbatchFile,const CunqaArgs& ar
     return true;
 }
 
-void write_noise_model_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args, const std::vector<std::string>& supported_noisy_simulators)
+void write_noise_model_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args)
 {
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
 
-    } else if (std::find(supported_noisy_simulators.begin(), supported_noisy_simulators.end(), std::string(args.simulator)) == supported_noisy_simulators.end()) {
+    } else if (std::find(constants::SUPPORTED_NOISY_SIMULATORS.begin(), constants::SUPPORTED_NOISY_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_NOISY_SIMULATORS.end()) {
         LOGGER_ERROR("Simulator {} is not available for noisy simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
@@ -171,3 +173,5 @@ void write_noise_model_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args, c
         throw std::runtime_error("Error.");
     }  
 }
+
+} // End namespace

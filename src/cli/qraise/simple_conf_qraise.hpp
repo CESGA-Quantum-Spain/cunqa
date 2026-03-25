@@ -8,6 +8,8 @@
 #include "utils_qraise.hpp"
 #include "logger.hpp"
 
+
+namespace{
 using namespace cunqa;
 
 
@@ -143,13 +145,13 @@ bool write_simple_run_command(std::ofstream& sbatchFile, const CunqaArgs& args)
     return true;
 }
 
-void write_simple_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args, const std::vector<std::string>& supported_simple_simulators)
+void write_simple_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
 
-    } else if (std::find(supported_simple_simulators.begin(), supported_simple_simulators.end(), std::string(args.simulator)) == supported_simple_simulators.end()) {
+    } else if (std::find(constants::SUPPORTED_SIMPLE_SIMULATORS.begin(), constants::SUPPORTED_SIMPLE_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_SIMPLE_SIMULATORS.end()) {
         LOGGER_ERROR("Simulator {} is not available for simple simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
@@ -162,3 +164,5 @@ void write_simple_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args, const
         throw std::runtime_error("Error.");
     }  
 }
+
+} // End namespace

@@ -1,6 +1,11 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.24)
 
-project(CUNQA VERSION 2.0.0 LANGUAGES CXX)
+file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
+string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
+
+project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES CXX)
+
+message(STATUS "Building CUNQA ${PROJECT_VERSION}")
 
 message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE CONFIGURATION TYPE: ${CMAKE_CONFIGURATION_TYPES}")
@@ -100,15 +105,156 @@ endfunction()
 set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+option(OPENMP_IN_QC "Enable OpenMP parallelization for quantum communications in some simulator adapters" ON)
+if(OPENMP_IN_QC)
+    message(STATUS "OpenMP for QC enabled")
+endif()
+
+#######################################################################
+################### EXTERNAL LIBRARIES ################################
+#######################################################################
+
 # =====================================================================
 #  NLOHMANN JSON - json management library
 # =====================================================================
-find_or_fetch_package(
-  nlohmann_json
-  "git@github.com:nlohmann/json.git"
-  "3.11.3"
-  "v3.11.3"
+find_package(nlohmann_json "3.12.0" QUIET)
+if(NOT nlohmann_json_FOUND)
+  message(STATUS "Package nlohmann_json not found, fetching from git@github.com:nlohmann/json.git")
+  FetchContent_Declare(
+      nlohmann_json
+      GIT_REPOSITORY "git@github.com:nlohmann/json.git"
+      GIT_TAG        "v3.12.0"
+  )
+  FetchContent_MakeAvailable(nlohmann_json)
+  set(nlohmann_json_POPULATED TRUE)
+  set(nlohmann_json_SOURCE_DIR "${nlohmann_json_SOURCE_DIR}")
+  set(nlohmann_json_BINARY_DIR "${nlohmann_json_BINARY_DIR}")
+else()
+  message(STATUS "Found package nlohmann_json: nlohmann_json_DIR = ${nlohmann_json_DIR}")
+  # Mark as populated in FetchContent's registry without downloading anything.
+  # This blocks any downstream FetchContent_Declare for the same name.
+  FetchContent_Declare(
+      nlohmann_json
+      GIT_REPOSITORY "git@github.com:nlohmann/json.git"
+      GIT_TAG        "v3.12.0"
+      FIND_PACKAGE_ARGS "3.12.0"
+  )
+  FetchContent_SetPopulated(nlohmann_json)
+endif()
+
+# =====================================================================
+#  Eigen
+# =====================================================================
+# Prevent finding Eigen from other builds
+set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
+
+find_package(Eigen3 5.0 QUIET)
+if(NOT Eigen3_FOUND)
+  FetchContent_Declare(
+    Eigen3
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG        5.0.0 
+    GIT_SHALLOW    OFF
+  )
+  FetchContent_MakeAvailable(Eigen3)
+  
+  set(EIGEN_INSTALL_DIR "${CMAKE_BINARY_DIR}/eigen_install")
+  
+  if(NOT EXISTS "${EIGEN_INSTALL_DIR}/include/eigen3/Eigen/Core")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND}
+        -DCMAKE_INSTALL_PREFIX=${EIGEN_INSTALL_DIR}
+        -DEIGEN_BUILD_BLAS=OFF
+        -DEIGEN_BUILD_LAPACK=OFF
+        -S ${eigen3_SOURCE_DIR}
+        -B ${eigen3_BINARY_DIR}
+      RESULT_VARIABLE _eigen_configure_result
+    )
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} --install ${eigen3_BINARY_DIR}
+        --prefix ${EIGEN_INSTALL_DIR}
+      RESULT_VARIABLE _eigen_install_result
+    )
+  endif()
+
+  set(Eigen3_DIR "${EIGEN_INSTALL_DIR}/share/eigen3/cmake")
+  find_package(Eigen3 5.0 REQUIRED NO_CMAKE_PACKAGE_REGISTRY NO_SYSTEM_ENVIRONMENT_PATH NO_DEFAULT_PATH)
+  include_directories("${CMAKE_BINARY_DIR}/eigen_install/include/eigen3")
+else()
+  message(STATUS "Package Eigen3 5.0 found.")
+endif()
+
+
+
+# =====================================================================
+#  ZeroMQ stack (libzmq + cppzmq)
+# =====================================================================
+
+# -- libzmq -----------------------------------------------------------
+include(FetchContent)
+
+find_package(libzmq 4.3.5 QUIET)
+if(NOT ${PACKAGE_NAME}_FOUND)
+# Force options for minimal libzmq build
+  set(WITH_DOCS OFF CACHE BOOL "" FORCE)
+  set(WITH_PERF_TOOL OFF CACHE BOOL "" FORCE)
+  set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(WITH_GNUTLS OFF CACHE BOOL "" FORCE)  # avoid optional TLS dependency
+  set(BUILD_SHARED ON CACHE BOOL "" FORCE)
+  set(BUILD_STATIC OFF CACHE BOOL "" FORCE)
+
+  # Fetch libzmq
+  FetchContent_Declare(
+    libzmq
+    GIT_REPOSITORY https://github.com/zeromq/libzmq.git
+    GIT_TAG v4.3.5
+  )
+
+  FetchContent_GetProperties(libzmq)
+  if(NOT libzmq_POPULATED)
+    FetchContent_Populate(libzmq)
+    add_subdirectory(${libzmq_SOURCE_DIR} ${libzmq_BINARY_DIR})
+  endif()
+  if(TARGET libzmq)
+    message(STATUS "libzmq target exists")
+  else()
+    message(STATUS "libzmq target DOES NOT exist")
+  endif()
+else()
+  message(STATUS "Found package libzmq: libzmq_DIR = ${libzmq_DIR}")
+endif()
+
+#-- cppzmq ------------------------------------------------------------
+find_package(cppzmq 4.9.0 QUIET)
+if(NOT cppzmq_FOUND)
+  set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(
+    cppzmq
+    GIT_REPOSITORY https://github.com/zeromq/cppzmq.git
+    GIT_TAG v4.9.0
+  )
+
+  FetchContent_GetProperties(cppzmq)
+  if(NOT cppzmq_POPULATED)
+    FetchContent_Populate(cppzmq)
+    add_subdirectory(${cppzmq_SOURCE_DIR} ${cppzmq_BINARY_DIR})
+  endif()
+else()
+  message(STATUS "Found package cppzmq: cppzmq_DIR = ${cppzmq_DIR}")
+endif()
+
+# -- pyzmq -----------------------------------------------------------
+set(ZeroMQ_DIR "${libzmq_BINARY_DIR}" CACHE PATH "Path to ZeroMQConfig.cmake" FORCE)
+set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}")
+
+FetchContent_Declare(
+    pyzmq
+    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
+    GIT_TAG        "v27.1.0"
 )
+FetchContent_MakeAvailable(pyzmq)
+install(DIRECTORY "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq")
+install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq/backend/cython")
 
 # =====================================================================
 #  SPDLOG - logging backend
@@ -126,69 +272,6 @@ find_or_fetch_package(
 install(TARGETS spdlog DESTINATION "${CMAKE_INSTALL_LIBDIR}") # does this fails with FindPackage??
 
 # =====================================================================
-#  MQT-DDSIM - quantum circuit simulator
-# =====================================================================
-find_or_fetch_package(
-  mqt-ddsim
-  "git@github.com:munich-quantum-toolkit/ddsim.git"
-  "1.24.0"
-  "v1.24.0"
-)
-
-# =====================================================================
-#  ZeroMQ stack (libzmq + cppzmq)
-# =====================================================================
-
-# -- libzmq -----------------------------------------------------------
-set(WITH_DOCS OFF               CACHE BOOL "Disable docs"               FORCE)
-set(ENABLE_CPACK OFF            CACHE BOOL "Disable CPACK"              FORCE)
-set(WITH_PERF_TOOL OFF          CACHE BOOL "Disable performance tool"   FORCE)
-set(ZMQ_BUILD_TESTS OFF         CACHE BOOL "Disable tests"              FORCE)
-set(ENABLE_DRAFTS ON            CACHE BOOL "Enable drafts"              FORCE)
-set(BUILD_SHARED ON             CACHE BOOL "Build shared library"       FORCE)
-set(BUILD_STATIC OFF            CACHE BOOL "Build static library"       FORCE)
-
-find_or_fetch_package(
-  libzmq
-  "git@github.com:zeromq/libzmq.git"
-  "4.3.5"
-  "v4.3.5"
-)
-
-# -- cppzmq -----------------------------------------------------------
-set(CPPZMQ_BUILD_TESTS OFF      CACHE BOOL "Disable tests"              FORCE)
-
-find_or_fetch_package(
-  cppzmq
-  "git@github.com:zeromq/cppzmq.git"
-  "4.11.0"
-  "v4.11.0"
-)
-
-# -- pyzmq -----------------------------------------------------------
-set(ZeroMQ_DIR "${libzmq_BINARY_DIR}" CACHE PATH "Path to ZeroMQConfig.cmake" FORCE)
-set(LDFLAGS "-Wl,-rpath,${ZMQ_PREFIX}")
-
-FetchContent_Declare(
-    pyzmq
-    GIT_REPOSITORY "git@github.com:zeromq/pyzmq.git"
-    GIT_TAG        "v27.1.0"
-)
-FetchContent_MakeAvailable(pyzmq)
-install(DIRECTORY "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq")
-install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq/backend/cython")
-
-# =====================================================================
-#  CUNQA SIMULATOR - CESGA Quantum Spain
-# =====================================================================
-find_or_fetch_package(
-  cunqasimulator
-  "git@github.com:CESGA-Quantum-Spain/cunqasimulator.git"
-  "0.1.2"
-  "v0.1.2"
-)
-
-# =====================================================================
 #  ARGPARSE - command line parsing
 # =====================================================================
 FetchContent_Declare(
@@ -197,6 +280,12 @@ FetchContent_Declare(
     GIT_TAG "b1479bf9f2f44010ad79efff00bb9bf8ec56dbab"
 )
 FetchContent_MakeAvailable(argparse)
+
+
+
+#######################################################################
+############################ SIMULATORS ###############################
+#######################################################################
 
 # =====================================================================
 #  AER - Qiskit simulator headers (fork with version 0.17.2 minimal fix and GPU setter)
@@ -270,27 +359,38 @@ if (DEFINED AER_GPU)
   target_link_libraries(aer_headers INTERFACE Python::Python Threads::Threads ${PMIX_LIB} CUDA::cudart)
 endif()
 
+
+# =====================================================================
+#  MQT-DDSIM - quantum circuit simulator
+# =====================================================================
+set(_ORIG_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+set(_ORIG_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+set(_ORIG_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+set(_ORIG_INCLUDE_DIRS ${CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE})
+set(_ORIG_COMPILE_DEFINITIONS ${CMAKE_CXX_FLAGS})
+set(BUILD_MQT_CORE_MLIR OFF CACHE BOOL "" FORCE)
+find_or_fetch_package(
+  mqt-ddsim
+  "git@github.com:munich-quantum-toolkit/ddsim.git"
+  "2.2.0"
+  "v2.2.0"
+)
+set(CMAKE_CXX_FLAGS "${_ORIG_CXX_FLAGS}" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "${_ORIG_CXX_FLAGS_DEBUG}" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "${_ORIG_CXX_FLAGS_RELEASE}" CACHE STRING "" FORCE)
+include_directories(${_ORIG_INCLUDE_DIRS})
+add_definitions(${_ORIG_COMPILE_DEFINITIONS})
+
+
 # =====================================================================
 #  Maestro and its dependencies
 # =====================================================================
-find_package(Eigen3 5.0 QUIET)
-if(NOT Eigen3_FOUND)
-  message(STATUS "Package Eigen3 not found, fetching from https://gitlab.com/libeigen/eigen.git")
-  FetchContent_Declare(
-      MaestroEigen
-      GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
-      GIT_TAG        "bc3b39870ecb690a623a3f49149a358b95c5781d"
-  )
-  FetchContent_GetProperties(MaestroEigen)
-  if(NOT maestroeigen_POPULATED)
-      FetchContent_Populate(MaestroEigen)
-  endif()
-  #FetchContent_MakeAvailable(MaestroEigen)
-  set(EIGEN5_INCLUDE_DIR "${maestroeigen_SOURCE_DIR}") 
-else()
-  message(STATUS "Eigen 5.0 found")
-  set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_PATH}") 
-endif()
+get_target_property(
+  EIGEN5_INCLUDE_DIR 
+  Eigen3::Eigen 
+  INTERFACE_INCLUDE_DIRECTORIES
+)
+set(EIGEN5_INCLUDE_DIR "${EIGEN5_INCLUDE_DIR}") 
 
 get_target_property(
     JSON_INCLUDE_PATH 
@@ -324,6 +424,11 @@ endif()
 set(AER_INCLUDE_DIR "${maestro-aer_SOURCE_DIR}/src")
 
 # -- Maestro ----------------------------------------------------------
+set(ENV{EIGEN5_INCLUDE_DIR} "${EIGEN5_INCLUDE_DIR}")
+set(ENV{JSON_INCLUDE_DIR}   "${JSON_INCLUDE_DIR}")
+set(ENV{QCSIM_INCLUDE_DIR}  "${QCSIM_INCLUDE_DIR}")
+set(ENV{AER_INCLUDE_DIR}    "${AER_INCLUDE_DIR}")
+set(ENV{BOOST_ROOT}         "${Boost_DIR}/../../../")
 
 FetchContent_Declare(
     maestro
@@ -333,29 +438,67 @@ FetchContent_Declare(
 set(BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(maestro)
 
+if(UNIX AND NOT APPLE)
+    target_link_options(maestro PRIVATE -Wl,-Bsymbolic-functions)
+endif()
+
 target_include_directories(maestro PUBLIC "${maestro_SOURCE_DIR}")
 install(TARGETS maestro DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
 
 # =====================================================================
 #  Qulacs - Fujitsu simulator (Fork with ECR gate implemented)
 # =====================================================================
 FetchContent_Declare(
     qulacs
-    GIT_REPOSITORY "git@github.com:usendon/qulacs.git"
-    GIT_TAG "6065d9ac8d30bd8a16b41b1e93776968ecc5b6d4"
+    GIT_REPOSITORY "git@github.com:CESGA-Quantum-Spain/qulacs.git"
+    GIT_TAG "main"
 )
 
-set(USE_PYTHON OFF CACHE BOOL "" FORCE)
-set(BUILD_QULACS_WITH_MPI OFF)
-if(BUILD_QULACS_WITH_MPI)
-  set(CXX_COMPILER "mpic++" CACHE STRING "" FORCE) # Warning!
-  set(USE_MPI ON CACHE BOOL "" FORCE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Qulacs will NOT to set its own flags
+set(OPT_FLAGS "" CACHE STRING "" FORCE) 
+
+# Prevent Qulacs from changing the output directories
+set(PYTHON_SETUP_FLAG ON CACHE BOOL "" FORCE) # This bypasses the ARCHIVE_OUTPUT_DIRECTORY logic
+
+FetchContent_GetProperties(qulacs)
+if(NOT qulacs_POPULATED)
+    FetchContent_Populate(qulacs)
+
+    set(_OLD_MODULE_PATH ${CMAKE_MODULE_PATH})
+
+    set(USE_PYTHON OFF CACHE BOOL "" FORCE)
+    set(USE_TEST OFF CACHE BOOL "" FORCE)
+    set(USE_OMP ON CACHE BOOL "" FORCE)
+    set(BUILD_QULACS_WITH_MPI OFF CACHE BOOL "" FORCE)
+
+    # EXCLUDE_FROM_ALL to not build their benchmarks/tests
+    set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE PATH "" FORCE)
+    set(EIGEN3_INCLUDE_DIRS "${eigen3_SOURCE_DIR}" CACHE PATH "" FORCE)
+    set(EIGEN3_FOUND TRUE CACHE BOOL "" FORCE)
+    add_subdirectory(${qulacs_SOURCE_DIR} ${qulacs_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+    # RESTORE paths to fix the "File /CMakeLists.cmake.in does not exist" error
+    set(CMAKE_MODULE_PATH ${_OLD_MODULE_PATH})
+    
+    # Force reset the FetchContent commands to standard CMake versions if needed
+    include(FetchContent) 
 endif()
-FetchContent_MakeAvailable(qulacs)
 
 
-#  Restore original compiler flags
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
+# =====================================================================
+#  CUNQA SIMULATOR - CESGA Quantum Spain
+# =====================================================================
+find_or_fetch_package(
+  cunqasimulator
+  "git@github.com:CESGA-Quantum-Spain/cunqasimulator.git"
+  "0.1.2"
+  "v0.1.2"
+)
+
+
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURRENT_SOURCE_DIR}/src")
 #include_directories("${Python_INCLUDE_DIRS}" "${MPI_INCLUDE_PATH}")

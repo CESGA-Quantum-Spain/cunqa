@@ -1,9 +1,12 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <complex>
 #include <unordered_map>
 #include <string_view>
+
+#include <utils/json.hpp>
 
 namespace cunqa {
 namespace constants{
@@ -17,11 +20,76 @@ const std::string COMM_FILEPATH = "@COMM_FILEPATH@";
 const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
 
 
+enum SIMULATORS {
+  AER,
+  MUNICH,
+  MAESTRO,
+  QULACS,
+  CUNQASIM
+};
+
+const std::unordered_map<std::string, int> SIMULATORS_MAP {
+  {"Aer", AER},
+  {"Munich", MUNICH},
+  {"Maestro", MAESTRO},
+  {"Qulacs", QULACS},
+  {"Cunqa", CUNQASIM},
+};
+
+inline const std::vector<std::string> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_NOISY_SIMULATORS = {"Aer", "Munich"};
+
+
+using CUNQAComplex = std::vector<double>;
+using CUNQADiagonalMatrix = std::vector<CUNQAComplex>;
+using CUNQARow = std::vector<CUNQAComplex>;
+using CUNQAMatrix = std::vector<CUNQARow>;
+using CUNQAComplexVector = std::vector<std::complex<double>>;
+
+struct CUNQAInstruction {
+  std::string name;
+  std::vector<int> qubits = {};
+  std::vector<int> clbits = {};
+  std::vector<double> params = {};
+  std::vector<std::string> qpus = {};
+  std::vector<CUNQAInstruction> instructions = {}; 
+  std::vector<CUNQAMatrix> matrix = {}; 
+  std::vector<CUNQADiagonalMatrix> diagonal = {}; 
+  std::vector<int> l_clbits = {};
+  std::vector<int> r_clbits = {};
+  std::vector<unsigned int> block_size = {};
+  std::vector<unsigned int> pauli_id_list = {};
+  int seed = 0;
+};
+
+struct StructuredQuantumTask {
+    std::string id;
+    int n_qubits;
+    int n_clbits;
+    std::vector<CUNQAInstruction> instructions;
+};
+
 enum INSTRUCTIONS {
     UNITARY,
+    DIAGONAL,
+    MULTIPLEXER,
+    MULTIPAULI,
+    AMPLITUDEDAMPINGNOISE,
+    BITFLIPNOISE,
+    DENSEMATRIX,
+    DEPHASINGNOISE,
+    DEPOLARIZINGNOISE,
+    INDEPENDENTXZNOISE,
+    RANDOMUNITARY,
+    SPARSEMATRIX,
+    TWOQUBITDEPOLARIZINGNOISE,
+    COPY,
+    RESET,
+    BARRIER,
 
     MEASURE,
-    COPY,
 
     ID,
     X,
@@ -29,54 +97,77 @@ enum INSTRUCTIONS {
     Z,
     H,
     S,
-    SDAG,
+    SDG,
     T,
-    TDAG,
+    TDG,
     SX,
     SY, 
     SZ,
-    SXDAG,
-    SYDAG,
-    SZDAG,
+    SXDG,
+    SYDG,
+    SZDG,
     P0,
     P1,
-    RESET,
+    V,
+    VDG,
+    K,
 
     RX,
     RY,
     RZ,
+    GLOBALP,
     P,
+    U1,
     ROTINVX,
     ROTINVY,
     ROTINVZ,
-    U1,
+    ROTX,
+    ROTY,
+    ROTZ,
+    MULTIPAULIROTATION,
 
     U2,
     R,
 
     U3,
+
     U,
 
     ECR,
-    CU1,
-    CU3,
     SWAP,
+    ISWAP,
+    FUSEDSWAP,
     CX,
     CY,
     CZ,
+    CH,
     CSX,
+    CSXDG,
     CSY, 
     CSZ,
+    CS,
+    CSDG,
     CT,
-
-    CP,
+    DCX,
+    
     CRX,
     CRY,
     CRZ,
+    CP,
+    CU1,
     RXX,
     RYY,
     RZZ,
     RZX,
+
+    CU2,
+    CR,
+    XXMYY,
+    XXPYY,
+
+    CU3,
+
+    CU,
 
     CECR,
     CSWAP,
@@ -84,10 +175,26 @@ enum INSTRUCTIONS {
     CCY,
     CCZ,
 
-    CU2,
-    CR,
+    MCX,
+    MCY,
+    MCZ,
+    MCSX,
 
-    CU,
+    MCRX,
+    MCRY,
+    MCRZ,
+    MCP,
+    MCU1,
+
+    MCU2,
+    MCR,
+
+    MCU3,
+
+    MCU,
+
+    MCSWAP,
+
 
     CIF,
     SEND,
@@ -101,12 +208,27 @@ enum INSTRUCTIONS {
 };
 
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
-    // UNITARY
+    // SPECIAL
     {"unitary", UNITARY},
+    {"diagonal", DIAGONAL},
+    {"multiplexer", MULTIPLEXER},
+    {"multipauli", MULTIPAULI},
+    {"amplitudedampingnoise", AMPLITUDEDAMPINGNOISE},
+    {"bitflipnoise", BITFLIPNOISE},
+    {"densematrix", DENSEMATRIX},
+    {"dephasingnoise", DEPHASINGNOISE},
+    {"depolarizingnoise", DEPOLARIZINGNOISE},
+    {"independentxznoise", INDEPENDENTXZNOISE},
+    {"randomunitary", RANDOMUNITARY},
+    {"sparsematrix", SPARSEMATRIX},
+    {"twoqubitdepolarizingnoise", TWOQUBITDEPOLARIZINGNOISE},
+    {"copy", COPY},
+    {"reset", RESET},
+    {"barrier", BARRIER},
+
 
     // MEASURE
     {"measure", MEASURE},
-    {"copy", COPY},
 
     // ONE QUBIT NO PARAM
     {"id", ID},
@@ -118,26 +240,32 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"sx", SX},
     {"sy", SY},
     {"sz", SZ},
-    {"sdag", SDAG},
-    {"sxdag", SXDAG},
-    {"sydag", SYDAG},
-    {"szdag", SZDAG},
+    {"sdg", SDG},
+    {"sxdg", SXDG},
+    {"sydg", SYDG},
+    {"szdg", SZDG},
     {"t", T},
-    {"tdag", TDAG},
+    {"tdg", TDG},
     {"p0", P0},
     {"p1", P1},
-    {"reset", RESET},
+    {"v", V},
+    {"vdg", VDG},
+    {"k", K},
 
     // ONE QUBIT ONE PARAM
-    {"u1", U1},
-    {"p", P},
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
+    {"gp", GLOBALP},
+    {"p", P},
     {"u1", U1},
     {"rotinvx", ROTINVX},
     {"rotinvy", ROTINVY},
     {"rotinvz", ROTINVZ},
+    {"rotx", ROTX},
+    {"roty", ROTY},
+    {"rotz", ROTZ},
+    {"multipaulirotation", MULTIPAULIROTATION},
 
     // ONE QUBIT TWO PARAM
     {"u2", U2},
@@ -145,42 +273,84 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // ONE QUBIT THREE PARAM
     {"u3", U3},
+
+    // ONE QUBIT FOUR PARAM
     {"u", U},
 
     // TWO QUBIT NO PARAM
+    {"ecr", ECR},
     {"swap", SWAP},
+    {"iswap", ISWAP},
+    {"fusedswap", FUSEDSWAP},
     {"cx", CX},
     {"cy", CY},
     {"cz", CZ},
+    {"ch", CH},
     {"csx", CSX},
+    {"csxdg", CSXDG},
     {"csy", CSY},
     {"csz", CSZ},
+    {"cs", CS},
+    {"csdg", CSDG},
     {"ct", CT}, 
-    {"ecr", ECR},
+    {"dcx", DCX},
 
     // TWO QUBIT ONE PARAM
-    {"cu1", CU1},
-    {"cp", CP},
     {"crx", CRX},
     {"cry", CRY},
     {"crz", CRZ},
+    {"cp", CP},
+    {"cu1", CU1},
     {"rxx", RXX},
     {"ryy", RYY},
     {"rzz", RZZ},
     {"rzx", RZX},
 
-    // TWO QUBIT THREE PARAM
+    // TWO QUBIT TWO PARAM
     {"cu2", CU2},
     {"cr", CR},
-    {"cu", CU},
+    {"xxmyy", XXMYY},
+    {"xxpyy", XXPYY},
+
+    // TWO QUBIT THREE PARAM
     {"cu3", CU3},
+    
+    //TWO QUBIT FOUR PARAM
+    {"cu", CU},
+
 
     // THREE QUBIT NO PARAM
+    {"cecr", CECR},
+    {"cswap", CSWAP},
     {"ccx", CCX},
     {"ccy", CCY},
     {"ccz", CCZ},
-    {"cecr", CECR},
-    {"cswap", CSWAP},
+
+    // MULTICONTROLED ONE QUBIT NO PARAM
+    {"mcx", MCX},
+    {"mcy", MCY},
+    {"mcz", MCZ},
+    {"mcsx", MCSX},
+
+    // MULTICONTROLED ONE QUBIT ONE PARAM
+    {"mcrx", MCRX},
+    {"mcry", MCRY},
+    {"mcrz", MCRZ},
+    {"mcp", MCP},
+    {"mcu1", MCU1},
+
+    // MULTICONTROLED ONE QUBIT TWO PARAM
+    {"mcu2", MCU2},
+    {"mcr", MCR},
+
+    // MULTICONTROLED ONE QUBIT THREE PARAM
+    {"mcu3", MCU3},
+
+    // MULTICONTROLED ONE QUBIT FOUR PARAM
+    {"mcu", MCU},
+
+    // MULTICONTROLED TWO QUBIT NO PARAM
+    {"mcswap", MCSWAP},
 
     // CLASSICAL IF
     {"cif", CIF},
@@ -199,18 +369,325 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"save_state", SAVE_STATE}
 };
 
-const std::vector<std::string> BASIS_GATES = {
-    "unitary",
+
+const std::vector<std::string> AER_BASIS_GATES = {
+    "measure", 
     "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
-    "u1", "p", "rx", "ry", "rz",
-    "u2", "r",
-    "u3", "u",
-    "ecr", "swap", "cx", "cy", "cz", "csx",
-    "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", 
-    "cu", "cu3",
-    "cswap", "ccx", "ccz",
+    "u1", "gp", "rx", "ry", "rz",
+    "u2", "r", 
+    "u3",
+    "swap", "cx", "cy", "cz", "csx", "ecr",
+    "cp", "cu1", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx",
+    "cu2", 
+    "cu3", "cu", 
+    "ccx", "ccz",  "cswap", 
+    "mcx", "mcy", "mcz", "mcsx",  
+    "mcp", "mcu1", "mcrx", "mcry", "mcrz", 
+    "mcu2", "mcr",
+    "mcu3",
+    "mcswap", 
+    "unitary", "diagonal", "multiplexer",
 };
 
+const std::vector<std::string> MUNICH_BASIS_GATES = {
+  "measure",
+  "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
+  "u1", "gp", "p", "rx", "ry", "rz", 
+  "u2", 
+  "u3", 
+  "u",
+  "cx", "cy", "cz", "ch", "csx", "cs", "csdg", "swap", "iswap", "ecr", "dcx",  
+  "cu1", "cp", "crx", "cry", "crz", "rxx", "ryy", "rzz", "rzx", "xxmyy", "xxpyy", 
+  "cu3",
+  "cu",
+  "cswap", 
+  "mcx", "mcp",
+  "reset", "barrier",
+};
+
+const std::vector<std::string> MAESTRO_BASIS_GATES = {
+  "measure",
+  "x", "y", "z", "h", "s", "sdg", "t", "tdg", "sx", "sxdg", "k",
+  "p", "rx", "ry", "rz", 
+  "u", 
+  "cx", "cy", "cz", "ch", "csx", "csxdg", "swap", 
+  "cp", "crx", "cry", "crz",
+  "ccx", "cswap",
+  "cu",
+  "reset",
+};
+
+const std::vector<std::string> QULACS_BASIS_GATES = {
+  "measure",
+  "id", "x", "y", "z", "h", "s", "sdg", "t", "tdg", "p0", "p1", "sx", "sxdg", "sy", "sydg", "multipauli",
+  "u1", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz", "rotx", "roty", "rotz", "parametricrx", "parametricry", "parametricrz", "multipaulirotation",
+  "u2", 
+  "u3",
+  "cx", "cz", "swap", "fusedswap", "ecr",
+  "cp",
+  "amplitudedampingdoise", "bitflipnoise", "densematrix", "dephasingnoise", "depolarizingnoise", "diagonalmatrix", "independentxznoise", "randomunitary", "sparsematrix", "twoqubitdepolarizingnoise",
+};
+
+const std::vector<std::string> CUNQASIM_BASIS_GATES = {
+  "measure", 
+  "id", "x", "y", "z", "h", "sx",
+  "rx", "ry", "rz", 
+  "swap", "cx", "cy", "cz", "ecr", 
+  "crx", "cry", "crz",
+};
+
+
+inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions(const std::vector<JSON>& json_instructions)
+{
+    std::vector<CUNQAInstruction> cunqa_instructions;
+    
+    for (auto& instruction : json_instructions) {
+        std::string instruction_name = instruction.at("name").get<std::string>();
+        CUNQAInstruction cunqa_instruction = {};
+        auto instruction_type = INSTRUCTIONS_MAP.at(instruction_name);
+
+        switch (instruction_type) {
+        case MEASURE:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .clbits = instruction.at("clbits").get<std::vector<int>>()
+            };
+            break;
+        }
+        case ID:
+        case X:
+        case Y:
+        case Z:
+        case H:
+        case S:
+        case SDG:
+        case T:
+        case TDG:
+        case SX:
+        case SY:
+        case SZ:
+        case SXDG:
+        case SYDG:
+        case SZDG:
+        case P0:
+        case P1:
+        case V:
+        case VDG:
+        case K:
+        case ECR:
+        case SWAP:
+        case ISWAP:
+        case CX:
+        case CY:
+        case CZ:
+        case CH:
+        case CSX:
+        case CSXDG:
+        case CSY:
+        case CSZ:
+        case CS:
+        case CSDG:
+        case CT:
+        case DCX:
+        case CECR:
+        case CSWAP:
+        case CCX:
+        case CCY:
+        case CCZ:
+        case MCX:
+        case MCY:
+        case MCZ:
+        case MCSX:
+        case MCSWAP:
+        case BARRIER:
+        case RESET:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>()
+            };
+            break;
+        }
+        case FUSEDSWAP:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .block_size = instruction.at("block_size").get<std::vector<unsigned int>>()
+            };
+            break;
+        }
+        case RX:
+        case RY:
+        case RZ:
+        case GLOBALP:
+        case P:
+        case U1:
+        case ROTINVX:
+        case ROTINVY:
+        case ROTINVZ:
+        case ROTX:
+        case ROTY:
+        case ROTZ:
+        case U2:
+        case R:
+        case U3:
+        case U:
+        case CRX:
+        case CRY:
+        case CRZ:
+        case CP:
+        case CU1:
+        case RXX:
+        case RYY:
+        case RZZ:
+        case RZX:
+        case CU2:
+        case CR:
+        case XXMYY:
+        case XXPYY:
+        case CU3:
+        case CU:
+        case MCRX:
+        case MCRY:
+        case MCRZ:
+        case MCP:
+        case MCU1:
+        case MCU2:
+        case MCR:
+        case MCU3:
+        case MCU:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .params = instruction.at("params").get<std::vector<double>>()
+            };
+            break;
+        }
+        case MULTIPAULI:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .pauli_id_list = instruction.at("pauli_id_list").get<std::vector<unsigned int>>()
+            };
+            break;
+        }
+        case MULTIPAULIROTATION:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .params = instruction.at("params").get<std::vector<double>>(),
+                .pauli_id_list = instruction.at("pauli_id_list").get<std::vector<unsigned int>>()
+            };
+            break;
+        }
+        case UNITARY:
+        case SPARSEMATRIX:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()
+            };
+            break;
+        }
+        case DIAGONAL:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .diagonal = instruction.at("matrix").get<std::vector<CUNQADiagonalMatrix>>()
+            };
+            break;
+        }
+        case AMPLITUDEDAMPINGNOISE:
+        case BITFLIPNOISE:
+        case DEPHASINGNOISE:
+        case DEPOLARIZINGNOISE:
+        case INDEPENDENTXZNOISE:
+        case TWOQUBITDEPOLARIZINGNOISE:
+        {
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .params = instruction.at("params").get<std::vector<double>>(),
+                .seed = seed
+            };
+            break;
+        }
+        case RANDOMUNITARY:
+        {
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .seed = seed
+            };
+            break;
+        }
+        case COPY:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .l_clbits = instruction.at("l_clbits").get<std::vector<int>>(),
+                .r_clbits = instruction.at("r_clbits").get<std::vector<int>>()
+            };
+            break;
+        }
+        case SEND:
+        case RECV:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .clbits = instruction.at("clbits").get<std::vector<int>>(), 
+                .qpus = instruction.at("qpus").get<std::vector<std::string>>()
+            };
+            break;
+        }
+        case CIF:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .clbits = instruction.at("clbits").get<std::vector<int>>(), 
+                .instructions = from_json_instructions_to_cunqainstructions(instruction.at("instructions").get<cunqa::JSON>())
+            };
+            break;
+        }
+        case QSEND:
+        case QRECV:
+        case EXPOSE:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .qpus = instruction.at("qpus").get<std::vector<std::string>>()
+            };
+            break;
+        }
+        case RCONTROL:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qpus = instruction.at("qpus").get<std::vector<std::string>>(),
+                .instructions = from_json_instructions_to_cunqainstructions(instruction.at("instructions").get<cunqa::JSON>())
+            };
+            break;
+        }
+        default:
+            std::cerr << "Instruction not suported!" << "\n";
+        } // End switch
+
+        cunqa_instructions.push_back(cunqa_instruction);
+    }
+
+    return cunqa_instructions;
+}
 
 } // End namespace constants
 } //End namespace cunqa

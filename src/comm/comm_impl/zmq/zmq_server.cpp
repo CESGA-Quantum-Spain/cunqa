@@ -10,12 +10,12 @@ namespace comm {
 struct Server::Impl {
     zmq::context_t context_;
     zmq::socket_t socket_;
-    std::queue<uint32_t> rid_queue_;
+    std::queue<std::string> rid_queue_;
 
     std::string zmq_endpoint;
 
     Impl(const std::string& mode) :
-        socket_{context_, zmq::socket_type::server}
+        socket_{context_, zmq::socket_type::router}
     {
         try {
             std::string ip = (mode == "hpc" ? "127.0.0.1"s : get_IP_address());
@@ -36,10 +36,18 @@ struct Server::Impl {
     std::string recv() 
     { 
         try {
+            zmq::message_t identity;
+            auto id_size = socket_.recv(identity, zmq::recv_flags::none);
+            std::string id_data(static_cast<char*>(identity.data()), id_size.value());
+            rid_queue_.push(id_data);
+
+            int more = 0;
+            size_t more_size = sizeof(more);
+            socket_.getsockopt(ZMQ_RCVMORE, &more, &more_size);
+
             zmq::message_t message;
             auto size = socket_.recv(message, zmq::recv_flags::none);
             std::string data(static_cast<char*>(message.data()), size.value());
-            rid_queue_.push(message.routing_id());
             return data;
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error receiving data: {}", e.what());
@@ -51,11 +59,13 @@ struct Server::Impl {
     {
         try {
             zmq::message_t message(result.begin(), result.end());
-            message.set_routing_id(rid_queue_.front());
+            //message.set_routing_id(rid_queue_.front());
+            std::string recvr_id = rid_queue_.front();
             rid_queue_.pop();
-            
+            zmq::message_t identity_frame(recvr_id.begin(), recvr_id.end());
+
+            socket_.send(identity_frame, zmq::send_flags::sndmore);
             socket_.send(message, zmq::send_flags::none);
-            //LOGGER_DEBUG("Sent result: {}", result);
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error sending result: {}", e.what());
             throw;

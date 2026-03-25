@@ -9,7 +9,7 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Maestro", quantum_comm=True, co_located = True)
+    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
 except Exception as error:
     raise error
 
@@ -18,11 +18,10 @@ try:
 
     # 2. Design circuits with distributed instructions between them
     # First circuit 
-    cc_1 = CunqaCircuit(1, 1, id="First")
+    cc_1 = CunqaCircuit(1, 0, id="First")
     cc_1.h(0)
     cc_1.qsend(qubit = 0, recving_circuit = "Second")
-    cc_1.measure(0,0)
-
+    
     # Second circuit 
     cc_2 = CunqaCircuit(2, 2, id="Second")
     cc_2.qrecv(qubit = 0, control_circuit = "First")

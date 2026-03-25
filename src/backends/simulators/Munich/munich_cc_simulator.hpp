@@ -7,8 +7,6 @@
 #include "backends/simulators/simulator_strategy.hpp"
 #include "classical_channel/classical_channel.hpp"
 
-#include "munich_helpers.hpp"
-
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -19,7 +17,7 @@ public:
     MunichCCSimulator();
     ~MunichCCSimulator() = default;
 
-    inline std::string get_name() const override {return "MunichSimulator";}
+    inline std::string get_name() const override {return "Munich";}
     JSON execute([[maybe_unused]] const CCBackend& backend, const QuantumTask& circuit) override;
 
 private:

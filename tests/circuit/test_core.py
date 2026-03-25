@@ -303,8 +303,11 @@ ONEQUBIT_NOPARAM = [
     ("szdg",    (0,), {"name": "szdg",  "qubits": [0]}),
     ("t",       (0,), {"name": "t",     "qubits": [0]}),
     ("tdg",     (0,), {"name": "tdg",   "qubits": [0]}),
-    ("P0",      (0,), {"name": "p0",    "qubits": [0]}),
-    ("P1",      (0,), {"name": "p1",    "qubits": [0]}),
+    ("p0",      (0,), {"name": "p0",    "qubits": [0]}),
+    ("p1",      (0,), {"name": "p1",    "qubits": [0]}),
+    ("v",       (0,), {"name": "v",     "qubits": [0]}),
+    ("vdg",     (0,), {"name": "vdg",   "qubits": [0]}),
+    ("k",       (0,), {"name": "k",     "qubits": [0]}),
     ("reset",   (0,), {"name": "reset", "qubits": [0]})
 ]
 @pytest.mark.parametrize("method, args, expected", ONEQUBIT_NOPARAM)
@@ -315,12 +318,19 @@ def test_onequbit_noparam_gates(method, args, expected):
     assert circuit.instructions[-1] == expected
 
 TWOQUBIT_NOPARAM = [
-    ("swap", (0,1,), {"name": "swap", "qubits": [0,1]}),
-    ("ecr",  (0,1,), {"name": "ecr",  "qubits": [0,1]}),
-    ("cx",   (0,1,), {"name": "cx",   "qubits": [0,1]}),
-    ("cy",   (0,1,), {"name": "cy",   "qubits": [0,1]}),
-    ("cz",   (0,1,), {"name": "cz",   "qubits": [0,1]}),
-    ("csx",  (0,1,), {"name": "csx",  "qubits": [0,1]})
+    ("swap",      (0,1,), {"name": "swap",      "qubits": [0,1]}),
+    ("iswap",     (0,1,), {"name": "iswap",     "qubits": [0,1]}),
+    ("ecr",       (0,1,), {"name": "ecr",       "qubits": [0,1]}),
+    ("cx",        (0,1,), {"name": "cx",        "qubits": [0,1]}),
+    ("cy",        (0,1,), {"name": "cy",        "qubits": [0,1]}),
+    ("cz",        (0,1,), {"name": "cz",        "qubits": [0,1]}),
+    ("ch",        (0,1,), {"name": "ch",        "qubits": [0,1]}),
+    ("csx",       (0,1,), {"name": "csx",       "qubits": [0,1]}),
+    ("csxdg",     (0,1,), {"name": "csxdg",     "qubits": [0,1]}),
+    ("cs",        (0,1,), {"name": "cs",        "qubits": [0,1]}),
+    ("csdg",      (0,1,), {"name": "csdg",      "qubits": [0,1]}),
+    ("ct",        (0,1,), {"name": "ct",        "qubits": [0,1]}),
+    ("dcx",       (0,1,), {"name": "dcx",       "qubits": [0,1]}),
 ]
 @pytest.mark.parametrize("method, args, expected", TWOQUBIT_NOPARAM)
 def test_twoqubit_noparam_gates(method, args, expected):
@@ -360,10 +370,10 @@ ONEQUBIT_PARAM = [
     ("r",       (0.1,0.2,0,),     {"name": "r",       "qubits": [0], "params": [0.1,0.2]}),
     ("rx",      (0.1,0,),         {"name": "rx",      "qubits": [0], "params": [0.1]}),
     ("ry",      (0.1,0,),         {"name": "ry",      "qubits": [0], "params": [0.1]}),
-    ("rz",      (0.1,0,),         {"name": "rz",      "qubits": [0], "params": [0.1]}),
-    ("RotInvX", (0.1,0,),         {"name": "rotinvx", "qubits": [0], "params": [0.1]}),
-    ("RotInvY", (0.1,0,),         {"name": "rotinvy", "qubits": [0], "params": [0.1]}),
-    ("RotInvZ", (0.1,0,),         {"name": "rotinvz", "qubits": [0], "params": [0.1]}),
+    ("rz",      (0.1,0,),         {"name": "rz",      "qubits": [0], "params": [0.1]}), 
+    ("rotinvx", (0.1,0,),         {"name": "rotinvx", "qubits": [0], "params": [0.1]}),
+    ("rotinvy", (0.1,0,),         {"name": "rotinvy", "qubits": [0], "params": [0.1]}),
+    ("rotinvz", (0.1,0,),         {"name": "rotinvz", "qubits": [0], "params": [0.1]}),
 ]
 @pytest.mark.parametrize("method, args, expected", ONEQUBIT_PARAM)
 def test_onequbit_param_gates(method, args, expected):
@@ -373,16 +383,22 @@ def test_onequbit_param_gates(method, args, expected):
     assert circuit.instructions[-1] == expected
 
 TWOQUBIT_PARAM = [
-    ("rxx", (0.1,0,1,),             {"name": "rxx", "qubits": [0,1], "params": [0.1]}),
-    ("ryy", (0.1,0,1,),             {"name": "ryy", "qubits": [0,1], "params": [0.1]}),
-    ("rzz", (0.1,0,1,),             {"name": "rzz", "qubits": [0,1], "params": [0.1]}),
-    ("rzx", (0.1,0,1,),             {"name": "rzx", "qubits": [0,1], "params": [0.1]}),
-    ("cr",  (0.1,0,1,),             {"name": "cr",  "qubits": [0,1], "params": [0.1]}),
-    ("crx", (0.1,0,1,),             {"name": "crx", "qubits": [0,1], "params": [0.1]}),
-    ("cry", (0.1,0,1,),             {"name": "cry", "qubits": [0,1], "params": [0.1]}),
-    ("crz", (0.1,0,1,),             {"name": "crz", "qubits": [0,1], "params": [0.1]}),
-    ("cp",  (0.1,0,1,),             {"name": "cp",  "qubits": [0,1], "params": [0.1]}),
-    ("cu",  (0.1,0.2,0.3,0.4,0,1,), {"name": "cu",  "qubits": [0,1], "params": [0.1,0.2,0.3,0.4]}),
+    ("rxx",   (0.1,0,1,),             {"name": "rxx",   "qubits": [0,1], "params": [0.1]}),
+    ("ryy",   (0.1,0,1,),             {"name": "ryy",   "qubits": [0,1], "params": [0.1]}),
+    ("rzz",   (0.1,0,1,),             {"name": "rzz",   "qubits": [0,1], "params": [0.1]}),
+    ("rzx",   (0.1,0,1,),             {"name": "rzx",   "qubits": [0,1], "params": [0.1]}),
+    ("cr",    (0.1,0,1,),             {"name": "cr",    "qubits": [0,1], "params": [0.1]}),
+    ("crx",   (0.1,0,1,),             {"name": "crx",   "qubits": [0,1], "params": [0.1]}),
+    ("cry",   (0.1,0,1,),             {"name": "cry",   "qubits": [0,1], "params": [0.1]}),
+    ("crz",   (0.1,0,1,),             {"name": "crz",   "qubits": [0,1], "params": [0.1]}),
+    ("cp",    (0.1,0,1,),             {"name": "cp",    "qubits": [0,1], "params": [0.1]}),
+    ("cu1",   (0.1,0,1,),             {"name": "cu1",   "qubits": [0,1], "params": [0.1]}),
+    ("cu2",   (0.1, 0.2,0,1,),        {"name": "cu2",   "qubits": [0,1], "params": [0.1, 0.2]}),
+    ("cu3",   (0.1,0.2,0.3,0,1,),     {"name": "cu3",   "qubits": [0,1], "params": [0.1,0.2,0.3]}),
+    ("cu",    (0.1,0.2,0.3,0.4,0,1,), {"name": "cu",    "qubits": [0,1], "params": [0.1,0.2,0.3,0.4]}),
+    ("cu",    (0.1,0.2,0.3,0.4,0,1,), {"name": "cu",    "qubits": [0,1], "params": [0.1,0.2,0.3,0.4]}),
+    ("xxmyy", (0.1,0.2,0,1,),         {"name": "xxmyy", "qubits": [0,1], "params": [0.1,0.2]}),
+    ("xxpyy", (0.1,0.2,0,1,),         {"name": "xxpyy", "qubits": [0,1], "params": [0.1,0.2]}),
 ]
 @pytest.mark.parametrize("method, args, expected", TWOQUBIT_PARAM)
 def test_twoqubit_param_gates(method, args, expected):
@@ -391,6 +407,57 @@ def test_twoqubit_param_gates(method, args, expected):
 
     assert circuit.instructions[-1] == expected
 
+MULTICONTROL_GATES = [
+    ("mcx",   (0, 1, 2),                   {"name": "mcx",   "qubits": [0, 1, 2]}),
+    ("mcy",   (0, 1, 2),                   {"name": "mcy",   "qubits": [0, 1, 2]}),
+    ("mcz",   (0, 1, 2),                   {"name": "mcz",   "qubits": [0, 1, 2]}),
+    ("mcsx",  (0, 1, 2),                   {"name": "mcsx",  "qubits": [0, 1, 2]}),
+    ("mcp",   (1.0, 0, 1, 2),              {"name": "mcp",   "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcrx",  (1.0, 0, 1, 2),              {"name": "mcrx",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcry",  (1.0, 0, 1, 2),              {"name": "mcry",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcrz",  (1.0, 0, 1, 2),              {"name": "mcrz",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcu1",  (1.0, 0, 1, 2),              {"name": "mcu1",  "qubits": [0, 1, 2], "params": [1.0]}),
+    ("mcu2",  (1.0, 2.0, 0, 1, 2),         {"name": "mcu2",  "qubits": [0, 1, 2], "params": [1.0, 2.0]}),
+    ("mcu3",  (1.0, 2.0, 3.0, 0, 1, 2),    {"name": "mcu3",  "qubits": [0, 1, 2], "params": [1.0, 2.0, 3.0]}),
+    ("mcu",   (1.0, 2.0, 3.0, 4.0, 0, 1, 2), {"name": "mcu", "qubits": [0, 1, 2], "params": [1.0, 2.0, 3.0, 4.0]}),
+]
+
+@pytest.mark.parametrize("method, args, expected", MULTICONTROL_GATES)
+def test_multicontrol_gates(method, args, expected):
+    circuit = CunqaCircuit(3)
+    getattr(circuit, method)(*args)
+
+    assert circuit.instructions[-1] == expected
+
+SPECIAL_GATES = [
+    ("unitary", ([[1.0 + 0.0j, 0.0 + 0.0j], [0.0 + 0.0j, 1.0 + 0.0j]], 0),
+        {
+            "name": "unitary",
+            "qubits": [0],
+            "matrix": [[
+                [[1.0, 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [1.0, 0.0]],
+            ]],
+        },
+    ),
+    ("randomunitary",              (0,1,),                   {"name": "randomunitary",             "qubits": [0,1]}),
+    ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[[1.0,1.0],[0.0,-1.0]]]}),
+    ("fusedswap",                  (3,0,1),                  {"name": "fusedswap",                 "qubits": [0,1],"block_size":[3]}),
+    ("multipauli",                 ([1,2,3],0,),             {"name": "multipauli",                "qubits": [0],  "pauli_id_list":[1,2,3]}),
+    ("multipaulirotation",         (1.0,[1,2,3],0,),         {"name": "multipaulirotation",        "qubits": [0],  "params":[1.0], "pauli_id_list":[1,2,3]}),
+    ("amplitudedampingnoise",      (1.0,0,1,),               {"name": "amplitudedampingnoise",     "qubits": [0,1],"params":[1.0]}),
+    ("bitflipnoise",               (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
+    ("dephasingnoise",             (1.0,0,),                 {"name": "dephasingnoise",            "qubits": [0],  "params":[1.0]}),
+    ("depolarizingnoise",          (1.0,0,),                 {"name": "depolarizingnoise",         "qubits": [0],  "params":[1.0]}),
+    ("independentxznoise",         (1.0,0,),                 {"name": "independentxznoise",        "qubits": [0],  "params":[1.0]}),
+    ("twoqubitdepolarizingnoise",  (1.0,0,1,),               {"name": "twoqubitdepolarizingnoise", "qubits": [0,1],"params":[1.0]}),
+]
+@pytest.mark.parametrize("method, args, expected", SPECIAL_GATES)
+def test_twoqubit_param_gates(method, args, expected):
+    circuit = CunqaCircuit(2)
+    getattr(circuit, method)(*args)
+
+    assert circuit.instructions[-1] == expected
 
 def test_unitary_accepts_numpy(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "UNIT")
@@ -405,7 +472,7 @@ def test_unitary_accepts_numpy(monkeypatch):
     assert instr["name"] == "unitary"
     assert instr["qubits"] == [0]
 
-    encoded = instr["elements"][0]
+    encoded = instr["matrix"][0]
     assert encoded == [
         [[1.0, 0.0], [0.0, 0.0]],
         [[0.0, 0.0], [1.0, 0.0]],
@@ -535,7 +602,7 @@ def test_quantum_control_context_adds_rcontrol_to_target():
     control = CunqaCircuit(1, id="CTRL")
     target = CunqaCircuit(1, id="TGT")
 
-    with control.expose(0, target) as (rqubit, subcircuit):
+    with control.expose(0, target) as ([rqubit], subcircuit):
         assert rqubit == -1
         subcircuit.x(0)
 

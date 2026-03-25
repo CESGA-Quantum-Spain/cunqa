@@ -65,8 +65,8 @@ try:
         result = run(parametric_circuit, qpus[k%10], params, shots = 2000, seed = SEED).result
         counts = result.counts
 
-        zeros = counts.get("0", 0)
-        ones = counts.get("1", 0)
+        zeros = sum([counts for result, counts in counts.items() if result.endswith('0')])
+        ones = sum([counts for result, counts in counts.items() if result.endswith('1')])
         measure.append(0 if zeros > ones else 1) 
                 
 

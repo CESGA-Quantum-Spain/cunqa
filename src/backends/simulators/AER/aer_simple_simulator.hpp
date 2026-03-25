@@ -15,7 +15,7 @@ public:
     AerSimpleSimulator() = default;
     ~AerSimpleSimulator() = default;
 
-    inline std::string get_name() const override {return "AerSimulator";} 
+    inline std::string get_name() const override {return "Aer";} 
     JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;
 };
 

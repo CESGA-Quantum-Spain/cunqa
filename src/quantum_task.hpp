@@ -3,20 +3,21 @@
 #include <vector>
 #include <string>
 #include "utils/json.hpp"
+#include "utils/constants.hpp"
 
 namespace cunqa {
+using namespace constants;
 
 class QuantumTask {
-public:
-    JSON circuit;
+    public:
+    std::string id;
+    std::vector<JSON> circuit;
     JSON config;
     std::vector<std::string> sending_to;
     bool is_dynamic = false; // C_IF gates & Communications
-    std::string id;
 
     QuantumTask() = default;
     QuantumTask(const std::string& quantum_task);
-    QuantumTask(const JSON& circuit, const JSON& config): circuit(circuit), config(config) {};
 
     void update_circuit(const std::string& quantum_task);
     
@@ -25,5 +26,6 @@ private:
 };
 
 std::string to_string(const QuantumTask& data);
+StructuredQuantumTask from_quantum_task_to_structuredqtask(const QuantumTask& quantum_task);
 
 } // End of cunqa namespace

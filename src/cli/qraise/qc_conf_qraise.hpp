@@ -10,6 +10,8 @@
 #include "utils_qraise.hpp"
 #include "logger.hpp"
 
+
+namespace{
 using namespace cunqa;
 
 
@@ -169,13 +171,13 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 }
 
 
-void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args, const std::vector<std::string>& supported_qc_simulators)
+void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
 
-    } else if (std::find(supported_qc_simulators.begin(), supported_qc_simulators.end(), std::string(args.simulator)) == supported_qc_simulators.end()) {
+    } else if (std::find(constants::SUPPORTED_QC_SIMULATORS.begin(), constants::SUPPORTED_QC_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_QC_SIMULATORS.end()) {
         LOGGER_ERROR("Simulator {} is not available for quantum communications simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
@@ -188,3 +190,5 @@ void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args, const std
         throw std::runtime_error("Error.");
     }  
 }
+
+} // End namespace 
