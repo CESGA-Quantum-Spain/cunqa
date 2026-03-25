@@ -7,9 +7,9 @@
 #include "comm/client.hpp"
 #include "utils/helpers/qasm2_to_json.hpp"
 #include "utils/helpers/json_to_qasm2.hpp"
+#include "utils/probabilities/process_counts.hpp"
 #include "json.hpp"
 
-#include "utils/probabilities/process_counts.hpp"
  
 namespace py = pybind11;
 using namespace cunqa::comm;
