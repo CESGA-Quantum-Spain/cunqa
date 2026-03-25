@@ -4,7 +4,7 @@ Backend JSON
 Here it is presented how to specify a backend using JSON. Supported simulators must be indicated with the following aliases:
 
 +--------------------------+----------------------------+
-| **Siulator Name**        | **Alias for the backend**  |
+| **Simulator Name**       |  **Alias for the backend** |
 +--------------------------+----------------------------+
 |  AerSimulator            |  Aer                       |
 +--------------------------+----------------------------+
