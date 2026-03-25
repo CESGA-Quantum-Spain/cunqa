@@ -36,7 +36,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
 from cunqa.circuit.ir import to_ir
 
-
+from qiskit_aer.library import default_qubits
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
 from qiskit.circuit import (
@@ -161,7 +161,7 @@ SUPPORTED_QISKIT_OPERATIONS = {
     'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 
     'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 
     'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 
-    'if_else', 'barrier', 'reset'
+    'if_else', 'barrier', 'reset', 'save_state'
 }
 
 
@@ -209,6 +209,8 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
             circuit_clbits.append(i)
         qc.add_register(ClassicalRegister(len(lista), cr))
 
+    # Track Parameter objects to avoid different Parameters with the same string (raises ERROR)
+    parameter_tracker = {}
 
     # processing instructions
     for instruction in copy.deepcopy(instructions):
@@ -241,9 +243,16 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
             if isinstance(param, Param):
 
-                symbol_map = {Parameter(symbol.name): symbol for symbol in param.variables}
-                qiskit_paramexp = ParameterExpression(symbol_map, param.expr)
+                symbol_map = {}
+                # Transfor Params to ParameterExpressions avoiding Parameter duplication
+                # Otherwise: symbol_map = {Parameter(symbol.name): symbol for symbol in param.variables}
+                for symbol in param.variables:
+                    if not symbol.name in parameter_tracker:
+                        parameter_tracker[symbol.name] = Parameter(symbol.name)
 
+                    symbol_map[parameter_tracker[symbol.name]] = symbol
+
+                qiskit_paramexp = ParameterExpression(symbol_map, param.expr)
                 qiskit_params.append(qiskit_paramexp)
 
             elif isinstance(param, float) or isinstance(param, int):
@@ -272,6 +281,10 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         elif instruction_name == "unitary":
 
             qc.unitary(instruction.get("matrix", []), qiskit_Qubit)
+
+        elif instruction_name == "save_state":
+            pershot = True if (instruction["snapshot_type"] == "list") else False
+            qc.save_state(label=instruction["label"], pershot=pershot)
 
         elif instruction_name == "cif":
 

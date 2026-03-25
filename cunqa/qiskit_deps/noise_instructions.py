@@ -246,7 +246,7 @@ def main(args=None):
         return backend_json
     
     except Exception as e:
-        logger.error(f"Error in main function: {e}")
+        logger.error(f"Error in noise_instructions main function: {e}")
         raise SystemExit(1)
 
 # Allow script to be run directly

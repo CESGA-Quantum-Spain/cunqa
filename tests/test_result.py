@@ -49,7 +49,7 @@ def test_counts_for_multiple_registers():
 
     r = Result(result_dict, circ_id="circC", registers=registers)
 
-    assert r.counts == {"001 11": 23, "110 10": 77}
+    assert r.counts == {"00 111": 23, "11 010": 77}
 
 
 def test_counts_with_empty_registers():

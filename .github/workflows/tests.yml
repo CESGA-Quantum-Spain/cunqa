@@ -41,6 +41,17 @@ jobs:
           def json_to_qasm2(a):
             pass
           PY
+      - name: Create stub cunqa/counts_and_probs.py (empty counts_and_probs)
+        shell: bash
+        run: |
+          cat > cunqa/counts_and_probs.py <<'PY'
+          def marginalize_counts(counts, region_sizes, check_lenght = False):
+            pass
+          def recombine_probs(probs, per_qubit, partial, num_qubits):
+            pass
+          def counts_to_probs(counts, per_qubit = False, partial = None):
+            pass
+          PY
       - name: Copy constants.py.in into constants.py
         run:
           cp cunqa/constants.py.in cunqa/constants.py

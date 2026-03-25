@@ -14,7 +14,7 @@ SUPPORTED_QISKIT_OPERATIONS = {
     'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 
     'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 
     'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 
-    'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset'
+    'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset', 'save_state'
 }
 
 @singledispatch
@@ -97,6 +97,14 @@ def _(c: QuantumCircuit) -> dict:
                 "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
                 "params":[[list(map(lambda z: [z.real, z.imag], row)) 
                            for row in instruction.operation.params[0].tolist()]]
+            })
+
+        elif instruction.operation.name == "save_state":
+            json_data["instructions"].append({
+                "name":instruction.operation.name, 
+                "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                "snapshot_type": instruction.operation._subtype,
+                "label": instruction.operation.label
             })
 
         elif instruction.operation.name == "if_else":
