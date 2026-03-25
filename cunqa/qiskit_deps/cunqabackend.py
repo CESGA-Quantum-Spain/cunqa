@@ -267,8 +267,8 @@ class CunqaBackend(BackendV2):
     
     @property
     def coupling_map_list(self):
-        return list(self._target.coupling_map)
-    
+        return list(self._target.build_coupling_map())
+
     @property
     def basis_gates(self):
         return [gate for gate in self.target._gate_map.keys() if gate != "measure"]
@@ -303,7 +303,7 @@ from qiskit.circuit.library.standard_gates import (
     U1Gate, U2Gate, U3Gate, CU1Gate, CU3Gate, UGate, CUGate, PhaseGate, RGate, RXGate, RYGate, 
     RZGate, ECRGate, CRXGate, CRYGate, CRZGate, IGate, XGate, YGate, ZGate, HGate, SGate, SdgGate, 
     SXGate, SXdgGate, TGate, TdgGate, SwapGate, CXGate, CYGate, CZGate, CSXGate, CSwapGate, CCXGate, 
-    CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate, )
+    CCZGate, CPhaseGate, RXXGate, RYYGate, RZZGate, RZXGate)
 
 def _get_gate(name: str):
 
