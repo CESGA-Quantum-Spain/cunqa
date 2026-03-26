@@ -31,7 +31,7 @@ import copy
 
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from cunqa.logger import logger
-from cunqa.qpu import Backend
+from cunqa.qpu import Backend, QPU
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.parameter import Param
 from cunqa.circuit.ir import to_ir
@@ -53,7 +53,7 @@ from qiskit.circuit import (
 
 def transpiler(
     circuit: Union[dict, QuantumCircuit, CunqaCircuit], 
-    backend: Backend, 
+    backend: Union[Backend, QPU], 
     opt_level: int = 1, 
     initial_layout: list[int] = None, 
     seed: int = None
@@ -71,7 +71,8 @@ def transpiler(
     Args:
         circuit (dict | qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit): circuit to be 
                                                                               transpiled.
-        backend (~cunqa.qpu.Backend): backend which transpilation will be done respect to.
+        backend (~cunqa.qpu.Backend | ~cunqa.qpu.QPU): transpilation will be done with respect to the 
+                                                       provided backend or the provided QPU's backend.
         opt_level (int): optimization level for creating the 
                          `qiskit.transpiler.passmanager.StagedPassManager`. Default set to 1.
         initial_layout (list[int]): initial position of virtual qubits on physical qubits for 
@@ -114,6 +115,7 @@ def transpiler(
 
     # transpilation
     try:
+        backend = backend.backend if isinstance(backend, QPU) else backend
         cunqabackend = CunqaBackend(backend = backend)
         qc_transpiled = transpile(
             qc, 
