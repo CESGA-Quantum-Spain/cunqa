@@ -11,7 +11,7 @@ nbsphinx
 pandoc
 lxml-html-clean #needed for nbsphinx functionalities
 sphinx-mdinclude
-autodocsumm>=0.6.0
+autodocsumm==0.2.15
 sphinx-toolbox>=3.5.0
 qiskit==1.2.4
 ipython
