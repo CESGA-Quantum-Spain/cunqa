@@ -19,6 +19,7 @@
 import numpy as np
 from typing import Union
 from itertools import accumulate
+from collections import Counter
 
 class Result:
     """
@@ -108,15 +109,15 @@ class Result:
             raise RuntimeError(f"The result format is unknown: no counts in it.")
         
         if len(self._registers) == 1:
-            return counts
+            return Counter(counts)
 
         # reversed to keep the order of counts keys
         lengths = [len(reg) for reg in reversed(self._registers.values())]
         if not lengths:
             return counts
         cuts = (0, *accumulate(lengths))
-        return {' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
-                count for bitstring, count in counts.items()}
+        return Counter({' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
+                count for bitstring, count in counts.items()})
 
     @property
     def time_taken(self) -> str:
