@@ -6,8 +6,8 @@
 #include "quantum_task.hpp"
 #include "simulators/simulator_strategy.hpp"
 
-#include "utils/constants.hpp"
 #include "utils/json.hpp"
+#include "utils/helpers/basis_gates.hpp"
 #include "logger.hpp"
 
 
@@ -20,9 +20,14 @@ struct QCConfig {
     int n_qubits = 32;
     std::string description = "Backend with quantum communications.";
     std::vector<std::vector<int>> coupling_map;
-    std::vector<std::string> basis_gates = constants::BASIS_GATES;
+    std::vector<std::string> basis_gates;
     std::string custom_instructions;
     std::vector<std::string> gates;
+
+    void set_basis_gates(const std::vector<std::string> basis_gates)
+    {
+        this->basis_gates = basis_gates;
+    }
 
     friend void from_json(const JSON& j, QCConfig &obj)
     {

@@ -11,7 +11,7 @@ namespace comm {
     
 struct Client::Impl {
     Impl() :
-        socket_{context_, zmq::socket_type::client}
+        socket_{context_, zmq::socket_type::dealer}
     { }
 
     ~Impl() 
@@ -48,7 +48,6 @@ struct Client::Impl {
             zmq::message_t reply;
             auto size = socket_.recv(reply, zmq::recv_flags::none);
             std::string result(static_cast<char*>(reply.data()), size.value());
-            //LOGGER_DEBUG("Result correctly received: {}", result);
             return result;
         } catch (const zmq::error_t& e) {
             LOGGER_ERROR("Error receiving the circuit: {}", e.what());
@@ -63,7 +62,7 @@ struct Client::Impl {
             socket_.disconnect(endpoint);
         } else {
             socket_.close();
-            socket_ = zmq::socket_t(context_, zmq::socket_type::client);
+            socket_ = zmq::socket_t(context_, zmq::socket_type::dealer);
         }
     }
 

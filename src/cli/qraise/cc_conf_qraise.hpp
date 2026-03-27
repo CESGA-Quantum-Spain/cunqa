@@ -9,6 +9,8 @@
 #include "utils_qraise.hpp"
 #include "logger.hpp"
 
+
+namespace {
 using namespace cunqa;
 
 
@@ -117,13 +119,6 @@ bool write_cc_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
 
 bool write_cc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 {
-    std::vector<std::string> simulators_with_cc = {"Cunqa", "Aer", "Munich", "Maestro", "Qulacs"};
-    bool is_available_cc_simulator = std::find(simulators_with_cc.begin(), simulators_with_cc.end(), std::string(args.simulator)) != simulators_with_cc.end();
-    if (!is_available_cc_simulator) {
-        LOGGER_ERROR("Available CC simulators are \"Aer\", \"Cunqa\", \"Munich\", \"Maestro\" and \"Qulacs\" , but the following was provided: {}", std::string(args.simulator));
-        return false;
-    } 
-
     std::string run_command;
     std::string subcommand;
     std::string backend_path;
@@ -142,10 +137,8 @@ bool write_cc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 
 #ifdef USE_MPI_BTW_QPU
     run_command =  "srun --mpi=pmix --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
-    LOGGER_DEBUG("Run command with MPI comm: {}", run_command);
 #elif defined(USE_ZMQ_BTW_QPU)
     run_command =  "srun --task-epilog=$EPILOG_PATH setup_qpus " +  subcommand;
-    LOGGER_DEBUG("Run command with ZMQ comm: {}", run_command);
 #endif
 
     sbatchFile << run_command;
@@ -154,17 +147,25 @@ bool write_cc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
 }
 
 
-void write_cc_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args)
+void write_cc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
+
+    } else if (std::find(constants::SUPPORTED_CC_SIMULATORS.begin(), constants::SUPPORTED_CC_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_CC_SIMULATORS.end()) {
+        LOGGER_ERROR("Simulator {} is not available for classical communications simulation. Aborting. ", std::string(args.simulator));
+        throw std::runtime_error("Error.");
+
     } else if (exists_family_name(args.family_name, constants::QPUS_FILEPATH)) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
+
     } else if (!write_cc_sbatch_header(sbatchFile, args) || !write_cc_run_command(sbatchFile, args)) {
         LOGGER_ERROR("Error writing CC sbatch file.");
         throw std::runtime_error("Error.");
     }
     
 }
+
+} // End namespace

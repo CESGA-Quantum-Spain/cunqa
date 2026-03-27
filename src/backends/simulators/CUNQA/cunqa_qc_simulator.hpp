@@ -17,7 +17,7 @@ public:
     CunqaQCSimulator();
     ~CunqaQCSimulator() = default;
 
-    inline std::string get_name() const override {return "CunqaSimulator";}
+    inline std::string get_name() const override {return "Cunqa";}
     JSON execute(const QCBackend& backend, const QuantumTask& quantumtask) override; 
 
 private:

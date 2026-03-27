@@ -15,7 +15,7 @@ public:
     AerQCSimulator();
     ~AerQCSimulator() = default;
 
-    inline std::string get_name() const override {return "AerQCSimulator";}
+    inline std::string get_name() const override {return "Aer";}
     JSON execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& circuit) override;
 
 private:

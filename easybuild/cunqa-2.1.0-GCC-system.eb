@@ -9,8 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.0.0'
-versionsuffix = '-cuda-12.8.0'
+version = '2.1.0'
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
 description = """ 
@@ -40,8 +39,7 @@ builddependencies = [
    ('Boost', '1.83.0'),
    ('pybind11', '2.12.0'),
    ('CMake', '3.27.6'),
-   ('Cython', '3.0.11'),
-   ('CUDA', '12.8.0')
+   ('Cython', '3.0.11')
 ]
 
 dependencies = [
@@ -55,7 +53,6 @@ sanity_check_paths = {
 
 configopts = [
     "-DCMAKE_CXX_FLAGS=",
-    "-DAER_GPU=TRUE"
 ]
 
 modextrapaths = {

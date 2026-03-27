@@ -10,7 +10,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"simple_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
@@ -21,17 +21,26 @@ Raw Quantum Circuit JSON
       },
       {
         "name":"measure",
-        "qubits":[0]
+        "qubits":[0],
+        "clbits":[0]
       },
       {
         "name":"measure",
-        "qubits":[1]
-      },
-    }, 
-    "num_qubits": 2,
-    "num_clbits": 2,
-    "classical_registers": [0, 1],
-    "quantum_registers": [0, 1],  
+        "qubits":[1],
+        "clbits":[1]
+      }
+    ], 
+    "config":
+    {
+      "shots": 1024,
+      "num_qubits":2,
+      "num_clbits":2,
+      "device":
+      {
+        "device_name":"CPU",
+        "target_devices":[]
+      }
+    },
     "is_dynamic":false, 
     "sending_to":[]
   }
@@ -42,25 +51,33 @@ Raw Quantum Circuit JSON
 
   {
     "id":"sender_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
       },
       {
         "name":"measure",
-        "qubits":[0]
+        "qubits":[0],
+        "clbits":[0]
       },
       {
         "name":"send",
         "clbits":[0],
         "circuits":["receiver_circuit"]
       }
-    }, 
-    "num_qubits": 1,
-    "num_clbits": 1,
-    "classical_registers": [0],
-    "quantum_registers": [0],  
+    ], 
+    "config":
+    {
+      "shots": 1024,
+      "num_qubits":1,
+      "num_clbits":1,
+      "device":
+      {
+        "device_name":"CPU",
+        "target_devices":[]
+      }
+    },
     "is_dynamic":true, 
     "sending_to":["receiver_circuit"]
   }
@@ -69,17 +86,24 @@ Raw Quantum Circuit JSON
 
   {
     "id":"receiver_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"recv",
         "clbits":[0],
         "circuits":["sender_circuit"]
       }
-    }, 
-    "num_qubits": 1,
-    "num_clbits": 1,
-    "classical_registers": [0],
-    "quantum_registers": [0],  
+    ], 
+    "config":
+    {
+      "shots": 1024,
+      "num_qubits":1,
+      "num_clbits":1,
+      "device":
+      {
+        "device_name":"CPU",
+        "target_devices":[]
+      }
+    },
     "is_dynamic":true, 
     "sending_to":[]
   }
@@ -90,7 +114,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"qsender_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"h",
         "qubits":[0]
@@ -100,14 +124,23 @@ Raw Quantum Circuit JSON
         "qubits":[0],
         "circuits":["qreceiver_circuit"]
       },
-      {"name":"measure",
-        "qubits":[0]
+      {
+        "name":"measure",
+        "qubits":[0],
+        "clbits":[0]
       }
-    }, 
-    "num_qubits": 1,
-    "num_clbits": 1,
-    "classical_registers": [0],
-    "quantum_registers": [0],  
+    ], 
+    "config":
+    {
+      "shots": 1024,
+      "num_qubits":1,
+      "num_clbits":1,
+      "device":
+      {
+        "device_name":"CPU",
+        "target_devices":[]
+      }
+    },
     "is_dynamic":true, 
     "sending_to":[]
   }
@@ -116,7 +149,7 @@ Raw Quantum Circuit JSON
 
   {
     "id":"qreceiver_circuit", 
-    "instructions": {
+    "instructions": [
       {
         "name":"qrecv",
         "qubits":[0],
@@ -124,13 +157,21 @@ Raw Quantum Circuit JSON
       },
       {
         "name":"measure",
-        "qubits":[0]
+        "qubits":[0],
+        "clbits":[0]
       }
-    }, 
-    "num_qubits": 1,
-    "num_clbits": 1,
-    "classical_registers": [0],
-    "quantum_registers": [0],  
+    ], 
+    "config":
+    {
+      "shots": 1024,
+      "num_qubits":1,
+      "num_clbits":1,
+      "device":
+      {
+        "device_name":"CPU",
+        "target_devices":[]
+      }
+    },
     "is_dynamic":true, 
     "sending_to":[]
   }

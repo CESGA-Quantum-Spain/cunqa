@@ -102,11 +102,22 @@
 .wy-side-scroll {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
-.wy-side-scroll .wy-side-nav-search,
-.wy-side-scroll .wy-menu {
-  flex: 0 0 auto;
+.wy-nav-side {
+  height: 100vh;
+  position: fixed;
+}
+
+.sidebar-logos {
+  margin-top: auto;
+  padding: 0.9rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
 }
 
 /* El footer se va al fondo */

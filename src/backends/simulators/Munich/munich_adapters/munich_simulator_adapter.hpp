@@ -9,7 +9,8 @@
 namespace cunqa {
 namespace sim {
 
-class MunichSimulatorAdapter : public CircuitSimulator<dd::DDPackageConfig>
+
+class MunichSimulatorAdapter : public CircuitSimulator
 {
 public:
 
@@ -29,12 +30,14 @@ public:
     }
 
     JSON simulate(const Backend* backend);
-    JSON simulate(comm::ClassicalChannel* classical_channel = nullptr);
+    JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 private:
 
     std::string execute_shot_(
-        const std::vector<QuantumTask>& quantum_tasks, 
-        comm::ClassicalChannel* classical_channel
+        const std::vector<StructuredQuantumTask>& st_qtasks, 
+        comm::ClassicalChannel* classical_channel,
+        const bool allows_qc,
+        const size_t& n_comm_qubits
     );
     
 };

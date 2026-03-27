@@ -426,7 +426,6 @@ def qraise(n, t, *,
 
     cmd_getstate = ["squeue", "-h", "-j", job_id, "-o", "%T"]
     
-    i = 0
     while True:
         state = subprocess.run(
             cmd_getstate, 
@@ -444,10 +443,7 @@ def qraise(n, t, *,
             if count == n:
                 break
         # We do this to prevent an overload of the Slurm deamon 
-        if i == 500:
-            time.sleep(2)
-        else:
-            i += 1
+        time.sleep(1)
 
     # Wait for QPUs to be raised, so that get_QPUs can be executed inmediately
     print("QPUs ready to work \U00002705")

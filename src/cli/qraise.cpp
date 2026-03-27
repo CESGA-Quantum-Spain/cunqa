@@ -9,7 +9,6 @@
 
 #include "argparse/argparse.hpp"
 
-#include "utils/constants.hpp"
 #include "qraise/utils_qraise.hpp"
 #include "qraise/args_qraise.hpp"
 #include "qraise/noise_model_conf_qraise.hpp"

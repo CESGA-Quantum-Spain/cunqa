@@ -124,7 +124,7 @@ CUNQA has a set of dependencies, as any other platform. The versions listed belo
 ```text
 gcc             12.3.0
 qiskit          1.2.4
-CMake           3.21.0
+CMake           3.24.0
 python          3.9 (recommended 3.11)
 pybind11        2.7 (recommended 2.12)
 MPI             3.1
@@ -138,7 +138,7 @@ Lapack          -
 #### Can be installed by the user (otherwise installed automatically during configuration)
 
 ```text
-nlohmann JSON   3.11.3
+nlohmann JSON   3.12.0
 spdlog          1.16.0
 MQT-DDSIM       1.24.0
 libzmq          4.3.5
@@ -200,13 +200,13 @@ CUNQA is available as an Lmod module at CESGA. To use it:
 
 - In QMIO:
   ```bash
-  module load qmio/hpc gcc/12.3.0 cunqa/2.0.0-python-3.9.9-mpi
+  module load qmio/hpc gcc/12.3.0 cunqa/2.1.0-python-3.9.9-mpi
   ```
 
 - In FT3:
   ```bash
-  module load cesga/2022 gcc/system cunqa/2.0.0 # without GPUs
-  module load cesga/2022 gcc/system cunqa/2.0.0-cuda-12.8.0 # with GPUs
+  module load cesga/2022 gcc/system cunqa/2.1.0 # without GPUs
+  module load cesga/2022 gcc/system cunqa/2.1.0-cuda-12.8.0 # with GPUs
   ```
 
 If your HPC center is interested in deploying it this way, the EasyBuild files used at CESGA are 

@@ -16,7 +16,7 @@ public:
     MaestroSimpleSimulator() = default;
     ~MaestroSimpleSimulator() override;
 
-    inline std::string get_name() const override {return "MaestroSimulator";} 
+    inline std::string get_name() const override {return "Maestro";} 
     JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;
 };
 

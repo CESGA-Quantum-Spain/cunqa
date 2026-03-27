@@ -18,7 +18,7 @@ public:
     MunichQCSimulator();
     ~MunichQCSimulator() = default;
 
-    inline std::string get_name() const override {return "MunichQCSimulator";}
+    inline std::string get_name() const override {return "Munich";}
     JSON execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& circuit) override;
 
 private:

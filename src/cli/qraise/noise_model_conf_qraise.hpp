@@ -8,6 +8,8 @@
 #include "logger.hpp"
 #include "args_qraise.hpp"
 
+
+namespace {
 using namespace cunqa;
 
 
@@ -150,19 +152,26 @@ void write_noise_model_sbatch(std::ofstream& sbatchFile,const CunqaArgs& args)
     if (args.n_qpus == 0 || args.time == "") {
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
+
+    } else if (std::find(constants::SUPPORTED_NOISY_SIMULATORS.begin(), constants::SUPPORTED_NOISY_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_NOISY_SIMULATORS.end()) {
+        LOGGER_ERROR("Simulator {} is not available for noisy simulation. Aborting. ", std::string(args.simulator));
+        throw std::runtime_error("Error.");
+
     } else if (exists_family_name(args.family_name, constants::QPUS_FILEPATH)) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
-    } else if (args.simulator == "Munich" or args.simulator == "Cunqa"){
-        LOGGER_ERROR("Personalized noise models are only supported in AerSimulatorbut {} was provided.", args.simulator.c_str());
-        throw std::runtime_error("Bad simulator.");
+
     } else if (args.cc || args.qc){
         LOGGER_ERROR("Personalized noise models not supported with classical/quantum communications schemes");
         throw std::runtime_error("Bad communication scheme.");
+
     } else if (args.backend.has_value()) {
         LOGGER_WARN("Because noise properties were provided backend will be redefined according to them.");
+
     } else if (!write_noise_model_sbatch_header(sbatchFile, args) || !write_noise_model_run_command(sbatchFile, args)) {
         LOGGER_ERROR("Error writing noise sbatch file.");
         throw std::runtime_error("Error.");
     }  
 }
+
+} // End namespace

@@ -16,7 +16,7 @@ public:
     QulacsCCSimulator();
     ~QulacsCCSimulator() = default;
 
-    inline std::string get_name() const override {return "QulacsSimulator";}
+    inline std::string get_name() const override {return "Qulacs";}
     JSON execute(const CCBackend& backend, const QuantumTask& circuit) override;
 
 private:

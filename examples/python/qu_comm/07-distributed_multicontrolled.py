@@ -1,5 +1,4 @@
 import os, sys
-import numpy as np
 
 # In order to import cunqa, we append to the search path the cunqa installation path
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
@@ -15,22 +14,26 @@ except Exception as error:
     raise error
 
 try:
-    qpus   = get_QPUs(co_located = True, family = family)
+    qpus = get_QPUs(co_located=True, family = family)
 
     # 2. Design circuits with distributed instructions between them
-    cc_1 = CunqaCircuit(1, id="First")
-    cc_2 = CunqaCircuit(1, id="Second")
+    # First circuit 
+    cc_1 = CunqaCircuit(2, 2, id="First")
+    cc_2 = CunqaCircuit(1, 1, id="Second")
+
 
     cc_1.h(0)
+    cc_1.h(1)
 
-    with cc_1.expose(0, cc_2) as ([rqubit], subcircuit):
-        subcircuit.cx(rqubit,0)
+    with cc_1.expose([0, 1], cc_2) as ([rqubit0, rqubit1], subcircuit):
+        subcircuit.mcx(rqubit0, rqubit1, 0)
 
-    cc_1.measure_all()
-    cc_2.measure_all()
+    cc_1.measure(0,0)
+    cc_1.measure(1,1)
+    cc_2.measure(0,0)
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
+    distr_jobs = run([cc_1, cc_2], qpus, shots=1000, n_communication_qubits = 5)
 
     # Collect the results
     result_list = gather(distr_jobs)
