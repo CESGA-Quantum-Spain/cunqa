@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import numpy as np
 import copy
-from typing import Union, Optional
+import random
+from typing import Union, Optional, Tuple
 from sympy.core.sympify import sympify, SympifyError
 
 from cunqa.utils import generate_id
 from cunqa.circuit.parameter import Param
 
 from cunqa.logger import logger
+
+MAX_TAG_VALUE = 100_000
 
 class CunqaCircuit:
     """
@@ -331,7 +334,7 @@ class CunqaCircuit:
             "quantum_registers": self.quantum_regs,
             "is_dynamic": self.is_dynamic, 
             "sending_to": list(self.sending_to),
-            "params": self.params
+            "params": self.params,
         }
 
     @property
@@ -517,7 +520,7 @@ class CunqaCircuit:
     # Quantum communication directives
     # --------------------------------
     
-    def qsend(self, qubit: int, recving_circuit: Union[str, 'CunqaCircuit']) -> None:
+    def qsend(self, qubit: int, recving_circuit: Union[str, 'CunqaCircuit'], tag: Optional[int] = None) -> None:
         """
         Class method to send a qubit from the current circuit to another one.
         
@@ -534,13 +537,19 @@ class CunqaCircuit:
         elif isinstance(recving_circuit, CunqaCircuit):
             recving_circuit_id = recving_circuit.id
         
+        if tag:
+            assert tag < 0, "Tag must be a negative number" 
+        else:
+            tag = 0
+
         self.add_instructions({
             "name": "qsend",
             "qubits": [qubit],
-            "circuits": [recving_circuit_id]
+            "circuits": [recving_circuit_id],
+            "tags":[tag]
         })
 
-    def qrecv(self, qubit: int, control_circuit: Union[str, 'CunqaCircuit']) -> None:
+    def qrecv(self, qubit: int, control_circuit: Union[str, 'CunqaCircuit'], tag: Optional[int] = None) -> None:
         """
         Class method to receive a qubit from a remote circuit into an ancilla qubit.
         
@@ -556,13 +565,19 @@ class CunqaCircuit:
         elif isinstance(control_circuit, CunqaCircuit):
             control_circuit_id = control_circuit.id
         
+        if tag:
+            assert tag < 0, "Tag must be a negative number" 
+        else:
+            tag = 0
+        
         self.add_instructions({
             "name": "qrecv",
             "qubits": [qubit],
-            "circuits": [control_circuit_id]
+            "circuits": [control_circuit_id],
+            "tags": [tag]
         })
 
-    def expose(self, qubits: Union[list[int], int], target_circuit: Union[str, 'CunqaCircuit']) -> 'QuantumControlContext':
+    def expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit') -> 'QuantumControlContext':
         """
         Class method to expose a qubit from the current circuit to another one for a telegate 
         operation. The exposed qubit will be used at the target circuit as the control qubit in 
@@ -588,18 +603,13 @@ class CunqaCircuit:
         
         if isinstance(qubits, int):
             qubits = [qubits]
-        
-        if isinstance(target_circuit, str):
-            target_circuit_id = target_circuit
-        elif isinstance(target_circuit, CunqaCircuit):
-            target_circuit_id = target_circuit.id
-        
+                
         self.add_instructions({
             "name": "expose",
             "qubits": qubits,
-            "circuits": [target_circuit_id]
+            "circuits": [target_circuit.id]
         })
-        return QuantumControlContext(self, target_circuit, len(qubits))
+        return QuantumControlContext([self], target_circuit, len(qubits))
 
     # ----------------------
     # Non-unitary operations
@@ -2166,6 +2176,41 @@ class CunqaCircuit:
             "qubits":[*qubits],
             "params":[prob]
             })
+
+
+    def WIP_expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit', tags: Optional[Union[list[int], int]] = None) -> list[int]:
+        self.is_dynamic = True
+        
+        if isinstance(qubits, int):
+            qubits = [qubits]
+        if tags:
+            if isinstance(tags, int):
+                tags = [tags]
+            assert len(qubits) == len(tags), "Number of tags must be equal than number of qubits"
+            assert all(tag < 0 for tag in tags), "Tags must be negative integers" 
+        else:
+            tags = [-x for x in random.sample(range(1, MAX_TAG_VALUE + 1), len(qubits))]
+                
+        self.add_instructions({
+            "name": "expose",
+            "qubits": qubits,
+            "circuits": [target_circuit.id],
+            "tags":tags
+        })
+
+        return tags
+
+    def WIP_unexpose(self, tags: Union[list[int], int]) -> None:
+        self.is_dynamic = True
+
+        if isinstance(tags, int):
+            tags = [tags]
+
+        self.add_instructions({
+            "name":"unexpose",
+            "tags":tags,
+        })
+
             
 class ClassicalControlContext:
     def __init__(self, circuit, clbits: Union[int, list[int]]):
@@ -2196,12 +2241,12 @@ class ClassicalControlContext:
 class QuantumControlContext:
     def __init__(
         self, 
-        control_circuit: 'CunqaCircuit', 
+        control_circuits: list['CunqaCircuit'], 
         target_circuit: 'CunqaCircuit', 
         num_qubits: int
     ) -> int:
         self.num_qubits = num_qubits
-        self.control_circuit = control_circuit
+        self.control_circuits = control_circuits
         self.target_circuit = target_circuit
 
     def __enter__(self):
@@ -2219,7 +2264,7 @@ class QuantumControlContext:
         rcontrol = {
             "name": "rcontrol",
             "instructions": instructions,
-            "circuits": [self.control_circuit.info['id']]
+            "circuits": [control_circuit.info['id'] for control_circuit in self.control_circuits]
         }
         self.target_circuit.add_instructions(rcontrol)
 

@@ -46,7 +46,6 @@ void AerExecutor::run()
     while (true) {
         for(const auto& qpu_id: qpu_ids) {
             message = classical_channel.recv_info(qpu_id);
-
             if(!message.empty()) {
                 qpus_working.push_back(qpu_id);
                 quantum_task_json = JSON::parse(message);

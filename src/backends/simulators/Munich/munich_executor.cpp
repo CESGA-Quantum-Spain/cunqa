@@ -35,6 +35,7 @@ MunichExecutor::MunichExecutor(const std::size_t& n_qpus) :
         classical_channel.connect(key);
         classical_channel.send_info("ready", key);
     }
+
 };
 
 void MunichExecutor::run()
@@ -61,7 +62,7 @@ void MunichExecutor::run()
         std::string result_str = result.dump();
 
         for(const auto& qpu: qpus_working) {
-            classical_channel.send_info(result_str, qpu);
+            classical_channel.send_info(result_str, qpu); 
         }
 
         qpus_working.clear();

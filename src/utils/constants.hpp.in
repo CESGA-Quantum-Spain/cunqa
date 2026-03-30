@@ -54,6 +54,7 @@ struct CUNQAInstruction {
   std::vector<int> clbits = {};
   std::vector<double> params = {};
   std::vector<std::string> qpus = {};
+  std::vector<int> tags = {};
   std::vector<CUNQAInstruction> instructions = {}; 
   std::vector<CUNQAMatrix> matrix = {}; 
   std::vector<CUNQADiagonalMatrix> diagonal = {}; 
@@ -202,6 +203,7 @@ enum INSTRUCTIONS {
     QSEND,
     QRECV,
     EXPOSE,
+    UNEXPOSE,
     RCONTROL,
 
     SAVE_STATE
@@ -364,6 +366,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"qrecv", QRECV},
 
     {"expose", EXPOSE},
+    {"unexpose", UNEXPOSE},
     {"rcontrol", RCONTROL},
 
     {"save_state", SAVE_STATE}
@@ -661,12 +664,30 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         }
         case QSEND:
         case QRECV:
-        case EXPOSE:
         {
             cunqa_instruction = {
                 .name = instruction_name,
                 .qubits = instruction.at("qubits").get<std::vector<int>>(), 
-                .qpus = instruction.at("qpus").get<std::vector<std::string>>()
+                .qpus = instruction.at("qpus").get<std::vector<std::string>>(),
+                .tags = instruction.at("tags").get<std::vector<int>>()
+            };
+            break;
+        }
+        case EXPOSE:
+        {   
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(), 
+                .qpus = instruction.at("qpus").get<std::vector<std::string>>(),
+                .tags = instruction.at("tags").get<std::vector<int>>()
+            };
+            break;
+        }
+        case UNEXPOSE:
+        {   
+            cunqa_instruction = {
+                .name = instruction_name,
+                .tags = instruction.at("tags").get<std::vector<int>>(), 
             };
             break;
         }
