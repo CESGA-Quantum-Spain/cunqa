@@ -21,6 +21,13 @@ from typing import Union
 from itertools import accumulate
 from collections import Counter
 
+class CunqaCounts(Counter):
+    """
+    Modified Counter that eliminates the word 'Counter' from its string representation.
+    """
+    def __str__(self):
+        return str(dict(self))
+
 class Result:
     """
     Class to describe the result of a simulation. 
@@ -107,16 +114,16 @@ class Result:
             counts = self._result["counts"]
         else:
             raise RuntimeError(f"The result format is unknown: no counts in it.")
-        
+
         if len(self._registers) == 1:
-            return Counter(counts)
+            return CunqaCounts(counts)
 
         # reversed to keep the order of counts keys
         lengths = [len(reg) for reg in reversed(self._registers.values())]
         if not lengths:
-            return counts
+            return CunqaCounts(counts)
         cuts = (0, *accumulate(lengths))
-        return Counter({' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
+        return CunqaCounts({' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
                 count for bitstring, count in counts.items()})
 
     @property
