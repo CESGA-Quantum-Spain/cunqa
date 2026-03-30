@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cmath>
 #include <vector>
 #include <algorithm>
 
@@ -18,7 +19,10 @@ using namespace cunqa;
 bool write_qc_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus + 1) << "\n";
-    int cores_per_qpu = (args.cores_per_qpu >= args.n_qpus) ? args.cores_per_qpu : args.n_qpus;
+    int cores_per_qpu = std::ceil(
+        static_cast<double>(args.n_qpus * (args.cores_per_qpu + 1)) / 
+        (args.n_qpus + 1)
+    );
     sbatchFile << "#SBATCH -c " << std::to_string(cores_per_qpu) << "\n";
     sbatchFile << "#SBATCH -N " << std::to_string(args.number_of_nodes.value()) << "\n";
     
