@@ -64,6 +64,7 @@ struct GlobalState {
     std::unordered_map<std::string, std::queue<int>> qc_meas_td;
     std::unordered_map<int, std::queue<int>> qc_meas_td_tagged;
     std::vector<CommunicationQubitsPair> communication_pairs;
+    std::unordered_map<int, bool> exposed_qubits;
     std::unordered_map<LocalCCIDs, std::queue<int>, LocalIDsHash> local_cc_queue;  // To mimic classical communications when executing with quantum communications
     bool ended = false;
 };
@@ -113,6 +114,17 @@ int find_my_communication_pair_by_tag(const GlobalState& G, const int tag)
     } 
 
     return -1;
+}
+
+bool is_some_of_my_qubits_exposed(const GlobalState& G, const TaskState& T, const std::vector<int>& qubits)
+{
+    for (const auto& qubit : qubits) {
+        if (qubit < 0) continue;
+        if (G.exposed_qubits.contains(qubit + T.zero_qubit) && G.exposed_qubits.at(qubit + T.zero_qubit)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -192,6 +204,11 @@ std::string MunichSimulatorAdapter::execute_shot_(
         [&](TaskState& T, const std::optional<constants::CUNQAInstruction>& instruction = std::nullopt) 
     {
         const CUNQAInstruction inst = !instruction.has_value() ? *T.it : instruction.value();
+        if (is_some_of_my_qubits_exposed(G, T, inst.qubits)) {
+            T.waiting = true;
+            return;
+        }
+        T.waiting = false;
         auto inst_type = INSTRUCTIONS_MAP.at(inst.name);
         
         switch (inst_type) {
@@ -268,7 +285,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 int index = find_my_communication_pair_by_tag(G, inst.qubits[0]);
                 if (index == -1) {
                     T.waiting = true;
-                    break;
+                    return;
                 } else {
                     T.waiting = false;
                     ctrl = G.communication_pairs[index].q1;
@@ -307,7 +324,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 int index = find_my_communication_pair_by_tag(G, inst.qubits[0]);
                 if (index == -1) {
                     T.waiting = true;
-                    break;
+                    return;
                 } else {
                     T.waiting = false;
                     ctrl = G.communication_pairs[index].q1;
@@ -328,7 +345,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                     int index = find_my_communication_pair_by_tag(G, inst.qubits[i]);
                     if (index == -1) {
                         T.waiting = true;
-                        break;
+                        return;
                     } else {
                         T.waiting = false;
                         tmp_qubits.push_back(G.communication_pairs[index].q1);
@@ -350,7 +367,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                     int index = find_my_communication_pair_by_tag(G, inst.qubits[0]);
                     if (index == -1) {
                         T.waiting = true;
-                        break;
+                        return;
                     } else {
                         T.waiting = false;
                         tmp_qubits.push_back(G.communication_pairs[index].q1);
@@ -434,7 +451,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             std::vector<int> indices = generate_entanglement_(1);
             if (indices.empty()) {
                 T.waiting = true;
-                break;
+                return;
             }
             T.waiting = false;
             int index = indices[0];
@@ -493,7 +510,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             } else {
                 if (!G.qc_meas_td.contains(inst.qpus[0]) || G.qc_meas_td[inst.qpus[0]].empty()) {
                     T.blocked_by_teledata = true;
-                    break;
+                    return;
                 }
                 // Get the sender measurements
                 meas1 = G.qc_meas_td[inst.qpus[0]].front();
@@ -525,12 +542,12 @@ std::string MunichSimulatorAdapter::execute_shot_(
         {
             if (2 * inst.qubits.size() > n_comm_qubits) {
                 LOGGER_ERROR("Not enough communication qubits to expose {} qubits at the same time", std::to_string(inst.qubits.size()));
-                break;
+                return;
             }
             std::vector<int> indices = generate_entanglement_(inst.qubits.size());
             if (indices.empty()) {
                 T.waiting = true;
-                break;
+                return;
             }
             T.waiting = false;
             
@@ -538,7 +555,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             for (auto& index : indices) {
                 G.communication_pairs[index].tag = inst.tags[qid];
                 G.communication_pairs[index].exposed_qubit = inst.qubits[qid] + T.zero_qubit;
-                
+                G.exposed_qubits[inst.qubits[qid] + T.zero_qubit] = true;                
                 
                 // CX to the entangled pair
                 Control control(inst.qubits[qid] + T.zero_qubit);
@@ -562,7 +579,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                 int index = find_my_communication_pair_by_tag(G, tag);
                 if (index == -1) {
                     LOGGER_ERROR("Tag {} not associated to any expose.", std::to_string(tag));
-                    break;
+                    return;
                 } 
                 indices.push_back(index);
             }
@@ -576,6 +593,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
                     auto z = std::make_unique<StandardOperation>(G.communication_pairs[index].exposed_qubit, OpType::Z);
                     applyOperationToStateAdapter(std::move(z));
                 }
+                G.exposed_qubits[G.communication_pairs[index].exposed_qubit] = false;
                 G.communication_pairs[index].idle = true;
             }
 
@@ -602,9 +620,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
             if (!(T.blocked_by_teledata || T.blocked_by_cc || T.waiting))
                 ++T.it;
 
+            
             if (T.it != T.end)
                 G.ended = false;
-            else
+            else 
                 T.finished = true;
         }
 

@@ -26,6 +26,7 @@ try:
     [rqubit0, rqubit1] = cc_1.WIP_expose([0, 1], cc_2)
     cc_2.cx(rqubit0, 0)
     cc_2.WIP_unexpose(rqubit0)
+    cc_2.WIP_unexpose(rqubit1)
 
     cc_1.measure_all()
     cc_2.measure_all()
