@@ -18,7 +18,8 @@ using namespace cunqa;
 bool write_qc_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
     sbatchFile << "#SBATCH --ntasks=" << std::to_string(args.n_qpus + 1) << "\n";
-    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu * args.n_qpus) << "\n";
+    int cores_per_qpu = (args.cores_per_qpu >= args.n_qpus) ? args.cores_per_qpu : args.n_qpus;
+    sbatchFile << "#SBATCH -c " << std::to_string(cores_per_qpu) << "\n";
     sbatchFile << "#SBATCH -N " << std::to_string(args.number_of_nodes.value()) << "\n";
     
     if(args.partition.has_value())
@@ -79,7 +80,8 @@ bool write_qc_gpu_resources(std::ofstream& sbatchFile, const CunqaArgs& args)
     }
 #endif // GPU_ARCH
 
-    sbatchFile << "#SBATCH -c " << std::to_string(args.cores_per_qpu * args.n_qpus) << "\n";
+    int cores_per_qpu = (args.cores_per_qpu >= args.n_qpus) ? args.cores_per_qpu : args.n_qpus;
+    sbatchFile << "#SBATCH -c " << std::to_string(cores_per_qpu) << "\n";
     if (args.mem_per_qpu.has_value()) {
         int total_mem = args.mem_per_qpu.value() + args.n_qpus;
         sbatchFile << "#SBATCH --mem=" << std::to_string(total_mem) << "G\n";
