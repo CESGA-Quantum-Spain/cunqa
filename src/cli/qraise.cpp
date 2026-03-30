@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
     // Executing and deleting the file
     auto sbatch_result = std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
-    //remove_tmp_files();
+    remove_tmp_files();
     
     
     return sbatch_result;
