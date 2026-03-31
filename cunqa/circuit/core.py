@@ -271,7 +271,7 @@ class CunqaCircuit:
 
         
     """
-
+    instances = {}
     
     # global attributes
     _ids: set = set() #: Set with ids in use.
@@ -279,6 +279,8 @@ class CunqaCircuit:
 
     _id: str #: Circuit identifier.
     is_dynamic: bool #: Whether the circuit has local non-unitary operations.
+    has_cc: bool #: Whether the circuit has classical communications.
+    has_qc: bool #: Whether the circuit has quantum communications.
     instructions: list[dict] #: Set of operations applied to the circuit.
     quantum_regs: dict  #: Dictionary of quantum registers as ``{"name": [assigned qubits]}``.
     classical_regs: dict #: Dictionary of classical registers of the circuit as ``{"name": [assigned clbits]}``.
@@ -292,6 +294,8 @@ class CunqaCircuit:
             id: Optional[str] = None
         ):
         self.is_dynamic = False
+        self.has_cc = False
+        self.has_qc = False
         self.instructions = []
         self.params = []
         self.quantum_regs = {}
@@ -312,6 +316,8 @@ class CunqaCircuit:
         else:
             self._id = id
 
+        CunqaCircuit.instances[self._id] = self
+
     @property
     def id(self) -> str:
         """Returns circuit id."""
@@ -330,6 +336,8 @@ class CunqaCircuit:
             "classical_registers": self.classical_regs,
             "quantum_registers": self.quantum_regs,
             "is_dynamic": self.is_dynamic, 
+            "has_cc": self.has_cc, 
+            "has_qc": self.has_qc, 
             "sending_to": list(self.sending_to),
             "params": self.params
         }
@@ -466,7 +474,7 @@ class CunqaCircuit:
                                                 bit is sent.
 
         """
-        self.is_dynamic = True
+        self.is_dynamic = True; self.has_cc = True
         
         if isinstance(clbits, int):
             clbits = [clbits]
@@ -496,8 +504,7 @@ class CunqaCircuit:
                                                   bit is sent.
 
         """
-
-        self.is_dynamic = True
+        self.is_dynamic = True; self.has_cc = True
 
         if isinstance(clbits, int):
             clbits = [clbits]
@@ -527,7 +534,7 @@ class CunqaCircuit:
             recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                  sent.
         """
-        self.is_dynamic = True
+        self.is_dynamic = True; self.has_qc = True
         
         if isinstance(recving_circuit, str):
             recving_circuit_id = recving_circuit
@@ -549,7 +556,7 @@ class CunqaCircuit:
 
             control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
         """
-        self.is_dynamic = True
+        self.is_dynamic = True; self.has_qc = True
         
         if isinstance(control_circuit, str):
             control_circuit_id = control_circuit
@@ -584,7 +591,7 @@ class CunqaCircuit:
                 subcircuit.cx(rqubit, 1)
             
         """ 
-        self.is_dynamic = True
+        self.is_dynamic = True; self.has_qc = True
         
         if isinstance(qubits, int):
             qubits = [qubits]

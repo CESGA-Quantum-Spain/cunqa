@@ -22,7 +22,7 @@ import re
 from typing import Union, Any, Optional, TypedDict
 from sympy import Symbol
 
-from sympy import Symbol
+from collections import Counter
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
@@ -191,17 +191,16 @@ def run(
         def split(item: str) -> list[str]:
             return [p for p in re.split(r"[|+]", item) if p]
 
-        singles = {item for item in items if len(split(item)) == 1}
+        occurrences = Counter()
+        # Count in how many of the items each circuit id appears
+        for item in items:
+            occurrences.update(set(split(item)))
 
-        conflicts = {
-            part
-            for item in items
-            if len(split(item)) > 1
-            for part in split(item)
-            if part in singles
-        }
+        conflicts      = {item for item, count in occurrences.items() if count >= 2}
+        conflict_circs = [CunqaCircuit.instances[confl] for confl in conflicts]
 
-        if conflicts:
+        # Raise error if any conflict circuit has communications
+        if conflicts and any([(c.has_cc or c.has_qc) for c in conflict_circs]):
             raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
 
         return {
