@@ -270,9 +270,7 @@ class CunqaCircuit:
 
 
         
-    """
-    instances = {}
-    
+    """    
     # global attributes
     _ids: set = set() #: Set with ids in use.
     _communicated: dict[str, CunqaCircuit] = {} #: Dictionary with the circuits that employ communication directives.
@@ -301,6 +299,7 @@ class CunqaCircuit:
         self.quantum_regs = {}
         self.classical_regs = {}        
         self.sending_to = set()
+        self.components_comm = {}
 
         self.add_q_register("q0", num_qubits)
         
@@ -315,8 +314,6 @@ class CunqaCircuit:
                            f"generated one: {self._id}.")
         else:
             self._id = id
-
-        CunqaCircuit.instances[self._id] = self
 
     @property
     def id(self) -> str:
@@ -339,7 +336,8 @@ class CunqaCircuit:
             "has_cc": self.has_cc, 
             "has_qc": self.has_qc, 
             "sending_to": list(self.sending_to),
-            "params": self.params
+            "params": self.params,
+            "component_comms": self.components_comm
         }
 
     @property

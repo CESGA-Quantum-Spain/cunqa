@@ -51,6 +51,9 @@ class FakeCircuit:
         self.instructions = []
         self.is_dynamic = False
         self._expose_calls = []
+        self.components_comm = {}
+        self.has_cc = False
+        self.has_qc = False
 
     @property
     def info(self):

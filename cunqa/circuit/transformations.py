@@ -270,6 +270,15 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
             if consumed:
                 advance(idx)
 
+    # Store info about whether the component circuits have communications for exceptions in run method
+    components_comm = {}
+    for circ in circuits:
+        if len(circ.components_comm) != 0:
+            components_comm.update(circ.components_comm)
+        else:
+            components_comm[circ.id] = (circ.has_cc or circ.has_qc)
+    union_circuit.components_comm = components_comm
+
     union_circuit.add_instructions(union_instructions)
     return union_circuit
 
@@ -311,6 +320,15 @@ def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
                     if circ_id in circuit_ids:
                         raise ValueError("Cannot add two circuits that communicate with eachother.")
             addition_instructions.append(instr)
+
+    # Store info about whether the component circuits have communications for exceptions in run method
+    components_comm = {}
+    for circ in circuits:
+        if len(circ.components_comm) != 0:
+            components_comm.update(circ.components_comm)
+        else:
+            components_comm[circ.id] = (circ.has_cc or circ.has_qc)
+    addition_circuit.components_comm = components_comm
 
     addition_circuit.add_instructions(addition_instructions)
     return addition_circuit        
