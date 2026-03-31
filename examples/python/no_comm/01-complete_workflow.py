@@ -8,12 +8,9 @@ from cunqa.qpu import qraise, get_QPUs, run, qdrop
 from cunqa.qjob import gather
 from cunqa.circuit import CunqaCircuit
 
-try:
-    # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    # If GPU execution is desired, just add "gpu = True" as another qraise argument
-    family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
-except Exception as error:
-    raise error
+# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
+# If GPU execution is desired, just add "gpu = True" as another qraise argument
+family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
 
 try:
     qpus  = get_QPUs(co_located = True, family = family)
@@ -28,11 +25,9 @@ try:
     qc.h(0)
     qc.cx(0, 1)
     qc.measure_all()
-    #qc.is_dynamic = True
 
     # 3. Execute the same circuit on both deployed QPUs
-    qjobs = run([qc, qc], qpus, shots = 10) # non-blocking call
-
+    qjobs = run([qc, qc], qpus, shots = 1000) # non-blocking call
 
     results = gather(qjobs)
 
@@ -42,11 +37,9 @@ try:
     # Printing the counts
     for counts in counts_list:
         print(f"Counts: {counts}")
-
-    # 4. Relinquish resources
-    qdrop(family)
     
 except Exception as error:
-    qdrop(family)
     raise error
-
+finally:
+    # 4. Release classical resources
+    qdrop(family)

@@ -8,11 +8,8 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-try:
-    # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
-except Exception as error:
-    raise error
+# 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
+family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
 
 try:
     qpus   = get_QPUs(co_located = True, family = family)
@@ -39,9 +36,8 @@ try:
     for i, result in enumerate(result_list):
         print(f"Counts {i} is {result.counts}")
 
+except Exception as error:
+    raise error
+finally:
     # 4. Relinquish resources: drop the deployed QPUs 
     qdrop(family)
-
-except Exception as error:
-    qdrop(family)
-    raise error
