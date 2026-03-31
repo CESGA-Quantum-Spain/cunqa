@@ -13,6 +13,8 @@ import pytest
 import numpy as np
 import sympy
 from unittest.mock import Mock, patch
+from cunqa.circuit.core import CunqaCircuit
+import cunqa.circuit.core as circuit_mod
 from cunqa.circuit.parameter import Param
 
 @pytest.fixture(autouse=True)
@@ -193,8 +195,6 @@ def test_add_instruction_complex_expression():
     assert len(circuit.params) == 1
     assert isinstance(instr["params"][0], Param)
 
-from cunqa.circuit.core import CunqaCircuit, QuantumControlContext
-import cunqa.circuit.core as circuit_mod
 
 def test_init_generates_id_and_adds_default_q_register(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "ABC")
@@ -571,51 +571,31 @@ def test_qsend(target_factory, expected_id):
     c1 = CunqaCircuit(1, num_clbits=2, id="A")
     target = target_factory()
 
-    c1.qsend(0, target)
+    c1.qsend(0, target, -1)
 
     assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "qsend", "qubits": [0], "circuits": [expected_id]}
+    assert c1.instructions[-1] == {"name": "qsend", "qubits": [0], "circuits": [expected_id], "tags": [-1]}
 
 @pytest.mark.parametrize("target_factory, expected_id", B_CIRCUIT)
 def test_qrecv(target_factory, expected_id):
     c1 = CunqaCircuit(1, num_clbits=2, id="A")
     target = target_factory()
 
-    c1.qrecv(0, target)
+    c1.qrecv(0, target, -1)
 
     assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "qrecv", "qubits": [0], "circuits": [expected_id]}
+    assert c1.instructions[-1] == {"name": "qrecv", "qubits": [0], "circuits": [expected_id], "tags":[-1]}
 
-@pytest.mark.parametrize("target_factory, expected_id", B_CIRCUIT)
-def test_expose(target_factory, expected_id):
+def test_expose_and_unexpose():
     c1 = CunqaCircuit(1, id="A")
-    target = target_factory()
+    c2 = CunqaCircuit(1, id="B")
 
-    ctx = c1.expose(0, target)
+    rcontrol = c1.expose(0, c2, -1)
+    c2.unexpose(rcontrol)
 
     assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "expose", "qubits": [0], "circuits": [expected_id]}
-    assert isinstance(ctx, QuantumControlContext)
+    assert c2.is_dynamic is True
+    assert rcontrol[0] == -1
+    assert c1.instructions[-1] == {"name": "expose", "qubits": [0], "circuits": ["B"], "tags":[-1]}
+    assert c2.instructions[-1] == {"name": "unexpose", "tags":[-1]}
 
-
-def test_quantum_control_context_adds_rcontrol_to_target():
-    control = CunqaCircuit(1, id="CTRL")
-    target = CunqaCircuit(1, id="TGT")
-
-    with control.expose(0, target) as ([rqubit], subcircuit):
-        assert rqubit == -1
-        subcircuit.x(0)
-
-    rcontrol_instr = target.instructions[-1]
-    assert rcontrol_instr["name"] == "rcontrol"
-    assert rcontrol_instr["circuits"] == ["CTRL"]
-    assert [i["name"] for i in rcontrol_instr["instructions"]] == ["x"]
-
-
-def test_quantum_control_context_rejects_remote_ops_inside_block():
-    control = CunqaCircuit(1, id="CTRL")
-    target = CunqaCircuit(1, id="TGT")
-
-    with pytest.raises(RuntimeError):
-        with control.expose(0, target) as (rqubit, subcircuit):
-            subcircuit.recv(0, "OTHER")  # forbidden by __exit__

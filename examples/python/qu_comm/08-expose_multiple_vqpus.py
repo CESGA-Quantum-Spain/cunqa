@@ -19,14 +19,13 @@ qc_2 = CunqaCircuit(1, 1, id="Third")
 qc_0.h(0)
 qc_0.h(1)
 qc_1.h(0)
-rcontrols0 = qc_0.WIP_expose([0, 1], qc_2)
-rcontrols1 = qc_1.WIP_expose(0, qc_2)
-
+rcontrols0 = qc_0.expose([0, 1], qc_2)
+rcontrols1 = qc_1.expose(0, qc_2)
 
 qc_2.mcx(rcontrols0[0], rcontrols0[1], rcontrols1[0], 0)
 
-qc_2.WIP_unexpose(rcontrols0)
-qc_2.WIP_unexpose(rcontrols1)
+qc_2.unexpose(rcontrols0)
+qc_2.unexpose(rcontrols1)
 
 qc_0.measure(0,0)
 qc_0.measure(1,1)

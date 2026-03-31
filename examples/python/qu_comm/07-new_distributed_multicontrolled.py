@@ -25,9 +25,9 @@ try:
     cc_1.h(0)
     cc_1.h(1)
 
-    rqubits = cc_1.WIP_expose([0, 1], cc_2)
+    rqubits = cc_1.expose([0, 1], cc_2)
     cc_2.mcx(rqubits[0], rqubits[1], 0)
-    cc_2.WIP_unexpose(rqubits)
+    cc_2.unexpose(rqubits)
 
     cc_1.measure(0,0)
     cc_1.measure(1,1)

@@ -577,39 +577,38 @@ class CunqaCircuit:
             "tags": [tag]
         })
 
-    def expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit') -> 'QuantumControlContext':
-        """
-        Class method to expose a qubit from the current circuit to another one for a telegate 
-        operation. The exposed qubit will be used at the target circuit as the control qubit in 
-        controlled operations.
-        
-        Args:
-            qubit (int | list): qubit to be exposed.
-            target_circuit (str | CunqaCircuit): id of the circuit or circuit object where the exposed qubit is used.
-        
-        Returns:
-            A :py:class:`QuantumControlContext` object to manage remotly controlled operations in 
-            the given circuit.
-
-        Usage example:
-
-        .. code-block:: python
-
-            with origin_circ.expose(0, target_circuit) as ([rqubit], subcircuit):
-                subcircuit.cx(rqubit, 1)
-            
-        """ 
+    def expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit', tags: Optional[Union[list[int], int]] = None) -> list[int]:
         self.is_dynamic = True
         
         if isinstance(qubits, int):
             qubits = [qubits]
+        if tags:
+            if isinstance(tags, int):
+                tags = [tags]
+            assert len(qubits) == len(tags), "Number of tags must be equal than number of qubits"
+            assert all(tag < 0 for tag in tags), "Tags must be negative integers" 
+        else:
+            tags = [-x for x in random.sample(range(1, MAX_TAG_VALUE + 1), len(qubits))]
                 
         self.add_instructions({
             "name": "expose",
             "qubits": qubits,
-            "circuits": [target_circuit.id]
+            "circuits": [target_circuit.id],
+            "tags":tags
         })
-        return QuantumControlContext([self], target_circuit, len(qubits))
+
+        return tags
+
+    def unexpose(self, tags: Union[list[int], int]) -> None:
+        self.is_dynamic = True
+
+        if isinstance(tags, int):
+            tags = [tags]
+
+        self.add_instructions({
+            "name":"unexpose",
+            "tags":tags,
+        })
 
     # ----------------------
     # Non-unitary operations
@@ -2177,40 +2176,6 @@ class CunqaCircuit:
             "params":[prob]
             })
 
-
-    def WIP_expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit', tags: Optional[Union[list[int], int]] = None) -> list[int]:
-        self.is_dynamic = True
-        
-        if isinstance(qubits, int):
-            qubits = [qubits]
-        if tags:
-            if isinstance(tags, int):
-                tags = [tags]
-            assert len(qubits) == len(tags), "Number of tags must be equal than number of qubits"
-            assert all(tag < 0 for tag in tags), "Tags must be negative integers" 
-        else:
-            tags = [-x for x in random.sample(range(1, MAX_TAG_VALUE + 1), len(qubits))]
-                
-        self.add_instructions({
-            "name": "expose",
-            "qubits": qubits,
-            "circuits": [target_circuit.id],
-            "tags":tags
-        })
-
-        return tags
-
-    def WIP_unexpose(self, tags: Union[list[int], int]) -> None:
-        self.is_dynamic = True
-
-        if isinstance(tags, int):
-            tags = [tags]
-
-        self.add_instructions({
-            "name":"unexpose",
-            "tags":tags,
-        })
-
             
 class ClassicalControlContext:
     def __init__(self, circuit, clbits: Union[int, list[int]]):
@@ -2236,36 +2201,4 @@ class ClassicalControlContext:
         }
         self._circuit.add_instructions(cif)
  
-        return False
-
-class QuantumControlContext:
-    def __init__(
-        self, 
-        control_circuits: list['CunqaCircuit'], 
-        target_circuit: 'CunqaCircuit', 
-        num_qubits: int
-    ) -> int:
-        self.num_qubits = num_qubits
-        self.control_circuits = control_circuits
-        self.target_circuit = target_circuit
-
-    def __enter__(self):
-        self._subcircuit = CunqaCircuit(self.target_circuit.num_qubits, self.target_circuit.num_clbits)
-        return [-i for i in range(1, self.num_qubits + 1)], self._subcircuit
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        instructions = []
-        for instruction in self._subcircuit.instructions:
-            if instruction["name"] in ["qsend", "qrecv", "expose", "recv"]:
-                raise RuntimeError("Remote operations, quantum or classical, are not allowed "
-                                   "within a telegate block.")
-            instructions.append(instruction)
-
-        rcontrol = {
-            "name": "rcontrol",
-            "instructions": instructions,
-            "circuits": [control_circuit.info['id'] for control_circuit in self.control_circuits]
-        }
-        self.target_circuit.add_instructions(rcontrol)
-
         return False
