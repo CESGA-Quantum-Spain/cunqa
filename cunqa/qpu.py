@@ -22,7 +22,7 @@ import re
 from typing import Union, Any, Optional, TypedDict
 from sympy import Symbol
 
-from sympy import Symbol
+from collections import Counter
 from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
@@ -187,21 +187,20 @@ def run(
     else:
         circuits_ir = [to_ir(circuits)]
 
-    def expand_mapping(items: list[str]) -> dict[str, str]:
+    def expand_mapping(items: list[str], components_comm: dict[bool]) -> dict[str, str]:
         def split(item: str) -> list[str]:
             return [p for p in re.split(r"[|+]", item) if p]
 
-        singles = {item for item in items if len(split(item)) == 1}
+        occurrences = Counter()
+        # Count in how many of the items each circuit id appears
+        for item in items:
+            occurrences.update(set(split(item)))
 
-        conflicts = {
-            part
-            for item in items
-            if len(split(item)) > 1
-            for part in split(item)
-            if part in singles
-        }
+        conflicts      = {item for item, count in occurrences.items() if count >= 2}
+        conflict_comms = [true_false for circ_id, true_false in components_comm.items() if circ_id in conflicts]
 
-        if conflicts:
+        # Raise error if any conflict circuit has communications
+        if conflicts and any(conflict_comms):
             raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
 
         return {
@@ -224,9 +223,15 @@ def run(
     elif len(circuits_ir) < len(qpus):
         logger.warning("More QPUs provided than the number of circuits. "
                        "Last QPUs will remain unused.")
+        
+    # Needed for union and add compatibility check
+    components_comm = {}
+    for circ in circuits_ir:
+        if "components_comm" in circ:
+            components_comm.update(circ["components_comm"])
     
     # translate circuit ids in comm instruction to qpu endpoints
-    transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
+    transformed_circs = expand_mapping([c["id"] for c in circuits_ir], components_comm)
     correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
     for circuit in circuits_ir:
         for instr in circuit["instructions"]:
