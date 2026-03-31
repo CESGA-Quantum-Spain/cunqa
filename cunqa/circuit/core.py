@@ -337,7 +337,7 @@ class CunqaCircuit:
             "has_qc": self.has_qc, 
             "sending_to": list(self.sending_to),
             "params": self.params,
-            "component_comms": self.components_comm
+            "components_comm": self.components_comm
         }
 
     @property
