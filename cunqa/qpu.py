@@ -304,6 +304,7 @@ def qraise(n, t, *,
            classical_comm = False, 
            quantum_comm = False,  
            simulator = None, 
+           n_comm_qubits = None,
            backend = None, 
            noise_properties_path = None, 
            no_thermal_relaxation = False,
@@ -333,6 +334,7 @@ def qraise(n, t, *,
         quantum_comm (bool): if ``True``, vQPUs will allow quantum communications.
         simulator (str): name of the desired simulator to use. Default is `Aer 
                          <https://github.com/Qiskit/qiskit-aer>`_.
+        n_comm_qubits (int): number of communication qubits for quantum communications.
         backend (str): path to a file containing the backend information.
         noise_properties_path (str): Path to the noise properties json file, only supported for 
                                 simulator Aer. Default: None
@@ -371,6 +373,8 @@ def qraise(n, t, *,
         command = command + " --classical_comm"
     if quantum_comm:
         command = command + " --quantum_comm"
+    if n_comm_qubits:
+        command = command + f" --n_comm_qubits={str(n_comm_qubits)}"
     if simulator is not None:
         command = command + f" --simulator={str(simulator)}"
     if family is not None:

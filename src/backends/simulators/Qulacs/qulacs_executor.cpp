@@ -17,8 +17,8 @@ using namespace std::string_literals;
 namespace cunqa {
 namespace sim {
 
-QulacsExecutor::QulacsExecutor(const std::size_t& n_qpus) : 
-    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
+QulacsExecutor::QulacsExecutor(const std::size_t& n_qpus, int& n_comm_qubits) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}, n_comm_qubits{n_comm_qubits}
 {
     JSON ids;
     do {
@@ -54,7 +54,7 @@ void QulacsExecutor::run()
             }
         }
 
-        QulacsComputationAdapter qc(quantum_tasks);
+        QulacsComputationAdapter qc(quantum_tasks, n_comm_qubits);
         QulacsSimulatorAdapter qulacs_sa(qc);
         auto result = qulacs_sa.simulate(&classical_channel, true);
         

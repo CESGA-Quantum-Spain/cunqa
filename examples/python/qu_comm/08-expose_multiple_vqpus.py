@@ -8,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
 
-family = qraise(3, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
+family = qraise(3, "00:10:00", simulator="Munich", quantum_comm=True, n_comm_qubits = 6, co_located = True)
 qpus = get_QPUs(co_located=True, family = family)
 
 qc_0 = CunqaCircuit(2, 2, id="First")
@@ -33,7 +33,7 @@ qc_1.measure(0,0)
 qc_2.measure(0,0)
 
 
-distr_jobs = run([qc_0, qc_1, qc_2], qpus, shots=1000, n_communication_qubits = 6)
+distr_jobs = run([qc_0, qc_1, qc_2], qpus, shots=1000)
 
 result_list = gather(distr_jobs)
 

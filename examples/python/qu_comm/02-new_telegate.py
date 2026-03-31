@@ -10,7 +10,7 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, co_located = True)
+    family = qraise(2, "00:10:00", simulator="Munich", quantum_comm=True, n_comm_qubits=4, co_located = True)
 except Exception as error:
     raise error
 
@@ -31,7 +31,7 @@ try:
     cc_2.measure_all()
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2], qpus, shots=1024, n_communication_qubits = 4) 
+    distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
 
     # Collect the results
     result_list = gather(distr_jobs)

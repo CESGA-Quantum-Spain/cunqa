@@ -877,20 +877,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         st_qtasks.push_back(from_quantum_task_to_structuredqtask(quantum_task));
         n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
     }
-
-    size_t n_comm_qubits = 0;
-    if (qc.quantum_tasks.size() > 1) { // Quantum Communications 
-        if (qc.quantum_tasks[0].config.contains("n_communication_qubits")) {
-            n_comm_qubits = qc.quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
-            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
-                n_comm_qubits++;
-            }
-        } else {
-            n_comm_qubits = 2;
-        }
-
-        n_qubits += n_comm_qubits;
-    }
+    n_qubits += qc.num_comm_qubits;
 
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
     // is qcsim or gpu specified?
@@ -966,7 +953,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
             for (std::size_t i = 0; i < shots; i++) {
                 AllocateQubits(simulator, n_qubits);
                 InitializeSimulator(simulator);
-                local_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+                local_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
                 ClearSimulator(simulator);
             }
 
@@ -986,7 +973,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
         {
             AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
             InitializeSimulator(simulator);
-            meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+            meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
             ClearSimulator(simulator);
         } // End all shots
     }
@@ -1002,7 +989,7 @@ JSON MaestroSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel
     {
         AllocateQubits(simulator, n_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
         InitializeSimulator(simulator);
-        meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+        meas_counter[execute_shot_(simulator, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
         ClearSimulator(simulator);
     } // End all shots
 #endif

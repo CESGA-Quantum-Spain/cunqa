@@ -8,13 +8,14 @@ namespace sim {
 
 class AerExecutor {
 public:
-    AerExecutor(const std::size_t& n_qpus);
+    AerExecutor(const std::size_t& n_qpus, int& n_comm_qubits);
     ~AerExecutor() = default;
 
     void run();
 private:
     comm::ClassicalChannel classical_channel;
     std::vector<std::string> qpu_ids;
+    int n_comm_qubits;
 };
 
 } // End of sim namespace

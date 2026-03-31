@@ -8,13 +8,14 @@ namespace sim {
 
 class QulacsExecutor {
 public:
-    QulacsExecutor(const std::size_t& n_qpus);
+    QulacsExecutor(const std::size_t& n_qpus, int& n_comm_qubits);
     ~QulacsExecutor() = default;
 
     void run();
 private:
     comm::ClassicalChannel classical_channel;
     std::vector<std::string> qpu_ids;
+    int n_comm_qubits;
 };
 
 } // End of sim namespace

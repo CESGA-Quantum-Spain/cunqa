@@ -23,9 +23,11 @@ int main(int argc, char *argv[])
 {
     std::string sim_arg;
     std::size_t n_qpus;
-    if (argc == 3) {
+    int n_comm_qubits;
+    if (argc == 4) {
         sim_arg = argv[1];
         n_qpus = static_cast<size_t>(std::stoull(argv[2]));
+        n_comm_qubits = std::stoi(argv[3]);
     } else {
         LOGGER_ERROR("Passing incorrect number of arguments.");
         return EXIT_FAILURE;
@@ -35,35 +37,35 @@ int main(int argc, char *argv[])
         case murmur::hash("Aer"): 
         {
             LOGGER_DEBUG("Raising executor with Aer.");
-            AerExecutor executor(n_qpus);
+            AerExecutor executor(n_qpus, n_comm_qubits);
             executor.run();
             break;
         }
         case murmur::hash("Munich"):
         {
             LOGGER_DEBUG("Raising executor with Munich.");
-            MunichExecutor executor(n_qpus);
+            MunichExecutor executor(n_qpus, n_comm_qubits);
             executor.run();
             break;
         }
         case murmur::hash("Cunqa"):
         {
             LOGGER_DEBUG("Raising executor with Cunqa.");
-            CunqaExecutor executor(n_qpus);
+            CunqaExecutor executor(n_qpus, n_comm_qubits);
             executor.run();
             break;
         }
         case murmur::hash("Maestro"):
         {
             LOGGER_DEBUG("Raising executor with Maestro.");
-            MaestroExecutor executor(n_qpus);
+            MaestroExecutor executor(n_qpus, n_comm_qubits);
             executor.run();
             break;
         }
         case murmur::hash("Qulacs"):
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
-            QulacsExecutor executor(n_qpus);
+            QulacsExecutor executor(n_qpus, n_comm_qubits);
             executor.run();
             break;
         }

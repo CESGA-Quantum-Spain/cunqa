@@ -37,7 +37,7 @@ private:
         const std::vector<StructuredQuantumTask>& st_qtasks, 
         comm::ClassicalChannel* classical_channel,
         const bool allows_qc,
-        const size_t& n_comm_qubits
+        const int& n_comm_qubits
     );
     
 };

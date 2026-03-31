@@ -30,6 +30,7 @@ struct CunqaArgs : public argparse::Args
     bool& co_located                                    = flag("co-located", "co-located mode. The user can connect with any deployed QPU.");
     bool& cc                                            = flag("classical_comm", "Enable classical communications.");
     bool& qc                                            = flag("quantum_comm", "Enable quantum communications.");
+    int& n_comm_qubits                                  = kwarg("n_comm_qubits", "Number of communication qubits for quantum communications").set_default(2);
     std::optional<std::string>& infrastructure          = kwarg("infrastructure", "Path to a infrastructure of QPUs.");
     bool& qmio                                          = flag("qmio", "Deploy QMIO.").set_default(false);
     bool& gpu                                           = flag("gpu", "Run on GPU").set_default(false);

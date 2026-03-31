@@ -17,8 +17,8 @@ using namespace std::string_literals;
 namespace cunqa {
 namespace sim {
 
-AerExecutor::AerExecutor(const std::size_t& n_qpus) : 
-    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
+AerExecutor::AerExecutor(const std::size_t& n_qpus, int& n_comm_qubits) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}, n_comm_qubits{n_comm_qubits}
 {
     JSON ids;
     do {
@@ -53,7 +53,7 @@ void AerExecutor::run()
             }
         }
 
-        AerComputationAdapter qc(quantum_tasks);
+        AerComputationAdapter qc(quantum_tasks, n_comm_qubits);
         AerSimulatorAdapter aer_sa(qc);
         auto result = aer_sa.simulate(&classical_channel, true);
         

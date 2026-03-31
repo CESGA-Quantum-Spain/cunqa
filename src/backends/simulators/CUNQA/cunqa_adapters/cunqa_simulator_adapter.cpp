@@ -541,20 +541,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
         st_qtasks.push_back(from_quantum_task_to_structuredqtask(quantum_task));
         n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
     }
-
-    size_t n_comm_qubits = 0;
-    if (qc.quantum_tasks.size() > 1) { // Quantum Communications 
-        if (qc.quantum_tasks[0].config.contains("n_communication_qubits")) {
-            n_comm_qubits = qc.quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
-            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
-                n_comm_qubits++;
-            }
-        } else {
-            n_comm_qubits = 2;
-        }
-
-        n_qubits += n_comm_qubits;
-    }
+    n_qubits += qc.num_comm_qubits;
 
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -568,7 +555,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
 
             #pragma omp for
             for (std::size_t i = 0; i < shots; i++) {
-                local_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+                local_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
                 executor.restart_statevector();
             }
 
@@ -580,7 +567,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
         Executor executor(n_qubits);
         for (int i = 0; i < shots; i++)
         {
-            meas_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+            meas_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
             executor.restart_statevector();
             
         } // End all shots
@@ -589,7 +576,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
     Executor executor(n_qubits);
     for (int i = 0; i < shots; i++)
     {
-        meas_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc,n_comm_qubits)]++;
+        meas_counter[execute_shot_(executor, st_qtasks, classical_channel, allows_qc, qc.num_comm_qubits)]++;
         executor.restart_statevector();
         
     } // End all shots

@@ -8,13 +8,14 @@ namespace sim {
 
 class CunqaExecutor {
 public:
-    CunqaExecutor(const std::size_t& n_qpus);
+    CunqaExecutor(const std::size_t& n_qpus, int& n_comm_qubits);
     ~CunqaExecutor() = default;
 
     void run();
 private:
     comm::ClassicalChannel classical_channel;
     std::vector<std::string> qpu_ids;
+    int n_comm_qubits;
 };
 
 } // End of sim namespace

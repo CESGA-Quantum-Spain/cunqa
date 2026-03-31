@@ -12,11 +12,18 @@ public:
     MaestroComputationAdapter(const QuantumTask& quantum_task) :
         quantum_tasks{quantum_task}
     { }
-    MaestroComputationAdapter(const std::vector<QuantumTask>& quantum_tasks) :
-        quantum_tasks{quantum_tasks}
+    MaestroComputationAdapter(const std::vector<QuantumTask>& quantum_tasks, const int& n_comm_qubits) :
+        quantum_tasks{quantum_tasks}, num_comm_qubits{get_num_comm_qubits_(n_comm_qubits)}
     { }
 
     std::vector<QuantumTask> quantum_tasks;
+    int num_comm_qubits = 0;
+
+    int get_num_comm_qubits_(const int& ncq)
+    {
+        int tmp = (ncq % 2 != 0) ? ncq + 1 : ncq; // Ensure communication qubits always in pairs
+        return tmp; 
+    }
 };
 
 

@@ -529,6 +529,8 @@ class CunqaCircuit:
 
             recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                  sent.
+
+            tag (int): Optional negative integer to associate a qsend with a qrecv. If not set, the communication directives will take place in order.
         """
         self.is_dynamic = True
         
@@ -557,6 +559,8 @@ class CunqaCircuit:
             qubit (int): ancilla to which the received qubit is assigned.
 
             control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
+
+            tag (int): Optional negative integer to associate a qrecv with a qsend. If not set, the communication directives will take place in order.
         """
         self.is_dynamic = True
         
@@ -577,11 +581,28 @@ class CunqaCircuit:
             "tags": [tag]
         })
 
-    def expose(self, qubits: Union[list[int], int], target_circuit: 'CunqaCircuit', tags: Optional[Union[list[int], int]] = None) -> list[int]:
+    def expose(self, qubits: Union[list[int], int], target_circuit: Union['CunqaCircuit', str], tags: Optional[Union[list[int], int]] = None) -> list[int]:
+        """
+        Class method to expose one or several qubits to a target circuit.
+        
+        Args:
+            qubits (int | list[int]): index or list of indices of qubit(s) to be exposed.
+
+            target_circuit (CunqaCircuit | str): CunqaCircuit object or string ID of the circuit that will ''see'' the exposed qubits.
+
+            tags (int | list[int]): Optional negative integer or list of integers, each of one associated to a exposed qubit. If not set, random values are se
+
+        Result:
+            The function returns a list of negative integers, corresponding to each exposed qubit. This values can be used as arguments of controlled gates to specify that are remotely controlled. 
+        """
         self.is_dynamic = True
         
         if isinstance(qubits, int):
             qubits = [qubits]
+        if isinstance(target_circuit, str):
+            target_circuit_id = target_circuit
+        elif isinstance(target_circuit, CunqaCircuit):
+            target_circuit_id = target_circuit.id
         if tags:
             if isinstance(tags, int):
                 tags = [tags]
@@ -593,7 +614,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "expose",
             "qubits": qubits,
-            "circuits": [target_circuit.id],
+            "circuits": [target_circuit_id],
             "tags":tags
         })
 

@@ -17,8 +17,8 @@ using namespace std::string_literals;
 namespace cunqa {
 namespace sim {
 
-MunichExecutor::MunichExecutor(const std::size_t& n_qpus) : 
-    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}
+MunichExecutor::MunichExecutor(const std::size_t& n_qpus, int& n_comm_qubits) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_executor"s}, n_comm_qubits{n_comm_qubits}
 {
     JSON ids;
     do {
@@ -54,7 +54,7 @@ void MunichExecutor::run()
             }
         }
 
-        auto qc = std::make_unique<QuantumComputationAdapter>(quantum_tasks);
+        auto qc = std::make_unique<QuantumComputationAdapter>(quantum_tasks, n_comm_qubits);
         MunichSimulatorAdapter simulator(std::move(qc));
         auto result = simulator.simulate(&classical_channel, true);
         

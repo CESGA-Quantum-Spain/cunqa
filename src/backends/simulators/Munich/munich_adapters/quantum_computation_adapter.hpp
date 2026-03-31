@@ -25,36 +25,29 @@ public:
     { 
         n_qubits = quantum_task.config.at("num_qubits").get<size_t>();
     }
-    QuantumComputationAdapter(const std::vector<QuantumTask>& quantum_tasks) : 
-        QuantumComputation(get_num_qubits_(quantum_tasks), get_num_clbits_(quantum_tasks)),
-        quantum_tasks{quantum_tasks}
+
+    QuantumComputationAdapter(const std::vector<QuantumTask>& quantum_tasks, const int& n_comm_qubits) : QuantumComputation(get_total_qubits(quantum_tasks, n_comm_qubits), get_num_clbits_(quantum_tasks)), quantum_tasks{quantum_tasks}
     { 
-        n_qubits = get_num_qubits_(quantum_tasks);
-        n_comm_qubits = get_num_comm_qubits_(quantum_tasks);
+        n_qubits = get_total_qubits(quantum_tasks, n_comm_qubits);
+        num_comm_qubits = get_num_comm_qubits_(n_comm_qubits);
     }
 
     std::vector<QuantumTask> quantum_tasks;
     size_t n_qubits;
-    size_t n_comm_qubits = 0;
+    int num_comm_qubits = 0;
 
 private:
 
-    std::size_t get_num_qubits_(const std::vector<QuantumTask>& quantum_tasks) 
+    std::size_t get_total_qubits(const std::vector<QuantumTask>& quantum_tasks, const int& ncq) 
     {
-        size_t tmp_n_qubits;
+        size_t tmp_n_qubits = 0;
         for (auto& quantum_task : quantum_tasks) {
             tmp_n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
         }
+        int tmp_num_comm_qubits = (ncq % 2 != 0) ? ncq + 1 : ncq; // Ensure communication qubits always in pairs
 
-        if (quantum_tasks[0].config.contains("n_communication_qubits")) {
-            size_t n_comm_qubits = quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
-            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
-                n_comm_qubits++;
-            }
-            tmp_n_qubits += n_comm_qubits;
-        } else {
-            tmp_n_qubits += 2;
-        }
+        tmp_n_qubits += tmp_num_comm_qubits;
+
 
         return tmp_n_qubits; 
     }
@@ -68,17 +61,10 @@ private:
         return num_clbits;
     }
 
-    std::size_t get_num_comm_qubits_(const std::vector<QuantumTask>& quantum_tasks) 
+    int get_num_comm_qubits_(const int& ncq)
     {
-        if (quantum_tasks[0].config.contains("n_communication_qubits")) {
-            size_t n_comm_qubits = quantum_tasks[0].config.at("n_communication_qubits").get<size_t>();
-            if (n_comm_qubits % 2 != 0) { // Ensure communication qubits always in pairs
-                n_comm_qubits++;
-            }
-            return n_comm_qubits;
-        } else {
-            return 2;
-        }
+        int tmp = (ncq % 2 != 0) ? ncq + 1 : ncq; // Ensure communication qubits always in pairs
+        return tmp; 
     }
 
 };

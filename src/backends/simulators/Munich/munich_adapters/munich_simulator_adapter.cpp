@@ -139,7 +139,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
     const std::vector<StructuredQuantumTask>& st_qtasks, 
     comm::ClassicalChannel *classical_channel,
     const bool allows_qc,
-    const size_t& n_comm_qubits
+    const int& n_comm_qubits
 )
 {
     std::unordered_map<std::string, TaskState> Ts;
@@ -713,10 +713,9 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < shots; i++)
-    {   
+    for (std::size_t i = 0; i < shots; i++) {   
         initializeSimulationAdapter(p_qca->n_qubits);
-        meas_counter[execute_shot_(st_qtasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
+        meas_counter[execute_shot_(st_qtasks, classical_channel, allows_qc, p_qca->num_comm_qubits)]++;
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();
