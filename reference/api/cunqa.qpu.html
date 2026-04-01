@@ -363,14 +363,17 @@ nodes.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.qpu.qdrop">
-<span class="sig-name descname"><span class="pre">qdrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">families</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.qdrop" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qdrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">families</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qpu.qdrop" title="Link to this definition"></a></dt>
 <dd><p>Same functionality as the <cite>qdrop</cite> bash command, with the peculiarity that it only takes as
 argument the vQPU family names (and it does not accept the job ID as the bash command). This is
 done because the Python version of the <cite>qraise</cite> bash command returns only the family name.</p>
 <p>If no families are provided, all vQPUs deployed by the user will be dropped.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>families</strong> (<em>str</em>) – family names of the groups of vQPUs to be dropped.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>families</strong> (<em>str</em>) – family names of the groups of vQPUs to be dropped.</p></li>
+<li><p><strong>remove_logs</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
