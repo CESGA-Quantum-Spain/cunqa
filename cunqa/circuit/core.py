@@ -299,7 +299,7 @@ class CunqaCircuit:
         self.quantum_regs = {}
         self.classical_regs = {}        
         self.sending_to = set()
-        self.components_comm = {}
+        self.blocks_with_comms = []
 
         self.add_q_register("q0", num_qubits)
         
@@ -337,7 +337,7 @@ class CunqaCircuit:
             "has_qc": self.has_qc, 
             "sending_to": list(self.sending_to),
             "params": self.params,
-            "components_comm": self.components_comm
+            "blocks_with_comms": self.blocks_with_comms
         }
 
     @property
