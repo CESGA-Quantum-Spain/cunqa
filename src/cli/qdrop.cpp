@@ -108,26 +108,16 @@ bool deleteLogFiles(const std::vector<std::string>& job_ids = {},
             }
         }
         
-        // "qraise_XXXXXX" regex
-        std::regex qraise_pattern(R"(^qraise_\d+$)");
-        
         for (const auto& entry : std::filesystem::directory_iterator(directory)) {
             if (entry.is_regular_file()) {
                 std::string filename = entry.path().filename().string();
                 
                 bool should_delete = false;
-                
-                if (!job_ids.empty()) {
-                    // If job_ids are provided, only delete filenames in targets
-                    should_delete = targets.count(filename) > 0;
-                } else {
-                    // If no job_idsare provided, delete files matching "qraise_XXXXXX" pattern
-                    should_delete = std::regex_match(filename, qraise_pattern);
-                }
+                should_delete = targets.count(filename) > 0;
                 
                 if (should_delete) {
                     std::filesystem::remove(entry.path());
-                    LOGGER_DEBUG("Deleted: ", filename);
+                    LOGGER_DEBUG("Deleted: {}", filename);
                 }
             }
         }
@@ -168,10 +158,10 @@ int main(int argc, char* argv[])
     } else if (!args.ids.has_value() && args.family.has_value()) {
         auto ids = find_family_id(read_qpus_json(), args.family.value());
 
-        if (size(ids)) 
+        if (size(ids)) {
             removeJobs(ids);
-            if (args.remove_logs) deleteLogFiles(ids);
-        else {
+            if (args.remove_logs) { deleteLogFiles(ids); }
+        } else {
             std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" 
                       << "No qraise jobs are currently running with the specified family names.\n";
             return EXIT_FAILURE;

@@ -19,7 +19,7 @@ install(TARGETS ${QRAISE_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # QDROP executable
 add_executable(qdrop qdrop.cpp)
-target_link_libraries(qdrop PRIVATE json morrisfranken::argparse)
+target_link_libraries(qdrop PRIVATE json morrisfranken::argparse logger_client)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # SETUP_QPUS executable

@@ -451,7 +451,7 @@ def qraise(n, t, *,
     return family if family is not None else str(job_id)
     
 
-def qdrop(*families: str):
+def qdrop(families: Union[str, list[str]], remove_logs: bool = False):
     """
     Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as 
     argument the vQPU family names (and it does not accept the job ID as the bash command). This is 
@@ -462,7 +462,9 @@ def qdrop(*families: str):
     Args:
         families (str): family names of the groups of vQPUs to be dropped.
     """
-    
+    if isinstance(families, str):
+        families = [families]
+
     # Building the terminal command to drop the specified families
     cmd = ['qdrop'] 
 
@@ -470,8 +472,12 @@ def qdrop(*families: str):
     if len( families ) == 0:
         cmd.append('--all') 
     else:
-        cmd.append('--fam')
-        for family in families:
-            cmd.append(family)
- 
+        family_str = f"--fam={families[0]}"
+        for family in families[1:]:
+            family_str += (',' + str(family))
+        cmd.append(family_str)
+
+    if remove_logs:
+        cmd.append('--rm')
+
     subprocess.run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal
