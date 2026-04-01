@@ -200,7 +200,7 @@ def run(
         conflict_comms = [circ_id for circ_id in blocks_with_comms if circ_id in conflicts]
 
         # Raise error if any conflict circuit has communications
-        if conflicts and conflict_comms:
+        if conflict_comms:
             raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
 
         return {
