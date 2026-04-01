@@ -44,9 +44,9 @@ try:
         print(f"Counts: {counts}")
 
     # 4. Relinquish resources
-    qdrop(family)
+    qdrop(family, remove_logs=True)
     
 except Exception as error:
-    qdrop(family)
+    qdrop(family, remove_logs=True)
     raise error
 

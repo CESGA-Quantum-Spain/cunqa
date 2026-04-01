@@ -551,7 +551,7 @@ def test_qdrop_multiple_families(monkeypatch):
         called["cmd"] = cmd
 
     monkeypatch.setattr(qpu_mod.subprocess, "run", fake_run)
-    qdrop("famA", "famB", "famC")
+    qdrop(["famA", "famB", "famC"])
 
     assert called["cmd"] == ["qdrop", "--fam=famA,famB,famC"]
 

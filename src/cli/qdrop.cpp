@@ -9,9 +9,10 @@
 #include <set>
 #include <unordered_set>
 #include <ranges>
+#include <regex>
 
 #include "argparse/argparse.hpp"
-//#include "logger.hpp"
+#include "logger.hpp"
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
 
@@ -21,6 +22,7 @@ struct CunqaArgs : public argparse::Args
 {
     std::optional<std::vector<std::string>>& ids    = arg("Slurm IDs of the QPUs to be dropped.").multi_argument();
     std::optional<std::vector<std::string>>& family = kwarg("fam,family_name", "Family name of the QPUs to be dropped.");
+    bool &remove_logs                               = flag("rm, remove_logs", "Logs files qraise_XXXXXX will be deleted.");
     bool &all                                       = flag("all", "All qraise jobs will be dropped.");
 };
 
@@ -94,6 +96,38 @@ void removeJobs(const std::vector<std::string>& job_ids, const bool& all = false
     }
 }
 
+// Function more general than needed to support future extension
+bool deleteLogFiles(const std::vector<std::string>& job_ids = {},
+                    const std::string& directory = ".") {
+    try {
+        std::unordered_set<std::string> targets;
+        
+        if (!job_ids.empty()) {
+            for (const auto& job_id : job_ids) {
+                targets.insert("qraise_" + job_id);
+            }
+        }
+        
+        for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+            if (entry.is_regular_file()) {
+                std::string filename = entry.path().filename().string();
+                
+                bool should_delete = false;
+                should_delete = targets.count(filename) > 0;
+                
+                if (should_delete) {
+                    std::filesystem::remove(entry.path());
+                    LOGGER_DEBUG("Deleted: {}", filename);
+                }
+            }
+        }
+        return true;
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 int main(int argc, char* argv[]) 
 {
     auto args = argparse::parse<CunqaArgs>(argc, argv);
@@ -101,8 +135,11 @@ int main(int argc, char* argv[])
     if (args.all) {
         auto ids = get_qpus_ids(read_qpus_json());
 
-        if (size(ids)) removeJobs(ids, true);
-        else return EXIT_FAILURE;
+        if (size(ids))
+            removeJobs(ids, true);
+            if (args.remove_logs) deleteLogFiles(ids);
+        else 
+            return EXIT_FAILURE;
     } else if (args.ids.has_value() && !args.family.has_value()) {
         auto ids = get_qpus_ids(read_qpus_json());
 
@@ -112,6 +149,7 @@ int main(int argc, char* argv[])
 
         if (size(filtered_ids)) 
             removeJobs(filtered_ids);
+            if (args.remove_logs) deleteLogFiles(filtered_ids);
         else {
             std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" 
                       << "No qraise jobs are currently running with the specified id.\n";
@@ -120,9 +158,10 @@ int main(int argc, char* argv[])
     } else if (!args.ids.has_value() && args.family.has_value()) {
         auto ids = find_family_id(read_qpus_json(), args.family.value());
 
-        if (size(ids)) 
+        if (size(ids)) {
             removeJobs(ids);
-        else {
+            if (args.remove_logs) { deleteLogFiles(ids); }
+        } else {
             std::cerr << "\033[1;33m" << "Warning: " << "\033[0m" 
                       << "No qraise jobs are currently running with the specified family names.\n";
             return EXIT_FAILURE;
