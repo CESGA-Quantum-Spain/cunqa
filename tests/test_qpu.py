@@ -528,7 +528,7 @@ def test_qdrop_no_families(monkeypatch):
 
 
 def test_qdrop_single_family(monkeypatch):
-    """If one family is passed, qdrop should call: ['qdrop', '--fam', family]."""
+    """If one family is passed, qdrop should call: ['qdrop', '--fam=family']."""
     called = {}
 
     def fake_run(cmd, *args, **kwargs):
@@ -537,13 +537,13 @@ def test_qdrop_single_family(monkeypatch):
     monkeypatch.setattr(qpu_mod.subprocess, "run", fake_run)
     qdrop("famA")
 
-    assert called["cmd"] == ["qdrop", "--fam", "famA"]
+    assert called["cmd"] == ["qdrop", "--fam=famA"]
 
 
 def test_qdrop_multiple_families(monkeypatch):
     """
     If multiple families are passed, qdrop should call:
-    ['qdrop', '--fam', fam1, fam2, ...] preserving order.
+    ['qdrop', '--fam=fam1,fam2,...'] preserving order.
     """
     called = {}
 
@@ -553,7 +553,7 @@ def test_qdrop_multiple_families(monkeypatch):
     monkeypatch.setattr(qpu_mod.subprocess, "run", fake_run)
     qdrop("famA", "famB", "famC")
 
-    assert called["cmd"] == ["qdrop", "--fam", "famA", "famB", "famC"]
+    assert called["cmd"] == ["qdrop", "--fam=famA,famB,famC"]
 
 # ------------------------
 # get_QPUs tests
