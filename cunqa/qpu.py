@@ -228,7 +228,7 @@ def run(
     blocks_with_comms = []
     for circ in circuits_ir:
         if "blocks_with_comms" in circ:
-            blocks_with_comms.update(circ["blocks_with_comms"])
+            blocks_with_comms += circ["blocks_with_comms"]
     
     # translate circuit ids in comm instruction to qpu endpoints
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir], blocks_with_comms)
