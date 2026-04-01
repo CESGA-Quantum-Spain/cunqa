@@ -451,7 +451,7 @@ def qraise(n, t, *,
     return family if family is not None else str(job_id)
     
 
-def qdrop(families: Union[str, list[str]], remove_logs: bool = False):
+def qdrop(families: Union[str, list[str]] = [], remove_logs: bool = False):
     """
     Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as 
     argument the vQPU family names (and it does not accept the job ID as the bash command). This is 
