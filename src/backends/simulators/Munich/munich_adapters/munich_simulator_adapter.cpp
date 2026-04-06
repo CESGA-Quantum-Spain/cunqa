@@ -578,7 +578,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
             for (const auto& tag : inst.tags) {
                 int index = find_my_communication_pair_by_tag(G, tag);
                 if (index == -1) {
-                    LOGGER_WARNING("Trying to unexpose a yet not-exposed qubit. Strange, but waiting for an expose...");
+                    LOGGER_WARN("Trying to unexpose a yet not-exposed qubit. Strange, but waiting for an expose...");
                     T.waiting = true;
                     return;
                 } 
