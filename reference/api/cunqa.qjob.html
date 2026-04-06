@@ -233,7 +233,7 @@ need to change the parameters of the gates in a circuit as they are optimized in
 This parameter update is done using the <a class="reference internal" href="#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob.upgrade_parameters">
-<span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upgrade_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob.upgrade_parameters" title="Link to this definition"></a></dt>
 <dd><p>Method to upgrade the parameters in a previously submitted job of parametric circuit.
 First it checks weather the prior simulation’s result was retrieved. If not, it is discarded,
 and the new set of parameters is sent to the server to be reassigned to the circuit for
@@ -255,10 +255,13 @@ can be done automatically as in the example above, but be aware that once the
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>param_values</strong> (<em>dict</em><em> | </em><em>list</em>) – either a list of ordered parameters to assign to the
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_values</strong> (<em>dict</em><em> | </em><em>list</em>) – either a list of ordered parameters to assign to the
 parametrized circuit or a dictionary with keys being the
 free parameters’ names and its values being its
-corresponding new values.</p>
+corresponding new values.</p></li>
+<li><p><strong>shots</strong> (<em>int</em>) – number of shots for the next circuit execution</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
