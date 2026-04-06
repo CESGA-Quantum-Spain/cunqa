@@ -578,11 +578,13 @@ std::string MunichSimulatorAdapter::execute_shot_(
             for (const auto& tag : inst.tags) {
                 int index = find_my_communication_pair_by_tag(G, tag);
                 if (index == -1) {
-                    LOGGER_ERROR("Tag {} not associated to any expose.", std::to_string(tag));
+                    LOGGER_WARNING("Trying to unexpose a yet not-exposed qubit. Strange, but waiting for an expose...");
+                    T.waiting = true;
                     return;
                 } 
                 indices.push_back(index);
             }
+            T.waiting = false;
 
             for (auto& index : indices) {
                 auto h = std::make_unique<StandardOperation>(G.communication_pairs[index].q1, OpType::H);
