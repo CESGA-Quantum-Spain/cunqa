@@ -31,7 +31,8 @@ target_link_libraries(${SETUP_QPUS_NAME} PRIVATE json logger_qpu qpu
                                          munich_simple_simulator munich_cc_simulator munich_qc_simulator 
                                          cunqa_simple_simulator cunqa_cc_simulator cunqa_qc_simulator
                                          maestro_simple_simulator maestro_cc_simulator maestro_qc_simulator
-                                         qulacs_simple_simulator qulacs_cc_simulator qulacs_qc_simulator)
+                                         qulacs_simple_simulator qulacs_cc_simulator qulacs_qc_simulator
+                                         qsim_simple_simulator qsim_cc_simulator qsim_qc_simulator)
 target_include_directories(${SETUP_QPUS_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")
 if (COMPILATION_FOR_GPU)
     target_compile_definitions(${SETUP_QPUS_NAME} PUBLIC GPU_ARCH=${GPU_ARCH} 
@@ -45,7 +46,7 @@ install(TARGETS ${SETUP_QPUS_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 set(SETUP_EXECUTOR_NAME "setup_executor")
 add_executable(${SETUP_EXECUTOR_NAME} setup_executor.cpp)
-target_link_libraries(${SETUP_EXECUTOR_NAME} PRIVATE aer_executor munich_executor cunqa_executor maestro_executor qulacs_executor logger_executor)
+target_link_libraries(${SETUP_EXECUTOR_NAME} PRIVATE aer_executor munich_executor cunqa_executor maestro_executor qulacs_executor qsim_executor logger_executor)
 target_include_directories(${SETUP_EXECUTOR_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")
 if (COMPILATION_FOR_GPU)
     target_compile_definitions(${SETUP_EXECUTOR_NAME} PUBLIC GPU_ARCH=${GPU_ARCH} 
