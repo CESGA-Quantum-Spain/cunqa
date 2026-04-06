@@ -40,11 +40,11 @@ try:
     print(f"{green_txt}Result 1: {qjob.result.counts}{reset}")
 
     # Upgrade with a dict with only some of the Variables (previous values are preserved)
-    qjob.upgrade_parameters({"y": np.pi})
+    qjob.upgrade_parameters({"y": np.pi}, shots=2048)
     print(f"{green_txt}Result 2: {qjob.result.counts}{reset}")
 
     # Now with a list (in the order in which the parameters where added to the circuit)
-    qjob.upgrade_parameters([0, 0, np.pi])
+    qjob.upgrade_parameters([0, 0, np.pi], shots=1024)
     print(f"{green_txt}Result 3: {qjob.result.counts}{reset}")
 
     # 4. Relinquish resources

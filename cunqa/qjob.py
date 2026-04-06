@@ -190,7 +190,8 @@ class QJob:
             
     def upgrade_parameters(
         self, 
-        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]],
+        shots: int = None
     ) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
@@ -218,6 +219,7 @@ class QJob:
                                         parametrized circuit or a dictionary with keys being the 
                                         free parameters' names and its values being its 
                                         corresponding new values.
+            shots (int): number of shots for the next circuit execution
         """
 
         if self._result is None: 
@@ -234,9 +236,11 @@ class QJob:
 
         self.assign_parameters_(param_values)
               
+        if shots is None:
+            shots = self._quantum_task["config"]["shots"]
         try:
             premessage = json.dumps(self._params, default=encoder)
-            message = """{{"params":{}}}""".format(premessage).replace("'", '"')
+            message = """{{"params":{}, "shots": {}}}""".format(premessage, shots).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
             self._updated = False
         except Exception as error:
