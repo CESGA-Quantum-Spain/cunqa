@@ -36,7 +36,7 @@ class CunqaCircuit:
 
         * - Unitary operations
           - Single-qubit gates with no parameters
-          - :py:meth:`id`, :py:meth:`x`, :py:meth:`y`, :py:meth:`z`, :py:meth:`h`, :py:meth:`s`, :py:meth:`sdg`, :py:meth:`sx`, :py:meth:`sxdg`, :py:meth:`sy`, :py:meth:`sydg`, :py:meth:`sz`, :py:meth:`szdg`, :py:meth:`t`, :py:meth:`tdg`, :py:meth:`p0`, :py:meth:`p1`, :py:meth:`v`, :py:meth:`vdg`, :py:meth:`k` 
+          - :py:meth:`id`, :py:meth:`x`, :py:meth:`y`, :py:meth:`z`, :py:meth:`h`, :py:meth:`s`, :py:meth:`sdg`, :py:meth:`sx`, :py:meth:`sxdg`, :py:meth:`sy`, :py:meth:`sydg`, :py:meth:`sz`, :py:meth:`szdg`, :py:meth:`t`, :py:meth:`tdg`, :py:meth:`p0`, :py:meth:`p1`, :py:meth:`v`, :py:meth:`vdg`, :py:meth:`k`, :py:meth:`hz2` 
 
         * -
           - Single-qubit gates with one parameter
@@ -56,15 +56,15 @@ class CunqaCircuit:
             
         * - 
           - Two-qubit gates with no parameters
-          - :py:meth:`swap`, :py:meth:`iswap`, :py:meth:`fusedswap`, :py:meth:`cx`, :py:meth:`cy`, :py:meth:`cz`, :py:meth:`ch`, :py:meth:`csx`, :py:meth:`csxdg`, :py:meth:`csy`, :py:meth:`csz`, :py:meth:`cs`, :py:meth:`csdg`, :py:meth:`ecr`, :py:meth:`ct`, :py:meth:`dcx`  
+          - :py:meth:`id2`, :py:meth:`swap`, :py:meth:`iswap`, :py:meth:`fusedswap`, :py:meth:`cx`, :py:meth:`cy`, :py:meth:`cz`, :py:meth:`ch`, :py:meth:`csx`, :py:meth:`csxdg`, :py:meth:`csy`, :py:meth:`csz`, :py:meth:`cs`, :py:meth:`csdg`, :py:meth:`ecr`, :py:meth:`ct`, :py:meth:`dcx`  
 
         * -
           - Two-qubit gates with one parameter 
-          - :py:meth:`cu1`, :py:meth:`cp`, :py:meth:`crx`, :py:meth:`cry`, :py:meth:`crz`, :py:meth:`rxx`, :py:meth:`ryy`, :py:meth:`rzz`, :py:meth:`rzx`
+          - :py:meth:`cu1`, :py:meth:`cp`, :py:meth:`crx`, :py:meth:`cry`, :py:meth:`crz`, :py:meth:`rxx`, :py:meth:`ryy`, :py:meth:`rzz`, :py:meth:`rxy`, :py:meth:`rzx`
 
         * -
           - Two-qubit gates with two parameters
-          - :py:meth:`cu2`, :py:meth:`cr`, :py:meth:`xxmyy`, :py:meth:`xxpyy`
+          - :py:meth:`cu2`, :py:meth:`cr`, :py:meth:`xxmyy`, :py:meth:`xxpyy`, :py:meth:`fs`
 
         * -
           - Two-qubit gates with three parameters
@@ -182,6 +182,7 @@ class CunqaCircuit:
         .. automethod:: v
         .. automethod:: vdg
         .. automethod:: k
+        .. automethod:: hz2
         .. automethod:: u1
         .. automethod:: u2
         .. automethod:: u3
@@ -198,6 +199,7 @@ class CunqaCircuit:
     .. dropdown:: Two-qubit gates
         :animate: fade-in-slide-down
 
+        .. automethod:: id2
         .. automethod:: swap
         .. automethod:: iswap
         .. automethod:: fusedswap
@@ -215,6 +217,7 @@ class CunqaCircuit:
         .. automethod:: rxx
         .. automethod:: ryy
         .. automethod:: rzz
+        .. automethod:: rxy
         .. automethod:: rzx
         .. automethod:: cr
         .. automethod:: crx
@@ -227,6 +230,7 @@ class CunqaCircuit:
         .. automethod:: cu
         .. automethod:: xxmyy
         .. automethod:: xxpyy
+        .. automethod:: fs
     
     .. dropdown:: Three-qubit gates
         :animate: fade-in-slide-down
