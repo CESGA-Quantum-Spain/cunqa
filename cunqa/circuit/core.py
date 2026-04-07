@@ -1592,23 +1592,6 @@ class CunqaCircuit:
             "params": [theta, phi]
         })
 
-    def fs(self, theta:  Union[float, int, str], 
-                    phi:  Union[float, int, str], *qubits: int) -> None:
-        """
-        Class method to apply FS gate to the given qubits.
-
-        Args:
-            theta (float | int | str): angle.
-            phi (float | int | str): angle.
-            qubits (int): qubits in which the gate is applied, first one will be the control qubit 
-                          and second one the target qubit.
-        """
-        self.add_instructions({
-            "name":"fs",
-            "qubits": [*qubits],
-            "params": [theta, phi]
-        })
-
     def xxpyy(self, theta:  Union[float, int, str], 
                     phi:  Union[float, int, str], *qubits: int) -> None:
         """
@@ -1622,6 +1605,23 @@ class CunqaCircuit:
         """
         self.add_instructions({
             "name":"xxpyy",
+            "qubits": [*qubits],
+            "params": [theta, phi]
+        })
+    
+    def fs(self, theta:  Union[float, int, str], 
+                    phi:  Union[float, int, str], *qubits: int) -> None:
+        """
+        Class method to apply FS gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            phi (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first one will be the control qubit 
+                          and second one the target qubit.
+        """
+        self.add_instructions({
+            "name":"fs",
             "qubits": [*qubits],
             "params": [theta, phi]
         })
