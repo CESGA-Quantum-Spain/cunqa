@@ -169,7 +169,7 @@ enum INSTRUCTIONS {
     CR,
     XXMYY,
     XXPYY,
-    FSIM,
+    FS,
 
     CU3,
 
@@ -318,7 +318,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     // TWO QUBIT TWO PARAM
     {"cu2", CU2},
     {"cr", CR},
-    {"fsim", FSIM},
+    {"fs", FS},
     {"xxmyy", XXMYY},
     {"xxpyy", XXPYY},
 
@@ -444,7 +444,7 @@ const std::vector<std::string> QSIM_BASIS_GATES = {
   "rx", "ry", "rz", "rxy", 
   "id2", "cx", "cz", "swap", "iswap",
   "cp",
-  "fsim",
+  "fs",
   "gp",
   "unitary",
 };
@@ -572,7 +572,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case CR:
         case XXMYY:
         case XXPYY:
-        case FSIM:
+        case FS:
         case CU3:
         case CU:
         case MCRX:

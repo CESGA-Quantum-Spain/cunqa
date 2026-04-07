@@ -119,7 +119,29 @@ std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::st
 
 qsim::Matrix<float> cunqamatrix_to_qsimmatrix(const CUNQAMatrix& cunqa_matrix)
 {
-    return qsim::Matrix<float>();
+    size_t n = cunqa_matrix.size();
+    if (n == 0) return {};
+
+    qsim::Matrix<float> qsim_mat;
+    qsim_mat.resize(2 * n * n);
+
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            const auto& complex_val = cunqa_matrix[i][j];
+            
+            size_t base_idx = 2 * (n * i + j);
+
+            if (complex_val.size() >= 2) {
+                qsim_mat[base_idx]     = static_cast<float>(complex_val[0]); // Real
+                qsim_mat[base_idx + 1] = static_cast<float>(complex_val[1]); // Imag
+            } else if (complex_val.size() == 1) {
+                qsim_mat[base_idx]     = static_cast<float>(complex_val[0]);
+                qsim_mat[base_idx + 1] = 0.0f;
+            }
+        }
+    }
+
+    return qsim_mat;
 }
 
 
@@ -348,7 +370,7 @@ std::string execute_shot_(
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, inst.qubits[0] + T.zero_qubit, inst.params[0], inst.params[1]), state);
             break;
         }
-        case constants::FSIM:
+        case constants::FS:
         {
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateFS<float>::Create(0, inst.qubits[0] + T.zero_qubit, inst.qubits[1] + T.zero_qubit, inst.params[0], inst.params[1]), state);
             break;
@@ -709,7 +731,7 @@ void update_qsim_state(const JSON& circuit_json, qsim::SimulatorBasic<qsim::Para
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, qubits[0], params[0], params[1]), state);
             break;
         }
-        case constants::FSIM:
+        case constants::FS:
         {
             auto params = instruction.at("params").get<std::vector<float>>();
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateFS<float>::Create(0, qubits[0], qubits[1], params[0], params[1]), state);

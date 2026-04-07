@@ -957,6 +957,18 @@ class CunqaCircuit:
             "qubits":[qubit]
         })
 
+    def hz2(self, qubit: int) -> None:
+        """
+        Class method to apply hz2 gate to the given qubit.
+
+        Args:
+            qubit (int): qubit in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"hz2",
+            "qubits":[qubit]
+        })
+
     # Parametric single-qubit gates
 
     def u1(self, param: Union[float, int, str], qubit: int) -> None:
@@ -1148,6 +1160,18 @@ class CunqaCircuit:
         })
 
     # Non parametric two-qubit gates
+
+    def id2(self, *qubits: int) -> None:
+        """
+        Class method to apply id2 gate to the given qubits.
+
+        Args:
+            qubits (list[int]): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"id2",
+            "qubits":[*qubits]
+        })
 
     def swap(self, *qubits: int) -> None:
         """
@@ -1372,6 +1396,20 @@ class CunqaCircuit:
             "params":[param]
         })
 
+    def rxy(self, param:  Union[float,int, str], *qubits: int) -> None:
+        """
+        Class method to apply rxy gate to the given qubits.
+
+        Args:
+            param (float | int | str): parameter for the parametric gate.
+            qubits (int): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"rxy",
+            "qubits":[*qubits],
+            "params":[param]
+        })
+
     def rzx(self, param:  Union[float,int, str], *qubits: int) -> None:
         """
         Class method to apply rzx gate to the given qubits.
@@ -1554,6 +1592,23 @@ class CunqaCircuit:
             "params": [theta, phi]
         })
 
+    def fs(self, theta:  Union[float, int, str], 
+                    phi:  Union[float, int, str], *qubits: int) -> None:
+        """
+        Class method to apply FS gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            phi (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first one will be the control qubit 
+                          and second one the target qubit.
+        """
+        self.add_instructions({
+            "name":"fs",
+            "qubits": [*qubits],
+            "params": [theta, phi]
+        })
+
     def xxpyy(self, theta:  Union[float, int, str], 
                     phi:  Union[float, int, str], *qubits: int) -> None:
         """
@@ -1570,7 +1625,6 @@ class CunqaCircuit:
             "qubits": [*qubits],
             "params": [theta, phi]
         })
-
     # Non parametric three-qubit gates
 
     def ccx(self, *qubits: int) -> None:
