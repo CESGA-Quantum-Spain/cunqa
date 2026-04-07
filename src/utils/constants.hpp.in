@@ -25,6 +25,7 @@ enum SIMULATORS {
   MUNICH,
   MAESTRO,
   QULACS,
+  QSIM,
   CUNQASIM
 };
 
@@ -33,12 +34,13 @@ const std::unordered_map<std::string, int> SIMULATORS_MAP {
   {"Munich", MUNICH},
   {"Maestro", MAESTRO},
   {"Qulacs", QULACS},
+  {"Qsim", QSIM},
   {"Cunqa", CUNQASIM},
 };
 
-inline const std::vector<std::string> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
-inline const std::vector<std::string> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
-inline const std::vector<std::string> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
 inline const std::vector<std::string> SUPPORTED_NOISY_SIMULATORS = {"Aer", "Munich"};
 
 
@@ -111,6 +113,7 @@ enum INSTRUCTIONS {
     V,
     VDG,
     K,
+    HZ2,
 
     RX,
     RY,
@@ -133,6 +136,7 @@ enum INSTRUCTIONS {
 
     U,
 
+    ID2,
     ECR,
     SWAP,
     ISWAP,
@@ -158,12 +162,14 @@ enum INSTRUCTIONS {
     RXX,
     RYY,
     RZZ,
+    RXY,
     RZX,
 
     CU2,
     CR,
     XXMYY,
     XXPYY,
+    FS,
 
     CU3,
 
@@ -251,6 +257,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"v", V},
     {"vdg", VDG},
     {"k", K},
+    {"hz2", HZ2},
 
     // ONE QUBIT ONE PARAM
     {"rx", RX},
@@ -278,6 +285,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"u", U},
 
     // TWO QUBIT NO PARAM
+    {"id2", ID2},
     {"ecr", ECR},
     {"swap", SWAP},
     {"iswap", ISWAP},
@@ -304,11 +312,13 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rxx", RXX},
     {"ryy", RYY},
     {"rzz", RZZ},
+    {"rxy", RXY},
     {"rzx", RZX},
 
     // TWO QUBIT TWO PARAM
     {"cu2", CU2},
     {"cr", CR},
+    {"fs", FS},
     {"xxmyy", XXMYY},
     {"xxpyy", XXPYY},
 
@@ -428,6 +438,17 @@ const std::vector<std::string> QULACS_BASIS_GATES = {
   "amplitudedampingdoise", "bitflipnoise", "densematrix", "dephasingnoise", "depolarizingnoise", "diagonalmatrix", "independentxznoise", "randomunitary", "sparsematrix", "twoqubitdepolarizingnoise",
 };
 
+const std::vector<std::string> QSIM_BASIS_GATES = {
+  "measure",
+  "id", "x", "y", "z", "h", "s", "t", "sx", "sy", "hz2",
+  "rx", "ry", "rz", "rxy", 
+  "id2", "cx", "cz", "swap", "iswap",
+  "cp",
+  "fs",
+  "gp",
+  "unitary",
+};
+
 const std::vector<std::string> CUNQASIM_BASIS_GATES = {
   "measure", 
   "id", "x", "y", "z", "h", "sx",
@@ -476,6 +497,8 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case V:
         case VDG:
         case K:
+        case HZ2:
+        case ID2:
         case ECR:
         case SWAP:
         case ISWAP:
@@ -543,11 +566,13 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case RXX:
         case RYY:
         case RZZ:
+        case RXY:
         case RZX:
         case CU2:
         case CR:
         case XXMYY:
         case XXPYY:
+        case FS:
         case CU3:
         case CU:
         case MCRX:

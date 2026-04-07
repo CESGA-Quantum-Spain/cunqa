@@ -489,6 +489,23 @@ endif()
 
 
 # =====================================================================
+#  Qsim SIMULATOR - By Google 
+# =====================================================================
+find_package(qsim 0.22.0 QUIET)
+if(NOT qsim_FOUND)
+  message(STATUS "Package qsim not found, fetching from git@github.com:quantumlib/qsim.git")
+  FetchContent_Declare(
+      qsim
+      GIT_REPOSITORY git@github.com:quantumlib/qsim.git
+      GIT_TAG        v0.22.0
+      SOURCE_SUBDIR  intentionally_non_existent_dir  # Prevents running qsim CMakeLists.txt. It's header only, not needed.
+  )
+  FetchContent_MakeAvailable(qsim)
+else()
+  message(STATUS "Found package qsim: qsim_DIR = ${qsim_DIR}")
+endif()
+
+# =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
 # =====================================================================
 find_or_fetch_package(

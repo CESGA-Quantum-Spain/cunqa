@@ -308,6 +308,7 @@ ONEQUBIT_NOPARAM = [
     ("v",       (0,), {"name": "v",     "qubits": [0]}),
     ("vdg",     (0,), {"name": "vdg",   "qubits": [0]}),
     ("k",       (0,), {"name": "k",     "qubits": [0]}),
+    ("hz2",     (0,), {"name": "hz2",   "qubits": [0]}),
     ("reset",   (0,), {"name": "reset", "qubits": [0]})
 ]
 @pytest.mark.parametrize("method, args, expected", ONEQUBIT_NOPARAM)
@@ -318,6 +319,7 @@ def test_onequbit_noparam_gates(method, args, expected):
     assert circuit.instructions[-1] == expected
 
 TWOQUBIT_NOPARAM = [
+    ("id2",       (0,1,), {"name": "id2",       "qubits": [0,1]}),
     ("swap",      (0,1,), {"name": "swap",      "qubits": [0,1]}),
     ("iswap",     (0,1,), {"name": "iswap",     "qubits": [0,1]}),
     ("ecr",       (0,1,), {"name": "ecr",       "qubits": [0,1]}),
@@ -386,6 +388,7 @@ TWOQUBIT_PARAM = [
     ("rxx",   (0.1,0,1,),             {"name": "rxx",   "qubits": [0,1], "params": [0.1]}),
     ("ryy",   (0.1,0,1,),             {"name": "ryy",   "qubits": [0,1], "params": [0.1]}),
     ("rzz",   (0.1,0,1,),             {"name": "rzz",   "qubits": [0,1], "params": [0.1]}),
+    ("rxy",   (0.1,0,1,),             {"name": "rxy",   "qubits": [0,1], "params": [0.1]}),
     ("rzx",   (0.1,0,1,),             {"name": "rzx",   "qubits": [0,1], "params": [0.1]}),
     ("cr",    (0.1,0,1,),             {"name": "cr",    "qubits": [0,1], "params": [0.1]}),
     ("crx",   (0.1,0,1,),             {"name": "crx",   "qubits": [0,1], "params": [0.1]}),
@@ -399,6 +402,7 @@ TWOQUBIT_PARAM = [
     ("cu",    (0.1,0.2,0.3,0.4,0,1,), {"name": "cu",    "qubits": [0,1], "params": [0.1,0.2,0.3,0.4]}),
     ("xxmyy", (0.1,0.2,0,1,),         {"name": "xxmyy", "qubits": [0,1], "params": [0.1,0.2]}),
     ("xxpyy", (0.1,0.2,0,1,),         {"name": "xxpyy", "qubits": [0,1], "params": [0.1,0.2]}),
+    ("fs",    (0.1,0.2,0,1,),         {"name": "fs",    "qubits": [0,1], "params": [0.1,0.2]}),
 ]
 @pytest.mark.parametrize("method, args, expected", TWOQUBIT_PARAM)
 def test_twoqubit_param_gates(method, args, expected):

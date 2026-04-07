@@ -11,6 +11,7 @@
 #include "backends/simulators/Munich/munich_executor.hpp"
 #include "backends/simulators/Maestro/maestro_executor.hpp"
 #include "backends/simulators/Qulacs/qulacs_executor.hpp"
+#include "backends/simulators/Qsim/qsim_executor.hpp"
 
 #include "utils/json.hpp"
 #include "utils/helpers/murmur_hash.hpp"
@@ -64,6 +65,13 @@ int main(int argc, char *argv[])
         {
             LOGGER_DEBUG("Raising executor with Qulacs.");
             QulacsExecutor executor(n_qpus);
+            executor.run();
+            break;
+        }
+        case murmur::hash("Qsim"):
+        {
+            LOGGER_DEBUG("Raising executor with Qsim.");
+            QsimExecutor executor(n_qpus);
             executor.run();
             break;
         }
