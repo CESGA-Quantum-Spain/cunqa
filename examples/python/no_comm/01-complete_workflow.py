@@ -24,11 +24,10 @@ try:
     #                 |      
     #  qc.q1   ──────[X]───[M]─
     # ---------------------------
-    qc = CunqaCircuit(5)
+    qc = CunqaCircuit(2)
     qc.h(0)
     qc.cx(0, 1)
     qc.measure_all()
-    #qc.is_dynamic = True
 
     # 3. Execute the same circuit on both deployed QPUs
     qjobs = run([qc, qc], qpus, shots = 10) # non-blocking call
