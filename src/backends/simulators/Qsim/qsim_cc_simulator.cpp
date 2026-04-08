@@ -22,7 +22,11 @@ JSON QsimCCSimulator::execute(const CCBackend& backend, const QuantumTask& quant
     QsimComputationAdapter qsim_ca(quantum_task);
     QsimSimulatorAdapter qsim_sa(qsim_ca);
     if (quantum_task.is_dynamic) {
-        return qsim_sa.simulate(&classical_channel);
+        JSON result = qsim_sa.simulate(&classical_channel);
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
     } else {
         return qsim_sa.simulate(&backend);
     }

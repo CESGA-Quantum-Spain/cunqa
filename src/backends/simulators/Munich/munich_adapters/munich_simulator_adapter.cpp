@@ -50,7 +50,6 @@ struct CommunicationQubitsPair {
 struct TaskState {
     std::string id;
     int local_n_clbits = 0;
-    std::map<std::size_t, bool> local_creg;
     std::vector<constants::CUNQAInstruction>::const_iterator it, end;
     int zero_qubit = 0;
     int zero_clbit = 0;
@@ -63,7 +62,7 @@ struct TaskState {
 
 struct GlobalState {
     int n_qubits = 0, n_clbits = 0;
-    std::map<std::size_t, bool> global_creg;
+    std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::queue<int>> qc_meas_td;
     std::unordered_map<std::string, std::queue<int>> qc_meas_tg;
     std::vector<CommunicationQubitsPair> communication_pairs;
@@ -195,7 +194,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         case constants::MEASURE:
         {
             char char_measurement = measureAdapter(inst.qubits[0] + T.zero_qubit);
-            T.local_creg[inst.clbits[0]] = (char_measurement == '1');
+            G.creg[inst.clbits[0] + T.zero_clbit] = (char_measurement == '1');
 
             break;
         }
@@ -206,7 +205,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
                                          "copied on does not match.");
 
             for (size_t i = 0; i < inst.l_clbits.size(); ++i)
-                G.global_creg[inst.l_clbits[i] + T.zero_clbit] = G.global_creg[inst.r_clbits[i] + T.zero_clbit];
+                G.creg[inst.l_clbits[i] + T.zero_clbit] = G.creg[inst.r_clbits[i] + T.zero_clbit];
                 
             break;
         }
@@ -375,11 +374,11 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
                     .recvr = Ts[inst.qpus[0]].id
                 }; 
                 for (auto& clbit : inst.clbits) {
-                    G.local_cc_queue[local_cc_ids].push(G.global_creg[clbit + T.zero_clbit]);
+                    G.local_cc_queue[local_cc_ids].push(G.creg[clbit + T.zero_clbit]);
                 }
             } else {
                 for (const auto& clbit: inst.clbits) {
-                    classical_channel->send_measure(G.global_creg[clbit + T.zero_clbit], inst.qpus[0]);
+                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], inst.qpus[0]);
                 }
             }
             break;
@@ -393,7 +392,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
                 };
                 if (G.local_cc_queue.contains(local_cc_ids) && !G.local_cc_queue.at(local_cc_ids).empty()) {
                     for (const auto& clbit: inst.clbits) {
-                        G.global_creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
+                        G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
                         G.local_cc_queue.at(local_cc_ids).pop();
                     }
                     T.blocked_by_cc = false;
@@ -404,15 +403,14 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
             } else {
                 for (const auto& clbit: inst.clbits) {
                     int measurement = classical_channel->recv_measure(inst.qpus[0]);
-                    T.local_creg[clbit + T.zero_clbit] = (measurement == 1);
-                    G.global_creg[clbit + T.zero_clbit] = (measurement == 1);
+                    G.creg[clbit + T.zero_clbit] = (measurement == 1);
                 }
             }
             break;
         }
         case constants::CIF:
         {
-            if (G.global_creg[inst.clbits[0] + T.zero_clbit]) {
+            if (G.creg[inst.clbits[0] + T.zero_clbit]) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }
@@ -618,8 +616,10 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
     std::unordered_map<std::string, std::string> shot_bits;
     for (auto& [id, T]: Ts) {
         std::string bitstring(T.local_n_clbits, '0');
-        for (const auto &[bitIndex, value] : T.local_creg) {
-            bitstring[T.local_n_clbits - bitIndex - 1] = value ? '1' : '0';
+        for (const auto& [bitIndex, value] : G.creg) {
+            if (T.zero_clbit <= bitIndex && bitIndex < (T.zero_clbit + T.local_n_clbits)) {
+                bitstring[T.local_n_clbits + T.zero_clbit - bitIndex - 1] = value ? '1' : '0';
+            }
         }
         shot_bits[id] = bitstring;
     }

@@ -71,6 +71,7 @@ try:
 
     binary_string = ""
     for counts in counts_list:
+        print(counts)
         # Extract the most frequent measurement (the best estimate of theta)
         most_frequent_output = max(counts, key=counts.get)
         binary_string += most_frequent_output[1]
