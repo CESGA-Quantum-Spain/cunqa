@@ -129,8 +129,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
     
-    int qt_count = 0;
-    for (auto &quantum_task : st_qtasks) {
+    for (const auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
         T.local_n_clbits = quantum_task.n_clbits;
@@ -142,14 +141,10 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         T.blocked_by_telegate = false;
         T.blocked_by_cc = false;
         T.finished = false;
-        if (Ts.count(quantum_task.id)) {
-            quantum_task.id += "_" + std::to_string(qt_count); 
-        }
         Ts[quantum_task.id] = T;
+        
         G.n_qubits += quantum_task.n_qubits;
         G.n_clbits += quantum_task.n_clbits;
-
-        qt_count++;
     }
     
     // Here we add the communication qubits
@@ -722,9 +717,8 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    JSON meas_counter_json = meas_counter;
     JSON result_json = {
-        {"id_counts", meas_counter_json},
+        {"id_counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
 }

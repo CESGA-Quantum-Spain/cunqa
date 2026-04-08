@@ -44,13 +44,23 @@ void CunqaExecutor::run()
     JSON quantum_task_json;
     std::string message;
     while (true) {
+        int qpu_count = 0;
         for(const auto& qpu_id: qpu_ids) {
             message = classical_channel.recv_info(qpu_id);
             if(!message.empty()) {
                 qpus_working.push_back(qpu_id);
                 quantum_task_json = JSON::parse(message);
-                quantum_tasks.push_back(QuantumTask(message));
+                QuantumTask qtask(message);
+                for (const auto& [qpu_id, qtask_id] : qpu_quantumtask_map) {
+                    if (qtask.id == qtask_id) {
+                        qtask.id += "_" + std::to_string(qpu_count);
+                        break;
+                    }
+                }
+                qpu_quantumtask_map[qpu_id] = qtask.id;
+                quantum_tasks.push_back(qtask);
             }
+            qpu_count++;
         }
 
         CunqaComputationAdapter qc(quantum_tasks);
@@ -59,7 +69,7 @@ void CunqaExecutor::run()
         
         for(const auto& qpu: qpus_working) {
             JSON qpu_result = {
-                {"counts", result.at("id_counts").at(qpu)},
+                {"counts", result.at("id_counts").at(qpu_quantumtask_map[qpu])},
                 {"time_taken", result.at("time_taken")}
             };
             std::string qpu_result_str = qpu_result.dump();
@@ -68,6 +78,7 @@ void CunqaExecutor::run()
 
         qpus_working.clear();
         quantum_tasks.clear();
+        qpu_quantumtask_map.clear();
     }
 }
 
