@@ -57,11 +57,13 @@ void MaestroExecutor::run()
         MaestroSimulatorAdapter maestro_sa(qc);
         auto result = maestro_sa.simulate(&classical_channel, true);
         
-        // TODO: transform results to give each qpu its results
-        std::string result_str = result.dump();
-
         for(const auto& qpu: qpus_working) {
-            classical_channel.send_info(result_str, qpu);
+            JSON qpu_result = {
+                {"counts", result.at("id_counts").at(qpu)},
+                {"time_taken", result.at("time_taken")}
+            };
+            std::string qpu_result_str = qpu_result.dump();
+            classical_channel.send_info(qpu_result_str, qpu);
         }
 
         qpus_working.clear();

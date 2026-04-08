@@ -54,6 +54,8 @@ struct CommunicationQubitsPair {
 
 struct TaskState {
     std::string id;
+    int local_n_clbits = 0;
+    std::map<std::size_t, bool> local_creg;
     std::vector<constants::CUNQAInstruction>::const_iterator it, end;
     int zero_qubit = 0;
     int zero_clbit = 0;
@@ -67,7 +69,7 @@ struct TaskState {
 
 struct GlobalState {
     int n_qubits = 0, n_clbits = 0;
-    std::map<std::size_t, bool> creg;
+    std::map<std::size_t, bool> global_creg;
     std::unordered_map<std::string, std::queue<int>> qc_meas_td;
     std::unordered_map<std::string, std::queue<int>> qc_meas_tg;
     std::vector<CommunicationQubitsPair> communication_pairs;
@@ -145,7 +147,7 @@ qsim::Matrix<float> cunqamatrix_to_qsimmatrix(const CUNQAMatrix& cunqa_matrix)
 }
 
 
-std::string execute_shot_(
+std::unordered_map<std::string, std::string> execute_shot_(
     qsim::StateSpaceBasic<qsim::ParallelFor, float>& state_space,
     qsim::SimulatorBasic<qsim::ParallelFor>::State& state,
     qsim::SimulatorBasic<qsim::ParallelFor>& simulator,
@@ -163,6 +165,7 @@ std::string execute_shot_(
     for (auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
+        T.local_n_clbits = quantum_task.n_clbits;
         T.zero_qubit = G.n_qubits;
         T.zero_clbit = G.n_clbits;
         T.it = quantum_task.instructions.begin();
@@ -226,7 +229,7 @@ std::string execute_shot_(
         case constants::MEASURE:
         {
             auto measure_result = state_space.Measure({inst.qubits[0] + T.zero_qubit}, rgen, state);
-            G.creg[inst.clbits[0] + T.zero_clbit] = (measure_result.bitstring[0] == 1);
+            T.local_creg[inst.clbits[0]] = (measure_result.bitstring[0] == 1);
             break;
         }
         case constants::COPY:
@@ -236,7 +239,7 @@ std::string execute_shot_(
                                          "copied on does not match.");
 
             for (size_t i = 0; i < inst.l_clbits.size(); ++i)
-                G.creg[inst.l_clbits[i] + T.zero_clbit] = G.creg[inst.r_clbits[i] + T.zero_clbit];
+                G.global_creg[inst.l_clbits[i] + T.zero_clbit] = G.global_creg[inst.r_clbits[i] + T.zero_clbit];
                 
             break;
         }
@@ -418,11 +421,11 @@ std::string execute_shot_(
                     .recvr = Ts[inst.qpus[0]].id
                 };  
                 for (auto& clbit : inst.clbits) {
-                    G.local_cc_queue[local_cc_ids].push(G.creg[clbit + T.zero_clbit]);
+                    G.local_cc_queue[local_cc_ids].push(G.global_creg[clbit + T.zero_clbit]);
                 }
             } else {
                 for (const auto& clbit: inst.clbits) {
-                    classical_channel->send_measure(G.creg[clbit + T.zero_clbit], inst.qpus[0]);
+                    classical_channel->send_measure(G.global_creg[clbit + T.zero_clbit], inst.qpus[0]);
                 }
             }
             break;
@@ -436,7 +439,7 @@ std::string execute_shot_(
                 };
                 if (G.local_cc_queue.contains(local_cc_ids) && !G.local_cc_queue.at(local_cc_ids).empty()) {
                     for (const auto& clbit: inst.clbits) {
-                        G.creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
+                        G.global_creg[clbit + T.zero_clbit] = (G.local_cc_queue.at(local_cc_ids).front() == 1);
                         G.local_cc_queue.at(local_cc_ids).pop();
                     }
                     T.blocked_by_cc = false;
@@ -446,14 +449,14 @@ std::string execute_shot_(
             } else {
                 for (const auto& clbit: inst.clbits) {
                     int measurement = classical_channel->recv_measure(inst.qpus[0]);
-                    G.creg[clbit + T.zero_clbit] = (measurement == 1);
+                    G.global_creg[clbit + T.zero_clbit] = (measurement == 1);
                 }
             }
             break;
         }
         case constants::CIF:
         {
-            if (G.creg[inst.clbits[0] + T.zero_clbit]) {
+            if (G.global_creg[inst.clbits[0] + T.zero_clbit]) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }
@@ -639,15 +642,24 @@ std::string execute_shot_(
 
     } // End one shot
 
-    std::string result_bits(G.n_clbits, '0');
-    for (const auto &[bitIndex, value] : G.creg)
-    {
-        result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
+    std::unordered_map<std::string, std::string> shot_bits;
+    for (auto& [id, T]: Ts) {
+        std::string result_bits(T.local_n_clbits, '0');
+        for (const auto &[bitIndex, value] : T.local_creg) {
+            result_bits[T.local_n_clbits - bitIndex - 1] = value ? '1' : '0';
+        }
+        shot_bits[id] = result_bits;
     }
 
-    return result_bits;
+    return shot_bits;
 }
 
+void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>& meas_counter, const std::unordered_map<std::string, std::string>& shot_bitstrings)
+{
+    for (const auto& [circ_id, bitstring] : shot_bitstrings) {
+        meas_counter[circ_id][bitstring]++;
+    }
+}
 
 void update_qsim_state(const JSON& circuit_json, qsim::SimulatorBasic<qsim::ParallelFor>& simulator, qsim::SimulatorBasic<qsim::ParallelFor>::State& state)
 {
@@ -840,7 +852,7 @@ JSON QsimSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
 JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, const bool allows_qc)
 {
     LOGGER_DEBUG("Qsim dynamic simulation");
-    std::map<std::string, std::size_t> meas_counter;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>  meas_counter;
 
     JSON config = qc.quantum_tasks[0].config;
     auto shots = config.at("shots").get<int>();
@@ -884,7 +896,7 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
     if (size(qc.quantum_tasks) > 1) { // Quantum communications 
         #pragma omp parallel
         {
-            std::map<std::string, std::size_t> local_counter;
+            std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>  local_counter;
             
             qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space(num_threads);
             qsim::SimulatorBasic<qsim::ParallelFor>::State state = state_space.Create(n_qubits); 
@@ -893,12 +905,15 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
             #pragma omp for
             for (std::size_t i = 0; i < shots; i++) {
                 state_space.SetStateZero(state);
-                local_counter[execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;
+                update_meas_counter(local_counter, execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits));
             }
 
             #pragma omp critical
-            for (auto& [key, val] : local_counter)
-                meas_counter[key] += val;
+            for (const auto& [id, bitstrings_counter] : local_counter) {
+                for (const auto& [bitstring, counts] : bitstrings_counter) {
+                    meas_counter[id][bitstring] += counts;
+                } 
+            }
         }
     } else { // As if OPENMP_IN_QC not enabled
         qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space(num_threads);
@@ -906,7 +921,7 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
         qsim::SimulatorBasic<qsim::ParallelFor> simulator(num_threads);
         for (int i = 0; i < shots; i++) {
             state_space.SetStateZero(state);
-            meas_counter[execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;            
+            update_meas_counter(meas_counter, execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits));            
         } // End all shots
     }
 #else
@@ -915,7 +930,7 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
     qsim::SimulatorBasic<qsim::ParallelFor> simulator(num_threads);
     for (int i = 0; i < shots; i++) {
         state_space.SetStateZero(state);
-        meas_counter[execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits)]++;        
+        update_meas_counter(meas_counter, execute_shot_(state_space, state, simulator, rgen, st_qtasks, classical_channel, allows_qc, n_comm_qubits));        
     } // End all shots
 #endif
     auto end = std::chrono::high_resolution_clock::now();
@@ -923,7 +938,7 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
     float time_taken = duration.count();
 
     JSON result_json = {
-        {"counts", meas_counter},
+        {"id_counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
 
