@@ -7,12 +7,13 @@
 
 std::string circuit1 = R"(
 {
-    "id": "circuito1",
+    "id": "circuit1",
     "config": {
         "shots": 1024,
         "method": "statevector",
         "num_clbits": 0,
-        "num_qubits": 1
+        "num_qubits": 1,
+        "device":{"device_name":"CPU", "target_devices":[]}
     },
     "instructions": [
     {
@@ -22,26 +23,29 @@ std::string circuit1 = R"(
     {
         "name": "qsend",
         "qubits": [0],
-        "qpus": ["circuito2"]
+        "qpus": ["circuit2"]
     }
-    ]
+    ],
+    "sending_to": [], 
+    "is_dynamic": false
 }
 )";
 
 std::string circuit2 = R"(
 {
-    "id": "circuito2",
+    "id": "circuit2",
     "config": {
         "shots": 1024,
         "method": "statevector",
         "num_clbits": 2,
-        "num_qubits": 2
+        "num_qubits": 2,
+        "device":{"device_name":"CPU", "target_devices":[]}
     },
     "instructions": [
     {
         "name": "qrecv",
         "qubits": [0],
-        "qpus": ["circuito1"]
+        "qpus": ["circuit1"]
     },
     {
         "name": "cx",
@@ -50,14 +54,16 @@ std::string circuit2 = R"(
     {
         "name": "measure",
         "qubits": [0],
-        "clreg": [0]
+        "clbits": [0]
     },
     {
         "name": "measure",
         "qubits": [1],
-        "clreg": [1]
+        "clbits": [1]
     }
-    ]
+    ],
+    "sending_to": [], 
+    "is_dynamic": false
 }
 )";
 

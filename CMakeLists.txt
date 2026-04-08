@@ -523,6 +523,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURR
 add_subdirectory(src)
 add_subdirectory(cunqa)
 
+set(ENABLE_CUNQA_CPP_EXAMPLES FALSE CACHE BOOL "Enable CUNQA C++ examples")
+if(ENABLE_CUNQA_CPP_EXAMPLES)
+  message(STATUS "CUNQA cpp examples enabled")
+  add_subdirectory(examples/cpp)
+endif()
+
 # uninstall target
 if(NOT TARGET uninstall)
   configure_file(

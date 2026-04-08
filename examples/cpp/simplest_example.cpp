@@ -8,20 +8,20 @@
 std::string circuit1 = R"(
     {
         "id": "circuit1", 
-        "config": {"shots": 10, "method": "automatic", "avoid_parallelization": false, "num_clbits": 5, "num_qubits": 5, "seed": 123123}, 
+        "config": {
+            "shots": 10, 
+            "method": "automatic", 
+            "num_clbits": 2, 
+            "num_qubits": 2, 
+            "seed": 123123, 
+            "device":{"device_name":"CPU", "target_devices":[]}
+        }, 
         "instructions": [
             {"name": "h", "qubits": [0]}, 
             {"name": "cx", "qubits": [0, 1]}, 
-            {"name": "measure", "qubits": [0], "clbits": [0], "clreg": []}, 
-            {"name": "measure", "qubits": [1], "clbits": [1], "clreg": []}, 
-            {"name": "measure", "qubits": [2], "clbits": [2], "clreg": []}, 
-            {"name": "measure", "qubits": [3], "clbits": [3], "clreg": []}, 
-            {"name": "measure", "qubits": [4], "clbits": [4], "clreg": []}
+            {"name": "measure", "qubits": [0], "clbits": [0]}, 
+            {"name": "measure", "qubits": [1], "clbits": [1]}
         ], 
-        "num_qubits": 5, 
-        "num_clbits": 5, 
-        "classical_registers": {"measure": [0, 1, 2, 3, 4]}, 
-        "quantum_registers":   {"q0": [0, 1, 2, 3, 4]}, 
         "sending_to": [], 
         "is_dynamic": false
     }
