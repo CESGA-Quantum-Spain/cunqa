@@ -118,7 +118,7 @@ using namespace constants;
 
 
 std::string MunichSimulatorAdapter::execute_shot_(
-    const std::vector<StructuredQuantumTask>& st_qtasks, 
+    std::vector<StructuredQuantumTask>& st_qtasks, 
     comm::ClassicalChannel *classical_channel,
     const bool allows_qc,
     const size_t& n_comm_qubits
@@ -127,6 +127,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
     
+    int qt_count = 0;
     for (auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
@@ -138,10 +139,14 @@ std::string MunichSimulatorAdapter::execute_shot_(
         T.blocked_by_telegate = false;
         T.blocked_by_cc = false;
         T.finished = false;
+        if (Ts.count(quantum_task.id)) {
+            quantum_task.id += "_" + std::to_string(qt_count); 
+        }
         Ts[quantum_task.id] = T;
-        
         G.n_qubits += quantum_task.n_qubits;
         G.n_clbits += quantum_task.n_clbits;
+
+        qt_count++;
     }
     
     // Here we add the communication qubits
@@ -187,7 +192,6 @@ std::string MunichSimulatorAdapter::execute_shot_(
     {
         const CUNQAInstruction inst = !instruction.has_value() ? *T.it : instruction.value();
         auto inst_type = INSTRUCTIONS_MAP.at(inst.name);
-
         
         switch (inst_type) {
         case constants::MEASURE:
