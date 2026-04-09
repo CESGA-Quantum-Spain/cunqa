@@ -720,6 +720,8 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     JSON result_json = {
         {"id_counts", meas_counter},
         {"time_taken", time_taken}};
+
+    LOGGER_DEBUG("result: {}", result_json.dump());
     return result_json;
 }
 

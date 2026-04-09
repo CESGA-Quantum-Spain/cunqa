@@ -10,10 +10,15 @@ JSON QulacsSimpleSimulator::execute(const SimpleBackend& backend, const QuantumT
     QulacsComputationAdapter qulacs_ca(quantum_task);
     QulacsSimulatorAdapter qulacs_sa(qulacs_ca);
 
-    if (quantum_task.is_dynamic) 
-        return qulacs_sa.simulate();
-    else
+    if (quantum_task.is_dynamic) {
+        JSON result = qulacs_sa.simulate();
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
+    } else {
         return qulacs_sa.simulate(&backend);
+    }
 }
 
 } // End namespace sim

@@ -15,10 +15,15 @@ JSON MunichSimpleSimulator::execute(const SimpleBackend& backend, const QuantumT
     auto p_qca = std::make_unique<QuantumComputationAdapter>(quantum_task);
     MunichSimulatorAdapter csa(std::move(p_qca));
 
-    if (quantum_task.is_dynamic) 
-        return csa.simulate();
-    else
+    if (quantum_task.is_dynamic) {
+        JSON result = csa.simulate();
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
+    } else {
         return csa.simulate(&backend);
+    }
 } 
 
 } // End of sim namespace
