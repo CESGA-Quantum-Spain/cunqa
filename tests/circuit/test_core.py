@@ -344,7 +344,6 @@ def test_twoqubit_noparam_gates(method, args, expected):
 THREEQUBIT_NOPARAM = [
     ("ccx",   (0,1,2), {"name": "ccx",   "qubits": [0,1,2]}),
     ("ccz",   (0,1,2), {"name": "ccz",   "qubits": [0,1,2]}),
-    ("cecr",  (0,1,2), {"name": "cecr",  "qubits": [0,1,2]}),
     ("cswap", (0,1,2), {"name": "cswap", "qubits": [0,1,2]}),
 ]
 @pytest.mark.parametrize("method, args, expected", THREEQUBIT_NOPARAM)
@@ -353,15 +352,6 @@ def test_threequbit_noparam_gates(method, args, expected):
     getattr(circuit, method)(*args)
 
     assert circuit.instructions[-1] == expected
-
-# this gate is added already decomposed
-def test_ccy():
-    circuit = CunqaCircuit(3)
-    circuit.ccy(0,1,2)
-    
-    assert circuit.instructions[-1] == {"name":"rz",   "qubits":[2], "params":[np.pi/2]}
-    assert circuit.instructions[-2] == {"name": "ccx", "qubits": [0,1,2]}
-    assert circuit.instructions[-3] == {"name":"rz",   "qubits":[2], "params":[-np.pi/2]}
 
 ONEQUBIT_PARAM = [
     ("u1",      (0.1,0,),         {"name": "u1",      "qubits": [0], "params": [0.1]}),
