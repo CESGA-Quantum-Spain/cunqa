@@ -49,6 +49,7 @@ struct CommunicationQubitsPair {
 
 struct TaskState {
     std::string id;
+    int local_n_clbits = 0;
     std::vector<constants::CUNQAInstruction>::const_iterator it, end;
     int zero_qubit = 0;
     int zero_clbit = 0;
@@ -117,7 +118,7 @@ namespace sim {
 using namespace constants;
 
 
-std::string MunichSimulatorAdapter::execute_shot_(
+std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_shot_(
     std::vector<StructuredQuantumTask>& st_qtasks, 
     comm::ClassicalChannel *classical_channel,
     const bool allows_qc,
@@ -127,10 +128,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
     std::unordered_map<std::string, TaskState> Ts;
     GlobalState G;
     
-    int qt_count = 0;
-    for (auto &quantum_task : st_qtasks) {
+    for (const auto &quantum_task : st_qtasks) {
         TaskState T;
         T.id = quantum_task.id;
+        T.local_n_clbits = quantum_task.n_clbits;
         T.zero_qubit = G.n_qubits;
         T.zero_clbit = G.n_clbits;
         T.it = quantum_task.instructions.begin();
@@ -139,14 +140,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
         T.blocked_by_telegate = false;
         T.blocked_by_cc = false;
         T.finished = false;
-        if (Ts.count(quantum_task.id)) {
-            quantum_task.id += "_" + std::to_string(qt_count); 
-        }
         Ts[quantum_task.id] = T;
+        
         G.n_qubits += quantum_task.n_qubits;
         G.n_clbits += quantum_task.n_clbits;
-
-        qt_count++;
     }
     
     // Here we add the communication qubits
@@ -198,6 +195,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         {
             char char_measurement = measureAdapter(inst.qubits[0] + T.zero_qubit);
             G.creg[inst.clbits[0] + T.zero_clbit] = (char_measurement == '1');
+
             break;
         }
         case constants::COPY:
@@ -615,14 +613,25 @@ std::string MunichSimulatorAdapter::execute_shot_(
 
     } // End one shot
 
-    // result is a map from the cbit index to the Boolean value
-    std::string result_bits(G.n_clbits, '0');
-    for (const auto &[bitIndex, value] : G.creg)
-    {
-        result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
+    std::unordered_map<std::string, std::string> shot_bits;
+    for (auto& [id, T]: Ts) {
+        std::string bitstring(T.local_n_clbits, '0');
+        for (const auto& [bitIndex, value] : G.creg) {
+            if (T.zero_clbit <= bitIndex && bitIndex < (T.zero_clbit + T.local_n_clbits)) {
+                bitstring[T.local_n_clbits + T.zero_clbit - bitIndex - 1] = value ? '1' : '0';
+            }
+        }
+        shot_bits[id] = bitstring;
     }
 
-    return result_bits;
+    return shot_bits;
+}
+
+void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>& meas_counter, const std::unordered_map<std::string, std::string>& shot_bitstrings)
+{
+    for (const auto& [circ_id, bitstring] : shot_bitstrings) {
+        meas_counter[circ_id][bitstring]++;
+    }
 }
 
 JSON MunichSimulatorAdapter::simulate(const Backend* backend)
@@ -689,7 +698,7 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     LOGGER_DEBUG("Munich dynamic simulation");
     // TODO: Avoid the static casting?
     auto p_qca = static_cast<QuantumComputationAdapter *>(qc.get());
-    std::map<std::string, std::size_t> meas_counter;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>  meas_counter;
 
     auto shots = p_qca->quantum_tasks[0].config.at("shots").get<std::size_t>();
 
@@ -699,10 +708,9 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < shots; i++)
-    {   
+    for (std::size_t i = 0; i < shots; i++) {   
         initializeSimulationAdapter(p_qca->n_qubits);
-        meas_counter[execute_shot_(st_qtasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
+        update_meas_counter(meas_counter, execute_shot_(st_qtasks, classical_channel, allows_qc, p_qca->n_comm_qubits));
     } // End all shots
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -710,8 +718,10 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     float time_taken = duration.count();
 
     JSON result_json = {
-        {"counts", meas_counter},
+        {"id_counts", meas_counter},
         {"time_taken", time_taken}};
+
+    LOGGER_DEBUG("result: {}", result_json.dump());
     return result_json;
 }
 

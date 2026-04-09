@@ -12,7 +12,16 @@ JSON MaestroSimpleSimulator::execute(const SimpleBackend& backend, const Quantum
 {
     MaestroComputationAdapter maestro_ca(quantum_task);
     MaestroSimulatorAdapter maestro_sa(maestro_ca);
-    return maestro_sa.simulate(&backend);
+
+    if (quantum_task.is_dynamic) {
+        JSON result = maestro_sa.simulate();
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
+    } else {
+        return maestro_sa.simulate(&backend);
+    }
 }
 
 } // End namespace sim

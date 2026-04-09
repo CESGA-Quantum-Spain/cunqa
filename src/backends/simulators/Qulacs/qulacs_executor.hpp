@@ -15,6 +15,7 @@ public:
 private:
     comm::ClassicalChannel classical_channel;
     std::vector<std::string> qpu_ids;
+    std::unordered_map<std::string, std::string> qpu_quantumtask_map;
 };
 
 } // End of sim namespace

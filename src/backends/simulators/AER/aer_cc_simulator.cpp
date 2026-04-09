@@ -22,7 +22,11 @@ JSON AerCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantu
     AerComputationAdapter aer_ca(quantum_task);
     AerSimulatorAdapter aer_sa(aer_ca);
     if (quantum_task.is_dynamic) {
-        return aer_sa.simulate(&classical_channel);
+        JSON result = aer_sa.simulate(&classical_channel);
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
     } else {
         return aer_sa.simulate(&backend);
     }

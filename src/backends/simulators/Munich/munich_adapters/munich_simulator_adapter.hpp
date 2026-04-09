@@ -33,7 +33,7 @@ public:
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 private:
 
-    std::string execute_shot_(
+    std::unordered_map<std::string, std::string> execute_shot_(
         std::vector<StructuredQuantumTask>& st_qtasks, 
         comm::ClassicalChannel* classical_channel,
         const bool allows_qc,

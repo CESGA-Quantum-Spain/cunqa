@@ -8,7 +8,7 @@ from cunqa.circuit import CunqaCircuit
 
 try:
     # 1. Deploy vQPUs
-    family = qraise(1, "01:00:00",  co_located = True)
+    family = qraise(1, "01:00:00", simulator = "Aer", co_located = True)
 except Exception as error:
     raise error
 

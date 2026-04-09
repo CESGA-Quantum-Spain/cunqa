@@ -10,10 +10,15 @@ JSON QsimSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTas
     QsimComputationAdapter qsim_ca(quantum_task);
     QsimSimulatorAdapter qsim_sa(qsim_ca);
 
-    if (quantum_task.is_dynamic) 
-        return qsim_sa.simulate();
-    else
+    if (quantum_task.is_dynamic) {
+        JSON result = qsim_sa.simulate();
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
+    } else {
         return qsim_sa.simulate(&backend);
+    }
 }
 
 } // End namespace sim

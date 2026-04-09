@@ -21,7 +21,11 @@ JSON CunqaCCSimulator::execute([[maybe_unused]] const CCBackend& backend, const 
     CunqaComputationAdapter cunqa_ca(quantum_task);
     CunqaSimulatorAdapter cunqa_sa(cunqa_ca);
     if (quantum_task.is_dynamic) {
-        return cunqa_sa.simulate(&classical_channel);
+        JSON result = cunqa_sa.simulate(&classical_channel);
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
     } else {
         return cunqa_sa.simulate(&backend);
     }

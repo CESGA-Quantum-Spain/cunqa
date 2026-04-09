@@ -22,7 +22,11 @@ JSON QulacsCCSimulator::execute(const CCBackend& backend, const QuantumTask& qua
     QulacsComputationAdapter qulacs_ca(quantum_task);
     QulacsSimulatorAdapter qulacs_sa(qulacs_ca);
     if (quantum_task.is_dynamic) {
-        return qulacs_sa.simulate(&classical_channel);
+        JSON result = qulacs_sa.simulate(&classical_channel);
+        return {
+            {"counts", result.at("id_counts").at(quantum_task.id)},
+            {"time_taken", result.at("time_taken")}
+        };
     } else {
         return qulacs_sa.simulate(&backend);
     }
