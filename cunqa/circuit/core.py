@@ -1429,21 +1429,6 @@ class CunqaCircuit:
             "params":[param]
         })
 
-    def cr(self, param:  Union[float,int, str], *qubits: int) -> None:
-        """
-        Class method to apply cr gate to the given qubits.
-
-        Args:
-            param (float | int | str): parameter for the parametric gate.
-            qubits (int): qubits in which the gate is applied, first one will be the control qubit 
-                          and second one the target qubit.
-        """
-        self.add_instructions({
-            "name":"cr",
-            "qubits":[*qubits],
-            "params":[param]
-        })
-
     def crx(self, param:  Union[float,int, str], *qubits: int) -> None:
         """
         Class method to apply crx gate to the given qubits.
@@ -1645,39 +1630,6 @@ class CunqaCircuit:
             "qubits": [*qubits]
         })
 
-    def ccy(self, *qubits: int) -> None:
-        """
-        Class method to apply ccy gate to the given qubits. Gate is decomposed as follows as it is 
-        not commonly supported by simulators.
-
-        .. code-block::
-        
-            q_0: ──────────────■─────────────
-                               │             
-            q_1: ──────────────■─────────────
-                 ┌──────────┐┌─┴─┐┌─────────┐
-            q_2: ┤ Rz(-π/2) ├┤ X ├┤ Rz(π/2) ├
-                 └──────────┘└───┘└─────────┘
-
-        Args:
-            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
-                          the following one will be target qubit.
-        """
-        self.add_instructions({
-            "name":"rz",
-            "qubits":[qubits[-1]],
-            "params":[-np.pi/2]
-        })
-        self.add_instructions({
-            "name":"ccx",
-            "qubits":[*qubits]
-        })
-        self.add_instructions({
-            "name":"rz",
-            "qubits":[qubits[-1]],
-            "params":[np.pi/2]
-        })
-
     def ccz(self, *qubits: int) -> None:
         """
         Class method to apply ccz gate to the given qubits.
@@ -1688,19 +1640,6 @@ class CunqaCircuit:
         """
         self.add_instructions({
             "name":"ccz",
-            "qubits":[*qubits]
-        })
-
-    def cecr(self, *qubits: int) -> None:
-        """
-        Class method to apply cecr gate to the given qubits.
-
-        Args:
-            qubits (int): qubits in which the gate is applied, first one will be control qubit and 
-                          second one target qubit.
-        """
-        self.add_instructions({
-            "name":"cecr",
             "qubits":[*qubits]
         })
 
