@@ -64,6 +64,7 @@ struct CUNQAInstruction {
   std::vector<unsigned int> block_size = {};
   std::vector<unsigned int> pauli_id_list = {};
   int seed = 0;
+  int condition = 1;
 };
 
 struct StructuredQuantumTask {
@@ -680,7 +681,8 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             cunqa_instruction = {
                 .name = instruction_name,
                 .clbits = instruction.at("clbits").get<std::vector<int>>(), 
-                .instructions = from_json_instructions_to_cunqainstructions(instruction.at("instructions").get<cunqa::JSON>())
+                .instructions = from_json_instructions_to_cunqainstructions(instruction.at("instructions").get<cunqa::JSON>()),
+                .condition = instruction.at("condition").get<int>()
             };
             break;
         }

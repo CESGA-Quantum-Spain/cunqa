@@ -686,7 +686,8 @@ class CunqaCircuit:
     
     def cif(
             self, 
-            clbits: Union[int, list[int]]
+            clbits: Union[int, list[int]],
+            condition: int = 1
         ) -> ClassicalControlContext:
         """
         Method for implementing a gate conditioned to a classical measurement. The control qubit 
@@ -713,7 +714,7 @@ class CunqaCircuit:
             clbits (int | list[int]): clbits employed as the condition.
         """
         self.is_dynamic = True
-        return ClassicalControlContext(self, clbits)
+        return ClassicalControlContext(self, clbits, condition)
     
     # ------------------
     # Unitary operations
@@ -2231,9 +2232,10 @@ class CunqaCircuit:
             })
             
 class ClassicalControlContext:
-    def __init__(self, circuit, clbits: Union[int, list[int]]):
+    def __init__(self, circuit, clbits: Union[int, list[int]], condition: int = 1):
         self._circuit = circuit
         self._clbits = clbits
+        self._condition = condition
     
     def __enter__(self):
         self._subcircuit = CunqaCircuit(self._circuit.num_qubits)
@@ -2250,7 +2252,8 @@ class ClassicalControlContext:
         cif = {
             "name": "cif",
             "clbits": [self._clbits],
-            "instructions": instructions
+            "instructions": instructions,
+            "condition": self._condition
         }
         self._circuit.add_instructions(cif)
  
