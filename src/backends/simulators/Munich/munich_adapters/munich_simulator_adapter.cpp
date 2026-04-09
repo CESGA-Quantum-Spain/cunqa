@@ -410,7 +410,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         }
         case constants::CIF:
         {
-            if (G.creg[inst.clbits[0] + T.zero_clbit]) {
+            if ((bool)inst.condition == G.creg[inst.clbits[0] + T.zero_clbit]) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }

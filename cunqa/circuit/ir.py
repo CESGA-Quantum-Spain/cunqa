@@ -120,9 +120,10 @@ def _(c: QuantumCircuit) -> dict:
                     if sub_circuit is not None
                 ][0]
 
-            if instruction.condition[1] not in [1]:
-                raise ValueError("Only 1 is accepted as condition for classicaly controlled "
-                                 "operations for the current version.")
+
+            if (condition := instruction.condition[1]) not in [0, 1]:
+                raise ValueError("Only 0 or 1 are accepted as conditions for classically controlled "
+                                "operations for the current version.")
             
             for re in c.qregs:
                 sub_circuit.add_register(re)
@@ -132,7 +133,8 @@ def _(c: QuantumCircuit) -> dict:
             cc_instruction = {
                 "name": "cif",
                 "clbits": [classical_registers[k][b] for k,b in zip(clreg, bit)],
-                "instructions": sub_instructions
+                "instructions": sub_instructions,
+                "condition": condition
                 }
             
             json_data["instructions"].append(cc_instruction)
