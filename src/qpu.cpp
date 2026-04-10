@@ -10,11 +10,12 @@ using namespace std::string_literals;
 namespace cunqa {
 
 QPU::QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, 
-         const std::string& name, const std::string& family) :
+         const std::string& name, const std::string& family, const std::string& comm) :
     backend{std::move(backend)},
     server{std::make_unique<comm::Server>(mode)},
     name_{name},
-    family_{family}
+    family_{family},
+    comm_{comm}
 { }
 
 void QPU::turn_ON() 
