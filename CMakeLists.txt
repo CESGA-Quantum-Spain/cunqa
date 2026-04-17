@@ -505,6 +505,22 @@ else()
   message(STATUS "Found package qsim: qsim_DIR = ${qsim_DIR}")
 endif()
 
+# ===================================================================================
+#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
+# ===================================================================================
+find_package(quest 4.2.0 QUIET)
+if(NOT quest_FOUND)
+  message(STATUS "Package quest not found, fetching from git@github.com:QuEST-Kit/QuEST.git")
+  FetchContent_Declare(
+      qsim
+      GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
+      GIT_TAG        v4.2.0
+  )
+  FetchContent_MakeAvailable(quest)
+else()
+  message(STATUS "Found package quest: quest_DIR = ${quest_DIR}")
+endif()
+
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
 # =====================================================================
