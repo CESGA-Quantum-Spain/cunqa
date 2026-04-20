@@ -512,7 +512,7 @@ find_package(quest 4.2.0 QUIET)
 if(NOT quest_FOUND)
   message(STATUS "Package quest not found, fetching from git@github.com:QuEST-Kit/QuEST.git")
   FetchContent_Declare(
-      qsim
+      quest
       GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
       GIT_TAG        v4.2.0
   )

@@ -1199,99 +1199,36 @@ std::unordered_map<std::string, std::string> execute_shot_(
     return shot_bits;
 }
 
-void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>& meas_counter, const std::unordered_map<std::string, long long int>& shot_outcomes)
+void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::size_t, std::size_t>>& meas_counter, const std::unordered_map<std::string, long long int>& shot_outcomes)
 {
     for (const auto& [circ_id, outcome] : shot_outcomes) {
         meas_counter[circ_id][outcome]++;
     }
 }
 
-JSON convert_quest_result(const std::vector<uint64_t>& sample, const int n_qubits) {
-    std::unordered_map<uint64_t, int> counts;
-    for (uint64_t v : sample)
-        counts[v]++;
-
-    JSON result_json;
-    for (const auto& [value, count] : counts) {
-        std::string bitstring(n_qubits, '0');
-        for (int i = 0; i < n_qubits; ++i)
-            bitstring[n_qubits - 1 - i] = ((value >> i) & 1) ? '1' : '0';
-
-        result_json[bitstring] = count;
+std::unordered_map<std::string, std::size_t> convert_quest_result(
+    const std::unordered_map<std::size_t, std::size_t>& quest_counts, 
+    const int n_qubits) {
+    std::unordered_map<std::string, std::size_t> counts;
+    counts.reserve(quest_counts.size());
+    
+    std::string binary_str(n_qubits, '0');
+    
+    for (const auto& [num, count] : quest_counts) {
+        // Convert number to binary string (in-place)
+        for (int i = n_qubits - 1; i >= 0; --i) {
+            binary_str[i] = ((num >> (n_qubits - 1 - i)) & 1) ? '1' : '0';
+        }
+        counts[binary_str] = count;
     }
-    return result_json;
+    
+    return counts;
 }
 
 } // End of anonymous namespace
 
 namespace cunqa {
 namespace sim {
-
-JSON QuestSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
-{
-    LOGGER_DEBUG("Qsim usual simulation");
-    try
-    { 
-        auto quantum_task = qc.quantum_tasks[0];
-        auto n_qubits = quantum_task.config.at("num_qubits").get<unsigned>();
-        auto shots = quantum_task.config.at("shots").get<uint64_t>();
-        auto method = quantum_task.config.at("method").get<std::string>();
-
-        int vec_or_mat{};
-        if (method == "statevector" || method == "automatic"){
-            vec_or_mat = 0;
-        } else if (method == "density_matrix") {
-            vec_or_mat = 1;
-        } else {
-            LOGGER_ERROR("QuEST simulator only supports statevector or density matrix simulation, while {} was given", method);
-            throw std::invalid_argument{"QuEST simulator only supports statevector or density matrix simulation"};
-        }
-
-        unsigned seed = 0;
-        if (quantum_task.config.contains("seed")) {
-            seed = quantum_task.config.at("seed").get<unsigned>();
-        }
-        const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
-        unsigned num_threads = 1;
-        if (num_threads_char != nullptr) {
-            num_threads = std::stoi(num_threads_char);
-        }
-        
-        auto start = std::chrono::high_resolution_clock::now();
-        int useMultithread = (num_threads > 1) ? 1 : 0;
-        int useGpuAccel = (quantum_task.config.at("device")["device_name"] == "GPU") ? 1 : 0; 
-        initCustomQuESTEnv(0, useGpuAccel, useMultithread); // args: (int useDistrib, int useGpuAccel, int useMultithread)
-        QuESTEnv env = getQuESTEnv();
-        if (quantum_task.config.contains("seed")) {
-            seedQuEST(env, &seed, 1);
-        } 
-
-        Qureg qubits_state = createCustomQureg(n_qubits, vec_or_mat, env.isDistributed, env.isGpuAccelerated, env.isMultithreaded);
-        initZeroState(qubits_state);
-        
-        JSON circuit_json = quantum_task.circuit;
-        update_quest_state(circuit_json, qubits_state);
-        std::vector<uint64_t> results = state_space.Sample(state, shots, seed);
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> duration = end - start;
-        float time_taken = duration.count();
-
-        JSON counts_json = convert_quest_result(results, n_qubits);
-        
-        JSON result_json = {
-            {"counts", counts_json},
-            {"time_taken", time_taken}};
-
-        return result_json;
-    } 
-    catch (const std::exception &e)
-    {
-        // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Qsim simulator.");
-        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
-    }
-    return JSON();
-}
 
 JSON QuestSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, const bool allows_qc)
 {
@@ -1394,8 +1331,13 @@ JSON QuestSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
     destroyQureg(qubits_state);
     finalizeQuESTEnv();
 
+    std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>> results;
+    for (auto& [key, counts] : meas_counter) {
+        results[key] = convert_quest_result(counts, n_qubits);
+    }
+
     JSON result_json = {
-        {"id_counts", meas_counter},
+        {"id_counts", results},
         {"time_taken", time_taken}};
     return result_json;
 

@@ -10,15 +10,13 @@ JSON QuestSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTa
     QuestComputationAdapter quest_ca(quantum_task);
     QuestSimulatorAdapter quest_sa(quest_ca);
 
-    if (quantum_task.is_dynamic) {
-        JSON result = quest_sa.simulate();
-        return {
-            {"counts", result.at("id_counts").at(quantum_task.id)},
-            {"time_taken", result.at("time_taken")}
-        };
-    } else {
-        return quest_sa.simulate(&backend);
-    }
+    // Dynamic simulation always
+    JSON result = quest_sa.simulate();
+    return {
+        {"counts", result.at("id_counts").at(quantum_task.id)},
+        {"time_taken", result.at("time_taken")}
+    };
+    
 }
 
 } // End namespace sim

@@ -57,6 +57,7 @@ struct CUNQAInstruction {
   std::vector<int> qubits = {};
   std::vector<int> clbits = {};
   std::vector<double> params = {};
+  std::vector<double> axis = {};
   std::vector<std::string> qpus = {};
   std::vector<CUNQAInstruction> instructions = {}; 
   std::vector<CUNQAMatrix> matrix = {}; 
@@ -65,8 +66,10 @@ struct CUNQAInstruction {
   std::vector<int> r_clbits = {};
   std::vector<unsigned int> block_size = {};
   std::vector<unsigned int> pauli_id_list = {};
+  std::string paulistr{};
   int seed = 0;
   int condition = 1;
+  int num_controls = 0;
 };
 
 struct StructuredQuantumTask {
@@ -680,8 +683,8 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             cunqa_instruction = {
                 .name = instruction_name,
                 .qubits = instruction.at("qubits").get<std::vector<int>>(),
-                .num_controls = instruction.at("num_controls").get<int>(),
-                .params = instruction.at("parmas").get<std::vector<double>>()
+                .params = instruction.at("parmas").get<std::vector<double>>(),
+                .num_controls = instruction.at("num_controls").get<int>()
             };
             break;
         }
