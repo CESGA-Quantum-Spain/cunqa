@@ -652,7 +652,11 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
         quantum_task_to_mqt_circuit(quantum_task.circuit, *mqt_circuit);
         
         float time_taken;
-        JSON noise_model_json = backend->config.at("noise_model");
+
+        JSON noise_model_json = {};
+        if (backend->config.contains("noise_model")) {
+            noise_model_json = backend->config.at("noise_model").get<JSON>();
+        }
         if (!noise_model_json.empty()) {
             const ApproximationInfo approx_info{noise_model_json["step_fidelity"], noise_model_json["approx_steps"], ApproximationInfo::FidelityDriven};
             StochasticNoiseSimulator sim(std::move(mqt_circuit), approx_info, seed, "APD", noise_model_json["noise_prob"],
