@@ -386,17 +386,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         {
             auto cunqa_matrix = inst.matrix[0];
             qsim::Matrix<float> qsim_matrix = cunqamatrix_to_qsimmatrix(cunqa_matrix);
-            std::vector<unsigned> unsigned_qubits;
+            std::vector<unsigned> unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             if (inst.qubits.size() > 1) {

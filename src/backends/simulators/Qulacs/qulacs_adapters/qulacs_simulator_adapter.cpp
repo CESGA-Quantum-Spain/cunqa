@@ -389,20 +389,20 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MULTIPAULI:
         {
-            std::vector<unsigned int> uiqubits;
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
             for (int i = 0; i < inst.qubits.size(); i++) {
-                uiqubits.push_back(inst.qubits[i] + T.zero_qubit);
+                unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
             }
-            gate::Pauli(uiqubits, inst.pauli_id_list)->update_quantum_state(&state);
+            gate::Pauli(unsigned_qubits, inst.pauli_id_list)->update_quantum_state(&state);
             break;
         }
         case constants::MULTIPAULIROTATION:
         {
-            std::vector<unsigned int> uiqubits;
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
             for (int i = 0; i < inst.qubits.size(); i++) {
-                uiqubits.push_back(inst.qubits[i] + T.zero_qubit);
+                unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
             }
-            gate::PauliRotation(uiqubits, inst.pauli_id_list, inst.params[0])->update_quantum_state(&state);
+            gate::PauliRotation(unsigned_qubits, inst.pauli_id_list, inst.params[0])->update_quantum_state(&state);
             break;
         }
         case constants::UNITARY:
@@ -410,17 +410,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
             ComplexMatrix qulacs_matrix = sim::cunqamatrix_to_qulacsdensematrix(inst.matrix[0]);
 
             if (inst.qubits.size() > 1) {
-                std::vector<unsigned int> unsigned_qubits;
+                std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
                 for (size_t i = 0; i < inst.qubits.size(); i++) {
                     if (inst.qubits[i] < 0) {
                         for (auto& index : comm_indices) {
                             if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                                unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                                unsigned_qubits[i] = G.communication_pairs[index].q1;
                                 break;
                             }
                         }
                     } else {
-                        unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                        unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                     }
                 }
                 gate::DenseMatrix(unsigned_qubits, qulacs_matrix)->update_quantum_state(&state);
@@ -433,27 +433,27 @@ std::unordered_map<std::string, std::string> execute_shot_(
         {
             SparseComplexMatrix qulacs_sparse = sim::cunqamatrix_to_sparse(inst.matrix[0]);
 
-            std::vector<unsigned int> uiqubits;
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
             for (int i = 0; i < inst.qubits.size(); i++) {
-                uiqubits.push_back(inst.qubits[i] + T.zero_qubit);
+                unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
             }
-            gate::SparseMatrix(uiqubits, qulacs_sparse)->update_quantum_state(&state);
+            gate::SparseMatrix(unsigned_qubits, qulacs_sparse)->update_quantum_state(&state);
             break;
         }
         case constants::DIAGONAL:
         {   
             ComplexVector qulacs_diagonal = sim::cunqadiagonal_to_qulacsdiagonal(inst.diagonal[0]);
-            std::vector<unsigned int> unsigned_qubits;
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
 
@@ -462,14 +462,14 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::RANDOMUNITARY:
         {
-            std::vector<unsigned int> uiqubits;
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
             for (int i = 0; i < inst.qubits.size(); i++) {
-                uiqubits.push_back(inst.qubits[i] + T.zero_qubit);
+                unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
             }
             if (inst.seed != 0) {
-                gate::RandomUnitary(uiqubits, inst.seed)->update_quantum_state(&state);
+                gate::RandomUnitary(unsigned_qubits, inst.seed)->update_quantum_state(&state);
             } else {
-                gate::RandomUnitary(uiqubits)->update_quantum_state(&state);
+                gate::RandomUnitary(unsigned_qubits)->update_quantum_state(&state);
             }
             break;
         }
