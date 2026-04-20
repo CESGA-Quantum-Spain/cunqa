@@ -9,7 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.1.0'
+version = '2.3.0'
 versionsuffix = '-cuda-12.8.0'
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
