@@ -357,17 +357,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCX:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcx(unsigned_qubits);
@@ -375,17 +375,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCY:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcy(unsigned_qubits);
@@ -393,17 +393,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCZ:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcz(unsigned_qubits);
@@ -411,17 +411,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCSX:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcsx(unsigned_qubits);
@@ -429,17 +429,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCP:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcphase(unsigned_qubits, inst.params[0]);
@@ -447,17 +447,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCRX:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcrx(unsigned_qubits, inst.params[0]);
@@ -465,17 +465,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCRY:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcry(unsigned_qubits, inst.params[0]);
@@ -483,17 +483,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCRZ:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcrz(unsigned_qubits, inst.params[0]);
@@ -501,17 +501,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCU:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcu(unsigned_qubits, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
@@ -519,17 +519,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::MCSWAP:
         {
-            reg_t unsigned_qubits;
+            reg_t unsigned_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
-                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
                             break;
                         }
                     }
                 } else {
-                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
             state->apply_mcswap(unsigned_qubits);

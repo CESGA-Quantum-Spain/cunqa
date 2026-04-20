@@ -315,7 +315,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         }
         case constants::MCX:
         {
-            std::vector<int> tmp_qubits;
+            std::vector<int> tmp_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
@@ -335,7 +335,7 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         }
         case constants::MCP:
         {
-            std::vector<int> tmp_qubits;
+            std::vector<int> tmp_qubits(inst.qubits.size());
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
@@ -721,7 +721,6 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
         {"id_counts", meas_counter},
         {"time_taken", time_taken}};
 
-    LOGGER_DEBUG("result: {}", result_json.dump());
     return result_json;
 }
 

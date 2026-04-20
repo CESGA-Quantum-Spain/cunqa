@@ -420,7 +420,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CCX:
         {
-            std::vector<int> tmp_qubits;
+            std::vector<int> tmp_qubits(inst.qubits.size());
             for (int i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[0] < 0) {
                     for (auto& index : comm_indices) {
