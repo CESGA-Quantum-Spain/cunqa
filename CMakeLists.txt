@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
 string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 
-project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES CXX)
+project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 
 message(STATUS "Building CUNQA ${PROJECT_VERSION}")
 
@@ -25,6 +25,8 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
     cmake_policy(SET CMP0135 NEW)
 endif()
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+
+set(BUILD_SHARED_LIBS OFF)
 
 # GPU MACROS
 set(COMPILATION_FOR_GPU FALSE)
@@ -508,18 +510,12 @@ endif()
 # ===================================================================================
 #  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
 # ===================================================================================
-find_package(quest 4.2.0 QUIET)
-if(NOT quest_FOUND)
-  message(STATUS "Package quest not found, fetching from git@github.com:QuEST-Kit/QuEST.git")
-  FetchContent_Declare(
-      quest
-      GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
-      GIT_TAG        v4.2.0
-  )
-  FetchContent_MakeAvailable(quest)
-else()
-  message(STATUS "Found package quest: quest_DIR = ${quest_DIR}")
-endif()
+find_or_fetch_package(
+  quest
+  "git@github.com:QuEST-Kit/QuEST.git"
+  "4.2.0"
+  "v4.2.0"
+)
 
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain

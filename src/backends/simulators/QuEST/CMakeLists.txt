@@ -3,7 +3,7 @@ add_subdirectory(quest_adapters)
 # Simple simulator
 add_library(quest_simple_simulator "${CMAKE_CURRENT_SOURCE_DIR}/quest_simple_simulator.cpp")
 target_link_libraries(quest_simple_simulator PUBLIC json
-                                           PRIVATE logger_qpu quest_adapters)
+                                           PRIVATE logger_qpu quest_adapters QuEST)
 
 # Classical communications simulator
 add_library(quest_cc_simulator "${CMAKE_CURRENT_SOURCE_DIR}/quest_cc_simulator.cpp")

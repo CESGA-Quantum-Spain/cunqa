@@ -15,13 +15,12 @@ class QuestSimulatorAdapter
 {
 public:
     QuestSimulatorAdapter() = default;
-    QuestSimulatorAdapter(QuestComputationAdapter& qc) : qc{qc} {}
+    QuestSimulatorAdapter(QuestComputationAdapter& qc);
 
     JSON simulate(const Backend* backend);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 
     QuestComputationAdapter qc;
-
 };
 
 

@@ -113,8 +113,7 @@ std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::st
 }
 
 std::unordered_map<std::string, std::string> execute_shot_(
-    quest::QuESTEnv& env,
-    quest::Qureg& qubits_state,
+    Qureg& qubits_state,
     std::vector<StructuredQuantumTask>& st_qtasks, 
     cunqa::comm::ClassicalChannel* classical_channel,
     const bool allows_qc, 
@@ -159,12 +158,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
 
         if (!indices.empty()) {
             for (auto& index : indices) {
-                auto meas1 = applyQubitMeasurement(qubits_state, G.communication_pairs[index].q1);
-                if (meas1.bitstring[0]) {
+                int meas1 = applyQubitMeasurement(qubits_state, G.communication_pairs[index].q1);
+                if (meas1) {
                     applyPauliX(qubits_state, G.communication_pairs[index].q1);
                 } 
-                auto meas2 = applyQubitMeasurement(qubits_state, G.communication_pairs[index].q0);
-                if (meas2.bitstring[0]) {
+                int meas2 = applyQubitMeasurement(qubits_state, G.communication_pairs[index].q0);
+                if (meas2) {
                     applyPauliX(qubits_state, G.communication_pairs[index].q0);
                 }
                 applyHadamard(qubits_state, G.communication_pairs[index].q0);
@@ -446,7 +445,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
 
-            applyTwoQubitRotateX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            applyControlledRotateX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
             break;
         }
         case constants::CRY:
@@ -465,7 +464,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
 
-            applyTwoQubitRotateY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            applyControlledRotateY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
             break;
         }
         case constants::CRZ:
@@ -484,7 +483,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
 
-            applyTwoQubitRotateZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            applyControlledRotateZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
             break;
         }
         case constants::CRAXIS:
@@ -578,18 +577,18 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CPAULISTR:
         {
-            applyControlledPauliStr(qubits_state, qubits[0], getPauliStr(inst.paulistr));
+            applyControlledPauliStr(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr));
             break;
         }
         case constants::CPAULIGADGET:
         {
-            applyControlledPauliGadget(qubits_state, qubits[0], getPauliStr(inst.paulistr), inst.params[0]);
+            applyControlledPauliGadget(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr), inst.params[0]);
             break;
         }
         case constants::CPHASEGADGET:
         {
-            std::vector<int> targets(qubits.begin()+1, qubits.end());
-            applyControlledPhaseGadget(qubits_state, qubits[0], targets, inst.params[0]);
+            std::vector<int> targets(inst.qubits.begin() + 1, inst.qubits.end());
+            applyControlledPhaseGadget(qubits_state, inst.qubits[0], targets, inst.params[0]);
             break;
         }
         //Multicontrolled
@@ -783,7 +782,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             applyMultiControlledRotateZ(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
             break;
         }
-        case constants::MCRAxis:
+        case constants::MCRAXIS:
         {
             std::vector<int> unsigned_qubits;
             for (size_t i = 0; i < inst.qubits.size(); i++) {
@@ -821,7 +820,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             applyMultiControlledSwap(qubits_state, controls, *(unsigned_qubits.end()-2), unsigned_qubits.back());
             break;
         }
-        case constants::MCSqrtSWAP:
+        case constants::MCSQRTSWAP:
         {
             std::vector<int> unsigned_qubits;
             for (size_t i = 0; i < inst.qubits.size(); i++) {
@@ -899,7 +898,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
         // --- Multi-qubit X ---
         case constants::MX:
         {
-            td::vector<int> unsigned_qubits;
+            std::vector<int> unsigned_qubits;
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
@@ -1066,7 +1065,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
 
             // Swap the value to the desired qubit
-            applySwap(G.communication_pairs[index].q1, inst.qubits[0] + T.zero_qubit);
+            applySwap(qubits_state, G.communication_pairs[index].q1, inst.qubits[0] + T.zero_qubit);
 
             G.communication_pairs[index].idle = true;
             break;
@@ -1199,30 +1198,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
     return shot_bits;
 }
 
-void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::size_t, std::size_t>>& meas_counter, const std::unordered_map<std::string, long long int>& shot_outcomes)
+void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>& meas_counter, const std::unordered_map<std::string, std::string>& shot_bitstrings)
 {
-    for (const auto& [circ_id, outcome] : shot_outcomes) {
+    for (const auto& [circ_id, outcome] : shot_bitstrings) {
         meas_counter[circ_id][outcome]++;
     }
-}
-
-std::unordered_map<std::string, std::size_t> convert_quest_result(
-    const std::unordered_map<std::size_t, std::size_t>& quest_counts, 
-    const int n_qubits) {
-    std::unordered_map<std::string, std::size_t> counts;
-    counts.reserve(quest_counts.size());
-    
-    std::string binary_str(n_qubits, '0');
-    
-    for (const auto& [num, count] : quest_counts) {
-        // Convert number to binary string (in-place)
-        for (int i = n_qubits - 1; i >= 0; --i) {
-            binary_str[i] = ((num >> (n_qubits - 1 - i)) & 1) ? '1' : '0';
-        }
-        counts[binary_str] = count;
-    }
-    
-    return counts;
 }
 
 } // End of anonymous namespace
@@ -1230,9 +1210,23 @@ std::unordered_map<std::string, std::size_t> convert_quest_result(
 namespace cunqa {
 namespace sim {
 
+QuestSimulatorAdapter::QuestSimulatorAdapter(QuestComputationAdapter& qc): qc{qc} 
+{
+    const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
+    unsigned num_threads = 1;
+    if (num_threads_char != nullptr) {
+        num_threads = std::stoi(num_threads_char);
+    }
+    int useMultithread = (num_threads > 1) ? 1 : 0;
+    int useGpuAccel = (qc.quantum_tasks[0].config.at("device")["device_name"] == "GPU") ? 1 : 0;
+    if (!isQuESTEnvInit()) {
+        initCustomQuESTEnv(0, useGpuAccel, useMultithread);
+    }
+} 
+
 JSON QuestSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, const bool allows_qc)
 {
-    LOGGER_DEBUG("Qsim dynamic simulation");
+    LOGGER_DEBUG("Quest dynamic simulation");
     std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>  meas_counter;
 
     JSON config = qc.quantum_tasks[0].config;
@@ -1264,31 +1258,35 @@ JSON QuestSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
         seed = config.at("seed").get<unsigned>();
     }
 
-    const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
-    unsigned num_threads = 1;
-    if (num_threads_char != nullptr) {
-        num_threads = std::stoi(num_threads_char);
+    int vec_or_mat{};
+    std::string method = config.at("method").get<std::string>();
+    if (method == "statevector" || method == "automatic"){
+        vec_or_mat = 0;
+    } else if (method == "density_matrix") {
+        vec_or_mat = 1;
+    } else {
+        LOGGER_ERROR("QuEST simulator only supports statevector or density matrix simulation, while {} was given", method);
+        throw std::invalid_argument{"QuEST simulator only supports statevector or density matrix simulation"};
     }
 
+    float time_taken = 0.0f;
     auto start = std::chrono::high_resolution_clock::now();
 #ifdef OPENMP_IN_QC
     if (size(qc.quantum_tasks) > 1) { // Quantum communications 
         #pragma omp parallel
         {
             std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>  local_counter;
-            
-            int useMultithread = (num_threads > 1) ? 1 : 0;
-            int useGpuAccel = (quantum_task.config.at("device")["device_name"] == "GPU") ? 1 : 0; 
-            initCustomQuESTEnv(0, useGpuAccel, useMultithread); // args: (int useDistrib, int useGpuAccel, int useMultithread)
-            QuESTEnv env = getQuESTEnv();
-            if (quantum_task.config.contains("seed")) {
-                seedQuEST(env, &seed, 1);
+
+            if (config.contains("seed")) {
+                setSeeds(&seed, 1);
             }
-                
+            
+            Qureg qubits_state = createCustomQureg(n_qubits, vec_or_mat, 0, 0, 1);
             #pragma omp for
-            for (std::size_t i = 0; i < shots; i++) {
+            for (size_t i = 0; i < shots; i++) {
+                LOGGER_DEBUG("shot= {}", std::to_string(i));
                 initZeroState(qubits_state);
-                update_meas_counter(local_counter, execute_shot_(env, qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));
+                update_meas_counter(local_counter, execute_shot_(qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));
             }
 
             #pragma omp critical
@@ -1297,51 +1295,51 @@ JSON QuestSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
                     meas_counter[id][bitstring] += counts;
                 } 
             }
+            auto end = std::chrono::high_resolution_clock::now();
+            #pragma omp critical
+            {
+                time_taken = std::max(time_taken, std::chrono::duration<float>(end - start).count());
+            }
+            
+            #pragma omp barrier
+            destroyQureg(qubits_state);
         }
     } else { // As if OPENMP_IN_QC not enabled
-        int useMultithread = (num_threads > 1) ? 1 : 0;
-        int useGpuAccel = (quantum_task.config.at("device")["device_name"] == "GPU") ? 1 : 0; 
-        initCustomQuESTEnv(0, useGpuAccel, useMultithread); // args: (int useDistrib, int useGpuAccel, int useMultithread)
-        QuESTEnv env = getQuESTEnv();
-        if (quantum_task.config.contains("seed")) {
-            seedQuEST(env, &seed, 1);
+        
+        if (config.contains("seed")) {
+            setSeeds(&seed, 1);
         }
+
+        Qureg qubits_state = createCustomQureg(n_qubits, vec_or_mat, 0, 0, 0);
         for (int i = 0; i < shots; i++) {
             initZeroState(qubits_state);
-            update_meas_counter(meas_counter, execute_shot_(env, qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));            
+            update_meas_counter(meas_counter, execute_shot_(qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));            
         } // End all shots
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        time_taken = duration.count();
+
+        destroyQureg(qubits_state);
     }
 #else
-    int useMultithread = (num_threads > 1) ? 1 : 0;
-    int useGpuAccel = (quantum_task.config.at("device")["device_name"] == "GPU") ? 1 : 0; 
-    initCustomQuESTEnv(0, useGpuAccel, useMultithread); // args: (int useDistrib, int useGpuAccel, int useMultithread)
-    QuESTEnv env = getQuESTEnv();
-    if (quantum_task.config.contains("seed")) {
-        seedQuEST(env, &seed, 1);
+    if (config.contains("seed")) {
+        setSeeds(&seed, 1);
     }
+    Qureg qubits_state = createCustomQureg(n_qubits, vec_or_mat, 0, 0, 0);
     for (int i = 0; i < shots; i++) {
         initZeroState(qubits_state);
-        update_meas_counter(meas_counter, execute_shot_(env, qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));        
+        update_meas_counter(meas_counter, execute_shot_(qubits_state, st_qtasks, classical_channel, allows_qc, n_comm_qubits));        
     } // End all shots
-#endif
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;
-    float time_taken = duration.count();
+    time_taken = duration.count();
 
     destroyQureg(qubits_state);
-    finalizeQuESTEnv();
-
-    std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>> results;
-    for (auto& [key, counts] : meas_counter) {
-        results[key] = convert_quest_result(counts, n_qubits);
-    }
-
+#endif
     JSON result_json = {
-        {"id_counts", results},
+        {"id_counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
-
-    return JSON();
 }
 
 
