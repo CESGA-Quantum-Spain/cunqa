@@ -192,6 +192,7 @@ class CunqaCircuit:
         .. automethod:: rx
         .. automethod:: ry
         .. automethod:: rz
+        .. automethod:: raxis
         .. automethod:: rotinvx
         .. automethod:: rotinvy
         .. automethod:: rotinvz
@@ -202,6 +203,7 @@ class CunqaCircuit:
         .. automethod:: id2
         .. automethod:: swap
         .. automethod:: iswap
+        .. automethod:: sqrtswap
         .. automethod:: fusedswap
         .. automethod:: ecr
         .. automethod:: cx
@@ -240,6 +242,13 @@ class CunqaCircuit:
         .. automethod:: ccz
         .. automethod:: cecr
         .. automethod:: cswap
+        .. automethod:: csqrtswap
+
+    .. dropdown:: Multi-qubit gates
+        :animate: fade-in-slide-down
+
+        .. automethod:: mx
+        .. automethod:: cmx
 
     .. dropdown:: Multicontrol gates
         :animate: fade-in-slide-down
@@ -247,15 +256,25 @@ class CunqaCircuit:
         .. automethod:: mcx
         .. automethod:: mcy
         .. automethod:: mcz
+        .. automethod:: mch
         .. automethod:: mcsx
+        .. automethod:: mcs
         .. automethod:: mcp
+        .. automethod:: mct
+        .. automethod:: mcmx
+        .. automethod:: mcswap
+        .. automethod:: mcsqrtswap
         .. automethod:: mcrx
         .. automethod:: mcry
         .. automethod:: mcrz
+        .. automethod:: mcraxis
         .. automethod:: mcu1
         .. automethod:: mcu2
         .. automethod:: mcu3
         .. automethod:: mcu
+        .. automethod:: mcpaulistr
+        .. automethod:: mcpauligadget
+        .. automethod:: mcphasegadget
 
     .. dropdown:: Special gates
         :animate: fade-in-slide-down
@@ -263,6 +282,13 @@ class CunqaCircuit:
         .. automethod:: unitary
         .. automethod:: randomunitary
         .. automethod:: diagonal
+        .. automethod:: phasegadget
+        .. automethod:: cphasegadget
+        .. automethod:: paulistr
+        .. automethod:: cpaulistr
+        .. automethod:: pauligadget
+        .. automethod:: nonunitarypauligadget
+        .. automethod:: cpauligadget
         .. automethod:: multipauli
         .. automethod:: multipaulirotation
         .. automethod:: amplitudedampingnoise
@@ -1121,6 +1147,22 @@ class CunqaCircuit:
             "params":[param]
         })
 
+    def raxis(self, param:  Union[float,int, str], axis: list[float], qubit: int) -> None:
+        """
+        Class method to apply a rotation in the specified axis to the given qubit.
+
+        Args:
+            param (float | int | str): parameter for the parametric gate.
+            axis (list[float]): three element list with the values of X, Y and Z.
+            qubit (int): qubit in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"raxis",
+            "qubits":[qubit],
+            "params":[param],
+            "axis": axis
+        })
+
     def rotinvx(self, param:  Union[float,int, str], qubit: int) -> None:
         """
         Class method to apply rotinvx gate to the given qubit.
@@ -1199,6 +1241,18 @@ class CunqaCircuit:
         """
         self.add_instructions({
             "name":"iswap",
+            "qubits":[*qubits]
+        })
+
+    def sqrtswap(self, *qubits: int) -> None:
+        """
+        Class method to apply sqrtswap gate to the given qubits.
+
+        Args:
+            qubits (list[int]): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"sqrtswap",
             "qubits":[*qubits]
         })
 
@@ -1656,6 +1710,46 @@ class CunqaCircuit:
             "qubits":[*qubits]
         })
 
+    def csqrtswap(self, *qubits: int) -> None:
+        """
+        Class method to apply csqrtswap gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name":"csqrtswap",
+            "qubits":[*qubits]
+        })
+
+    # Multiqubit gates, no param
+
+    def mx(self, *qubits: int) -> None:
+        """
+        Class method to apply mx gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name":"mx",
+            "qubits":[*qubits]
+        })
+
+    def cmx(self, *qubits: int) -> None:
+        """
+        Class method to apply mcx gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first one will be control and 
+                          the following will be target qubits.
+        """
+        self.add_instructions({
+            "name":"cmx",
+            "qubits":[*qubits]
+        })
+    
     # Non parametric multicontrol gates
 
     def mcx(self, *qubits: int) -> None:
@@ -1689,11 +1783,24 @@ class CunqaCircuit:
         Class method to apply mcz gate to the given qubits.
 
         Args:
-            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
                           the following one will be target qubit.
         """
         self.add_instructions({
             "name":"mcz",
+            "qubits":[*qubits]
+        })
+
+    def mch(self, *qubits: int) -> None:
+        """
+        Class method to apply mch gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name":"mch",
             "qubits":[*qubits]
         })
     
@@ -1702,12 +1809,81 @@ class CunqaCircuit:
         Class method to apply mcsx gate to the given qubits.
 
         Args:
-            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
                           the following one will be target qubit.
         """
         self.add_instructions({
             "name":"mcsx",
             "qubits":[*qubits]
+        })
+
+    def mcs(self, *qubits: int) -> None:
+        """
+        Class method to apply mcs gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name":"mcs",
+            "qubits":[*qubits]
+        })
+
+    def mct(self, *qubits: int) -> None:
+        """
+        Class method to apply mcz gate to the given qubits.
+
+        Args:
+            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name":"mcz",
+            "qubits":[*qubits]
+        })
+
+    def mcmx(self, num_controls: int, *qubits: int) -> None:
+        """
+        Class method to apply mcmx gate to the given qubits.
+
+        Args:
+            num_controls (int): number of control qubit 
+            qubits (int): qubits in which the gate is applied, first num_controls will be control qubits and 
+                          the following ones will be target qubits.
+        """
+        self.add_instructions({
+            "name":"mcmx",
+            "qubits":[*qubits],
+            "num_controls": num_controls
+        })
+
+    def mcswap(self, *qubits: int) -> None:
+        """
+        Class method to apply mcswap gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "mcswap",
+            "qubits": [*qubits],
+        })
+
+    def mcsqrtswap(self, *qubits: int) -> None:
+        """
+        Class method to apply mcmcsqrtswapswap gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "mcsqrtswap",
+            "qubits": [*qubits],
         })
     
     # Parametric multicontrol gates
@@ -1763,13 +1939,29 @@ class CunqaCircuit:
 
         Args:
             theta (float | int | str): angle.
-            qubits (int): qubits in which the gate is applied, first two will be control qubits and 
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
                           the following one will be target qubit.
         """
         self.add_instructions({
             "name": "mcrz",
             "qubits": [*qubits],
             "params": [theta]
+        })
+
+    def mcraxis(self, theta: Union[float, int, str], axis: list[float], *qubits: int) -> None:
+        """
+        Class method to apply mcraxis gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "mcraxis",
+            "qubits": [*qubits],
+            "params": [theta],
+            "axis": axis
         })
     
     def mcu1(self, theta: Union[float, int, str], *qubits: int) -> None:
@@ -1854,6 +2046,54 @@ class CunqaCircuit:
             "name": "mcu",
             "qubits": [*qubits],
             "params": [theta, phi, lam, beta]
+        })
+
+    def mcpaulistr(self, paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply mcpaulistr gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "mcpaulistr",
+            "qubits": [*qubits],
+            "paulistr": paulistr
+        })
+
+    def mcpauligadget(self, theta: Union[float, int, str], paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply mcrmcpauligadgetz gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "mcpauligadget",
+            "qubits": [*qubits],
+            "params": [theta],
+            "paulistr": paulistr
+        })
+
+    def mcphasegadget(self, theta: Union[float, int, str], num_controls: int, *qubits: int) -> None:
+        """
+        Class method to apply mcphasegadget gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            num_controls (int): number of controls qubits
+            qubits (int): qubits in which the gate is applied, first num_controls will be control qubits and 
+                          the following ones will be target qubits.
+        """
+        self.add_instructions({
+            "name": "mcphasegadget",
+            "qubits": [*qubits],
+            "params": [theta],
+            "num_comtrols": num_controls
         })
 
     # Special gates
@@ -1978,6 +2218,113 @@ class CunqaCircuit:
             "matrix":[expanded_diagonal]
         })
 
+    def phasegadget(self, theta: Union[float, int, str], *qubits: int) -> None:
+        """
+        Class method to apply phasegadget gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name": "phasegadget",
+            "qubits": [*qubits],
+            "params": [theta]
+        })
+
+    def cphasegadget(self, theta: Union[float, int, str], *qubits: int) -> None:
+        """
+        Class method to apply cphasegadget gate to the given qubits.
+
+        Args:
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be the control qubit and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "cphasegadget",
+            "qubits": [*qubits],
+            "params": [theta]
+        })
+    
+    def paulistr(self, paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply paulistr gate to the given qubits.
+
+        Args:
+            paulistr (str): pauli str to apply.
+            qubits (int): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name": "paulistr",
+            "qubits": [*qubits],
+            "paulistr": paulistr
+        })
+
+    def cpaulistr(self, paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply cpaulistr gate to the given qubits.
+
+        Args:
+            paulistr (str): pauli str to apply.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "cpaulistr",
+            "qubits": [*qubits],
+            "paulistr": paulistr
+        })
+    
+    def pauligadget(self, theta: Union[float, int, str], paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply pauligadget gate to the given qubits.
+
+        Args:
+            paulistr (str): pauli str to apply.
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be control qubits and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "pauligadget",
+            "qubits": [*qubits],
+            "params": [theta],
+            "paulistr": paulistr
+        })
+
+    def nonunitarypauligadget(self, theta: Union[float, int, str], paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply nonunitarypauligadget gate to the given qubits.
+
+        Args:
+            paulistr (str): pauli str to apply.
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied.
+        """
+        self.add_instructions({
+            "name": "nonunitarypauligadget",
+            "qubits": [*qubits],
+            "params": [theta],
+            "paulistr": paulistr
+        })
+
+    def cpauligadget(self, theta: Union[float, int, str], paulistr: str, *qubits: int) -> None:
+        """
+        Class method to apply cpauligadget gate to the given qubits.
+
+        Args:
+            paulistr (str): pauli str to apply.
+            theta (float | int | str): angle.
+            qubits (int): qubits in which the gate is applied, first will be the control qubit and 
+                          the following one will be target qubit.
+        """
+        self.add_instructions({
+            "name": "cpauligadget",
+            "qubits": [*qubits],
+            "params": [theta],
+            "paulistr": paulistr
+        })
 
     def multipauli(self, pauli_id_list: list[int], *qubits: int) -> None:
         """
