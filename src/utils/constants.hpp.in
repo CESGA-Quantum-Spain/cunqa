@@ -26,6 +26,7 @@ enum SIMULATORS {
   MAESTRO,
   QULACS,
   QSIM,
+  QUEST,
   CUNQASIM
 };
 
@@ -35,12 +36,13 @@ const std::unordered_map<std::string, int> SIMULATORS_MAP {
   {"Maestro", MAESTRO},
   {"Qulacs", QULACS},
   {"Qsim", QSIM},
+  {"Quest", QUEST},
   {"Cunqa", CUNQASIM},
 };
 
-inline const std::vector<std::string> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
-inline const std::vector<std::string> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
-inline const std::vector<std::string> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Quest", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Quest", "Cunqa"};
+inline const std::vector<std::string> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Qsim", "Quest", "Cunqa"};
 inline const std::vector<std::string> SUPPORTED_NOISY_SIMULATORS = {"Aer", "Munich"};
 
 
@@ -55,6 +57,7 @@ struct CUNQAInstruction {
   std::vector<int> qubits = {};
   std::vector<int> clbits = {};
   std::vector<double> params = {};
+  std::vector<double> axis = {};
   std::vector<std::string> qpus = {};
   std::vector<CUNQAInstruction> instructions = {}; 
   std::vector<CUNQAMatrix> matrix = {}; 
@@ -63,8 +66,10 @@ struct CUNQAInstruction {
   std::vector<int> r_clbits = {};
   std::vector<unsigned int> block_size = {};
   std::vector<unsigned int> pauli_id_list = {};
+  std::string paulistr{};
   int seed = 0;
   int condition = 1;
+  int num_controls = 0;
 };
 
 struct StructuredQuantumTask {
@@ -88,6 +93,11 @@ enum INSTRUCTIONS {
     RANDOMUNITARY,
     SPARSEMATRIX,
     TWOQUBITDEPOLARIZINGNOISE,
+    PAULISTR,
+    CPAULISTR,
+    PAULIGADGET,
+    NONUNITARYPAULIGADGET,
+    CPAULIGADGET,
     COPY,
     RESET,
     BARRIER,
@@ -119,6 +129,7 @@ enum INSTRUCTIONS {
     RX,
     RY,
     RZ,
+    RAXIS,
     GLOBALP,
     P,
     U1,
@@ -141,6 +152,7 @@ enum INSTRUCTIONS {
     ECR,
     SWAP,
     ISWAP,
+    SQRTSWAP,
     FUSEDSWAP,
     CX,
     CY,
@@ -158,6 +170,7 @@ enum INSTRUCTIONS {
     CRX,
     CRY,
     CRZ,
+    CRAXIS,
     CP,
     CU1,
     RXX,
@@ -178,18 +191,29 @@ enum INSTRUCTIONS {
 
     CECR,
     CSWAP,
+    CSQRTSWAP,
     CCX,
     CCY,
     CCZ,
+
+    MX,
+    CMX,
+
+    PHASEGADGET,
+    CPHASEGADGET,
 
     MCX,
     MCY,
     MCZ,
     MCSX,
+    MCS,
+    MCT,
+    MCH,
 
     MCRX,
     MCRY,
     MCRZ,
+    MCRAXIS,
     MCP,
     MCU1,
 
@@ -201,7 +225,13 @@ enum INSTRUCTIONS {
     MCU,
 
     MCSWAP,
+    MCSQRTSWAP,
 
+    MCMX,
+
+    MCPAULISTR,
+    MCPAULIGADGET,
+    MCPHASEGADGET,
 
     CIF,
     SEND,
@@ -229,6 +259,11 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"randomunitary", RANDOMUNITARY},
     {"sparsematrix", SPARSEMATRIX},
     {"twoqubitdepolarizingnoise", TWOQUBITDEPOLARIZINGNOISE},
+    {"paulistr", PAULISTR},
+    {"cpaulistr", CPAULISTR},
+    {"pauligadget", PAULIGADGET},
+    {"nonunitarypauligadget", NONUNITARYPAULIGADGET},
+    {"cpauligadget", CPAULIGADGET},
     {"copy", COPY},
     {"reset", RESET},
     {"barrier", BARRIER},
@@ -264,6 +299,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"rx", RX},
     {"ry", RY},
     {"rz", RZ},
+    {"raxis", RAXIS},
     {"gp", GLOBALP},
     {"p", P},
     {"u1", U1},
@@ -290,6 +326,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"ecr", ECR},
     {"swap", SWAP},
     {"iswap", ISWAP},
+    {"sqrtswap", SQRTSWAP},
     {"fusedswap", FUSEDSWAP},
     {"cx", CX},
     {"cy", CY},
@@ -308,6 +345,7 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     {"crx", CRX},
     {"cry", CRY},
     {"crz", CRZ},
+    {"craxis", CRAXIS},
     {"cp", CP},
     {"cu1", CU1},
     {"rxx", RXX},
@@ -329,24 +367,36 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     //TWO QUBIT FOUR PARAM
     {"cu", CU},
 
-
     // THREE QUBIT NO PARAM
     {"cecr", CECR},
     {"cswap", CSWAP},
+    {"csqrtswap", CSQRTSWAP},
     {"ccx", CCX},
     {"ccy", CCY},
     {"ccz", CCZ},
+
+    // SEVERAL QUBIT NO PARAM
+    {"mx", MX},
+    {"cmx", CMX},
+
+    // SEVERAL QUBIT PARAM
+    {"phasegadget", PHASEGADGET},
+    {"cphasegadget", CPHASEGADGET},
 
     // MULTICONTROLED ONE QUBIT NO PARAM
     {"mcx", MCX},
     {"mcy", MCY},
     {"mcz", MCZ},
     {"mcsx", MCSX},
+    {"mcs", MCS},
+    {"mct", MCT},
+    {"mch", MCH},
 
     // MULTICONTROLED ONE QUBIT ONE PARAM
     {"mcrx", MCRX},
     {"mcry", MCRY},
     {"mcrz", MCRZ},
+    {"mcraxis", MCRAXIS},
     {"mcp", MCP},
     {"mcu1", MCU1},
 
@@ -362,6 +412,15 @@ const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
 
     // MULTICONTROLED TWO QUBIT NO PARAM
     {"mcswap", MCSWAP},
+    {"mcsqrtswap", MCSQRTSWAP},
+
+    // MULTICONTROLLED SEVERAL QUBITS NO PARAM
+    {"mcmx", MCMX},
+
+    // MULTICONTROLLED SEVERAL QUBITS PARAM
+    {"mcpaulistr", MCPAULISTR},
+    {"mcpauligadget", MCPAULIGADGET},
+    {"mcphasegadget", MCPHASEGADGET},
 
     // CLASSICAL IF
     {"cif", CIF},
@@ -453,6 +512,27 @@ const std::vector<std::string> QSIM_BASIS_GATES = {
   "unitary",
 };
 
+const std::vector<std::string> QUEST_BASIS_GATES = {
+    "s", "cs", "mcs",
+    "t", "ct", "mct",
+    "h", "ch", "mch",
+    "swap", "cswap", "mcswap",
+    "sqrtswap", "csqrtswap", "mcsqrtswap",
+    "x", "y", "z",
+    "cx", "cy", "cz",
+    "mcx", "mcy", "mcz",
+    "paulistr", "cpaulistr", "mcpaulistr",
+    "rx", "ry", "rz",
+    "crx", "cry", "crz",
+    "mcrx", "mcry", "mcrz",
+    "raxis", "craxis", "mcraxis",
+    "pauligadget", "nonunitarypauligadget", "cpauligadget", "mcpauligadget",
+    "phasegadget", "cphasegadget", "mcphasegadget",
+    "p", "cp", "mcp",
+    "mx", "cmx", "mcmx",
+    "measure"
+};
+
 const std::vector<std::string> CUNQASIM_BASIS_GATES = {
   "measure", 
   "id", "x", "y", "z", "h", "sx",
@@ -506,6 +586,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case ECR:
         case SWAP:
         case ISWAP:
+        case SQRTSWAP:
         case CX:
         case CY:
         case CZ:
@@ -520,14 +601,21 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case DCX:
         case CECR:
         case CSWAP:
+        case CSQRTSWAP:
         case CCX:
         case CCY:
         case CCZ:
         case MCX:
         case MCY:
         case MCZ:
+        case MCS:
+        case MCT:
+        case MCH:
         case MCSX:
         case MCSWAP:
+        case MCSQRTSWAP:
+        case MX:
+        case CMX:
         case BARRIER:
         case RESET:
         {
@@ -543,6 +631,61 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .name = instruction_name,
                 .qubits = instruction.at("qubits").get<std::vector<int>>(),
                 .block_size = instruction.at("block_size").get<std::vector<unsigned int>>()
+            };
+            break;
+        }
+        case RAXIS: 
+        case CRAXIS:
+        case MCRAXIS:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .params = instruction.at("qubits").get<double>(),
+                .axis = instruction.at("axis").get<std::vector<double>>()
+            };
+            break;
+        }
+        case PAULISTR:
+        case CPAULISTR:
+        case MCPAULISTR:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .paulistr = instruction.at("paulistr").get<std::string>()
+            };
+            break;
+        }
+        case PAULIGADGET:
+        case NONUNITARYPAULIGADGET: 
+        case CPAULIGADGET:
+        case MCPAULIGADGET: 
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .params = instruction.at("parmas").get<std::vector<double>>(),
+                .paulistr = instruction.at("paulistr").get<std::string>()
+            };
+            break;
+        }
+        case MCMX:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .num_controls = instruction.at("num_controls").get<int>()
+            };
+            break;
+        }
+        case MCPHASEGADGET:
+        {
+            cunqa_instruction = {
+                .name = instruction_name,
+                .qubits = instruction.at("qubits").get<std::vector<int>>(),
+                .params = instruction.at("parmas").get<std::vector<double>>(),
+                .num_controls = instruction.at("num_controls").get<int>()
             };
             break;
         }
@@ -588,6 +731,8 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
         case MCR:
         case MCU3:
         case MCU:
+        case PHASEGADGET:
+        case CPHASEGADGET:
         {
             cunqa_instruction = {
                 .name = instruction_name,

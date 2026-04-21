@@ -936,8 +936,6 @@ JSON QsimSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, c
         {"id_counts", meas_counter},
         {"time_taken", time_taken}};
     return result_json;
-
-    return JSON();
 }
 
 

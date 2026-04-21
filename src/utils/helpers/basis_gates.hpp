@@ -27,6 +27,9 @@ std::vector<std::string> get_basis_gates(const std::string simulator)
   case QSIM:
       return QSIM_BASIS_GATES;
       break;
+  case QUEST:
+      return QUEST_BASIS_GATES;
+      break;
   case CUNQASIM:
       return CUNQASIM_BASIS_GATES;
       break;

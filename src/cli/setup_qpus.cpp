@@ -29,6 +29,9 @@
 #include "backends/simulators/Qsim/qsim_simple_simulator.hpp"
 #include "backends/simulators/Qsim/qsim_cc_simulator.hpp"
 #include "backends/simulators/Qsim/qsim_qc_simulator.hpp"
+#include "backends/simulators/QuEST/quest_simple_simulator.hpp"
+#include "backends/simulators/QuEST/quest_cc_simulator.hpp"
+#include "backends/simulators/QuEST/quest_qc_simulator.hpp"
 
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
@@ -147,6 +150,10 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with QsimSimpleSimulator.");
                     turn_ON_QPU<QsimSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
                     break;
+                case murmur::hash("Quest"):
+                    LOGGER_DEBUG("QPU going to turn on with QuestSimpleSimulator.");
+                    turn_ON_QPU<QuestSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
+                    break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support simple simulation or does not exist.", sim_arg);
                     return EXIT_FAILURE;
@@ -179,6 +186,10 @@ int main(int argc, char *argv[])
                     LOGGER_DEBUG("QPU going to turn on with QsimCCSimulator.");
                     turn_ON_QPU<QsimCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
                     break;
+                case murmur::hash("Quest"):
+                    LOGGER_DEBUG("QPU going to turn on with QuestCCSimulator.");
+                    turn_ON_QPU<QuestCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
+                    break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support classical communication simulation or does not exist.", sim_arg);
                     return EXIT_FAILURE;
@@ -208,8 +219,12 @@ int main(int argc, char *argv[])
                     turn_ON_QPU<QulacsQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
                     break;
                 case murmur::hash("Qsim"):
-                    LOGGER_DEBUG("QPU going to turn on with QsimQCSimulator.");
+                    LOGGER_DEBUG("QPU going to turn on with QsimQCSimulator."); 
                     turn_ON_QPU<QsimQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
+                    break;
+                case murmur::hash("Quest"):
+                    LOGGER_DEBUG("QPU going to turn on with QuestQCSimulator.");
+                    turn_ON_QPU<QuestQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
                     break;
                 default:
                     LOGGER_ERROR("Simulator {} do not support quantum communication simulation or does not exist.", sim_arg);

@@ -86,7 +86,7 @@ class QJob:
 
         run_config = {
             "shots": 1024, 
-            "method":"automatic", 
+            "method": "automatic", 
             "avoid_parallelization": False,
             "num_clbits": circuit_ir["num_clbits"], 
             "num_qubits": circuit_ir["num_qubits"], 
