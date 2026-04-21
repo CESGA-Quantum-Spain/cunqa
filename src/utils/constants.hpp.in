@@ -641,7 +641,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             cunqa_instruction = {
                 .name = instruction_name,
                 .qubits = instruction.at("qubits").get<std::vector<int>>(),
-                .params = instruction.at("qubits").get<std::vector<double>>(),
+                .params = instruction.at("params").get<std::vector<double>>(),
                 .axis = instruction.at("axis").get<std::vector<double>>()
             };
             break;
