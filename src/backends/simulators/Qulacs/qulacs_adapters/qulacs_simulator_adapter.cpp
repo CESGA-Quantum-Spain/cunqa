@@ -429,6 +429,38 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
             break;
         }
+        case constants::CUNITARY:
+        {
+            ComplexMatrix qulacs_matrix = sim::cunqamatrix_to_qulacsdensematrix(inst.matrix[0]);
+
+            std::vector<unsigned int> unsigned_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+
+            std::vector<TargetQubitInfo> target_qubits;
+            for (size_t i = 1; i < unsigned_qubits.size(); i++) {
+                target_qubits.emplace_back(unsigned_qubits[i], 0);
+            }
+
+            std::vector<ControlQubitInfo> control_qubits = {
+                ControlQubitInfo(unsigned_qubits[0], 1)  // control value = 1
+            };
+
+            auto gate = new QuantumGateMatrix(target_qubits, &qulacs_matrix, control_qubits);
+            gate->update_quantum_state(&state);
+            delete gate;
+            break;
+}
         case constants::SPARSEMATRIX:
         {
             SparseComplexMatrix qulacs_sparse = sim::cunqamatrix_to_sparse(inst.matrix[0]);

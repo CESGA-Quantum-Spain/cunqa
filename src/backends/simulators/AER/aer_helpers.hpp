@@ -129,7 +129,7 @@ JSON quantum_task_to_AER(QuantumTask& quantum_task)
 
     //JSON Object because if not it generates an array
     for (auto& instruction : quantum_task.circuit) {
-        instruction = JSON::parse(std::regex_replace(instruction.dump(), std::regex("clbits"), "memory"));
+        instruction = JSON::parse(std::regex_replace(std::regex_replace(instruction.dump(), std::regex("clbits"), "memory"), std::regex("matrix"), "params"));
     }
     JSON new_circuit = {
         {"config", new_config},
@@ -194,10 +194,11 @@ inline void convert_cunqadiagonal_to_aerdiagonal(const CUNQADiagonalMatrix& cunq
 
 inline void convert_cunqa_matrix_to_complex_vector(const CUNQAMatrix& cunqa_matrix, CUNQAComplexVector& matrix_data)
 {
-    for (auto& row : cunqa_matrix) {
-        for (auto& z : row) {
-            std::complex<double> complex = z[0] + std::complex<double>(0, z[1]);
-            matrix_data.push_back(complex);
+    size_t n = cunqa_matrix.size();
+    for (size_t j = 0; j < n; ++j) {        // column first
+        for (size_t i = 0; i < n; ++i) {    // then row
+            const auto& z = cunqa_matrix[i][j];
+            matrix_data.push_back(std::complex<double>(z[0], z[1]));
         }
     }
 }

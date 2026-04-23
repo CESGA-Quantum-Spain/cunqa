@@ -81,6 +81,7 @@ struct StructuredQuantumTask {
 
 enum INSTRUCTIONS {
     UNITARY,
+    CUNITARY,
     DIAGONAL,
     MULTIPLEXER,
     MULTIPAULI,
@@ -247,6 +248,7 @@ enum INSTRUCTIONS {
 const std::unordered_map<std::string, int> INSTRUCTIONS_MAP = {
     // SPECIAL
     {"unitary", UNITARY},
+    {"cunitary", CUNITARY},
     {"diagonal", DIAGONAL},
     {"multiplexer", MULTIPLEXER},
     {"multipauli", MULTIPAULI},
@@ -456,7 +458,7 @@ const std::vector<std::string> AER_BASIS_GATES = {
     "mcu2", "mcr",
     "mcu3",
     "mcswap", 
-    "unitary", "diagonal", "multiplexer",
+    "unitary", "cunitary", "diagonal", "multiplexer",
 };
 
 const std::vector<std::string> MUNICH_BASIS_GATES = {
@@ -509,7 +511,7 @@ const std::vector<std::string> QSIM_BASIS_GATES = {
   "hz2",
   "fs",
   "gp",
-  "unitary",
+  "unitary", "cunitary"
 };
 
 const std::vector<std::string> QUEST_BASIS_GATES = {
@@ -761,6 +763,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
             break;
         }
         case UNITARY:
+        case CUNITARY:
         case SPARSEMATRIX:
         {
             cunqa_instruction = {

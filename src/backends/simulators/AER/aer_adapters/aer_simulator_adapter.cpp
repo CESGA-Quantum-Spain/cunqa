@@ -543,10 +543,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         case constants::UNITARY:
         {
             auto cunqa_matrix = inst.matrix[0];
-            CUNQAComplexVector matrix_data;
-            sim::convert_cunqa_matrix_to_complex_vector(cunqa_matrix, matrix_data);
             size_t dim = cunqa_matrix.size();
-            matrix<complex_t> aer_matrix(dim, dim, matrix_data.data());
+
+            // Fill in column-major order as required by the matrix class
+            CUNQAComplexVector matrix_data(dim * dim);
+            for (size_t i = 0; i < dim; i++)
+                for (size_t j = 0; j < dim; j++)
+                    matrix_data[j * dim + i] = complex_t(cunqa_matrix[i][j][0], cunqa_matrix[i][j][1]);
+
+            // copy_from_buffer actually copies the data, avoiding dangling pointer
+            matrix<complex_t> aer_matrix = matrix<complex_t>::copy_from_buffer(dim, dim, matrix_data.data());
+
             reg_t unsigned_qubits;
             for (size_t i = 0; i < inst.qubits.size(); i++) {
                 if (inst.qubits[i] < 0) {
@@ -560,7 +567,50 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
+            std::reverse(unsigned_qubits.begin(), unsigned_qubits.end());
             state->apply_unitary(unsigned_qubits, aer_matrix);
+            break;
+        }
+        case constants::CUNITARY:
+        {
+            auto cunqa_matrix = inst.matrix[0];
+            size_t dim = cunqa_matrix.size();
+            size_t ctrl_dim = 2 * dim;
+
+            // Fill controlled matrix in column-major order
+            CUNQAComplexVector ctrl_matrix_data(ctrl_dim * ctrl_dim, complex_t(0.0, 0.0));
+
+            // Top-left block: Identity (control = |0>), column-major: j * ctrl_dim + i
+            for (size_t i = 0; i < dim; i++) {
+                ctrl_matrix_data[i * ctrl_dim + i] = complex_t(1.0, 0.0);
+            }
+
+            // Bottom-right block: U (control = |1>), column-major: j * ctrl_dim + i
+            for (size_t j = 0; j < dim; j++) {
+                for (size_t i = 0; i < dim; i++) {
+                    ctrl_matrix_data[(dim + j) * ctrl_dim + (dim + i)] = complex_t(cunqa_matrix[i][j][0], cunqa_matrix[i][j][1]);
+                }
+            }
+
+            // copy_from_buffer copies the data, avoiding dangling pointer
+            matrix<complex_t> aer_ctrl_matrix = matrix<complex_t>::copy_from_buffer(ctrl_dim, ctrl_dim, ctrl_matrix_data.data());
+
+            reg_t unsigned_qubits;
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            unsigned_qubits.push_back(G.communication_pairs[index].q1);
+                            break;
+                        }
+                    }
+                } else {
+                    unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                }
+            }
+            std::reverse(unsigned_qubits.begin(), unsigned_qubits.end());
+
+            state->apply_unitary(unsigned_qubits, aer_ctrl_matrix);
             break;
         }
         case constants::DIAGONAL:

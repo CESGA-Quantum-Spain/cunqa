@@ -31,6 +31,7 @@ try:
 
     qc = CunqaCircuit(2, 2, id="qc")
     qc.unitary(H, 0)
+    qc.cunitary(H, 0, 1) # Controlled unitary 
     qc.cx(0, 1)
     qc.measure_all()
 

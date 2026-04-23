@@ -434,6 +434,16 @@ SPECIAL_GATES = [
             ]],
         },
     ),
+    ("cunitary", ([[1.0 + 0.0j, 0.0 + 0.0j], [0.0 + 0.0j, 1.0 + 0.0j]], 0, 1),
+        {
+            "name": "cunitary",
+            "qubits": [0, 1],
+            "matrix": [[
+                [[1.0, 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [1.0, 0.0]],
+            ]],
+        },
+    ),
     ("randomunitary",              (0,1,),                   {"name": "randomunitary",             "qubits": [0,1]}),
     ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[[1.0,1.0],[0.0,-1.0]]]}),
     ("fusedswap",                  (3,0,1),                  {"name": "fusedswap",                 "qubits": [0,1],"block_size":[3]}),
