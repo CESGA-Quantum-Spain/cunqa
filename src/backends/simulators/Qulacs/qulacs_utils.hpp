@@ -232,6 +232,24 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const JSON& circuit_j
             }
             break;
         }
+        case constants::CUNITARY:
+        {
+            auto cunqa_matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()[0];
+            ComplexMatrix qulacs_matrix = cunqa::sim::cunqamatrix_to_qulacsdensematrix(cunqa_matrix);
+
+            std::vector<TargetQubitInfo> target_qubits;
+            for (size_t i = 1; i < qubits.size(); i++) {
+                target_qubits.emplace_back(qubits[i], 0);
+            }
+
+            std::vector<ControlQubitInfo> control_qubits = {
+                ControlQubitInfo(qubits[0], 1)
+            };
+
+            auto gate = new QuantumGateMatrix(target_qubits, &qulacs_matrix, control_qubits);
+            circuit.add_gate(gate);
+            break;
+        }
         case constants::RANDOMUNITARY:
         {
             if (instruction.contains("seed")) {

@@ -406,6 +406,53 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
             break;
         }
+        case constants::CUNITARY:
+        {
+            auto cunqa_matrix = inst.matrix[0];
+            size_t dim = cunqa_matrix.size();
+            size_t ctrl_dim = 2 * dim;
+
+            // Build controlled-U as a CUNQAMatrix, reusing cunqamatrix_to_qsimmatrix
+            CUNQAMatrix ctrl_cunqa_matrix(ctrl_dim,
+                std::vector<std::vector<double>>(ctrl_dim, {0.0, 0.0}));
+
+            // Top-left block: Identity (control = |0>)
+            for (size_t i = 0; i < dim; i++) {
+                ctrl_cunqa_matrix[i][i] = {1.0, 0.0};
+            }
+
+            // Bottom-right block: U (control = |1>)
+            for (size_t i = 0; i < dim; i++) {
+                for (size_t j = 0; j < dim; j++) {
+                    ctrl_cunqa_matrix[dim + i][dim + j] = cunqa_matrix[i][j];
+                }
+            }
+
+            qsim::Matrix<float> ctrl_qsim_matrix = cunqamatrix_to_qsimmatrix(ctrl_cunqa_matrix);
+
+            // Resolve qubits the same way as UNITARY case
+            std::vector<unsigned> unsigned_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            unsigned_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    unsigned_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+
+            // qubits[0] = control, qubits[1] = target
+            // GateMatrix2::Create internally swaps them, consistent with UNITARY case
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(
+                simulator,
+                qsim::GateMatrix2<float>::Create(0, unsigned_qubits[0], unsigned_qubits[1], std::move(ctrl_qsim_matrix)),
+                state);
+            break;
+        }
         case constants::SEND:
         {
             if (allows_qc) {
@@ -766,6 +813,33 @@ void update_qsim_state(const JSON& circuit_json, qsim::SimulatorBasic<qsim::Para
             } else {
                 qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix1<float>::Create(0, qubits[0], std::move(qsim_matrix)), state);
             }
+            break;
+        }
+        case constants::CUNITARY:
+        {
+            auto cunqa_matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()[0];
+            size_t dim = cunqa_matrix.size();
+            size_t ctrl_dim = 2 * dim;
+
+            CUNQAMatrix ctrl_cunqa_matrix(ctrl_dim,
+                std::vector<std::vector<double>>(ctrl_dim, {0.0, 0.0}));
+
+            for (size_t i = 0; i < dim; i++) {
+                ctrl_cunqa_matrix[i][i] = {1.0, 0.0};
+            }
+
+            for (size_t i = 0; i < dim; i++) {
+                for (size_t j = 0; j < dim; j++) {
+                    ctrl_cunqa_matrix[dim + i][dim + j] = cunqa_matrix[i][j]; 
+                }
+            }
+
+            qsim::Matrix<float> ctrl_qsim_matrix = cunqamatrix_to_qsimmatrix(ctrl_cunqa_matrix);
+
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(
+                simulator,
+                qsim::GateMatrix2<float>::Create(0, qubits[0], qubits[1], std::move(ctrl_qsim_matrix)),
+                state);
             break;
         }
         default:
