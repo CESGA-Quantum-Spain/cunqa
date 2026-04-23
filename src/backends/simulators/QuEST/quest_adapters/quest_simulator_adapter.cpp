@@ -112,6 +112,24 @@ std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::st
     return comm_pairs;
 }
 
+std::vector<std::vector<qcomp>> cunqamatrix_to_questmatrix(const CUNQAMatrix& cunqa_matrix)
+{
+    size_t n = cunqa_matrix.size();
+    if (n == 0) return {};
+
+    std::vector<std::vector<qcomp>> quest_mat;
+
+    for (const auto& row : cunqa_matrix) {
+        std::vector<qcomp> complexRow;
+        for (const auto& complex : row) {
+            complexRow.emplace_back(complex[0], complex[1]);
+        }
+        quest_mat.push_back(complexRow);
+    }
+
+    return quest_mat;
+}
+
 std::unordered_map<std::string, std::string> execute_shot_(
     Qureg& qubits_state,
     std::vector<StructuredQuantumTask>& st_qtasks, 
@@ -951,6 +969,28 @@ std::unordered_map<std::string, std::string> execute_shot_(
             std::vector<int> controls(unsigned_qubits.begin(),                        unsigned_qubits.begin() + inst.num_controls + 1);
             std::vector<int> targets(unsigned_qubits.begin() + inst.num_controls + 1, unsigned_qubits.end());
             applyMultiControlledMultiQubitNot(qubits_state, controls, targets);
+            break;
+        }
+        case constants::UNITARY:
+        {
+            auto cunqa_matrix = inst.matrix[0];
+            CompMatr quest_matrix = createCompMatr(inst.qubits.size());
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
+            std::vector<int> int_qubits;
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            int_qubits.push_back(G.communication_pairs[index].q1);
+                            break;
+                        }
+                    }
+                } else {
+                    int_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                }
+            }
+            applyCompMatr(qubits_state, int_qubits, quest_matrix);
             break;
         }
         case constants::SEND:
