@@ -684,11 +684,24 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CIF:
         {
-            // Sum mod 2 of the values provided, if there is only one sum = G.creg[inst.clbits[0] + T.zero_clbit]
-            bool sum = std::accumulate(inst.clbits.begin(), inst.clbits.end(), false,
-                    [&G, &T](int acc, int clbit) { return acc ^ (G.creg[clbit + T.zero_clbit]); });
+            std::unordered_map<std::string, std::function<bool(bool, bool)>> ops{
+                {"and", [](bool a, bool b) { return a & b; }},
+                {"or",  [](bool a, bool b) { return a | b; }},
+                {"xor", [](bool a, bool b) { return a ^ b; }},
+                {"0and", [](bool a, bool b) { return !a & !b; }},
+                {"0or",  [](bool a, bool b) { return !a | !b; }},
+                {"0xor", [](bool a, bool b) { return !a ^ !b; }}
+            };
+            // Operates on the values provided, with the specified operation.
+            // If there is only one value, sum = G.creg[inst.clbits[0] + T.zero_clbit]
+            bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
+                           G.creg[inst.clbits[0] + T.zero_clbit],
+                           [&](bool acc, int clbit) { 
+                               return ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
+                           });
+            result = (static_cast<bool>(inst.condition)) ? result : !result;
 
-            if (static_cast<bool>(inst.condition) == sum) {
+            if (static_cast<bool>(inst.condition) == result) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }

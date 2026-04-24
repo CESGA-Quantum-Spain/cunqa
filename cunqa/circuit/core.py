@@ -713,7 +713,8 @@ class CunqaCircuit:
     def cif(
             self, 
             clbits: Union[int, list[int]],
-            condition: int = 1
+            condition: int = 1,
+            operation: str = "and"
         ) -> ClassicalControlContext:
         """
         Method for implementing a gate conditioned to a classical measurement. The control qubit 
@@ -737,10 +738,18 @@ class CunqaCircuit:
         may be added in future versions if needed.
 
         Args:
-            clbits (int | list[int]): clbits employed as the condition.
+            clbits (int | list[int]): clbits to match the condition.
+            condition (int): can be 1 or 0. The clbits will have to match this condition 
+                             for the gate to be applied. Default = 1
+            operation (str): can be "and", "or" or "xor". If multiple clbits are provided, their 
+                             measures are operated on with the selected operation and the result is
+                             matched to condition. "and" means all need to match the condition, 
+                             "or" means any of them should match and "xor" means there should be an
+                             odd number of mathching measures. 
         """
         self.is_dynamic = True
-        return ClassicalControlContext(self, clbits, condition)
+        operation = "0" + operation if (condition == 0) else operation
+        return ClassicalControlContext(self, clbits, condition, operation)
     
     # ------------------
     # Unitary operations
@@ -2553,7 +2562,7 @@ class CunqaCircuit:
             })
             
 class ClassicalControlContext:
-    def __init__(self, circuit, clbits: Union[int, list[int]], condition: int = 1):
+    def __init__(self, circuit, clbits: Union[int, list[int]], condition: int = 1, operation = "and"):
         self._circuit = circuit
         self._clbits = [clbits] if isinstance(clbits, int) else clbits
         self._condition = condition
