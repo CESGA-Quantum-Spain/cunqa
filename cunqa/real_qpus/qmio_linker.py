@@ -3,6 +3,7 @@ sys.path.append(os.getenv("HOME"))
 
 import zmq
 import json
+import glob
 import psutil
 import socket
 import pickle
@@ -26,6 +27,16 @@ PREFERRED_NETWORK_IFACE = "ib"
 
 def _get_qmio_config(family : str, endpoint : str) -> dict:
     SLURM_JOB_ID = os.getenv("SLURM_JOB_ID") 
+    # Find the most recent calibration file
+    CALIBRATION_FILES_PATH = "/opt/cesga/qmio/hpc/calibrations"
+    calibration_files = glob.glob(os.path.join(CALIBRATION_FILES_PATH, "????_??_??__??_??_??.json"))
+    
+    if not calibration_files:
+        raise FileNotFoundError("No calibration files found")
+    
+    last_calibration_file = max(calibration_files, key=os.path.getctime)
+    logger.debug(f"Using latest calibration file: {last_calibration_file}")
+    
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
@@ -36,7 +47,7 @@ def _get_qmio_config(family : str, endpoint : str) -> dict:
                         [18,19],[20,19],[22,21],[22,31],[23,20],[23,30],[24,17],[24,27],
                         [25,16],[25,26],[26,27],[28,27],[28,29],[30,29],[30,31]],
         "basis_gates":["sx", "x", "rz", "ecr"],
-        "noise":"",
+        "noise_properties_path":last_calibration_file,
     }
 
     qmio_config_json = {
