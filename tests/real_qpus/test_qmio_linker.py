@@ -3,7 +3,7 @@ import pickle
 import socket
 import json
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -23,7 +23,15 @@ os.environ.setdefault("ZMQ_SERVER", "tcp://127.0.0.1:5555")
 # -----------------------
 
 def test_get_qmio_config_contains_family_endpoint_and_backend():
-    cfg = qmio_linked_mod._get_qmio_config("famA", "tcp://1.2.3.4:7777")
+    fake_files = [
+        "/opt/cesga/qmio/hpc/calibrations/2024_01_01__00_00_00.json",
+        "/opt/cesga/qmio/hpc/calibrations/2024_06_15__12_30_00.json",
+    ]
+
+    with patch("cunqa.real_qpus.qmio_linker.glob.glob", return_value=fake_files), \
+        patch("cunqa.real_qpus.qmio_linker.os.path.getctime", side_effect=lambda f: fake_files.index(f)):
+        cfg = qmio_linked_mod._get_qmio_config("famA", "tcp://1.2.3.4:7777")
+
     assert isinstance(cfg, dict)
     assert cfg["family"] == "famA"
     assert cfg["net"]["endpoint"] == "tcp://1.2.3.4:7777"
