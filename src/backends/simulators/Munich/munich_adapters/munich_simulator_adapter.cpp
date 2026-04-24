@@ -414,14 +414,15 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
                 {"and", [](bool a, bool b) { return a & b; }},
                 {"or",  [](bool a, bool b) { return a | b; }},
                 {"xor", [](bool a, bool b) { return a ^ b; }},
-                {"0and", [](bool a, bool b) { return !a & !b; }},
-                {"0or",  [](bool a, bool b) { return !a | !b; }},
-                {"0xor", [](bool a, bool b) { return !a ^ !b; }}
+                {"0and", [](bool a, bool b) { return a & !b; }},
+                {"0or",  [](bool a, bool b) { return a | !b; }},
+                {"0xor", [](bool a, bool b) { return a ^ !b; }}
             };
+            bool init = (static_cast<bool>(inst.condition)) ? G.creg[inst.clbits[0] + T.zero_clbit] : !G.creg[inst.clbits[0] + T.zero_clbit];
             // Operates on the values provided, with the specified operation.
             // If there is only one value, sum = G.creg[inst.clbits[0] + T.zero_clbit]
             bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
-                           G.creg[inst.clbits[0] + T.zero_clbit],
+                           init,
                            [&](bool acc, int clbit) { 
                                return ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
                            });

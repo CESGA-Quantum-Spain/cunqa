@@ -749,7 +749,7 @@ class CunqaCircuit:
         """
         self.is_dynamic = True
         operation = "0" + operation if (condition == 0) else operation
-        return ClassicalControlContext(self, clbits, condition, operation)
+        return ClassicalControlContext(self, clbits, operation, condition)
     
     # ------------------
     # Unitary operations
@@ -2562,10 +2562,11 @@ class CunqaCircuit:
             })
             
 class ClassicalControlContext:
-    def __init__(self, circuit, clbits: Union[int, list[int]], condition: int = 1, operation = "and"):
+    def __init__(self, circuit, clbits: Union[int, list[int]], operation, condition: int = 1):
         self._circuit = circuit
         self._clbits = [clbits] if isinstance(clbits, int) else clbits
         self._condition = condition
+        self._operation = operation
     
     def __enter__(self):
         self._subcircuit = CunqaCircuit(self._circuit.num_qubits)
@@ -2583,7 +2584,8 @@ class ClassicalControlContext:
             "name": "cif",
             "clbits": self._clbits,
             "instructions": instructions,
-            "condition": self._condition
+            "condition": self._condition,
+            "operation": self._operation
         }
         self._circuit.add_instructions(cif)
  
