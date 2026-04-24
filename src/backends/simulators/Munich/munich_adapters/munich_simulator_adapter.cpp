@@ -410,7 +410,11 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         }
         case constants::CIF:
         {
-            if ((bool)inst.condition == G.creg[inst.clbits[0] + T.zero_clbit]) {
+            // Sum mod 2 of the values provided, if there is only one sum = G.creg[inst.clbits[0] + T.zero_clbit]
+            bool sum = std::accumulate(inst.clbits.begin(), inst.clbits.end(), false,
+                    [&G, &T](int acc, int clbit) { return acc ^ (G.creg[clbit + T.zero_clbit]); });
+
+            if (static_cast<bool>(inst.condition) == sum) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }

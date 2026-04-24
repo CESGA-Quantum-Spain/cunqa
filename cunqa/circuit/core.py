@@ -2555,7 +2555,7 @@ class CunqaCircuit:
 class ClassicalControlContext:
     def __init__(self, circuit, clbits: Union[int, list[int]], condition: int = 1):
         self._circuit = circuit
-        self._clbits = clbits
+        self._clbits = [clbits] if isinstance(clbits, int) else clbits
         self._condition = condition
     
     def __enter__(self):
@@ -2572,7 +2572,7 @@ class ClassicalControlContext:
 
         cif = {
             "name": "cif",
-            "clbits": [self._clbits],
+            "clbits": self._clbits,
             "instructions": instructions,
             "condition": self._condition
         }
