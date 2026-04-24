@@ -213,18 +213,21 @@ std::unordered_map<std::string, std::string> execute_shot_(
         case constants::CY:
         case constants::CZ:
         {
-            int control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<int> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            executor.apply_gate(inst.name, {control, inst.qubits[1] + T.zero_qubit});
+            }
+            executor.apply_gate(inst.name, {tmp_qubits[0], tmp_qubits[1]});
             break;
         }
         case constants::ECR:
@@ -243,18 +246,21 @@ std::unordered_map<std::string, std::string> execute_shot_(
         case constants::CRZ:
         {
             Params params = inst.params;
-            int control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<int> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            executor.apply_parametric_gate(inst.name, {control, inst.qubits[1] + T.zero_qubit}, params);
+            }
+            executor.apply_parametric_gate(inst.name, {tmp_qubits[0], tmp_qubits[1]}, params);
             break;
         }
         case constants::SWAP:
