@@ -308,36 +308,40 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CX:
         {
-            int control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<int> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCNot<float>::Create(0, control, inst.qubits[1] + T.zero_qubit), state);
+                }
+            }
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCNot<float>::Create(0, tmp_qubits[0], tmp_qubits[1]), state);
             break;
         }
         case constants::CZ:
         {
-            int control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<int> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCZ<float>::Create(0, control, inst.qubits[1] + T.zero_qubit), state);
+                }
+            }
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCZ<float>::Create(0, tmp_qubits[0], tmp_qubits[1]), state);
             break;
         }
         case constants::SWAP:
@@ -352,19 +356,21 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CP:
         {
-            int control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<int> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, control, inst.qubits[1] + T.zero_qubit, inst.params[0]), state);
+                }
+            }
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, tmp_qubits[0], tmp_qubits[1], inst.params[0]), state);
             break;
         }
         case constants::RXY:

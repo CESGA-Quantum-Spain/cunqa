@@ -342,34 +342,40 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CX:
         {
-            UINT control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<UINT> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            gate::CNOT(control, inst.qubits[1] + T.zero_qubit)->update_quantum_state(&state);
+            }
+            gate::CNOT(tmp_qubits[0], tmp_qubits[1])->update_quantum_state(&state);
             break;
         }
         case constants::CZ:
         {
-            UINT control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<UINT> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            gate::CZ(control, inst.qubits[1] + T.zero_qubit)->update_quantum_state(&state);
+            }
+            gate::CZ(tmp_qubits[0], tmp_qubits[1])->update_quantum_state(&state);
             break;
         }
         case constants::ECR:

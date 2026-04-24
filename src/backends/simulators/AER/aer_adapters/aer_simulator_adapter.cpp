@@ -238,123 +238,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_u(inst.qubits[0] + T.zero_qubit, inst.params[0], inst.params[1], inst.params[2]);
             break;
         }
-        case constants::CX:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcx({control, inst.qubits[1] + T.zero_qubit});
-            break;
-        }
-        case constants::CY:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcy({control, inst.qubits[1] + T.zero_qubit});
-            break;
-        }
-        case constants::CZ:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcz({control, inst.qubits[1] + T.zero_qubit});
-            break;
-        }
-        case constants::CRX:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcrx({control, inst.qubits[1] + T.zero_qubit}, inst.params[0]);
-            break;
-        }
-        case constants::CRY:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcry({control, inst.qubits[1] + T.zero_qubit}, inst.params[0]);
-            break;
-        }
-        case constants::CRZ:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_mcrz({control, inst.qubits[1] + T.zero_qubit}, inst.params[0]);
-            break;
-        }
-        case constants::CU:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            } 
-            state->apply_cu({control, inst.qubits[1] + T.zero_qubit}, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
-            break;
-        }
         case constants::SWAP:
         {
             state->apply_mcswap({inst.qubits[0] + T.zero_qubit, inst.qubits[1] + T.zero_qubit});
             break;
         }
+        case constants::CX:
         case constants::MCX:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -373,6 +262,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcx(unsigned_qubits);
             break;
         }
+        case constants::CY:
         case constants::MCY:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -391,6 +281,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcy(unsigned_qubits);
             break;
         }
+        case constants::CZ:
         case constants::MCZ:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -409,6 +300,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcz(unsigned_qubits);
             break;
         }
+        case constants::CSX:
         case constants::MCSX:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -427,6 +319,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcsx(unsigned_qubits);
             break;
         }
+        case constants::CP:
         case constants::MCP:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -445,6 +338,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcphase(unsigned_qubits, inst.params[0]);
             break;
         }
+        case constants::CRX:
         case constants::MCRX:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -463,6 +357,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcrx(unsigned_qubits, inst.params[0]);
             break;
         }
+        case constants::CRY:
         case constants::MCRY:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -481,6 +376,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcry(unsigned_qubits, inst.params[0]);
             break;
         }
+        case constants::CRZ:
         case constants::MCRZ:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -499,6 +395,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcrz(unsigned_qubits, inst.params[0]);
             break;
         }
+        case constants::CU:
         case constants::MCU:
         {
             reg_t unsigned_qubits(inst.qubits.size());
@@ -517,6 +414,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             state->apply_mcu(unsigned_qubits, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
             break;
         }
+        case constants::CSWAP:
         case constants::MCSWAP:
         {
             reg_t unsigned_qubits(inst.qubits.size());

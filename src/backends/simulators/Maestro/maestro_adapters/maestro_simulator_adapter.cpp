@@ -252,177 +252,9 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CX:
         {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCX(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::CY:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCY(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::CZ:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCZ(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::CH:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCH(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::CSX:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCSX(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::CSXDG:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCSXDG(simulator, control, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::SWAP:
-        {
-            ApplySwap(simulator, inst.qubits[0] + T.zero_qubit, inst.qubits[1] + T.zero_qubit);
-            break;
-        }
-        case constants::ECR:
-            // TODO
-            break;
-        case constants::CP:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCP(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
-            break;
-        }
-        case constants::CRX:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCRx(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
-            break;
-        }
-        case constants::CRY:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCRy(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
-            break;
-        }
-        case constants::CRZ:
-        {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
-                    }
-                }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
-            }
-            ApplyCRz(simulator, control, inst.qubits[1] + T.zero_qubit, inst.params[0]);
-            break;
-        }
-        case constants::CCX:
-        {
-            std::vector<int> tmp_qubits(inst.qubits.size());
-            for (int i = 0; i < inst.qubits.size(); i++) {
-                if (inst.qubits[0] < 0) {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
                     for (auto& index : comm_indices) {
                         if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
                             tmp_qubits[i] = G.communication_pairs[index].q1;
@@ -433,39 +265,228 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
             }
-            ApplyCCX(simulator, tmp_qubits[0], tmp_qubits[1], tmp_qubits[2]);
+            ApplyCX(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::CY:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCY(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::CZ:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCZ(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::CH:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCH(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::CSX:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCSX(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::CSXDG:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCSXDG(simulator, tmp_qubits[0], tmp_qubits[1]);
+            break;
+        }
+        case constants::SWAP:
+        {
+            ApplySwap(simulator, inst.qubits[0] + T.zero_qubit, inst.qubits[1] + T.zero_qubit);
+            break;
+        }
+        case constants::CP:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCP(simulator, tmp_qubits[0], tmp_qubits[1], inst.params[0]);
+            break;
+        }
+        case constants::CRX:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCRx(simulator, tmp_qubits[0], tmp_qubits[1], inst.params[0]);
+            break;
+        }
+        case constants::CRY:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCRy(simulator, tmp_qubits[0], tmp_qubits[1], inst.params[0]);
+            break;
+        }
+        case constants::CRZ:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCRz(simulator, tmp_qubits[0], tmp_qubits[1], inst.params[0]);
+            break;
+        }
+        case constants::CCX:
+        {
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
+                    }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
+                }
+            }
+            ApplyCP(simulator, tmp_qubits[0], tmp_qubits[1], tmp_qubits[2]);
             break;
         }
         case constants::CSWAP:
         {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
             }
-            ApplyCSwap(simulator, control, inst.qubits[1] + T.zero_qubit, inst.qubits[2] + T.zero_qubit);
+            ApplyCSwap(simulator, tmp_qubits[0], tmp_qubits[1], tmp_qubits[2]);
             break;
         }
         case constants::CU:
         {
-            unsigned long control;
-            if (inst.qubits[0] < 0) {
-                for (auto& index : comm_indices) {
-                    if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[0]) {
-                        control = G.communication_pairs[index].q1;
-                        break;
+            std::vector<unsigned long> tmp_qubits(inst.qubits.size());
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            tmp_qubits[i] = G.communication_pairs[index].q1;
+                            break;
+                        }
                     }
+                } else {
+                    tmp_qubits[i] = inst.qubits[i] + T.zero_qubit;
                 }
-            } else {
-                control = inst.qubits[0] + T.zero_qubit;
             }
-            ApplyCU(simulator, control, inst.qubits[0] + T.zero_qubit, inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
+            ApplyCU(simulator, tmp_qubits[0], tmp_qubits[1], inst.params[0], inst.params[1], inst.params[2], inst.params[3]);
             break;
         }
         case constants::RESET:
