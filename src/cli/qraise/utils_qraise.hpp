@@ -48,12 +48,7 @@ bool exists_family_name(const std::string& family, const std::string& info_path)
     }
 }
 
-void remove_tmp_files(const std::string filepath = "")
+void remove_tmp_files(const std::string filepath)
 {
-    if (!filepath.empty()) {
-        std::string rmv_cmd = "rm " + filepath;
-        std::system(rmv_cmd.c_str());
-    } else {
-        std::system("rm qraise_sbatch_tmp.sbatch");
-    }
+    fs::remove(filepath);
 }

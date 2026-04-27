@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     } catch (const std::exception& e) {
         sbatchFile.close();
         LOGGER_ERROR("Error writing the sbatch file. Aborting. {}", e.what());
-        remove_tmp_files();
+        remove_tmp_files(tmp_filepath);
         return 1;
     }
     sbatchFile.close();

@@ -62,7 +62,6 @@ std::string generate_noise_instructions(const JSON& back_path_json, const std::s
                                    + family + " "s
                                    + back_path_json.at("fakeqmio").get<std::string>());
                                    
-    LOGGER_DEBUG("Command: {}", command);
     std::system(command.c_str());
     return "";
 }
