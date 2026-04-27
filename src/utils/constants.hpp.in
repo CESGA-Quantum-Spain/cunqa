@@ -71,6 +71,7 @@ struct CUNQAInstruction {
   std::vector<CUNQAInstruction> instructions = {}; 
   std::vector<CUNQAMatrix> matrix = {}; 
   std::vector<CUNQADiagonalMatrix> diagonal = {}; 
+  std::optional<std::vector<int>> states = {};
   std::vector<int> l_clbits = {};
   std::vector<int> r_clbits = {};
   std::vector<unsigned int> block_size = {};
@@ -635,6 +636,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .name = instruction_name,
                 .qubits = instruction.at("qubits").get<std::vector<int>>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case FUSEDSWAP:
@@ -656,6 +660,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .params = instruction.at("params").get<std::vector<double>>(),
                 .axis = instruction.at("axis").get<std::vector<double>>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case PAULISTR:
@@ -667,6 +674,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .qubits = instruction.at("qubits").get<std::vector<int>>(),
                 .paulistr = instruction.at("paulistr").get<std::string>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case PAULIGADGET:
@@ -680,6 +690,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .params = instruction.at("parmas").get<std::vector<double>>(),
                 .paulistr = instruction.at("paulistr").get<std::string>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case MCMX:
@@ -689,6 +702,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .qubits = instruction.at("qubits").get<std::vector<int>>(),
                 .num_controls = instruction.at("num_controls").get<int>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case MCPHASEGADGET:
@@ -699,6 +715,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .params = instruction.at("parmas").get<std::vector<double>>(),
                 .num_controls = instruction.at("num_controls").get<int>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case RX:
@@ -751,6 +770,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .qubits = instruction.at("qubits").get<std::vector<int>>(), 
                 .params = instruction.at("params").get<std::vector<double>>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case MULTIPAULI:
@@ -781,6 +803,9 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .qubits = instruction.at("qubits").get<std::vector<int>>(), 
                 .matrix = instruction.at("matrix").get<std::vector<CUNQAMatrix>>()
             };
+            if (instruction.contains("states")) {
+                cunqa_instruction.states = instruction.at("states").get<std::vector<int>>();
+            }
             break;
         }
         case DIAGONAL:

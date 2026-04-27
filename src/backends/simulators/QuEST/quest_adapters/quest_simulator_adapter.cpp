@@ -329,8 +329,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledPauliX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledPauliX(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledPauliX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CY:
@@ -348,8 +352,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledPauliY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledPauliY(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledPauliY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CZ:
@@ -367,8 +375,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledPauliZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledPauliZ(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledPauliZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CH:
@@ -386,8 +398,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledHadamard(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledHadamard(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledHadamard(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CS:
@@ -405,8 +421,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledS(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledS(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledS(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CT:
@@ -424,8 +444,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledT(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledT(qubits_state, control, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyControlledT(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back());
+            }
             break;
         }
         case constants::CP:
@@ -462,8 +486,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledRotateX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledRotateX(qubits_state, control, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyControlledRotateX(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::CRY:
@@ -481,8 +509,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledRotateY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledRotateY(qubits_state, control, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyControlledRotateY(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::CRZ:
@@ -500,8 +532,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledRotateZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledRotateZ(qubits_state, control, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyControlledRotateZ(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::CRAXIS:
@@ -519,8 +555,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-
-            applyControlledRotateAroundAxis(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledRotateAroundAxis(qubits_state, control, inst.states.value(), unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            } else {
+                applyControlledRotateAroundAxis(qubits_state, *unsigned_qubits.begin(), unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            }
             break;
         }
         // Several qubits
@@ -539,7 +579,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-            applyControlledSwap(qubits_state, unsigned_qubits[0], unsigned_qubits[1], unsigned_qubits[2]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledSwap(qubits_state, control, inst.states.value(), unsigned_qubits[1], unsigned_qubits[2]);
+            } else {
+                applyControlledSwap(qubits_state, unsigned_qubits[0], unsigned_qubits[1], unsigned_qubits[2]);
+            }
             break;
         }
         case constants::CSQRTSWAP:
@@ -557,7 +602,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-            applyControlledSqrtSwap(qubits_state, unsigned_qubits[0], unsigned_qubits[1], unsigned_qubits[2]);
+            if (inst.states){
+                std::vector<int> control = {*unsigned_qubits.begin()};
+                applyMultiStateControlledSwap(qubits_state, control, inst.states.value(), unsigned_qubits[1], unsigned_qubits[2]);
+            } else {
+                applyControlledSqrtSwap(qubits_state, unsigned_qubits[0], unsigned_qubits[1], unsigned_qubits[2]);
+            }
             break;
         }
         case constants::PAULISTR:
@@ -594,19 +644,34 @@ std::unordered_map<std::string, std::string> execute_shot_(
             break;
         }
         case constants::CPAULISTR:
-        {
-            applyControlledPauliStr(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr));
+        {   
+            if (inst.states){
+                std::vector<int> control = {inst.qubits[0]};
+                applyMultiStateControlledPauliStr(qubits_state, control, inst.states.value(), getPauliStr(inst.paulistr));
+            } else {
+                applyControlledPauliStr(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr));
+            }
             break;
         }
         case constants::CPAULIGADGET:
-        {
-            applyControlledPauliGadget(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr), inst.params[0]);
+        {   
+            if (inst.states){
+                std::vector<int> control = {inst.qubits[0]};
+                applyMultiStateControlledPauliGadget(qubits_state, control, inst.states.value(), getPauliStr(inst.paulistr), inst.params[0]);
+            } else {
+                applyControlledPauliGadget(qubits_state, inst.qubits[0], getPauliStr(inst.paulistr), inst.params[0]);
+            }
             break;
         }
         case constants::CPHASEGADGET:
         {
             std::vector<int> targets(inst.qubits.begin() + 1, inst.qubits.end());
-            applyControlledPhaseGadget(qubits_state, inst.qubits[0], targets, inst.params[0]);
+            if (inst.states){
+                std::vector<int> control = {inst.qubits[0]};
+                applyMultiStateControlledPhaseGadget(qubits_state, control, inst.states.value(), targets, inst.params[0]);
+            } else {
+                applyControlledPhaseGadget(qubits_state, inst.qubits[0], targets, inst.params[0]);
+            }
             break;
         }
         //Multicontrolled
@@ -626,7 +691,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledPauliX(qubits_state, controls, unsigned_qubits.back());
+            if (inst.states){
+                applyMultiStateControlledPauliX(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledPauliX(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCY:
@@ -645,7 +714,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledPauliY(qubits_state, controls, unsigned_qubits.back());
+            if (inst.states){
+                applyMultiStateControlledPauliY(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledPauliY(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCZ:
@@ -664,7 +737,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledPauliZ(qubits_state, controls, unsigned_qubits.back());
+            if (inst.states){
+                applyMultiStateControlledPauliZ(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledPauliZ(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCH:
@@ -683,7 +760,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledHadamard(qubits_state, controls, unsigned_qubits.back());
+            if (inst.states){
+                applyMultiStateControlledHadamard(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledHadamard(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCS:
@@ -702,7 +783,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledS(qubits_state, controls, inst.qubits.back());
+            if (inst.states){
+                applyMultiStateControlledS(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledS(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCT:
@@ -721,7 +806,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledT(qubits_state, controls, inst.qubits.back());
+            if (inst.states){
+                applyMultiStateControlledT(qubits_state, controls, inst.states.value(), unsigned_qubits.back());
+            } else {
+                applyMultiControlledT(qubits_state, controls, unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCP:
@@ -759,7 +848,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledRotateX(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                applyMultiStateControlledRotateX(qubits_state, controls, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyMultiControlledRotateX(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::MCRY:
@@ -778,7 +871,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledRotateY(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                applyMultiStateControlledRotateY(qubits_state, controls, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyMultiControlledRotateY(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::MCRZ:
@@ -797,7 +894,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledRotateZ(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            if (inst.states){
+                applyMultiStateControlledRotateZ(qubits_state, controls, inst.states.value(), unsigned_qubits.back(), inst.params[0]);
+            } else {
+                applyMultiControlledRotateZ(qubits_state, controls, unsigned_qubits.back(), inst.params[0]);
+            }
             break;
         }
         case constants::MCRAXIS:
@@ -816,7 +917,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-1);
-            applyMultiControlledRotateAroundAxis(qubits_state, controls, unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            if (inst.states){
+                applyMultiStateControlledRotateAroundAxis(qubits_state, controls, inst.states.value(), unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            } else {
+                applyMultiControlledRotateAroundAxis(qubits_state, controls, unsigned_qubits.back(), inst.params[0], inst.axis[0], inst.axis[1], inst.axis[2]);
+            }
             break;
         }
         case constants::MCSWAP:
@@ -835,7 +940,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-2);
-            applyMultiControlledSwap(qubits_state, controls, *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            if (inst.states){
+                applyMultiStateControlledSwap(qubits_state, controls, inst.states.value(), *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            } else {
+                applyMultiControlledSwap(qubits_state, controls, *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCSQRTSWAP:
@@ -854,7 +963,13 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> controls(unsigned_qubits.begin(), unsigned_qubits.end()-2);
-            applyMultiControlledSqrtSwap(qubits_state, controls, *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            if (inst.states){
+                // Using different arg types due to bug on overloaded function
+                std::vector<int> states = inst.states.value();
+                applyMultiStateControlledSqrtSwap(qubits_state, controls.data(), states.data(), controls.size(), *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            } else {
+                applyMultiControlledSqrtSwap(qubits_state, controls, *(unsigned_qubits.end()-2), unsigned_qubits.back());
+            }
             break;
         }
         case constants::MCPAULISTR:
@@ -872,7 +987,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-            applyMultiControlledPauliStr(qubits_state, unsigned_qubits, getPauliStr(inst.paulistr));
+            if (inst.states){
+                applyMultiStateControlledPauliStr(qubits_state, unsigned_qubits, inst.states.value(), getPauliStr(inst.paulistr));
+            } else {
+                applyMultiControlledPauliStr(qubits_state, unsigned_qubits, getPauliStr(inst.paulistr));
+            }
             break;
         }
         case constants::MCPAULIGADGET:
@@ -890,7 +1009,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     unsigned_qubits.push_back(inst.qubits[i] + T.zero_qubit);
                 }
             }
-            applyMultiControlledPauliGadget(qubits_state, unsigned_qubits, getPauliStr(inst.paulistr), inst.params[0]);
+            if (inst.states){
+                applyMultiStateControlledPauliGadget(qubits_state, unsigned_qubits, inst.states.value(), getPauliStr(inst.paulistr), inst.params[0]);
+            } else {
+                applyMultiControlledPauliGadget(qubits_state, unsigned_qubits, getPauliStr(inst.paulistr), inst.params[0]);
+            }
             break;
         }
         case constants::MCPHASEGADGET:
@@ -910,7 +1033,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
             std::vector<int> controls(unsigned_qubits.begin(),                        unsigned_qubits.begin() + inst.num_controls + 1);
             std::vector<int> targets(unsigned_qubits.begin() + inst.num_controls + 1, unsigned_qubits.end());
-            applyMultiControlledPhaseGadget(qubits_state, controls, targets, inst.params[0]);
+            if (inst.states){
+                applyMultiStateControlledPhaseGadget(qubits_state, controls, inst.states.value(), targets, inst.params[0]);
+            } else {
+                applyMultiControlledPhaseGadget(qubits_state, controls, targets, inst.params[0]);
+            }
             break;
         }
         // --- Multi-qubit X ---
@@ -948,7 +1075,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> targets(unsigned_qubits.begin()+1, unsigned_qubits.end());
-            applyControlledMultiQubitNot(qubits_state, unsigned_qubits[0], targets);
+            std::vector<int> control = {unsigned_qubits[0]};
+            if (inst.states){
+                applyMultiStateControlledMultiQubitNot(qubits_state, control, inst.states.value(), targets);
+            } else {
+                applyControlledMultiQubitNot(qubits_state, unsigned_qubits[0], targets);
+            }
             break;
         }
         case constants::MCMX:
@@ -968,7 +1100,11 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
             std::vector<int> controls(unsigned_qubits.begin(),                        unsigned_qubits.begin() + inst.num_controls + 1);
             std::vector<int> targets(unsigned_qubits.begin() + inst.num_controls + 1, unsigned_qubits.end());
-            applyMultiControlledMultiQubitNot(qubits_state, controls, targets);
+            if (inst.states){
+                applyMultiStateControlledMultiQubitNot(qubits_state, controls, inst.states.value(), targets);
+            } else {
+                applyMultiControlledMultiQubitNot(qubits_state, controls, targets);
+            }
             break;
         }
         case constants::UNITARY:
@@ -1013,7 +1149,12 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 }
             }
             std::vector<int> targets(int_qubits.begin() + 1, int_qubits.end());
-            applyControlledCompMatr(qubits_state, int_qubits[0], targets, quest_matrix);
+            if (inst.states){
+                std::vector<int> control = {int_qubits[0]};
+                applyMultiStateControlledCompMatr(qubits_state, control, inst.states.value(), targets, quest_matrix);
+            } else {
+                applyControlledCompMatr(qubits_state, int_qubits[0], targets, quest_matrix);
+            }
             break;
         }
         case constants::SEND:
