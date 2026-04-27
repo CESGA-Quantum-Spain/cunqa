@@ -748,7 +748,7 @@ class CunqaCircuit:
                              odd number of mathching measures. 
         """
         self.is_dynamic = True
-        operation = "n" + operation if (condition == 0) else operation
+        operation = (operation + "n") if (condition == 0) else operation
         return ClassicalControlContext(self, clbits, operation, condition)
     
     # ------------------

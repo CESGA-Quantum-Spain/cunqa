@@ -1042,7 +1042,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
                            init,
                            [&](bool acc, int clbit) { 
-                               return constants::boolean_ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
+                               return constants::cif_ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
                            });
             result = (static_cast<bool>(inst.condition)) ? result : !result;
 
