@@ -993,6 +993,29 @@ std::unordered_map<std::string, std::string> execute_shot_(
             applyCompMatr(qubits_state, int_qubits, quest_matrix);
             break;
         }
+        case constants::CUNITARY:
+        {
+            auto cunqa_matrix = inst.matrix[0];
+            CompMatr quest_matrix = createCompMatr(inst.qubits.size() - 1);
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
+            std::vector<int> int_qubits;
+            for (size_t i = 0; i < inst.qubits.size(); i++) {
+                if (inst.qubits[i] < 0) {
+                    for (auto& index : comm_indices) {
+                        if (!G.communication_pairs[index].idle && G.communication_pairs[index].label == inst.qubits[i]) {
+                            int_qubits.push_back(G.communication_pairs[index].q1);
+                            break;
+                        }
+                    }
+                } else {
+                    int_qubits.push_back(inst.qubits[i] + T.zero_qubit);
+                }
+            }
+            std::vector<int> targets(int_qubits.begin() + 1, int_qubits.end());
+            applyControlledCompMatr(qubits_state, int_qubits[0], targets, quest_matrix);
+            break;
+        }
         case constants::SEND:
         {
             if (allows_qc) {
