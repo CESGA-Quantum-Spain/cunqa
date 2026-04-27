@@ -311,7 +311,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CIF:
         {
-            if ((bool)inst.condition == G.creg[inst.clbits[0] + T.zero_clbit]) {
+            bool init = (static_cast<bool>(inst.condition)) ? G.creg[inst.clbits[0] + T.zero_clbit] : !G.creg[inst.clbits[0] + T.zero_clbit];
+            // Operates on the values provided, with the specified operation.
+            // If there is only one value, sum = G.creg[inst.clbits[0] + T.zero_clbit]
+            bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
+                           init,
+                           [&](bool acc, int clbit) { 
+                               return constants::cif_ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
+                           });
+            result = (static_cast<bool>(inst.condition)) ? result : !result;
+
+            if (static_cast<bool>(inst.condition) == result) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }

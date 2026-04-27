@@ -117,7 +117,6 @@ std::vector<int> find_my_communication_pairs(const GlobalState& G, const std::st
     return comm_pairs;
 }
 
-
 std::unordered_map<std::string, std::string> execute_shot_(
     AER::AerState* state, 
     std::vector<StructuredQuantumTask>& st_qtasks,
@@ -582,7 +581,17 @@ std::unordered_map<std::string, std::string> execute_shot_(
         }
         case constants::CIF:
         {
-            if ((bool)inst.condition == G.creg[inst.clbits[0] + T.zero_clbit]) {
+            bool init = (static_cast<bool>(inst.condition)) ? G.creg[inst.clbits[0] + T.zero_clbit] : !G.creg[inst.clbits[0] + T.zero_clbit];
+            // Applies the specified operation to the sequence of bits provided
+            // If there is only one value, result = G.creg[inst.clbits[0] + T.zero_clbit] when checking inst.condition == result
+            bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
+                           init,
+                           [&](bool acc, int clbit) { 
+                               return constants::cif_ops[inst.operation](acc, G.creg[clbit + T.zero_clbit]); 
+                           });
+            result = (static_cast<bool>(inst.condition)) ? result : !result;
+
+            if (static_cast<bool>(inst.condition) == result) {
                 for(const auto& sub_inst: inst.instructions) {
                     apply_next_instr(T, sub_inst, {});
                 }

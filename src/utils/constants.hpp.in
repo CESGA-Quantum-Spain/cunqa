@@ -52,6 +52,15 @@ using CUNQARow = std::vector<CUNQAComplex>;
 using CUNQAMatrix = std::vector<CUNQARow>;
 using CUNQAComplexVector = std::vector<std::complex<double>>;
 
+inline std::unordered_map<std::string, std::function<bool(bool, bool)>> cif_ops{
+    {"and",  [](bool a, bool b) { return a & b; }},
+    {"or",   [](bool a, bool b) { return a | b; }},
+    {"xor",  [](bool a, bool b) { return a ^ b; }},
+    {"andn", [](bool a, bool b) { return a & !b; }},
+    {"orn",  [](bool a, bool b) { return a | !b; }},
+    {"xorn", [](bool a, bool b) { return a ^ !b; }}
+};
+
 struct CUNQAInstruction {
   std::string name;
   std::vector<int> qubits = {};
@@ -66,7 +75,8 @@ struct CUNQAInstruction {
   std::vector<int> r_clbits = {};
   std::vector<unsigned int> block_size = {};
   std::vector<unsigned int> pauli_id_list = {};
-  std::string paulistr{};
+  std::string paulistr;
+  std::string operation;
   int seed = 0;
   int condition = 1;
   int num_controls = 0;
@@ -833,6 +843,7 @@ inline std::vector<CUNQAInstruction> from_json_instructions_to_cunqainstructions
                 .name = instruction_name,
                 .clbits = instruction.at("clbits").get<std::vector<int>>(), 
                 .instructions = from_json_instructions_to_cunqainstructions(instruction.at("instructions").get<cunqa::JSON>()),
+                .operation = instruction.at("operation").get<std::string>(),
                 .condition = instruction.at("condition").get<int>()
             };
             break;
