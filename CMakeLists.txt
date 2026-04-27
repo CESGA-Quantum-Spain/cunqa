@@ -259,7 +259,7 @@ install(DIRECTORY "${pyzmq_SOURCE_DIR}/zmq/" DESTINATION "${CMAKE_INSTALL_PREFIX
 install(TARGETS "_zmq" DESTINATION "${CMAKE_INSTALL_PREFIX}/zmq/backend/cython")
 
 # =====================================================================
-#  SPDLOG - logging backend
+#  SPDLOG - logging backend 
 # =====================================================================
 set(SPDLOG_SYSTEM_INCLUDES OFF   CACHE BOOL "Disable libsodium"          FORCE)
 set(SPDLOG_BUILD_SHARED ON       CACHE BOOL "Build shared library"       FORCE)

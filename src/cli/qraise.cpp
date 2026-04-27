@@ -29,7 +29,9 @@ int main(int argc, char* argv[])
 {
     auto args = argparse::parse<CunqaArgs>(argc, argv, true); //true ensures an error is raised if we feed qraise an unrecognized flag
 
-    std::ofstream sbatchFile("qraise_sbatch_tmp.sbatch");
+    pid_t pid = getpid();
+    std::string tmp_filepath = "qraise_sbatch_tmp_" + std::to_string(pid) + ".sbatch"; 
+    std::ofstream sbatchFile(tmp_filepath);
     try {
         if (args.infrastructure.has_value()) {
             write_infrastructure_sbatch(sbatchFile, args);
@@ -53,8 +55,9 @@ int main(int argc, char* argv[])
     sbatchFile.close();
 
     // Executing and deleting the file
-    auto sbatch_result = std::system("sbatch --parsable qraise_sbatch_tmp.sbatch");
-    remove_tmp_files();
+    std::string sbatch_cmd = "sbatch --parsable " + tmp_filepath;
+    auto sbatch_result = std::system(sbatch_cmd.c_str());
+    remove_tmp_files(tmp_filepath);
     
     
     return sbatch_result;
