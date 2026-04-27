@@ -693,8 +693,8 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 {"0xor", [](bool a, bool b) { return a ^ !b; }}
             };
             bool init = (static_cast<bool>(inst.condition)) ? G.creg[inst.clbits[0] + T.zero_clbit] : !G.creg[inst.clbits[0] + T.zero_clbit];
-            // Operates on the values provided, with the specified operation.
-            // If there is only one value, sum = G.creg[inst.clbits[0] + T.zero_clbit]
+            // Applies the specified operation to the sequence of bits provided
+            // If there is only one value, result = G.creg[inst.clbits[0] + T.zero_clbit] when checking inst.condition == result
             bool result = std::accumulate(inst.clbits.begin() + 1, inst.clbits.end(), 
                            init,
                            [&](bool acc, int clbit) { 
