@@ -479,7 +479,7 @@ measurement in the given classical bits.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.cif">
-<span class="sig-name descname"><span class="pre">cif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cif" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clbits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'and'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.cif" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Method for implementing a gate conditioned to a classical measurement. The control qubit
 provided is measured, if it’s 1 the gate provided is applied to the given qubits. In order
 to do this,  <code class="docutils literal notranslate"><span class="pre">cif</span></code> context manager is introduced, which enables a more expressive and
@@ -500,8 +500,14 @@ may be added in future versions if needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p class="sd-card-text"><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – clbits employed as the condition.</p></li>
-<li><p class="sd-card-text"><strong>condition</strong> (<em>int</em>)</p></li>
+<li><p class="sd-card-text"><strong>clbits</strong> (<em>int</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) – clbits to match the condition.</p></li>
+<li><p class="sd-card-text"><strong>condition</strong> (<em>int</em>) – can be 1 or 0. The clbits will have to match this condition
+for the gate to be applied. Default = 1</p></li>
+<li><p class="sd-card-text"><strong>operation</strong> (<em>str</em>) – can be “and”, “or” or “xor”. If multiple clbits are provided, their
+measures are operated on with the selected operation and the result is
+matched to condition. “and” means all need to match the condition,
+“or” means any of them should match and “xor” means there should be an
+odd number of mathching measures.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
