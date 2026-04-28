@@ -155,7 +155,7 @@ available:</p>
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">How to deploy a vQPU?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">The deployment of vQPUs is made through the bash command <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> or
-through the Python function <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a>. Depending on the desired vQPU type,
+through the Python function <code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code>. Depending on the desired vQPU type,
 different argumets must be provided to the command or to the function, depending on the one being
 used. These arguments will be explored inside the description of each of the <a class="reference internal" href="#sec-dqc-schemes"><span class="std std-ref">DQC schemes</span></a>
 below.</p>
@@ -173,14 +173,14 @@ compile time as discussed in the <a class="reference internal" href="../installa
 no-communication model and with the AER simulator</strong>. Adding it to the other communication models is
 considered part of the future improvements. In order to do this, the vQPUs have to be deployed with
 a valid noise model scheme. This is done with the aforementioned <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a>
-Bash command or its Python function counterpart <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a>, with the first
+Bash command or its Python function counterpart <code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code>, with the first
 accepting the flag <code class="docutils literal notranslate"><span class="pre">noise-properties</span></code> and the second the argument <code class="docutils literal notranslate"><span class="pre">noise_properties_path</span></code>; both being the path
 to a noise properties JSON file. The format of this JSON file is shown in
 <a class="reference internal" href="../further_examples/json_examples/noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>.</p>
 <p class="sd-card-text">Additionally, a vQPU with the noise model of <a class="reference external" href="https://www.cesga.es/infraestructuras/cuantica/">CESGA’s QMIO quantum computer</a>
 can be deployed, but only if CUNQA is being executed inside the CESGA’s infrastructure. This can be
 done by employing the <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> flag in the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or
-with <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument in the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> Python function.</p>
+with <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument in the <code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code> Python function.</p>
 </div>
 </details></section>
 <section id="quantum-circuits">

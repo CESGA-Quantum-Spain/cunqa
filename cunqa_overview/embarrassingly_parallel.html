@@ -178,9 +178,9 @@ scheme, are further explained at <a class="reference internal" href="../referenc
 </section>
 <section id="execution">
 <h2><strong>Execution</strong><a class="headerlink" href="#execution" title="Link to this heading"></a></h2>
-<p>Once we obtain the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects through <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>
-function <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> is employed for executing them into the vQPUs. By providing
-the list of circuits and the list of <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects we allow their mapping.</p>
+<p>Once we obtain the <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> objects through <code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code>
+function <code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code> is employed for executing them into the vQPUs. By providing
+the list of circuits and the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> objects we allow their mapping.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qpus_list</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuits_list</span><span class="p">,</span> <span class="n">qpus_list</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>

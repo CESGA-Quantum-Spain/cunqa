@@ -141,7 +141,7 @@ use of CUNQA than the one displayed in the <a class="reference internal" href=".
 </a>
 </div>
 </div>
-<p>For optimization algorithms, the <a class="reference internal" href="../reference/api/cunqa.mappers.html#module-cunqa.mappers" title="cunqa.mappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mappers</span></code></a> submodule and the
+<p>For optimization algorithms, the <code class="xref py py-mod docutils literal notranslate"><span class="pre">mappers</span></code> submodule and the
 <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob.upgrade_parameters" title="cunqa.qjob.QJob.upgrade_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade_parameters</span></code></a> method of the the <a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> were
 developed. The usage of these two features can be seen in the following examples.</p>
 <div class="toctree-wrapper compound">
@@ -263,7 +263,7 @@ the way these vQPUs are deployed, because they need to receive the path a JSON s
 model properties.</p>
 <p>To do this, as it was explained in <a class="reference internal" href="../cunqa_overview/cunqa_overview.html"><span class="doc">CUNQA overview</span></a>, the
 <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or its Python function counterpart
-<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> have to be employed with the flag <cite>noise-properties</cite>, in the first
+<code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code> have to be employed with the flag <cite>noise-properties</cite>, in the first
 case, and with the argument <cite>noise_properties_path</cite>, in the second; with both being the path
 to a noise properties JSON file. The format of this JSON file is shown in
 <a class="reference internal" href="json_examples/noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>.</p>
@@ -283,7 +283,7 @@ to a noise properties JSON file. The format of this JSON file is shown in
 vQPU configured with the noise model of <a class="reference external" href="https://www.cesga.es/infraestructuras/cuantica/">CESGA’s QMIO quantum computer</a>,
 provided that CUNQA is running within the CESGA infrastructure. This setup can be enabled by using
 the <code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> option in the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command or by passing the
-<code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument to the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> Python function.</p>
+<code class="docutils literal notranslate"><span class="pre">fakeqmio</span></code> argument to the <code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code> Python function.</p>
 <div class="tab-set docutils">
 <input checked="True" class="tab-input" id="tab-set--1-input--1" name="tab-set--1" type="radio" /><label class="tab-label" for="tab-set--1-input--1">Bash command</label><div class="tab-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>-t<span class="w"> </span><span class="m">01</span>:00:00<span class="w"> </span>--co-located<span class="w"> </span>--fakeqmio

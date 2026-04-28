@@ -129,7 +129,7 @@
 <span id="cunqa-qjob"></span><h1>cunqa.qjob<a class="headerlink" href="#module-cunqa.qjob" title="Link to this heading"></a></h1>
 <p>Contains objects that define and manage quantum emulation jobs. The core of this module is the
 class <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>. These objects are created when a quantum job is sent to a
-vQPU, as a return of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> function:</p>
+vQPU, as a return of the <code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code> function:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">)</span>
 <span class="go">&lt;cunqa.qjob.QJob object at XXXXXXXX&gt;</span>
 </pre></div>
@@ -150,7 +150,7 @@ which receives a list of <a class="reference internal" href="#cunqa.qjob.QJob" t
 <dt class="sig sig-object py" id="cunqa.qjob.QJob">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit_ir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
 <dd><p>Class to handle jobs sent to vQPUs. A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output
-of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method. The quantum job not only contains the circuit to
+of the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code> method. The quantum job not only contains the circuit to
 be simulated, but also simulation instructions and information of the vQPU to which the job
 is sent. This class has a main attribute: <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code></a> which stores the information
 about the execution.</p>
@@ -238,7 +238,7 @@ This parameter update is done using the <a class="reference internal" href="#cun
 First it checks weather the prior simulation’s result was retrieved. If not, it is discarded,
 and the new set of parameters is sent to the server to be reassigned to the circuit for
 simulation. This method can be used on a loop, carefully saving the intermediate results.
-Also, this method is used by the class <a class="reference internal" href="cunqa.mappers.html#cunqa.mappers.QJobMapper" title="cunqa.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, check out its
+Also, this method is used by the class <code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code>, check out its
 documentation for a extensive description.</p>
 <p>There are two ways of passing new parameters. First, as a <strong>list</strong> with the corresponding
 values in the order of the gates in the circuit, in which case missing parameters will

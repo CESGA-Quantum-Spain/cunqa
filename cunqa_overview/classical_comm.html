@@ -162,7 +162,7 @@ operations are applied to the designated local qubits.</p>
 </div>
 <p>The above command line launches vQPUs with all-to-all classical communications connectivity. For
 additional options in the Bash command checkout <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a>, and check
-<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> for the Python function. Again, it is recomended to use the
+<code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code> for the Python function. Again, it is recomended to use the
 <code class="docutils literal notranslate"><span class="pre">--co-located</span></code> flag (and <code class="docutils literal notranslate"><span class="pre">co_located</span></code> attribute in Python), as it allows to access the vQPUs
 from every node, not just the one the vQPUs are being set up. In this documentation we are going
 to consider that this flag is set.</p>
@@ -212,12 +212,12 @@ gate at qubit <code class="docutils literal notranslate"><span class="pre">0</sp
 </section>
 <section id="execution">
 <h2><strong>Execution</strong><a class="headerlink" href="#execution" title="Link to this heading"></a></h2>
-<p>We obtain the <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects associated to the displayed vQPUs with
-<a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>, as a common step between the three models. It is important that
+<p>We obtain the <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> objects associated to the displayed vQPUs with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code>, as a common step between the three models. It is important that
 those allow classical communications—i.e., that the aforementioned <code class="docutils literal notranslate"><span class="pre">classical-comm</span></code> flag was
 set—, otherwise an error will be raised.</p>
-<p>For the distribution, function <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> is used. By providing
-the list of circuits and the list of <a class="reference internal" href="../reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> objects we allow their mapping to the corresponding
+<p>For the distribution, function <code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code> is used. By providing
+the list of circuits and the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> objects we allow their mapping to the corresponding
 vQPUs:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qpus_list</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
