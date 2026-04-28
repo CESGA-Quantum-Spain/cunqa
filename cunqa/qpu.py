@@ -341,7 +341,7 @@ def qraise(n, t, *,
            fakeqmio = False, 
            family = None, 
            co_located = True, 
-           cores = None, 
+           cores_per_qpu = None, 
            mem_per_qpu = None, 
            n_nodes = None, 
            node_list = None, 
@@ -375,13 +375,15 @@ def qraise(n, t, *,
                            `hpc` mode, vQPUs can only be accessed from the node in which they 
                            are deployed. In `co-located` mode, they can be accessed from other 
                            nodes.
-        cores (str): number of cores per vQPU, the total for the SLURM job will be 
-                     `n*cores`.
+        cores_per_qpu (str): number of cores per vQPU, the total for the SLURM job will be 
+                     `n*cores_per_qpu`.
         mem_per_qpu (str): memory to allocate for each vQPU in GB, format to use is "XXG".
         n_nodes (str): number of nodes for the SLURM job.
         node_list (str): list of nodes in which the vQPUs will be deployed.
         qpus_per_node (str): sets the number of vQPUs deployed on each node.
         partition (str): partition of the nodes in which the QPUs are going to be executed.
+        gpu (bool): enable execution in GPU. CUNQA must be previously compiled to support GPU execution.
+        qmio (bool): deploy QMIO, the quantum computer at CESGA, as a vQPU to interact with it.
     """
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
@@ -406,8 +408,8 @@ def qraise(n, t, *,
         command = command + f" --family_name={str(family)}"
     if co_located:
         command = command + " --co-located"
-    if cores is not None:
-        command = command + f" --cores={str(cores)}"
+    if cores_per_qpu is not None:
+        command = command + f" --cores-per-qpu={str(cores_per_qpu)}"
     if mem_per_qpu is not None:
         command = command + f" --mem-per-qpu={str(mem_per_qpu)}G"
     if n_nodes is not None:
