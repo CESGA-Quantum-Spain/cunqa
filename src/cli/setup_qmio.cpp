@@ -15,7 +15,7 @@ namespace {
 
 int set_up_linker(const std::string& family)
 {
-    std::string command = "python " + constants::INSTALL_PATH + "/cunqa/real_qpus/qmio_linker.py " + family;
+    std::string command = "python " + INSTALL_PATH + "/cunqa/real_qpus/qmio_linker.py " + family;
     const char* c_command = command.c_str();
     int status = std::system(c_command);
 

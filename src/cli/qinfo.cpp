@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     auto args = argparse::parse<CunqaArgs>(argc, argv);
 
-    std::ifstream file(cunqa::constants::QPUS_FILEPATH);
+    std::ifstream file(cunqa::QPUS_FILEPATH);
     if (!file.is_open()) {
         std::cerr << "\033[31mCould not open the QPUs info file! Check if there are deployed QPUs. \033[0m " << "\n";
         return 1;

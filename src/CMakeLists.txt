@@ -7,17 +7,21 @@ if(NOT USE_MPI_BTW_QPU AND NOT USE_ZMQ_BTW_QPU)
 endif()
 
 add_subdirectory(utils)
-add_subdirectory(classical_channel)
-add_subdirectory(backends)
+add_subdirectory(quantum_task)
+add_subdirectory(sim)
 add_subdirectory(comm)
 
-add_library(quantum_task quantum_task.cpp)
-target_link_libraries(quantum_task PUBLIC json
-                                   PRIVATE logger_qpu)
-
 add_library(qpu qpu.cpp)
-target_link_libraries(qpu PUBLIC server 
-                          PRIVATE json quantum_task logger_qpu)
+target_link_libraries(qpu 
+    PUBLIC 
+        server
+        backend
+    PRIVATE 
+        json 
+        quantum_task
+        logger_qpu
+)
+target_include_directories(qpu PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(cli)
 

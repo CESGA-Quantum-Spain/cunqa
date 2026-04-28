@@ -27,12 +27,8 @@ struct Server::Impl {
     { 
         auto ep = acceptor_.local_endpoint();
         auto port = ep.port();
-        asio_endpoint = ip + ":" + std::to_string(port);  
-    }
-
-    void accept()
-    {
-        acceptor_.accept(socket_);
+        asio_endpoint = ip + ":" + std::to_string(port); 
+        acceptor_.accept(socket_); 
     }
 
     std::string recv() 
@@ -50,11 +46,11 @@ struct Server::Impl {
                 // Client closed the connection cleanly
                 LOGGER_DEBUG("Client disconnected gracefully.");
                 socket_.close(); 
-                return "CLOSE";
+                accept();
             } else if (e.code() == boost::asio::error::connection_reset) {
                 LOGGER_ERROR("Client connection reset (forcible close).");
                 socket_.close(); 
-                return "CLOSE";
+                accept();
             } else {
                 LOGGER_ERROR("Error receiving the circuit.");
                 throw;

@@ -26,7 +26,7 @@ struct CunqaArgs : public argparse::Args
 
 cunqa::JSON read_qpus_json() 
 {
-    std::ifstream in(cunqa::constants::QPUS_FILEPATH);
+    std::ifstream in(cunqa::QPUS_FILEPATH);
     cunqa::JSON j;
     in >> j;
     return j;
@@ -88,7 +88,7 @@ void removeJobs(const std::vector<std::string>& job_ids, const bool& all = false
     if (all) {
         auto left_jobs = read_qpus_json();
         if(size(left_jobs)) {
-            std::ofstream ofs(cunqa::constants::QPUS_FILEPATH, std::ios::trunc);
+            std::ofstream ofs(cunqa::QPUS_FILEPATH, std::ios::trunc);
             ofs << "{}";
         }
     }

@@ -5,7 +5,11 @@ configure_file(
 )
 
 add_library(json json.cpp)
-target_link_libraries(json PRIVATE Threads::Threads
-                           PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(json 
+    PUBLIC 
+        nlohmann_json::nlohmann_json
+    PRIVATE 
+        Threads::Threads
+)
 target_compile_options(json PRIVATE -fPIC)
 add_subdirectory(logger)

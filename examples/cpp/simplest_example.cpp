@@ -48,7 +48,7 @@ cunqa::JSON read_file(const std::string& filename)
 
 int main()
 {
-    cunqa::JSON qpus = read_file(cunqa::constants::QPUS_FILEPATH);
+    cunqa::JSON qpus = read_file(cunqa::QPUS_FILEPATH);
 
     std::vector<Client> clients(3);
     std::vector<std::string> circuits{circuit1, circuit1, circuit1};

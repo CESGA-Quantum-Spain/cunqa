@@ -16,7 +16,7 @@ endif()
 # Adding C++20 standard as required
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg") # Dani, for profiling with gprof
+
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 message(STATUS "C++ version ${CXX_STANDARD} configured.")
 message(STATUS "${CMAKE_VERSION}")
@@ -37,8 +37,6 @@ endif()
 set(CUNQA_PATH "$ENV{STORE}/.cunqa")
 set(QPUS_FILEPATH "$ENV{STORE}/.cunqa/qpus.json")
 set(COMM_FILEPATH "$ENV{STORE}/.cunqa/communications.json")
-include_directories("${CMAKE_BINARY_DIR}/src")
-
 
 # Set INSTALL paths
 # TODO: I put this if 
@@ -76,15 +74,15 @@ endif()
 
 find_package(Threads REQUIRED)
 find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED COMPONENTS CXX)
 find_package(Boost REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 include(FetchContent)
 
 function(find_or_fetch_package PACKAGE_NAME GIT_REPOSITORY VERSION TAG)
-  find_package(${PACKAGE_NAME} ${VERSION} QUIET)
+  find_package(${PACKAGE_NAME} ${VERSION} EXACT QUIET)
   if(NOT ${PACKAGE_NAME}_FOUND)
     message(STATUS "Package ${PACKAGE_NAME} not found, fetching from ${GIT_REPOSITORY}")
     FetchContent_Declare(
@@ -269,6 +267,7 @@ find_or_fetch_package(
   "1.16.0"
   "v1.16.0"
 )
+
 install(TARGETS spdlog DESTINATION "${CMAKE_INSTALL_LIBDIR}") # does this fails with FindPackage??
 
 # =====================================================================
@@ -499,9 +498,11 @@ find_or_fetch_package(
 )
 
 
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" "${CMAKE_CURRENT_SOURCE_DIR}/src")
-#include_directories("${Python_INCLUDE_DIRS}" "${MPI_INCLUDE_PATH}")
+include_directories(
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logger" 
+  "${CMAKE_BINARY_DIR}/src"
+  "${CMAKE_SOURCE_DIR}/src"
+)
 
 add_subdirectory(src)
 add_subdirectory(cunqa)

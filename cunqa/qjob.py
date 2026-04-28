@@ -90,7 +90,9 @@ class QJob:
             "avoid_parallelization": False,
             "num_clbits": circuit_ir["num_clbits"], 
             "num_qubits": circuit_ir["num_qubits"], 
-            "device": self._device
+            "device": self._device,
+            "sending_to": circuit_ir["sending_to"],
+            "is_dynamic": circuit_ir["is_dynamic"],
         }
 
         if (run_parameters == None) or (len(run_parameters) == 0):
@@ -104,8 +106,6 @@ class QJob:
         self._quantum_task = {
             "config": run_config, 
             "instructions": circuit_ir["instructions"],
-            "sending_to": circuit_ir["sending_to"],
-            "is_dynamic": circuit_ir["is_dynamic"],
             "id": circuit_ir["id"][1]
         }
       

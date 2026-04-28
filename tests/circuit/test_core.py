@@ -387,7 +387,6 @@ TWOQUBIT_PARAM = [
     ("ryy",   (0.1,0,1,),             {"name": "ryy",   "qubits": [0,1], "params": [0.1]}),
     ("rzz",   (0.1,0,1,),             {"name": "rzz",   "qubits": [0,1], "params": [0.1]}),
     ("rzx",   (0.1,0,1,),             {"name": "rzx",   "qubits": [0,1], "params": [0.1]}),
-    ("cr",    (0.1,0,1,),             {"name": "cr",    "qubits": [0,1], "params": [0.1]}),
     ("crx",   (0.1,0,1,),             {"name": "crx",   "qubits": [0,1], "params": [0.1]}),
     ("cry",   (0.1,0,1,),             {"name": "cry",   "qubits": [0,1], "params": [0.1]}),
     ("crz",   (0.1,0,1,),             {"name": "crz",   "qubits": [0,1], "params": [0.1]}),

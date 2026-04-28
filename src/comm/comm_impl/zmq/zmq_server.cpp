@@ -89,11 +89,6 @@ Server::Server(const std::string& mode) :
 
 Server::~Server() = default;
 
-void Server::accept() 
-{
-    // ZMQ does not need to accept connection as Asio
-}
-
 std::string Server::recv_data() 
 { 
     return pimpl_->recv();

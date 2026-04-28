@@ -8,7 +8,7 @@
 #include <condition_variable>
 
 #include "comm/server.hpp"
-#include "backends/backend.hpp"
+#include "sim/backend.hpp"
 #include "utils/json.hpp"
 
 using namespace std::string_literals;
@@ -20,8 +20,13 @@ public:
     std::unique_ptr<sim::Backend> backend;
     std::unique_ptr<comm::Server> server;
 
-    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, 
-        const std::string& name, const std::string& family);
+    QPU(
+        std::unique_ptr<sim::Backend> backend, 
+        const std::string& mode, 
+        const std::string& name, 
+        const std::string& family
+    );
+    
     void turn_ON();
 
 private:

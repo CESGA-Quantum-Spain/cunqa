@@ -21,7 +21,7 @@ try:
     #                 |      
     #  qc.q1   ──────[X]───[M]─
     # ---------------------------
-    qc = CunqaCircuit(5)
+    qc = CunqaCircuit(2)
     qc.h(0)
     qc.cx(0, 1)
     qc.measure_all()

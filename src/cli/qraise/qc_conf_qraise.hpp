@@ -112,7 +112,7 @@ bool write_qc_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args)
     //sbatchFile << "#SBATCH --profile=all\n";   // Enable comprehensive profiling
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
-    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(CUNQA_PATH) << "/epilog.sh\n";
 
     return true;
 }
@@ -177,11 +177,11 @@ void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
 
-    } else if (std::find(constants::SUPPORTED_QC_SIMULATORS.begin(), constants::SUPPORTED_QC_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_QC_SIMULATORS.end()) {
+    } else if (std::find(SUPPORTED_QC_SIMULATORS.begin(), SUPPORTED_QC_SIMULATORS.end(), std::string(args.simulator)) == SUPPORTED_QC_SIMULATORS.end()) {
         LOGGER_ERROR("Simulator {} is not available for quantum communications simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
-    } else if (exists_family_name(args.family_name, constants::QPUS_FILEPATH)) {
+    } else if (exists_family_name(args.family_name, QPUS_FILEPATH)) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
 

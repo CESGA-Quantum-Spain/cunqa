@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "backends/simple_backend.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -32,7 +31,6 @@ public:
     Server(const std::string& mode);
     ~Server();
 
-    void accept();
     std::string recv_data();
     void send_result(const std::string& result);
     void close();

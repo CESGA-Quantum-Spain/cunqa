@@ -487,8 +487,6 @@ std::unordered_map<std::string_view, AddersFn> add_instruction {
     {"cy", add_2q0p_instruction},
     {"cz", add_2q0p_instruction},
     {"csx", add_2q0p_instruction},
-    {"csy", add_2q0p_instruction},
-    {"csz", add_2q0p_instruction},
     {"ct", add_2q0p_instruction},
 
     {"cp", add_2q1p_instruction},
@@ -502,7 +500,6 @@ std::unordered_map<std::string_view, AddersFn> add_instruction {
     {"rzx", add_2q1p_instruction},
 
     {"cu2", add_2q2p_instruction},
-    {"cr", add_2q2p_instruction},
 
     {"cu3", add_2q3p_instruction},
     {"cu", add_2q3p_instruction},

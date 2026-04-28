@@ -86,7 +86,7 @@ void write_infrastructure_sbatch(std::ofstream& sbatchFile, const CunqaArgs& arg
 
 
     // ------ Directory and enviroment parameters block -------
-    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(CUNQA_PATH) << "/epilog.sh\n";
     //--------------------------------------------------------
 
 
@@ -177,7 +177,7 @@ void write_infrastructure_sbatch(std::ofstream& sbatchFile, const CunqaArgs& arg
         backend_path = properties.at("backend").get<std::string>();
         qpus_path = R"({"backend_from_infrastructure":{")" + name + "\":\"" + backend_path +  R"("}})" ;
 
-        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --task-epilog=$EPILOG_PATH " + setup_qpus + " co_located no_comm "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
+        sbatchFile << "srun -n 1 -c " + std::to_string(qpu_cores) + " --mem=" + std::to_string(qpu_memory) + "G --task-epilog=$EPILOG_PATH " + setup_qpus + " co_located nc "  + name + " " + simulator + " \'" + qpus_path + "\'"; 
         
     }
     //--------------------------------------------------

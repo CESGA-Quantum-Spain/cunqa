@@ -110,7 +110,7 @@ bool write_simple_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args
     //sbatchFile << "#SBATCH --profile=all\n";   // Enable comprehensive profiling
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
-    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(CUNQA_PATH) << "/epilog.sh\n";
 
     return true;
 }
@@ -132,11 +132,11 @@ bool write_simple_run_command(std::ofstream& sbatchFile, const CunqaArgs& args)
             LOGGER_DEBUG("Qraise with no communications and personalized backend. \n");
             backend_path = std::string(args.backend.value());
             backend = R"({"backend_path":")" + backend_path + R"("})" ;
-            subcommand = mode + " no_comm " + args.family_name + " " + args.simulator + " \'" + backend + "\'" "\n";
+            subcommand = mode + " nc " + args.family_name + " " + args.simulator + " \'" + backend + "\'" "\n";
             run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
         }
     } else {
-        subcommand = mode + " no_comm " + args.family_name + " " + args.simulator + "\n";
+        subcommand = mode + " nc " + args.family_name + " " + args.simulator + "\n";
         run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
     }
 
@@ -151,11 +151,11 @@ void write_simple_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         LOGGER_ERROR("qraise needs two mandatory arguments:\n \t -n: number of vQPUs to be raised\n\t -t: maximum time vQPUs will be raised (hh:mm:ss)\n");
         throw std::runtime_error("Bad arguments.");
 
-    } else if (std::find(constants::SUPPORTED_SIMPLE_SIMULATORS.begin(), constants::SUPPORTED_SIMPLE_SIMULATORS.end(), std::string(args.simulator)) == constants::SUPPORTED_SIMPLE_SIMULATORS.end()) {
+    } else if (std::find(SUPPORTED_SIMPLE_SIMULATORS.begin(), SUPPORTED_SIMPLE_SIMULATORS.end(), std::string(args.simulator)) == SUPPORTED_SIMPLE_SIMULATORS.end()) {
         LOGGER_ERROR("Simulator {} is not available for simple simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
-    } else if (exists_family_name(args.family_name, constants::QPUS_FILEPATH)) {
+    } else if (exists_family_name(args.family_name, QPUS_FILEPATH)) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
         
