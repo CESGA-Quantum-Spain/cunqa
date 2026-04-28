@@ -55,6 +55,7 @@ jobs:
       - name: Copy constants.py.in into constants.py
         run:
           cp cunqa/constants.py.in cunqa/constants.py
+          sed -i 's/CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@/CUNQA_USE_QISKIT_PY = True/' cunqa/constants.py
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
