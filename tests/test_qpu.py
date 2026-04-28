@@ -420,7 +420,7 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     assert "--backend=/path/to/backend.json" in cmd_str
     assert "--family_name=my_family" in cmd_str
     assert "--co-located" in cmd_str
-    assert "--cores_per_qpu=8" in cmd_str
+    assert "--cores-per-qpu=8" in cmd_str
     assert "--mem-per-qpu=16G" in cmd_str
     assert "--n_nodes=3" in cmd_str
     assert "--node_list=node01,node02" in cmd_str
@@ -428,7 +428,7 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     assert cmd_str == (f"qraise -n {2} -t {t} --noise-properties=/path/to/noise_properties.json "
                        "--no-termal-relaxation --no-readout-error --no-gate-error --fakeqmio "
                        f"--classical_comm --quantum_comm --simulator=aer_sim --family_name={family} "
-                       "--co-located --cores_per_qpu=8 --mem-per-qpu=16G --n_nodes=3 "
+                       "--co-located --cores-per-qpu=8 --mem-per-qpu=16G --n_nodes=3 "
                        "--node_list=node01,node02 --qpus_per_node=2 "
                        "--backend=/path/to/backend.json --partition=partition1")
     assert result == family
