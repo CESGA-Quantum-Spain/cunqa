@@ -29,9 +29,9 @@ MunichExecutor::MunichExecutor(const std::size_t& n_qpus) :
         }
     } while (ids.size() != n_qpus);
 
+    classical_channel.publish();
     for (const auto& [key, _]: ids.items()) {
         qpu_ids.push_back(key);
-        classical_channel.publish();
         classical_channel.connect(key);
         classical_channel.send_info("ready", key);
     }

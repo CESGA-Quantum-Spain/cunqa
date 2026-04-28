@@ -121,22 +121,37 @@ JSON read_file(const std::string &filename)
 
 void write_on_file(JSON local_data, const std::string &filename, const std::string &id)
 {
+    const std::string lockfile = filename + ".lock";
+    int lock_fd = -1;
     int fd = -1;
+
+    while (true) {
+        lock_fd = open(lockfile.c_str(), O_CREAT | O_EXCL | O_WRONLY, 0644);
+        if (lock_fd != -1) break;
+        if (errno != EEXIST)
+            throw std::runtime_error("Failed to create lockfile: " + std::string(strerror(errno)));
+        usleep(1000);
+    }
+
     try {
         fd = open_file(filename);
-        auto fl = lock(fd, LockMode::Write);
+
         auto j = read_json(fd);
-        
+
         j[id] = local_data;
 
         write_json(fd, j);
-        unlock(fd, fl);
+        fsync(fd);
         close(fd);
+        close(lock_fd);
+        unlink(lockfile.c_str());
     } catch (const std::exception &e) {
         if (fd != -1) close(fd);
-        std::string msg =
-            "Error writing JSON safely using POSIX (fcntl) locks.\nSystem message: ";
-        throw std::runtime_error(msg + e.what());
+        close(lock_fd);
+        unlink(lockfile.c_str());
+        throw std::runtime_error(
+            "Error writing JSON safely using atomic lock.\nSystem message: " +
+            std::string(e.what()));
     }
 }
 
