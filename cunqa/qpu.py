@@ -249,6 +249,27 @@ def run(
         return qjobs[0]
     return qjobs
 
+
+def _acquire_lockfile(lockfile: str, timeout: float = 5.0, retry_interval: float = 0.001):
+    """Acquire atomic lockfile, raises if timeout exceeded."""
+    start = time.time()
+    while True:
+        try:
+            fd = os.open(lockfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+            os.close(fd)
+            return  # Lock acquired
+        except FileExistsError:
+            if time.time() - start > timeout:
+                raise TimeoutError(f"Timeout waiting for lockfile: {lockfile}")
+            time.sleep(retry_interval)
+
+def _release_lockfile(lockfile: str):
+    """Release atomic lockfile."""
+    try:
+        os.unlink(lockfile)
+    except FileNotFoundError:
+        pass  # Already released
+
 def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs raised by the user. It 
@@ -258,14 +279,18 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         co_located (bool): if ``False``, filters by the vQPUs available at the local node.
         family (str): filters vQPUs by their family name.    
     """
-    # access raised QPUs information on qpu.json file
-    with open(QPUS_FILEPATH, "r") as f:
-        qpus_json = json.load(f)
-        if len(qpus_json) == 0:
-            logger.warning(f"No QPUs were found.")
-            return None
+    lockfile = QPUS_FILEPATH + ".lock"
+    _acquire_lockfile(lockfile)
+    try:
+        with open(QPUS_FILEPATH, "r") as f:
+            qpus_json = json.load(f)
+            if len(qpus_json) == 0:
+                logger.warning(f"No QPUs were found.")
+                return None
+    finally:
+        _release_lockfile(lockfile)
 
-    # extract selected QPUs from qpu.json information 
+    # Rest of the function unchanged...
     local_node = os.getenv("SLURMD_NODENAME")
     if co_located:
         targets = {
@@ -285,7 +310,7 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
                 if ((info["net"].get("nodename") == local_node) and 
                     (family is None or info.get("family") == family))
             }
-    
+
     qpus = [
         QPU(
             id = id,
@@ -295,7 +320,7 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
             endpoint = info['net']['endpoint']
         ) for id, info in targets.items()
     ]
-        
+
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
