@@ -29,7 +29,7 @@ try:
                     simulator="Maestro",
                     quantum_comm = True, 
                     co_located = True, 
-                    cores = CORES_PER_QPU, 
+                    cores_per_qpu = CORES_PER_QPU, 
                     mem_per_qpu = MEM_PER_QPU)
 except Exception as error:
     raise error

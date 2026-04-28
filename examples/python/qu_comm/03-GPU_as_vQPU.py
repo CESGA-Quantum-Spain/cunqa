@@ -16,7 +16,7 @@ try:
     # 1. Deploy vQPUs and retrieve them using get_QPUs
     # The number of cores must match the ones given in the warning at https://cesga-docs.gitlab.io/ft3-user-guide/gpu_nodes.html#nvidia-a100
     # Number of cores should be modified if more QPUs are requested
-    family = qraise(3, "00:10:00", cores = 8, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
+    family = qraise(3, "00:10:00", cores_per_qpu = 8, simulator="Aer", quantum_comm=True, co_located = True, gpu = True)
 except Exception as error:
     raise error
 

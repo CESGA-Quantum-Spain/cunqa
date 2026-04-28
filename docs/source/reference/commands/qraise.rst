@@ -29,7 +29,7 @@ General deployment options
     Time during which the QPUs will remain active.
     Default: empty string.
 
-``-c, --cores <int>``
+``-c, --cores-per-qpu <int>``
     Number of CPU cores assigned to each QPU.
     Default: ``2``
 
