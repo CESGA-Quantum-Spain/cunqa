@@ -59,6 +59,16 @@ if(NOT SYSTEM_NAME OR NOT (SYSTEM_NAME STREQUAL "QMIO" OR SYSTEM_NAME STREQUAL "
     set(SYSTEM_NAME "EXTERNAL_CLUSTER")
 endif()
 
+# Enable or disable Qiskit dependency. Enabled by default
+option(CUNQA_USE_QISKIT "Enable Qiskit support in CUNQA" ON)
+if(CUNQA_USE_QISKIT)
+  message(STATUS "Enabled Qiskit support in CUNQA")
+  set(CUNQA_USE_QISKIT_PY "True")
+else()
+  message(STATUS "Disabled Qiskit support in CUNQA")
+  set(CUNQA_USE_QISKIT_PY "False")
+endif()
+
 if(${SYSTEM_NAME} STREQUAL "QMIO")
   set(pybind11_DIR "/opt/cesga/qmio/hpc/software/Compiler/gcccore/12.3.0/pybind11/2.13.6-python-3.11.9/lib64/python3.11/site-packages/pybind11/share/cmake/pybind11/")
   find_package(Python 3.9.9 COMPONENTS Interpreter Development)

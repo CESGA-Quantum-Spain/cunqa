@@ -2,4 +2,6 @@ QPUS_FILEPATH = "@QPUS_FILEPATH@"
 CUNQA_PATH = "@CUNQA_PATH@"
 LIBS_DIR = "@CMAKE_INSTALL_RPATH@"
 
+CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@
+
 REMOTE_GATES = ["send", "recv", "qsend", "qrecv", "expose", "rcontrol"]

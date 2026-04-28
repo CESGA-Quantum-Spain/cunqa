@@ -23,7 +23,6 @@ from typing import Union, Any, Optional, TypedDict
 from sympy import Symbol
 
 from collections import Counter
-from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
@@ -140,7 +139,7 @@ class QPU:
 
 
 def run(
-        circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
+        circuits: Union[list[Union[dict, 'QuantumCircuit', CunqaCircuit]], Union[dict, 'QuantumCircuit', CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
         param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None,
         **run_args: Any
