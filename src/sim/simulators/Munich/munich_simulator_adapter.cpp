@@ -10,7 +10,7 @@
 
 #include "StochasticNoiseSimulator.hpp"
 
-#include "quantum_task.hpp"
+#include "quantum_task/quantum_task.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
 #include "logger.hpp"
 

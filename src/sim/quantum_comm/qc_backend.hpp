@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "backend.hpp"
-#include "quantum_task.hpp"
+#include "sim/backend.hpp"
+#include "quantum_task/quantum_task.hpp"
 #include "simulators/simulator_strategy.hpp"
 
 #include "utils/json.hpp"

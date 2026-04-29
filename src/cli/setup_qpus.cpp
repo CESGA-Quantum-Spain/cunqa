@@ -10,6 +10,7 @@
 
 #include "qpu.hpp"
 #include "sim/no_comm/nc_backend.hpp"
+#include "sim/classical_comm/cc_backend.hpp"
 #include "sim/simulators/simulator_factory.hpp"
 
 #include "utils/constants.hpp"
@@ -50,8 +51,6 @@ int main(int argc, char *argv[])
     std::string family(argv[3]);
     std::string sim_arg(argv[4]);
 
-    LOGGER_DEBUG("Aquí bien.");
-
     if (family == "default")
         family = std::getenv("SLURM_JOB_ID");
     std::string name = std::getenv("SLURM_JOB_ID") 
@@ -90,15 +89,20 @@ int main(int argc, char *argv[])
     switch(murmur::hash(communications)) {
         case murmur::hash("nc"): 
         {
-            LOGGER_DEBUG("Sim Arg {}.", sim_arg);
+            LOGGER_DEBUG("Turning ON the QPUs without comms and with {} simulator.", sim_arg);
             auto backend = std::make_unique<NCBackend>(make_simulator(sim_arg), backend_json);
             QPU qpu(std::move(backend), mode, name, family);
             qpu.turn_ON();
             break;
         }
-        case murmur::hash("cc"): 
-            // TODO
+        case murmur::hash("cc"):
+        {
+            LOGGER_DEBUG("Turning ON the QPUs with classical comms and with {} simulator.", sim_arg);
+            auto backend = std::make_unique<CCBackend>(make_simulator(sim_arg), backend_json);
+            QPU qpu(std::move(backend), mode, name, family);
+            qpu.turn_ON();
             break;
+        } 
         case murmur::hash("qc"):
             // TODO
             break;

@@ -3,9 +3,9 @@
 #include <vector>
 #include <string_view>
 
-#include "simulator.hpp"
-#include "circuit.hpp"
-#include "run_config.hpp"
+#include "sim/simulator.hpp"
+#include "quantum_task/circuit.hpp"
+#include "quantum_task/run_config.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -31,23 +31,23 @@ public:
 
     JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
 
-    void apply_gate(const OneQubitNoParam& instruction) override;
-    void apply_gate(const OneQubitOneParam& instruction) override;
-    void apply_gate(const OneQubitThreeParam& instruction) override;
+    void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) override;
 
-    void apply_gate(const TwoQubitNoParam& instruction) override;
-    void apply_gate(const TwoQubitOneParam& instruction) override;
-    void apply_gate(const TwoQubitFourParam& instruction) override;
+    void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
 
-    void apply_gate(const MulticontrolNoParam& instruction) override;
-    void apply_gate(const MulticontrolParam& instruction) override;
+    void apply_gate(const InstructionType& type, const MulticontrolNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const MulticontrolParam& payload) override;
 
-    void apply_gate(const MatrixGate& instruction) override;
-    void apply_gate(const DiagonalMatrixGate& instruction) override;
+    void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
+    void apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload) override;
 
-    void apply_gate(const Measure& instruction) override;
-    void apply_gate(const Reset& instruction) override;
-    void apply_gate(const Copy& instruction) override;
+    void apply_gate(const InstructionType& type, const Measure& payload) override;
+    void apply_gate(const InstructionType& type, const Reset& payload) override;
+    void apply_gate(const InstructionType& type, const Copy& payload) override;
 private:
     struct State;
     std::unique_ptr<State> state_;

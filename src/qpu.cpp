@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "qpu.hpp"
-#include "quantum_task.hpp"
+#include "quantum_task/quantum_task.hpp"
 #include "utils/constants.hpp"
 
 #include "logger.hpp"
@@ -16,359 +16,411 @@ Circuit json_to_circuit(const JSON& circuit_json)
 {
     Circuit circuit;
     for (auto const& instruction : circuit_json) {
-        LOGGER_DEBUG("Instruccion: {}", instruction.dump());
         Instruction cunqa_instruction;
-        auto instruction_tag = INSTRUCTIONS_MAP.at(instruction.at("name").get<std::string>());
-        switch (instruction_tag) {
-            case InstructionTag::ID:
-            case InstructionTag::X:
-            case InstructionTag::Y:
-            case InstructionTag::Z:
-            case InstructionTag::H:
-            case InstructionTag::S:
-            case InstructionTag::SX:
-            case InstructionTag::SY:
-            case InstructionTag::SZ:
-            case InstructionTag::SDG:
-            case InstructionTag::SXDG:
-            case InstructionTag::SYDG:
-            case InstructionTag::SZDG:
-            case InstructionTag::T:
-            case InstructionTag::TDG:
-            case InstructionTag::P0:
-            case InstructionTag::P1:
-            case InstructionTag::V:
-            case InstructionTag::VDG:
-            case InstructionTag::K:
+        auto instruction_type = INSTRUCTIONS_MAP.at(instruction.at("name").get<std::string>());
+        switch (instruction_type) {
+            case InstructionType::ID:
+            case InstructionType::X:
+            case InstructionType::Y:
+            case InstructionType::Z:
+            case InstructionType::H:
+            case InstructionType::S:
+            case InstructionType::SX:
+            case InstructionType::SY:
+            case InstructionType::SZ:
+            case InstructionType::SDG:
+            case InstructionType::SXDG:
+            case InstructionType::SYDG:
+            case InstructionType::SZDG:
+            case InstructionType::T:
+            case InstructionType::TDG:
+            case InstructionType::P0:
+            case InstructionType::P1:
+            case InstructionType::V:
+            case InstructionType::VDG:
+            case InstructionType::K:
             {
-                cunqa_instruction = OneQubitNoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitNoParam {
+                        instruction.at("qubits").get<Qubit>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::RX:
-            case InstructionTag::RY:
-            case InstructionTag::RZ:
-            case InstructionTag::GLOBALP:
-            case InstructionTag::P:
-            case InstructionTag::U1:
-            case InstructionTag::ROTX:
-            case InstructionTag::ROTY:
-            case InstructionTag::ROTZ:
-            case InstructionTag::ROTINVX:
-            case InstructionTag::ROTINVY:
-            case InstructionTag::ROTINVZ:
+            case InstructionType::RX:
+            case InstructionType::RY:
+            case InstructionType::RZ:
+            case InstructionType::GLOBALP:
+            case InstructionType::P:
+            case InstructionType::U1:
+            case InstructionType::ROTX:
+            case InstructionType::ROTY:
+            case InstructionType::ROTZ:
+            case InstructionType::ROTINVX:
+            case InstructionType::ROTINVY:
+            case InstructionType::ROTINVZ:
             {
                 auto param = instruction.at("params").get<double>();
                 circuit.params.push_back(&param);
-                cunqa_instruction = OneQubitOneParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(), 
-                    param
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitOneParam {
+                        instruction.at("qubits").get<Qubit>(), 
+                        param
+                    }
                 };
                 break;
             }
-            case InstructionTag::U2:
-            case InstructionTag::R:
+            case InstructionType::U2:
+            case InstructionType::R:
             {
                 auto params = instruction.at("params").get<std::array<double, 2>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
-                cunqa_instruction = OneQubitTwoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(), 
-                    params
+                
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitTwoParam {
+                        instruction.at("qubits").get<Qubit>(), 
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::U3:
+            case InstructionType::U3:
             {
                 auto params = instruction.at("params").get<std::array<double, 3>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
                 circuit.params.push_back(&params[2]);
-                cunqa_instruction = OneQubitThreeParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(), 
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitThreeParam {
+                        instruction.at("qubits").get<Qubit>(), 
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::U:
+            case InstructionType::U:
             {
                 auto params = instruction.at("params").get<std::array<double, 4>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
                 circuit.params.push_back(&params[2]);
                 circuit.params.push_back(&params[3]);
-                cunqa_instruction = OneQubitFourParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(), 
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitFourParam {
+                        instruction.at("qubits").get<Qubit>(), 
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::ECR:
-            case InstructionTag::SWAP:
-            case InstructionTag::ISWAP:
-            case InstructionTag::CX:
-            case InstructionTag::CY:
-            case InstructionTag::CZ:
-            case InstructionTag::CH:
-            case InstructionTag::CSX:
-            case InstructionTag::CSXDG:
-            case InstructionTag::CS:
-            case InstructionTag::CSDG:
-            case InstructionTag::CT:
-            case InstructionTag::DCX:
+            case InstructionType::ECR:
+            case InstructionType::SWAP:
+            case InstructionType::ISWAP:
+            case InstructionType::CX:
+            case InstructionType::CY:
+            case InstructionType::CZ:
+            case InstructionType::CH:
+            case InstructionType::CSX:
+            case InstructionType::CSXDG:
+            case InstructionType::CS:
+            case InstructionType::CSDG:
+            case InstructionType::CT:
+            case InstructionType::DCX:
             {
-                cunqa_instruction = TwoQubitNoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitNoParam {
+                        instruction.at("qubits").get<std::array<Qubit, 2>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::CRX:
-            case InstructionTag::CRY:
-            case InstructionTag::CRZ:
-            case InstructionTag::CP:
-            case InstructionTag::CU1:
-            case InstructionTag::RXX:
-            case InstructionTag::RYY:
-            case InstructionTag::RZZ:
-            case InstructionTag::RZX:
+            case InstructionType::CRX:
+            case InstructionType::CRY:
+            case InstructionType::CRZ:
+            case InstructionType::CP:
+            case InstructionType::CU1:
+            case InstructionType::RXX:
+            case InstructionType::RYY:
+            case InstructionType::RZZ:
+            case InstructionType::RZX:
             {
                 auto param = instruction.at("params").get<double>();
                 circuit.params.push_back(&param);
-                cunqa_instruction = TwoQubitOneParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>(),
-                    param
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitOneParam {
+                        instruction.at("qubits").get<std::array<Qubit, 2>>(),
+                        param
+                    }
                 };
                 break;
             }
-            case InstructionTag::CU2:
-            case InstructionTag::XXMYY:
-            case InstructionTag::XXPYY:
+            case InstructionType::CU2:
+            case InstructionType::XXMYY:
+            case InstructionType::XXPYY:
             {
                 auto params = instruction.at("params").get<std::array<double, 2>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
-                cunqa_instruction = TwoQubitTwoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>(),
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitTwoParam {
+                        instruction.at("qubits").get<std::array<Qubit, 2>>(),
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::CU3:
+            case InstructionType::CU3:
             {
                 auto params = instruction.at("params").get<std::array<double, 3>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
                 circuit.params.push_back(&params[2]);
-                cunqa_instruction = TwoQubitThreeParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>(),
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitThreeParam {
+                        instruction.at("qubits").get<std::array<Qubit, 2>>(),
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::CU:
+            case InstructionType::CU:
             {
                 auto params = instruction.at("params").get<std::array<double, 4>>();
                 circuit.params.push_back(&params[0]);
                 circuit.params.push_back(&params[1]);
                 circuit.params.push_back(&params[2]);
                 circuit.params.push_back(&params[3]);
-                cunqa_instruction = TwoQubitFourParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>(),
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitFourParam{
+                        instruction.at("qubits").get<std::array<Qubit, 2>>(),
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::CECR:
-            case InstructionTag::CSWAP:
-            case InstructionTag::CCX:
-            case InstructionTag::CCY:
-            case InstructionTag::CCZ:
+            case InstructionType::CECR:
+            case InstructionType::CSWAP:
+            case InstructionType::CCX:
+            case InstructionType::CCY:
+            case InstructionType::CCZ:
             {
-                cunqa_instruction = ThreeQubitNoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 3>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = ThreeQubitNoParam{
+                        instruction.at("qubits").get<std::array<Qubit, 3>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::MCX:
-            case InstructionTag::MCY:
-            case InstructionTag::MCZ:
-            case InstructionTag::MCSX:
-            case InstructionTag::MCSWAP:
+            case InstructionType::MCX:
+            case InstructionType::MCY:
+            case InstructionType::MCZ:
+            case InstructionType::MCSX:
+            case InstructionType::MCSWAP:
             {
-                cunqa_instruction = MulticontrolNoParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = MulticontrolNoParam{
+                        instruction.at("qubits").get<std::vector<Qubit>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::MCRX:
-            case InstructionTag::MCRY:
-            case InstructionTag::MCRZ:
-            case InstructionTag::MCP:
-            case InstructionTag::MCU1:
-            case InstructionTag::MCU2:
-            case InstructionTag::MCU3:
-            case InstructionTag::MCU:
+            case InstructionType::MCRX:
+            case InstructionType::MCRY:
+            case InstructionType::MCRZ:
+            case InstructionType::MCP:
+            case InstructionType::MCU1:
+            case InstructionType::MCU2:
+            case InstructionType::MCU3:
+            case InstructionType::MCU:
             {
                 auto params = instruction.at("params").get<std::vector<double>>();
                 for(auto& param : params)
                     circuit.params.push_back(&param);
-                cunqa_instruction = MulticontrolParam{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<int>>(), 
-                    params
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = MulticontrolParam{
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        params
+                    }
                 };
                 break;
             }
-            case InstructionTag::UNITARY:
-            case InstructionTag::SPARSEMATRIX:
+            case InstructionType::UNITARY:
+            case InstructionType::SPARSEMATRIX:
             {
-                cunqa_instruction = MatrixGate{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>(), 
-                    Matrix() // TODO: Arreglar
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = MatrixGate{
+                        instruction.at("qubits").get<std::vector<Qubit>>(), 
+                        Matrix() // TODO: Arreglar
+                    }
                 };
                 break;
             }
-            case InstructionTag::DIAGONAL:
+            case InstructionType::DIAGONAL:
             {
-                cunqa_instruction = DiagonalMatrixGate{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>(), 
-                    DiagonalMatrix() // TODO: Arreglar
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = DiagonalMatrixGate {
+                        instruction.at("qubits").get<std::vector<Qubit>>(), 
+                        DiagonalMatrix() // TODO: Arreglar
+                    }
                 };
                 break;
             }
-            case InstructionTag::RANDOMUNITARY:
+            case InstructionType::RANDOMUNITARY:
             {
                 int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
-                cunqa_instruction = RandomUnitary{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<int>>(), 
-                    seed
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = RandomUnitary {
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        seed
+                    }
                 };
                 break;
             }
-            case InstructionTag::FUSEDSWAP:
+            case InstructionType::FUSEDSWAP:
             {
-                cunqa_instruction = FusedSwap{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>(),
-                    instruction.at("block_size").get<int>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = FusedSwap {
+                        instruction.at("qubits").get<std::vector<Qubit>>(),
+                        instruction.at("block_size").get<int>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::MULTIPAULI:
-            case InstructionTag::MULTIPAULIROTATION:
+            case InstructionType::MULTIPAULI:
+            case InstructionType::MULTIPAULIROTATION:
             {
                 double param = 0;
                 if (instruction.contains("param"))
                     param = instruction.at("param");
-                cunqa_instruction = MultiPauli{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>(), 
-                    param,
-                    instruction.at("pauli_id_list").get<std::vector<unsigned int>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = MultiPauli{
+                        instruction.at("qubits").get<std::vector<Qubit>>(), 
+                        param,
+                        instruction.at("pauli_id_list").get<std::vector<unsigned int>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::AMPLITUDEDAMPINGNOISE:
-            case InstructionTag::BITFLIPNOISE:
-            case InstructionTag::DEPHASINGNOISE:
-            case InstructionTag::DEPOLARIZINGNOISE:
-            case InstructionTag::INDEPENDENTXZNOISE:
+            case InstructionType::AMPLITUDEDAMPINGNOISE:
+            case InstructionType::BITFLIPNOISE:
+            case InstructionType::DEPHASINGNOISE:
+            case InstructionType::DEPOLARIZINGNOISE:
+            case InstructionType::INDEPENDENTXZNOISE:
             {
                 int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
-                cunqa_instruction = OneQubitNoise{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(), 
-                    instruction.at("params").get<double>(),
-                    seed
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = OneQubitNoise{
+                        instruction.at("qubits").get<Qubit>(), 
+                        instruction.at("params").get<double>(),
+                        seed
+                    }
                 };
                 break;
             }
-            case InstructionTag::TWOQUBITDEPOLARIZINGNOISE:
+            case InstructionType::TWOQUBITDEPOLARIZINGNOISE:
             {
                 int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
-                cunqa_instruction = TwoQubitNoise{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::array<Qubit, 2>>(), 
-                    instruction.at("params").get<double>(),
-                    seed
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = TwoQubitNoise{
+                        instruction.at("qubits").get<std::array<Qubit, 2>>(), 
+                        instruction.at("params").get<double>(),
+                        seed
+                    }
                 };
                 break;
             }
-            case InstructionTag::SEND:
-            case InstructionTag::RECV:
+            case InstructionType::SEND:
+            case InstructionType::RECV:
             {
-                cunqa_instruction = ClassicalComm{
-                    instruction_tag,
-                    instruction.at("clbits").get<std::vector<Clbit>>(), 
-                    instruction.at("qpus").get<std::vector<std::string>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = ClassicalComm{
+                        instruction.at("clbits").get<std::vector<Clbit>>(), 
+                        instruction.at("qpus").get<std::vector<std::string>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::QSEND:
-            case InstructionTag::QRECV:
-            case InstructionTag::EXPOSE:
-            case InstructionTag::UNEXPOSE:
+            case InstructionType::QSEND:
+            case InstructionType::QRECV:
+            case InstructionType::EXPOSE:
+            case InstructionType::UNEXPOSE:
             {
-                cunqa_instruction = QuantumComm{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>(),
-                    instruction.at("qpus").get<std::vector<std::string>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = QuantumComm{
+                        instruction.at("qubits").get<std::vector<Qubit>>(),
+                        instruction.at("qpus").get<std::vector<std::string>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::CIF:
-            case InstructionTag::ENDCIF:
+            case InstructionType::CIF:
+            case InstructionType::ENDCIF:
             {
-                cunqa_instruction = ClassicalIf{
-                    instruction_tag,
-                    instruction.at("clbits").get<std::vector<Clbit>>(), 
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = ClassicalIf{
+                        instruction.at("clbits").get<std::vector<Clbit>>(), 
+                    }
                 };
                 break;
             }
-            case InstructionTag::COPY:
+            case InstructionType::COPY:
             {
-                cunqa_instruction = Copy{
-                    instruction_tag,
-                    instruction.at("l_clbits").get<std::vector<Clbit>>(),
-                    instruction.at("r_clbits").get<std::vector<Clbit>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = Copy{
+                        instruction.at("l_clbits").get<std::vector<Clbit>>(),
+                        instruction.at("r_clbits").get<std::vector<Clbit>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::RESET:
+            case InstructionType::RESET:
             {
-                cunqa_instruction = Reset{
-                    instruction_tag,
-                    instruction.at("qubits").get<std::vector<Qubit>>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = Reset{
+                        instruction.at("qubits").get<std::vector<Qubit>>()
+                    }
                 };
                 break;
             }
-            case InstructionTag::SAVE_STATE:
+            case InstructionType::SAVE_STATE:
             {
                 // TODO: Hacerlo
                 break;
             }    
-            case InstructionTag::MEASURE:
+            case InstructionType::MEASURE:
             {
-                cunqa_instruction = Measure{
-                    instruction_tag,
-                    instruction.at("qubits").get<Qubit>(),
-                    instruction.at("clbits").get<Clbit>()
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = Measure{
+                        instruction.at("qubits").get<Qubit>(),
+                        instruction.at("clbits").get<Clbit>()
+                    }
                 };
                 break;
             }

@@ -2,19 +2,19 @@
 
 #include <vector>
 
-#include "backend.hpp"
-#include "quantum_task.hpp"
-#include "simulators/simulator_strategy.hpp"
+#include "sim/backend.hpp"
+#include "quantum_task/quantum_task.hpp"
+#include "sim/simulator.hpp"
+#include "cc_executor.hpp"
 
 #include "utils/json.hpp"
-#include "utils/helpers/basis_gates.hpp"
-#include "logger.hpp"
 
 
 namespace cunqa {
 namespace sim {
 
-struct CCConfig {
+class CCBackend final : public Backend {
+public:
     std::string name = "CCBackend";
     std::string version = "0.0.1";
     int n_qubits = 32;
@@ -23,68 +23,46 @@ struct CCConfig {
     std::vector<std::string> basis_gates;
     std::string custom_instructions;
     std::vector<std::string> gates;
-
-    void set_basis_gates(const std::vector<std::string> basis_gates)
-    {
-        this->basis_gates = basis_gates;
-    }
-
-    friend void from_json(const JSON& j, CCConfig &obj)
-    {
-        j.at("name").get_to(obj.name);
-        j.at("version").get_to(obj.version);
-        j.at("n_qubits").get_to(obj.n_qubits);
-        j.at("description").get_to(obj.description);
-        j.at("coupling_map").get_to(obj.coupling_map);
-        j.at("basis_gates").get_to(obj.basis_gates);
-        j.at("custom_instructions").get_to(obj.custom_instructions);
-        j.at("gates").get_to(obj.gates);
-    }
-
-    friend void to_json(JSON& j, const CCConfig& obj)
-    {
-        j = {   
-            {"name", obj.name}, 
-            {"version", obj.version},
-            {"n_qubits", obj.n_qubits}, 
-            {"description", obj.description},
-            {"coupling_map", obj.coupling_map},
-            {"basis_gates", obj.basis_gates}, 
-            {"custom_instructions", obj.custom_instructions},
-            {"gates", obj.gates},
-        };
-    }
-};
-
-class CCBackend final : public Backend {
-public:
-    CCConfig cc_config;
+    std::string simulator_name;
     
-    CCBackend(const CCConfig& cc_config, std::unique_ptr<SimulatorStrategy<CCBackend>> simulator): 
-        cc_config{cc_config},
-        simulator_{std::move(simulator)}
+    CCBackend(std::unique_ptr<Simulator> simulator, const JSON& backend_json): 
+        executor_{std::move(simulator)}
     {
-        config = cc_config;
+        if (!backend_json.empty()) {
+            name = backend_json.at("name");
+            version = backend_json.at("version");
+            n_qubits = backend_json.at("n_qubits");
+            description = backend_json.at("description");
+            coupling_map = backend_json.at("coupling_map");
+            basis_gates = backend_json.at("basis_gates");
+            custom_instructions = backend_json.at("custom_instructions");
+            gates = backend_json.at("gates");
+            simulator_name = simulator->get_name();
+        }
     }
 
-    CCBackend(CCBackend& cc_backend) = default;
-
-    inline JSON execute(const QuantumTask& quantum_task) const override
+    inline JSON execute(const QuantumTask& quantum_task) override
     {
-        return simulator_->execute(*this, quantum_task);
+        return executor_.execute(quantum_task);
     }
 
-    // TODO: Achieve this using the JSON adl serializer
-    JSON to_json() const override 
+    JSON to_json() const
     {
-        JSON config_json = config;
-        const auto simulator_name = simulator_->get_name();
-        config_json["simulator"] = simulator_name;
-        return config_json;
+        return {{   
+            {"name", name}, 
+            {"version", version},
+            {"n_qubits", n_qubits}, 
+            {"description", description},
+            {"coupling_map", coupling_map},
+            {"basis_gates", basis_gates}, 
+            {"custom_instructions", custom_instructions},
+            {"gates", gates},
+            {"simulator", simulator_name}
+        }};
     }
 
 private:
-    std::unique_ptr<SimulatorStrategy<CCBackend>> simulator_;
+    CCExecutor executor_;
 };
 
 } // End of sim namespace

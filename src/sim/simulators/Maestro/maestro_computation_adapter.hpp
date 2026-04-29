@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quantum_task.hpp"
+#include "quantum_task/quantum_task.hpp"
 
 namespace cunqa {
 namespace sim {

@@ -3,8 +3,8 @@
 #include <span>
 #include <string_view>
 
-#include "run_config.hpp"
-#include "circuit.hpp"
+#include "quantum_task/run_config.hpp"
+#include "quantum_task/circuit.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -30,127 +30,127 @@ public:
         return result;
     }
 
-    virtual void apply_gate(const OneQubitNoParam& instruction) 
+    virtual void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) 
     { 
-        unsupported_gate(instruction); 
+        unsupported_gate(type, payload); 
     }
 
-    virtual void apply_gate(const OneQubitOneParam& instruction) 
+    virtual void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) 
     { 
-        unsupported_gate(instruction); 
+        unsupported_gate(type, payload); 
     }
     
-    virtual void apply_gate(const OneQubitTwoParam& instruction) 
+    virtual void apply_gate(const InstructionType& type, const OneQubitTwoParam& payload) 
     { 
-        unsupported_gate(instruction); 
+        unsupported_gate(type, payload); 
     }
 
-    virtual void apply_gate(const OneQubitThreeParam& instruction) 
+    virtual void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) 
     { 
-        unsupported_gate(instruction); 
+        unsupported_gate(type, payload); 
     }
 
-    virtual void apply_gate(const OneQubitFourParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const OneQubitFourParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitNoParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitOneParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitTwoParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitThreeParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitThreeParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitFourParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const ThreeQubitNoParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const MulticontrolNoParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const MulticontrolNoParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const MulticontrolParam& instruction)
+    virtual void apply_gate(const InstructionType& type, const MulticontrolParam& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const MultiPauli& instruction)
+    virtual void apply_gate(const InstructionType& type, const MultiPauli& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const FusedSwap& instruction)
+    virtual void apply_gate(const InstructionType& type, const FusedSwap& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const MatrixGate& instruction)
+    virtual void apply_gate(const InstructionType& type, const MatrixGate& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const DiagonalMatrixGate& instruction)
+    virtual void apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const OneQubitNoise& instruction)
+    virtual void apply_gate(const InstructionType& type, const OneQubitNoise& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const TwoQubitNoise& instruction)
+    virtual void apply_gate(const InstructionType& type, const TwoQubitNoise& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const RandomUnitary& instruction)
+    virtual void apply_gate(const InstructionType& type, const RandomUnitary& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const Measure& instruction)
+    virtual void apply_gate(const InstructionType& type, const Measure& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const Reset& instruction)
+    virtual void apply_gate(const InstructionType& type, const Reset& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const Copy& instruction)
+    virtual void apply_gate(const InstructionType& type, const Copy& payload)
     {
-        unsupported_gate(instruction);
+        unsupported_gate(type, payload);
     }
 
 protected:
     template <typename Gate>
-    [[noreturn]] inline void unsupported_gate(const Gate& instruction) const
+    [[noreturn]] inline void unsupported_gate(const InstructionType& type, const Gate& payload) const
     {
         throw std::runtime_error(
-            "Gate " + INVERTED_INSTRUCTIONS_MAP.at(instruction.tag) + 
+            "Gate " + INVERTED_INSTRUCTIONS_MAP.at(type) + 
             " not supported by " + get_name() + " simulator." 
         );
     }

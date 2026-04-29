@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "simulator.hpp"
-#include "classical_channel.hpp"
-#include "quantum_task.hpp"
+#include "sim/simulator.hpp"
+#include "quantum_task/quantum_task.hpp"
+#include "comm/classical_channel.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -11,7 +11,6 @@ namespace sim {
 class CCExecutor {
 public:
     CCExecutor(std::unique_ptr<Simulator> simulator);
-    ~CCExecutor() = default;
 
     JSON execute(const QuantumTask& quantum_task);
 private:

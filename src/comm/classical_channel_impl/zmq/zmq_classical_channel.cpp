@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "zmq.hpp"
 
-#include "classical_channel/classical_channel.hpp"
+#include "comm/classical_channel.hpp"
 #include "utils/helpers/net_functions.hpp"
 
 #include "utils/json.hpp"
@@ -130,12 +130,6 @@ void ClassicalChannel::connect(const std::string& qpu_id)
 //------------------------------------------------------------------------------------
 void ClassicalChannel::send_info(const std::string& data, const std::string& target) { pimpl_->send(data, target); }
 std::string ClassicalChannel::recv_info(const std::string& origin) { return pimpl_->recv(origin); }
-
-//-----------------------------------------
-// Send and recv functions for measurements
-//-----------------------------------------
-void ClassicalChannel::send_measure(const int& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
-int ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
 
 //-----------------------------------------
 // Send and recv functions for measurements

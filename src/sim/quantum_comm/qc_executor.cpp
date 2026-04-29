@@ -13,7 +13,7 @@ std::string execute_shot_(
     while (stream.has_next())
     {
         auto instr = stream.next();
-        switch (instr.tag)
+        switch (instr.type)
         {
             case cunqa::CIF:
             {

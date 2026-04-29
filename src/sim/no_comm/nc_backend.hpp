@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "simulator.hpp"
-#include "backend.hpp"
-#include "quantum_task.hpp"
+#include "sim/simulator.hpp"
+#include "sim/backend.hpp"
+#include "quantum_task/quantum_task.hpp"
 #include "nc_executor.hpp"
 #include "utils/json.hpp"
 
@@ -21,6 +21,7 @@ public:
     std::vector<std::string> basis_gates;
     std::string custom_instructions;
     std::vector<std::string> gates;
+    std::string simulator_name;
     JSON noise_model = {};
     std::string noise_properties_path;
     std::string noise_path;
@@ -37,13 +38,14 @@ public:
             basis_gates = backend_json.at("basis_gates");
             custom_instructions = backend_json.at("custom_instructions");
             gates = backend_json.at("gates");
+            simulator_name = simulator->get_name();
             noise_model = backend_json.at("noise_model");
             noise_properties_path = backend_json.at("noise_properties_path");
             noise_path = backend_json.at("noise_path");
         }
     }
 
-    inline JSON execute(const QuantumTask& quantum_task) const override
+    inline JSON execute(const QuantumTask& quantum_task) override
     {
         return quantum_task.config.is_dynamic ? executor_.custom_execute(quantum_task)
                                               : executor_.native_execute(quantum_task, noise_model);
@@ -60,6 +62,7 @@ public:
             {"basis_gates", basis_gates}, 
             {"custom_instructions", custom_instructions},
             {"gates", gates},
+            {"simulator", simulator_name},
             {"noise_model", noise_path},
             {"noise_properties_path", noise_properties_path}
         }};

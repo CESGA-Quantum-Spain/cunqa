@@ -29,6 +29,7 @@ target_link_libraries(setup_qpus
     qpu
     logger_qpu
     nc_executor
+    cc_executor
     simulator
     simulator_factory
 )

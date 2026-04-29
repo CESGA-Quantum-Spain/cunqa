@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "simulator.hpp"
+#include "sim/simulator.hpp"
 #include "comm/classical_channel/classical_channel.hpp"
 
 namespace cunqa {

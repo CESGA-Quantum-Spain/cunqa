@@ -4,8 +4,8 @@
 #include <variant>
 #include <string>
 
-#include "circuit.hpp"
-#include "run_config.hpp"
+#include "quantum_task/circuit.hpp"
+#include "quantum_task/run_config.hpp"
 
 namespace cunqa {
 

@@ -1,11 +1,22 @@
-
-add_library(cc_executor cc_executor.cpp)
-target_link_directories(cc_executor PUBLIC json)
-target_include_directories(cc_executor
-    PUBLIC
-        "${CMAKE_SOURCE_DIR}/src/quantum_task"
-        "${CMAKE_SOURCE_DIR}/src/sim"
-        "${CMAKE_SOURCE_DIR}/src/comm"
-    PRIVATE
-        "${CURRENT_SOURCE_DIR}"
+add_library(cc_executor)
+target_sources(cc_executor
+  PRIVATE
+    cc_executor.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES
+      cc_executor.hpp
+      cc_backend.hpp
 )
+target_link_libraries(cc_executor 
+  PUBLIC 
+    backend 
+    simulator 
+    quantum_task
+    classical_channel
+    json
+  PRIVATE
+    logger_qpu
+)
+

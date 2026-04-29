@@ -4,7 +4,7 @@
 #include "ir/operations/OpType.hpp"
 #include "dd/Operations.hpp"
 
-#include "quantum_task.hpp"
+#include "quantum_task/quantum_task.hpp"
 #include "utils/constants.hpp"
 #include "logger.hpp"
 

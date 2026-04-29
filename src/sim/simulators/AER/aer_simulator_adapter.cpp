@@ -211,231 +211,231 @@ void AerSimulatorAdapter::clear()
     state_->aer_state.clear();
 }
 
-void AerSimulatorAdapter::apply_gate(const OneQubitNoParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitNoParam& payload)
 {
-    auto qubit = static_cast<AER::uint_t>(instruction.qubit);
-    switch (instruction.tag)
+    auto qubit = static_cast<AER::uint_t>(payload.qubit);
+    switch (type)
     {
-        case InstructionTag::ID:
+        case InstructionType::ID:
             break;
 
-        case InstructionTag::X:
+        case InstructionType::X:
             state_->aer_state.apply_x(qubit);
             break;
 
-        case InstructionTag::Y:
+        case InstructionType::Y:
             state_->aer_state.apply_y(qubit);
             break;
 
-        case InstructionTag::Z:
+        case InstructionType::Z:
             state_->aer_state.apply_z(qubit);
             break;
 
-        case InstructionTag::H:
+        case InstructionType::H:
             state_->aer_state.apply_h(qubit);
             break;
 
-        case InstructionTag::SX:
+        case InstructionType::SX:
             state_->aer_state.apply_mcsx({qubit});
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const OneQubitOneParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitOneParam& payload)
 {
-    AER::reg_t qubit = {static_cast<AER::uint_t>(instruction.qubit)};
-    switch (instruction.tag)
+    AER::reg_t qubit = {static_cast<AER::uint_t>(payload.qubit)};
+    switch (type)
     {
-        case InstructionTag::RX:
-            state_->aer_state.apply_mcrx(qubit, instruction.param);
+        case InstructionType::RX:
+            state_->aer_state.apply_mcrx(qubit, payload.param);
             break;
 
-        case InstructionTag::RY:
-            state_->aer_state.apply_mcry(qubit, instruction.param);
+        case InstructionType::RY:
+            state_->aer_state.apply_mcry(qubit, payload.param);
             break;
 
-        case InstructionTag::RZ:
-            state_->aer_state.apply_mcrz(qubit, instruction.param);
+        case InstructionType::RZ:
+            state_->aer_state.apply_mcrz(qubit, payload.param);
             break;
 
-        case InstructionTag::GLOBALP:
-            state_->aer_state.apply_global_phase(instruction.param);
+        case InstructionType::GLOBALP:
+            state_->aer_state.apply_global_phase(payload.param);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const OneQubitThreeParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitThreeParam& payload)
 {
-    auto qubit = static_cast<AER::uint_t>(instruction.qubit);
-    switch (instruction.tag)
+    auto qubit = static_cast<AER::uint_t>(payload.qubit);
+    switch (type)
     {
-        case InstructionTag::U3:
+        case InstructionType::U3:
             state_->aer_state.apply_u(
                 qubit,
-                instruction.params[0],
-                instruction.params[1],
-                instruction.params[2]
+                payload.params[0],
+                payload.params[1],
+                payload.params[2]
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const TwoQubitNoParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitNoParam& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::SWAP:
+        case InstructionType::SWAP:
             state_->aer_state.apply_mcswap(qubits);
             break;
 
-        case InstructionTag::CX:
+        case InstructionType::CX:
             state_->aer_state.apply_mcx(qubits);
             break;
 
-        case InstructionTag::CY:
+        case InstructionType::CY:
             state_->aer_state.apply_mcy(qubits);
             break;
 
-        case InstructionTag::CZ:
+        case InstructionType::CZ:
             state_->aer_state.apply_mcz(qubits);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const TwoQubitOneParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitOneParam& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::CRX:
-            state_->aer_state.apply_mcrx(qubits, instruction.param);
+        case InstructionType::CRX:
+            state_->aer_state.apply_mcrx(qubits, payload.param);
             break;
 
-        case InstructionTag::CRY:
-            state_->aer_state.apply_mcry(qubits, instruction.param);
+        case InstructionType::CRY:
+            state_->aer_state.apply_mcry(qubits, payload.param);
             break;
 
-        case InstructionTag::CRZ:
-            state_->aer_state.apply_mcrz(qubits, instruction.param);
+        case InstructionType::CRZ:
+            state_->aer_state.apply_mcrz(qubits, payload.param);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const TwoQubitFourParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitFourParam& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::CU:
+        case InstructionType::CU:
             state_->aer_state.apply_cu(
                 qubits,
-                instruction.params[0],
-                instruction.params[1],
-                instruction.params[2],
-                instruction.params[3]
+                payload.params[0],
+                payload.params[1],
+                payload.params[2],
+                payload.params[3]
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const MulticontrolNoParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const MulticontrolNoParam& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::MCX:
+        case InstructionType::MCX:
             state_->aer_state.apply_mcx(qubits);
             break;
 
-        case InstructionTag::MCY:
+        case InstructionType::MCY:
             state_->aer_state.apply_mcy(qubits);
             break;
 
-        case InstructionTag::MCZ:
+        case InstructionType::MCZ:
             state_->aer_state.apply_mcz(qubits);
             break;
 
-        case InstructionTag::MCSX:
+        case InstructionType::MCSX:
             state_->aer_state.apply_mcsx(qubits);
             break;
 
-        case InstructionTag::MCSWAP:
+        case InstructionType::MCSWAP:
             state_->aer_state.apply_mcswap(qubits);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const MulticontrolParam& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const MulticontrolParam& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::MCRX:
-            state_->aer_state.apply_mcrx(qubits, instruction.params[0]);
+        case InstructionType::MCRX:
+            state_->aer_state.apply_mcrx(qubits, payload.params[0]);
             break;
 
-        case InstructionTag::MCRY:
-            state_->aer_state.apply_mcry(qubits, instruction.params[0]);
+        case InstructionType::MCRY:
+            state_->aer_state.apply_mcry(qubits, payload.params[0]);
             break;
 
-        case InstructionTag::MCRZ:
-            state_->aer_state.apply_mcrz(qubits, instruction.params[0]);
+        case InstructionType::MCRZ:
+            state_->aer_state.apply_mcrz(qubits, payload.params[0]);
             break;
 
-        case InstructionTag::MCP:
-            state_->aer_state.apply_mcphase(qubits, instruction.params[0]);
+        case InstructionType::MCP:
+            state_->aer_state.apply_mcphase(qubits, payload.params[0]);
             break;
 
-        case InstructionTag::MCU:
+        case InstructionType::MCU:
             state_->aer_state.apply_mcu(
                 qubits,
-                instruction.params[0],
-                instruction.params[1],
-                instruction.params[2],
-                instruction.params[3]
+                payload.params[0],
+                payload.params[1],
+                payload.params[2],
+                payload.params[3]
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const MatrixGate& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGate& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::UNITARY:
+        case InstructionType::UNITARY:
         {
             std::vector<complex_t> matrix_data;
 
-            for (const auto& row : instruction.matrix)
+            for (const auto& row : payload.matrix)
                 matrix_data.insert(matrix_data.end(), row.begin(), row.end());
 
-            const auto dim = instruction.matrix.size();
+            const auto dim = payload.matrix.size();
 
             matrix<complex_t> aer_matrix{
                 dim,
@@ -448,75 +448,75 @@ void AerSimulatorAdapter::apply_gate(const MatrixGate& instruction)
         }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const DiagonalMatrixGate& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::DIAGONAL:
+        case InstructionType::DIAGONAL:
             state_->aer_state.apply_diagonal_matrix(
                 qubits,
-                instruction.matrix
+                payload.matrix
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const Measure& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const Measure& payload)
 {
-    auto qubit = static_cast<AER::uint_t>(instruction.qubit);
-    switch (instruction.tag)
+    auto qubit = static_cast<AER::uint_t>(payload.qubit);
+    switch (type)
     {
-        case InstructionTag::MEASURE:
-            creg[instruction.clbit] =
+        case InstructionType::MEASURE:
+            creg[payload.clbit] =
                 static_cast<bool>(state_->aer_state.apply_measure({qubit}));
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const Reset& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const Reset& payload)
 {
-    AER::reg_t qubits(instruction.qubits.begin(), instruction.qubits.end());
-    switch (instruction.tag)
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
     {
-        case InstructionTag::RESET:
+        case InstructionType::RESET:
             state_->aer_state.apply_reset(qubits);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void AerSimulatorAdapter::apply_gate(const Copy& instruction)
+void AerSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::COPY:
-            if (instruction.l_clbits.size() != instruction.r_clbits.size()) {
+        case InstructionType::COPY:
+            if (payload.l_clbits.size() != payload.r_clbits.size()) {
                 throw std::runtime_error(
                     "The number of copied clbits and the number of clbits "
                     "copied on does not match."
                 );
             }
 
-            for (size_t i = 0; i < instruction.l_clbits.size(); ++i)
-                creg[instruction.l_clbits[i]] = creg[instruction.r_clbits[i]];
+            for (size_t i = 0; i < payload.l_clbits.size(); ++i)
+                creg[payload.l_clbits[i]] = creg[payload.r_clbits[i]];
 
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 

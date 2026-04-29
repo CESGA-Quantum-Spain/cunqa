@@ -52,151 +52,151 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
         switch (INSTRUCTIONS_MAP.at(gate_name))
         {   
             // Non-parametric 1 qubit gates
-            case InstructionTag::ID:
-            case InstructionTag::X:
-            case InstructionTag::Y:
-            case InstructionTag::Z:
-            case InstructionTag::H:
-            case InstructionTag::S:
-            case InstructionTag::SX:
-            case InstructionTag::SY:
-            case InstructionTag::SZ:
-            case InstructionTag::SDG:
-            case InstructionTag::SXDG:
-            case InstructionTag::SYDG:
-            case InstructionTag::SZDG:
-            case InstructionTag::T:
-            case InstructionTag::TDG:
-            case InstructionTag::P0:
-            case InstructionTag::P1:
-            case InstructionTag::V:
-            case InstructionTag::VDG:
-            case InstructionTag::K:
+            case InstructionType::ID:
+            case InstructionType::X:
+            case InstructionType::Y:
+            case InstructionType::Z:
+            case InstructionType::H:
+            case InstructionType::S:
+            case InstructionType::SX:
+            case InstructionType::SY:
+            case InstructionType::SZ:
+            case InstructionType::SDG:
+            case InstructionType::SXDG:
+            case InstructionType::SYDG:
+            case InstructionType::SZDG:
+            case InstructionType::T:
+            case InstructionType::TDG:
+            case InstructionType::P0:
+            case InstructionType::P1:
+            case InstructionType::V:
+            case InstructionType::VDG:
+            case InstructionType::K:
                 qasm_circt += gate_name + " q["  + std::to_string(qubits[0]) + "];\n";
                 break;
             // 1 Parametric 1 qubit gates
-            case InstructionTag::U1:
-            case InstructionTag::GLOBALP:
-            case InstructionTag::P:
-            case InstructionTag::RX:
-            case InstructionTag::RY:
-            case InstructionTag::RZ:
-            case InstructionTag::ROTINVX:
-            case InstructionTag::ROTINVY:
-            case InstructionTag::ROTINVZ:
-            case InstructionTag::ROTX:
-            case InstructionTag::ROTY:
-            case InstructionTag::ROTZ:
+            case InstructionType::U1:
+            case InstructionType::GLOBALP:
+            case InstructionType::P:
+            case InstructionType::RX:
+            case InstructionType::RY:
+            case InstructionType::RZ:
+            case InstructionType::ROTINVX:
+            case InstructionType::ROTINVY:
+            case InstructionType::ROTINVZ:
+            case InstructionType::ROTX:
+            case InstructionType::ROTY:
+            case InstructionType::ROTZ:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ") q[" + std::to_string(qubits[0]) + "];\n";
                 break;
             }
             // 2 Parametric 1 qubit gates
-                case InstructionTag::U2:
-                case InstructionTag::R:
+                case InstructionType::U2:
+                case InstructionType::R:
                 {
                     params = instruction.at("params").get<std::vector<double>>();
                     qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ")" + " q[" + std::to_string(qubits[0]) + "];\n";
                     break;
                 }
             // 3 Parametric 1 qubit gates
-            case InstructionTag::U3: 
+            case InstructionType::U3: 
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) + ")" + " q[" + std::to_string(qubits[0]) + "];\n";
                 break;
             }
             // 4 Parametric 1 qubit gates
-            case InstructionTag::U:
+            case InstructionType::U:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) +", " + std::to_string(params[3]) + ")" + " q[" + std::to_string(qubits[0]) + "];\n";
                 break;
             }
             //UNITARY
-            case InstructionTag::UNITARY:
+            case InstructionType::UNITARY:
             {
                 matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<std::vector<double>>>>>();
                 qasm_circt += gate_name + "(" + triple_vector_to_string(matrix[0]) + ") q[" + std::to_string(qubits[0]) + "];\n";
                 break;
             }
             // Non-parametric 2 qubit gates
-            case InstructionTag::SWAP:
-            case InstructionTag::ISWAP:
-            case InstructionTag::CX:
-            case InstructionTag::CY:
-            case InstructionTag::CZ:
-            case InstructionTag::CSX:
-            case InstructionTag::CSXDG:
-            case InstructionTag::CS:
-            case InstructionTag::CSDG:
-            case InstructionTag::CT:
-            case InstructionTag::DCX:
-            case InstructionTag::ECR:
+            case InstructionType::SWAP:
+            case InstructionType::ISWAP:
+            case InstructionType::CX:
+            case InstructionType::CY:
+            case InstructionType::CZ:
+            case InstructionType::CSX:
+            case InstructionType::CSXDG:
+            case InstructionType::CS:
+            case InstructionType::CSDG:
+            case InstructionType::CT:
+            case InstructionType::DCX:
+            case InstructionType::ECR:
                 qasm_circt += gate_name + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             // Parametric 2 qubit gates
-            case InstructionTag::CU1:
-            case InstructionTag::CP:
-            case InstructionTag::CRX:
-            case InstructionTag::CRY:
-            case InstructionTag::CRZ:
-            case InstructionTag::RXX:
-            case InstructionTag::RYY:
-            case InstructionTag::RZZ:
-            case InstructionTag::RZX:
-            case InstructionTag::XXMYY:
-            case InstructionTag::XXPYY:
+            case InstructionType::CU1:
+            case InstructionType::CP:
+            case InstructionType::CRX:
+            case InstructionType::CRY:
+            case InstructionType::CRZ:
+            case InstructionType::RXX:
+            case InstructionType::RYY:
+            case InstructionType::RZZ:
+            case InstructionType::RZX:
+            case InstructionType::XXMYY:
+            case InstructionType::XXPYY:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ")" + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             }
             // 2 Parametric 2 qubit gates
-            case InstructionTag::CU2:
+            case InstructionType::CU2:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt +=  gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ")" + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             }
             // 3 Parametric 2 qubit gates
-            case InstructionTag::CU3:
+            case InstructionType::CU3:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt +=  gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) + ")" + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             }
             // 4 Parametric 2 qubit gates
-            case InstructionTag::CU:
+            case InstructionType::CU:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt +=  gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) + ", " + std::to_string(params[3]) + ")" + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             }
             // Non-parametric 3 qubit gates
-            case InstructionTag::CCX:
-            case InstructionTag::CCY:
-            case InstructionTag::CCZ:
-            case InstructionTag::CECR:
-            case InstructionTag::CSWAP:
+            case InstructionType::CCX:
+            case InstructionType::CCY:
+            case InstructionType::CCZ:
+            case InstructionType::CECR:
+            case InstructionType::CSWAP:
                 qasm_circt += gate_name + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "], q[" + std::to_string(qubits[2]) + "];\n";
                 break;
             // Non-parametric 1 qubit multicontroled
-            case InstructionTag::MCX:
-            case InstructionTag::MCY:
-            case InstructionTag::MCZ:
-            case InstructionTag::MCSX:
+            case InstructionType::MCX:
+            case InstructionType::MCY:
+            case InstructionType::MCZ:
+            case InstructionType::MCSX:
             {
                 qasm_circt += gate_name + " q[" + std::to_string(qubits[0]) + "], q[" + std::to_string(qubits[1]) + "];\n";
                 break;
             }
             // 1 parametric 1 qubit multicontroled
-            case InstructionTag::MCRX:
-            case InstructionTag::MCRY:
-            case InstructionTag::MCRZ:
-            case InstructionTag::MCP:
-            case InstructionTag::MCU1:
+            case InstructionType::MCRX:
+            case InstructionType::MCRY:
+            case InstructionType::MCRZ:
+            case InstructionType::MCP:
+            case InstructionType::MCU1:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ") ";
@@ -210,7 +210,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 break;
             }
             // 2 parametric 1 qubit multicontroled
-            case InstructionTag::MCU2:
+            case InstructionType::MCU2:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) + ") ";
@@ -224,7 +224,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 break;
             }
             // 3 parametric 1 qubit multicontroled
-            case InstructionTag::MCU3:
+            case InstructionType::MCU3:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) +", " + std::to_string(params[3]) + ") ";
@@ -238,7 +238,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 break;
             }
             // 4 parametric 1 qubit multicontroled
-            case InstructionTag::MCU:
+            case InstructionType::MCU:
             {
                 params = instruction.at("params").get<std::vector<double>>();
                 qasm_circt += gate_name + "(" + std::to_string(params[0]) + ", " + std::to_string(params[1]) + ", " + std::to_string(params[2]) +", " + std::to_string(params[3]) + ") ";
@@ -252,7 +252,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 break;
             }
             // Non-parametric 2 qubit multicontroled
-            case InstructionTag::MCSWAP:
+            case InstructionType::MCSWAP:
             {
                 qasm_circt += gate_name + " ";
                 for (size_t i = 0; i < qubits.size(); ++i) {
@@ -264,7 +264,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
                 qasm_circt += ";\n";
                 break;
             }
-            case InstructionTag::MEASURE:
+            case InstructionType::MEASURE:
             {
                 auto clbits = instruction.at("clbits").get<std::vector<int>>();
                 qasm_circt += "measure q[" + std::to_string(qubits[0]) + "] -> c[" + std::to_string(clbits[0]) + "];\n";
