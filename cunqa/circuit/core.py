@@ -2565,7 +2565,7 @@ class CunqaCircuit:
     # (Any of the following (and their multicontrolled versions) can be controlled by 0: CS, CT, CH, CSWAP, CSQRTSWAP, CY, CZ, CPAULISTR, CRX, CRY, CRZ, CRAXIS, CPAULIGADGET, CPHASEGADGET, CMX, CUNITARY)
     def c0x(self, *qubits: int) -> None:
         """
-        Class method to apply an controlled by zero x gate to the given qubits.
+        Class method to apply a controlled-by-zero x gate to the given qubits.
 
         Args:
             qubits (int): qubits in which the gate is applied, first one will be control qubit and 
@@ -2577,9 +2577,9 @@ class CunqaCircuit:
             "states": [0]
         })
 
-    def mc0x(self, states: list[int], *qubits: int) -> None:
+    def mcstatex(self, states: list[int], *qubits: int) -> None:
         """
-        Class method to apply mcx gate to the given qubits.
+        Class method to apply an controlled-by-state x gate to the given qubits.
 
         Args:
             qubits (int): qubits in which the gate is applied, first two will be control qubits and 
