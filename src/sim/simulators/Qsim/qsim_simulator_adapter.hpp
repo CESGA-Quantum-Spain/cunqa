@@ -10,23 +10,25 @@
 namespace cunqa {
 namespace sim {
 
-class QuestSimulatorAdapter final : public Simulator {
+class QsimSimulatorAdapter final : public Simulator {
 public:
-    QuestSimulatorAdapter() = default;
-    ~QuestSimulatorAdapter();
+    QsimSimulatorAdapter() = default;
+    ~QsimSimulatorAdapter();
 
     inline std::string get_name() const noexcept override
     {
-        return "Quest";
+        return "Qsim";
     }
 
     inline std::span<const std::string_view> get_basis_gates() const noexcept override 
     {
-        return QUEST_BASIS_GATES;
+        return QSIM_BASIS_GATES;
     }
 
     void initialize() override;
     void clear() override;
+
+    JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
 
     void apply_gate(const OneQubitNoParam& instruction) override;
     void apply_gate(const OneQubitOneParam& instruction) override;
@@ -53,27 +55,20 @@ public:
     void apply_gate(const Reset& instruction) override;
     void apply_gate(const Copy& instruction) override;
 private:
-    std::unique_ptr<Qureg> qubits_state;
+    qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space;
+    qsim::SimulatorBasic<qsim::ParallelFor>::State state; 
+    qsim::SimulatorBasic<qsim::ParallelFor> simulator;
 
-    static constexpr std::array<std::string_view, 53> QUEST_BASIS_GATES = {{
-        "s", "cs", "mcs",
-        "t", "ct", "mct",
-        "h", "ch", "mch",
-        "swap", "cswap", "mcswap",
-        "sqrtswap", "csqrtswap", "mcsqrtswap",
-        "x", "y", "z",
-        "cx", "cy", "cz",
-        "mcx", "mcy", "mcz",
-        "paulistr", "cpaulistr", "mcpaulistr",
-        "rx", "ry", "rz",
-        "crx", "cry", "crz",
-        "mcrx", "mcry", "mcrz",
-        "raxis", "craxis", "mcraxis",
-        "pauligadget", "nonunitarypauligadget", "cpauligadget", "mcpauligadget",
-        "phasegadget", "cphasegadget", "mcphasegadget",
-        "p", "cp", "mcp",
-        "mx", "cmx", "mcmx",
-        "measure"
+    static constexpr std::array<std::string_view, 26> QSIM_BASIS_GATES = {{
+        "measure",
+        "id", "x", "y", "z", "h", "s", "t", "sx", "sy", "hz2",
+        "rx", "ry", "rz", "rxy", 
+        "id2", "cx", "cz", "swap", "iswap",
+        "cp",
+        "hz2",
+        "fs",
+        "gp",
+        "unitary", "cunitary"
     }};
 };
 

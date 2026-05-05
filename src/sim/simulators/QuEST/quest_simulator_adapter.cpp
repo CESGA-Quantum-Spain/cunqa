@@ -53,7 +53,6 @@ namespace cunqa {
 namespace sim {
 
 QuestSimulatorAdapter::QuestSimulatorAdapter() = default;
-
 QuestSimulatorAdapter::~QuestSimulatorAdapter() = default;
 
 void QuestSimulatorAdapter::initialize() {
