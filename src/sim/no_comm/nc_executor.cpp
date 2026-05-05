@@ -22,14 +22,14 @@ JSON NCExecutor::custom_execute(const QuantumTask& quantum_task)
         simulator_->initialize();
         for (int pc = 0; pc < quantum_task.circuit.instructions.size(); ++pc) {
             
-            std::visit([&](const auto& instr) {
-                using T = std::decay_t<decltype(instr)>;
+            std::visit([&](const auto& payload) {
+                using T = std::decay_t<decltype(payload)>;
 
                 auto type = quantum_task.circuit.instructions[pc].type;
 
                 if constexpr (std::is_same_v<T, ClassicalIf>) {
                     // If the clbit is 0, we skip all the gates till ENDCIF arrives.
-                    if (type == InstructionType::CIF && !simulator_->creg[instr.clbits[0]])
+                    if (type == InstructionType::CIF && !simulator_->creg[payload.clbits[0]])
                         while (pc < quantum_task.circuit.instructions.size() && quantum_task.circuit.instructions[pc].type != InstructionType::ENDCIF)
                             ++pc;
                     // We always avoid ENDCIF cause it does not possess semantic meaning
@@ -40,7 +40,7 @@ JSON NCExecutor::custom_execute(const QuantumTask& quantum_task)
                 else if constexpr (std::is_same_v<T, std::monostate>)
                     throw std::runtime_error("Empty circuit received.");
                 else
-                    simulator_->apply_gate(type, instr);
+                    simulator_->apply_gate(type, payload);
             }, quantum_task.circuit.instructions[pc].payload);
 
         }

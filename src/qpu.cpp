@@ -211,6 +211,7 @@ Circuit json_to_circuit(const JSON& circuit_json)
             }
             case InstructionType::CECR:
             case InstructionType::CSWAP:
+            case InstructionType::CSQRTSWAP:
             case InstructionType::CCX:
             case InstructionType::CCY:
             case InstructionType::CCZ:
@@ -226,12 +227,18 @@ Circuit json_to_circuit(const JSON& circuit_json)
             case InstructionType::MCX:
             case InstructionType::MCY:
             case InstructionType::MCZ:
+            case InstructionType::MCH:
             case InstructionType::MCSX:
+            case InstructionType::MCS:
+            case InstructionType::MCT:
             case InstructionType::MCSWAP:
+            case InstructionType::MCSQRTSWAP:
+            case InstructionType::MX:
+            case InstructionType::CMX:
             {
                 cunqa_instruction = {
                     .type = instruction_type,
-                    .payload = MulticontrolNoParam{
+                    .payload = MultiNoParam{
                         instruction.at("qubits").get<std::vector<Qubit>>()
                     }
                 };
@@ -240,20 +247,78 @@ Circuit json_to_circuit(const JSON& circuit_json)
             case InstructionType::MCRX:
             case InstructionType::MCRY:
             case InstructionType::MCRZ:
+            case InstructionType::MCRAXIS:
             case InstructionType::MCP:
             case InstructionType::MCU1:
             case InstructionType::MCU2:
             case InstructionType::MCU3:
             case InstructionType::MCU:
+            case InstructionType::PHASEGADGET:
+            case InstructionType::CPHASEGADGET:
             {
                 auto params = instruction.at("params").get<std::vector<double>>();
                 for(auto& param : params)
                     circuit.params.push_back(&param);
                 cunqa_instruction = {
                     .type = instruction_type,
-                    .payload = MulticontrolParam{
+                    .payload = MultiParam{
                         instruction.at("qubits").get<std::vector<int>>(), 
                         params
+                    }
+                };
+                break;
+            }
+            case InstructionType::PAULISTR:
+            case InstructionType::CPAULISTR:
+            case InstructionType::MCPAULISTR:
+            {
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = PauliNoParam{
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        instruction.at("paulistr").get<std::string>()
+                    }
+                };
+                break;
+            }
+            case InstructionType::PAULIGADGET:
+            case InstructionType::CPAULIGADGET:
+            case InstructionType::MCPAULIGADGET:
+            case InstructionType::NONUNITARYPAULIGADGET:
+            {
+                auto params = instruction.at("params").get<std::vector<double>>();
+                for(auto& param : params)
+                    circuit.params.push_back(&param);
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = PauliParam{
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        parmas,
+                        instruction.at("paulistr").get<std::string>()
+                    }
+                };
+                break;
+            }
+            case InstructionType::MCMX:
+            {
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = NumControlsNoParam{
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        instruction.at("num_controls").get<int>()
+                    }
+                };
+                break;
+            }
+            case InstructionType::MCPHASEGADGET:
+            {
+                auto param = instruction.at("params").get<double>();
+                circuit.params.push_back(&param);
+                cunqa_instruction = {
+                    .type = instruction_type,
+                    .payload = NumControlsParam{
+                        instruction.at("qubits").get<std::vector<int>>(), 
+                        param
                     }
                 };
                 break;

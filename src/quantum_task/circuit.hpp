@@ -73,19 +73,41 @@ struct ThreeQubitNoParam {
 // Here we use std::vector for simplicity and
 // because multicontrolled are not as used as 
 // the rest of the gates.
-struct MulticontrolNoParam {
+struct MultiNoParam {
     std::vector<Qubit> qubits;
 };
 
-struct MulticontrolParam {
+struct MultiParam {
     std::vector<Qubit> qubits;
     std::vector<double> params;
+};
+
+struct PauliNoParam {
+    std::vector<Qubit> qubits;
+    std::string paulistr;
+};
+
+struct PauliParam {
+    std::vector<Qubit> qubits;
+    double param;
+    std::string paulistr;
 };
 
 struct MultiPauli {
     std::vector<Qubit> qubits;
     double param;
     std::vector<unsigned int> pauli_id_list;
+};
+
+struct NumControlsNoParam {
+    std::vector<Qubit> qubits;
+    int num_controls;
+};
+
+struct NumControlsParam {
+    std::vector<Qubit> qubits;
+    double param;
+    int num_controls;
 };
 
 struct FusedSwap {
