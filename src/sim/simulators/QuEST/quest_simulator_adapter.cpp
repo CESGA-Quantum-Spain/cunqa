@@ -124,7 +124,6 @@ void QuestSimulatorAdapter::apply_gate(const OneQubitNoParam& instruction)
 
 void QuestSimulatorAdapter::apply_gate(const OneQubitOneParam& instruction)
 {
-    AER::reg_t qubit = {static_cast<AER::uint_t>(instruction.qubit)};
     switch (instruction.tag)
     {
         case InstructionTag::P:
