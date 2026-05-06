@@ -22,6 +22,7 @@ public:
 
     inline void initializeSimulationAdapter(std::size_t nQubits) { initializeSimulation(nQubits); }
     inline void applyOperationToStateAdapter(std::unique_ptr<qc::Operation>&& op) { applyOperationToState(op); }
+    inline void applyresetadapter(NonUnitaryOperation& op) { reset(&op); }
     inline char measureAdapter(dd::Qubit i) { return measure(i); }
     inline void resetStateAdapter(const int n_qubits) 
     { 

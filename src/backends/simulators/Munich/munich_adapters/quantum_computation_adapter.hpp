@@ -195,7 +195,6 @@ inline void quantum_task_to_mqt_circuit(const JSON& circuit, QuantumComputation&
         case constants::TDG:
         case constants::V:
         case constants::VDG:
-        case constants::RESET:
         case constants::BARRIER:
         {
             mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
@@ -272,15 +271,20 @@ inline void quantum_task_to_mqt_circuit(const JSON& circuit, QuantumComputation&
             mqt_circuit.emplace_back(std::make_unique<StandardOperation>(controls, qubits[qubits.size() - 1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
             break;
         }
+        case constants::RESET:
+        {
+            mqt_circuit.reset(qubits[0]);
+            break;
+        }
         default:
         {
             std::string gate_name = instruction.at("name").get<std::string>();
             LOGGER_ERROR("Gate {} not supported.", gate_name);
             break;
         }
-
-        } // end switch 
-    } // end for
+        
+    } // end switch 
+} // end for
 }
 
 } // End of sim namespace

@@ -360,9 +360,9 @@ std::unordered_map<std::string, std::string> MunichSimulatorAdapter::execute_sho
         }
         case constants::RESET:
         {
-            LOGGER_ERROR("RESET not supported because the following error raises: DD for gatereset not available!");
-            //auto reset = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
-            //applyOperationToStateAdapter(std::move(reset));
+            //LOGGER_ERROR("RESET not supported because the following error raises: DD for non-unitary operation not available!");
+            NonUnitaryOperation reset(inst.qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            applyresetadapter(reset);
             break;
         }
         case constants::BARRIER:
