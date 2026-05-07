@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include <utils/json.hpp>
+#include <optional>
 
 namespace cunqa {
 namespace constants{
