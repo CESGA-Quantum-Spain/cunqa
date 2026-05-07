@@ -24,6 +24,100 @@ namespace cunqa {
 namespace sim {
 
 
+MunichSimulatorAdapter::QuestSimulatorAdapter() = default;
+MunichSimulatorAdapter::~QuestSimulatorAdapter() = default;
+
+void MunichSimulatorAdapter::initialize() {
+    const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
+    unsigned num_threads = 1;
+    if (num_threads_char != nullptr) {
+        num_threads = std::stoi(num_threads_char);
+    }
+    initializeSimulation(config.num_qubits);
+
+    if (config.seed != -1) {
+        std::mt19937 rgen(config.seed);
+    } else {
+        std::mt19937 rgen(0);
+    }
+}
+
+void QsimSimulatorAdapter::clear()
+{
+    initializeSimulation(config.num_qubits);
+}
+
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitNoParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::ID:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId1<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::X:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::Y:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::Z:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateZ<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::H:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHd<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::S:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateS<float>::Create(0, payload.qubit), state);
+            break;
+        }
+        
+        case InstructionType::T:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateT<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::SX:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX2<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::SY:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY2<float>::Create(0, payload.qubit), state);
+            break;
+        }
+
+        case InstructionType::HZ2:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHZ2<float>::Create(0, payload.qubit), state);
+            break;
+        }
+        
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+
+
 std::string MunichSimulatorAdapter::execute_shot_(
     const std::vector<QuantumTask> &quantum_tasks, 
     comm::ClassicalChannel *classical_channel,
@@ -31,65 +125,6 @@ std::string MunichSimulatorAdapter::execute_shot_(
     const size_t& n_comm_qubits
 )
 {
-    std::unordered_map<std::string, TaskState> Ts;
-    GlobalState G;
-
-    for (auto &quantum_task : quantum_tasks)
-    {
-        TaskState T;
-        T.id = quantum_task.id;
-        T.zero_qubit = G.n_qubits;
-        T.zero_clbit = G.n_clbits;
-        T.it = quantum_task.circuit.begin();
-        T.end = quantum_task.circuit.end();
-        T.blocked_by_teledata = false;
-        T.blocked_by_telegate = false;
-        T.blocked_by_cc = false;
-        T.finished = false;
-        Ts[quantum_task.id] = T;
-        
-        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
-    }
-    
-    // Here we add the communication qubits
-    if (n_comm_qubits != 0) {
-        G.n_qubits += n_comm_qubits;
-        for (int i = 0; i < n_comm_qubits; i+=2) {
-            CommunicationQubitsPair cqp = {
-                .q0 = G.n_qubits - n_comm_qubits + i,
-                .q1 = G.n_qubits - n_comm_qubits + i + 1
-            };
-            G.communication_pairs.push_back(cqp);
-        }
-    }
-
-    auto generate_entanglement_ = [&](const size_t n_pairs) {
-        std::vector<int> indices = find_idle_communication_pairs(G, n_pairs);
-
-        if (!indices.empty()) {
-            for (auto& index : indices) {
-                int meas1 = measureAdapter(G.communication_pairs[index].q1) - '0';
-                int meas2 = measureAdapter(G.communication_pairs[index].q0) - '0';
-                if (meas1) {
-                    auto x_op = std::make_unique<StandardOperation>(G.communication_pairs[index].q1, OpType::X);
-                    applyOperationToStateAdapter(std::move(x_op));
-                }
-                if (meas2) {
-                    auto x_op = std::make_unique<StandardOperation>(G.communication_pairs[index].q0, OpType::X);
-                    applyOperationToStateAdapter(std::move(x_op));
-                }   
-                auto std_op1 = std::make_unique<StandardOperation>(G.communication_pairs[index].q0, OpType::H);
-                applyOperationToStateAdapter(std::move(std_op1));
-                Control control(G.communication_pairs[index].q0);
-                auto std_op2 = std::make_unique<StandardOperation>(control, G.communication_pairs[index].q1, OpType::X);
-                applyOperationToStateAdapter(std::move(std_op2));
-            }
-        }
-
-        return indices;
-    };
-
     std::function<void(TaskState&, const JSON&, const std::vector<int>)> apply_next_instr = 
         [&](TaskState& T, const JSON& instruction = {}, const std::vector<int> comm_indices = {}) 
     {
@@ -270,9 +305,9 @@ std::string MunichSimulatorAdapter::execute_shot_(
         }
         case RESET:
         {
-            LOGGER_ERROR("RESET not supported because the following error raises: DD for gatereset not available!");
-            //auto reset = std::make_unique<StandardOperation>(qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
-            //applyOperationToStateAdapter(std::move(reset));
+            //LOGGER_ERROR("RESET not supported because the following error raises: DD for non-unitary operation not available!");
+            NonUnitaryOperation reset(inst.qubits[0] + T.zero_qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type));
+            applyresetadapter(reset);
             break;
         }
         case SEND:
@@ -504,30 +539,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
         } // End switch
     };
 
-    while (!G.ended)
-    {
-        G.ended = true;
-        for (auto& [id, T]: Ts)
-        {
-            if (T.finished)
-                continue;
-            else if (T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc) {
-                G.ended = false;
-                continue;
-            }
 
-            apply_next_instr(T, {}, {});
-
-            if (!(T.blocked_by_teledata || T.blocked_by_telegate || T.blocked_by_cc))
-                ++T.it;
-
-            if (T.it != T.end)
-                G.ended = false;
-            else
-                T.finished = true;
-        }
-
-    } // End one shot
+    
 
     // result is a map from the cbit index to the Boolean value
     std::string result_bits(G.n_clbits, '0');
