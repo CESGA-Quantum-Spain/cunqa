@@ -8,14 +8,38 @@
 namespace cunqa {
 namespace sim {
 
-class MunichSimulatorAdapter final : public Simulator 
-{
+class MunichSimulatorAdapter final : public Simulator {
 public:
+    MunichSimulatorAdapter() = default;
+    ~MunichSimulatorAdapter();
+
+    inline std::string get_name() const noexcept override
+    {
+        return "Munich";
+    }
     
     std::span<const std::string_view> get_basis_gates() const noexcept override 
     {
         return MUNICH_BASIS_GATES;
     }
+
+    void initialize() override;
+    void clear() override;
+
+    JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
+
+    void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+
+    void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload) override;
+
+    void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
+
+    void apply_gate(const InstructionType& type, const Measure& payload) override;
+    void apply_gate(const InstructionType& type, const Reset& payload) override;
+    void apply_gate(const InstructionType& type, const Copy& payload) override;
 
 private:
 

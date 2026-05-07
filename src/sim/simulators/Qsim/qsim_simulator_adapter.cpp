@@ -108,158 +108,202 @@ void QsimSimulatorAdapter::clear()
     state_space.SetStateZero(state);
 }
 
-void QsimSimulatorAdapter::apply_gate(const OneQubitNoParam& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::ID:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId1<float>::Create(0, intruction.qubit), state);
+        case InstructionType::ID:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId1<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::X:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX<float>::Create(0, intruction.qubit), state);
+        case InstructionType::X:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::Y:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY<float>::Create(0, intruction.qubit), state);
+        case InstructionType::Y:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::Z:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateZ<float>::Create(0, intruction.qubit), state);
+        case InstructionType::Z:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateZ<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::H:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHd<float>::Create(0, intruction.qubit), state);
+        case InstructionType::H:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHd<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::S:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateS<float>::Create(0, intruction.qubit), state);
+        case InstructionType::S:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateS<float>::Create(0, payload.qubit), state);
             break;
+        }
         
-        case InstructionTag::T:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateT<float>::Create(0, intruction.qubit), state);
+        case InstructionType::T:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateT<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::SX:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX2<float>::Create(0, intruction.qubit), state);
+        case InstructionType::SX:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX2<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::SY:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY2<float>::Create(0, intruction.qubit), state);
+        case InstructionType::SY:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY2<float>::Create(0, payload.qubit), state);
             break;
+        }
 
-        case InstructionTag::HZ2:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHZ2<float>::Create(0, intruction.qubit), state);
+        case InstructionType::HZ2:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHZ2<float>::Create(0, payload.qubit), state);
             break;
+        }
         
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QsimSimulatorAdapter::apply_gate(const OneQubitOneParam& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitOneParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::RX: 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRX<float>::Create(0, instruction.qubit, static_cast<float>(instruction.param)), state);
+        case InstructionType::RX:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRX<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state);
             break;
+        }
         
-        case InstructionTag::RY:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRY<float>::Create(0, instruction.qubit, static_cast<float>(instruction.param)), state);
+        case InstructionType::RY:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRY<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state);
             break;
+        }
         
-        case InstructionTag::RZ: 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRZ<float>::Create(0, instruction.qubit, static_cast<float>(instruction.param)), state);
+        case InstructionType::RZ:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRZ<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state);
             break;
+        }
         
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QsimSimulatorAdapter::apply_gate(const TwoQubitNoParam& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::ID2:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId2<float>::Create(0, instruction.qubits[0], instruction.qubits[1]), state);
+        case InstructionType::ID2:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId2<float>::Create(0, payload.qubits[0], payload.qubits[1]), state);
             break;
+        }
 
-        case InstructionTag::CX:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCNot<float>::Create(0, instruction.qubits[0], instruction.qubits[1]), state);
+        case InstructionType::CX:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCNot<float>::Create(0, payload.qubits[0], payload.qubits[1]), state);
             break;
+        }
 
-        case InstructionTag::CZ:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCZ<float>::Create(0, instruction.qubits[0], instruction.qubits[1]), state);
+        case InstructionType::CZ:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCZ<float>::Create(0, payload.qubits[0], payload.qubits[1]), state);
             break;
+        }
 
-        case InstructionTag::SWAP:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateSwap<float>::Create(0, instruction.qubits[0], instruction.qubits[1]), state);
+        case InstructionType::SWAP:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateSwap<float>::Create(0, payload.qubits[0], payload.qubits[1]), state);
             break;
+        }
 
-        case InstructionTag::ISWAP:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateIS<float>::Create(0, instruction.qubits[0], instruction.qubits[1]), state);
+        case InstructionType::ISWAP:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateIS<float>::Create(0, payload.qubits[0], payload.qubits[1]), state);
             break;
+        }
                 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QsimSimulatorAdapter::apply_gate(const TwoQubitOneParam& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitOneParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::CP:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, instruction.qubits[0], instruction.qubits[1], instruction.param), state);
-            break;
-        
-        case InstructionTag::GLOBALP:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateGPh<float>::Create(0, instruction.param), state);
-            break;
-
-        default:
-            unsupported_gate(instruction);
-    }
-}
-
-void QsimSimulatorAdapter::apply_gate(const TwoQubitTwoParam& instruction)
-{
-    switch (instruction.tag)
-    {
-        case InstructionTag::RXY: 
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, instruction.qubits[0], instruction.params[0], instruction.params[1]), state);
-            break;
-
-        case InstructionTag::FS:
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateFS<float>::Create(0, instruction.qubits[0], instruction.qubits[1], instruction.params[0], instruction.params[1]), state);
-            break;
-
-        default:
-            unsupported_gate(instruction);
-    }
-}
-
-void QsimSimulatorAdapter::apply_gate(const MatrixGate& instruction)
-{
-    switch (instruction.tag)
-    {
-        case InstructionTag::UNITARY:
+        case InstructionType::CP:
         {
-            auto cunqa_matrix = instruction.matrix;
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, payload.qubits[0], payload.qubits[1], payload.param), state);
+            break;
+        }
+        
+        case InstructionType::GLOBALP:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateGPh<float>::Create(0, payload.param), state);
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::RXY: //TODO: check if it's actually two-qubit
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, payload.qubits[0], payload.params[0], payload.params[1]), state);
+            break;
+        }
+
+        case InstructionType::FS:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateFS<float>::Create(0, payload.qubits[0], payload.qubits[1], payload.params[0], payload.params[1]), state);
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGate& payload)
+{
+    switch (type)
+    {
+        case InstructionType::UNITARY:
+        {
+            auto cunqa_matrix = payload.matrix;
             qsim::Matrix<float> qsim_matrix = cunqamatrix_to_qsimmatrix(cunqa_matrix);
 
             if (qubits.size() > 1) {
-                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix2<float>::Create(0, instruction.qubits[0], instruction.qubits[1], std::move(qsim_matrix)), state);
+                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix2<float>::Create(0, payload.qubits[0], payload.qubits[1], std::move(qsim_matrix)), state);
             } else {
-                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix1<float>::Create(0, instruction.qubits[0], std::move(qsim_matrix)), state);
+                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix1<float>::Create(0, payload.qubits[0], std::move(qsim_matrix)), state);
             }
             break;
         }
-        case constants::CUNITARY:
+        case InstructionType::CUNITARY:
         {
-            auto cunqa_matrix = instruction.matrix;
+            auto cunqa_matrix = payload.matrix;
             size_t dim = cunqa_matrix.size();
             size_t ctrl_dim = 2 * dim;
 
@@ -280,49 +324,53 @@ void QsimSimulatorAdapter::apply_gate(const MatrixGate& instruction)
 
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(
                 simulator,
-                qsim::GateMatrix2<float>::Create(0, instruction.qubits[0], instruction.qubits[1], std::move(ctrl_qsim_matrix)),
+                qsim::GateMatrix2<float>::Create(0, payload.qubits[0], payload.qubits[1], std::move(ctrl_qsim_matrix)),
                 state);
             break;
         }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QsimSimulatorAdapter::apply_gate(const Measure& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const Measure& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::MEASURE:
-            creg[instruction.clbit] =
-                static_cast<bool>(state_space.Measure({instruction.qubit}, rgen, state));
+        case InstructionType::MEASURE:
+        {
+            creg[payload.clbit] =
+                static_cast<bool>(state_space.Measure({payload.qubit}, rgen, state));
             break;
+        }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QsimSimulatorAdapter::apply_gate(const Copy& instruction)
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::COPY:
-            if (instruction.l_clbits.size() != instruction.r_clbits.size()) {
+        case InstructionType::COPY:
+        {
+            if (payload.l_clbits.size() != payload.r_clbits.size()) {
                 throw std::runtime_error(
                     "The number of copied clbits and the number of clbits "
                     "copied on does not match."
                 );
             }
 
-            for (size_t i = 0; i < instruction.l_clbits.size(); ++i)
-                creg[instruction.l_clbits[i]] = creg[instruction.r_clbits[i]];
+            for (size_t i = 0; i < payload.l_clbits.size(); ++i)
+                creg[payload.l_clbits[i]] = creg[payload.r_clbits[i]];
 
             break;
+        }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 

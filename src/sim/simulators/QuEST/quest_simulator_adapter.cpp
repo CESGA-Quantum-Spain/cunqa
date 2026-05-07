@@ -85,441 +85,490 @@ void QuestSimulatorAdapter::clear()
     initZeroState(qubits_state);
 }
 
-
-void QuestSimulatorAdapter::apply_gate(const OneQubitNoParam& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::ID:
+        case InstructionType::ID:
             break;
 
-        case InstructionTag::X:
-            applyPauliX(qubits_state, instruction.qubit);
+        case InstructionType::X:
+            applyPauliX(qubits_state, payload.qubit);
             break;
 
-        case InstructionTag::Y:
-            applyPauliY(qubits_state, instruction.qubit);
+        case InstructionType::Y:
+            applyPauliY(qubits_state, payload.qubit);
             break;
 
-        case InstructionTag::Z:
-            applyPauliZ(qubits_state, instruction.qubit);
+        case InstructionType::Z:
+            applyPauliZ(qubits_state, payload.qubit);
             break;
 
-        case InstructionTag::H:
-            applyHadamard(qubits_state, instruction.qubit);
+        case InstructionType::H:
+            applyHadamard(qubits_state, payload.qubit);
             break;
 
-        case InstructionTag::S:
-            applyS(qubits_state, instruction.qubit);
+        case InstructionType::S:
+            applyS(qubits_state, payload.qubit);
             break;
         
-        case InstructionTag::T:
-            applyT(qubits_state, instruction.qubit);
-            break;
-        
-        default:
-            unsupported_gate(instruction);
-    }
-}
-
-void QuestSimulatorAdapter::apply_gate(const OneQubitOneParam& instruction)
-{
-    switch (instruction.tag)
-    {
-        case InstructionTag::P:
-            applyPhaseShift(qubits_state, instruction.qubit, instruction.param);
-            break;
-
-        case InstructionTag::RX:
-            applyRotateX(qubits_state, instruction.qubit, instruction.param);
-            break;
-
-        case InstructionTag::RY:
-            applyRotateY(qubits_state, instruction.qubit, instruction.param);
-            break;
-
-        case InstructionTag::RZ:
-            applyRotateZ(qubits_state, instruction.qubit, instruction.param);
+        case InstructionType::T:
+            applyT(qubits_state, payload.qubit);
             break;
         
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const OneQubitFourParam& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitOneParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::RAXIS:
+        case InstructionType::P:
+            applyPhaseShift(qubits_state, payload.qubit, payload.param);
+            break;
+
+        case InstructionType::RX:
+            applyRotateX(qubits_state, payload.qubit, payload.param);
+            break;
+
+        case InstructionType::RY:
+            applyRotateY(qubits_state, payload.qubit, payload.param);
+            break;
+
+        case InstructionType::RZ:
+            applyRotateZ(qubits_state, payload.qubit, payload.param);
+            break;
+        
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitFourParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::RAXIS:
             applyRotateAroundAxis(
                 qubits_state, 
-                instruction.qubit, 
-                instruction.params[0],
-                instruction.params[1], //axis
-                instruction.params[2], //axis 
-                instruction.params[3]  //axis
+                payload.qubit, 
+                payload.params[0],
+                payload.params[1], //axis
+                payload.params[2], //axis 
+                payload.params[3]  //axis
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const TwoQubitNoParam& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::SWAP:
-            applySwap(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::SWAP:
+            applySwap(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
         
-        case InstructionTag::SQRTSWAP:
-            applySqrtSwap(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::SQRTSWAP:
+            applySqrtSwap(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
-        case InstructionTag::CX:
-            applyControlledPauliX(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CX:
+            applyControlledPauliX(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
-        case InstructionTag::CY:
-            applyControlledPauliY(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CY:
+            applyControlledPauliY(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
-        case InstructionTag::CZ:
-            applyControlledPauliZ(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CZ:
+            applyControlledPauliZ(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
-        case InstructionTag::CH:
-            applyControlledHadamard(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CH:
+            applyControlledHadamard(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
-        case InstructionTag::CS:
-            applyControlledS(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CS:
+            applyControlledS(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
         
-        case InstructionTag::CT:
-            applyControlledT(qubits_state, *instruction.qubits.begin(), instruction.qubits.back());
+        case InstructionType::CT:
+            applyControlledT(qubits_state, *payload.qubits.begin(), payload.qubits.back());
             break;
 
         
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const TwoQubitOneParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitOneParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::CP:
-            applyTwoQubitPhaseShift(qubits_state, *instruction.qubits.begin(), instruction.qubits.back(), instruction.param);
+        case InstructionType::CP:
+            applyTwoQubitPhaseShift(qubits_state, *payload.qubits.begin(), payload.qubits.back(), payload.param);
             break;
 
-        case InstructionTag::CRX:
-            applyControlledRotateX(qubits_state, *instruction.qubits.begin(), instruction.qubits.back(), instruction.param);
+        case InstructionType::CRX:
+            applyControlledRotateX(qubits_state, *payload.qubits.begin(), payload.qubits.back(), payload.param);
             break;
 
-        case InstructionTag::CRY:
-            applyControlledRotateY(qubits_state, *instruction.qubits.begin(), instruction.qubits.back(), instruction.param);
+        case InstructionType::CRY:
+            applyControlledRotateY(qubits_state, *payload.qubits.begin(), payload.qubits.back(), payload.param);
             break;
 
-        case InstructionTag::CRZ:
-            applyControlledRotateZ(qubits_state, *instruction.qubits.begin(), instruction.qubits.back(), instruction.param);
+        case InstructionType::CRZ:
+            applyControlledRotateZ(qubits_state, *payload.qubits.begin(), payload.qubits.back(), payload.param);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const TwoQubitFourParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitFourParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::CRAXIS:
+        case InstructionType::CRAXIS:
             applyControlledRotateAroundAxis(
                 qubits_state,
-                *intruction.qubits.begin(),
-                intruction.qubits.back(),
-                instruction.params[0],
-                instruction.params[1], //axis
-                instruction.params[2], //axis 
-                instruction.params[3]  //axis
+                *payload.qubits.begin(),
+                payload.qubits.back(),
+                payload.params[0],
+                payload.params[1], //axis
+                payload.params[2], //axis 
+                payload.params[3]  //axis
             );
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const ThreeQubitNoParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::CSWAP:
-            applyControlledSwap(qubits_state, instruction.qubits[0], instruction.qubits[1], instruction.qubits[2]);
+        case InstructionType::CSWAP:
+            applyControlledSwap(qubits_state, payload.qubits[0], payload.qubits[1], payload.qubits[2]);
             break;
 
-        case InstructionTag::CSQRTSWAP:
-            applyControlledSqrtSwap(qubits_state, instruction.qubits[0], instruction.qubits[1], instruction.qubits[2]);
+        case InstructionType::CSQRTSWAP:
+            applyControlledSqrtSwap(qubits_state, payload.qubits[0], payload.qubits[1], payload.qubits[2]);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const PauliNoParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const PauliNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::PAULISTR:
-            applyPauliStr(qubits_state, getPauliStr(instruction.paulistr));
+        case InstructionType::PAULISTR:
+            applyPauliStr(qubits_state, getPauliStr(payload.paulistr));
             break;
 
-        case InstructionTag::CPAULISTR:   
-            applyControlledPauliStr(qubits_state, instruction.qubits[0], getPauliStr(instruction.paulistr));
+        case InstructionType::CPAULISTR:   
+            applyControlledPauliStr(qubits_state, payload.qubits[0], getPauliStr(payload.paulistr));
             break;
 
-        case constants::MCPAULISTR:
-            applyMultiControlledPauliStr(qubits_state, instruction.qubits, getPauliStr(instruction.paulistr));
+        case InstructionType::MCPAULISTR:
+            applyMultiControlledPauliStr(qubits_state, payload.qubits, getPauliStr(payload.paulistr));
             break;
         
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const PauliParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const PauliParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::PAULIGADGET:
-            applyPauliGadget(qubits_state, getPauliStr(instruction.paulistr), instruction.param);
+        case InstructionType::PAULIGADGET:
+            applyPauliGadget(qubits_state, getPauliStr(payload.paulistr), payload.param);
             break;
 
-        case InstructionTag::NONUNITARYPAULIGADGET:
-            applyNonUnitaryPauliGadget(qubits_state, getPauliStr(instruction.paulistr), instruction.param);
+        case InstructionType::NONUNITARYPAULIGADGET:
+            applyNonUnitaryPauliGadget(qubits_state, getPauliStr(payload.paulistr), payload.param);
             break;
 
-        case InstructionTag::CPAULIGADGET:
-            applyControlledPauliGadget(qubits_state, instruction.qubits[0], getPauliStr(instruction.paulistr), instruction.param);
+        case InstructionType::CPAULIGADGET:
+            applyControlledPauliGadget(qubits_state, payload.qubits[0], getPauliStr(payload.paulistr), payload.param);
             break;
 
-        case constants::MCPAULIGADGET:
-            applyMultiControlledPauliGadget(qubits_state, instruction.qubits, getPauliStr(instruction.paulistr), instruction.param);
+        case InstructionType::MCPAULIGADGET:
+            applyMultiControlledPauliGadget(qubits_state, payload.qubits, getPauliStr(payload.paulistr), payload.param);
             break;
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const MultiNoParam& instruction)
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const MultiNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::MCX:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledPauliX(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCX:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledPauliX(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCY:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledPauliY(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCY:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledPauliY(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCZ:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledPauliZ(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCZ:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledPauliZ(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCH:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledHadamard(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCH:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledHadamard(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCS:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledS(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCS:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledS(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCT:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledPauliX(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCT:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledT(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCSWAP:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledSwap(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCSWAP:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledSwap(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case InstructionTag::MCSQRTSWAP:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledSqrtSwap(qubits_state, controls, instruction.qubits.back());
+        case InstructionType::MCSQRTSWAP:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledSqrtSwap(qubits_state, controls, payload.qubits.back());
             break;
+        }
 
-        case constants::MX:
-            applyMultiQubitNot(qubits_state, instruction.qubits);
+        case InstructionType::MX:
+        {
+            applyMultiQubitNot(qubits_state, payload.qubits);
             break;
+        }
 
-        case constants::CMX:
-            std::vector<int> targets(instruction.qubits.begin()+1, instruction.qubits.end());
-            applyControlledMultiQubitNot(qubits_state, instruction.qubits[0], targets);
+        case InstructionType::CMX:
+        {
+            std::vector<int> targets(payload.qubits.begin()+1, payload.qubits.end());
+            applyControlledMultiQubitNot(qubits_state, payload.qubits[0], targets);
             break;
+        }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const MultiParam& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const MultiParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::MCRX:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledRotateX(qubits_state, controls, instruction.qubits.back(), instruction.params[0]);
+        case InstructionType::MCRX:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledRotateX(qubits_state, controls, payload.qubits.back(), payload.params[0]);
             break;
+        }
 
-        case InstructionTag::MCRY:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledRotateY(qubits_state, controls, instruction.qubits.back(), instruction.params[0]);
+        case InstructionType::MCRY:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledRotateY(qubits_state, controls, payload.qubits.back(), payload.params[0]);
             break;
+        }
 
-        case InstructionTag::MCRZ:
-            std::vector<int> controls(instruction.qubits.begin(), instruction.qubits.end()-1);
-            applyMultiControlledRotateZ(qubits_state, controls, instruction.qubits.back(), instruction.params[0]);
+        case InstructionType::MCRZ:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
+            applyMultiControlledRotateZ(qubits_state, controls, payload.qubits.back(), payload.params[0]);
             break;
+        }
 
-        case InstructionTag::MCP:
-            applyMultiQubitPhaseShift(qubits_state, instruction.qubits, instruction.params[0]);
+        case InstructionType::MCP:
+        {
+            applyMultiQubitPhaseShift(qubits_state, payload.qubits, payload.params[0]);
             break;
+        }
 
-        case InstructionTag::MCRAXIS:
+        case InstructionType::MCRAXIS:
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.end()-1);
             applyMultiControlledRotateAroundAxis(
                 qubits_state,
                 controls,
-                isntruction.qubits.back(),
-                instruction.params[0],
-                instruction.params[1], //axis
-                instruction.params[2], //axis
-                instruction.params[3]  //axis
+                payload.qubits.back(),
+                payload.params[0],
+                payload.params[1], //axis
+                payload.params[2], //axis
+                payload.params[3]  //axis
             );
             break;
+        }
 
-        case InstructionTag::PHASEGADGET:
-            applyPhaseGadget(qubits_state, instruction.qubits, instruction.params[0]);
+        case InstructionType::PHASEGADGET:
+        {
+            applyPhaseGadget(qubits_state, payload.qubits, payload.params[0]);
             break;
+        }
 
-        case InstructionTag::CPHASEGADGET:
-            std::vector<int> targets(instruction.qubits.begin() + 1, instruction.qubits.end());
-            applyControlledPhaseGadget(qubits_state, instruction.qubits[0], targets, instruction.params[0]);
+        case InstructionType::CPHASEGADGET:
+        {
+            std::vector<int> targets(payload.qubits.begin() + 1, payload.qubits.end());
+            applyControlledPhaseGadget(qubits_state, payload.qubits[0], targets, payload.params[0]);
             break;
+        }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const NumControlsNoParam& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const NumControlsNoParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::MCMX:
-            std::vector<int> controls(instruction.qubits.begin(),                               instruction.qubits.begin() + instruction.num_controls + 1);
-            std::vector<int> targets(instruction.qubits.begin() + instruction.num_controls + 1, instruction.qubits.end());
+        case InstructionType::MCMX:
+        {
+            std::vector<int> controls(payload.qubits.begin(),                           payload.qubits.begin() + payload.num_controls + 1);
+            std::vector<int> targets(payload.qubits.begin() + payload.num_controls + 1, payload.qubits.end());
             applyMultiControlledMultiQubitNot(qubits_state, controls, targets);
             break;
-
-        default:
-            unsupported_gate(instruction);
-    }
-}
-
-void QuestSimulatorAdapter::apply_gate(const NumControlsParam& instruction)
-{
-    switch (instruction.tag)
-    {
-        case InstructionTag::MCPHASEGADGET:
-            std::vector<int> controls(instruction.qubits.begin(),                               instruction.qubits.begin() + instruction.num_controls + 1);
-            std::vector<int> targets(instruction.qubits.begin() + instruction.num_controls + 1, instruction.qubits.end());
-            applyMultiControlledPhaseGadget(qubits_state, controls, targets, instruction.param);
-            break;
-
-        default:
-            unsupported_gate(instruction);
-    }
-}
-
-void QuestSimulatorAdapter::apply_gate(const MatrixGate& instruction)
-{
-    switch (instruction.tag)
-    {
-        case InstructionTag::UNITARY:
-        {
-            auto cunqa_matrix = instruction.matrix;
-            CompMatr quest_matrix = createCompMatr(instruction.qubits.size());
-            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
-            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
-            
-            applyCompMatr(qubits_state, instruction.qubits, quest_matrix); //instruction.qubits must be std::vector<int>
-            break;
-        }
-        case constants::CUNITARY:
-        {
-            auto cunqa_matrix = instruction.matrix;
-            CompMatr quest_matrix = createCompMatr(instruction.qubits.size() - 1);
-            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
-            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
-            
-            std::vector<int> targets(instruction.qubits.begin() + 1, instruction.qubits.end());
-            applyControlledCompMatr(qubits_state, instruction.qubits[0], targets, quest_matrix);
-            break;
         }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const Measure& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const NumControlsParam& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::MEASURE:
-            creg[instruction.clbit] =
-                static_cast<bool>(applyQubitMeasurement(qubits_state, instruction.qubit));
-            break;
+        case InstructionType::MCPHASEGADGET:
+            {
+                std::vector<int> controls(payload.qubits.begin(), payload.qubits.begin() + payload.num_controls + 1);
+                std::vector<int> targets(payload.qubits.begin() + payload.num_controls + 1, payload.qubits.end());
+                applyMultiControlledPhaseGadget(qubits_state, controls, targets, payload.param);
+                break;
+            }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 
-void QuestSimulatorAdapter::apply_gate(const Copy& instruction)
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGate& payload)
 {
-    switch (instruction.tag)
+    switch (type)
     {
-        case InstructionTag::COPY:
-            if (instruction.l_clbits.size() != instruction.r_clbits.size()) {
+        case InstructionType::UNITARY:
+        {
+            auto cunqa_matrix = payload.matrix;
+            CompMatr quest_matrix = createCompMatr(payload.qubits.size());
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
+            
+            applyCompMatr(qubits_state, payload.qubits, quest_matrix); //payload.qubits must be std::vector<int>
+            break;
+        }
+        case InstructionType::CUNITARY:
+        {
+            auto cunqa_matrix = payload.matrix;
+            CompMatr quest_matrix = createCompMatr(payload.qubits.size() - 1);
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(cunqa_matrix));
+            
+            std::vector<int> targets(payload.qubits.begin() + 1, payload.qubits.end());
+            applyControlledCompMatr(qubits_state, payload.qubits[0], targets, quest_matrix);
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const Measure& payload)
+{
+    switch (type)
+    {
+        case InstructionType::MEASURE:
+        {
+            creg[payload.clbit] =
+                static_cast<bool>(applyQubitMeasurement(qubits_state, payload.qubit));
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& payload)
+{
+    switch (type)
+    {
+        case InstructionType::COPY:
+        {
+            if (payload.l_clbits.size() != payload.r_clbits.size()) {
                 throw std::runtime_error(
                     "The number of copied clbits and the number of clbits "
                     "copied on does not match."
                 );
             }
 
-            for (size_t i = 0; i < instruction.l_clbits.size(); ++i)
-                creg[instruction.l_clbits[i]] = creg[instruction.r_clbits[i]];
+            for (size_t i = 0; i < payload.l_clbits.size(); ++i)
+                creg[payload.l_clbits[i]] = creg[payload.r_clbits[i]];
 
             break;
+        }
 
         default:
-            unsupported_gate(instruction);
+            unsupported_gate(type, payload);
     }
 }
 

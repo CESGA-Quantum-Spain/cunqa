@@ -30,17 +30,18 @@ public:
 
     JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
 
-    void apply_gate(const OneQubitNoParam& instruction) override;
-    void apply_gate(const OneQubitOneParam& instruction) override;
+    void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
 
-    void apply_gate(const TwoQubitNoParam& instruction) override;
-    void apply_gate(const TwoQubitOneParam& instruction) override;
-    void apply_gate(const TwoQubitTwoParam& instruction) override;
+    void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload) override;
 
-    void apply_gate(const MatrixGate& instruction) override;
+    void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
 
-    void apply_gate(const Measure& instruction) override;
-    void apply_gate(const Copy& instruction) override;
+    void apply_gate(const InstructionType& type, const Measure& payload) override;
+    void apply_gate(const InstructionType& type, const Copy& payload) override;
+    
 private:
     qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space;
     qsim::SimulatorBasic<qsim::ParallelFor>::State state; 

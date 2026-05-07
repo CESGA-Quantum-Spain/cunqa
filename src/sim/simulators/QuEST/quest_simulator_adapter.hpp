@@ -28,30 +28,29 @@ public:
     void initialize() override;
     void clear() override;
 
-    void apply_gate(const OneQubitNoParam& instruction) override;
-    void apply_gate(const OneQubitOneParam& instruction) override;
-    void apply_gate(const OneQubitFourParam& instruction) override;
+    void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitFourParam& payload) override;
 
-    void apply_gate(const TwoQubitNoParam& instruction) override;
-    void apply_gate(const TwoQubitOneParam& instruction) override;
-    void apply_gate(const TwoQubitFourParam& instruction) override;
+    void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
 
-    void apply_gate(const ThreeQubitNoParam& instruction) override;
+    void apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload) override;
 
-    void apply_gate(const MultiNoParam& instruction) override;
-    void apply_gate(const MultiParam& instruction) override;
+    void apply_gate(const InstructionType& type, const MultiNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const MultiParam& payload) override;
 
-    void apply_gate(const PauliNoParam& instruction) override;
-    void apply_gate(const PauliParam& instruction) override;
+    void apply_gate(const InstructionType& type, const PauliNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const PauliParam& payload) override;
 
-    void apply_gate(const NumControlsNoParam& instruction) override;
-    void apply_gate(const NumControlsParam& instruction) override;
+    void apply_gate(const InstructionType& type, const NumControlsNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const NumControlsParam& payload) override;
 
-    void apply_gate(const MatrixGate& instruction) override;
+    void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
 
-    void apply_gate(const Measure& instruction) override;
-    void apply_gate(const Reset& instruction) override;
-    void apply_gate(const Copy& instruction) override;
+    void apply_gate(const InstructionType& type, const Measure& payload) override;
+    void apply_gate(const InstructionType& type, const Copy& payload) override;
 private:
     std::unique_ptr<Qureg> qubits_state;
 
