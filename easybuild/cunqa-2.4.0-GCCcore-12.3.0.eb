@@ -9,7 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.3.0'
+version = '2.4.0'
 local_pyversionsuffix = '-python-3.11.9'
 versionsuffix = '%s-mpi' % local_pyversionsuffix
 
