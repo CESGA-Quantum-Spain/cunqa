@@ -42,6 +42,7 @@ public:
     void apply_gate(const InstructionType& type, const Copy& payload) override;
 
 private:
+    int seed;
 
 static constexpr std::array<std::string_view, 51> MUNICH_BASIS_GATES = {{
     "measure",
