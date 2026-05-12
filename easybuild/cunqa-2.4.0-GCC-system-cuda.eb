@@ -1,17 +1,16 @@
-# QMIO EasyBuild file for CUNQA
+# FT3 EasyBuild file for CUNQA
 # Author:
 #   - Álvaro Carballido Costas
 #   - Marta Losada Estévez
-#   - Jorge Vázquez Pérez
+#   - Jorge Vázquez Pérez 
 #   - Daniel Expósito Patiño 
 # Fundacion Publica Galega Centro Tecnoloxico de Supercomputacion de Galicia (CESGA)
 
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.3.0'
-local_pyversionsuffix = '-python-3.11.9'
-versionsuffix = '%s-mpi' % local_pyversionsuffix
+version = '2.4.0'
+versionsuffix = '-cuda-12.8.0'
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
 description = """ 
@@ -20,8 +19,7 @@ resources as emulated QPUs. It defines an API for communicating with the QPUs an
 the necessary tools to manage them.
 """
 
-toolchain = {'name': 'GCC', 'version': '12.3.0'}
-toolchainopts = {'rpath': False}
+toolchain = {'name': 'GCC', 'version': 'system'}
 
 #sources = [{
 #    'filename': '%(namelower)s-%(version)s.tar.gz',
@@ -38,31 +36,38 @@ toolchainopts = {'rpath': False}
 sources = ['%(name)s-%(version)s.tar.gz']
 
 builddependencies = [
-   ('OpenBLAS', '0.3.24'),
-   ('Boost', '1.85.0'),
-   ('pybind11', '2.13.6', local_pyversionsuffix),
-   ('CMake', '3.27.6')
+   ('OpenMPI', '5.0.5'),
+   ('pybind11', '2.12.0'),
+   ('CMake', '3.27.6'),
+   ('Cython', '3.0.11'),
+   ('CUDA', '12.8.0')
 ]
 
-# Implicit from Qiskit: ('hpcx-mt-ompi', EXTERNAL_MODULE),
 dependencies = [
-    ('Python', '3.11.9'),
-#   ('ZeroMQ', '4.3.4', local_pyversionsuffix),
-    ('nlohmann_json', '3.12.0'),
-    ('Qiskit', '1.2.4', versionsuffix),
+    ('Boost', '1.83.0'),
+    ('Qiskit', '1.2.4')
 ]
-
-configopts = [
-    "-DCMAKE_CXX_FLAGS=",
-]
-
-modextrapaths = {
-    'PYTHONPATH': ['.'],
-}
 
 sanity_check_paths = {
     'files': ['bin/qraise', 'bin/qdrop', 'bin/setup_qpus', 'bin/setup_executor'],
     'dirs': ['bin', 'lib'],
+}
+
+configopts = [
+    "-DCMAKE_CXX_FLAGS=",
+    "-DAER_GPU=TRUE"
+]
+
+# Here we use this instead of modextravars because of the Easybuild version in FT3 (4.4.2)
+# does not support pushenv (it translates it incorrectly into the .lua).
+import os
+local_store_dir = os.getenv('STORE') 
+modluafooter = '''
+pushenv("STORE", "%s")
+''' % local_store_dir
+
+modextrapaths = {
+    'PYTHONPATH': ['.'],
 }
 
 moduleclass = 'tools'

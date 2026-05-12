@@ -13,9 +13,6 @@
 
 void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 {
-    std::string home = std::getenv("HOME");
-    std::string cunqa_path = home + "/cunqa/";
-
     sbatchFile << "#!/bin/bash\n";
     sbatchFile << "#SBATCH --job-name=qraise \n";
     sbatchFile << "#SBATCH --partition qpu \n";
@@ -29,8 +26,8 @@ void write_qmio_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
 
     sbatchFile << "\n\n";
 
-    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
-    sbatchFile << "EPILOG_PATH=" << std::string(cunqa::constants::CUNQA_PATH) << "/epilog.sh\n";
+    sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_MEM_PER_NODE SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(cunqa::constants::INSTALL_PATH) << "/bin/epilog.sh\n";
 
     sbatchFile << "\n\n";
 

@@ -568,6 +568,9 @@ def _mock_qpus_json(monkeypatch, qpus_dict: dict):
       - mock `json.load` in that same module to just return our dict
     """
     monkeypatch.setattr("builtins.open", mock_open())
+    monkeypatch.setattr("os.open", lambda path, flags, mode: 123)
+    os_close_mock = Mock()
+    monkeypatch.setattr("os.close", os_close_mock)
     monkeypatch.setattr(qpu_mod.json, "load", lambda f: qpus_dict)
 
 

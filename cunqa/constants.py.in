@@ -1,7 +1,9 @@
-QPUS_FILEPATH = "@QPUS_FILEPATH@"
-CUNQA_PATH = "@CUNQA_PATH@"
-LIBS_DIR = "@CMAKE_INSTALL_RPATH@"
+import os
 
+CUNQA_PATH = os.getenv("STORE") + "/.cunqa"
+QPUS_FILEPATH = CUNQA_PATH + "/qpus.json"
+
+LIBS_DIR = "@CMAKE_INSTALL_PREFIX@/lib"
 CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@
 
 REMOTE_GATES = ["send", "recv", "qsend", "qrecv", "expose", "rcontrol"]

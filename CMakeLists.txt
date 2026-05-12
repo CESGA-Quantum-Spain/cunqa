@@ -36,9 +36,7 @@ set(GPU_ARCH "")
 if(NOT DEFINED ENV{STORE})
     message(FATAL_ERROR "The STORE environment variable is not defined")
 endif()
-set(CUNQA_PATH "$ENV{STORE}/.cunqa")
-set(QPUS_FILEPATH "$ENV{STORE}/.cunqa/qpus.json")
-set(COMM_FILEPATH "$ENV{STORE}/.cunqa/communications.json")
+
 include_directories("${CMAKE_BINARY_DIR}/src")
 
 
