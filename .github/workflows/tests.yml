@@ -54,6 +54,8 @@ jobs:
           PY
       - name: Copy constants.py.in into constants.py
         shell: bash
+        env:
+          STORE: ""
         run: |
           cp cunqa/constants.py.in cunqa/constants.py
           sed -i 's/CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@/CUNQA_USE_QISKIT_PY = True/' cunqa/constants.py
