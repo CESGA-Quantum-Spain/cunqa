@@ -83,6 +83,6 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh"
     @ONLY
 )
-install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
+install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh" DESTINATION "${CMAKE_INSTALL_BINDIR}") 
 
 

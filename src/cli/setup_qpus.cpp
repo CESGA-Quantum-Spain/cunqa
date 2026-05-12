@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     if (back_path_json.contains("noise_properties_path")) {
         if (sim_arg != "Aer")
             throw std::runtime_error("Noise is only available with AER at the moment.");
-        std::string fpath = std::string(constants::CUNQA_PATH) + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
+        std::string fpath = get_cunqa_path() + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
 
         if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
             generate_noise_instructions(back_path_json, family);

@@ -200,7 +200,7 @@ CUNQA is available as an Lmod module at CESGA. To use it:
 
 - In QMIO:
   ```bash
-  module load qmio/hpc gcc/12.3.0 cunqa/2.4.0-python-3.9.9-mpi
+  module load qmio/hpc gcc/12.3.0 cunqa/2.4.0-python-3.11.9-mpi
   ```
 
 - In FT3:

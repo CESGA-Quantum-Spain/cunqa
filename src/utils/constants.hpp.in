@@ -4,36 +4,33 @@
 #include <vector>
 #include <complex>
 #include <unordered_map>
+#include <cstdlib>
+#include <stdexcept>
+#include <string>
 #include <string_view>
-
-#include <utils/json.hpp>
 #include <optional>
+
+#include "utils/json.hpp"
 
 namespace cunqa {
 namespace constants{
 
-// Helper function to obtain the dynamic directory.
-// 'inline' avoids multiple definition errors when including the header.
-inline std::string get_user_cunqa_dir() {
-    // If $STORE is defined, this is the selected path
-    if (const char* store_env = std::getenv("STORE")) {
-        return std::string(store_env) + std::string("/.cunqa");
+// Helper function to obtain the dynamic directory of CUNQA files storage
+inline std::string get_cunqa_path() {
+    const char* store_env = std::getenv("STORE");
+
+    if (!store_env) {
+        throw std::runtime_error("Environment variable STORE is not defined");
     }
-    // Otherwise select $HOME
-    const char* home_env = std::getenv("HOME");
-    std::string home = home_env ? std::string(home_env) : ".";
-    return home + "/.cunqa";
+
+    return std::string{store_env} + "/.cunqa";
 }
 
-// This is constexpr because it is employed in __attribute__((constructor))
-// of the logger_client, that is initialized before main (therefore before
-// const std::string parameters are initialized) 
-inline constexpr std::string_view CUNQA_PATH = "@CUNQA_PATH@";
 const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
 
 // Dynamic variables
-inline const std::string QPUS_FILEPATH = get_user_cunqa_dir() + "/qpus.json";
-inline const std::string COMM_FILEPATH = get_user_cunqa_dir() + "/communications.json";
+inline const std::string QPUS_FILEPATH = get_cunqa_path() + "/qpus.json";
+inline const std::string COMM_FILEPATH = get_cunqa_path() + "/communications.json";
 
 enum SIMULATORS {
   AER,

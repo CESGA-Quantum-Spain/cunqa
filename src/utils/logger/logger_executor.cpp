@@ -1,6 +1,7 @@
-#include "logger.hpp"
 #include <string>
 #include <spdlog/sinks/stdout_color_sinks.h>
+
+#include "logger.hpp"
 
 using namespace std::literals;
 

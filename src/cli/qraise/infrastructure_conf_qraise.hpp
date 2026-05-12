@@ -86,7 +86,7 @@ void write_infrastructure_sbatch(std::ofstream& sbatchFile, const CunqaArgs& arg
 
 
     // ------ Directory and enviroment parameters block -------
-    sbatchFile << "EPILOG_PATH=" << std::string(constants::CUNQA_PATH) << "/epilog.sh\n";
+    sbatchFile << "EPILOG_PATH=" << std::string(constants::INSTALL_PATH) << "/bin/epilog.sh\n";
     //--------------------------------------------------------
 
 
