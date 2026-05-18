@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "simulator.hpp"
-#include "circuit.hpp"
-#include "run_config.hpp"
+#include "sim/simulator.hpp"
+#include "quantum_task/circuit.hpp"
+#include "quantum_task/run_config.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -12,7 +12,7 @@ namespace sim {
 
 class QsimSimulatorAdapter final : public Simulator {
 public:
-    QsimSimulatorAdapter() = default;
+    QsimSimulatorAdapter();
     ~QsimSimulatorAdapter();
 
     inline std::string get_name() const noexcept override
@@ -43,10 +43,8 @@ public:
     void apply_gate(const InstructionType& type, const Copy& payload) override;
     
 private:
-    qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space;
-    qsim::SimulatorBasic<qsim::ParallelFor>::State state; 
-    qsim::SimulatorBasic<qsim::ParallelFor> simulator;
-    std::mt19937& rgen;
+    struct State;
+    std::unique_ptr<State> state_;
 
     static constexpr std::array<std::string_view, 26> QSIM_BASIS_GATES = {{
         "measure",

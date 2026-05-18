@@ -85,17 +85,37 @@ public:
         unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const InstructionType& type, const MulticontrolNoParam& payload)
+    virtual void apply_gate(const InstructionType& type, const MultiNoParam& payload)
     {
         unsupported_gate(type, payload);
     }
 
-    virtual void apply_gate(const InstructionType& type, const MulticontrolParam& payload)
+    virtual void apply_gate(const InstructionType& type, const MultiParam& payload)
+    {
+        unsupported_gate(type, payload);
+    }
+
+    virtual void apply_gate(const InstructionType& type, const PauliNoParam& payload)
+    {
+        unsupported_gate(type, payload);
+    }
+
+    virtual void apply_gate(const InstructionType& type, const PauliParam& payload)
     {
         unsupported_gate(type, payload);
     }
 
     virtual void apply_gate(const InstructionType& type, const MultiPauli& payload)
+    {
+        unsupported_gate(type, payload);
+    }
+
+    virtual void apply_gate(const InstructionType& type, const NumControlsNoParam& payload)
+    {
+        unsupported_gate(type, payload);
+    }
+
+    virtual void apply_gate(const InstructionType& type, const NumControlsParam& payload)
     {
         unsupported_gate(type, payload);
     }

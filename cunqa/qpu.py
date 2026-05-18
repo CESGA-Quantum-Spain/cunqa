@@ -305,7 +305,7 @@ def qraise(n, t, *,
            quantum_comm = False,  
            simulator = None, 
            backend = None, 
-           noise_properties_path = None, 
+           noise_properties = None, 
            no_thermal_relaxation = False,
            no_readout_error = False,
            no_gate_error = False,
@@ -334,7 +334,7 @@ def qraise(n, t, *,
         simulator (str): name of the desired simulator to use. Default is `Aer 
                          <https://github.com/Qiskit/qiskit-aer>`_.
         backend (str): path to a file containing the backend information.
-        noise_properties_path (str): Path to the noise properties json file, only supported for 
+        noise_properties (str): Path to the noise properties json file, only supported for 
                                 simulator Aer. Default: None
         no_thermal_relaxation (bool): if ``True``, deactivate thermal relaxation in a noisy backend. Default: ``false``
         no_readout_error (bool): if ``True``, deactivate readout error in a noisy backend. Default: ``false``
@@ -357,8 +357,8 @@ def qraise(n, t, *,
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
 
-    if noise_properties_path is not None:
-        command = command + f" --noise-properties={str(noise_properties_path)}"
+    if noise_properties is not None:
+        command = command + f" --noise-properties={str(noise_properties)}"
     if no_thermal_relaxation:
         command = command + " --no-termal-relaxation"
     if no_readout_error:

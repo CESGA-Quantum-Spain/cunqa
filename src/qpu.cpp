@@ -286,14 +286,13 @@ Circuit json_to_circuit(const JSON& circuit_json)
             case InstructionType::MCPAULIGADGET:
             case InstructionType::NONUNITARYPAULIGADGET:
             {
-                auto params = instruction.at("params").get<std::vector<double>>();
-                for(auto& param : params)
-                    circuit.params.push_back(&param);
+                auto param = instruction.at("params").get<double>();
+                circuit.params.push_back(&param);
                 cunqa_instruction = {
                     .type = instruction_type,
                     .payload = PauliParam{
                         instruction.at("qubits").get<std::vector<int>>(), 
-                        parmas,
+                        param,
                         instruction.at("paulistr").get<std::string>()
                     }
                 };

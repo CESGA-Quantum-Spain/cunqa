@@ -39,8 +39,8 @@ public:
     void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
     void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
 
-    void apply_gate(const InstructionType& type, const MulticontrolNoParam& payload) override;
-    void apply_gate(const InstructionType& type, const MulticontrolParam& payload) override;
+    void apply_gate(const InstructionType& type, const MultiNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const MultiParam& payload) override;
 
     void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
     void apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload) override;

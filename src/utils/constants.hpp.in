@@ -44,6 +44,7 @@ enum class InstructionType {
     V,
     VDG,
     K,
+    HZ2,
 
     RX,
     RY,
@@ -66,6 +67,7 @@ enum class InstructionType {
 
     U,
 
+    ID2,
     ECR,
     SWAP,
     ISWAP,
@@ -90,11 +92,13 @@ enum class InstructionType {
     RXX,
     RYY,
     RZZ,
+    RXY,
     RZX,
 
     CU2,
     XXMYY,
     XXPYY,
+    FS,
 
     CU3,
 
@@ -102,6 +106,7 @@ enum class InstructionType {
 
     CECR,
     CSWAP,
+    CSQRTSWAP,
     CCX,
     CCY,
     CCZ,
@@ -125,11 +130,14 @@ enum class InstructionType {
     MCRX,
     MCRY,
     MCRZ,
+    MCRAXIS,
     MCP,
     MCU1,
     MCU2,
     MCU3,
     MCU,
+
+    MCMX,
 
     MCPAULISTR,
     MCPAULIGADGET,
@@ -194,6 +202,7 @@ inline const std::unordered_map<std::string, InstructionType> INSTRUCTIONS_MAP =
     {"v", InstructionType::V},
     {"vdg", InstructionType::VDG},
     {"k", InstructionType::K},
+    {"hz2", InstructionType::HZ2},
 
     // ONE QUBIT ONE PARAM
     {"rx", InstructionType::RX},
@@ -220,6 +229,7 @@ inline const std::unordered_map<std::string, InstructionType> INSTRUCTIONS_MAP =
     {"u", InstructionType::U},
 
     // TWO QUBIT NO PARAM
+    {"id2", InstructionType::ID2},
     {"ecr", InstructionType::ECR},
     {"swap", InstructionType::SWAP},
     {"iswap", InstructionType::ISWAP},
@@ -243,10 +253,12 @@ inline const std::unordered_map<std::string, InstructionType> INSTRUCTIONS_MAP =
     {"rxx", InstructionType::RXX},
     {"ryy", InstructionType::RYY},
     {"rzz", InstructionType::RZZ},
+    {"rxy", InstructionType::RXY},
     {"rzx", InstructionType::RZX},
 
     // TWO QUBIT TWO PARAM
     {"cu2", InstructionType::CU2},
+    {"fs", InstructionType::FS},
     {"xxmyy", InstructionType::XXMYY},
     {"xxpyy", InstructionType::XXPYY},
 
@@ -279,6 +291,9 @@ inline const std::unordered_map<std::string, InstructionType> INSTRUCTIONS_MAP =
     {"mcu2", InstructionType::MCU2},
     {"mcu3", InstructionType::MCU3},
     {"mcu", InstructionType::MCU},
+
+    // MULTICONTROLLED MULTITARGET
+    {"mcu", InstructionType::MCMX},
 
     // SPECIAL UNITARY GATES
     {"unitary", InstructionType::UNITARY},

@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "simulator.hpp"
-#include "circuit.hpp"
-#include "run_config.hpp"
+#include "sim/simulator.hpp"
+#include "quantum_task/circuit.hpp"
+#include "quantum_task/run_config.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -12,7 +12,7 @@ namespace sim {
 
 class QuestSimulatorAdapter final : public Simulator {
 public:
-    QuestSimulatorAdapter() = default;
+    QuestSimulatorAdapter();
     ~QuestSimulatorAdapter();
 
     inline std::string get_name() const noexcept override
@@ -27,6 +27,8 @@ public:
 
     void initialize() override;
     void clear() override;
+
+    JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
@@ -52,7 +54,8 @@ public:
     void apply_gate(const InstructionType& type, const Measure& payload) override;
     void apply_gate(const InstructionType& type, const Copy& payload) override;
 private:
-    std::unique_ptr<Qureg> qubits_state;
+    struct State;
+    std::unique_ptr<State> state_;
 
     static constexpr std::array<std::string_view, 53> QUEST_BASIS_GATES = {{
         "s", "cs", "mcs",

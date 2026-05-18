@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
 string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 
-project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES CXX)
+project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES CXX C)
 
 message(STATUS "Building CUNQA ${PROJECT_VERSION}")
 
@@ -486,6 +486,34 @@ if(NOT qulacs_POPULATED)
     include(FetchContent) 
 endif()
 
+# =====================================================================
+#  Qsim SIMULATOR - By Google 
+# =====================================================================
+find_package(qsim 0.22.0 QUIET)
+if(NOT qsim_FOUND)
+  message(STATUS "Package qsim not found, fetching from git@github.com:quantumlib/qsim.git")
+  FetchContent_Declare(
+      qsim
+      GIT_REPOSITORY git@github.com:quantumlib/qsim.git
+      GIT_TAG        v0.22.0
+      SOURCE_SUBDIR  intentionally_non_existent_dir  # Prevents running qsim CMakeLists.txt. It's header only, not needed.
+  )
+  FetchContent_MakeAvailable(qsim)
+else()
+  message(STATUS "Found package qsim: qsim_DIR = ${qsim_DIR}")
+endif()
+
+add_library(qsim_headers INTERFACE)
+target_include_directories(qsim_headers INTERFACE "${qsim_SOURCE_DIR}/lib")
+# ===================================================================================
+#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
+# ===================================================================================
+find_or_fetch_package(
+  quest
+  "git@github.com:QuEST-Kit/QuEST.git"
+  "4.2.0"
+  "v4.2.0"
+)
 
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain

@@ -1,6 +1,6 @@
 add_library(quest_adapters "${CMAKE_CURRENT_SOURCE_DIR}/quest_simulator_adapter.cpp")
 target_include_directories(quest_adapters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" 
-                                                   "${CMAKE_CURRENT_SOURCE_DIR}/.." 
+                                                   "${CMAKE_CURRENT_SOURCE_DIR}/.."  
                                                    ) 
 
 target_link_libraries(quest_adapters PUBLIC classical_channel 
