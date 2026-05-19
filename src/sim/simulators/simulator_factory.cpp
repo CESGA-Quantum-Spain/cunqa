@@ -7,7 +7,7 @@
 #include "Munich/munich_simulator_adapter.hpp"
 #include "Qsim/qsim_simulator_adapter.hpp"
 #include "QuEST/quest_simulator_adapter.hpp"
-// #include "Qulacs/qulacs_simulator_adapter.hpp"
+#include "Qulacs/qulacs_simulator_adapter.hpp"
 
 #include <stdexcept>
 

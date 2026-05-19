@@ -3,7 +3,10 @@
 #include <vector>
 #include <string_view>
 
-#include "src/sim/simulator.hpp"
+#include "sim/simulator.hpp"
+#include "quantum_task/circuit.hpp"
+#include "quantum_task/run_config.hpp"
+#include "utils/json.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -31,23 +34,26 @@ public:
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitTwoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) override;
 
     void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
-    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
-    void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
-
-    void apply_gate(const InstructionType& type, const MultiNoParam& payload) override;
-    void apply_gate(const InstructionType& type, const MultiParam& payload) override;
+    void apply_gate(const InstructionType& type, const FusedSwap& payload) override;
+    void apply_gate(const InstructionType& type, const MultiPauli& payload) override;
 
     void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
     void apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload) override;
 
+    void apply_gate(const InstructionType& type, const RandomUnitary& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitNoise& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitNoise& payload) override;
+
     void apply_gate(const InstructionType& type, const Measure& payload) override;
-    void apply_gate(const InstructionType& type, const Reset& payload) override;
     void apply_gate(const InstructionType& type, const Copy& payload) override;
 
 private:
+    struct State;
+    std::unique_ptr<State> state_;
 
     static constexpr std::array<std::string_view, 49> QULACS_BASIS_GATES = {{
         "measure",
