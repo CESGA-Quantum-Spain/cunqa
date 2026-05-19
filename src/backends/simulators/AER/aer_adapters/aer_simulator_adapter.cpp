@@ -163,10 +163,10 @@ std::unordered_map<std::string, std::string> execute_shot_(
 
         if (!indices.empty()) {
             for (auto& index : indices) {
-                state->apply_reset({G.communication_pairs[index].q1});
-                state->apply_reset({G.communication_pairs[index].q0});
+                state->apply_reset({static_cast<unsigned long>(G.communication_pairs[index].q1)});
+                state->apply_reset({static_cast<unsigned long>(G.communication_pairs[index].q0)});
                 state->apply_h(G.communication_pairs[index].q0);
-                state->apply_mcx({G.communication_pairs[index].q0, G.communication_pairs[index].q1});
+                state->apply_mcx({static_cast<unsigned long>(G.communication_pairs[index].q0), static_cast<unsigned long>(G.communication_pairs[index].q1)});
             }
         }
 
@@ -610,14 +610,14 @@ std::unordered_map<std::string, std::string> execute_shot_(
             G.communication_pairs[index].qcomm_protocol = "teledata";
 
             // CX to the entangled pair
-            state->apply_mcx({inst.qubits[0] + T.zero_qubit, G.communication_pairs[index].q0});
+            state->apply_mcx({inst.qubits[0] + T.zero_qubit, static_cast<unsigned long>(G.communication_pairs[index].q0)});
 
             // H to the sent qubit
             state->apply_h(inst.qubits[0] + T.zero_qubit);
 
             uint_t result = state->apply_measure({inst.qubits[0] + T.zero_qubit});
             G.qc_meas_td[T.id].push(result);
-            G.qc_meas_td[T.id].push(state->apply_measure({G.communication_pairs[index].q0}));
+            G.qc_meas_td[T.id].push(state->apply_measure({static_cast<unsigned long>(G.communication_pairs[index].q0)}));
 
             if (result) {
                 state->apply_reset({inst.qubits[0] + T.zero_qubit});
@@ -658,7 +658,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             }
 
             // Swap the value to the desired qubit
-            state->apply_mcswap({G.communication_pairs[index].q1, inst.qubits[0] + T.zero_qubit});
+            state->apply_mcswap({static_cast<unsigned long>(G.communication_pairs[index].q1), inst.qubits[0] + T.zero_qubit});
 
             G.communication_pairs[index].idle = true;
             break;
@@ -678,9 +678,9 @@ std::unordered_map<std::string, std::string> execute_shot_(
                     G.communication_pairs[index].label = -(qid + 1);
 
                     // CX to the entangled pair
-                    state->apply_mcx({inst.qubits[qid] + T.zero_qubit, G.communication_pairs[index].q0});
+                    state->apply_mcx({inst.qubits[qid] + T.zero_qubit, static_cast<unsigned long>(G.communication_pairs[index].q0)});
 
-                    uint_t result = state->apply_measure({G.communication_pairs[index].q0});
+                    uint_t result = state->apply_measure({static_cast<unsigned long>(G.communication_pairs[index].q0)});
 
                     G.qc_meas_tg[T.id].push(result);
                     T.cat_entangled = true;
@@ -728,7 +728,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
                 G.qc_meas_tg[inst.qpus[0]].pop();
 
                 if (meas2) {
-                    state->apply_mcx({G.communication_pairs[index].q1});
+                    state->apply_mcx({static_cast<unsigned long>(G.communication_pairs[index].q1)});
                 }
             }
 
@@ -739,7 +739,7 @@ std::unordered_map<std::string, std::string> execute_shot_(
             for (auto& index : indices) {
                 state->apply_h(G.communication_pairs[index].q1);
 
-                uint_t result = state->apply_measure({G.communication_pairs[index].q1});
+                uint_t result = state->apply_measure({static_cast<unsigned long>(G.communication_pairs[index].q1)});
                 G.qc_meas_tg[T.id].push(result);
             }
 
