@@ -2,7 +2,7 @@
 
 #include "simulator_factory.hpp"
 #include "AER/aer_simulator_adapter.hpp"
-// #include "CUNQA/cunqa_simulator_adapter.hpp"
+#include "CUNQA/cunqa_simulator_adapter.hpp"
 #include "Maestro/maestro_simulator_adapter.hpp"
 #include "Munich/munich_simulator_adapter.hpp"
 #include "Qsim/qsim_simulator_adapter.hpp"
@@ -19,9 +19,9 @@ std::unique_ptr<Simulator> make_simulator(const std::string& simulator_name)
     if (simulator_name == "Aer") {
         auto simulator = std::make_unique<AerSimulatorAdapter>();
         return simulator;
-    // } else if (simulator_name == "Cunqa") {
-    //     auto simulator = std::make_unique<CunqaSimulatorAdapter>();
-    //     return simulator;
+    } else if (simulator_name == "Cunqa") {
+        auto simulator = std::make_unique<CunqaSimulatorAdapter>();
+        return simulator;
     } else if (simulator_name == "Maestro") {
         auto simulator = std::make_unique<MaestroSimulatorAdapter>();
         return simulator;
