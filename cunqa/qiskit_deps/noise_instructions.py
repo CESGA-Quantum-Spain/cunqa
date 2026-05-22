@@ -8,6 +8,7 @@ import fcntl
 sys.path.append(os.getenv("HOME"))
 
 from cunqa.logger import logger
+from cunqa.constants import CUNQA_PATH
 from cunqa.qiskit_deps.cunqabackend import CunqaBackend
 from qiskit_aer.noise import NoiseModel
 
