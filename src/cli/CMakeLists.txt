@@ -1,6 +1,15 @@
-# QRAISE executable
+
+# =====================================================
+#  QRAISE executable
+# =====================================================
 add_executable(qraise qraise.cpp)
-target_link_libraries(qraise PRIVATE json logger_client morrisfranken::argparse)
+target_link_libraries(qraise 
+  PRIVATE 
+    json
+    logger_client
+    morrisfranken::argparse
+    constants
+  )
 
 if(USE_MPI_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_MPI_BTW_QPU)
@@ -16,40 +25,96 @@ endif()
 
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-# QDROP executable
+# =====================================================
+#  QDROP executable
+# =====================================================
 add_executable(qdrop qdrop.cpp)
-target_link_libraries(qdrop PRIVATE json morrisfranken::argparse)
+target_link_libraries(qdrop 
+  PRIVATE 
+    json
+    morrisfranken::argparse
+    constants
+)
 install(TARGETS qdrop DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-# SETUP_QPUS executable
+# =====================================================
+#  QINFO executable
+# =====================================================
+add_executable(qinfo qinfo.cpp)
+target_link_libraries(qinfo 
+  PRIVATE 
+    json 
+    logger_client 
+    morrisfranken::argparse
+)
+install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# =====================================================
+#  SETUP_QPUS executable
+# =====================================================
 add_executable(setup_qpus setup_qpus.cpp)
 target_link_libraries(setup_qpus
     PRIVATE 
-    json 
-    qpu
-    logger_qpu
-    nc_executor
-    cc_executor
-    simulator
-    simulator_factory
+      json 
+      qpu
+      logger_qpu
+      constants
+      simulator
+      simulator_factory
+      backend
+      backend_factory
 )
 
 if (COMPILATION_FOR_GPU)
-    target_compile_definitions(setup_qpus PUBLIC GPU_ARCH=${GPU_ARCH} COMPILATION_FOR_GPU=1)
+    target_compile_definitions(setup_qpus 
+      PUBLIC 
+        GPU_ARCH=${GPU_ARCH} 
+        COMPILATION_FOR_GPU=1
+    )
 else()
-    target_compile_definitions(setup_qpus PUBLIC COMPILATION_FOR_GPU=0)
+    target_compile_definitions(setup_qpus 
+      PUBLIC 
+        COMPILATION_FOR_GPU=0
+    )
 endif()
 
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-# QINFO executable
-add_executable(qinfo qinfo.cpp)
-target_link_libraries(qinfo PRIVATE json logger_client morrisfranken::argparse)
-install(TARGETS qinfo DESTINATION "${CMAKE_INSTALL_BINDIR}")
+# =====================================================
+#  SETUP_EXECUTOR executable
+# =====================================================
 
-# SETUP_QMIO executable
+add_executable(setup_executor setup_executor.cpp)
+target_link_libraries(setup_executor 
+  PRIVATE 
+    logger_executor
+    qc_executor
+    simulator_factory
+)
+
+if (COMPILATION_FOR_GPU)
+    target_compile_definitions(setup_executor 
+      PUBLIC 
+        GPU_ARCH=${GPU_ARCH} 
+        COMPILATION_FOR_GPU=1
+    )
+else()
+    target_compile_definitions(setup_executor PUBLIC COMPILATION_FOR_GPU=0)
+endif()
+install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# =====================================================
+#  SETUP_QMIO executable
+# =====================================================
 add_executable(setup_qmio setup_qmio.cpp)
-target_link_libraries(setup_qmio PRIVATE json cppzmq server logger_qpu)
+target_link_libraries(setup_qmio 
+  PRIVATE 
+    json
+    cppzmq
+    server
+    logger_qpu
+    constants
+)
 target_include_directories(setup_qmio 
     PRIVATE   
         "${ZMQ_BINARY_DIR}"

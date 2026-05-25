@@ -201,22 +201,22 @@ class CunqaBackend(BackendV2):
         
         else:
 
-            target = Target(num_qubits = backend_json["n_qubits"])
+            target = Target(num_qubits = backend_json["num_qubits"])
 
             if len(backend_json["coupling_map"]) == 0:
                 coupling_map = []
-                for i in range(backend_json["n_qubits"]):
-                    for j in range(backend_json["n_qubits"]):
+                for i in range(backend_json["num_qubits"]):
+                    for j in range(backend_json["num_qubits"]):
                         if i != j:
                             coupling_map.append([i,j])
                         
-                        for k in range(backend_json["n_qubits"]):
+                        for k in range(backend_json["num_qubits"]):
                             if k != j and k != i:
                                 coupling_map.append([i,j,k])
             else:
                 coupling_map = backend_json["coupling_map"]
 
-            target.add_instruction(Measure(), { (q,): None for q in range(backend_json["n_qubits"]) })
+            target.add_instruction(Measure(), { (q,): None for q in range(backend_json["num_qubits"]) })
 
             for gate in backend_json["basis_gates"]:
 
@@ -236,7 +236,7 @@ class CunqaBackend(BackendV2):
                                     if len(couple) == gate_object.num_qubits}
 
                     else:
-                        inst_map = { (q,): None for q in range(backend_json["n_qubits"]) }
+                        inst_map = { (q,): None for q in range(backend_json["num_qubits"]) }
 
                     target.add_instruction(gate_object, inst_map)
 

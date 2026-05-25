@@ -77,7 +77,7 @@ void ClassicalChannel::publish()
     {
         {"endpoint", endpoint}
     };
-    write_on_file(endpoint, COMM_FILEPATH, qpu_id);
+    write_on_file(endpoint, std::string(COMM_FILEPATH), qpu_id);
 }
 
 void connect(const std::string& qpu_id)

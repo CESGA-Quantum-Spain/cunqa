@@ -57,15 +57,15 @@ void add_qreg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& au
     auto p4 = sv_inst.find('[', p3);
     auto p5 = sv_inst.find(']', p4);
 
-    int num_qubits = circuit_json["num_qubits"];
+    std::pair<std::size_t, std::size_t> num_qubits = circuit_json["num_qubits"];
     int num_qregs = std::stoi(std::string(sv_inst.substr(p4+1, p5-p4-1)));
 
     std::vector<int> qreg_indexes(num_qregs);
-    std::iota(qreg_indexes.begin(), qreg_indexes.end(), num_qubits);
+    std::iota(qreg_indexes.begin(), qreg_indexes.end(), num_qubits.first);
     circuit_json["quantum_registers"][std::string(sv_inst.substr(p3, p4-p3))] = qreg_indexes;
 
-    circuit_json["num_qubits"] = circuit_json.value("num_qubits", 0) + num_qregs;
-
+    num_qubits.first += num_qregs;
+    circuit_json["num_qubits"] = num_qubits;
 }
 
 void add_creg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json)
@@ -519,7 +519,7 @@ JSON qasm2_to_json(const std::string& circuit_qasm) {
     JSON circuit_json = 
     {
         {"instructions", std::vector<JSON>()},
-        {"num_qubits", 0},
+        {"num_qubits", std::pair<std::size_t, std::size_t>()},
         {"num_clbits", 0},
         {"quantum_registers", JSON()},
         {"classical_registers", JSON()}

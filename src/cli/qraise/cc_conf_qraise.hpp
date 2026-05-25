@@ -157,7 +157,7 @@ void write_cc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         LOGGER_ERROR("Simulator {} is not available for classical communications simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
-    } else if (exists_family_name(args.family_name, QPUS_FILEPATH)) {
+    } else if (exists_family_name(args.family_name, std::string(QPUS_FILEPATH))) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
 

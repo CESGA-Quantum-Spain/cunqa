@@ -39,7 +39,7 @@ class Backend(TypedDict):
     .. autoattribute:: custom_instructions
     .. autoattribute:: description
     .. autoattribute:: gates
-    .. autoattribute:: n_qubits
+    .. autoattribute:: num_qubits
     .. autoattribute:: name
     .. autoattribute:: noise_properties_path
     .. autoattribute:: simulator
@@ -50,7 +50,7 @@ class Backend(TypedDict):
     custom_instructions: str #: Any custom instructions that the Backend has defined.
     description: str #: Custom description of the Backend itself.
     gates: list[str] #: Specific gates supported.
-    n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
+    num_qubits: tuple[int] #: Number of qubits that form the Backend: computation and communication qubits available.
     name: str #: Name assigned to the Backend.
     noise_properties_path: str #: Path to the noise model json file gathering the noise instructions needed for the simulator.
     simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
@@ -225,7 +225,14 @@ def run(
         logger.warning("More QPUs provided than the number of circuits. "
                        "Last QPUs will remain unused.")
     
-    # translate circuit ids in comm instruction to qpu endpoints
+    # check whether the QPU has enough qubits for the circuit
+    for qpu, circuit_ir in zip(qpus, circuits_ir):
+        if qpu.backend["num_qubits"][0] < circuit_ir["num_qubits"][0]:
+            raise ValueError("Not enough compute qubits in the QPU for the circuit.")
+        if qpu.backend["num_qubits"][1] < circuit_ir["num_qubits"][1]:
+            raise ValueError("Not enough communication qubits in the QPU for the circuit.")
+    
+    # translate circuit ids in comm instruction to qpu ids
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
     correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
     for circuit in circuits_ir:

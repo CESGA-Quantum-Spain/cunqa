@@ -13,8 +13,7 @@ endif()
 target_include_directories(aer_simulator_adapter PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(aer_simulator_adapter 
     PUBLIC
-        circuit
-        run_config
+        quantum_task
         simulator
     PRIVATE 
         aer_headers

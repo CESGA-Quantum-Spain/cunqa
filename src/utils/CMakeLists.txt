@@ -4,7 +4,25 @@ configure_file(
     @ONLY
 )
 
-add_library(json json.cpp)
+add_library(constants INTERFACE)
+target_sources(constants
+  INTERFACE
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_BINARY_DIR}/src"
+    FILES
+      "${CMAKE_BINARY_DIR}/src/utils/constants.hpp"
+)
+
+add_library(json)
+target_sources(json
+  PRIVATE
+    json.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_SOURCE_DIR}/src"
+    FILES
+      "${CMAKE_SOURCE_DIR}/src/utils/json.hpp"
+)
 target_link_libraries(json 
     PUBLIC 
         nlohmann_json::nlohmann_json

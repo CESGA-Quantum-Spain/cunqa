@@ -59,7 +59,7 @@ struct TaskState {
 };
 
 struct GlobalState {
-    int n_qubits = 0, n_clbits = 0;
+    int num_qubits = 0, num_clbits = 0;
     std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::queue<int>> qc_meas_td;
     std::unordered_map<std::string, std::queue<int>> qc_meas_tg;
@@ -129,8 +129,8 @@ std::string MunichSimulatorAdapter::execute_shot_(
     {
         TaskState T;
         T.id = quantum_task.id;
-        T.zero_qubit = G.n_qubits;
-        T.zero_clbit = G.n_clbits;
+        T.zero_qubit = G.num_qubits;
+        T.zero_clbit = G.num_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked_by_teledata = false;
@@ -139,17 +139,17 @@ std::string MunichSimulatorAdapter::execute_shot_(
         T.finished = false;
         Ts[quantum_task.id] = T;
         
-        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
+        G.num_qubits += quantum_task.config.at("num_qubits").get<int>();
+        G.num_clbits += quantum_task.config.at("num_clbits").get<int>();
     }
     
     // Here we add the communication qubits
     if (n_comm_qubits != 0) {
-        G.n_qubits += n_comm_qubits;
+        G.num_qubits += n_comm_qubits;
         for (int i = 0; i < n_comm_qubits; i+=2) {
             CommunicationQubitsPair cqp = {
-                .q0 = G.n_qubits - n_comm_qubits + i,
-                .q1 = G.n_qubits - n_comm_qubits + i + 1
+                .q0 = G.num_qubits - n_comm_qubits + i,
+                .q1 = G.num_qubits - n_comm_qubits + i + 1
             };
             G.communication_pairs.push_back(cqp);
         }
@@ -189,7 +189,7 @@ std::string MunichSimulatorAdapter::execute_shot_(
         std::vector<int> qubits;
         if (inst.contains("qubits"))
             qubits = inst.at("qubits").get<std::vector<int>>();
-        auto inst_type = INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        auto inst_type = instruction_type_from_name(inst.at("name").get<std::string>());
         
         switch (inst_type) {
         case MEASURE:
@@ -621,10 +621,10 @@ std::string MunichSimulatorAdapter::execute_shot_(
     } // End one shot
 
     // result is a map from the cbit index to the Boolean value
-    std::string result_bits(G.n_clbits, '0');
+    std::string result_bits(G.num_clbits, '0');
     for (const auto &[bitIndex, value] : G.creg)
     {
-        result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
+        result_bits[G.num_clbits - bitIndex - 1] = value ? '1' : '0';
     }
 
     return result_bits;
@@ -639,11 +639,11 @@ JSON MunichSimulatorAdapter::simulate(const Backend* backend)
     // TODO: Change the format with the free functions
     try
     {   
-        size_t n_qubits = quantum_task.config.at("num_qubits");
-        size_t n_clbits = quantum_task.config.at("num_clbits");
+        size_t num_qubits = quantum_task.config.at("num_qubits");
+        size_t num_clbits = quantum_task.config.at("num_clbits");
         size_t seed = quantum_task.config.contains("seed") ? quantum_task.config.at("seed").get<size_t>() : 0;
 
-        auto mqt_circuit = std::make_unique<QuantumComputation>(n_qubits, n_clbits, seed); 
+        auto mqt_circuit = std::make_unique<QuantumComputation>(num_qubits, num_clbits, seed); 
 
         quantum_task_to_mqt_circuit(quantum_task.circuit, *mqt_circuit);
         
@@ -701,7 +701,7 @@ JSON MunichSimulatorAdapter::simulate(comm::ClassicalChannel *classical_channel,
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < shots; i++)
     {   
-        initializeSimulationAdapter(p_qca->n_qubits);
+        initializeSimulationAdapter(p_qca->num_qubits);
         meas_counter[execute_shot_(p_qca->quantum_tasks, classical_channel, allows_qc, p_qca->n_comm_qubits)]++;
     } // End all shots
 

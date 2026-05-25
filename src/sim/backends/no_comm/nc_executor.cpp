@@ -3,7 +3,7 @@
 
 #include "nc_executor.hpp"
 
-#include "utils/constants.hpp"
+#include "quantum_task/instruction_type.hpp"
 #include "utils/json.hpp"
 
 #include "logger.hpp"
@@ -35,7 +35,7 @@ JSON NCExecutor::custom_execute(const QuantumTask& quantum_task)
                     // We always avoid ENDCIF cause it does not possess semantic meaning
                     if (type == InstructionType::ENDCIF)
                         return;
-                } else if constexpr (std::is_same_v<T, ClassicalComm> ||std::is_same_v<T, QuantumComm>)
+                } else if constexpr (std::is_same_v<T, ClassicalComm> ||std::is_same_v<T, GenEnt>)
                     throw std::runtime_error("No communications allowed in the no communication scheme!");
                 else if constexpr (std::is_same_v<T, std::monostate>)
                     throw std::runtime_error("Empty circuit received.");

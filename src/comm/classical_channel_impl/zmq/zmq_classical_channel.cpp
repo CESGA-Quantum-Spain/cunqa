@@ -108,8 +108,8 @@ ClassicalChannel::~ClassicalChannel() = default;
 //-------------------------------------------------
 void ClassicalChannel::publish()
 {
-    JSON endpoint_json = { {"endpoint", endpoint} };
-    write_on_file(endpoint_json, COMM_FILEPATH, qpu_id);
+    JSON endpoint_json = { {"endpoint", endpoint}, {"rank", getenv("SLURM_PROCID")} };
+    write_on_file(endpoint_json, std::string(COMM_FILEPATH), qpu_id);
 }
 
 
@@ -119,7 +119,7 @@ void ClassicalChannel::publish()
 void ClassicalChannel::connect(const std::string& qpu_id) 
 {
     if(!communications.contains(qpu_id))
-        communications = read_file(COMM_FILEPATH);
+        communications = read_file(std::string(COMM_FILEPATH));
 
     auto endpoint = communications.at(qpu_id).at("endpoint").get<std::string>();
     pimpl_->connect(endpoint, qpu_id);

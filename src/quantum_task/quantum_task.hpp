@@ -1,11 +1,12 @@
 #pragma once
 
-#include <vector>
-#include <variant>
+#include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "quantum_task/circuit.hpp"
-#include "quantum_task/run_config.hpp"
+#include "circuit.hpp"
+#include "run_config.hpp"
 
 namespace cunqa {
 

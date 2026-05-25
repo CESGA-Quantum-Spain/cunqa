@@ -136,7 +136,7 @@ def prepare_backend_json(backend, args, noise_model, noise_properties_path):
         return {
             "name": f"{'CunqaBackend' if not args.fakeqmio else 'FakeQmio'}_{args.family_name}",
             "version": "",
-            "n_qubits": backend.num_qubits, 
+            "num_qubits": backend.num_qubits, 
             "description": description,
             "coupling_map": backend.coupling_map_list,
             "basis_gates": backend.basis_gates,

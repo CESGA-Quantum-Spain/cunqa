@@ -1,11 +1,37 @@
 # Server
-add_library(server "${CMAKE_CURRENT_SOURCE_DIR}/zmq_server.cpp")           
-target_link_libraries(server PRIVATE logger_qpu cppzmq 
-                             PUBLIC json)
+add_library(server) 
+target_sources(server
+  PRIVATE
+    zmq_server.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_SOURCE_DIR}/src"
+    FILES
+      "${CMAKE_SOURCE_DIR}/src/comm/server.hpp"
+)          
+target_link_libraries(server 
+  PRIVATE 
+    logger_qpu 
+    cppzmq
+  PUBLIC 
+    json)
 
 # Client
-add_library(client "${CMAKE_CURRENT_SOURCE_DIR}/zmq_client.cpp")
-target_link_libraries(client PRIVATE logger_client cppzmq)
+add_library(client)
+target_sources(client
+  PRIVATE
+    zmq_client.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_SOURCE_DIR}/src"
+    FILES
+      "${CMAKE_SOURCE_DIR}/src/comm/client.hpp"
+)     
+target_link_libraries(client 
+  PRIVATE 
+    logger_client 
+    cppzmq
+)
 set_target_properties(client PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )

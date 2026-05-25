@@ -3,9 +3,9 @@
 #include <string>
 
 #include "comm/server.hpp"
-#include "logger.hpp"
 #include "utils/helpers/net_functions.hpp"
-#include "utils/constants.hpp"
+
+#include "logger.hpp"
 
 namespace as = boost::asio;
 using namespace std::string_literals;

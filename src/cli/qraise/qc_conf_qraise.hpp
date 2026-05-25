@@ -138,7 +138,7 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
     
 #ifdef USE_ZMQ_BTW_QPU
     if (!args.gpu) {
-        int simulator_n_cores = args.cores_per_qpu * args.n_qpus; 
+        int simulator_n_cores = args.cores_per_qpu * args.n_qpus - args.n_qpus; 
         int simulator_memory;
         if (args.mem_per_qpu.has_value()) {
             simulator_memory = args.mem_per_qpu.value() * args.n_qpus;
@@ -152,7 +152,7 @@ bool write_qc_run_command(std::ofstream& sbatchFile,const CunqaArgs& args)
         LOGGER_ERROR("CUNQA was not compiled with GPU support.");
         return false;
 #endif
-        int simulator_n_cores = args.cores_per_qpu - args.n_qpus; 
+        int simulator_n_cores = args.cores_per_qpu * args.n_qpus - args.n_qpus; 
         int simulator_memory;
         if (args.mem_per_qpu.has_value()) {
             simulator_memory = args.mem_per_qpu.value() * args.n_qpus;
@@ -181,7 +181,7 @@ void write_qc_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         LOGGER_ERROR("Simulator {} is not available for quantum communications simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
-    } else if (exists_family_name(args.family_name, QPUS_FILEPATH)) {
+    } else if (exists_family_name(args.family_name, std::string(QPUS_FILEPATH))) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
 

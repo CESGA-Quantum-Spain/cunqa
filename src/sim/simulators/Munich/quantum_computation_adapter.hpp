@@ -23,18 +23,18 @@ public:
         QuantumComputation(quantum_task.config.at("num_qubits").get<size_t>(), quantum_task.config.at("num_clbits").get<size_t>()),
         quantum_tasks{quantum_task}
     { 
-        n_qubits = quantum_task.config.at("num_qubits").get<size_t>();
+        num_qubits = quantum_task.config.at("num_qubits").get<size_t>();
     }
     QuantumComputationAdapter(const std::vector<QuantumTask>& quantum_tasks) : 
         QuantumComputation(get_num_qubits_(quantum_tasks), get_num_clbits_(quantum_tasks)),
         quantum_tasks{quantum_tasks}
     { 
-        n_qubits = get_num_qubits_(quantum_tasks);
+        num_qubits = get_num_qubits_(quantum_tasks);
         n_comm_qubits = get_num_comm_qubits_(quantum_tasks);
     }
 
     std::vector<QuantumTask> quantum_tasks;
-    size_t n_qubits;
+    size_t num_qubits;
     size_t n_comm_qubits = 0;
 
 private:
@@ -168,10 +168,10 @@ inline void quantum_task_to_mqt_circuit(const JSON& circuit, QuantumComputation&
     int inst_type;
     std::vector<unsigned int> qubits;
     for (auto& instruction : circuit) {
-        inst_type = INSTRUCTIONS_MAP.at(instruction.at("name").get<std::string>());
+        inst_type = instruction_type_from_name(instruction.at("name").get<std::string>());
         qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
 
-        switch (INSTRUCTIONS_MAP.at(instruction.at("name").get<std::string>()))
+        switch (instruction_type_from_name(instruction.at("name").get<std::string>()))
         {
         case MEASURE:
         {

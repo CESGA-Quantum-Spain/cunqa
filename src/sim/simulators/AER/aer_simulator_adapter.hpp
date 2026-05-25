@@ -5,7 +5,6 @@
 
 #include "sim/simulator.hpp"
 #include "quantum_task/circuit.hpp"
-#include "quantum_task/run_config.hpp"
 
 namespace cunqa {
 namespace sim {

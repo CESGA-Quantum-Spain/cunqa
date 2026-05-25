@@ -17,7 +17,7 @@ public:
     inline JSON native_execute(const QuantumTask& quantum_task, const JSON& noise_model)
     {
         simulator_->config = quantum_task.config;
-        simulator_->native_execute(quantum_task.circuit, noise_model);
+        return simulator_->native_execute(quantum_task.circuit, noise_model);
     }
 
     JSON custom_execute(const QuantumTask& quantum_task);

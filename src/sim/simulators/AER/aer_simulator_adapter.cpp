@@ -13,13 +13,14 @@
 #include "noise/noise_model.hpp"
 
 #include "aer_simulator_adapter.hpp"
+#include "quantum_task/run_config.hpp"
 #include "utils/json.hpp"
 
 #include "logger.hpp"
 
 namespace {
 
-constexpr std::array<std::string_view, 68> AER_config_KEYS = {{
+constexpr std::array<std::string_view, 68> AER_CONFIG_KEYS = {{
     "shots",
     "method",
     "precision",
@@ -90,19 +91,19 @@ constexpr std::array<std::string_view, 68> AER_config_KEYS = {{
     "runtime_parameter_bind_enable",
 }};
 
-AER::Config config_to_AER(const cunqa::RunConfig& config)
+AER::Config config_to_AER(const cunqa::RunConfig& config, std::size_t num_qubits)
 {
     cunqa::JSON AER_config = {
         {"shots", config.shots},
         {"method", config.method},
         {"avoid_parallelization", config.avoid_parallelization},
         {"num_clbits", config.num_clbits},
-        {"num_qubits", config.num_qubits}
+        {"num_qubits", num_qubits}
     };
 
     // Generic Aer configuration options
     for (auto& [key, value] : config.simulator_specifics.items()) {
-        if (std::find(AER_config_KEYS.begin(), AER_config_KEYS.end(), key) != AER_config_KEYS.end()) {
+        if (std::find(AER_CONFIG_KEYS.begin(), AER_CONFIG_KEYS.end(), key) != AER_CONFIG_KEYS.end()) {
             AER_config[std::string(key)] = value;
         }
     }
@@ -195,19 +196,18 @@ AerSimulatorAdapter::~AerSimulatorAdapter() = default;
 
 void AerSimulatorAdapter::initialize()
 {
-    creg = std::vector<bool>(config.num_clbits, false);
-
     state_->aer_state.set_method((config.method == "automatic") ? "statevector" : config.method);
     state_->aer_state.set_device(config.device.at("device_name").get<std::string>());
     state_->aer_state.set_precision("double");
     config.seed != NO_SEED ? state_->aer_state.set_seed(config.seed) : state_->aer_state.set_random_seed();
 
-    state_->aer_state.allocate_qubits(config.num_qubits);
+    state_->aer_state.allocate_qubits(num_qubits);
     state_->aer_state.initialize();
 }
 
 void AerSimulatorAdapter::clear()
 {
+    creg.clear();
     state_->aer_state.clear();
 }
 
@@ -475,8 +475,14 @@ void AerSimulatorAdapter::apply_gate(const InstructionType& type, const Measure&
     switch (type)
     {
         case InstructionType::MEASURE:
-            creg[payload.clbit] =
-                static_cast<bool>(state_->aer_state.apply_measure({qubit}));
+            if(payload.clbit < config.num_clbits) {
+                creg[payload.clbit] =
+                    static_cast<bool>(state_->aer_state.apply_measure({qubit}));
+                save_clbit[payload.clbit] = payload.save;
+            } else {
+                throw std::runtime_error("Cannot store measurement: classical bit "
+                                         "index exceeds the available range.");
+            }    
             break;
 
         default:
@@ -511,7 +517,11 @@ void AerSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& pa
             }
 
             for (size_t i = 0; i < payload.l_clbits.size(); ++i)
-                creg[payload.l_clbits[i]] = creg[payload.r_clbits[i]];
+                if(payload.l_clbits[i] < config.num_clbits && payload.r_clbits[i] < config.num_clbits)
+                    creg[payload.l_clbits[i]] = creg[payload.r_clbits[i]];
+                else
+                    throw std::runtime_error("Cannot copy measurement: classical bit "
+                                             "index exceeds the available range.");
 
             break;
 
@@ -529,7 +539,7 @@ JSON AerSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noi
                 {"instructions", circuit_to_AER(circuit)}
             }))
         };
-        auto AER_config = config_to_AER(config);
+        auto AER_config = config_to_AER(config, num_qubits);
         AER::Noise::NoiseModel noise_model(noise_model);
 
         auto AER_result = controller_execute<AER::Controller>(circuits, noise_model, AER_config);

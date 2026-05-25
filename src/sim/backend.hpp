@@ -8,7 +8,7 @@ namespace sim {
 
 class Backend {
 public:
-    virtual inline JSON execute(const QuantumTask& quantum_task) = 0;
+    virtual inline JSON execute(const std::string& quantum_task_str) = 0;
     virtual JSON to_json() const = 0;
 };
 

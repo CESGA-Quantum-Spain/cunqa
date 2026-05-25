@@ -12,7 +12,5 @@ target_sources(simulator
 )
 target_link_libraries(simulator INTERFACE quantum_task)
 
-add_subdirectory(no_comm)
-add_subdirectory(classical_comm)
-#add_subdirectory(quantum_comm)
 add_subdirectory(simulators)
+add_subdirectory(backends)

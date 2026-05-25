@@ -59,7 +59,7 @@ struct TaskState {
 };
 
 struct GlobalState {
-    int n_qubits = 0, n_clbits = 0;
+    int num_qubits = 0, num_clbits = 0;
     std::map<std::size_t, bool> creg;
     std::unordered_map<std::string, std::queue<int>> qc_meas_td;
     std::unordered_map<std::string, std::queue<int>> qc_meas_tg;
@@ -126,8 +126,8 @@ std::string execute_shot_(
     {
         TaskState T;
         T.id = quantum_task.id;
-        T.zero_qubit = G.n_qubits;
-        T.zero_clbit = G.n_clbits;
+        T.zero_qubit = G.num_qubits;
+        T.zero_clbit = G.num_clbits;
         T.it = quantum_task.circuit.begin();
         T.end = quantum_task.circuit.end();
         T.blocked_by_teledata = false;
@@ -136,17 +136,17 @@ std::string execute_shot_(
         T.finished = false;
         Ts[quantum_task.id] = T;
         
-        G.n_qubits += quantum_task.config.at("num_qubits").get<int>();
-        G.n_clbits += quantum_task.config.at("num_clbits").get<int>();
+        G.num_qubits += quantum_task.config.at("num_qubits").get<int>();
+        G.num_clbits += quantum_task.config.at("num_clbits").get<int>();
     }
     
     // Here we add the communication qubits
     if (n_comm_qubits != 0) {
-        G.n_qubits += n_comm_qubits;
+        G.num_qubits += n_comm_qubits;
         for (int i = 0; i < n_comm_qubits; i+=2) {
             CommunicationQubitsPair cqp = {
-                .q0 = G.n_qubits - n_comm_qubits + i,
-                .q1 = G.n_qubits - n_comm_qubits + i + 1
+                .q0 = G.num_qubits - n_comm_qubits + i,
+                .q1 = G.num_qubits - n_comm_qubits + i + 1
             };
             G.communication_pairs.push_back(cqp);
         }
@@ -181,7 +181,7 @@ std::string execute_shot_(
         std::vector<int> qubits;
         if (inst.contains("qubits"))
             qubits = inst.at("qubits").get<std::vector<int>>();
-        auto inst_type = cunqa::INSTRUCTIONS_MAP.at(inst.at("name").get<std::string>());
+        auto inst_type = cunqa::instruction_type_from_name(inst.at("name").get<std::string>());
         std::string inst_name = inst.at("name").get<std::string>();
 
         switch (inst_type)
@@ -505,10 +505,10 @@ std::string execute_shot_(
 
     } // End one shot
 
-    std::string result_bits(G.n_clbits, '0');
+    std::string result_bits(G.num_clbits, '0');
     for (const auto &[bitIndex, value] : G.creg)
     {
-        result_bits[G.n_clbits - bitIndex - 1] = value ? '1' : '0';
+        result_bits[G.num_clbits - bitIndex - 1] = value ? '1' : '0';
     }
 
     return result_bits;
@@ -524,9 +524,9 @@ JSON CunqaSimulatorAdapter::simulate([[maybe_unused]] const Backend* backend)
     LOGGER_DEBUG("Cunqa usual simulation");
     try
     { 
-        auto n_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
+        auto num_qubits = qc.quantum_tasks[0].config.at("num_qubits").get<int>();
         auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
-        Executor executor(n_qubits);
+        Executor executor(num_qubits);
         QuantumCircuit circuit = qc.quantum_tasks[0].circuit;
         JSON result = executor.run(circuit, shots);
 
@@ -550,9 +550,9 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
     auto shots = qc.quantum_tasks[0].config.at("shots").get<int>();
     std::string method = qc.quantum_tasks[0].config.at("method").get<std::string>();
 
-    size_t n_qubits = 0;
+    size_t num_qubits = 0;
     for (auto& quantum_task : qc.quantum_tasks) {
-        n_qubits += quantum_task.config.at("num_qubits").get<size_t>();
+        num_qubits += quantum_task.config.at("num_qubits").get<size_t>();
     }
 
     size_t n_comm_qubits = 0;
@@ -566,7 +566,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
             n_comm_qubits = 2;
         }
 
-        n_qubits += n_comm_qubits;
+        num_qubits += n_comm_qubits;
     }
 
 
@@ -577,7 +577,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
         {
             std::map<std::string, std::size_t> local_counter;
             
-            Executor executor(n_qubits);
+            Executor executor(num_qubits);
 
             #pragma omp for
             for (std::size_t i = 0; i < shots; i++) {
@@ -590,7 +590,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
                 meas_counter[key] += val;
         }
     } else { // As if OPENMP_IN_QC not enabled
-        Executor executor(n_qubits);
+        Executor executor(num_qubits);
         for (int i = 0; i < shots; i++)
         {
             meas_counter[execute_shot_(executor, qc.quantum_tasks, classical_channel, allows_qc, n_comm_qubits)]++;
@@ -599,7 +599,7 @@ JSON CunqaSimulatorAdapter::simulate(comm::ClassicalChannel* classical_channel, 
         } // End all shots
     }
 #else
-    Executor executor(n_qubits);
+    Executor executor(num_qubits);
     for (int i = 0; i < shots; i++)
     {
         meas_counter[execute_shot_(executor, qc.quantum_tasks, classical_channel, allows_qc,n_comm_qubits)]++;

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "utils/constants.hpp"
+#include "quantum_task/instruction_type.hpp"
 #include "utils/json.hpp"
 
 namespace
@@ -39,7 +39,8 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
     std::string qasm_circt = "OPENQASM 2.0;\ninclude \"qelib1.inc\";\n";
 
     // Quantum and classical register declaration
-    qasm_circt += "qreg q[" + std::to_string(config.at("num_qubits").get<int>()) + "];";
+    std::pair<std::size_t, std::size_t> num_qubits = config.at("num_qubits");
+    qasm_circt += "qreg q[" + std::to_string(num_qubits.first) + "];";
     qasm_circt += "creg c[" + std::to_string(config.at("num_clbits").get<int>()) + "];\n";
 
     // Instruction processing
@@ -49,7 +50,7 @@ inline std::string json_to_qasm2(const JSON& instructions, const JSON& config)
         std::vector<double> params;
         std::vector<std::vector<std::vector<std::vector<double>>>> matrix;
 
-        switch (INSTRUCTIONS_MAP.at(gate_name))
+        switch (instruction_type_from_name(gate_name))
         {   
             // Non-parametric 1 qubit gates
             case InstructionType::ID:

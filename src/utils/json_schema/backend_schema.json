@@ -30,7 +30,7 @@
                     "type":"string",
                     "default":""
                 },
-                "n_qubits":
+                "num_qubits":
                 {
                     "description":"Number of qubits of the QPU",
                     "type":"integer",

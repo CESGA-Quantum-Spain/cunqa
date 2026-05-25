@@ -1,17 +1,34 @@
-option(USE_MPI_BTW_QPU "Using the MPI library for communication between QPUs" OFF)
-option(USE_ZMQ_BTW_QPU "Using the ZMQ library for communication between QPUs" OFF)
-
-# Set default if both are OFF
-if(NOT USE_MPI_BTW_QPU AND NOT USE_ZMQ_BTW_QPU)
-    set(USE_ZMQ_BTW_QPU ON CACHE BOOL "Using ZMQ by default" FORCE)
-endif()
-
 add_subdirectory(utils)
-add_subdirectory(quantum_task)
 add_subdirectory(sim)
 add_subdirectory(comm)
 
-add_library(qpu qpu.cpp)
+add_library(quantum_task INTERFACE)
+target_sources(quantum_task
+  INTERFACE
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES
+      quantum_task/instruction_type.hpp
+      quantum_task/circuit.hpp
+      quantum_task/run_config.hpp
+      quantum_task/quantum_task.hpp
+)
+target_link_libraries(quantum_task
+  INTERFACE
+    json
+    logger_executor
+)
+
+add_library(qpu)
+target_sources(qpu
+  PRIVATE
+    qpu.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES
+      qpu.hpp
+)
 target_link_libraries(qpu 
     PUBLIC 
         server
@@ -20,8 +37,8 @@ target_link_libraries(qpu
         json 
         quantum_task
         logger_qpu
+        constants
 )
-target_include_directories(qpu PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(cli)
 

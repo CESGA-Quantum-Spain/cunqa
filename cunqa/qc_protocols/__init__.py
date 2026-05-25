@@ -1,0 +1,1 @@
+from cunqa.qc_protocols.teledata import qsend, qrecv

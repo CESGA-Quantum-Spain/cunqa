@@ -1,21 +1,19 @@
-
+#include <chrono>
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <stdexcept>
 #include <string>
-#include <vector>
-#include <fcntl.h>
+#include <thread>
 #include <sys/file.h>
-#include <unistd.h>
+#include <fcntl.h> 
+#include <unistd.h> 
 
 #include "qpu.hpp"
-#include "sim/no_comm/nc_backend.hpp"
-#include "sim/classical_comm/cc_backend.hpp"
 #include "sim/simulators/simulator_factory.hpp"
+#include "sim/backends/backend_factory.hpp"
 
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
-#include "utils/helpers/murmur_hash.hpp"
 
 #include "logger.hpp"
 
@@ -32,7 +30,7 @@ std::string generate_noise_instructions(const cunqa::JSON& back_path_json, const
     else 
         backend_path = "default";
 
-    std::string command("python "s + INSTALL_PATH + "/cunqa/qiskit_deps/noise_instructions.py "s
+    std::string command("python "s + std::string(INSTALL_PATH) + "/cunqa/qiskit_deps/noise_instructions.py "s
                                    + back_path_json.at("noise_properties_path").get<std::string>() + " "s
                                    + backend_path + " "s
                                    + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
@@ -44,19 +42,8 @@ std::string generate_noise_instructions(const cunqa::JSON& back_path_json, const
     return "";
 }
 
-int main(int argc, char *argv[])
+cunqa::JSON get_backend_json(int argc, char *argv[], std::string sim_arg, std::string family)
 {
-    std::string mode(argv[1]);
-    std::string communications(argv[2]);
-    std::string family(argv[3]);
-    std::string sim_arg(argv[4]);
-
-    if (family == "default")
-        family = std::getenv("SLURM_JOB_ID");
-    std::string name = std::getenv("SLURM_JOB_ID") 
-                     + "_"s 
-                     + std::getenv("SLURM_TASK_PID");
-    
     cunqa::JSON backend_json;
     auto back_path_json = (argc == 6 ? cunqa::JSON::parse(std::string(argv[5])) : cunqa::JSON());
     if (back_path_json.contains("noise_properties_path")) {
@@ -85,30 +72,27 @@ int main(int argc, char *argv[])
         std::ifstream f(back_path_json.at("backend_path").get<std::string>());
         backend_json = cunqa::JSON::parse(f);
     }
+    return backend_json;
+}
 
-    switch(murmur::hash(communications)) {
-        case murmur::hash("nc"): 
-        {
-            LOGGER_DEBUG("Turning ON the QPUs without comms and with {} simulator.", sim_arg);
-            auto backend = std::make_unique<NCBackend>(make_simulator(sim_arg), backend_json);
-            QPU qpu(std::move(backend), mode, name, family);
-            qpu.turn_ON();
-            break;
-        }
-        case murmur::hash("cc"):
-        {
-            LOGGER_DEBUG("Turning ON the QPUs with classical comms and with {} simulator.", sim_arg);
-            auto backend = std::make_unique<CCBackend>(make_simulator(sim_arg), backend_json);
-            QPU qpu(std::move(backend), mode, name, family);
-            qpu.turn_ON();
-            break;
-        } 
-        case murmur::hash("qc"):
-            // TODO
-            break;
-        default:
-            //LOGGER_ERROR("No {} communication method available.", communications);
-            return EXIT_FAILURE;
-    }
+int main(int argc, char *argv[])
+{
+    std::string mode(argv[1]);
+    std::string communications(argv[2]);
+    std::string family(argv[3]);
+    std::string sim_arg(argv[4]);
+
+    if (family == "default") family = std::getenv("SLURM_JOB_ID");
+    std::string name = std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID");
+    auto backend_json = get_backend_json(argc, argv, sim_arg, family);
+
+    QPU qpu(
+        make_backend(make_simulator(sim_arg), communications, backend_json), 
+        mode, 
+        name, 
+        family
+    );
+    qpu.turn_ON();
+
     return EXIT_SUCCESS;
 }

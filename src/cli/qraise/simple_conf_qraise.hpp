@@ -124,17 +124,11 @@ bool write_simple_run_command(std::ofstream& sbatchFile, const CunqaArgs& args)
     std::string mode = args.co_located ? "co_located" : "hpc";
 
     if (args.backend.has_value()) {
-        LOGGER_DEBUG("Backend provided.");
-        if(args.backend.value() == "etiopia_computer.json") {
-            LOGGER_ERROR("Terrible mistake. Possible solution: {}", cafe);
-            return false;
-        } else {
-            LOGGER_DEBUG("Qraise with no communications and personalized backend. \n");
-            backend_path = std::string(args.backend.value());
-            backend = R"({"backend_path":")" + backend_path + R"("})" ;
-            subcommand = mode + " nc " + args.family_name + " " + args.simulator + " \'" + backend + "\'" "\n";
-            run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
-        }
+        LOGGER_DEBUG("Qraise with no communications and personalized backend. \n");
+        backend_path = std::string(args.backend.value());
+        backend = R"({"backend_path":")" + backend_path + R"("})" ;
+        subcommand = mode + " nc " + args.family_name + " " + args.simulator + " \'" + backend + "\'" "\n";
+        run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
     } else {
         subcommand = mode + " nc " + args.family_name + " " + args.simulator + "\n";
         run_command = "srun --task-epilog=$EPILOG_PATH setup_qpus " + subcommand;
@@ -155,7 +149,7 @@ void write_simple_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         LOGGER_ERROR("Simulator {} is not available for simple simulation. Aborting. ", std::string(args.simulator));
         throw std::runtime_error("Error.");
 
-    } else if (exists_family_name(args.family_name, QPUS_FILEPATH)) {
+    } else if (exists_family_name(args.family_name, std::string(QPUS_FILEPATH))) {
         LOGGER_ERROR("There are QPUs with the same family name as the provided: {}.", args.family_name.c_str());
         throw std::runtime_error("Bad family name.");
         

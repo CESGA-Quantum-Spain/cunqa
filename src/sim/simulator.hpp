@@ -1,8 +1,11 @@
 #pragma once
 
 #include <span>
+#include <map>
 #include <string_view>
+#include <utility>
 
+#include "quantum_task/instruction_type.hpp"
 #include "quantum_task/run_config.hpp"
 #include "quantum_task/circuit.hpp"
 
@@ -11,24 +14,32 @@ namespace sim {
 
 class Simulator {
 public:
-    std::vector<bool> creg;
+    std::map<int, bool> creg;
+    std::map<int, bool> save_clbit;
+    std::size_t num_qubits;
     RunConfig config;
     
     virtual inline std::string get_name() const = 0;
     virtual inline std::span<const std::string_view> get_basis_gates() const = 0;
+
+    inline std::string get_measures() const
+    {
+        std::string result;
+        for (const auto& [clbit, value] : creg)
+            if (save_clbit.contains(clbit) && save_clbit.at(clbit))    
+                result += value ? '1' : '0';
+        return result;
+    }
+
+    inline void set_num_qubits(std::pair<std::size_t, std::size_t> num_qubits_)
+    {
+        num_qubits = num_qubits_.first + num_qubits_.second;
+    }
     
     virtual void initialize() = 0;
     virtual void clear() = 0;
 
     virtual JSON native_execute(const Circuit& circuit, const JSON& noise_model) = 0;
-
-    inline std::string get_measures() const
-    {
-        std::string result;
-        for (const auto& cbit : creg)
-            result += cbit ? '1' : '0';
-        return result;
-    }
 
     virtual void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) 
     { 
@@ -150,7 +161,7 @@ protected:
     [[noreturn]] inline void unsupported_gate(const InstructionType& type, const Gate& payload) const
     {
         throw std::runtime_error(
-            "Gate " + INVERTED_INSTRUCTIONS_MAP.at(type) + 
+            "Gate " + std::string(instruction_type_name(type)) + 
             " not supported by " + get_name() + " simulator." 
         );
     }

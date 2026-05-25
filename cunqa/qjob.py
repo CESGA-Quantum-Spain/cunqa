@@ -93,6 +93,7 @@ class QJob:
             "device": self._device,
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
+            "qpu_id": circuit_ir["id"][1]
         }
 
         if (run_parameters == None) or (len(run_parameters) == 0):
@@ -106,7 +107,7 @@ class QJob:
         self._quantum_task = {
             "config": run_config, 
             "instructions": circuit_ir["instructions"],
-            "id": circuit_ir["id"][1]
+            "id": circuit_ir["id"][0]
         }
       
         logger.debug("Qjob configured")
