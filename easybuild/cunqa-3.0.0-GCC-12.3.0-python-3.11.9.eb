@@ -9,7 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.1.0'
+version = '3.0.0'
 local_pyversionsuffix = '-python-3.11.9'
 versionsuffix = '%s-mpi' % local_pyversionsuffix
 
@@ -39,7 +39,6 @@ sources = ['%(name)s-%(version)s.tar.gz']
 
 builddependencies = [
    ('OpenBLAS', '0.3.24'),
-   ('Boost', '1.85.0'),
    ('pybind11', '2.13.6', local_pyversionsuffix),
    ('CMake', '3.27.6')
 ]
@@ -47,9 +46,9 @@ builddependencies = [
 # Implicit from Qiskit: ('hpcx-mt-ompi', EXTERNAL_MODULE),
 dependencies = [
     ('Python', '3.11.9'),
-#   ('ZeroMQ', '4.3.4', local_pyversionsuffix),
+    ('Boost', '1.85.0'),
     ('nlohmann_json', '3.12.0'),
-    ('Qiskit', '1.2.4', versionsuffix),
+    ('Qiskit', '1.2.4', versionsuffix)
 ]
 
 configopts = [
@@ -83,7 +82,14 @@ moduleclass = 'tools'
 #area_tools
 #area_visualizationanddataformats
 #area_quantumcomputing
+
 modluafooter = 'add_property("type0","area_quantumcomputing")'
+# if store variable not available, change for custom dir
+modluafooter += r'''
+if not os.getenv("STORE") then
+  setenv("STORE", os.getenv("HOME"))
+end
+'''
 
 usage = """
 \033[94mINTERACTIVE USE:\033[0m

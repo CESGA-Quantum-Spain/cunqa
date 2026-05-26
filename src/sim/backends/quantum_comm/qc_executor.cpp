@@ -297,7 +297,7 @@ QCExecutor::QCExecutor(
 
     JSON backends;
     do {
-        backends = read_file(std::string(QPUS_FILEPATH));
+        backends = read_file(QPUS_FILEPATH);
     } while (backends.size() != qpus_ids_.size());
     
     std::size_t accumulated_qubits{0};

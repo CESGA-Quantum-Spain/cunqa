@@ -1,3 +1,4 @@
+add_subdirectory(helpers_qraise)
 
 # =====================================================
 #  QRAISE executable
@@ -5,22 +6,14 @@
 add_executable(qraise qraise.cpp)
 target_link_libraries(qraise 
   PRIVATE 
-    json
+    write_sbatch
     logger_client
-    morrisfranken::argparse
-    constants
-  )
+)
 
 if(USE_MPI_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_MPI_BTW_QPU)
 elseif(USE_ZMQ_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_ZMQ_BTW_QPU)
-endif()
-
-if (COMPILATION_FOR_GPU)
-    target_compile_definitions(qraise PUBLIC GPU_ARCH=${GPU_ARCH} COMPILATION_FOR_GPU=1)
-else()
-    target_compile_definitions(qraise PUBLIC COMPILATION_FOR_GPU=0)
 endif()
 
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
@@ -64,19 +57,6 @@ target_link_libraries(setup_qpus
       backend
       backend_factory
 )
-
-if (COMPILATION_FOR_GPU)
-    target_compile_definitions(setup_qpus 
-      PUBLIC 
-        GPU_ARCH=${GPU_ARCH} 
-        COMPILATION_FOR_GPU=1
-    )
-else()
-    target_compile_definitions(setup_qpus 
-      PUBLIC 
-        COMPILATION_FOR_GPU=0
-    )
-endif()
 
 install(TARGETS setup_qpus DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
@@ -128,11 +108,4 @@ add_executable(erase_key erase_key.cpp)
 target_link_libraries(erase_key PRIVATE json)
 install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh"
-    @ONLY
-)
-install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/epilog.sh" DESTINATION "$ENV{STORE}/.cunqa") 
-
-
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "${CMAKE_INSTALL_BINDIR}")

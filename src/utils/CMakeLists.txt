@@ -8,9 +8,12 @@ add_library(constants INTERFACE)
 target_sources(constants
   INTERFACE
     FILE_SET HEADERS
-    BASE_DIRS "${CMAKE_BINARY_DIR}/src"
+    BASE_DIRS 
+      "${CMAKE_BINARY_DIR}/src"
+      "${CMAKE_SOURCE_DIR}/src"
     FILES
       "${CMAKE_BINARY_DIR}/src/utils/constants.hpp"
+      "${CMAKE_SOURCE_DIR}/src/utils/helpers/environment.hpp"
 )
 
 add_library(json)

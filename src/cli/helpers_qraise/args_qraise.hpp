@@ -3,9 +3,6 @@
 #include <optional>
 
 #include "argparse/argparse.hpp"
-#include "logger.hpp"
-
-using namespace std::literals;
 
 struct CunqaArgs : public argparse::Args 
 {

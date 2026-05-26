@@ -12,6 +12,10 @@ class CCExecutor {
 public:
     CCExecutor(std::unique_ptr<Simulator> simulator);
 
+    inline Simulator& simulator() noexcept {
+        return *simulator_;
+    }
+
     JSON execute(const QuantumTask& quantum_task);
 private:
     std::unique_ptr<Simulator> simulator_;

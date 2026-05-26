@@ -14,6 +14,10 @@ public:
         simulator_{std::move(simulator)}
     { }
 
+    inline Simulator& simulator() noexcept {
+        return *simulator_;
+    }
+
     inline JSON native_execute(const QuantumTask& quantum_task, const JSON& noise_model)
     {
         simulator_->config = quantum_task.config;

@@ -1,4 +1,3 @@
-#include "logger.hpp"
 #include <string>
 #include <iostream>
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -6,7 +5,7 @@
 
 #include "utils/constants.hpp"
 
-using namespace std::literals;
+#include "logger.hpp"
 
 std::shared_ptr<spdlog::logger> logger;
 
@@ -15,7 +14,7 @@ __attribute__((constructor)) void initializeLogger() {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     console_sink->set_level(spdlog::level::warn);
 
-    const std::string log_path = std::string(cunqa::CUNQA_PATH) + "/logs/logging.log";
+    const std::string log_path = cunqa::get_cunqa_path() + "/logs/logging.log";
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_path, 10*1024*1024, 10, false); // 10 files of 10 MB each
     file_sink->set_level(spdlog::level::debug);
 

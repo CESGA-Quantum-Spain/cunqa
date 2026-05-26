@@ -5,6 +5,7 @@
 
 #include "comm/server.hpp"
 #include "utils/helpers/net_functions.hpp"
+#include "utils/helpers/environment.hpp"
 #include "utils/json.hpp"
 #include "utils/constants.hpp"
 #include "logger.hpp"
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
     std::string family = argv[1];
 
     if (family == "default") {
-        family = std::getenv("SLURM_JOB_ID");
+        family = get_env_variable("SLURM_JOB_ID");
     }
     
     int setup = set_up_linker(std::string(family));

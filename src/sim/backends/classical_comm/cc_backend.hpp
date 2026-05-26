@@ -28,6 +28,8 @@ public:
     CCBackend(std::unique_ptr<Simulator> simulator, const JSON& backend_json): 
         executor_{std::move(simulator)}
     {
+        auto& sim = executor_.simulator();
+
         if (!backend_json.empty()) {
             name = backend_json.at("name");
             version = backend_json.at("version");
@@ -36,12 +38,18 @@ public:
             coupling_map = backend_json.at("coupling_map");
             basis_gates = backend_json.at("basis_gates");
             custom_instructions = backend_json.at("custom_instructions");
+            simulator_name = sim.get_name();
         } else {
-            auto gates = simulator->get_basis_gates();
-            basis_gates = std::vector<std::string>{gates.begin(),gates.end()};
+            simulator_name = sim.get_name();
+            
+            auto gates = sim.get_basis_gates();
+            basis_gates.clear();
+            basis_gates.reserve(gates.size());
+
+            for (std::string_view gate : gates)
+                basis_gates.emplace_back(gate);
         }
-        simulator_name = simulator->get_name();
-        simulator->set_num_qubits(num_qubits);
+        sim.set_num_qubits(num_qubits);
     }
 
     inline JSON execute(const std::string& quantum_task_str) override
@@ -62,7 +70,7 @@ public:
 
     JSON to_json() const
     {
-        return {{   
+        return {  
             {"name", name}, 
             {"version", version},
             {"num_qubits", num_qubits}, 
@@ -71,7 +79,7 @@ public:
             {"basis_gates", basis_gates}, 
             {"custom_instructions", custom_instructions},
             {"simulator", simulator_name}
-        }};
+        };
     }
 
 private:

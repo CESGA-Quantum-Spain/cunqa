@@ -9,7 +9,7 @@
 easyblock = 'CMakePythonPackage'
 
 name = 'cunqa'
-version = '2.1.0'
+version = '3.0.0'
 
 homepage = "https://github.com/CESGA-Quantum-Spain/cunqa"
 description = """ 
@@ -36,14 +36,14 @@ sources = ['%(name)s-%(version)s.tar.gz']
 
 builddependencies = [
    ('OpenMPI', '5.0.5'),
-   ('Boost', '1.83.0'),
    ('pybind11', '2.12.0'),
    ('CMake', '3.27.6'),
    ('Cython', '3.0.11')
 ]
 
 dependencies = [
-    ('Qiskit', '1.2.4')
+    ('Qiskit', '1.2.4'),
+    ('Boost', '1.83.0')
 ]
 
 sanity_check_paths = {
@@ -77,7 +77,14 @@ moduleclass = 'tools'
 #area_tools
 #area_visualizationanddataformats
 #area_quantumcomputing
+
 modluafooter = 'add_property("type0","area_quantumcomputing")'
+# if store variable not available, change for custom dir
+modluafooter += r'''
+if not os.getenv("STORE") then
+  setenv("STORE", os.getenv("HOME"))
+end
+'''
 
 usage = """
 \033[94mINTERACTIVE USE:\033[0m

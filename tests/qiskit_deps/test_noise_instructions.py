@@ -237,63 +237,6 @@ class TestBackendJsonPreparation:
             assert backend_json['n_qubits'] == 5
             assert backend_json['noise_model'] == {"noise": "model"}
 
-class TestMainFunction:
-    '''def test_main_function_full_flow(self, mock_args, sample_noise_properties):
-        """Test the entire main function flow"""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Patch various dependencies
-            with patch('cunqa.constants.CUNQA_PATH', tmpdir), \
-                 patch.dict(os.environ, {'SLURM_JOB_ID': 'test_job'}), \
-                 patch('cunqa.qiskit_deps.noise_instructions.load_noise_properties', return_value=sample_noise_properties), \
-                 patch('cunqa.qiskit_deps.cunqabackend.CunqaBackend') as mock_backend_class, \
-                 patch('cunqa.qiskit_deps.noise_instructions.create_noise_model') as mock_create_noise_model, \
-                 patch('cunqa.qiskit_deps.noise_instructions.write_backend_json') as mock_write_backend_json:
-                
-                # Setup mock objects
-                mock_backend = MagicMock()
-                mock_backend.num_qubits = 2
-                mock_backend.coupling_map_list = [[0, 1]]
-                mock_backend.basis_gates = ['u1', 'u2', 'cx']
-                mock_backend_class.return_value = mock_backend
-
-                mock_noise_model = MagicMock()
-                mock_noise_model.to_dict.return_value = {"noise": "model"}
-                mock_create_noise_model.return_value = mock_noise_model
-
-                # Run main function
-                result = noise_instr.main(mock_args)
-
-                # Verify function calls and results
-                mock_backend_class.assert_called_once()
-                mock_create_noise_model.assert_called_once()
-                mock_write_backend_json.assert_called_once()
-
-                assert result['name'].startswith('CunqaBackend')
-                assert result['n_qubits'] == 2 '''
-
-''' def test_validate_json_schema(sample_noise_properties):
-    """Test JSON schema validation"""
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as schema_file:
-        json.dump({
-            "type": "object",
-            "properties": {
-                "qubits": {"type": "array"},
-                "gates": {"type": "array"}
-            },
-            "required": ["qubits", "gates"]
-        }, schema_file)
-        schema_file.close()
-
-        try:
-            # Test successful validation
-            noise_instr.validate_json_schema(sample_noise_properties, schema_file.name)
-            
-            # Test invalid JSON
-            with pytest.raises(ValueError):
-                noise_instr.validate_json_schema({"invalid": "data"}, schema_file.name)
-        finally:
-            os.unlink(schema_file.name) '''
-
 # Error handling and edge case tests
 def test_main_function_error_handling():
     """Test error handling in main function"""

@@ -195,8 +195,6 @@ def main(args=None):
         args = parser.parse_args()
     
     # TODO: Paths to JSON schemas
-    # schema_noise_properties = os.path.join(CUNQA_PATH, "json_schema", "calibrations_schema.json")
-    # schema_backend = os.path.join(CUNQA_PATH, "json_schema", "backend_schema.json")
     
     try:
         # Load and validate noise properties

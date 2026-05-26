@@ -10,6 +10,7 @@
 #include "comm/server.hpp"
 #include "sim/backend.hpp"
 #include "utils/json.hpp"
+#include "utils/helpers/environment.hpp"
 
 using namespace std::string_literals;
 
@@ -47,7 +48,7 @@ private:
             {"net", server_json},
             {"name", obj.name_},
             {"family", obj.family_},
-            {"slurm_job_id", std::getenv("SLURM_JOB_ID")}
+            {"slurm_job_id", get_env_variable("SLURM_JOB_ID")}
         };
     }
 };

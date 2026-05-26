@@ -12,6 +12,7 @@
 #include "sim/simulators/simulator_factory.hpp"
 #include "sim/backends/backend_factory.hpp"
 
+#include "utils/helpers/environment.hpp"
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
 
@@ -49,12 +50,12 @@ cunqa::JSON get_backend_json(int argc, char *argv[], std::string sim_arg, std::s
     if (back_path_json.contains("noise_properties_path")) {
         if (sim_arg != "Aer")
             throw std::runtime_error("Noise is only available with AER at the moment.");
-        std::string fpath = std::string(CUNQA_PATH) 
+        std::string fpath = get_cunqa_path()
             + "/tmp_noisy_backend_" 
-            + std::getenv("SLURM_JOB_ID") 
+            + get_env_variable("SLURM_JOB_ID") 
             + ".json";
 
-        if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0")
+        if (get_env_variable("SLURM_PROCID") == "0")
             generate_noise_instructions(back_path_json, family);
         else {
             int fd = open(fpath.c_str(), O_RDONLY);
@@ -82,8 +83,8 @@ int main(int argc, char *argv[])
     std::string family(argv[3]);
     std::string sim_arg(argv[4]);
 
-    if (family == "default") family = std::getenv("SLURM_JOB_ID");
-    std::string name = std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID");
+    if (family == "default") family = get_env_variable("SLURM_JOB_ID");
+    auto name = get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID");
     auto backend_json = get_backend_json(argc, argv, sim_arg, family);
 
     QPU qpu(

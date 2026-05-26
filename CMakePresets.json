@@ -22,6 +22,7 @@
       "description": "Preset recommended for local development.",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "OPENMP_IN_QC": "ON",
         "USE_MPI_BTW_QPU": "OFF",
         "USE_ZMQ_BTW_QPU": "ON"
