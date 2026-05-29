@@ -153,6 +153,16 @@ CPMAddPackage(
 set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
 
 
+# ===================================================================================
+#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
+# ===================================================================================
+CPMAddPackage(
+  NAME quest
+  GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
+  GIT_TAG v4.2.0
+  DOWNLOAD_ONLY YES
+)
+
 # ---------------------------------------------------------------------
 #  AER - Qiskit simulator headers, fork for Maestro
 # ---------------------------------------------------------------------
@@ -273,8 +283,6 @@ if(qulacs_ADDED)
 else()
   message(STATUS "Using existing qulacs package")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
 ]]
 
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

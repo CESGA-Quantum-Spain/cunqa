@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <string_view>
 
 #include "sim/simulator.hpp"
 #include "quantum_task/circuit.hpp"
@@ -11,20 +10,19 @@
 namespace cunqa {
 namespace sim {
 
-class MaestroSimulatorAdapter final : public Simulator {
+class QsimSimulatorAdapter final : public Simulator {
 public:
-    
-    MaestroSimulatorAdapter();
-    ~MaestroSimulatorAdapter();
+    QsimSimulatorAdapter();
+    ~QsimSimulatorAdapter();
 
     inline std::string get_name() const noexcept override
     {
-        return "Maestro";
+        return "Qsim";
     }
 
-    std::span<const std::string_view> get_basis_gates() const noexcept override 
+    inline std::span<const std::string_view> get_basis_gates() const noexcept override 
     {
-        return MAESTRO_BASIS_GATES;
+        return QSIM_BASIS_GATES;
     }
 
     void initialize() override;
@@ -34,34 +32,31 @@ public:
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
-    void apply_gate(const InstructionType& type, const OneQubitFourParam& payload) override;
 
     void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
-    void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload) override;
 
-    void apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const MatrixGate& payload) override;
 
     void apply_gate(const InstructionType& type, const Measure& payload) override;
-    void apply_gate(const InstructionType& type, const Reset& payload) override;
     void apply_gate(const InstructionType& type, const Copy& payload) override;
-
+    
 private:
-    void* maestroInstance = nullptr;
-    void* simulator;
+    struct State;
+    std::unique_ptr<State> state_;
 
-    static constexpr std::array<std::string_view, 32> MAESTRO_BASIS_GATES = {{
+    static constexpr std::array<std::string_view, 26> QSIM_BASIS_GATES = {{
         "measure",
-        "x", "y", "z", "h", "s", "sdg", "t", "tdg", "sx", "sxdg", "k",
-        "p", "rx", "ry", "rz",
-        "u",
-        "cx", "cy", "cz", "ch", "csx", "csxdg", "swap",
-        "cp", "crx", "cry", "crz",
-        "ccx", "cswap",
-        "cu",
-        "reset",
+        "id", "x", "y", "z", "h", "s", "t", "sx", "sy", "hz2",
+        "rx", "ry", "rz", "rxy", 
+        "id2", "cx", "cz", "swap", "iswap",
+        "cp",
+        "hz2",
+        "fs",
+        "gp",
+        "unitary", "cunitary"
     }};
-
 };
 
 

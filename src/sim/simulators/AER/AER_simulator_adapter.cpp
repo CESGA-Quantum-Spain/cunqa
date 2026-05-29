@@ -352,7 +352,7 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubit
     }
 }
 
-void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MulticontrolNoParam& payload)
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MultiNoParam& payload)
 {
     AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
     switch (type)
@@ -382,7 +382,7 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const Multicon
     }
 }
 
-void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MulticontrolParam& payload)
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MultiParam& payload)
 {
     AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
     switch (type)

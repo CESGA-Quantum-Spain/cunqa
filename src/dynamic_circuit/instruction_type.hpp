@@ -14,8 +14,9 @@ namespace cunqa {
 using DiagonalMatrix = std::vector<std::complex<double>>;
 using Matrix = std::vector<std::vector<std::complex<double>>>;
 
+
 enum class InstructionType {
-    ID,
+        ID,
     X,
     Y,
     Z,
@@ -25,7 +26,7 @@ enum class InstructionType {
     T,
     TDG,
     SX,
-    SY,
+    SY, 
     SZ,
     SXDG,
     SYDG,
@@ -35,10 +36,12 @@ enum class InstructionType {
     V,
     VDG,
     K,
+    HZ2,
 
     RX,
     RY,
     RZ,
+    RAXIS,
     GLOBALP,
     P,
     U1,
@@ -56,9 +59,11 @@ enum class InstructionType {
 
     U,
 
+    ID2,
     ECR,
     SWAP,
     ISWAP,
+    SQRTSWAP,
     CX,
     CY,
     CZ,
@@ -69,20 +74,23 @@ enum class InstructionType {
     CSDG,
     CT,
     DCX,
-
+    
     CRX,
     CRY,
     CRZ,
+    CRAXIS,
     CP,
     CU1,
     RXX,
     RYY,
     RZZ,
+    RXY,
     RZX,
 
     CU2,
     XXMYY,
     XXPYY,
+    FS,
 
     CU3,
 
@@ -90,32 +98,57 @@ enum class InstructionType {
 
     CECR,
     CSWAP,
+    CSQRTSWAP,
     CCX,
     CCY,
     CCZ,
+
+    MX,
+    CMX,
+
+    PHASEGADGET,
+    CPHASEGADGET,
 
     MCX,
     MCY,
     MCZ,
     MCSX,
+    MCS,
+    MCT,
+    MCH,
     MCSWAP,
+    MCSQRTSWAP,
 
     MCRX,
     MCRY,
     MCRZ,
+    MCRAXIS,
     MCP,
     MCU1,
     MCU2,
     MCU3,
     MCU,
 
+    MCMX,
+
+    MCPAULISTR,
+    MCPAULIGADGET,
+    MCPHASEGADGET,
+
     UNITARY,
+    CUNITARY,
     SPARSEMATRIX,
     DIAGONAL,
     RANDOMUNITARY,
     FUSEDSWAP,
     MULTIPAULI,
     MULTIPAULIROTATION,
+
+    PAULISTR,
+    CPAULISTR,
+    PAULIGADGET,
+    NONUNITARYPAULIGADGET,
+    CPAULIGADGET,
 
     AMPLITUDEDAMPINGNOISE,
     BITFLIPNOISE,
@@ -149,25 +182,27 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     InstructionTypeEntry{"z", InstructionType::Z},
     InstructionTypeEntry{"h", InstructionType::H},
     InstructionTypeEntry{"s", InstructionType::S},
+    InstructionTypeEntry{"sdg", InstructionType::SDG},
+    InstructionTypeEntry{"t", InstructionType::T},
+    InstructionTypeEntry{"tdg", InstructionType::TDG},
     InstructionTypeEntry{"sx", InstructionType::SX},
     InstructionTypeEntry{"sy", InstructionType::SY},
     InstructionTypeEntry{"sz", InstructionType::SZ},
-    InstructionTypeEntry{"sdg", InstructionType::SDG},
     InstructionTypeEntry{"sxdg", InstructionType::SXDG},
     InstructionTypeEntry{"sydg", InstructionType::SYDG},
     InstructionTypeEntry{"szdg", InstructionType::SZDG},
-    InstructionTypeEntry{"t", InstructionType::T},
-    InstructionTypeEntry{"tdg", InstructionType::TDG},
     InstructionTypeEntry{"p0", InstructionType::P0},
     InstructionTypeEntry{"p1", InstructionType::P1},
     InstructionTypeEntry{"v", InstructionType::V},
     InstructionTypeEntry{"vdg", InstructionType::VDG},
     InstructionTypeEntry{"k", InstructionType::K},
+    InstructionTypeEntry{"hz2", InstructionType::HZ2},
 
     // ONE QUBIT ONE PARAM
     InstructionTypeEntry{"rx", InstructionType::RX},
     InstructionTypeEntry{"ry", InstructionType::RY},
     InstructionTypeEntry{"rz", InstructionType::RZ},
+    InstructionTypeEntry{"raxis", InstructionType::RAXIS},
     InstructionTypeEntry{"gp", InstructionType::GLOBALP},
     InstructionTypeEntry{"p", InstructionType::P},
     InstructionTypeEntry{"u1", InstructionType::U1},
@@ -189,9 +224,11 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     InstructionTypeEntry{"u", InstructionType::U},
 
     // TWO QUBIT NO PARAM
+    InstructionTypeEntry{"id2", InstructionType::ID2},
     InstructionTypeEntry{"ecr", InstructionType::ECR},
     InstructionTypeEntry{"swap", InstructionType::SWAP},
     InstructionTypeEntry{"iswap", InstructionType::ISWAP},
+    InstructionTypeEntry{"sqrtswap", InstructionType::SQRTSWAP},
     InstructionTypeEntry{"cx", InstructionType::CX},
     InstructionTypeEntry{"cy", InstructionType::CY},
     InstructionTypeEntry{"cz", InstructionType::CZ},
@@ -207,17 +244,20 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     InstructionTypeEntry{"crx", InstructionType::CRX},
     InstructionTypeEntry{"cry", InstructionType::CRY},
     InstructionTypeEntry{"crz", InstructionType::CRZ},
+    InstructionTypeEntry{"craxis", InstructionType::CRAXIS},
     InstructionTypeEntry{"cp", InstructionType::CP},
     InstructionTypeEntry{"cu1", InstructionType::CU1},
     InstructionTypeEntry{"rxx", InstructionType::RXX},
     InstructionTypeEntry{"ryy", InstructionType::RYY},
     InstructionTypeEntry{"rzz", InstructionType::RZZ},
+    InstructionTypeEntry{"rxy", InstructionType::RXY},
     InstructionTypeEntry{"rzx", InstructionType::RZX},
 
     // TWO QUBIT TWO PARAM
     InstructionTypeEntry{"cu2", InstructionType::CU2},
     InstructionTypeEntry{"xxmyy", InstructionType::XXMYY},
     InstructionTypeEntry{"xxpyy", InstructionType::XXPYY},
+    InstructionTypeEntry{"fs", InstructionType::FS},
 
     // TWO QUBIT THREE PARAM
     InstructionTypeEntry{"cu3", InstructionType::CU3},
@@ -228,35 +268,63 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     // THREE QUBIT NO PARAM
     InstructionTypeEntry{"cecr", InstructionType::CECR},
     InstructionTypeEntry{"cswap", InstructionType::CSWAP},
+    InstructionTypeEntry{"csqrtswap", InstructionType::CSQRTSWAP},
     InstructionTypeEntry{"ccx", InstructionType::CCX},
     InstructionTypeEntry{"ccy", InstructionType::CCY},
     InstructionTypeEntry{"ccz", InstructionType::CCZ},
+
+    // MULTI-QUBIT NO PARAM
+    InstructionTypeEntry{"mx", InstructionType::MX},
+    InstructionTypeEntry{"cmx", InstructionType::CMX},
+
+    // PHASE GADGETS
+    InstructionTypeEntry{"phasegadget", InstructionType::PHASEGADGET},
+    InstructionTypeEntry{"cphasegadget", InstructionType::CPHASEGADGET},
 
     // MULTICONTROLLED NO PARAM
     InstructionTypeEntry{"mcx", InstructionType::MCX},
     InstructionTypeEntry{"mcy", InstructionType::MCY},
     InstructionTypeEntry{"mcz", InstructionType::MCZ},
     InstructionTypeEntry{"mcsx", InstructionType::MCSX},
+    InstructionTypeEntry{"mcs", InstructionType::MCS},
+    InstructionTypeEntry{"mct", InstructionType::MCT},
+    InstructionTypeEntry{"mch", InstructionType::MCH},
     InstructionTypeEntry{"mcswap", InstructionType::MCSWAP},
+    InstructionTypeEntry{"mcsqrtswap", InstructionType::MCSQRTSWAP},
 
     // MULTICONTROLLED WITH PARAM
     InstructionTypeEntry{"mcrx", InstructionType::MCRX},
     InstructionTypeEntry{"mcry", InstructionType::MCRY},
     InstructionTypeEntry{"mcrz", InstructionType::MCRZ},
+    InstructionTypeEntry{"mcraxis", InstructionType::MCRAXIS},
     InstructionTypeEntry{"mcp", InstructionType::MCP},
     InstructionTypeEntry{"mcu1", InstructionType::MCU1},
     InstructionTypeEntry{"mcu2", InstructionType::MCU2},
     InstructionTypeEntry{"mcu3", InstructionType::MCU3},
     InstructionTypeEntry{"mcu", InstructionType::MCU},
 
+    // MULTICONTROLLED SPECIAL
+    InstructionTypeEntry{"mcmx", InstructionType::MCMX},
+    InstructionTypeEntry{"mcpaulistr", InstructionType::MCPAULISTR},
+    InstructionTypeEntry{"mcpauligadget", InstructionType::MCPAULIGADGET},
+    InstructionTypeEntry{"mcphasegadget", InstructionType::MCPHASEGADGET},
+
     // SPECIAL UNITARY GATES
     InstructionTypeEntry{"unitary", InstructionType::UNITARY},
+    InstructionTypeEntry{"cunitary", InstructionType::CUNITARY},
     InstructionTypeEntry{"sparsematrix", InstructionType::SPARSEMATRIX},
     InstructionTypeEntry{"diagonal", InstructionType::DIAGONAL},
     InstructionTypeEntry{"randomunitary", InstructionType::RANDOMUNITARY},
     InstructionTypeEntry{"fusedswap", InstructionType::FUSEDSWAP},
     InstructionTypeEntry{"multipauli", InstructionType::MULTIPAULI},
     InstructionTypeEntry{"multipaulirotation", InstructionType::MULTIPAULIROTATION},
+
+    // PAULI RELATED GATES
+    InstructionTypeEntry{"paulistr", InstructionType::PAULISTR},
+    InstructionTypeEntry{"cpaulistr", InstructionType::CPAULISTR},
+    InstructionTypeEntry{"pauligadget", InstructionType::PAULIGADGET},
+    InstructionTypeEntry{"nonunitarypauligadget", InstructionType::NONUNITARYPAULIGADGET},
+    InstructionTypeEntry{"cpauligadget", InstructionType::CPAULIGADGET},
 
     // NOISE RELATED GATES
     InstructionTypeEntry{"amplitudedampingnoise", InstructionType::AMPLITUDEDAMPINGNOISE},

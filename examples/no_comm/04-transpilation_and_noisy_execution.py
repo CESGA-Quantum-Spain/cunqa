@@ -12,7 +12,7 @@ try:
     file_dir = os.path.dirname(os.path.abspath(__file__))
     noise_properties_path = file_dir + "/noise_properties_example.json"
     
-    family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_properties_path=noise_properties_path)
+    family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_properties=noise_properties_path)
 except Exception as error:
     raise error
 

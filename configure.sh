@@ -23,7 +23,7 @@ else
 fi
 
 if [ -n "$1" ]; then
-    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1 #-DAER_GPU=TRUE
+    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1 #-DAER_GPU=TRUE    -DCMAKE_BUILD_TYPE=Debug
 else
     cmake -B build/ #-DAER_GPU=TRUE
 fi

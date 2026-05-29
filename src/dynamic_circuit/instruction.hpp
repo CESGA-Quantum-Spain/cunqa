@@ -68,19 +68,41 @@ struct ThreeQubitNoParam {
 // Here we use std::vector for simplicity and
 // because multicontrolled are not as used as 
 // the rest of the gates.
-struct MulticontrolNoParam {
+struct MultiNoParam {
     std::vector<std::size_t> qubits;
 };
 
-struct MulticontrolParam {
+struct MultiParam {
     std::vector<std::size_t> qubits;
     std::vector<double*> params;
+};
+
+struct PauliNoParam {
+    std::vector<std::size_t> qubits;
+    std::string paulistr;
+};
+
+struct PauliParam {
+    std::vector<std::size_t> qubits;
+    double* param;
+    std::string paulistr;
 };
 
 struct MultiPauli {
     std::vector<std::size_t> qubits;
     double* param;
     std::vector<unsigned int> pauli_id_list;
+};
+
+struct NumControlsNoParam {
+    std::vector<std::size_t> qubits;
+    int num_controls;
+};
+
+struct NumControlsParam {
+    std::vector<std::size_t> qubits;
+    double* param;
+    int num_controls;
 };
 
 struct FusedSwap {
@@ -159,9 +181,13 @@ using InstructionVariant = std::variant<
     TwoQubitThreeParam,
     TwoQubitFourParam,
     ThreeQubitNoParam,
-    MulticontrolNoParam,
-    MulticontrolParam,
+    MultiNoParam,
+    MultiParam,
+    PauliNoParam,
+    PauliParam,
     MultiPauli,
+    NumControlsNoParam,
+    NumControlsParam,
     FusedSwap,
     MatrixGate,
     DiagonalMatrixGate,
