@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+
+#include "circuit.hpp"
 #include "sim/simulator.hpp"
-#include "quantum_task/quantum_task.hpp"
+#include "sim/run_config.hpp"
 #include "comm/classical_channel.hpp"
 
 namespace cunqa {
@@ -16,10 +18,11 @@ public:
         return *simulator_;
     }
 
-    JSON execute(const QuantumTask& quantum_task);
+    JSON execute(const JSON& instructions, const RunConfig& run_config);
 private:
     std::unique_ptr<Simulator> simulator_;
     comm::ClassicalChannel classical_channel_;
+    std::unique_ptr<Circuit> last_circuit_;
 };
 
 } // End of sim namespace

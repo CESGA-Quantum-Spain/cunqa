@@ -7,7 +7,7 @@
 #include <utility>
 #include <numeric>
 
-#include "quantum_task/instruction_type.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
 #include "sim/simulator.hpp"
 
 namespace cunqa {

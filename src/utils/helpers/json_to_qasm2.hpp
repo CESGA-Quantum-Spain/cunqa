@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "quantum_task/instruction_type.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
 #include "utils/json.hpp"
 
 namespace

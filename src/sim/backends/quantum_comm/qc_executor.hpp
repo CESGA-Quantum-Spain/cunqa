@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
+
 #include "sim/simulator.hpp"
 #include "comm/classical_channel.hpp"
-#include "quantum_task/quantum_task.hpp"
 
 namespace cunqa {
 namespace sim {

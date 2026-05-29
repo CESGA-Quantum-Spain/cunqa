@@ -1,7 +1,8 @@
 #include <string>
 
 #include "cc_executor.hpp"
-#include "quantum_task/instruction_type.hpp"
+#include "dynamic_circuit/dynamic_circuit.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
 #include "utils/helpers/environment.hpp"
 
 #include "logger.hpp"
@@ -14,11 +15,10 @@ using namespace cunqa;
 
 void execute_shot_(
     sim::Simulator* simulator,
-    const Circuit& circuit,
+    const DynamicCircuit& circuit,
     comm::ClassicalChannel& classical_channel
 )
 {
-
     for (int pc = 0; pc < circuit.instructions.size(); pc++) {
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
@@ -65,18 +65,28 @@ CCExecutor::CCExecutor(std::unique_ptr<Simulator> simulator) :
     classical_channel_.publish();
 };
 
-JSON CCExecutor::execute(const QuantumTask& quantum_task)
+JSON CCExecutor::execute(const JSON& instructions, const RunConfig& run_config)
 {
     std::map<std::string, std::size_t> meas_counter;
     
-    for(const std::string& qpu_id: quantum_task.config.sending_to)
+    // Either create a new circuit or update the previous one
+    if (auto it = instructions.find("instructions"); it != instructions.end()) {
+        auto& instr_values = *it;
+        last_circuit_ = std::make_unique<DynamicCircuit>(instr_values);
+    } 
+    else if (auto it = instructions.find("params"); it != instructions.end())
+        last_circuit_->update_params(it->get<std::vector<double>>());
+
+    auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
+    simulator_->config = run_config;
+
+    for(const std::string& qpu_id: run_config.sending_to)
         classical_channel_.connect(qpu_id);
         
-    simulator_->config = quantum_task.config;
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < quantum_task.config.shots; i++) {
+    for (std::size_t i = 0; i < run_config.shots; i++) {
         simulator_->initialize();
-        execute_shot_(simulator_.get(), quantum_task.circuit, classical_channel_);
+        execute_shot_(simulator_.get(), circuit, classical_channel_);
         meas_counter[simulator_->get_measures()]++;
         simulator_->clear();
     } // End all shots

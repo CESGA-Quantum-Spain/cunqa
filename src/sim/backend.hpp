@@ -1,6 +1,5 @@
 #pragma once
 
-#include "quantum_task/quantum_task.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {

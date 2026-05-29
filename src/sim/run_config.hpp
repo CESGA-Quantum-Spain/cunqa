@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "utils/json.hpp"
-#include "logger.hpp"
 
 namespace cunqa {
 

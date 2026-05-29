@@ -6,12 +6,9 @@
 #include "sim/backend.hpp"
 #include "sim/simulator.hpp"
 #include "comm/classical_channel.hpp"
-#include "quantum_task/quantum_task.hpp"
 
 #include "utils/helpers/environment.hpp"
 #include "utils/json.hpp"
-
-#include "logger.hpp"
 
 namespace cunqa {
 namespace sim {

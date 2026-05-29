@@ -9,7 +9,6 @@ target_link_libraries(qclient
   PRIVATE 
     client
     json
-    quantum_task
 )
 install(TARGETS qclient DESTINATION cunqa)
 

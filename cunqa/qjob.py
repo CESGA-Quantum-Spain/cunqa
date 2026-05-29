@@ -236,8 +236,9 @@ class QJob:
         self.assign_parameters_(param_values)
               
         try:
-            premessage = json.dumps(self._params, default=encoder)
-            message = """{{"params":{}}}""".format(premessage).replace("'", '"')
+            params_str = json.dumps(self._params, default=encoder)
+            config_str = json.dumps(self._quantum_task["config"], default=encoder)
+            message = """{{"params": {}, "config": {}}}""".format(params_str, config_str).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
             self._updated = False
         except Exception as error:

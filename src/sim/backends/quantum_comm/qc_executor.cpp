@@ -9,10 +9,9 @@
 #include <chrono>
 
 #include "qc_executor.hpp"
-#include "quantum_task/instruction_type.hpp"
-#include "quantum_task/circuit.hpp"
-#include "quantum_task/run_config.hpp"
-#include "quantum_task/quantum_task.hpp"
+#include "sim/run_config.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
+#include "dynamic_circuit/dynamic_circuit.hpp"
 #include "utils/helpers/environment.hpp"
 #include "utils/constants.hpp"
 
@@ -31,9 +30,21 @@ enum class BlockType {
     BY_CC
 };
 
+struct QuantumTask {
+    std::string id;
+    cunqa::RunConfig config;
+    cunqa::DynamicCircuit circuit;
+
+    QuantumTask(std::string id, cunqa::RunConfig config, cunqa::DynamicCircuit&& circuit)
+        : id(std::move(id))
+        , config(std::move(config))
+        , circuit(std::move(circuit))
+    { };
+};
+
 struct InstructionStream 
 {
-    std::vector<cunqa::QuantumTask> quantum_tasks;
+    std::vector<QuantumTask> quantum_tasks;
     std::size_t num_quantum_tasks;
     std::vector<bool> finished;
     std::vector<BlockType> blocked;
@@ -41,7 +52,7 @@ struct InstructionStream
     std::vector<std::size_t> pointed_instruction;
 
     InstructionStream(
-        const std::vector<cunqa::QuantumTask>& quantum_tasks_,
+        const std::vector<QuantumTask>& quantum_tasks_,
         const std::vector<std::size_t>& zero_clbits_,
         const std::vector<std::size_t>& zero_qubits_
     )
@@ -241,7 +252,7 @@ void execute_shot_(
 
 void update_measures_(
     std::shared_ptr<cunqa::sim::Simulator> simulator,
-    const std::vector<cunqa::QuantumTask>& quantum_tasks,
+    const std::vector<QuantumTask>& quantum_tasks,
     const std::vector<std::size_t>& zero_clbits,
     MeasCounter& meas_counter
 )
@@ -327,10 +338,11 @@ void QCExecutor::run()
             for(const auto& qpu_id : qpus_ids_) {
                 auto message = JSON::parse(classical_channel_.recv_info(qpu_id));
                 if(!message.empty()) {
+                    RunConfig run_config(message.at("config"));
                     QuantumTask quantum_task(
                         message.at("id").get<std::string>(), 
-                        RunConfig(message.at("config")), 
-                        Circuit::from_json(message.at("instructions"))
+                        run_config, 
+                        DynamicCircuit(message.at("instructions"))
                     );
                     quantum_tasks.push_back(quantum_task);
                     zero_clbits_.push_back(accumulated_clbits);

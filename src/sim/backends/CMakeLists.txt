@@ -18,8 +18,8 @@ target_link_libraries(backend_factory
     simulator 
     json
   PRIVATE 
-    nc_executor
-    cc_executor
+    nc_backend
+    cc_backend
     qc_backend
 )
 target_include_directories(backend_factory PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

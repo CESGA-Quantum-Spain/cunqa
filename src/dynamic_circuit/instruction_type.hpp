@@ -1,11 +1,18 @@
 #pragma once
 
 #include <array>
+#include <variant>
 #include <optional>
+#include <string>
+#include <vector>
+#include <complex>
 #include <string_view>
 #include <stdexcept>
 
 namespace cunqa {
+
+using DiagonalMatrix = std::vector<std::complex<double>>;
+using Matrix = std::vector<std::vector<std::complex<double>>>;
 
 enum class InstructionType {
     ID,

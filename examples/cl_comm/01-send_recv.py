@@ -19,14 +19,15 @@ try:
     circuit_2 = CunqaCircuit(1, 1, id="circuit_2")
 
     circuit_1.h(0)
-    circuit_1.measure(0,0)
+    circuit_1.measure(0, 0, save = False)
     circuit_1.send(0, recving_circuit = "circuit_2")
     
     circuit_2.recv(0, sending_circuit = "circuit_1")
-    #with circuit_2.cif(0) as cgates:
-    #    cgates.x(0)
+    circuit_2.cif(0)
+    circuit_2.x(0)
+    circuit_2.endcif(0)
 
-    #circuit_2.measure(0,0)
+    circuit_2.measure(0,0)
 
     # 3. Execution
 

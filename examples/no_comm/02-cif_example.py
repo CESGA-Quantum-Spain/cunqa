@@ -26,11 +26,10 @@ try:
     qc.h(0)
     qc.measure(0, 0)
 
-    # with qc.cif(0) as cgates:
-    #    cgates.x(1)
-
+    qc.cif(0)
+    qc.x(1)
+    qc.endcif(0)
     qc.measure(1,1)
-    qc.is_dynamic = True
     
     # 3. Execute circuit on vQPU
     qjob = run(qc, qpu, shots = 1024)

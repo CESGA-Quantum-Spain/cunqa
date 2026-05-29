@@ -3,7 +3,8 @@
 
 #include "nc_executor.hpp"
 
-#include "quantum_task/instruction_type.hpp"
+#include "dynamic_circuit/dynamic_circuit.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
 #include "utils/json.hpp"
 
 #include "logger.hpp"
@@ -11,26 +12,35 @@
 namespace cunqa {
 namespace sim {
 
-JSON NCExecutor::custom_execute(const QuantumTask& quantum_task)
-{
+JSON NCExecutor::custom_execute(const JSON& quantum_task)
+{   
     std::map<std::string, std::size_t> meas_counter;
 
-    simulator_->config = quantum_task.config;
+    if (auto it = quantum_task.find("config"); it != quantum_task.end())
+        simulator_->config = RunConfig(*it);
+
+    // Either create a new circuit or update the previous one
+    if (auto it = quantum_task.find("instructions"); it != quantum_task.end())
+        last_circuit_ = std::make_unique<DynamicCircuit>(*it);
+    else if (auto it = quantum_task.find("params"); it != quantum_task.end())
+        last_circuit_->update_params(it->get<std::vector<double>>());
+    
+    auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
 
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < quantum_task.config.shots; i++) {
+    for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
-        for (int pc = 0; pc < quantum_task.circuit.instructions.size(); ++pc) {
+        for (int pc = 0; pc < circuit.instructions.size(); ++pc) {
             
             std::visit([&](const auto& instr) {
                 using T = std::decay_t<decltype(instr)>;
 
-                auto type = quantum_task.circuit.instructions[pc].type;
+                auto type = circuit.instructions[pc].type;
 
                 if constexpr (std::is_same_v<T, ClassicalIf>) {
                     // If the clbit is 0, we skip all the gates till ENDCIF arrives.
                     if (type == InstructionType::CIF && !simulator_->creg[instr.clbits[0]])
-                        while (pc < quantum_task.circuit.instructions.size() && quantum_task.circuit.instructions[pc].type != InstructionType::ENDCIF)
+                        while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
                             ++pc;
                     // We always avoid ENDCIF cause it does not possess semantic meaning
                     if (type == InstructionType::ENDCIF)
@@ -41,7 +51,7 @@ JSON NCExecutor::custom_execute(const QuantumTask& quantum_task)
                     throw std::runtime_error("Empty circuit received.");
                 else
                     simulator_->apply_gate(type, instr);
-            }, quantum_task.circuit.instructions[pc].payload);
+            }, circuit.instructions[pc].payload);
 
         }
 

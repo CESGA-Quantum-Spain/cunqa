@@ -5,9 +5,9 @@
 #include <string_view>
 #include <utility>
 
-#include "quantum_task/instruction_type.hpp"
-#include "quantum_task/run_config.hpp"
-#include "quantum_task/circuit.hpp"
+#include "dynamic_circuit/instruction_type.hpp"
+#include "dynamic_circuit/dynamic_circuit.hpp"
+#include "sim/run_config.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -19,10 +19,7 @@ public:
     std::size_t num_qubits;
     RunConfig config;
     
-    virtual inline std::string get_name() const = 0;
-    virtual inline std::span<const std::string_view> get_basis_gates() const = 0;
-
-    inline std::string get_measures() const
+    std::string get_measures() const
     {
         std::string result;
         for (const auto& [clbit, value] : creg)
@@ -31,14 +28,18 @@ public:
         return result;
     }
 
-    inline void set_num_qubits(std::pair<std::size_t, std::size_t> num_qubits_)
+    void set_num_qubits(std::pair<std::size_t, std::size_t> num_qubits_)
     {
         num_qubits = num_qubits_.first + num_qubits_.second;
     }
-    
+
+    virtual std::string get_name() const = 0;
+    virtual std::span<const std::string_view> get_basis_gates() const = 0;
+
     virtual void initialize() = 0;
     virtual void clear() = 0;
 
+    virtual std::unique_ptr<Circuit> create_circuit(const JSON& instructions_json) const = 0;
     virtual JSON native_execute(const Circuit& circuit, const JSON& noise_model) = 0;
 
     virtual void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) 

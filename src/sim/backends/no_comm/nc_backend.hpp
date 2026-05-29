@@ -5,8 +5,8 @@
 
 #include "sim/simulator.hpp"
 #include "sim/backend.hpp"
-#include "quantum_task/quantum_task.hpp"
 #include "nc_executor.hpp"
+
 #include "utils/json.hpp"
 
 #include "logger.hpp"
@@ -62,19 +62,18 @@ public:
 
     inline JSON execute(const std::string& quantum_task_str) override
     {
-        auto quantum_task_json = JSON::parse(quantum_task_str);
-        auto id = quantum_task_json.at("id").get<std::string>();
-        RunConfig run_config(quantum_task_json.at("config"));
+        auto quantum_task = JSON::parse(quantum_task_str);
 
-        if (auto it = quantum_task_json.find("instructions"); it != quantum_task_json.end()) {
-            auto& instructions = *it;
-            last_quantum_task_ = QuantumTask(id, run_config, Circuit::from_json(instructions));
+        // TODO: Use ID to Qjob unordered get
+        if (quantum_task.contains("id")) {
+            auto id = quantum_task.at("id").get<std::string>();
+            quantum_task.erase("id");
         }
-        else if (auto it = quantum_task_json.find("params"); it != quantum_task_json.end())
-            last_quantum_task_.update_params(it->get<std::vector<double>>());
 
-        return last_quantum_task_.config.is_dynamic ? executor_.custom_execute(last_quantum_task_)
-                                                   : executor_.native_execute(last_quantum_task_, noise_model);
+        bool is_dynamic = quantum_task.at("config").at("is_dynamic");
+
+        return is_dynamic ? executor_.custom_execute(quantum_task)
+                          : executor_.native_execute(quantum_task, noise_model);
     }
 
     JSON to_json() const
@@ -95,7 +94,6 @@ public:
 
 private:
     NCExecutor executor_;
-    QuantumTask last_quantum_task_;
 };
 
 } // End of sim namespace

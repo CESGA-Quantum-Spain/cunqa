@@ -726,7 +726,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rx",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
 
     def ry(self, param: Union[float, int, str], qubit: int) -> None:
@@ -740,7 +740,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "ry",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     def rz(self, param: Union[float, int, str], qubit: int) -> None:
@@ -754,7 +754,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rz",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
 
     def globalp(self, param: Union[float, int, str]) -> None:
@@ -768,7 +768,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "gp",
             "qubits": 0,
-            "params": param
+            "params": [param]
         })
 
     def p(self, param: Union[float, int, str], qubit: int) -> None:
@@ -797,7 +797,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "u1",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     def rotx(self, param: Union[float, int, str], qubit: int) -> None:
@@ -811,7 +811,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rotx",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
 
     def roty(self, param: Union[float, int, str], qubit: int) -> None:
@@ -825,7 +825,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "roty",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     def rotz(self, param: Union[float, int, str], qubit: int) -> None:
@@ -839,7 +839,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rotz",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     def rotinvx(self, param: Union[float, int, str], qubit: int) -> None:
@@ -854,7 +854,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rotinvx",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
 
     def rotinvy(self, param: Union[float, int, str], qubit: int) -> None:
@@ -868,7 +868,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rotinvy",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     def rotinvz(self, param: Union[float, int, str], qubit: int) -> None:
@@ -882,7 +882,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rotinvz",
             "qubits": qubit,
-            "params": param
+            "params": [param]
         })
     
     # One qubit two params gates
@@ -1147,7 +1147,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "crx",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def cry(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1162,7 +1162,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "cry",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def crz(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1177,7 +1177,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"crz",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def cp(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1192,7 +1192,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"cp",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def cu1(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1207,7 +1207,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"cu1",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
     
     def rxx(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1221,7 +1221,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"rxx",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
     
     def ryy(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1235,7 +1235,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"ryy",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def rzz(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1249,7 +1249,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"rzz",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     def rzx(self, param: Union[float, int, str], *qubits: int) -> None:
@@ -1263,7 +1263,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"rzx",
             "qubits": [*qubits],
-            "params": param
+            "params": [param]
         })
 
     # Two qubits two params gates
@@ -2201,20 +2201,6 @@ class CunqaCircuit:
             "snapshot_type": "list" if pershot else "single",
             "label": label
         })
-
-    def measure_all(self) -> None:
-        """
-        Class to apply a global measurement of all of the qubits of the circuit. An additional 
-        classcial register will be added and labeled as "measure".
-        """
-        new_clreg = self.add_cl_register("measure", self.num_qubits[0])
-
-        for q in range(self.num_qubits[0]):
-            self.add_instructions({
-                "name": "measure",
-                "qubits": q,
-                "clbits": self.classical_regs[new_clreg][q],
-            })
     
     def measure(
         self, 
@@ -2242,4 +2228,19 @@ class CunqaCircuit:
                 "qubits": q,
                 "clbits": c,
                 "save": save
+            })
+            
+    def measure_all(self) -> None:
+        """
+        Class to apply a global measurement of all of the qubits of the circuit. An additional 
+        classcial register will be added and labeled as "measure".
+        """
+        new_clreg = self.add_cl_register("measure", self.num_qubits[0])
+
+        for q in range(self.num_qubits[0]):
+            self.add_instructions({
+                "name": "measure",
+                "qubits": q,
+                "clbits": self.classical_regs[new_clreg][q],
+                "save": True
             })

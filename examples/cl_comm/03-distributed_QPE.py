@@ -45,8 +45,9 @@ try:
             circuits[i].recv(0, sending_circuit = f"cc_{recv_id}")
 
             # Gate conditioned by the received bit
-            with circuits[i].cif(0) as cgates:
-                cgates.rz(param, 0)
+            circuits[i].cif(clbits = 0)
+            circuits[i].rz(param, 0)
+            circuits[i].endcif(0)
 
         circuits[i].h(0)
 

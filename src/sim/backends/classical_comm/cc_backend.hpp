@@ -5,11 +5,11 @@
 
 #include "sim/backend.hpp"
 #include "sim/simulator.hpp"
-#include "quantum_task/quantum_task.hpp"
 #include "cc_executor.hpp"
 
 #include "utils/json.hpp"
 
+#include "logger.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -18,7 +18,7 @@ class CCBackend final : public Backend {
 public:
     std::string name = "CCBackend";
     std::string version = "0.0.1";
-    std::pair<std::size_t, std::size_t> num_qubits = {32, 0};
+    std::pair<std::size_t, std::size_t> num_qubits = {6, 0};
     std::string description = "Backend with classical communications.";
     std::vector<std::vector<std::size_t>> coupling_map;
     std::vector<std::string> basis_gates;
@@ -54,18 +54,18 @@ public:
 
     inline JSON execute(const std::string& quantum_task_str) override
     {
-        auto quantum_task_json = JSON::parse(quantum_task_str);
-        auto id = quantum_task_json.at("id").get<std::string>();
-        RunConfig run_config(quantum_task_json.at("config"));
-
-        if (auto it = quantum_task_json.find("instructions"); it != quantum_task_json.end()) {
-            auto& instructions = *it;
-            last_quantum_task_ = QuantumTask(id, run_config, Circuit::from_json(instructions));
-        }
-        else if (auto it = quantum_task_json.find("params"); it != quantum_task_json.end())
-            last_quantum_task_.update_params(it->get<std::vector<double>>());
+        auto quantum_task = JSON::parse(quantum_task_str);
         
-        return executor_.execute(last_quantum_task_);
+        // TODO: Use ID to Qjob unordered get
+        if (quantum_task.contains("id")) {
+            auto id = quantum_task.at("id").get<std::string>();
+            quantum_task.erase("id");
+        }
+
+        RunConfig run_config(quantum_task.at("config"));
+        quantum_task.erase("config");
+        
+        return executor_.execute(quantum_task, run_config);
     }
 
     JSON to_json() const
@@ -84,7 +84,6 @@ public:
 
 private:
     CCExecutor executor_;
-    QuantumTask last_quantum_task_;
 };
 
 } // End of sim namespace

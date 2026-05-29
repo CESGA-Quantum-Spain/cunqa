@@ -2,8 +2,6 @@
 #include <iostream>
 
 #include "qpu.hpp"
-#include "quantum_task/instruction_type.hpp"
-#include "quantum_task/quantum_task.hpp"
 #include "utils/constants.hpp"
 
 #include "logger.hpp"

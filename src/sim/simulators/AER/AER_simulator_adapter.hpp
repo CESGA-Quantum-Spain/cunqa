@@ -3,27 +3,31 @@
 #include <vector>
 #include <string_view>
 
+#include "circuit.hpp"
 #include "sim/simulator.hpp"
-#include "quantum_task/circuit.hpp"
+
+#include "utils/json.hpp"
 
 namespace cunqa {
 namespace sim {
 
-class AerSimulatorAdapter final : public Simulator {
+class AERSimulatorAdapter final : public Simulator {
 public:
     
-    AerSimulatorAdapter();
-    ~AerSimulatorAdapter();
+    AERSimulatorAdapter();
+    ~AERSimulatorAdapter();
 
     inline std::string get_name() const noexcept override
     {
         return "Aer";
     }
 
-    inline std::span<const std::string_view> get_basis_gates() const noexcept override 
+    std::span<const std::string_view> get_basis_gates() const noexcept override 
     {
         return AER_BASIS_GATES;
     }
+
+    std::unique_ptr<Circuit> create_circuit(const JSON& instructions_json) const override;
 
     void initialize() override;
     void clear() override;

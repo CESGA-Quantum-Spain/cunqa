@@ -6,7 +6,12 @@ target_sources(qc_executor
     FILE_SET HEADERS
     BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
     FILES
-      qc_executor.hpp
+      "${CMAKE_CURRENT_SOURCE_DIR}/qc_executor.hpp"
+)
+
+target_include_directories(qc_executor
+  PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 target_link_libraries(qc_executor 
@@ -15,8 +20,9 @@ target_link_libraries(qc_executor
     classical_channel
   PRIVATE
     constants
-    quantum_task
+    dynamic_circuit
     logger_executor
+    run_config
 )
 
 add_library(qc_backend INTERFACE)
@@ -25,9 +31,12 @@ target_sources(qc_backend
     FILE_SET HEADERS
     BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
     FILES
-      qc_backend.hpp
+      "${CMAKE_CURRENT_SOURCE_DIR}/qc_backend.hpp"
 )
 target_link_libraries(qc_backend 
   INTERFACE
-    logger_qpu
+    backend
+    simulator
+    classical_channel
+    json
 )
