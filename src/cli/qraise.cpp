@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
                 );
             }
 
-            sbatch_file.save_as("my_sbatch_script.sh");
+            //sbatch_file.save_as("my_sbatch_script.sh");
         }
 
         const std::string command = "sbatch --parsable " + shell_quote(sbatch_file.path());

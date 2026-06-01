@@ -24,7 +24,7 @@ public:
         std::string result;
         for (const auto& [clbit, value] : creg)
             if (save_clbit.contains(clbit) && save_clbit.at(clbit))    
-                result += value ? '1' : '0';
+                result = (value ? '1' : '0') + result;
         return result;
     }
 

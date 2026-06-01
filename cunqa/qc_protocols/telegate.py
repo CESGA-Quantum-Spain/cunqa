@@ -2,31 +2,44 @@ from typing import Union
 
 from cunqa.circuit.core import CunqaCircuit
 
-def expose(
-    circuit: CunqaCircuit, 
-    comp_qubit: int, 
-    comm_qubit: int, 
-    clbits: list[int],
-    target_circuits: Union[CunqaCircuit, str, list[CunqaCircuit], list[str]], 
+# TODO: Generalize telegate for N circuits
+    
+def cat_entangler(
+    target_circuits: list[CunqaCircuit],
+    comp_qubit: int,
+    comm_qubits: list[int], 
+    clbits: list[int], 
     tag: str = None
-) -> None:
-    """
-    Class method to expose one or several qubits to a target circuit.
+):
+    target_circuits[0].gen_ent(comm_qubits[0], target_circuits[1], tag)
+    target_circuits[0].cx(comp_qubit, comm_qubits[0])
+    target_circuits[0].measure(comm_qubits[0], clbits[0], save=False)
+    target_circuits[0].send(clbits[0], target_circuits[1])
     
-    Args:
-        qubits (int | list[int]): index or list of indices of qubit(s) to be exposed.
-        target_circuit (CunqaCircuit | str): CunqaCircuit object or string ID of the circuit 
-                                                that will ''see'' the exposed qubits.
-        tags (int | list[int]): Optional negative integer or list of integers, each of one 
-                                associated to a exposed qubit. If not set, random values are set.
-    Result:
-        The function returns a list of negative integers, corresponding to each exposed qubit. 
-        This values can be used as arguments of controlled gates to specify that are remotely 
-        controlled. 
-    """
+    target_circuits[1].gen_ent(comm_qubits[1], target_circuits[0], tag)
+    target_circuits[1].recv(clbits[1], target_circuits[0])
+    target_circuits[1].cif(clbits[1])
+    target_circuits[1].x(comm_qubits[1])
+    target_circuits[1].endcif(clbits[1])
     
-    circuit.gen_ent(comm_qubit, target_circuits, tag)
-
-
-def unexpose(circuit: CunqaCircuit, tag: str = None) -> None:
-    pass
+    """ for circuit, comm_qubit, clbit in zip(target_circuits[1:], comm_qubits[1:], clbits[1:]):
+        circuit.recv(clbit, target_circuits)
+        circuit.cif(clbit)
+        circuit.x(comm_qubit)
+        circuit.endcif(clbit) """
+    
+def cat_disentangler(
+    target_circuits: Union[list[CunqaCircuit], list[str]],
+    comp_qubit: int,
+    comm_qubits: list[int], 
+    clbits: list[int]
+):
+    
+    target_circuits[0].recv(clbits[0], target_circuits[1])
+    target_circuits[0].cif(clbits[0])
+    target_circuits[0].z(comp_qubit)
+    target_circuits[0].endcif(clbits[0])
+    
+    target_circuits[1].h(comm_qubits[1])
+    target_circuits[1].measure(comm_qubits[1], clbits[1], save=False)
+    target_circuits[1].send(clbits[1], target_circuits[0])

@@ -81,6 +81,9 @@ struct InstructionStream
                             for (auto& c : payload.clbits)
                                 c += zero_clbits_[t];
                         } else if constexpr (requires { payload.clbit; }) {
+                            LOGGER_DEBUG("MEASURE from qt {}", pointed_quantum_task);
+                            LOGGER_DEBUG("\tClbit: {}, Qubit: {}, save: {}", payload.clbit, payload.qubit, payload.save);
+                            LOGGER_DEBUG("ZERO QUBITS: {}", zero_clbits_[t]);
                             payload.clbit += zero_clbits_[t];
                         } else if constexpr (std::is_same_v<T, cunqa::Copy>) {
                             for (std::size_t i = 0; i < payload.l_clbits.size(); i++) {
@@ -102,7 +105,7 @@ struct InstructionStream
                             )};
                     }
                     if constexpr (std::is_same_v<T, cunqa::GenEnt>) {
-                        payload.qpus.push_back(quantum_tasks[t].config.qpu_id);
+                        //payload.qpus.push_back(quantum_tasks[t].config.qpu_id);
                         if (payload.tag == "NO_TAG") {
                             std::sort(payload.qpus.begin(), payload.qpus.end());
                             payload.tag = std::accumulate(
@@ -192,8 +195,9 @@ void execute_shot_(
     cunqa::ClassicalCommManager cc_manager;
     while(!stream.all_finished()) {
         auto instr = stream.get_current();
-        //LOGGER_DEBUG("INSTRUCTION: {} QUANTUM_TASK: {}", 
-        //    instruction_type_name(instr.type), stream.pointed_quantum_task);
+        LOGGER_DEBUG("INSTRUCTION: {} QUANTUM_TASK: {}", 
+            instruction_type_name(instr.type), stream.pointed_quantum_task);
+        
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
             auto type = instr.type;

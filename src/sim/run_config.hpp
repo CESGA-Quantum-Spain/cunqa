@@ -40,9 +40,11 @@ struct RunConfig {
         device = config.at("device");
 
         simulator_specifics = config;
+        simulator_specifics.erase("qpu_id");
         simulator_specifics.erase("shots");
         simulator_specifics.erase("method");
         simulator_specifics.erase("avoid_parallelization");
+        simulator_specifics.erase("is_dynamic");
         simulator_specifics.erase("num_clbits");
         simulator_specifics.erase("seed");
         simulator_specifics.erase("sending_to");
