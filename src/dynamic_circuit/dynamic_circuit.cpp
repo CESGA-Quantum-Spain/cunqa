@@ -432,6 +432,17 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     break;
                 }
                 case InstructionType::CIF:
+                {
+                    cunqa_instruction = {
+                        .type = instruction_type,
+                        .payload = ClassicalIf{
+                            instruction.at("clbits").get<std::vector<std::size_t>>(), 
+                            static_cast<bool>(instruction.at("condition").get<int>()),
+                            instruction.at("operation").get<std::string>()
+                        }
+                    };
+                    break;
+                }
                 case InstructionType::ENDCIF:
                 {
                     cunqa_instruction = {

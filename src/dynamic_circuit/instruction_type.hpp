@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <complex>
+#include <unordered_map>
+#include <functional>
 #include <string_view>
 #include <stdexcept>
 
@@ -171,6 +173,15 @@ enum class InstructionType {
 struct InstructionTypeEntry {
     std::string_view name;
     InstructionType type;
+};
+
+inline std::unordered_map<std::string, std::function<bool(bool, bool)>> cif_ops{
+    {"and",  [](bool a, bool b) { return a & b; }},
+    {"or",   [](bool a, bool b) { return a | b; }},
+    {"xor",  [](bool a, bool b) { return a ^ b; }},
+    {"andn", [](bool a, bool b) { return a & !b; }},
+    {"orn",  [](bool a, bool b) { return a | !b; }},
+    {"xorn", [](bool a, bool b) { return a ^ !b; }}
 };
 
 inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
