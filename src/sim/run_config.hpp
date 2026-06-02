@@ -49,6 +49,25 @@ struct RunConfig {
         simulator_specifics.erase("device");
     }
 
+    JSON to_json() const {
+        JSON json;
+        json["qpu_id"] = qpu_id;
+        json["shots"] = shots;
+        json["method"] = method;
+        json["avoid_parallelization"] = avoid_parallelization;
+        json["is_dynamic"] = is_dynamic;
+        json["num_clbits"] = num_clbits;
+        json["seed"] = seed;
+        json["sending_to"] = sending_to;
+        json["device"] = device;
+        json["simulator_specifics"] = simulator_specifics;
+        return json;
+    }
+
+    operator JSON() const {
+        return to_json();
+    }
+
     static RunConfig combine_configs(std::vector<RunConfig> configs)
     {
         RunConfig combined_config;

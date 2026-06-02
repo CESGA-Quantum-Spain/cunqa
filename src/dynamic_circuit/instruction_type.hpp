@@ -14,7 +14,6 @@ namespace cunqa {
 using DiagonalMatrix = std::vector<std::complex<double>>;
 using Matrix = std::vector<std::vector<std::complex<double>>>;
 
-
 enum class InstructionType {
         ID,
     X,

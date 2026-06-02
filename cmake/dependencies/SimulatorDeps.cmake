@@ -85,7 +85,7 @@ if(DEFINED AER_GPU)
   )
 endif()
 
-#[[
+
 # =====================================================================
 #  MQT-DDSIM - quantum circuit simulator
 # =====================================================================
@@ -160,7 +160,6 @@ CPMAddPackage(
   NAME quest
   GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
   GIT_TAG v4.2.0
-  DOWNLOAD_ONLY YES
 )
 
 # ---------------------------------------------------------------------
@@ -215,6 +214,17 @@ if(TARGET maestro)
 else()
   message(WARNING "Target maestro was not created")
 endif()
+
+# =====================================================================
+#  Qsim SIMULATOR - By Google 
+# =====================================================================
+CPMAddPackage(
+  NAME qsim
+  VERSION 0.22.0
+  GIT_REPOSITORY git@github.com:quantumlib/qsim.git
+  GIT_TAG v0.22.0
+  SOURCE_SUBDIR intentionally_non_existent_dir
+)
 
 # =====================================================================
 #  CUNQA SIMULATOR - CESGA Quantum Spain
@@ -283,6 +293,5 @@ if(qulacs_ADDED)
 else()
   message(STATUS "Using existing qulacs package")
 endif()
-]]
 
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

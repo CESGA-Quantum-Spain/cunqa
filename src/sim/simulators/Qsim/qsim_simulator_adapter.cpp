@@ -9,6 +9,7 @@
 #include <random>
 
 #include "qsim_simulator_adapter.hpp"
+#include "qsim_circuit_adapter.hpp"
 
 #include "seqfor.h"
 #include "parfor.h"
@@ -84,7 +85,7 @@ struct QsimSimulatorAdapter::State {
     std::mt19937 rgen;
 
     // Constructor
-    State(int num_threads, int num_qubits, unsigned seed) 
+    State(int num_threads, const int& num_qubits, unsigned seed) 
         : state_space(num_threads),
           state(state_space.Create(num_qubits)),
           simulator(num_threads),
@@ -109,9 +110,14 @@ unsigned processSeed(int seed){
 }
 
 QsimSimulatorAdapter::QsimSimulatorAdapter()
-    : state_(std::make_unique<State>(getNumThreads(), config.num_qubits, processSeed(config.seed)))
+    : state_(std::make_unique<State>(getNumThreads(), num_qubits, processSeed(config.seed)))
 { }
 QsimSimulatorAdapter::~QsimSimulatorAdapter() = default;
+
+std::unique_ptr<Circuit> QsimSimulatorAdapter::create_circuit(const JSON& instructions_json) const
+{
+    return std::make_unique<QsimCircuit>(instructions_json);
+}
 
 void QsimSimulatorAdapter::initialize() {
     state_->state_space.SetStateZero(state_->state);
@@ -197,19 +203,19 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubi
     {
         case InstructionType::RX:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRX<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRX<float>::Create(0, payload.qubit, static_cast<float>(*payload.param)), state_->state);
             break;
         }
         
         case InstructionType::RY:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRY<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRY<float>::Create(0, payload.qubit, static_cast<float>(*payload.param)), state_->state);
             break;
         }
         
         case InstructionType::RZ:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRZ<float>::Create(0, payload.qubit, static_cast<float>(payload.param)), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRZ<float>::Create(0, payload.qubit, static_cast<float>(*payload.param)), state_->state);
             break;
         }
         
@@ -263,13 +269,13 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubi
     {
         case InstructionType::CP:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateCP<float>::Create(0, payload.qubits[0], payload.qubits[1], payload.param), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateCP<float>::Create(0, payload.qubits[0], payload.qubits[1], *payload.param), state_->state);
             break;
         }
         
         case InstructionType::GLOBALP:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateGPh<float>::Create(0, payload.param), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateGPh<float>::Create(0, *payload.param), state_->state);
             break;
         }
 
@@ -284,13 +290,13 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubi
     {
         case InstructionType::RXY: //TODO: check if it's actually two-qubit
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRXY<float>::Create(0, payload.qubits[0], payload.params[0], payload.params[1]), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRXY<float>::Create(0, payload.qubits[0], *payload.params[0], *payload.params[1]), state_->state);
             break;
         }
 
         case InstructionType::FS:
         {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateFS<float>::Create(0, payload.qubits[0], payload.qubits[1], payload.params[0], payload.params[1]), state_->state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateFS<float>::Create(0, payload.qubits[0], payload.qubits[1], *payload.params[0], *payload.params[1]), state_->state);
             break;
         }
 

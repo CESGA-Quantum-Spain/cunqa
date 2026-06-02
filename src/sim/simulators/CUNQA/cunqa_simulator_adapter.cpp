@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include "cunqa_simulator_adapter.hpp"
+#include "cunqa_circuit_adapter.hpp"
 
 #include "result_cunqasim.hpp"
 #include "executor.hpp"
@@ -22,13 +23,18 @@ namespace sim {
 struct CunqaSimulatorAdapter::State {
     Executor executor;
 
-    State(int& n_qubits) : executor(n_qubits) {}
+    State(const int& n_qubits) : executor(n_qubits) {}
 };
 
 CunqaSimulatorAdapter::CunqaSimulatorAdapter()
-    : state_(std::make_unique<State>(config.num_qubits))
+    : state_(std::make_unique<State>(num_qubits))
 { }
 CunqaSimulatorAdapter::~CunqaSimulatorAdapter() = default;
+
+std::unique_ptr<Circuit> CunqaSimulatorAdapter::create_circuit(const JSON& instructions_json) const
+{
+    return std::make_unique<CunqaCircuit>(instructions_json);
+}
 
 void CunqaSimulatorAdapter::initialize()
 {
@@ -51,8 +57,8 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const OneQub
         case InstructionType::H:
         case InstructionType::SX:
         {
-            std::string inst_name = cunqa::INVERTED_INSTRUCTIONS_MAP.at(type);
-            state_->executor.apply_gate(inst_name, {payload.qubit});
+            std::string_view inst_name = instruction_type_name(type);
+            state_->executor.apply_gate(std::string(inst_name), {payload.qubit});
             break;
         }
 
@@ -69,9 +75,9 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const OneQub
         case InstructionType::RY:
         case InstructionType::RZ:
         {
-            std::string inst_name = cunqa::INVERTED_INSTRUCTIONS_MAP.at(type);
-            std::vector<double> params = {payload.param};
-            state_->executor.apply_parametric_gate(inst_name, {payload.qubit}, params);
+            std::string_view inst_name = instruction_type_name(type);
+            std::vector<double> params = {*payload.param};
+            state_->executor.apply_parametric_gate(std::string(inst_name), {payload.qubit}, params);
             break;
         }
 
@@ -89,8 +95,8 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQub
         case InstructionType::CZ:
         case InstructionType::SWAP:
         {
-            std::string inst_name = cunqa::INVERTED_INSTRUCTIONS_MAP.at(type);
-            state_->executor.apply_gate(inst_name, {payload.qubits[0], payload.qubits[1]});
+            std::string_view inst_name = instruction_type_name(type);
+            state_->executor.apply_gate(std::string(inst_name), {payload.qubits[0], payload.qubits[1]});
             break;
         }
 
@@ -107,9 +113,9 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQub
         case InstructionType::CRY:
         case InstructionType::CRZ:
         {
-            std::string inst_name = cunqa::INVERTED_INSTRUCTIONS_MAP.at(type);
-            std::vector<double> params = {payload.param};
-            state_->executor.apply_parametric_gate(inst_name, {payload.qubits[0], payload.qubits[1]}, params);
+            std::string_view inst_name = instruction_type_name(type);
+            std::vector<double> params = {*payload.param};
+            state_->executor.apply_parametric_gate(std::string(inst_name), {payload.qubits[0], payload.qubits[1]}, params);
             break;
         }
             
@@ -162,11 +168,13 @@ JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& n
 
     LOGGER_DEBUG("Cunqa usual simulation");
     try
-    { 
-        auto n_qubits = config.num_qubits;
+    {
+        auto& cunqa_adapter_circuit = dynamic_cast<const CunqaCircuit&>(circuit);
+        auto n_qubits = num_qubits;
         auto shots = config.shots;
+
         Executor executor(n_qubits);
-        QuantumCircuit cunqa_circuit = circuit.to_json();
+        QuantumCircuit cunqa_circuit = cunqa_adapter_circuit.instructions;
         JSON result = executor.run(cunqa_circuit, shots);
 
         return result;

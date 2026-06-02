@@ -11,6 +11,7 @@
 #include "utils/helpers/json_to_qasm2.hpp"
 
 #include "maestro_simulator_adapter.hpp"
+#include "maestro_circuit_adapter.hpp"
 #include "maestrolib/Interface.h"
 
 #include "logger.hpp"
@@ -24,13 +25,18 @@ MaestroSimulatorAdapter::MaestroSimulatorAdapter() {
 }
 MaestroSimulatorAdapter::~MaestroSimulatorAdapter() = default;
 
+std::unique_ptr<Circuit> MaestroSimulatorAdapter::create_circuit(const JSON& instructions_json) const
+{
+    return std::make_unique<MaestroCircuit>(instructions_json);
+}
+
 void MaestroSimulatorAdapter::initialize()
 {
     std::string method = config.method;
     std::string sim_name;
 
-    if (config.maestro_simulator.has_value())
-        sim_name = config.maestro_simulator.value_or("qiskit");
+    if (config.simulator_specifics.contains("maestro_simulator"))
+        sim_name = config.simulator_specifics.at("maestro_simulator");
 
     // -1 for simulator type means both qiskit aer and qcsim
     // -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
@@ -90,7 +96,7 @@ void MaestroSimulatorAdapter::initialize()
         throw std::runtime_error("ERROR: Unable to create the Maestro Simulator.");
     }
     auto simulator = GetSimulator(simulatorHandle);
-    AllocateQubits(simulator, config.num_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
+    AllocateQubits(simulator, num_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
     InitializeSimulator(simulator);
 }
 
@@ -145,22 +151,22 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const OneQ
     {
         case InstructionType::P:
         {
-            ApplyP(simulator, payload.qubit, payload.param);
+            ApplyP(simulator, payload.qubit, *payload.param);
             break;
         }
         case InstructionType::RX:
         {
-            ApplyRx(simulator, payload.qubit, payload.param);
+            ApplyRx(simulator, payload.qubit, *payload.param);
             break;
         }
         case InstructionType::RY:
         {
-            ApplyRy(simulator, payload.qubit, payload.param);
+            ApplyRy(simulator, payload.qubit, *payload.param);
             break;
         }
         case InstructionType::RZ:
         {
-            ApplyRz(simulator, payload.qubit, payload.param);
+            ApplyRz(simulator, payload.qubit, *payload.param);
             break;
         }
 
@@ -175,7 +181,7 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const OneQ
     {
         case InstructionType::U:
         {
-            ApplyU(simulator, payload.qubit, payload.params[0], payload.params[1], payload.params[2], payload.params[3]);
+            ApplyU(simulator, payload.qubit, *payload.params[0], *payload.params[1], *payload.params[2], *payload.params[3]);
             break;
         }
 
@@ -235,22 +241,22 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQ
     {
         case InstructionType::CP:
         {
-            ApplyCP(simulator, payload.qubits[0], payload.qubits[1], payload.param);
+            ApplyCP(simulator, payload.qubits[0], payload.qubits[1], *payload.param);
             break;
         }
         case InstructionType::CRX:
         {
-            ApplyCRx(simulator, payload.qubits[0], payload.qubits[1], payload.param);
+            ApplyCRx(simulator, payload.qubits[0], payload.qubits[1], *payload.param);
             break;
         }
         case InstructionType::CRY:
         {
-            ApplyCRy(simulator, payload.qubits[0], payload.qubits[1], payload.param);
+            ApplyCRy(simulator, payload.qubits[0], payload.qubits[1], *payload.param);
             break;
         }
         case InstructionType::CRZ:
         {
-            ApplyCRz(simulator, payload.qubits[0], payload.qubits[1], payload.param);
+            ApplyCRz(simulator, payload.qubits[0], payload.qubits[1], *payload.param);
             break;
         }
 
@@ -265,7 +271,7 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQ
     {
         case InstructionType::CU:
         {
-            ApplyCU(simulator, payload.qubits[0], payload.qubits[1], payload.params[0], payload.params[1], payload.params[2], payload.params[3]);
+            ApplyCU(simulator, payload.qubits[0], payload.qubits[1], *payload.params[0], *payload.params[1], *payload.params[2], *payload.params[3]);
             break;
         }
 
@@ -358,11 +364,13 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const Copy
 JSON MaestroSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
 {
     LOGGER_DEBUG("Maestro usual simulation");
-    try { 
-        JSON circuit_json = circuit.to_json();
+    try {
+        auto& maestro_adapter_circuit = dynamic_cast<const MaestroCircuit&>(circuit);
+
+        JSON circuit_json = maestro_adapter_circuit.instructions;
         JSON run_config_json = config.to_json();
 
-        auto simulatorHandle = CreateSimpleSimulator(config.num_qubits);
+        auto simulatorHandle = CreateSimpleSimulator(num_qubits);
         if (simulatorHandle == 0) {
             LOGGER_ERROR("Error creating the Maestro SimpleSimulator.");
             return {{"ERROR", "Unable to create the Maestro SimpleSimulator."}};
@@ -371,8 +379,8 @@ JSON MaestroSimulatorAdapter::native_execute(const Circuit& circuit, const JSON&
         std::string method = config.method;
         std::string sim_name;
 
-        if (config.maestro_simulator.has_value())
-            sim_name = config.maestro_simulator.value_or("qiskit");
+        if (config.simulator_specifics.contains("maestro_simulator"))
+            sim_name = config.simulator_specifics.at("maestro_simulator");
 
         // -1 for simulator type means both qiskit aer and qcsim
         // -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
