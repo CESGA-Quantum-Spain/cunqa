@@ -17,7 +17,7 @@ class QCBackend final : public Backend {
 public:
     std::string name = "QCBackend";
     std::string version = "0.0.1";
-    std::pair<std::size_t, std::size_t> num_qubits = {2, 1};
+    std::pair<std::size_t, std::size_t> num_qubits = {1, 1};
     std::string description = "Backend with quantum communications.";
     std::vector<std::vector<std::size_t>> coupling_map;
     std::vector<std::string> basis_gates;

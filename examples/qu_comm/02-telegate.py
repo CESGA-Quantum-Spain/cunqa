@@ -5,6 +5,7 @@ import numpy as np
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
+from cunqa.qc_protocols import cat_entangler, cat_disentangler
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
@@ -14,20 +15,22 @@ family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = 
 try:
     qpus   = get_QPUs(co_located = True, family = family)
 
-    # 2. Design circuits with distributed instructions between them
-    cc_1 = CunqaCircuit(1, id="First")
-    cc_2 = CunqaCircuit(1, id="Second")
-
+     # 2. Design circuits with distributed instructions between them
+    # First circuit 
+    cc_1 = CunqaCircuit((1, 1), 2, id="First")
+    cc_2 = CunqaCircuit((1, 1), 2, id="Second")
+    
     cc_1.h(0)
-
-    with cc_1.expose(0, cc_2) as ([rqubit], subcircuit):
-        subcircuit.cx(rqubit,0)
-
-    cc_1.measure_all()
-    cc_2.measure_all()
+    cat_entangler([cc_1, cc_2], 0, [1, 1], [0, 0], tag="telegate")
+    
+    cc_2.cx(1, 0)
+    cat_disentangler([cc_1, cc_2], 0, [1, 1], [0, 0])
+    
+    cc_1.measure(0,0)
+    cc_2.measure(0,0)
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2], qpus, shots=1024) 
+    distr_jobs = run([cc_1, cc_2], qpus, shots=10) 
 
     # Collect the results
     result_list = gather(distr_jobs)

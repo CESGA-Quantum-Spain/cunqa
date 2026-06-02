@@ -2101,6 +2101,7 @@ class CunqaCircuit:
         if not tag:
             tag = "NO_TAG"
     
+        circuit_ids.append(self._id)
         self.add_instructions({
             "name": "gen_ent",
             "comm_qubit": comm_qubit,
