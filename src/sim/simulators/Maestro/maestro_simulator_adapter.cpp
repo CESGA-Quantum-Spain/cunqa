@@ -306,10 +306,16 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const Meas
     {
         case InstructionType::MEASURE:
         {
-            const unsigned long int q[]{ payload.qubit };
-            const unsigned long long int measurement = ::Measure(simulator, q, 1);
-
-            creg[payload.clbit] = (measurement == 1);
+            if(payload.clbit < config.num_clbits) {
+                const unsigned long int q[]{ payload.qubit };
+                const unsigned long long int measurement = ::Measure(simulator, q, 1);
+                creg[payload.clbit] =
+                        (measurement == 1);
+                save_clbit[payload.clbit] = payload.save;
+            } else {
+                throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+            }    
             break;
         }
 
@@ -361,9 +367,9 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const Copy
     }
 }
 
-JSON MaestroSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON MaestroSimulatorAdapter::native_execute(const Circuit& circuit)
 {
-    LOGGER_DEBUG("Maestro usual simulation");
+    LOGGER_DEBUG("Maestro native execution");
     try {
         auto& maestro_adapter_circuit = dynamic_cast<const MaestroCircuit&>(circuit);
 

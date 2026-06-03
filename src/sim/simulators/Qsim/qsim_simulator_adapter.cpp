@@ -528,8 +528,15 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const Measure
     {
         case InstructionType::MEASURE:
         {
-            auto measure_result = state_->state_space.Measure({payload.qubit}, state_->rgen, state_->state);
-            creg[payload.clbit] = (measure_result.bitstring[0] == 1);
+            if(payload.clbit < config.num_clbits) {
+                auto measure_result = state_->state_space.Measure({payload.qubit}, state_->rgen, state_->state);
+                creg[payload.clbit] =
+                        (measure_result.bitstring[0] == 1);
+                save_clbit[payload.clbit] = payload.save;
+            } else {
+                throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+            }    
             break;
         }
 
@@ -563,7 +570,7 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& p
 }
 
 
-JSON QsimSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON QsimSimulatorAdapter::native_execute(const Circuit& circuit)
 {
     LOGGER_DEBUG("Qsim native execute");
     try {
@@ -588,7 +595,7 @@ JSON QsimSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& no
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
 
-        JSON counts_json = convert_qsim_result(results, num_qubits);
+        JSON counts_json = convert_qsim_result(results, config.num_clbits);
         
         JSON result_json = {
             {"counts", counts_json},

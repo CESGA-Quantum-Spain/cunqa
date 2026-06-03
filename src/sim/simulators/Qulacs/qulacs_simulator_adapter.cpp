@@ -814,7 +814,14 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const Measu
     switch (type)
     {
         case InstructionType::MEASURE:
-            creg[payload.clbit] = (measure_adapter(state_->state, payload.qubit) == 1);
+            if(payload.clbit < config.num_clbits) {
+                    creg[payload.clbit] =
+                        (measure_adapter(state_->state, payload.qubit) == 1);
+                    save_clbit[payload.clbit] = payload.save;
+                } else {
+                    throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+                }    
             break;
 
         default:
@@ -846,9 +853,9 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const Copy&
     }
 }
 
-JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit)
 {
-    LOGGER_DEBUG("Qulacs usual simulation");
+    LOGGER_DEBUG("Qulacs native execution");
     try {
         auto& qulacs_adapter_circuit = dynamic_cast<const QulacsCircuit&>(circuit);
 
@@ -867,7 +874,7 @@ JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& 
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
 
-        JSON counts = convert_to_counts(samples, num_qubits);
+        JSON counts = convert_to_counts(samples, config.num_clbits);
 
         JSON result_json = 
         {

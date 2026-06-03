@@ -27,12 +27,17 @@ public:
         return CUNQA_BASIS_GATES;
     }
 
+    void set_noise_model(const JSON& noise_properties) override
+    {
+        throw std::runtime_error("Set noise model not implemented in CunqaSimulator");
+    }
+
     std::unique_ptr<Circuit> create_circuit(const JSON& instructions_json) const override;
 
     void initialize() override;
     void clear() override;
 
-    JSON native_execute(const Circuit& circuit, const JSON& noise_model) override;
+    JSON native_execute(const Circuit& circuit) override;
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;

@@ -269,14 +269,35 @@ struct MunichSimulatorAdapter::State : public CircuitSimulator{
     inline char measureAdapter(dd::Qubit i) { return measure(i); }
 };
 
+struct MunichSimulatorAdapter::NoiseModel {
+    JSON Munich_noise_model;
+    ApproximationInfo approx_info;
+
+    void set_noise_model(const JSON& noise_model)
+    {
+        if (!noise_model.empty()) {
+            approx_info = {noise_model["step_fidelity"], noise_model["approx_steps"], ApproximationInfo::FidelityDriven};
+            Munich_noise_model = noise_model;
+        }
+        else
+            throw std::invalid_argument("Trying to create noise model with empty JSON");
+    }
+};
+
 MunichSimulatorAdapter::MunichSimulatorAdapter()
     : state_(std::make_unique<State>(std::move(getQuantumComputation(num_qubits, config.num_clbits, config.seed))))
+    , noise_model_(std::make_unique<NoiseModel>())
 { }
 MunichSimulatorAdapter::~MunichSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> MunichSimulatorAdapter::create_circuit(const JSON& instructions_json) const
 {
     return std::make_unique<MunichCircuit>(instructions_json);
+}
+
+void MunichSimulatorAdapter::set_noise_model(const JSON& noise_properties) 
+{
+    noise_model_->set_noise_model(noise_properties);
 }
 
 void MunichSimulatorAdapter::initialize() {
@@ -569,11 +590,16 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const Measu
     switch (type)
     {
         case InstructionType::MEASURE:
-        {   
-            creg[payload.clbit] =
-                static_cast<bool>(state_->measureAdapter(payload.qubit));
-            
-            break;
+        {  
+            if(payload.clbit < config.num_clbits) {
+                    creg[payload.clbit] =
+                        static_cast<bool>(state_->measureAdapter(payload.qubit));
+                    save_clbit[payload.clbit] = payload.save;
+                } else {
+                    throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+                }    
+            break; 
         }
         
         default:
@@ -606,9 +632,9 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const Copy&
 }
 
 
-JSON MunichSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON MunichSimulatorAdapter::native_execute(const Circuit& circuit)
 {
-    LOGGER_DEBUG("Munich native_execute");
+    LOGGER_DEBUG("Munich native execution");
 
     // TODO: Change the format with the free functions
     try {   
@@ -619,10 +645,9 @@ JSON MunichSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& 
         cunqa_circuit_to_mqt_circuit(munich_adapter_circuit, *mqt_circuit);
         
         float time_taken;
-        if (!noise_model.empty()) {
-            const ApproximationInfo approx_info{noise_model["step_fidelity"], noise_model["approx_steps"], ApproximationInfo::FidelityDriven};
-            StochasticNoiseSimulator sim(std::move(mqt_circuit), approx_info, seed, "APD", noise_model["noise_prob"],
-                                            noise_model["noise_prob_t1"], noise_model["noise_prob_multi"]); // "APD" selects all errors: Amplitude damping, Depolarization and Phase flip
+        if (!noise_model_->Munich_noise_model.empty()) {
+            StochasticNoiseSimulator sim(std::move(mqt_circuit), noise_model_->approx_info, seed, "APD", noise_model_->Munich_noise_model["noise_prob"],
+                                            noise_model_->Munich_noise_model["noise_prob_t1"], noise_model_->Munich_noise_model["noise_prob_multi"]); // "APD" selects all errors: Amplitude damping, Depolarization and Phase flip
 
             auto start = std::chrono::high_resolution_clock::now();
             auto result = sim.simulate(config.shots);
