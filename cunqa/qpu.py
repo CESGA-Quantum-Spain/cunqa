@@ -52,7 +52,7 @@ class Backend(TypedDict):
     gates: list[str] #: Specific gates supported.
     num_qubits: tuple[int] #: Number of qubits that form the Backend: computation and communication qubits available.
     name: str #: Name assigned to the Backend.
-    noise_properties_path: str #: Path to the noise model json file gathering the noise instructions needed for the simulator.
+    noise_model: dict #: Path to the noise model json file gathering the noise instructions needed for the simulator.
     simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
     version: str #: Version of the Backend.
 
@@ -312,11 +312,6 @@ def qraise(n, t, *,
            quantum_comm = False,  
            simulator = None, 
            backend = None, 
-           noise_properties = None, 
-           no_thermal_relaxation = False,
-           no_readout_error = False,
-           no_gate_error = False,
-           fakeqmio = False, 
            family = None, 
            co_located = True, 
            cores = None, 
@@ -341,13 +336,6 @@ def qraise(n, t, *,
         simulator (str): name of the desired simulator to use. Default is `Aer 
                          <https://github.com/Qiskit/qiskit-aer>`_.
         backend (str): path to a file containing the backend information.
-        noise_properties (str): Path to the noise properties json file, only supported for 
-                                simulator Aer. Default: None
-        no_thermal_relaxation (bool): if ``True``, deactivate thermal relaxation in a noisy backend. Default: ``false``
-        no_readout_error (bool): if ``True``, deactivate readout error in a noisy backend. Default: ``false``
-        no_gate_error (bool): if ``True``, deactivate gate error in a noisy backend. Default: ``false``
-        fakeqmio (bool): ``True`` for raising `n` vQPUs with FakeQmio backend. Only available 
-                         at CESGA.
         family (str): name to identify the group of vQPUs raised.
         co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In 
                            `hpc` mode, vQPUs can only be accessed from the node in which they 
@@ -364,16 +352,6 @@ def qraise(n, t, *,
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
 
-    if noise_properties is not None:
-        command = command + f" --noise-properties={str(noise_properties)}"
-    if no_thermal_relaxation:
-        command = command + " --no-termal-relaxation"
-    if no_readout_error:
-        command = command + " --no-readout-error"
-    if no_gate_error:
-        command = command + " --no-gate-error"
-    if fakeqmio:
-        command = command + " --fakeqmio"
     if classical_comm:
         command = command + " --classical_comm"
     if quantum_comm:

@@ -2,6 +2,8 @@
 
 #include <utility>
 #include <vector>
+#include <ranges>
+#include <algorithm>
 
 #include "sim/simulator.hpp"
 #include "sim/backend.hpp"
@@ -22,42 +24,61 @@ public:
     std::string description = "Simple backend with no communications.";
     std::vector<std::vector<std::size_t>> coupling_map;
     std::vector<std::string> basis_gates;
-    std::string custom_instructions;
     std::string simulator_name;
-    JSON noise_model = {};
-    std::string noise_properties_path;
-    std::string noise_path;
+    JSON noise_model;
     
     NCBackend(std::unique_ptr<Simulator> simulator, const JSON& backend_json)
-        : executor_{std::move(simulator)}
     {
-        auto& sim = executor_.simulator();
-
-        if (!backend_json.empty()) {
+        if (backend_json.contains("name"))
             name = backend_json.at("name");
+        
+        if (backend_json.contains("version"))
             version = backend_json.at("version");
+        
+        if (backend_json.contains("num_qubits"))
             num_qubits = backend_json.at("num_qubits");
+        simulator->set_num_qubits(num_qubits);
+
+        if (backend_json.contains("description"))
             description = backend_json.at("description");
+
+        if (backend_json.contains("coupling_map")) {
             coupling_map = backend_json.at("coupling_map");
-            basis_gates = backend_json.at("basis_gates");
-            custom_instructions = backend_json.at("custom_instructions");
-
-            simulator_name = sim.get_name();
-
-            noise_model = backend_json.at("noise_model");
-            noise_properties_path = backend_json.at("noise_properties_path");
-            noise_path = backend_json.at("noise_path");
-        } else {
-            simulator_name = sim.get_name();
-
-            auto gates = sim.get_basis_gates();
-            basis_gates.clear();
-            basis_gates.reserve(gates.size());
-
-            for (std::string_view gate : gates)
-                basis_gates.emplace_back(gate);
+            // TODO: Check if the coupling map is correctly defined
         }
-        sim.set_num_qubits(num_qubits);
+        
+        if (backend_json.contains("basis_gates")) {
+            std::vector<std::string> defined_basis_gates = backend_json.at("basis_gates");
+            auto sim_supported_gates = simulator->get_basis_gates();
+
+            auto well_defined = std::ranges::all_of(defined_basis_gates, 
+                [&sim_supported_gates](const std::string& gate) {
+                    return std::ranges::find(sim_supported_gates, std::string_view{gate}) 
+                        != sim_supported_gates.end();
+                }
+            );
+
+            if (well_defined)
+                basis_gates = defined_basis_gates;
+            else
+                throw std::invalid_argument("The defined basis gates are not supported by the simulator!");
+        }
+
+        if (backend_json.contains("noise_model")) {
+            noise_model = backend_json.at("noise_model");
+            const std::string noise_properties_path = noise_model.at("noise_properties_path");
+
+            auto noise_properties = read_file(noise_properties_path);
+            for (const auto& [key, value] : noise_model.items()) {
+                if (key != "noise_properties_path")
+                    noise_properties[key] = value;
+            }
+
+            simulator->set_noise_model(noise_properties);
+        }
+
+        simulator_name = simulator->get_name();
+        executor_.set_simulator(std::move(simulator));
     }
 
     inline JSON execute(const std::string& quantum_task_str) override
@@ -70,10 +91,7 @@ public:
             quantum_task.erase("id");
         }
 
-        bool is_dynamic = quantum_task.at("config").at("is_dynamic");
-
-        return is_dynamic ? executor_.custom_execute(quantum_task)
-                          : executor_.native_execute(quantum_task, noise_model);
+        return executor_.execute(quantum_task);
     }
 
     JSON to_json() const
@@ -85,10 +103,8 @@ public:
             {"description", description},
             {"coupling_map", coupling_map},
             {"basis_gates", basis_gates}, 
-            {"custom_instructions", custom_instructions},
             {"simulator", simulator_name},
-            {"noise_model", noise_path},
-            {"noise_properties_path", noise_properties_path}
+            {"noise_model", noise_model}
         };
     }
 

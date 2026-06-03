@@ -12,19 +12,10 @@
 namespace cunqa {
 namespace sim {
 
-JSON NCExecutor::custom_execute(const JSON& quantum_task)
+JSON NCExecutor::custom_execute_()
 {   
     std::map<std::string, std::size_t> meas_counter;
 
-    if (auto it = quantum_task.find("config"); it != quantum_task.end())
-        simulator_->config = RunConfig(*it);
-
-    // Either create a new circuit or update the previous one
-    if (auto it = quantum_task.find("instructions"); it != quantum_task.end())
-        last_circuit_ = std::make_unique<DynamicCircuit>(*it);
-    else if (auto it = quantum_task.find("params"); it != quantum_task.end())
-        last_circuit_->update_params(it->get<std::vector<double>>());
-    
     auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
 
     auto start = std::chrono::high_resolution_clock::now();

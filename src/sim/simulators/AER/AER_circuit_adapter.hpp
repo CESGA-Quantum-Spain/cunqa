@@ -148,8 +148,6 @@ struct AERCircuit : public Circuit {
                     break;
             }
         }
-
-        LOGGER_DEBUG("Instr values after normalization: {}", instructions.dump());
     }
 
     void update_params(const std::vector<double>& new_params) override

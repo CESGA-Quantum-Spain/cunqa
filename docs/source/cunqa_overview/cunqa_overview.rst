@@ -50,11 +50,6 @@ The modular structure of CUNQA allows the implementation of other simulators on 
   to a noise properties JSON file. The format of this JSON file is shown in 
   :doc:`../further_examples/json_examples/noise_properties_example`.
 
-  Additionally, a vQPU with the noise model of `CESGA's QMIO quantum computer <https://www.cesga.es/infraestructuras/cuantica/>`_ 
-  can be deployed, but only if CUNQA is being executed inside the CESGA's infrastructure. This can be 
-  done by employing the ``fakeqmio`` flag in the :doc:`../reference/commands/qraise` Bash command or 
-  with ``fakeqmio`` argument in the :py:func:`~cunqa.qpu.qraise` Python function.
-
 .. _sec_quantum_circs:
 
 Quantum circuits

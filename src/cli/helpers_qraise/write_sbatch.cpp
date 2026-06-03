@@ -53,8 +53,7 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
         sbatchFile << "#SBATCH --mem=" << total_mem << "G\n";
     }
 
-        
-
+    
     if (args.gpu) {
         if (args.simulator != "Aer")
             throw std::invalid_argument("At this moment, only Aer supports GPU simulation");
@@ -78,30 +77,9 @@ void write_run_command(std::ofstream& sbatchFile,
         args.family_name + " " + args.simulator;
 
     if (args.backend.has_value())
-        subcommand += " '{\"backend_path\":" + args.backend.value() + "}'";
+        subcommand += " " + args.backend.value();
 
     if (scheme == Communications::NC) {
-        if (args.noise_properties.has_value() || args.fakeqmio.has_value()) {
-            std::string noise_properties_path = 
-                args.fakeqmio.has_value() ? args.fakeqmio.value() 
-                                        : args.noise_properties.value();
-            
-            int thermal_relaxation = args.no_thermal_relaxation ? 0 : 1;
-            int readout_error = args.no_readout_error ? 0 : 1;
-            int gate_error = args.no_gate_error ? 0 : 1;
-            int fakeqmio = args.fakeqmio.has_value() ? 1 : 0;
-
-            std::string noise_properties = 
-                        R"({"noise_properties_path":")" + noise_properties_path
-                    + R"(","thermal_relaxation":")" + std::to_string(thermal_relaxation)
-                    + R"(","readout_error":")" + std::to_string(readout_error)
-                    + R"(","gate_error":")" + std::to_string(gate_error)
-                    + R"(","fakeqmio":")" + std::to_string(fakeqmio)+ R"("})";
-            subcommand += " '" + noise_properties + "'" + "\n";
-
-            if (args.backend.has_value())
-                LOGGER_WARN("Because noise properties were provided backend will be redefined according to them.");
-        } 
         sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qpus " << subcommand << "\n";
     } else if (scheme == Communications::CC) {
         sbatchFile << "srun";
@@ -177,13 +155,6 @@ void write_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
         throw std::invalid_argument("Simulator " + args.simulator + 
             " is not available for " + get_communications_name(scheme) + 
             " communications simulation. Aborting.");
-
-    if (args.noise_properties.has_value() || args.fakeqmio.has_value()) {
-        if (!noise_supported_by_simulator(args.simulator, scheme)) 
-            throw std::invalid_argument("Simulator " + args.simulator + 
-                " does not support noise for " + get_communications_name(scheme) + 
-                " communications simulation. Aborting.");
-    }
 
     if (exists_family_name(args.family_name, cunqa::QPUS_FILEPATH))
         throw std::runtime_error("There are QPUs with the same family name as the provided: " + 
