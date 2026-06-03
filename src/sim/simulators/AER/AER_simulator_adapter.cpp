@@ -14,6 +14,7 @@
 
 #include "AER_simulator_adapter.hpp"
 #include "AER_circuit_adapter.hpp"
+#include "AER_noise_helpers.hpp"
 
 #include "logger.hpp"
 
@@ -178,11 +179,41 @@ struct AERSimulatorAdapter::State {
     AER::AerState aer_state;
 };
 
+struct AERSimulatorAdapter::NoiseModel {
+    AER::Noise::NoiseModel AER_noise_model;
+
+    void set_noise_model(const JSON& noise_model)
+    {
+        if (!noise_model.empty())
+            AER_noise_model.load_from_json(noise_model);
+        else
+            throw std::invalid_argument("Trying to create noise model with empty JSON");
+    }
+};
+
 AERSimulatorAdapter::AERSimulatorAdapter()
     : state_(std::make_unique<State>())
+    , noise_model_(std::make_unique<NoiseModel>())
 { }
 
 AERSimulatorAdapter::~AERSimulatorAdapter() = default;
+
+void AERSimulatorAdapter::set_noise_model(const JSON& noise_properties) 
+{
+    bool thermal_relaxation = noise_properties.at("thermal_relaxation");
+    bool readout_error = noise_properties.at("readout_error");
+    bool gate_error = noise_properties.at("gate_error");
+
+    noise_model_->set_noise_model(
+        build_aer_noise_model(
+            noise_properties, 
+            thermal_relaxation, 
+            readout_error, 
+            gate_error
+        )
+    );
+}
+
 
 std::unique_ptr<Circuit> AERSimulatorAdapter::create_circuit(const JSON& instructions_json) const
 {
@@ -540,11 +571,10 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& pa
     }
 }
 
-JSON AERSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
 {
     JSON result;
     try {
-
         auto& AER_circuit = dynamic_cast<const AERCircuit&>(circuit);
 
         auto circuits = std::vector<std::shared_ptr<AER::Circuit>>{
@@ -555,10 +585,7 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noi
         };
 
         auto AER_config = config_to_AER(config, num_qubits);
-        
-        AER::Noise::NoiseModel AER_noise_model;
-        if (!noise_model.empty())
-            AER_noise_model.load_from_json(noise_model);
+        auto AER_noise_model = noise_model_->AER_noise_model;
 
         auto AER_result = controller_execute<AER::Controller>(circuits, AER_noise_model, AER_config);
         result = AER_result.to_json();

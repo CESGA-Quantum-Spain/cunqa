@@ -79,22 +79,32 @@ def _(c: QuantumCircuit) -> dict:
         qubit = [q._index for q in instruction.qubits]
         
         clreg = [r._register.name for r in instruction.clbits]
-        bit = [b._index for b in instruction.clbits]
+        clbit = [b._index for b in instruction.clbits]
 
         if instruction.operation.name == "barrier":
             pass
 
         elif instruction.operation.name == "measure":
+            qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+            if (len(qubits) == 1):
+                qubits = qubits[0]
+            clbits = [classical_registers[k][c] for k,c in zip(clreg, clbit)]
+            if (len(clbits) == 1):
+                clbits = clbits[0]
             json_data["instructions"].append({
                 "name":instruction.operation.name,
-                "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                "clbits":[classical_registers[k][b] for k,b in zip(clreg, bit)]
+                "qubits": qubits,
+                "clbits": clbits,
+                "save": True
             })
 
         elif instruction.operation.name == "unitary":
+            qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+            if (len(qubits) == 1):
+                qubits = qubits[0]
             json_data["instructions"].append({
                 "name":instruction.operation.name, 
-                "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                "qubits": qubits,
                 "params":[[list(map(lambda z: [z.real, z.imag], row)) 
                            for row in instruction.operation.params[0].tolist()]]
             })
@@ -134,11 +144,15 @@ def _(c: QuantumCircuit) -> dict:
                 str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param 
                 for param in instruction.operation.params
             ]
-        
-            instr = {"name":instruction.operation.name, 
-                     "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                     "params":instruction_params
-                    }
+
+            qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+            if (len(qubits) == 1):
+                qubits = qubits[0]
+            instr = {
+                "name":instruction.operation.name, 
+                "qubits": qubits,
+                "params":instruction_params
+            }
             
             if instruction.operation.condition != None:
 

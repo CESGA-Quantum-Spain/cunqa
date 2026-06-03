@@ -10,14 +10,14 @@ from cunqa.qiskit_deps.transpiler import transpiler
 try:
     # 1. Deploy noisy vQPUs
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    noise_properties_path = file_dir + "/noise_properties_example.json"
+    backend_path = file_dir + "/noisy_backend.json"
     
-    family = qraise(4, "00:10:00", simulator="Aer", co_located=True, noise_properties=noise_properties_path)
+    family = qraise(1, "00:10:00", simulator="Aer", co_located=True, backend=backend_path)
 except Exception as error:
     raise error
 
 try:
-    qpus  = get_QPUs(co_located=True)
+    [qpu]  = get_QPUs(co_located=True)
 
     # 2. Design circuit as any other execution
     qc = CunqaCircuit(num_qubits = 2)
@@ -26,18 +26,13 @@ try:
     qc.measure_all()
 
     # 3. Transpilation. Required for execution on noisy QPUs
-    qc_transpiled = transpiler(qc, qpus[-1].backend, opt_level = 2, initial_layout = None, seed = None)
-
+    qc_transpiled = transpiler(qc, qpu.backend, opt_level = 2, initial_layout = None, seed = None)
+    
     # 4. Execution
-    qcs = [qc_transpiled] * 4
-    qjobs = run(qcs, qpus, shots = 1000)
+    qjob = run(qc_transpiled, qpu, shots = 1000)
 
-    results = gather(qjobs)
-    counts_list = [result.counts for result in results]
-
-    for counts in counts_list:
-        print(f"Counts: {counts}" ) # Format: {'00':546, '11':454}
-
+    print(f"Counts: {qjob.result.counts}" ) # Format: {'00':546, '11':454}
+ 
     # 5. Relinquish resources
     qdrop(family)
 

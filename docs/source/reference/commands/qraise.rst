@@ -60,31 +60,6 @@ Backend and simulation options
     Selects simulator responsible for running the simulations.
     Default: ``Aer``
 
-Noise model options
-~~~~~~~~~~~~~~~~~~~
-
-``--noise-prop, --noise-properties <string>``  
-    Path to the noise properties JSON file.  
-    Only supported when using the ``Aer`` simulator.
-
-``-fq, --fakeqmio <string>``  
-    Raise a FakeQmio backend from a calibration file.  
-    If no value is provided, the default calibration set ``last_calibrations`` is used.
-    It can only be used when executing in CESGA.
-
-``--no-thermal-relaxation``  
-    Deactivate thermal relaxation in a noisy backend.  
-    Default: ``false``
-
-``--no-readout-error``  
-    Deactivate readout error in a noisy backend.  
-    Default: ``false``
-
-``--no-gate-error``  
-    Deactivate gate error in a noisy backend.  
-    Default: ``false``
-
-
 Grouping and communication options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

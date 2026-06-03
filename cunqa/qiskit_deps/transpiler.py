@@ -209,7 +209,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
             circuit_clbits.append(i)
         qc.add_register(ClassicalRegister(len(lista), cr))
 
-
     # processing instructions
     for instruction in copy.deepcopy(instructions):
 
@@ -221,18 +220,28 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         # instanciating instruction's classical and quantum bits
         qiskit_Clbit = []; qiskit_Qubit = []
 
-        if (instruction_clbits is not None) and (len(instruction_clbits) != 0):
+        if instruction_clbits is not None:
 
-            for inst_clbit in instruction_clbits:
+            if (isinstance(instruction_clbits, list)):
+                for inst_clbit in instruction_clbits:
+                    for k,v in classical_registers.items():
+                        if inst_clbit in v:
+                            qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(inst_clbit)))
+            else:
                 for k,v in classical_registers.items():
-                    if inst_clbit in v:
-                        qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(inst_clbit)))
+                    if instruction_clbits in v:
+                        qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(instruction_clbits)))
 
-        if (instruction_qubits is not None) and (len(instruction_qubits) != 0):
-            for inst_qubit in instruction_qubits:
+        if instruction_qubits is not None:
+            if (isinstance(instruction_qubits, list)):
+                for inst_qubit in instruction_qubits:
+                    for k,v in quantum_registers.items():
+                        if inst_qubit in v:
+                            qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
+            else:
                 for k,v in quantum_registers.items():
-                    if inst_qubit in v:
-                        qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
+                    if instruction_qubits in v:
+                        qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(instruction_qubits)))
 
         # processing params: Param, value or instructions for subcircuits in cif instruction
         qiskit_params = []; qiskit_cif_subcircs = []
@@ -265,18 +274,11 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
         # processing of the instruction itself
         if  instruction_name == "measure":
-
-            for qubit,clbit in zip(instruction_qubits, instruction_clbits):
-                qc.measure(qubit,clbit)
+            qc.measure(instruction_qubits, instruction_clbits)
 
         elif instruction_name == "unitary":
 
             qc.unitary(instruction.get("matrix", []), qiskit_Qubit)
-
-        elif instruction_name == "cif":
-
-            with qc.if_test((qiskit_Clbit, 1)) as else_:
-                qc.append(qiskit_cif_subcircs)
 
         elif instruction_name in SUPPORTED_QISKIT_OPERATIONS:
 

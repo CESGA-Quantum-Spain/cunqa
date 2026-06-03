@@ -41,18 +41,6 @@
       }
     },
     {
-      "name": "cluster-qmio",
-      "inherits": "base",
-      "displayName": "Cluster QMIO",
-      "description": "Preset oriented to QMIO environment (only available at CESGA).",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "OPENMP_IN_QC": "ON",
-        "USE_MPI_BTW_QPU": "ON",
-        "USE_ZMQ_BTW_QPU": "OFF"
-      }
-    },
-    {
       "name": "gpu",
       "inherits": "base",
       "displayName": "GPU (AER)",
@@ -74,10 +62,6 @@
     {
       "name": "release",
       "configurePreset": "release"
-    },
-    {
-      "name": "cluster-qmio",
-      "configurePreset": "cluster-qmio"
     },
     {
       "name": "gpu",

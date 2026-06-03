@@ -392,11 +392,6 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
         quantum_comm=True,
         simulator="aer_sim",
         backend="/path/to/backend.json",
-        fakeqmio=True,
-        noise_properties_path="/path/to/noise_properties.json",
-        no_thermal_relaxation=True,
-        no_readout_error=True,
-        no_gate_error=True,
         family=family,
         co_located=True,
         cores=8,
@@ -409,11 +404,6 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
 
     (cmd_str,), _ = run_mock.call_args_list[0]
 
-    assert "--fakeqmio" in cmd_str
-    assert "--noise-properties=/path/to/noise_properties.json" in cmd_str
-    assert "--no-termal-relaxation" in cmd_str
-    assert "--no-readout-error" in cmd_str
-    assert "--no-gate-error" in cmd_str
     assert "--classical_comm" in cmd_str
     assert "--quantum_comm" in cmd_str
     assert "--simulator=aer_sim" in cmd_str
@@ -425,8 +415,7 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     assert "--n_nodes=3" in cmd_str
     assert "--node_list=node01,node02" in cmd_str
     assert "--qpus_per_node=2" in cmd_str
-    assert cmd_str == (f"qraise -n {2} -t {t} --noise-properties=/path/to/noise_properties.json "
-                       "--no-termal-relaxation --no-readout-error --no-gate-error --fakeqmio "
+    assert cmd_str == (f"qraise -n {2} -t {t} "
                        f"--classical_comm --quantum_comm --simulator=aer_sim --family_name={family} "
                        "--co-located --cores=8 --mem-per-qpu=16G --n_nodes=3 "
                        "--node_list=node01,node02 --qpus_per_node=2 "

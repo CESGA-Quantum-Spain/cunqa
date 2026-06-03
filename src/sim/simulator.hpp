@@ -19,6 +19,12 @@ public:
     std::size_t num_qubits;
     RunConfig config;
     
+    void set_num_qubits(std::pair<std::size_t, std::size_t> num_qubits_)
+    {
+        num_qubits = num_qubits_.first + num_qubits_.second;
+    }
+    virtual void set_noise_model(const JSON& noise_properties) = 0;
+
     std::string get_measures() const
     {
         std::string result;
@@ -27,12 +33,6 @@ public:
                 result = (value ? '1' : '0') + result;
         return result;
     }
-
-    void set_num_qubits(std::pair<std::size_t, std::size_t> num_qubits_)
-    {
-        num_qubits = num_qubits_.first + num_qubits_.second;
-    }
-
     virtual std::string get_name() const = 0;
     virtual std::span<const std::string_view> get_basis_gates() const = 0;
 
@@ -40,7 +40,8 @@ public:
     virtual void clear() = 0;
 
     virtual std::unique_ptr<Circuit> create_circuit(const JSON& instructions_json) const = 0;
-    virtual JSON native_execute(const Circuit& circuit, const JSON& noise_model) = 0;
+
+    virtual JSON native_execute(const Circuit& circuit) = 0;
 
     virtual void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) 
     { 
