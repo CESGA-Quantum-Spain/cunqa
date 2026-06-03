@@ -182,6 +182,9 @@ JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit) {
 
         Executor executor(n_qubits);
         QuantumCircuit cunqa_circuit = cunqa_adapter_circuit.instructions;
+        for (auto instruction : cunqa_circuit)
+            LOGGER_DEBUG("{}", instruction.dump(4));
+            
         JSON result = executor.run(cunqa_circuit, shots);
 
         return result;
