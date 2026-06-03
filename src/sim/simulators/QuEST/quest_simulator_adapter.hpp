@@ -2,9 +2,9 @@
 
 #include <vector>
 
+#include "circuit.hpp"
 #include "sim/simulator.hpp"
-#include "quantum_task/circuit.hpp"
-#include "quantum_task/run_config.hpp"
+
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -24,6 +24,8 @@ public:
     {
         return QUEST_BASIS_GATES;
     }
+
+    std::unique_ptr<Circuit> create_circuit(const JSON& instructions_json) const override;
 
     void initialize() override;
     void clear() override;

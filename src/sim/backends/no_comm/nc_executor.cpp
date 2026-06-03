@@ -29,10 +29,23 @@ JSON NCExecutor::custom_execute_()
                 auto type = circuit.instructions[pc].type;
 
                 if constexpr (std::is_same_v<T, ClassicalIf>) {
-                    // If the clbit is 0, we skip all the gates till ENDCIF arrives.
-                    if (type == InstructionType::CIF && !simulator_->creg[payload.clbits[0]])
-                        while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
-                            ++pc;
+                    if (type == InstructionType::CIF){
+
+                        // Negate the clbit value if condition is 0. If there is only one clbit, result = init
+                        bool init = (payload.condition) ? simulator_->creg[payload.clbits[0]] : !simulator_->creg[payload.clbits[0]];
+                        // Operates on the values provided, with the specified operation. If condition is 0, the operation negates the second operand (check cif_ops)
+                        bool result = std::accumulate(payload.clbits.begin() + 1, payload.clbits.end(), 
+                                                      init,                       // Starting value
+                                                      [&](bool acc, int clbit) { 
+                                                          return cif_ops[payload.operation](acc, simulator_->creg[clbit]); 
+                                                      });
+
+                        // If condition is not met, we skip all the gates till ENDCIF arrives.
+                        if (!result){
+                            while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
+                                ++pc;
+                        } 
+                    }
                     // We always avoid ENDCIF cause it does not possess semantic meaning
                     if (type == InstructionType::ENDCIF)
                         return;

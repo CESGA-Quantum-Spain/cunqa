@@ -165,6 +165,8 @@ struct GenEnt {
 
 struct ClassicalIf {
     std::vector<std::size_t> clbits;
+    bool condition;
+    std::string operation;
 };
 
 

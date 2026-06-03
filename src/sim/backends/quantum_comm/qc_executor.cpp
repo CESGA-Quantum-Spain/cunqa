@@ -203,13 +203,24 @@ void execute_shot_(
             auto type = instr.type;
 
             if constexpr (std::is_same_v<T, cunqa::ClassicalIf>) {
-                // If the clbit is 0, we skip all the gates till ENDCIF arrives.
-                if (type == cunqa::InstructionType::CIF && !simulator->creg[payload.clbits[0]]) {
-                    cunqa::InstructionType type;
-                    do {
-                        type = stream.skip_next();
-                    } while (type != cunqa::InstructionType::ENDCIF);
-                }
+                if (type == cunqa::InstructionType::CIF) {
+                    // Negate the clbit value if condition is 0. If there is only one clbit, result = init
+                    bool init = (payload.condition) ? simulator->creg[payload.clbits[0]] : !simulator->creg[payload.clbits[0]];
+                    // Operates on the values provided, with the specified operation. If condition is 0, the operation negates the second operand (check cif_ops)
+                    bool result = std::accumulate(payload.clbits.begin() + 1, payload.clbits.end(), 
+                                init,                       // Starting value
+                                [&](bool acc, int clbit) { 
+                                    return cunqa::cif_ops[payload.operation](acc, simulator->creg[clbit]); 
+                                });
+
+                    // IF CONDITION IS NOT MET, SKIP ALL GATES UNTIL ENDCIF ARRIVES.
+                    if (!result){
+                        cunqa::InstructionType type;
+                        do {
+                            type = stream.skip_next();
+                        } while (type != cunqa::InstructionType::ENDCIF);
+                    }
+                } 
             } else if constexpr (std::is_same_v<T, cunqa::ClassicalComm>) {
                 if (type == cunqa::InstructionType::SEND) {
                     for (int i=0; i<payload.clbits.size(); i++) 
