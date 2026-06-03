@@ -427,8 +427,13 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGa
         {
             std::vector<complex_t> matrix_data;
 
-            for (const auto& row : payload.matrix)
-                matrix_data.insert(matrix_data.end(), row.begin(), row.end());
+            for (const auto& row : payload.matrix) {
+                for (const auto& complex_parts : row) {
+                    // Convert [real, imag] to complex_t
+                    complex_t val(complex_parts[0], complex_parts.size() > 1 ? complex_parts[1] : 0.0);
+                    matrix_data.push_back(val);
+                }
+            }
 
             const auto dim = payload.matrix.size();
 
@@ -450,12 +455,22 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGa
 void AERSimulatorAdapter::apply_gate(const InstructionType& type, const DiagonalMatrixGate& payload)
 {
     AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    
+    // Convert 2D diagonal matrix to 1D complex vector
+    AER::cvector_t diagonal;
+    for (size_t i = 0; i < payload.matrix.size(); ++i) {
+        const auto& complex_parts = payload.matrix[i];
+        // Each element is [real, imag]
+        std::complex<double> val(complex_parts[0], complex_parts.size() > 1 ? complex_parts[1] : 0.0);
+        diagonal.push_back(val);
+    }
+    
     switch (type)
     {
         case InstructionType::DIAGONAL:
             state_->aer_state.apply_diagonal_matrix(
                 qubits,
-                payload.matrix
+                diagonal
             );
             break;
 

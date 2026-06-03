@@ -2,7 +2,7 @@ add_subdirectory(no_comm)
 add_subdirectory(classical_comm)
 add_subdirectory(quantum_comm)
 
-add_library(backend_factory)
+add_library(backend_factory STATIC)
 target_sources(backend_factory
   PRIVATE
     backend_factory.cpp

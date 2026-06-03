@@ -1,16 +1,15 @@
 add_subdirectory(AER)
-add_subdirectory(Munich)
 add_subdirectory(CUNQA)
+add_subdirectory(Munich)
 add_subdirectory(Maestro)
 add_subdirectory(Qsim)
 add_subdirectory(QuEST)
 add_subdirectory(Qulacs)
 
-add_library(simulator_factory simulator_factory.cpp)
+add_library(simulator_factory STATIC simulator_factory.cpp)
 target_link_libraries(simulator_factory
   PUBLIC
     simulator
-  PRIVATE 
     AER_simulator_adapter
     cunqa_adapters
     munich_adapters

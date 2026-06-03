@@ -1,4 +1,4 @@
-add_library(qc_executor)
+add_library(qc_executor STATIC)
 target_sources(qc_executor
   PRIVATE
     qc_executor.cpp

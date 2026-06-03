@@ -1,4 +1,4 @@
-add_library(qulacs_adapters "${CMAKE_CURRENT_SOURCE_DIR}/qulacs_simulator_adapter.cpp")
+add_library(qulacs_adapters STATIC "${CMAKE_CURRENT_SOURCE_DIR}/qulacs_simulator_adapter.cpp")
 target_include_directories(qulacs_adapters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" 
                                                    "${CMAKE_CURRENT_SOURCE_DIR}/.." 
                                                    "${qulacs_SOURCE_DIR}/src"

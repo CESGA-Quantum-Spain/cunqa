@@ -1,5 +1,5 @@
 
-add_library(AER_simulator_adapter)
+add_library(AER_simulator_adapter STATIC)
 target_sources(AER_simulator_adapter
   PRIVATE
     AER_simulator_adapter.cpp

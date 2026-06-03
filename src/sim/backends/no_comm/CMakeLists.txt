@@ -1,5 +1,5 @@
 
-add_library(nc_executor)
+add_library(nc_executor STATIC)
 target_sources(nc_executor
   PRIVATE
     nc_executor.cpp

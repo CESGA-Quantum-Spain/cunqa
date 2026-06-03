@@ -1,5 +1,5 @@
 
-add_library(cc_executor)
+add_library(cc_executor STATIC)
 target_sources(cc_executor
   PRIVATE
     cc_executor.cpp

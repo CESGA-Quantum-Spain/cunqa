@@ -18,9 +18,9 @@ inline const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
 inline const std::string QPUS_FILEPATH = get_cunqa_path() + "/qpus.json";
 inline const std::string COMM_FILEPATH = get_cunqa_path() + "/communications.json";
 
-inline constexpr std::array<std::string_view, 5> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
-inline constexpr std::array<std::string_view, 5> SUPPORTED_CC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
-inline constexpr std::array<std::string_view, 5> SUPPORTED_QC_SIMULATORS = {"Aer", "Munich", "Maestro", "Qulacs", "Cunqa"};
+inline constexpr std::array<std::string_view, 7> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Cunqa", "Munich", "Maestro", "Qsim", "Quest", "Qulacs"};
+inline constexpr std::array<std::string_view, 7> SUPPORTED_CC_SIMULATORS = {"Aer", "Cunqa", "Munich", "Maestro", "Qsim", "Quest", "Qulacs"};
+inline constexpr std::array<std::string_view, 7> SUPPORTED_QC_SIMULATORS = {"Aer", "Cunqa", "Munich", "Maestro", "Qsim", "Quest", "Qulacs"};
 inline constexpr std::array<std::string_view, 2> SUPPORTED_NOISY_SIMULATORS = {"Aer", "Munich"};
 
 } // End namespace cunqa

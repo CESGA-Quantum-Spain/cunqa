@@ -1,4 +1,4 @@
-add_library(quest_adapters "${CMAKE_CURRENT_SOURCE_DIR}/quest_simulator_adapter.cpp")
+add_library(quest_adapters STATIC "${CMAKE_CURRENT_SOURCE_DIR}/quest_simulator_adapter.cpp")
 target_include_directories(quest_adapters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" 
                                                    "${CMAKE_CURRENT_SOURCE_DIR}/.."  
                                                    ) 

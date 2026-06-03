@@ -96,6 +96,7 @@ set(_ORIG_INCLUDE_DIRS "${CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE}")
 set(_ORIG_COMPILE_DEFINITIONS "${CMAKE_CXX_FLAGS}")
 
 set(BUILD_MQT_CORE_MLIR OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF)
 
 CPMAddPackage(
   NAME mqt-ddsim
@@ -238,6 +239,7 @@ CPMAddPackage(
 
 if(cunqasimulator_ADDED)
   message(STATUS "Fetched cunqasimulator with CPM")
+  set(BUILD_SHARED_LIBS OFF)
 else()
   message(STATUS "Using existing cunqasimulator package")
 endif()

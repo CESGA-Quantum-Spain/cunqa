@@ -29,7 +29,7 @@ std::vector<std::vector<qcomp>> cunqamatrix_to_questmatrix(const Matrix& cunqa_m
     for (const auto& row : cunqa_matrix) {
         std::vector<qcomp> complexRow;
         for (const auto& complex : row) {
-            complexRow.emplace_back(complex.real(), complex.imag());
+            complexRow.emplace_back(complex[0], complex[1]);
         }
         quest_mat.push_back(complexRow);
     }

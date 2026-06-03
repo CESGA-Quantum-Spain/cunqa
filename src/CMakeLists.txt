@@ -2,7 +2,7 @@ add_subdirectory(utils)
 add_subdirectory(sim)
 add_subdirectory(comm)
 
-add_library(qpu)
+add_library(qpu STATIC)
 target_sources(qpu
   PRIVATE
     qpu.cpp

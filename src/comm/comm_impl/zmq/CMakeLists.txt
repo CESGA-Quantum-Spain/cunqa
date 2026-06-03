@@ -1,5 +1,5 @@
 # Server
-add_library(server) 
+add_library(server STATIC) 
 target_sources(server
   PRIVATE
     zmq_server.cpp
@@ -17,7 +17,7 @@ target_link_libraries(server
     json)
 
 # Client
-add_library(client)
+add_library(client STATIC)
 target_sources(client
   PRIVATE
     zmq_client.cpp

@@ -1,5 +1,5 @@
 
-add_library(dynamic_circuit)
+add_library(dynamic_circuit STATIC)
 
 target_sources(dynamic_circuit
   PRIVATE  

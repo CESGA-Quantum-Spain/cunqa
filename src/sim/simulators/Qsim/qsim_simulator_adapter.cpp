@@ -20,12 +20,12 @@
 #include <simulator_sse.h> */
 
 #include "utils/constants.hpp"
+#include "utils/json.hpp"
 #include "logger.hpp"
 
 namespace {
-using namespace cunqa;
 
-using Matrix = std::vector<std::vector<std::complex<double>>>;
+using Matrix = std::vector<std::vector<std::vector<double>>>;
 qsim::Matrix<float> cunqamatrix_to_qsimmatrix(const Matrix& cunqa_matrix)
 {
     size_t n = cunqa_matrix.size();
@@ -40,29 +40,197 @@ qsim::Matrix<float> cunqamatrix_to_qsimmatrix(const Matrix& cunqa_matrix)
             
             size_t base_idx = 2 * (n * i + j);
             
-            qsim_mat[base_idx]     = static_cast<float>(complex_val.real());
-            qsim_mat[base_idx + 1] = static_cast<float>(complex_val.imag());
+            qsim_mat[base_idx]     = static_cast<float>(complex_val[0]);
+            qsim_mat[base_idx + 1] = static_cast<float>(complex_val[1]);
         }
     }
 
     return qsim_mat;
 }
 
-JSON circuit_to_QSIM(const cunqa::Circuit& circuit)
+cunqa::JSON circuit_to_QSIM(const cunqa::Circuit& circuit)
 {
     cunqa::JSON QSIM_circuit;
 
-    // TODO
+    // TODO: Circuit execution with Qsim not supported yet
 
     return QSIM_circuit;
 }
 
-JSON convert_qsim_result(const std::vector<uint64_t>& sample, const int n_qubits) {
+void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsim::ParallelFor>& simulator, qsim::SimulatorBasic<qsim::ParallelFor>::State& state)
+{
+    for (const auto& instruction : circuit_json) {
+        auto inst_type = cunqa::instruction_type_from_name(instruction.at("name").get<std::string>());
+
+        switch (inst_type) {
+        case cunqa::InstructionType::MEASURE:
+            LOGGER_DEBUG("Measure in Qsim usual simulation performed by sampling. Skiping.");
+            break;
+        case cunqa::InstructionType::ID:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId1<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::X:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::Y:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::Z:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateZ<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::H:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHd<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::S:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateS<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::T:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateT<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::SX:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateX2<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::SY:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateY2<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::HZ2:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateHZ2<float>::Create(0, qubit), state);
+            break;
+        }
+        case cunqa::InstructionType::RX: 
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            auto param = instruction.at("params").get<float>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRX<float>::Create(0, qubit, param), state);
+            break;
+        }
+        case cunqa::InstructionType::RY: 
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            auto param = instruction.at("params").get<float>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRY<float>::Create(0, qubit, param), state);
+            break;
+        }
+        case cunqa::InstructionType::RZ: 
+        {
+            auto qubit = instruction.at("qubits").get<unsigned>();
+            auto param = instruction.at("params").get<float>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRZ<float>::Create(0, qubit, param), state);
+            break;
+        }
+        case cunqa::InstructionType::ID2:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateId2<float>::Create(0, qubits[0], qubits[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::CX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCNot<float>::Create(0, qubits[0], qubits[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::CZ:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCZ<float>::Create(0, qubits[0], qubits[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::SWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateSwap<float>::Create(0, qubits[0], qubits[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::ISWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateIS<float>::Create(0, qubits[0], qubits[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::CP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto param = instruction.at("params").get<float>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, qubits[0], qubits[1], param), state);
+            break;
+        }
+        case cunqa::InstructionType::RXY: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto params = instruction.at("params").get<std::vector<float>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, qubits[0], params[0], params[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::FS:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto params = instruction.at("params").get<std::vector<float>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateFS<float>::Create(0, qubits[0], qubits[1], params[0], params[1]), state);
+            break;
+        }
+        case cunqa::InstructionType::GLOBALP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto params = instruction.at("params").get<std::vector<float>>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateGPh<float>::Create(0, params[0]), state);
+            break;
+        }
+        case cunqa::InstructionType::UNITARY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto cunqa_matrix = instruction.at("matrix").get<std::vector<cunqa::Matrix>>()[0];
+            qsim::Matrix<float> qsim_matrix = cunqamatrix_to_qsimmatrix(cunqa_matrix);
+
+            if (qubits.size() > 1) {
+                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix2<float>::Create(0, qubits[0], qubits[1], std::move(qsim_matrix)), state);
+            } else {
+                qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix1<float>::Create(0, qubits[0], std::move(qsim_matrix)), state);
+            }
+            break;
+        }
+        default:
+            std::cerr << "Instruction not suported!\nInstruction that failed: " << instruction_type_name(inst_type) << "\n";
+        };
+    }
+
+}
+
+cunqa::JSON convert_qsim_result(const std::vector<uint64_t>& sample, const int n_qubits) {
     std::unordered_map<uint64_t, int> counts;
     for (uint64_t v : sample)
         counts[v]++;
 
-    JSON result_json;
+    cunqa::JSON result_json;
     for (const auto& [value, count] : counts) {
         std::string bitstring(n_qubits, '0');
         for (int i = 0; i < n_qubits; ++i)
@@ -328,7 +496,7 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixG
             size_t ctrl_dim = 2 * dim;
 
             Matrix ctrl_cunqa_matrix(ctrl_dim,
-                std::vector<std::complex<double>>(ctrl_dim, {0.0, 0.0}));
+                std::vector<std::vector<double>>(ctrl_dim, {0.0, 0.0}));
 
             for (size_t i = 0; i < dim; i++) {
                 ctrl_cunqa_matrix[i][i] = {1.0, 0.0};
@@ -397,28 +565,44 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& p
 
 JSON QsimSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
 {
-    //TODO: fix
-    return {};
-    /* LOGGER_DEBUG("Qsim usual simulation");
-    JSON result;
+    LOGGER_DEBUG("Qsim native execute");
     try {
-        auto circuits = std::vector<std::shared_ptr<JSON>{
-            std::make_shared<JSON>({
-                {"instructions", circuit_to_QSIM(circuit)}
-            })
-        };
+        auto& qsim_adapter_circuit = dynamic_cast<const QsimCircuit&>(circuit);
 
-        this->initialize();
+        auto shots = config.shots;
+        const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
+        unsigned num_threads = 1;
+        if (num_threads_char != nullptr) {
+            num_threads = std::stoi(num_threads_char);
+        }
         
-        std::vector<uint64_t> sample = state_->state_space.Sample(state_->state, config.shots, config.seed);
+        auto start = std::chrono::high_resolution_clock::now();
+        qsim::StateSpaceBasic<qsim::ParallelFor, float> state_space(num_threads);
+        qsim::SimulatorBasic<qsim::ParallelFor>::State state = state_space.Create(num_qubits); 
+        state_space.SetStateZero(state);
+        qsim::SimulatorBasic<qsim::ParallelFor> simulator(num_threads);
+        
+        update_qsim_state(qsim_adapter_circuit.instructions, simulator, state);
+        std::vector<uint64_t> results = state_space.Sample(state, shots, config.seed);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        float time_taken = duration.count();
 
-        result = convert_qsim_result(sample, config.num_clbits);
-    } catch (const std::exception& e) {
-        // TODO: specify the circuit format in the docs.
-        LOGGER_ERROR("Error executing the circuit in the Munich simulator.\n\tTry checking the format of the circuit sent.");
-        result = {{"ERROR", std::string(e.what())}};
+        JSON counts_json = convert_qsim_result(results, num_qubits);
+        
+        JSON result_json = {
+            {"counts", counts_json},
+            {"time_taken", time_taken}};
+
+        return result_json;
     } 
-    return result; */
+    catch (const std::exception &e)
+    {
+        // TODO: specify the circuit format in the docs.
+        LOGGER_ERROR("Error executing the circuit in the Qsim simulator.");
+        return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
+    }
+    return JSON();
 }
 
 } // End of sim namespace

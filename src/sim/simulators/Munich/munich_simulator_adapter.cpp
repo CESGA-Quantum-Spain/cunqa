@@ -103,16 +103,14 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
 { 
     cunqa::InstructionType inst_type;
     for (auto& instruction : circuit.instructions) {
-
-        std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
-
-        switch (cunqa::instruction_type_from_name(instruction.at("name").get<std::string>()))
+        inst_type = cunqa::instruction_type_from_name(instruction.at("name").get<std::string>());
+        switch (inst_type)
         {
             case cunqa::InstructionType::MEASURE:
             {
                 mqt_circuit.emplace_back(std::make_unique<NonUnitaryOperation>(
-                    instruction.at("qubits").get<std::vector<Qubit>>()[0], 
-                    instruction.at("clbits").get<std::vector<Bit>>()[0]));
+                    instruction.at("qubits").get<Qubit>(), 
+                    instruction.at("clbits").get<Bit>()));
                 break;
             }
             case cunqa::InstructionType::ID:
@@ -129,7 +127,8 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::V:
             case cunqa::InstructionType::VDG:
             {
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
+                auto qubit = instruction.at("qubits").get<unsigned int>();
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
                 break;
             }
             case cunqa::InstructionType::RX:
@@ -139,26 +138,30 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::P:
             case cunqa::InstructionType::U1:
             {
-                auto params = instruction.at("params").get<std::vector<double>>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
+                auto qubit = instruction.at("qubits").get<unsigned int>();
+                auto param = instruction.at("params").get<double>();
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
                 break;
             }
             case cunqa::InstructionType::U2:
             {
+                auto qubit = instruction.at("qubits").get<unsigned int>();
                 auto params = instruction.at("params").get<std::vector<double>>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
                 break;
             }
             case cunqa::InstructionType::U3:
             {
+                auto qubit = instruction.at("qubits").get<unsigned int>();
                 auto params = instruction.at("params").get<std::vector<double>>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
                 break;
             }
             case cunqa::InstructionType::U:
             {
+                auto qubit = instruction.at("qubits").get<unsigned int>();
                 auto params = instruction.at("params").get<std::vector<double>>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
                 break;
             }
             case cunqa::InstructionType::ECR:
@@ -166,6 +169,7 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::ISWAP:
             case cunqa::InstructionType::DCX:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits, MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
                 break;
             }
@@ -178,6 +182,7 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::CSDG:
             case cunqa::InstructionType::CSWAP:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
                 break;
             }
@@ -188,8 +193,9 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::XXMYY:
             case cunqa::InstructionType::XXPYY:
             {
-                auto params = instruction.at("params").get<std::vector<double>>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+                auto param = instruction.at("params").get<double>();
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits, MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
                 break;
             }
             case cunqa::InstructionType::CP:
@@ -197,22 +203,31 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::CRY:
             case cunqa::InstructionType::CRZ:
             case cunqa::InstructionType::CU1:
+            {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+                auto param = instruction.at("params").get<double>();
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
+                break;
+            }
             case cunqa::InstructionType::CU2:
             case cunqa::InstructionType::CU3:
             case cunqa::InstructionType::CU:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 auto params = instruction.at("params").get<std::vector<double>>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
                 break;
             }
             case cunqa::InstructionType::MCX:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 Controls controls(qubits.begin(), qubits.end() - 1);
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(controls, qubits.back(), MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
                 break;
             }
             case cunqa::InstructionType::MCP:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 Controls controls(qubits.begin(), qubits.end() - 1);
                 auto params = instruction.at("params").get<std::vector<double>>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(controls, qubits.back(), MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
@@ -220,6 +235,7 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             }
             case cunqa::InstructionType::RESET:
             {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 for (auto& qubit : qubits) {
                     mqt_circuit.reset(qubit);
                 }
