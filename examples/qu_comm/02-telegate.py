@@ -10,27 +10,46 @@ from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
 # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
-family = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
+family = qraise(3, "00:10:00", simulator="Aer", quantum_comm=True, co_located = True)
 
 try:
-    qpus   = get_QPUs(co_located = True, family = family)
+    qpus = get_QPUs(co_located = True, family = family)
 
-     # 2. Design circuits with distributed instructions between them
-    # First circuit 
+    # 2. Design circuits with distributed instructions between them
     cc_1 = CunqaCircuit((1, 1), 2, id="First")
     cc_2 = CunqaCircuit((1, 1), 2, id="Second")
-    
-    cc_1.h(0)
-    cat_entangler([cc_1, cc_2], 0, [1, 1], [0, 0], tag="telegate")
-    
-    cc_2.cx(1, 0)
-    cat_disentangler([cc_1, cc_2], 0, [1, 1], [0, 0])
-    
-    cc_1.measure(0,0)
-    cc_2.measure(0,0)
+    cc_3 = CunqaCircuit((1, 1), 2, id="Third")
+
+    link_1, data_1 = cc_1.get_qubits()
+    link_2, data_2 = cc_2.get_qubits()
+    link_3, data_3 = cc_3.get_qubits()
+
+    cc_1.h(data_1[0])
+    cat_entangler(
+        [cc_1, cc_2, cc_3],
+        data_1[0],
+        [link_1[0], link_2[0], link_3[0]],
+        [0, 0, 0],
+        tag="telegate"
+    )
+
+    cc_2.cx(link_2[0], data_2[0])
+    cc_3.cx(link_3[0], data_3[0])
+
+    cat_disentangler(
+        [cc_1, cc_2, cc_3],
+        data_1[0],
+        [link_2[0], link_3[0]],
+        [0, 1],
+        [0, 0]
+    )
+
+    cc_1.measure(data_1[0], 0)
+    cc_2.measure(data_2[0], 0)
+    cc_3.measure(data_3[0], 0)
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2], qpus, shots=10) 
+    distr_jobs = run([cc_1, cc_2, cc_3], qpus, shots=1)
 
     # Collect the results
     result_list = gather(distr_jobs)
@@ -42,5 +61,5 @@ try:
 except Exception as error:
     raise error
 finally:
-    # 4. Relinquish resources: drop the deployed QPUs 
+    # 4. Relinquish resources: drop the deployed QPUs
     qdrop(family)

@@ -424,7 +424,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = GenEnt{
-                            instruction.at("comm_qubit").get<std::size_t>(),
+                            instruction.at("link_qubit").get<std::size_t>(),
                             instruction.at("qpus").get<std::vector<std::string>>(),
                             instruction.at("tag")
                         }

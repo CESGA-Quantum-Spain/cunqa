@@ -85,7 +85,7 @@ if(DEFINED AER_GPU)
   )
 endif()
 
-
+#[[
 # =====================================================================
 #  MQT-DDSIM - quantum circuit simulator
 # =====================================================================
@@ -293,5 +293,6 @@ if(qulacs_ADDED)
 else()
   message(STATUS "Using existing qulacs package")
 endif()
+]]
 
 set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

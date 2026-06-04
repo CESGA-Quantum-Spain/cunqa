@@ -120,7 +120,7 @@ class CunqaCircuit:
         :annotation: : int
     .. autoattribute:: instructions
     .. autoattribute:: is_dynamic
-    .. autoattribute:: qcomp_regs
+    .. autoattribute:: data_regs
     .. autoattribute:: classical_regs
     .. autoattribute:: sending_to
 
@@ -278,8 +278,8 @@ class CunqaCircuit:
     _id: str #: Circuit identifier.
     is_dynamic: bool #: Whether the circuit has local non-unitary operations.
     instructions: list[dict] #: Set of operations applied to the circuit.
-    qcomp_regs: dict  #: Dictionary of quantum registers with compute qubits as ``{"name": [assigned qubits]}``.
-    comm_qubits: list[int] #: List with communication qubits.
+    data_regs: dict  #: Dictionary of quantum registers with data qubits as ``{"name": [assigned qubits]}``.
+    link_qubits: list[int] #: List with link qubits.
     classical_regs: dict #: Dictionary of classical registers of the circuit as ``{"name": [assigned clbits]}``.
     sending_to: set[str] #: Set of circuit ids to which the current circuit is sending measurement outcomes or qubits. 
     params: list[Param] #: Ordered list of the parameters names that the circuit currently has.
@@ -293,16 +293,16 @@ class CunqaCircuit:
         self.is_dynamic = False
         self.instructions = []
         self.params = []
-        self.qcomp_regs = {}
-        self.comm_qubits = []
+        self.data_regs = {}
+        self.link_qubits = []
         self.classical_regs = {}        
         self.sending_to = set()
 
         if isinstance(num_qubits, tuple):
-            self.add_qcomp_register("q0", num_qubits[0])
-            self.add_comm_qubits(num_qubits[1])
+            self.add_data_register("q0", num_qubits[0])
+            self.add_link_qubits(num_qubits[1])
         else:
-            self.add_qcomp_register("q0", num_qubits)
+            self.add_data_register("q0", num_qubits)
         
         if num_clbits is not None and num_clbits != 0:
             self.add_cl_register("c0", num_clbits)
@@ -332,7 +332,7 @@ class CunqaCircuit:
             "num_qubits": self.num_qubits,
             "num_clbits": self.num_clbits,
             "classical_registers": self.classical_regs,
-            "quantum_registers": self.qcomp_regs,
+            "quantum_registers": self.data_regs,
             "is_dynamic": self.is_dynamic, 
             "sending_to": list(self.sending_to),
             "params": self.params
@@ -343,7 +343,7 @@ class CunqaCircuit:
         """
         Number of qubits of the circuit.
         """
-        return [sum([len(qr_comp) for qr_comp in self.qcomp_regs.values()]), len(self.comm_qubits)]
+        return [sum([len(qr) for qr in self.data_regs.values()]), len(self.link_qubits)]
     
     @property
     def num_clbits(self) -> int:
@@ -404,21 +404,21 @@ class CunqaCircuit:
                 new_instr = handle_params(instr)
                 self.instructions.append(new_instr)
            
-    def add_comm_qubits(self, num_comm_qubits: int):
+    def add_link_qubits(self, num_link_qubits: int):
         """
-        Class method to add communication qubits to the circuit.
+        Class method to add link qubits to the circuit.
 
         Args:
-            num_comm_qubits (int): number of communication qubits.
+            num_link_qubits (int): number of link qubits.
         """
-        if num_comm_qubits:
-            self.comm_qubits = [self.num_qubits[0] + i for i in range(num_comm_qubits)]
+        if num_link_qubits:
+            self.link_qubits = [self.num_qubits[0] + i for i in range(num_link_qubits)]
         else:
-            self.comm_qubits = []
+            self.link_qubits = []
              
-    def add_qcomp_register(self, name: str, reg_size: int):
+    def add_data_register(self, name: str, reg_size: int):
         """
-        Class method to add a quantum register to the circuit. A quantum register is understood as 
+        Class method to add a quantum register to the circuit. A quantum register is understood as
         a group of qubits with a label.
 
         Args:
@@ -428,18 +428,18 @@ class CunqaCircuit:
 
         if reg_size < 1:
             raise ValueError("The num_qubits attribute must be strictly positive.")
-        
+
         new_name = name
-        if new_name in self.qcomp_regs:
+        if new_name in self.data_regs:
             i = 0
-            while f"{name}_{i}" in self.qcomp_regs:
+            while f"{name}_{i}" in self.data_regs:
                 i += 1
             new_name = f"{name}_{i}"
             logger.warning(f"{name} for quantum register in use, renaming to {new_name}.")
 
-        self.qcomp_regs[new_name] = [(self.num_qubits[0] + i) for i in range(reg_size)]
+        self.data_regs[new_name] = [(self.num_qubits[0] + i) for i in range(reg_size)]
         if (self.num_qubits[1] != 0):
-            self.comm_qubits = [comm_qubit + self.num_qubits[0] for comm_qubit in self.comm_qubits]
+            self.link_qubits = [link_qubit + self.num_qubits[0] for link_qubit in self.link_qubits]
         return new_name
 
     def add_cl_register(self, name: str, num_clbits: int):
@@ -464,7 +464,23 @@ class CunqaCircuit:
         
         self.classical_regs[new_name] = [(self.num_clbits + i) for i in range(num_clbits)]
         return new_name
-    
+
+    def get_qubits(self) -> tuple:
+        """
+        Returns the link qubits and the data registers as a pair.
+        If there is only one data register, its qubit list is returned directly
+        instead of the full register dictionary, matching the flat format of link_qubits.
+
+        Returns:
+            tuple: ``(link_qubits, data_regs)`` where ``data_regs`` is a ``list[int]``
+                   when there is a single register, or the full ``dict`` otherwise.
+        """
+        if len(self.data_regs) == 1:
+            data = next(iter(self.data_regs.values()))
+        else:
+            data = self.data_regs
+        return (self.link_qubits, data)
+
     # =============== INSTRUCTIONS ===============
     
     # ------------------
@@ -2075,9 +2091,9 @@ class CunqaCircuit:
     # --------------------------------
     
     def gen_ent(
-        self, 
-        comm_qubit: int, 
-        circuits: Union[str, CunqaCircuit, list[str], list[CunqaCircuit]], 
+        self,
+        link_qubit: int,
+        circuits: Union[str, CunqaCircuit, list[str], list[CunqaCircuit]],
         tag: str
     ):
         self.is_dynamic = True
@@ -2101,10 +2117,12 @@ class CunqaCircuit:
         if not tag:
             tag = "NO_TAG"
     
-        circuit_ids.append(self._id)
+        if self._id not in circuit_ids:
+            circuit_ids.append(self._id)
+
         self.add_instructions({
             "name": "gen_ent",
-            "comm_qubit": comm_qubit,
+            "link_qubit": link_qubit,
             "circuits": circuit_ids,
             "tag": tag
         })
@@ -2131,14 +2149,15 @@ class CunqaCircuit:
             clbits (int | list[int]): clbits to match the condition.
             condition (int): can be 1 or 0. The clbits will have to match this condition 
                              for the gate to be applied. Default = 1
-            operation (str): can be "and", "or" or "xor". If multiple clbits are provided, their 
+            operation (str): If multiple clbits are provided, their 
                              measures are operated on with the selected operation and the result is
-                             matched to condition. "and" means all need to match the condition, 
-                             "or" means any of them should match and "xor" means there should be an
-                             odd number of mathching measures. 
+                             matched to condition. Operations supported are: "and", "or", "xor", 
+                             "nand", "nor" and "xnor".
         """
         self.is_dynamic = True
-        operation = (operation + "n") if (condition == 0) else operation
+        
+        if (operation not in ["and", "or", "xor", "nand", "nor", "xnor"]):
+            raise ValueError(f"Operation '{operation}' is not supported.")
         
         if isinstance(clbits, int):
             clbits = [clbits]
@@ -2151,20 +2170,16 @@ class CunqaCircuit:
         })
         
     
-    def endcif(self, clbits: Union[int, list[int]]) -> None:
+    def endcif(self) -> None:
         """
         Method to end the classical controlled gates.
         
         Args:
             clbits (int | list[int]): clbits to match the condition.
         """
-        
-        if isinstance(clbits, int):
-            clbits = [clbits]
-        
         self.add_instructions({
             "name": "endcif",
-            "clbits": clbits
+            "clbits": [0]
         })
 
     def reset(self, qubits: Union[int, list[int]]):

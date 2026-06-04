@@ -25,7 +25,7 @@ try:
     circuit_2.recv(0, sending_circuit = "circuit_1")
     circuit_2.cif(0)
     circuit_2.x(0)
-    circuit_2.endcif(0)
+    circuit_2.endcif()
 
     circuit_2.measure(0,0)
 

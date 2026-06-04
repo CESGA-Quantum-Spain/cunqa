@@ -132,7 +132,7 @@ def _(c: QuantumCircuit) -> dict:
 
             cc_instruction = {
                 "name": "cif",
-                "clbits": [classical_registers[k][b] for k,b in zip(clreg, bit)],
+                "clbits": [classical_registers[k][b] for k,b in zip(clreg, clbit)],
                 "instructions": sub_instructions
                 }
             

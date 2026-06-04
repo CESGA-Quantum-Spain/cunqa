@@ -228,9 +228,9 @@ def run(
     # check whether the QPU has enough qubits for the circuit
     for qpu, circuit_ir in zip(qpus, circuits_ir):
         if qpu.backend["num_qubits"][0] < circuit_ir["num_qubits"][0]:
-            raise ValueError("Not enough compute qubits in the QPU for the circuit.")
+            raise ValueError("Not enough data qubits in the QPU for the circuit.")
         if qpu.backend["num_qubits"][1] < circuit_ir["num_qubits"][1]:
-            raise ValueError("Not enough communication qubits in the QPU for the circuit.")
+            raise ValueError("Not enough link qubits in the QPU for the circuit.")
     
     # translate circuit ids in comm instruction to qpu ids
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir])

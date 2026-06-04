@@ -28,7 +28,7 @@ try:
 
     qc.cif(0)
     qc.x(1)
-    qc.endcif(0)
+    qc.endcif()
     qc.measure(1,1)
     
     # 3. Execute circuit on vQPU
