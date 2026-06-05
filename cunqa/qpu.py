@@ -369,7 +369,7 @@ def qraise(n, t, *,
     if n_nodes is not None:
         command = command + f" --n_nodes={str(n_nodes)}"
     if node_list is not None:
-        command = command + f" --node_list={str(node_list)}"
+        command = command + f" --nodelist={str(node_list)}"
     if qpus_per_node is not None:
         command = command + f" --qpus_per_node={str(qpus_per_node)}"
     if backend is not None:
