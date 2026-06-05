@@ -20,36 +20,36 @@ try:
     cc_2 = CunqaCircuit((1, 1), 2, id="Second")
     cc_3 = CunqaCircuit((1, 1), 2, id="Third")
 
-    link_1, data_1 = cc_1.get_qubits()
-    link_2, data_2 = cc_2.get_qubits()
-    link_3, data_3 = cc_3.get_qubits()
+    data_qubits_1, link_qubits_1 = cc_1.get_qubits()
+    data_qubits_2, link_qubits_2 = cc_2.get_qubits()
+    data_qubits_3, link_qubits_3 = cc_3.get_qubits()
 
-    cc_1.h(data_1[0])
+    cc_1.h(data_qubits_1[0])
     cat_entangler(
         [cc_1, cc_2, cc_3],
-        data_1[0],
-        [link_1[0], link_2[0], link_3[0]],
+        data_qubits_1[0],
+        [link_qubits_1[0], link_qubits_2[0], link_qubits_3[0]],
         [0, 0, 0],
         tag="telegate"
     )
 
-    cc_2.cx(link_2[0], data_2[0])
-    cc_3.cx(link_3[0], data_3[0])
+    cc_2.cx(link_qubits_2[0], data_qubits_2[0])
+    cc_3.cx(link_qubits_3[0], data_qubits_3[0])
 
     cat_disentangler(
         [cc_1, cc_2, cc_3],
-        data_1[0],
-        [link_2[0], link_3[0]],
+        data_qubits_1[0],
+        [link_qubits_2[0], link_qubits_3[0]],
         [0, 1],
         [0, 0]
     )
 
-    cc_1.measure(data_1[0], 0)
-    cc_2.measure(data_2[0], 0)
-    cc_3.measure(data_3[0], 0)
+    cc_1.measure(data_qubits_1[0], 0)
+    cc_2.measure(data_qubits_2[0], 0)
+    cc_3.measure(data_qubits_3[0], 0)
 
     # 3. Execute distributed circuits on QPUs with quantum communications
-    distr_jobs = run([cc_1, cc_2, cc_3], qpus, shots=1)
+    distr_jobs = run([cc_1, cc_2, cc_3], qpus, shots=1024)
 
     # Collect the results
     result_list = gather(distr_jobs)

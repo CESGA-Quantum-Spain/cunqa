@@ -27,6 +27,15 @@ def qsend(
     circuit.h(data_qubit)
     
     circuit.measure([data_qubit, link_qubit], clbits, save=False)
+    
+    # Reset to 0 value of the teleported qubit and link qubit employed
+    circuit.cif(clbits[0])
+    circuit.x(data_qubit)
+    circuit.endcif()
+    circuit.cif(clbits[1])
+    circuit.x(link_qubit)
+    circuit.endcif()
+    
     circuit.send(clbits, recving_circuit)
     
 

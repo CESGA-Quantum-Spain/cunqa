@@ -479,7 +479,7 @@ class CunqaCircuit:
             data = next(iter(self.data_regs.values()))
         else:
             data = self.data_regs
-        return (self.link_qubits, data)
+        return (data, self.link_qubits)
 
     # =============== INSTRUCTIONS ===============
     

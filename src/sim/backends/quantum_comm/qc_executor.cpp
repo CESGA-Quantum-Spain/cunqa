@@ -322,7 +322,12 @@ QCExecutor::QCExecutor(
 
     JSON backends;
     do {
-        backends = read_file(QPUS_FILEPATH);
+        const auto all_backends = read_file(QPUS_FILEPATH);
+
+        for (const auto& [qpu_id, value] : all_backends.items()) {
+            if (std::find(qpus_ids_.begin(), qpus_ids_.end(), qpu_id) != qpus_ids_.end())
+                backends[qpu_id] = value;
+        }
     } while (backends.size() != qpus_ids_.size());
     
     std::size_t accumulated_qubits{0};

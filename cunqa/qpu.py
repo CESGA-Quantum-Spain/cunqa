@@ -240,7 +240,7 @@ def run(
             if instr["name"] in REMOTE_GATES:
                 instr["qpus"] = [correspondence[transformed_circs[circ]] for circ in instr["circuits"]]
                 instr.pop("circuits")
-        circuit["sending_to"] = [correspondence[target_circuit] 
+        circuit["sending_to"] = [correspondence[transformed_circs[target_circuit]] 
                                     for target_circuit in circuit["sending_to"]]
         circuit["id"] = (circuit["id"], correspondence[circuit["id"]])
 
@@ -411,7 +411,6 @@ def qraise(n, t, *,
 
     cmd_getstate = ["squeue", "-h", "-j", job_id, "-o", "%T"]
     
-    i = 0
     while True:
         state = subprocess.run(
             cmd_getstate, 
@@ -429,10 +428,7 @@ def qraise(n, t, *,
             if count == n:
                 break
         # We do this to prevent an overload of the Slurm deamon 
-        if i == 500:
-            time.sleep(2)
-        else:
-            i += 1
+        time.sleep(1)
 
     # Wait for QPUs to be raised, so that get_QPUs can be executed inmediately
     print("QPUs ready to work \U00002705")
