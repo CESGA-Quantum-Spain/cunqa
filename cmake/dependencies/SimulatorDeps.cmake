@@ -30,26 +30,8 @@ if(pybind11_FOUND)
   message(STATUS "Linked pybind aer-cpp")
 endif()
 
-if(DEFINED AER_GPU)
-  message(STATUS "Compiling with AER_GPU")
-  set(COMPILATION_FOR_GPU TRUE)
-
-  # Architecture           GPUs examples         SM
-  # -------------------------------------------------
-  # Volta                  V100                  70
-  # Turing                 T4, RTX 2080          75
-  # Ampere                 A100                  80
-  # Ampere GA10x           RTX 30xx              86
-  # Ada Lovelace           RTX 40xx              89
-  # Hopper                 H100                  90
-
-  set(GPU_ARCH 80)
-  set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
-
-  enable_language(CUDA)
-
-  set(CMAKE_CUDA_STANDARD 20)
-  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+if(USE_GPU)
+  message(STATUS "Compiling AER simulator with GPU")
 
   find_package(Python REQUIRED COMPONENTS Interpreter Development)
   find_library(PMIX_LIB NAMES pmix REQUIRED)

@@ -16,6 +16,8 @@ elseif(USE_ZMQ_BTW_QPU)
     target_compile_definitions(qraise PUBLIC USE_ZMQ_BTW_QPU)
 endif()
 
+
+
 install(TARGETS qraise DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # =====================================================
@@ -72,15 +74,6 @@ target_link_libraries(setup_executor
     simulator_factory
 )
 
-if (COMPILATION_FOR_GPU)
-    target_compile_definitions(setup_executor 
-      PUBLIC 
-        GPU_ARCH=${GPU_ARCH} 
-        COMPILATION_FOR_GPU=1
-    )
-else()
-    target_compile_definitions(setup_executor PUBLIC COMPILATION_FOR_GPU=0)
-endif()
 install(TARGETS setup_executor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # =====================================================

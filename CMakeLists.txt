@@ -24,6 +24,10 @@ cunqa_setup_install_paths()
 cunqa_detect_platform()
 cunqa_configure_python_and_pybind11()
 
+if(USE_GPU)
+  enable_language(CUDA)
+endif()
+
 include(dependencies/CoreDeps)
 include(dependencies/CommDeps)
 include(dependencies/SimulatorDeps)

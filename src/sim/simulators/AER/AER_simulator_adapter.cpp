@@ -572,7 +572,7 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
         auto AER_config = config_to_AER(config, num_qubits);
         auto AER_noise_model = noise_model_->AER_noise_model;
 
-        auto AER_result = controller_execute<AER::Controller>(circuits, AER_noise_model, AER_config);
+        auto AER_result = AER::controller_execute<AER::Controller>(circuits, AER_noise_model, AER_config);
         result = AER_result.to_json();
 
         AER_to_results(result, config.num_clbits);

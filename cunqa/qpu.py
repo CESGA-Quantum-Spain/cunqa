@@ -318,10 +318,11 @@ def qraise(n, t, *,
            mem_per_qpu = None, 
            n_nodes = None, 
            node_list = None, 
-           qpus_per_node= None,
-           partition=None,
-           gpu=False,
-           qmio=False
+           qpus_per_node = None,
+           partition = None,
+           gpu = False,
+           gpu_name = None,
+           qmio = False
         ) -> str:
     """
     Raises vQPUs and returns the family name associated them. This function raises 
@@ -378,6 +379,8 @@ def qraise(n, t, *,
         command = command + f" --partition={str(partition)}"
     if gpu:
         command = command + " --gpu"
+    if gpu_name is not None:
+        command = command + f" --gpu_name={str(gpu_name)}"
     if qmio:
         command = command + " --qmio"
 

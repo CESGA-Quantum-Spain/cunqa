@@ -1,5 +1,18 @@
-
 add_library(AER_simulator_adapter)
+
+if(USE_GPU)
+  set_source_files_properties(
+    AER_simulator_adapter.cpp PROPERTIES LANGUAGE CUDA
+  )
+  set_target_properties(AER_simulator_adapter
+    PROPERTIES
+      CUDA_ARCHITECTURES "${GPU_ARCH}"
+      LANGUAGE CUDA
+      CUDA_STANDARD 20
+      CUDA_STANDARD_REQUIRED ON
+  )
+endif()
+
 target_sources(AER_simulator_adapter
   PRIVATE
     AER_simulator_adapter.cpp
@@ -28,4 +41,7 @@ target_link_libraries(AER_simulator_adapter
     OpenMP::OpenMP_CXX
 )
 
-set_target_properties(AER_simulator_adapter PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(AER_simulator_adapter 
+  PROPERTIES 
+    POSITION_INDEPENDENT_CODE ON
+)
