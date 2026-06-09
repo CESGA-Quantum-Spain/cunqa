@@ -3,7 +3,7 @@ set(CPPLOGGER_GLOBAL_LEVEL SPDLOG_LEVEL_DEBUG)
 # =====================================================
 #  QPU logger
 # =====================================================
-add_library(logger_qpu)
+add_library(logger_qpu STATIC)
 target_sources(logger_qpu
   PRIVATE
     logger_qpu.cpp
@@ -25,7 +25,7 @@ target_compile_definitions(logger_qpu
 # =====================================================
 #  Client logger
 # =====================================================
-add_library(logger_client)
+add_library(logger_client STATIC)
 target_sources(logger_client
   PRIVATE
     logger_client.cpp
@@ -51,7 +51,7 @@ set_target_properties(logger_client
 # =====================================================
 #  Quantum comm executor logger
 # =====================================================
-add_library(logger_executor)
+add_library(logger_executor STATIC)
 target_sources(logger_executor
   PRIVATE
     logger_executor.cpp

@@ -130,8 +130,15 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const Measur
     {
         case InstructionType::MEASURE:
         {
-            int measurement = state_->executor.apply_measure({payload.qubit});
-            creg[payload.clbit] = (measurement == 1);
+            if(payload.clbit < config.num_clbits) {
+                int measurement = state_->executor.apply_measure({payload.qubit});
+                creg[payload.clbit] =
+                        (measurement == 1);
+                save_clbit[payload.clbit] = payload.save;
+            } else {
+                throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+            }    
             break;
         }
 
@@ -164,9 +171,9 @@ void CunqaSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& 
     }
 }
 
-JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model) {
+JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit) {
 
-    LOGGER_DEBUG("Cunqa usual simulation");
+    LOGGER_DEBUG("Cunqa native execution");
     try
     {
         auto& cunqa_adapter_circuit = dynamic_cast<const CunqaCircuit&>(circuit);
@@ -175,13 +182,15 @@ JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& n
 
         Executor executor(n_qubits);
         QuantumCircuit cunqa_circuit = cunqa_adapter_circuit.instructions;
+        for (auto instruction : cunqa_circuit)
+            LOGGER_DEBUG("{}", instruction.dump(4));
+            
         JSON result = executor.run(cunqa_circuit, shots);
 
         return result;
     } 
     catch (const std::exception &e)
     {
-        // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Cunqa simulator.");
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }

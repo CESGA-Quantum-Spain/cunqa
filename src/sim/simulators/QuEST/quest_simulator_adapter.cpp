@@ -13,7 +13,6 @@
 #include "quest_circuit_adapter.hpp"
 #include "quest.h"
 
-#include "utils/constants.hpp"
 #include "logger.hpp"
 
 namespace {
@@ -29,7 +28,7 @@ std::vector<std::vector<qcomp>> cunqamatrix_to_questmatrix(const Matrix& cunqa_m
     for (const auto& row : cunqa_matrix) {
         std::vector<qcomp> complexRow;
         for (const auto& complex : row) {
-            complexRow.emplace_back(complex.real(), complex.imag());
+            complexRow.emplace_back(complex[0], complex[1]);
         }
         quest_mat.push_back(complexRow);
     }
@@ -561,8 +560,14 @@ void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const Measur
     {
         case InstructionType::MEASURE:
         {
-            creg[payload.clbit] =
-                static_cast<bool>(applyQubitMeasurement(state_->qubits_state, payload.qubit));
+            if(payload.clbit < config.num_clbits) {
+                creg[payload.clbit] =
+                    static_cast<bool>(applyQubitMeasurement(state_->qubits_state, payload.qubit));
+                save_clbit[payload.clbit] = payload.save;
+            } else {
+                throw std::runtime_error("Cannot store measurement: classical bit "
+                                         "index exceeds the available range.");
+            }    
             break;
         }
 
@@ -595,7 +600,7 @@ void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& 
     }
 }
 
-JSON QuestSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model){
+JSON QuestSimulatorAdapter::native_execute(const Circuit& circuit){
     //TODO: Implement
     return {};
 }

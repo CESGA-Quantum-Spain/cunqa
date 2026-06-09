@@ -121,7 +121,7 @@ struct DynamicCircuit : public Circuit{
                     for (const auto& row : payload.matrix) {
                         JSON row_json = JSON::array();
                         for (const auto& elem : row) {
-                            row_json.push_back({{"real", elem.real()}, {"imag", elem.imag()}});
+                            row_json.push_back({{"real", elem[0]}, {"imag", elem[1]}});
                         }
                         matrix_json.push_back(row_json);
                     }
@@ -131,7 +131,7 @@ struct DynamicCircuit : public Circuit{
                     instr_json["payload"]["qubits"] = payload.qubits;
                     JSON matrix_json = JSON::array();
                     for (const auto& elem : payload.matrix) {
-                        matrix_json.push_back({{"real", elem.real()}, {"imag", elem.imag()}});
+                        matrix_json.push_back({{"real", elem[0]}, {"imag", elem[1]}});
                     }
                     instr_json["payload"]["matrix"] = matrix_json;
                 }

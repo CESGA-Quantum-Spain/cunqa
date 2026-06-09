@@ -67,8 +67,6 @@ class Result:
         else:
             self._result = result
 
-
-    # TODO: Use length of counts to justify time_taken (ms) at the end of the line.
     def __str__(self):
         YELLOW = "\033[33m"
         RESET = "\033[0m"   

@@ -16,7 +16,7 @@ target_sources(constants
       "${CMAKE_SOURCE_DIR}/src/utils/helpers/environment.hpp"
 )
 
-add_library(json)
+add_library(json STATIC)
 target_sources(json
   PRIVATE
     json.cpp

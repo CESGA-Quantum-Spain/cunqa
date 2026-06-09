@@ -91,7 +91,6 @@ constexpr uint32_t MurmurHash3_x86_32(const char *key,
 // Compile time hash
 template<uint64_t N>
 constexpr uint32_t hash(const char(&s)[N]) {
-    // TODO: Change seed?
     return murmur::MurmurHash3_x86_32(s, N-1, 123321u);
 }
 

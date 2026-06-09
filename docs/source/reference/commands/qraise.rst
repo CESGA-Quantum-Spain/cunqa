@@ -43,7 +43,7 @@ General deployment options
     Number of compute nodes used to deploy the QPUs.
     Default: ``1``
 
-``--node_list <string>``
+``--nodelist <string>``
     List of nodes where the QPUs will be deployed.
     Multiple nodes can be specified at a time.
 

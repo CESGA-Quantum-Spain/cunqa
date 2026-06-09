@@ -13,11 +13,11 @@
 
 namespace cunqa {
 
-using DiagonalMatrix = std::vector<std::complex<double>>;
-using Matrix = std::vector<std::vector<std::complex<double>>>;
+using DiagonalMatrix = std::vector<std::vector<double>>;
+using Matrix = std::vector<std::vector<std::vector<double>>>;
 
 enum class InstructionType {
-        ID,
+    ID,
     X,
     Y,
     Z,

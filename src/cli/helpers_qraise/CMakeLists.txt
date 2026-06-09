@@ -1,4 +1,4 @@
-add_library(write_sbatch)
+add_library(write_sbatch STATIC)
 target_sources(write_sbatch
   PRIVATE
     write_sbatch.cpp

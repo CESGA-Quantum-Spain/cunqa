@@ -1,6 +1,6 @@
 
 message(STATUS "Classical channel uses ZMQ")
-add_library(classical_channel)
+add_library(classical_channel STATIC)
 target_sources(classical_channel
   PRIVATE
     zmq_classical_channel.cpp

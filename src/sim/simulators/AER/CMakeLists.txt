@@ -1,4 +1,4 @@
-add_library(AER_simulator_adapter)
+add_library(AER_simulator_adapter STATIC)
 
 if(USE_GPU)
   set_source_files_properties(
@@ -12,7 +12,6 @@ if(USE_GPU)
       CUDA_STANDARD_REQUIRED ON
   )
 endif()
-
 target_sources(AER_simulator_adapter
   PRIVATE
     AER_simulator_adapter.cpp

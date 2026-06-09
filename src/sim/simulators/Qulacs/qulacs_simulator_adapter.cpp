@@ -1,4 +1,5 @@
 
+#include <complex>
 #include <unordered_map>
 #include <stack>
 #include <queue>
@@ -13,9 +14,6 @@
 #include "cppsim/circuit.hpp"
 #include "cppsim/gate_factory.hpp"
 #include "cppsim/utility.hpp"
-
-#include "utils/constants.hpp"
-#include "utils/json.hpp"
 
 #include "logger.hpp"
 
@@ -67,8 +65,12 @@ inline ComplexMatrix cunqamatrix_to_qulacsdensematrix(const cunqa::Matrix& cunqa
     ComplexMatrix qulacs_matrix(rows, cols);
 
     for (size_t i = 0; i < rows; ++i) {
-        std::copy(cunqa_matrix[i].begin(), cunqa_matrix[i].end(), 
-                  qulacs_matrix.row(i).begin());
+        for (size_t j = 0; j < cols; ++j) {
+            const auto& complex_parts = cunqa_matrix[i][j];
+            // Convert [real, imag] to std::complex<double>
+            qulacs_matrix(i, j) = std::complex<double>(complex_parts[0], 
+                                                        complex_parts.size() > 1 ? complex_parts[1] : 0.0);
+        }
     }
 
     return qulacs_matrix;
@@ -88,7 +90,10 @@ inline SparseComplexMatrix cunqamatrix_to_sparse(const cunqa::Matrix& cunqa_matr
 
     for (size_t i = 0; i < rows; ++i) {
         for (size_t j = 0; j < cols; ++j) {
-            const auto& val = cunqa_matrix[i][j];
+            const auto& complex_parts = cunqa_matrix[i][j];
+            // Convert [real, imag] to std::complex<double>
+            CPPCTYPE val(complex_parts[0], complex_parts.size() > 1 ? complex_parts[1] : 0.0);
+            
             if (val != CPPCTYPE(0.0)) {
                 triplets.emplace_back(i, j, val);
             }
@@ -106,7 +111,9 @@ inline ComplexVector cunqadiagonal_to_qulacsdiagonal(const cunqa::DiagonalMatrix
     ComplexVector qulacs_diagonal(cunqa_diagonal.size());
 
     for (size_t i = 0; i < cunqa_diagonal.size(); ++i) {
-        qulacs_diagonal[i] = cunqa_diagonal[i];
+        const auto& complex_parts = cunqa_diagonal[i];
+        // Convert [real, imag] to std::complex<double>
+        qulacs_diagonal[i] = std::complex<double>(complex_parts[0], complex_parts.size() > 1 ? complex_parts[1] : 0.0);
     }
 
     return qulacs_diagonal;
@@ -116,8 +123,6 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
 {
     for (const auto& instruction : cunqa_circuit.instructions) {
 
-        std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
-
         switch (cunqa::instruction_type_from_name(instruction.at("name").get<std::string>()))
         {
         case cunqa::InstructionType::MEASURE:
@@ -125,205 +130,239 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
             break;
         case cunqa::InstructionType::X:
         {
-            circuit.add_X_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_X_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::Y:
         {
-            circuit.add_Y_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_Y_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::Z:
         {
-            circuit.add_Z_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_Z_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::H:
         {
-            circuit.add_H_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_H_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::S:
         {
-            circuit.add_S_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_S_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::SDG:
         {
-            circuit.add_Sdag_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_Sdag_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::T:
         {
-            circuit.add_T_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_T_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::TDG:
         {
-            circuit.add_Tdag_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_Tdag_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::SX:
         {
-            circuit.add_sqrtX_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_sqrtX_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::SXDG:
         {
-            circuit.add_sqrtXdag_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_sqrtXdag_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::SY:
         {
-            circuit.add_sqrtY_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_sqrtY_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::SYDG:
         {
-            circuit.add_sqrtYdag_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_sqrtYdag_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::P0:
         {
-            circuit.add_P0_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_P0_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::P1:
         {
-            circuit.add_P1_gate(qubits[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_P1_gate(qubit);
             break;
         }
             
         case cunqa::InstructionType::U1:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_U1_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_U1_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RX:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RX_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RY:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RY_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RZ:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RZ_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RZ_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVX:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotInvX_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotInvX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVY:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotInvY_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotInvY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVZ:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotInvZ_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotInvZ_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTX:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotX_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTY:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotY_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTZ:
         {
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_RotZ_gate(qubits[0], params[0]);
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            circuit.add_RotZ_gate(qubit, param);
             break;
         }
 
         case cunqa::InstructionType::U2: 
         {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
             auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_U2_gate(qubits[0], params[0], params[1]);
+            circuit.add_U2_gate(qubit, params[0], params[1]);
             break;
         }
         case cunqa::InstructionType::U3: 
         {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
             auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_U3_gate(qubits[0], params[0], params[1], params[2]);
+            circuit.add_U3_gate(qubit, params[0], params[1], params[2]);
             break;
         }
         case cunqa::InstructionType::CX:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             circuit.add_CNOT_gate(qubits[0], qubits[1]);
             break;
         }
         case cunqa::InstructionType::CZ:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             circuit.add_CZ_gate(qubits[0], qubits[1]);
             break;
         }
         case cunqa::InstructionType::ECR:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             circuit.add_ECR_gate(qubits[0], qubits[1]);
             break;
         }
         case cunqa::InstructionType::SWAP:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             circuit.add_SWAP_gate(qubits[0], qubits[1]);
             break;
         }
         case cunqa::InstructionType::FUSEDSWAP:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             circuit.add_FusedSWAP_gate(qubits[0], qubits[1], instruction.at("block_size").get<int>());
             break;
         }
         case cunqa::InstructionType::MULTIPAULI:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             std::vector<unsigned int> unsigned_quibits(qubits.begin(),qubits.end());
             circuit.add_multi_Pauli_gate(unsigned_quibits, instruction.at("pauli_id_list").get<std::vector<unsigned int>>());
             break;
         }
         case cunqa::InstructionType::MULTIPAULIROTATION:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             std::vector<unsigned int> uiqubits;
             for (int i = 0; i < qubits.size(); i++) {
                 uiqubits.push_back(qubits[i]);
             }
-            auto params = instruction.at("params").get<std::vector<double>>();
-            circuit.add_multi_Pauli_rotation_gate(uiqubits, instruction.at("pauli_id_list").get<std::vector<unsigned int>>(), params[0]);
+            auto param = instruction.at("params").get<double>();
+            circuit.add_multi_Pauli_rotation_gate(uiqubits, instruction.at("pauli_id_list").get<std::vector<unsigned int>>(), param);
             break;
         }
         case cunqa::InstructionType::UNITARY:
         {
-            cunqa::Matrix matrix = instruction.at("matrix").get<std::vector<std::vector<std::complex<double>>>>();
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<double>>>>();
             ComplexMatrix qulacs_matrix = cunqamatrix_to_qulacsdensematrix(matrix);
 
             std::vector<unsigned int> uiqubits;
@@ -339,7 +378,8 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
         }
         case cunqa::InstructionType::CUNITARY:
         {
-            cunqa::Matrix matrix = instruction.at("matrix").get<std::vector<std::vector<std::complex<double>>>>();
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<double>>>>();
             ComplexMatrix qulacs_matrix = cunqamatrix_to_qulacsdensematrix(matrix);
 
             std::vector<TargetQubitInfo> target_qubits;
@@ -357,6 +397,7 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
         }
         case cunqa::InstructionType::RANDOMUNITARY:
         {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
             std::vector<unsigned int> uiqubits;
             for (int i = 0; i < qubits.size(); i++) {
                 uiqubits.push_back(qubits[i]);
@@ -770,7 +811,14 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const Measu
     switch (type)
     {
         case InstructionType::MEASURE:
-            creg[payload.clbit] = (measure_adapter(state_->state, payload.qubit) == 1);
+            if(payload.clbit < config.num_clbits) {
+                    creg[payload.clbit] =
+                        (measure_adapter(state_->state, payload.qubit) == 1);
+                    save_clbit[payload.clbit] = payload.save;
+                } else {
+                    throw std::runtime_error("Cannot store measurement: classical bit "
+                                            "index exceeds the available range.");
+                }    
             break;
 
         default:
@@ -802,9 +850,9 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const Copy&
     }
 }
 
-JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& noise_model)
+JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit)
 {
-    LOGGER_DEBUG("Qulacs usual simulation");
+    LOGGER_DEBUG("Qulacs native execution");
     try {
         auto& qulacs_adapter_circuit = dynamic_cast<const QulacsCircuit&>(circuit);
 
@@ -823,7 +871,7 @@ JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& 
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
 
-        JSON counts = convert_to_counts(samples, num_qubits);
+        JSON counts = convert_to_counts(samples, config.num_clbits);
 
         JSON result_json = 
         {
@@ -834,7 +882,6 @@ JSON QulacsSimulatorAdapter::native_execute(const Circuit& circuit, const JSON& 
         return result_json;
 
     } catch (const std::exception& e) {
-        // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Qulacs simulator.");
         return {{"ERROR", std::string(e.what())}};
     }

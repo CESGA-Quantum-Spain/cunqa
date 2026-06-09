@@ -20,7 +20,44 @@ struct MaestroCircuit : public Circuit {
         : instructions(instructions_json)
     {
 
+        auto adapt_instr_format = [](JSON& instruction) {
+            auto normalize_index_list = [](JSON& field, const char* name) {
+                if (field.is_number_integer()) {
+                    field = JSON::array({ field });
+                    return;
+                }
+
+                if (!field.is_array()) {
+                    throw std::invalid_argument(
+                        std::string(name) + " must be an integer or an array of integers"
+                    );
+                }
+
+                for (const auto& item : field) {
+                    if (!item.is_number_integer()) {
+                        throw std::invalid_argument(
+                            std::string(name) + " must contain only integers"
+                        );
+                    }
+                }
+            };
+
+            if (auto it = instruction.find("clbits"); it != instruction.end()) {
+                normalize_index_list(*it, "clbits");
+
+                JSON memory = std::move(*it);
+                instruction.erase(it);
+                instruction["memory"] = std::move(memory);
+            }
+
+            if (auto it = instruction.find("qubits"); it != instruction.end()) {
+                normalize_index_list(*it, "qubits");
+            }
+        };
+
         for (auto& instruction : instructions) {
+            // Normalize current instruction before processing its params.
+            adapt_instr_format(instruction);
 
             auto instruction_type =
                 instruction_type_from_name(instruction.at("name").get<std::string>());
