@@ -223,7 +223,6 @@ class QJob:
 
         if self._result is None: 
             if self._future is not None:
-                # TODO: Improve this by having a queue of results
                 logger.warning("You have not obtained the previous results. They will be discarded.")
                 self._future.get() # we get the previous result because if not it stays in queue
             else:

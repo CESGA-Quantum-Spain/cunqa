@@ -315,8 +315,8 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = MatrixGate{
-                            instruction.at("qubits").get<std::vector<std::size_t>>(), 
-                            Matrix() // TODO: Arreglar
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            instruction.at("matrix").get<Matrix>()
                         }
                     };
                     break;
@@ -326,8 +326,8 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = DiagonalMatrixGate {
-                            instruction.at("qubits").get<std::vector<std::size_t>>(), 
-                            DiagonalMatrix() // TODO: Arreglar
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            instruction.at("matrix").get<DiagonalMatrix>()
                         }
                     };
                     break;
@@ -488,7 +488,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 }
                 default:
                     throw std::runtime_error("Instruction " 
-                        + instruction_type_name(instruction_type) 
+                        + std::string(instruction_type_name(instruction_type)) 
                         + " not suported!");
             } // End switch
             instructions.push_back(cunqa_instruction);

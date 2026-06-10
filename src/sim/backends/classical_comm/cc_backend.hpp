@@ -23,7 +23,6 @@ public:
     {
         auto quantum_task = JSON::parse(quantum_task_str);
 
-        // TODO: Use ID to Qjob unordered get
         if (quantum_task.contains("id")) {
             auto id = quantum_task.at("id").get<std::string>();
             quantum_task.erase("id");

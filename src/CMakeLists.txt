@@ -1,3 +1,5 @@
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall> $<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
+
 add_subdirectory(utils)
 add_subdirectory(sim)
 add_subdirectory(comm)

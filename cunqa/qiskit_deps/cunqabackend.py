@@ -59,7 +59,6 @@ class CunqaBackend(BackendV2):
         readout_errors = {}
         qubits_properties = []
         for k,q in qubits.items():
-            # TODO: check if key is the correct format q[i]
             qubits_properties.append(
                 QubitProperties(
                     t1=q["T1 (s)"],

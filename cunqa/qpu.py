@@ -89,7 +89,7 @@ class QPU:
         self._family = family
         
         if (device['device_name'] == 'QPU'):
-            self._qclient = QMIOClient() # TODO: Generalize QPU
+            self._qclient = QMIOClient()
         else:
             self._qclient = QClient()
 
@@ -169,8 +169,7 @@ def run(
     .. note::
         This method will check if two circuits are related, i.e., if one of them was part of a 
         transformation and the other is the result of a transformation. If this is true and a third
-        circuit tries to communicate with them, an error will be raised. A detailed example can be 
-        seen in #TODO.
+        circuit tries to communicate with them, an error will be raised.
 
     Args:
         circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.

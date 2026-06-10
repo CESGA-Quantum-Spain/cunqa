@@ -101,7 +101,7 @@ class Result:
                 {'001 11':23, '110 10':77}
         """
         if "qmio_results" in list(self._result.keys()): 
-            counts = self._result["qmio_results"]["c"] #TODO: More registers? 
+            counts = self._result["qmio_results"]["c"]
         elif "results" in list(self._result.keys()): # aer
             counts = self._result["results"][0]["data"]["counts"]
         elif "counts" in list(self._result.keys()): # munich and cunqa
@@ -159,8 +159,7 @@ class Result:
                     if len(statevector) == 1:
                         statevector = list(statevector.values())[0] # Extract the statevector if we only have one
                 
-            # TODO: ensure this actually works in C++
-            elif "statevector" in self._result:             # MUNICH and CUNQA_SIMULATOR
+            elif "statevector" in self._result: # MUNICH and CUNQA_SIMULATOR
                 statevector = self._result["statevector"]
                 if isinstance(statevector, dict):
                     for k, v in statevector.items():

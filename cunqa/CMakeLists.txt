@@ -1,3 +1,5 @@
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall> $<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
+
 pybind11_add_module(qclient qclient.cpp)
 
 target_include_directories(qclient 

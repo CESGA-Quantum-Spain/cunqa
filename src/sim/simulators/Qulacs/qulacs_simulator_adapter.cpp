@@ -395,6 +395,32 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
             circuit.add_gate(gate);
             break;
         }
+        case cunqa::InstructionType::SPARSEMATRIX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<double>>>>();
+            SparseComplexMatrix qulacs_sparse = cunqamatrix_to_sparse(matrix);
+
+            std::vector<unsigned int> uiqubits;
+            for (int i = 0; i < qubits.size(); i++) {
+                uiqubits.push_back(qubits[i]);
+            }
+            circuit.add_gate(gate::SparseMatrix(uiqubits, qulacs_sparse));
+            break;
+        }
+        case cunqa::InstructionType::DIAGONAL:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<double>>>();
+            ComplexVector qulacs_diagonal = cunqadiagonal_to_qulacsdiagonal(matrix);
+
+            std::vector<unsigned int> uiqubits;
+            for (int i = 0; i < qubits.size(); i++) {
+                uiqubits.push_back(qubits[i]);
+            }
+            circuit.add_gate(gate::DiagonalMatrix(uiqubits, qulacs_diagonal));
+            break;
+        }
         case cunqa::InstructionType::RANDOMUNITARY:
         {
             auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
@@ -488,6 +514,7 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const OneQu
             break;
 
         case InstructionType::H:
+            LOGGER_DEBUG("Aplicamos la H");
             gate::H(payload.qubit)->update_quantum_state(&state_->state);
             break;
 

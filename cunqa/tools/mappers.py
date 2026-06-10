@@ -191,8 +191,6 @@ class QPUCircuitMapper:
 
         """
         self.qpus = qpus
-
-        # TODO: Check when parameters get updated
         self.circuit = circuit
         self.run_parameters = run_parameters
 

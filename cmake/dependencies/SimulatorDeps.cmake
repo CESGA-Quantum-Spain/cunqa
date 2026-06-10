@@ -1,6 +1,3 @@
-set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-
 # =====================================================================
 #  AER - Qiskit simulator headers
 #  Fork with version 0.17.2 minimal fix and GPU setter
@@ -93,10 +90,6 @@ if(mqt-ddsim_ADDED)
 else()
   message(STATUS "Using existing mqt-ddsim package")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_ORIG_CXX_FLAGS}" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "${_ORIG_CXX_FLAGS_DEBUG}" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "${_ORIG_CXX_FLAGS_RELEASE}" CACHE STRING "" FORCE)
 
 include_directories(${_ORIG_INCLUDE_DIRS})
 add_definitions(${_ORIG_COMPILE_DEFINITIONS})
@@ -270,5 +263,3 @@ if(qulacs_ADDED)
 else()
   message(STATUS "Using existing qulacs package")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")
