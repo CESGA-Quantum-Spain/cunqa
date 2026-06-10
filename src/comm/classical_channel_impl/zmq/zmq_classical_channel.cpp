@@ -134,8 +134,8 @@ std::string ClassicalChannel::recv_info(const std::string& origin) { return pimp
 //-----------------------------------------
 // Send and recv functions for measurements
 //-----------------------------------------
-void ClassicalChannel::send_measure(const int& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
-int ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
+void ClassicalChannel::send_measure(const bool& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
+bool ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
 
 
 } // End of comm namespace

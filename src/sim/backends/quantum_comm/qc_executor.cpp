@@ -217,7 +217,7 @@ void execute_shot_(
                     bool result = std::accumulate(
                         payload.clbits.begin() + 1, payload.clbits.end(), 
                         simulator->creg[payload.clbits[0]], // Starting value
-                        [&](bool acc, int clbit) { 
+                        [&](bool acc, std::size_t clbit) { 
                             return cunqa::cif_ops[payload.operation](acc, simulator->creg[clbit]); 
                         });
 

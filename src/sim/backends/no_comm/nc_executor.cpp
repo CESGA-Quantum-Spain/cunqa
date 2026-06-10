@@ -21,7 +21,7 @@ JSON NCExecutor::custom_execute_()
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
-        for (int pc = 0; pc < circuit.instructions.size(); ++pc) {
+        for (std::size_t pc = 0; pc < circuit.instructions.size(); ++pc) {
             
             std::visit([&](const auto& payload) {
                 using T = std::decay_t<decltype(payload)>;
@@ -35,7 +35,7 @@ JSON NCExecutor::custom_execute_()
                         bool result = std::accumulate(
                             payload.clbits.begin() + 1, payload.clbits.end(), 
                             simulator_->creg[payload.clbits[0]], // Starting value
-                            [&](bool acc, int clbit) { 
+                            [&](bool acc, std::size_t clbit) { 
                                 return cif_ops[payload.operation](acc, simulator_->creg[clbit]); 
                             });
 

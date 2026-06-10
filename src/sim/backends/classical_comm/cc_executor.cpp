@@ -19,7 +19,7 @@ void execute_shot_(
     comm::ClassicalChannel& classical_channel
 )
 {
-    for (int pc = 0; pc < circuit.instructions.size(); pc++) {
+    for (std::size_t pc = 0; pc < circuit.instructions.size(); pc++) {
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
             auto type = circuit.instructions[pc].type;
@@ -31,9 +31,10 @@ void execute_shot_(
                         bool result = std::accumulate(
                             payload.clbits.begin() + 1, payload.clbits.end(), 
                             simulator->creg[payload.clbits[0]], // Starting value
-                            [&](bool acc, int clbit) { 
+                            [&](bool acc, std::size_t clbit) { 
                                 return cif_ops[payload.operation](acc, simulator->creg[clbit]); 
-                            });
+                            }
+                        );
 
                         // If condition is not met, we skip all the gates till ENDCIF arrives.
                         if (result != payload.condition){
@@ -48,10 +49,10 @@ void execute_shot_(
                 if (type == InstructionType::SEND) {
                     if (payload.clbits.size() != payload.qpus.size())
                         throw std::invalid_argument("Not the same number of clbits and qpus to send!");
-                    for (int i=0; i<payload.clbits.size(); i++) 
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) 
                         classical_channel.send_measure(simulator->creg[payload.clbits[i]], payload.qpus[i]);
                 } else {
-                    for (int i=0; i<payload.clbits.size(); i++)
+                    for (std::size_t i=0; i<payload.clbits.size(); i++)
                         simulator->creg[payload.clbits[i]] = classical_channel.recv_measure(payload.qpus[i]);;
                 }
             } else if constexpr (std::is_same_v<T, GenEnt>)
