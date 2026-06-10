@@ -38,23 +38,23 @@ try:
     circuit3 = CunqaCircuit((1, 1), id = "circuit3")
     #qrecv(circuit3, 0, 2, [0, 1], control_circuit = "circuit2", tag="teledata")
     
-    data_qubits2, link_qubits2 = circuit2.get_qubits()
-    data_qubits3, link_qubits3 = circuit3.get_qubits()
+    data_qubits2, comm_qubits2 = circuit2.get_qubits()
+    data_qubits3, comm_qubits3 = circuit3.get_qubits()
     
     cat_entangler(
         [circuit2, circuit3],
         data_qubits2[0],
-        [link_qubits2[0], link_qubits3[0]],
+        [comm_qubits2[0], comm_qubits3[0]],
         [0, 0],
         tag="telegate"
     )
     
-    circuit3.cx(link_qubits3[0], data_qubits3[0])
+    circuit3.cx(comm_qubits3[0], data_qubits3[0])
     
     cat_disentangler(
         [circuit2, circuit3],
         data_qubits2[0],
-        [link_qubits3[0]],
+        [comm_qubits3[0]],
         [0, 1],
         [0, 0]
     )

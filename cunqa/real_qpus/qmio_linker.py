@@ -10,10 +10,10 @@ import threading
 from queue import Queue
 from typing import Optional
 
-from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
-from cunqa.utils import write_json
 from cunqa.qclient import json_to_qasm2
-from cunqa.logger import logger
+from cunqa.utils.constants import QPUS_FILEPATH, LIBS_DIR
+from cunqa.utils.logger import logger
+from cunqa.utils import write_json
 
 try:
     sys.path.append(LIBS_DIR)

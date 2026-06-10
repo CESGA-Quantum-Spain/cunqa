@@ -29,8 +29,9 @@ from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
-from cunqa.logger import logger
-from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
+from cunqa.utils import read_json, write_json
+from cunqa.utils.logger import logger
+from cunqa.utils.constants import QPUS_FILEPATH, REMOTE_GATES
 
 class Backend(TypedDict):
     """
@@ -230,7 +231,7 @@ def run(
         if qpu.backend["num_qubits"][0] < circuit_ir["num_qubits"][0]:
             raise ValueError("Not enough data qubits in the QPU for the circuit.")
         if qpu.backend["num_qubits"][1] < circuit_ir["num_qubits"][1]:
-            raise ValueError("Not enough link qubits in the QPU for the circuit.")
+            raise ValueError("Not enough comm qubits in the QPU for the circuit.")
     
     # translate circuit ids in comm instruction to qpu ids
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
@@ -261,11 +262,10 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         family (str): filters vQPUs by their family name.    
     """
     # access raised QPUs information on qpu.json file
-    with open(QPUS_FILEPATH, "r") as f:
-        qpus_json = json.load(f)
-        if len(qpus_json) == 0:
-            logger.warning(f"No QPUs were found.")
-            return None
+    qpus_json = read_json(QPUS_FILEPATH)
+    if len(qpus_json) == 0:
+        logger.warning(f"No QPUs were found.")
+        return None
 
     # extract selected QPUs from qpu.json information 
     local_node = os.getenv("SLURMD_NODENAME")
@@ -314,7 +314,7 @@ def qraise(n, t, *,
            backend = None, 
            family = None, 
            co_located = True, 
-           cores = None, 
+           cores_per_qpu = None, 
            mem_per_qpu = None, 
            n_nodes = None, 
            node_list = None, 
@@ -345,7 +345,7 @@ def qraise(n, t, *,
         cores (str): number of cores per vQPU, the total for the SLURM job will be 
                      `n*cores`.
         mem_per_qpu (str): memory to allocate for each vQPU in GB, format to use is "XXG".
-        n_nodes (str): number of nodes for the SLURM job.
+        n-nodes (str): number of nodes for the SLURM job.
         node_list (str): list of nodes in which the vQPUs will be deployed.
         qpus_per_node (str): sets the number of vQPUs deployed on each node.
         partition (str): partition of the nodes in which the QPUs are going to be executed.
@@ -360,19 +360,19 @@ def qraise(n, t, *,
     if simulator is not None:
         command = command + f" --simulator={str(simulator)}"
     if family is not None:
-        command = command + f" --family_name={str(family)}"
+        command = command + f" --family-name={str(family)}"
     if co_located:
         command = command + " --co-located"
-    if cores is not None:
-        command = command + f" --cores={str(cores)}"
+    if cores_per_qpu is not None:
+        command = command + f" --cores-per-qpu={str(cores_per_qpu)}"
     if mem_per_qpu is not None:
         command = command + f" --mem-per-qpu={str(mem_per_qpu)}G"
     if n_nodes is not None:
-        command = command + f" --n_nodes={str(n_nodes)}"
+        command = command + f" --n-nodes={str(n_nodes)}"
     if node_list is not None:
         command = command + f" --nodelist={str(node_list)}"
     if qpus_per_node is not None:
-        command = command + f" --qpus_per_node={str(qpus_per_node)}"
+        command = command + f" --qpus-per-node={str(qpus_per_node)}"
     if backend is not None:
         command = command + f" --backend={str(backend)}"
     if partition is not None:
@@ -380,13 +380,12 @@ def qraise(n, t, *,
     if gpu:
         command = command + " --gpu"
     if gpu_name is not None:
-        command = command + f" --gpu_name={str(gpu_name)}"
+        command = command + f" --gpu-name={str(gpu_name)}"
     if qmio:
         command = command + " --qmio"
 
     if not os.path.exists(QPUS_FILEPATH):
-        with open(QPUS_FILEPATH, "w") as file:
-            file.write("{}")
+        write_json(QPUS_FILEPATH, "{}")
 
     print(f"Requested QPUs with command:\n\t{command}")
 
@@ -422,11 +421,7 @@ def qraise(n, t, *,
             check = True
         ).stdout.strip()
         if state == "RUNNING":
-            try:     
-                with open(QPUS_FILEPATH, "r") as file:
-                    data = json.load(file)
-            except json.JSONDecodeError:
-                continue
+            data = read_json(QPUS_FILEPATH)
             count = sum(1 for key in data if key.startswith(job_id))
             if count == n:
                 break
@@ -439,27 +434,33 @@ def qraise(n, t, *,
     return family if family is not None else str(job_id)
     
 
-def qdrop(*families: str):
+def qdrop(*families: str, remove_logs: bool = False):
     """
-    Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as 
-    argument the vQPU family names (and it does not accept the job ID as the bash command). This is 
-    done because the Python version of the `qraise` bash command returns only the family name. 
+    Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as
+    argument the vQPU family names (and it does not accept the job ID as the bash command). This is
+    done because the Python version of the `qraise` bash command returns only the family name.
 
     If no families are provided, all vQPUs deployed by the user will be dropped.
 
     Args:
         families (str): family names of the groups of vQPUs to be dropped.
+
+        remove_logs (bool): if ``True``, the ``qraise_XXXXXX`` log files of the dropped jobs are
+            also deleted. Defaults to ``False``.
     """
-    
+
     # Building the terminal command to drop the specified families
-    cmd = ['qdrop'] 
+    cmd = ['qdrop']
 
     # If no QPU is provided we drop all QPU slurm jobs
     if len( families ) == 0:
-        cmd.append('--all') 
+        cmd.append('--all')
     else:
         cmd.append('--fam')
         for family in families:
             cmd.append(family)
- 
+
+    if remove_logs:
+        cmd.append('--rm')
+
     subprocess.run(cmd) #run 'qdrop slurm_jobid_1 slurm_jobid_2 etc' on terminal

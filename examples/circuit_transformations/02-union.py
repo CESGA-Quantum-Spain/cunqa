@@ -28,28 +28,28 @@ try:
     # circuit2.data: ─────[X]─[M]─
     # Where $ represents the remote control of the gate
     # ---------------------------
-    circuit1 = CunqaCircuit((1, 1), 1, id="circuit1") # (data qubits, link qubits), clbits
+    circuit1 = CunqaCircuit((1, 1), 1, id="circuit1") # (data qubits, comm qubits), clbits
     circuit2 = CunqaCircuit((1, 1), 1, id="circuit2")
 
-    data_1, link_1 = circuit1.get_qubits()
-    data_2, link_2 = circuit2.get_qubits()
+    data_1, comm_1 = circuit1.get_qubits()
+    data_2, comm_2 = circuit2.get_qubits()
 
     circuit1.h(data_1[0])
 
     cat_entangler(
         [circuit1, circuit2],
         data_1[0],
-        [link_1[0], link_2[0]],
+        [comm_1[0], comm_2[0]],
         [0, 0],
         tag="telegate"
     )
 
-    circuit2.cx(link_2[0], data_2[0])
+    circuit2.cx(comm_2[0], data_2[0])
 
     cat_disentangler(
         [circuit1, circuit2],
         data_1[0],
-        [link_2[0]],
+        [comm_2[0]],
         [0],
         [0]
     )

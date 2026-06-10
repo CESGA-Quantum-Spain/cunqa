@@ -31,8 +31,8 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
     if (args.partition.has_value())
             sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
 
-    if (args.number_of_nodes.has_value())
-        sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
+    if (args.n_nodes.has_value())
+        sbatchFile << "#SBATCH -N " << args.n_nodes.value() << "\n";
 
     if (args.qpus_per_node.has_value())
         sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";

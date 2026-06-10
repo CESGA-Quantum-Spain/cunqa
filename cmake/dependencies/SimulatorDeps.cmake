@@ -102,9 +102,42 @@ include_directories(${_ORIG_INCLUDE_DIRS})
 add_definitions(${_ORIG_COMPILE_DEFINITIONS})
 
 
-# =====================================================================
-#  Maestro and its dependencies
-# =====================================================================
+# ===================================================================================
+#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
+# ===================================================================================
+CPMAddPackage(
+  NAME quest
+  GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
+  GIT_TAG v4.2.0
+)
+
+# ===================================================================================
+#  Maestro
+# ===================================================================================
+
+# ---------------------------------------------------------------------
+#  QCSim
+# ---------------------------------------------------------------------
+CPMAddPackage(
+  NAME qcsim
+  GIT_REPOSITORY git@github.com:aromanro/QCSim.git
+  GIT_TAG 76db3f97974221306c9e2b7be4c4c9f6e7318d6e
+  DOWNLOAD_ONLY YES
+)
+
+# ---------------------------------------------------------------------
+#  AER - Qiskit simulator headers, fork for Maestro
+# ---------------------------------------------------------------------
+CPMAddPackage(
+  NAME maestro_aer
+  GIT_REPOSITORY git@github.com:InvictusWingsSRL/qiskit-aer.git
+  GIT_TAG 96e82fdd1c8c1b17d749863ee5095262372e0d7e
+  DOWNLOAD_ONLY YES
+)
+
+set(AER_INCLUDE_DIR "${maestro_aer_SOURCE_DIR}/src")
+set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
+
 get_target_property(
   EIGEN5_INCLUDE_DIR
   Eigen3::Eigen
@@ -121,45 +154,6 @@ get_target_property(
 
 set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}")
 
-
-# ---------------------------------------------------------------------
-#  QCSim
-# ---------------------------------------------------------------------
-CPMAddPackage(
-  NAME qcsim
-  GIT_REPOSITORY git@github.com:aromanro/QCSim.git
-  GIT_TAG 76db3f97974221306c9e2b7be4c4c9f6e7318d6e
-  DOWNLOAD_ONLY YES
-)
-
-set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
-
-
-# ===================================================================================
-#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
-# ===================================================================================
-CPMAddPackage(
-  NAME quest
-  GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
-  GIT_TAG v4.2.0
-)
-
-# ---------------------------------------------------------------------
-#  AER - Qiskit simulator headers, fork for Maestro
-# ---------------------------------------------------------------------
-CPMAddPackage(
-  NAME maestro_aer
-  GIT_REPOSITORY git@github.com:InvictusWingsSRL/qiskit-aer.git
-  GIT_TAG 96e82fdd1c8c1b17d749863ee5095262372e0d7e
-  DOWNLOAD_ONLY YES
-)
-
-set(AER_INCLUDE_DIR "${maestro_aer_SOURCE_DIR}/src")
-
-
-# ---------------------------------------------------------------------
-#  Maestro
-# ---------------------------------------------------------------------
 set(ENV{EIGEN5_INCLUDE_DIR} "${EIGEN5_INCLUDE_DIR}")
 set(ENV{JSON_INCLUDE_DIR}   "${JSON_INCLUDE_DIR}")
 set(ENV{QCSIM_INCLUDE_DIR}  "${QCSIM_INCLUDE_DIR}")

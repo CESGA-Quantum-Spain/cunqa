@@ -29,7 +29,7 @@ General deployment options
     Time during which the QPUs will remain active.
     Default: empty string.
 
-``-c, --cores <int>``
+``-c, --cores-per-qpu <int>``
     Number of CPU cores assigned to each QPU.
     Default: ``2``
 
@@ -39,7 +39,7 @@ General deployment options
 ``--mem-per-qpu <int>``
     Amount of memory (in GB) assigned to each QPU.
 
-``-N, --n_nodes <int>``
+``-N, --n-nodes <int>``
     Number of compute nodes used to deploy the QPUs.
     Default: ``1``
 
@@ -47,7 +47,7 @@ General deployment options
     List of nodes where the QPUs will be deployed.
     Multiple nodes can be specified at a time.
 
-``--qpus_per_node <int>``
+``--qpus-per-node <int>``
     Number of QPUs deployed on each node.
 
 Backend and simulation options
@@ -63,7 +63,7 @@ Backend and simulation options
 Grouping and communication options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``--family_name <string>``
+``--family-name <string>``
     Name used to identify the group of QPUs that were raised together.
     Default: ``default``
 
@@ -72,10 +72,10 @@ Grouping and communication options
     If set, the vQPU can be accesed from any node.
     Otherwise, the user can only access it from the node it is deployed on.
 
-``--classical_comm``
+``--classical-comm``
     Enable classical communications between QPUs.
 
-``--quantum_comm``
+``--quantum-comm``
     Enable quantum communications between QPUs.
 
 GPU execution

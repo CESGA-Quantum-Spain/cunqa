@@ -43,6 +43,12 @@ try:
     # ---------------------------
     [circuit1, circuit2] = hsplit(circuit, 2)
 
+    data1, comm1 = circuit1.get_qubits()
+    print(f"{data1} and {comm1}")
+    
+    data2, comm2 = circuit2.get_qubits()
+    print(f"{data2} and {comm2}")
+
     qjobs = run([circuit1, circuit2], qpus_separated, shots=1024)
     results = gather(qjobs)
 
@@ -54,6 +60,5 @@ finally:
     # ---------------------------
     # Relinquishing resources
     # ---------------------------
-    qdrop(family_original)
-    qdrop(family_separated)
+    qdrop(family_original, family_separated, remove_logs=True)
 

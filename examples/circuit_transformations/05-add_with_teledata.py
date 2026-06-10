@@ -34,12 +34,12 @@ try:
 
     circuit2 = CunqaCircuit((2, 1), id = "circuit2")
     circuit2.cx(0,1)
-    data_qubits2, link_qubits2 = circuit2.get_qubits()
-    qsend(circuit2, data_qubits2[0], link_qubits2[0], [0, 1], recving_circuit="circuit3", tag="teledata")
+    data_qubits2, comm_qubits2 = circuit2.get_qubits()
+    qsend(circuit2, data_qubits2[0], comm_qubits2[0], [0, 1], recving_circuit="circuit3", tag="teledata")
     
     circuit3 = CunqaCircuit((1, 1), id = "circuit3")
-    data_qubits3, link_qubits3 = circuit3.get_qubits()
-    qrecv(circuit3, data_qubits3[0], link_qubits2[0], [0, 1], control_circuit = "circuit2", tag="teledata")
+    data_qubits3, comm_qubits3 = circuit3.get_qubits()
+    qrecv(circuit3, data_qubits3[0], comm_qubits2[0], [0, 1], control_circuit = "circuit2", tag="teledata")
     
     circuit3.measure_all()
 

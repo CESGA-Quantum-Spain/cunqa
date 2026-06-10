@@ -424,7 +424,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = GenEnt{
-                            instruction.at("link_qubit").get<std::size_t>(),
+                            instruction.at("comm_qubit").get<std::size_t>(),
                             instruction.at("qpus").get<std::vector<std::string>>(),
                             instruction.at("tag")
                         }
@@ -474,11 +474,6 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     };
                     break;
                 }
-                case InstructionType::SAVE_STATE:
-                {
-                    // TODO
-                    break;
-                }    
                 case InstructionType::MEASURE:
                 {
                     cunqa_instruction = {
@@ -492,7 +487,9 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     break;
                 }
                 default:
-                    throw std::runtime_error("Instruction not suported!");
+                    throw std::runtime_error("Instruction " 
+                        + instruction_type_name(instruction_type) 
+                        + " not suported!");
             } // End switch
             instructions.push_back(cunqa_instruction);
         } catch(const std::exception& e) {

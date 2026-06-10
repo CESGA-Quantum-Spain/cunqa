@@ -6,7 +6,7 @@ from cunqa.circuit.core import CunqaCircuit
 def qsend(
     circuit: CunqaCircuit, 
     data_qubit: int, 
-    link_qubit: int, 
+    comm_qubit: int, 
     clbits: list[int],
     recving_circuit: Union[str, 'CunqaCircuit'],
     tag: str = None
@@ -16,24 +16,24 @@ def qsend(
     
     Args:
         data_qubit (int): computation qubit to be sent.
-        link_qubit (int): communication qubit employed to send.
+        comm_qubit (int): communication qubit employed to send.
         recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                 sent.
         tag (str): unique identifier for the operation.
     """
     
-    circuit.gen_ent(link_qubit, recving_circuit, tag)
-    circuit.cx(data_qubit, link_qubit)
+    circuit.gen_ent(comm_qubit, recving_circuit, tag)
+    circuit.cx(data_qubit, comm_qubit)
     circuit.h(data_qubit)
     
-    circuit.measure([data_qubit, link_qubit], clbits, save=False)
+    circuit.measure([data_qubit, comm_qubit], clbits, save=False)
     
-    # Reset to 0 value of the teleported qubit and link qubit employed
+    # Reset to 0 value of the teleported qubit and comm qubit employed
     circuit.cif(clbits[0])
     circuit.x(data_qubit)
     circuit.endcif()
     circuit.cif(clbits[1])
-    circuit.x(link_qubit)
+    circuit.x(comm_qubit)
     circuit.endcif()
     
     circuit.send(clbits, recving_circuit)
@@ -42,7 +42,7 @@ def qsend(
 def qrecv(
     circuit: CunqaCircuit, 
     data_qubit: int, 
-    link_qubit: int, 
+    comm_qubit: int, 
     clbits: list[int],
     control_circuit: Union[str, 'CunqaCircuit'],
     tag: str = None    
@@ -52,22 +52,22 @@ def qrecv(
     
     Args:
         data_qubit (int): computation qubit the received qubit is assigned.
-        link_qubit (int): communication qubit employed to receive.
+        comm_qubit (int): communication qubit employed to receive.
         control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
     """
     
-    circuit.gen_ent(link_qubit, control_circuit, tag)
+    circuit.gen_ent(comm_qubit, control_circuit, tag)
     
     circuit.recv(clbits, control_circuit)
     
     circuit.cif(clbits[0])
-    circuit.x(link_qubit)
+    circuit.x(comm_qubit)
     circuit.endcif()
     
     circuit.cif(clbits[1])
-    circuit.z(link_qubit)
+    circuit.z(comm_qubit)
     circuit.endcif()
     
-    circuit.swap(link_qubit, data_qubit)
+    circuit.swap(comm_qubit, data_qubit)
     
     

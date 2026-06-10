@@ -39,7 +39,6 @@
        scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution>`_ 
        function.
 """
-from cunqa.logger import logger
 from cunqa.qjob import gather
 from cunqa.circuit import CunqaCircuit
 from cunqa.qpu import QPU, run

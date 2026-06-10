@@ -23,7 +23,7 @@
 import json
 from typing import  Optional, Any, Union
 
-from cunqa.logger import logger
+from cunqa.utils.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
 from sympy import Symbol

@@ -20,26 +20,26 @@ try:
     cc_2 = CunqaCircuit((1, 1), 2, id="Second")
     cc_3 = CunqaCircuit((1, 1), 2, id="Third")
 
-    data_qubits_1, link_qubits_1 = cc_1.get_qubits()
-    data_qubits_2, link_qubits_2 = cc_2.get_qubits()
-    data_qubits_3, link_qubits_3 = cc_3.get_qubits()
+    data_qubits_1, comm_qubits_1 = cc_1.get_qubits()
+    data_qubits_2, comm_qubits_2 = cc_2.get_qubits()
+    data_qubits_3, comm_qubits_3 = cc_3.get_qubits()
 
     cc_1.h(data_qubits_1[0])
     cat_entangler(
         [cc_1, cc_2, cc_3],
         data_qubits_1[0],
-        [link_qubits_1[0], link_qubits_2[0], link_qubits_3[0]],
+        [comm_qubits_1[0], comm_qubits_2[0], comm_qubits_3[0]],
         [0, 0, 0],
         tag="telegate"
     )
 
-    cc_2.cx(link_qubits_2[0], data_qubits_2[0])
-    cc_3.cx(link_qubits_3[0], data_qubits_3[0])
+    cc_2.cx(comm_qubits_2[0], data_qubits_2[0])
+    cc_3.cx(comm_qubits_3[0], data_qubits_3[0])
 
     cat_disentangler(
         [cc_1, cc_2, cc_3],
         data_qubits_1[0],
-        [link_qubits_2[0], link_qubits_3[0]],
+        [comm_qubits_2[0], comm_qubits_3[0]],
         [0, 1],
         [0, 0]
     )

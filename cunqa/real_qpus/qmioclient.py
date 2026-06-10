@@ -7,7 +7,7 @@ import time
 from typing import Optional
 import socket
 
-from cunqa.constants import LIBS_DIR
+from cunqa.utils.constants import LIBS_DIR
 
 try:
     sys.path.append(LIBS_DIR)
