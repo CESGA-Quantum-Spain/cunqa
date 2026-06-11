@@ -1,12 +1,28 @@
-add_library(qsim_adapters STATIC "${CMAKE_CURRENT_SOURCE_DIR}/qsim_simulator_adapter.cpp")
-target_include_directories(qsim_adapters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" 
-                                                   "${CMAKE_CURRENT_SOURCE_DIR}/.." 
-                                                   "${qsim_SOURCE_DIR}/lib" 
-                                                   ) 
+add_library(qsim_simulator_adapter STATIC)
 
+target_sources(qsim_simulator_adapter
+  PRIVATE
+    qsim_simulator_adapter.cpp
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS "${PROJECT_SOURCE_DIR}/src/sim/simulators"
+    FILES
+      "${CMAKE_CURRENT_SOURCE_DIR}/qsim_simulator_adapter.hpp"
+)
 
-target_link_libraries(qsim_adapters PUBLIC classical_channel 
-                                    PRIVATE json logger_qpu
-                                            OpenMP::OpenMP_CXX
-                                            )
-target_compile_definitions(qsim_adapters PRIVATE OPENMP_IN_QC)
+target_include_directories(qsim_simulator_adapter 
+  PRIVATE 
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_PROJECT_SOURCE}/src"
+    "${qsim_SOURCE_DIR}/lib" 
+) 
+
+target_link_libraries(qsim_simulator_adapter 
+  PUBLIC 
+    json
+    simulator
+    circuit
+  PRIVATE
+    logger_qpu
+    MQT::DDSim
+)

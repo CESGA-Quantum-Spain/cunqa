@@ -14,8 +14,8 @@ namespace sim {
 
 class Simulator {
 public:
-    std::map<int, bool> creg;
-    std::map<int, bool> save_clbit;
+    std::map<std::size_t, bool> creg;
+    std::map<std::size_t, bool> save_clbit;
     std::size_t num_qubits;
     RunConfig config;
     

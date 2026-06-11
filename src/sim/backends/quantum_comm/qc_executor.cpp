@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <memory>
+#include <thread> 
 #include <chrono>
 
 #include "qc_executor.hpp"
@@ -50,6 +51,7 @@ struct InstructionStream
     std::vector<BlockType> blocked;
     std::size_t pointed_quantum_task;
     std::vector<std::size_t> pointed_instruction;
+    std::size_t steps_since_progress{0};
 
     InstructionStream(
         const std::vector<QuantumTask>& quantum_tasks_,
@@ -81,9 +83,6 @@ struct InstructionStream
                             for (auto& c : payload.clbits)
                                 c += zero_clbits_[t];
                         } else if constexpr (requires { payload.clbit; }) {
-                            LOGGER_DEBUG("MEASURE from qt {}", pointed_quantum_task);
-                            LOGGER_DEBUG("\tClbit: {}, Qubit: {}, save: {}", payload.clbit, payload.qubit, payload.save);
-                            LOGGER_DEBUG("ZERO QUBITS: {}", zero_clbits_[t]);
                             payload.clbit += zero_clbits_[t];
                         } else if constexpr (std::is_same_v<T, cunqa::Copy>) {
                             for (std::size_t i = 0; i < payload.l_clbits.size(); i++) {
@@ -93,8 +92,10 @@ struct InstructionStream
                         }
                     }
                     if constexpr (std::is_same_v<T, cunqa::ClassicalComm>) {
-                        payload.qpus.push_back(quantum_tasks[t].config.qpu_id);
-                        std::sort(payload.qpus.begin(), payload.qpus.end());
+                        if (instr.type == cunqa::InstructionType::SEND)
+                            payload.qpus.insert(payload.qpus.begin(), quantum_tasks[t].config.qpu_id);
+                        else
+                            payload.qpus.push_back(quantum_tasks[t].config.qpu_id);
                         payload.qpus = std::vector<std::string>{std::accumulate(
                                 payload.qpus.begin(),
                                 payload.qpus.end(),
@@ -105,7 +106,6 @@ struct InstructionStream
                             )};
                     }
                     if constexpr (std::is_same_v<T, cunqa::GenEnt>) {
-                        //payload.qpus.push_back(quantum_tasks[t].config.qpu_id);
                         if (payload.tag == "NO_TAG") {
                             std::sort(payload.qpus.begin(), payload.qpus.end());
                             payload.tag = std::accumulate(
@@ -128,15 +128,23 @@ struct InstructionStream
         std::fill(finished.begin(), finished.end(), false);
         std::fill(blocked.begin(), blocked.end(), BlockType::NO_BLOCK);
         pointed_quantum_task = 0;
+        steps_since_progress = 0;
         std::fill(pointed_instruction.begin(), pointed_instruction.end(), 0);
     }
 
-    inline void complete_and_advance() noexcept
+    inline void complete_and_advance()
     {
         const auto total = quantum_tasks[pointed_quantum_task].circuit.instructions.size();
 
-        if (blocked[pointed_quantum_task] == BlockType::NO_BLOCK)
+        if (blocked[pointed_quantum_task] == BlockType::NO_BLOCK) {
             pointed_instruction[pointed_quantum_task]++;
+            steps_since_progress = 0; // made progress
+        } else {
+            if (++steps_since_progress >= static_cast<std::size_t>(std::count(finished.begin(), finished.end(), false)))
+                throw std::runtime_error(
+                    "Deadlock: every pending quantum task is blocked "
+                    "(circular SEND/RECV or unsatisfiable entanglement).");
+        }
 
         if (pointed_instruction[pointed_quantum_task] >= total)
             finished[pointed_quantum_task] = true;
@@ -148,7 +156,7 @@ struct InstructionStream
         }
     }
 
-    inline cunqa::Instruction get_current() noexcept
+    inline const cunqa::Instruction& get_current() noexcept
     {
         return quantum_tasks[pointed_quantum_task]
                     .circuit.instructions[pointed_instruction[pointed_quantum_task]];
@@ -194,27 +202,31 @@ void execute_shot_(
     cunqa::QuantumCommManager qc_manager{communication_qubits_};
     cunqa::ClassicalCommManager cc_manager;
     while(!stream.all_finished()) {
-        auto instr = stream.get_current();
-        LOGGER_DEBUG("INSTRUCTION: {} QUANTUM_TASK: {}", 
-            instruction_type_name(instr.type), stream.pointed_quantum_task);
+        const auto& instr = stream.get_current();
+        //LOGGER_DEBUG("INSTRUCTION: {} QUANTUM_TASK: {}", 
+        //    instruction_type_name(instr.type), stream.pointed_quantum_task);
         
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
-            auto type = instr.type;
+            const auto& type = instr.type;
 
             if constexpr (std::is_same_v<T, cunqa::ClassicalIf>) {
-                if (type == cunqa::InstructionType::CIF) {
-                    // Negate the clbit value if condition is 0. If there is only one clbit, result = init
-                    bool init = (payload.condition) ? simulator->creg[payload.clbits[0]] : !simulator->creg[payload.clbits[0]];
-                    // Operates on the values provided, with the specified operation. If condition is 0, the operation negates the second operand (check cif_ops)
-                    bool result = std::accumulate(payload.clbits.begin() + 1, payload.clbits.end(), 
-                                init,                       // Starting value
-                                [&](bool acc, int clbit) { 
-                                    return cunqa::cif_ops[payload.operation](acc, simulator->creg[clbit]); 
-                                });
+                if (type == cunqa::InstructionType::CIF){
+                    // Operates on the values provided, with the specified operation. 
+                    //If condition is 0, the operation negates the second operand (check cif_ops)
+                    bool result = std::accumulate(
+                        payload.clbits.begin() + 1, payload.clbits.end(), 
+                        simulator->creg[payload.clbits[0]], // Starting value
+                        [&](bool acc, std::size_t clbit) { 
+                            return cunqa::cif_ops[payload.operation](acc, simulator->creg[clbit]); 
+                        });
 
-                    // IF CONDITION IS NOT MET, SKIP ALL GATES UNTIL ENDCIF ARRIVES.
-                    if (!result){
+                    // If the condition is not met, skip every gate until the
+                    // matching ENDCIF arrives.
+                    // NOTE: nesting of CIF blocks is NOT supported. This stops at
+                    // the first ENDCIF, so a nested block would be mis-handled.
+                    // Circuits must not contain nested CIF blocks.
+                    if (result != payload.condition){
                         cunqa::InstructionType type;
                         do {
                             type = stream.skip_next();
@@ -223,13 +235,14 @@ void execute_shot_(
                 } 
             } else if constexpr (std::is_same_v<T, cunqa::ClassicalComm>) {
                 if (type == cunqa::InstructionType::SEND) {
-                    for (int i=0; i<payload.clbits.size(); i++) 
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) 
                         cc_manager.send(simulator->creg[payload.clbits[i]], payload.qpus[0]);
                 } else {
                     bool value_i;
-                    for (int i=0; i<payload.clbits.size(); i++) {
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) {
                         if (cc_manager.recv(payload.qpus[0], value_i)) {
                             simulator->creg[payload.clbits[i]] = value_i;
+                            simulator->save_clbit[payload.clbits[i]] = false;
                             if (stream.is_current_blocked())
                                 stream.unblock_current();
                         } else
@@ -290,6 +303,20 @@ void update_measures_(
     }
 }
 
+template <typename Predicate>
+void poll_until_(Predicate&& ready,
+                 const char* what,
+                 std::size_t max_attempts = 600,
+                 std::chrono::milliseconds interval = std::chrono::milliseconds{100})
+{
+    for (std::size_t attempt = 0; attempt < max_attempts; ++attempt) {
+        if (ready())
+            return;
+        std::this_thread::sleep_for(interval);
+    }
+    throw std::runtime_error(std::string("Timed out waiting for ") + what);
+}
+
 } // End of anonymous namespace
 
 
@@ -305,15 +332,14 @@ QCExecutor::QCExecutor(
 {
     auto slurm_job_id = get_env_variable("SLURM_JOB_ID");
 
-    do {
+    poll_until_([&] {
         qpus_ids_.clear();
-        const auto communications = read_file(std::string(COMM_FILEPATH));
-
-        for (const auto& [qpu_id, value] : communications.items()) {
+        const auto communications = read_file(COMM_FILEPATH);
+        for (const auto& [qpu_id, value] : communications.items())
             if (slurm_job_id == qpu_id.substr(0, qpu_id.find('_')))
                 qpus_ids_.push_back(qpu_id);
-        }
-    } while (qpus_ids_.size() != n_qpus);
+        return qpus_ids_.size() == n_qpus;
+    }, "QPU communication entries");
 
     classical_channel_.publish();
     for (const auto& qpu_id: qpus_ids_) {
@@ -322,9 +348,15 @@ QCExecutor::QCExecutor(
     }
 
     JSON backends;
-    do {
-        backends = read_file(QPUS_FILEPATH);
-    } while (backends.size() != qpus_ids_.size());
+    poll_until_([&] {
+        backends.clear();
+        const auto all_backends = read_file(QPUS_FILEPATH);
+        for (const auto& [qpu_id, value] : all_backends.items()) {
+            if (std::find(qpus_ids_.begin(), qpus_ids_.end(), qpu_id) != qpus_ids_.end())
+                backends[qpu_id] = value;
+        }
+        return backends.size() == qpus_ids_.size();
+    }, "QPUs backend definition");
     
     std::size_t accumulated_qubits{0};
     for (const auto& qpu_id : qpus_ids_) {
@@ -366,6 +398,11 @@ void QCExecutor::run()
             }
         }
         
+        if (quantum_tasks.empty()) {
+            LOGGER_INFO("Nothing to run: empty circuits sent to executor.");
+            continue;   // nothing to run this round
+        }
+
         {
             std::vector<RunConfig> run_configs;
             for (const auto& quantum_task: quantum_tasks)
@@ -382,7 +419,7 @@ void QCExecutor::run()
 
             execute_shot_(simulator_, stream, communication_qubits_);
             stream.reset();
-            
+
             update_measures_(simulator_, quantum_tasks, zero_clbits_, meas_counter);
             simulator_->clear();
         } // End of all shots

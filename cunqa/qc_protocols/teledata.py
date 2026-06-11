@@ -5,7 +5,7 @@ from cunqa.circuit.core import CunqaCircuit
 
 def qsend(
     circuit: CunqaCircuit, 
-    comp_qubit: int, 
+    data_qubit: int, 
     comm_qubit: int, 
     clbits: list[int],
     recving_circuit: Union[str, 'CunqaCircuit'],
@@ -15,7 +15,7 @@ def qsend(
     Class method to send a qubit from the current circuit to another one.
     
     Args:
-        comp_qubit (int): computation qubit to be sent.
+        data_qubit (int): computation qubit to be sent.
         comm_qubit (int): communication qubit employed to send.
         recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
                                                 sent.
@@ -23,16 +23,25 @@ def qsend(
     """
     
     circuit.gen_ent(comm_qubit, recving_circuit, tag)
-    circuit.cx(comp_qubit, comm_qubit)
-    circuit.h(comp_qubit)
+    circuit.cx(data_qubit, comm_qubit)
+    circuit.h(data_qubit)
     
-    circuit.measure([comp_qubit, comm_qubit], clbits, save=False)
+    circuit.measure([data_qubit, comm_qubit], clbits, save=False)
+    
+    # Reset to 0 value of the teleported qubit and comm qubit employed
+    circuit.cif(clbits[0])
+    circuit.x(data_qubit)
+    circuit.endcif()
+    circuit.cif(clbits[1])
+    circuit.x(comm_qubit)
+    circuit.endcif()
+    
     circuit.send(clbits, recving_circuit)
     
 
 def qrecv(
     circuit: CunqaCircuit, 
-    comp_qubit: int, 
+    data_qubit: int, 
     comm_qubit: int, 
     clbits: list[int],
     control_circuit: Union[str, 'CunqaCircuit'],
@@ -42,7 +51,7 @@ def qrecv(
     Class method to receive a qubit from a remote circuit into an ancilla qubit.
     
     Args:
-        comp_qubit (int): computation qubit the received qubit is assigned.
+        data_qubit (int): computation qubit the received qubit is assigned.
         comm_qubit (int): communication qubit employed to receive.
         control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
     """
@@ -53,12 +62,12 @@ def qrecv(
     
     circuit.cif(clbits[0])
     circuit.x(comm_qubit)
-    circuit.endcif(clbits[0])
+    circuit.endcif()
     
     circuit.cif(clbits[1])
     circuit.z(comm_qubit)
-    circuit.endcif(clbits[1])
+    circuit.endcif()
     
-    circuit.swap(comm_qubit, comp_qubit)
+    circuit.swap(comm_qubit, data_qubit)
     
     

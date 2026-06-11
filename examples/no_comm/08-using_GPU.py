@@ -10,10 +10,10 @@ from cunqa.circuit import CunqaCircuit
 
 # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
 # If GPU execution is desired, just add "gpu = True" as another qraise argument
-family = qraise(2, "00:10:00", simulator = "Aer", co_located = True)
+family = qraise(1, "00:10:00", cores = 32, simulator = "Aer", co_located = True, gpu = True, gpu_name = "t4", partition = "viz")
 
 try:
-    qpus  = get_QPUs(co_located = True, family = family)
+    [qpu] = get_QPUs(co_located = True, family = family)
 
     # 2. Design circuit:
     # ---------------------------
@@ -27,16 +27,10 @@ try:
     qc.measure_all()
 
     # 3. Execute the same circuit on both deployed QPUs
-    qjobs = run([qc, qc], qpus, shots = 1000) # non-blocking call
-
-    results = gather(qjobs)
+    qjob = run(qc, qpu, shots = 1000) # non-blocking call
 
     # Getting the counts
-    counts_list = [result.counts for result in results]
-
-    # Printing the counts
-    for counts in counts_list:
-        print(f"Counts: {counts}")
+    print(f"Counts: {qjob.result.result}")
     
 except Exception as error:
     raise error

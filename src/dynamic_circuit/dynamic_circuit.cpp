@@ -315,8 +315,8 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = MatrixGate{
-                            instruction.at("qubits").get<std::vector<std::size_t>>(), 
-                            Matrix() // TODO: Arreglar
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            instruction.at("matrix").get<Matrix>()
                         }
                     };
                     break;
@@ -326,8 +326,8 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = DiagonalMatrixGate {
-                            instruction.at("qubits").get<std::vector<std::size_t>>(), 
-                            DiagonalMatrix() // TODO: Arreglar
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            instruction.at("matrix").get<DiagonalMatrix>()
                         }
                     };
                     break;
@@ -474,11 +474,6 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     };
                     break;
                 }
-                case InstructionType::SAVE_STATE:
-                {
-                    // TODO
-                    break;
-                }    
                 case InstructionType::MEASURE:
                 {
                     cunqa_instruction = {
@@ -492,7 +487,9 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     break;
                 }
                 default:
-                    throw std::runtime_error("Instruction not suported!");
+                    throw std::runtime_error("Instruction " 
+                        + std::string(instruction_type_name(instruction_type)) 
+                        + " not suported!");
             } // End switch
             instructions.push_back(cunqa_instruction);
         } catch(const std::exception& e) {

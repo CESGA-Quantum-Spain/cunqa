@@ -1,6 +1,7 @@
 #include <regex>
 #include <fstream>
 #include <cmath>
+#include <cctype>
 #include <cstdio> // For popen, pclose
 #include <algorithm>
 #include <filesystem>
@@ -30,8 +31,8 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
     if (args.partition.has_value())
             sbatchFile << "#SBATCH --partition=" << args.partition.value() << "\n";
 
-    if (args.number_of_nodes.has_value())
-        sbatchFile << "#SBATCH -N " << args.number_of_nodes.value() << "\n";
+    if (args.n_nodes.has_value())
+        sbatchFile << "#SBATCH -N " << args.n_nodes.value() << "\n";
 
     if (args.qpus_per_node.has_value())
         sbatchFile << "#SBATCH --ntasks-per-node=" << args.qpus_per_node.value() << "\n";
@@ -53,16 +54,20 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
         sbatchFile << "#SBATCH --mem=" << total_mem << "G\n";
     }
 
+    sbatchFile << "#SBATCH --time=" << args.time << "\n";
+    sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     
-    if (args.gpu) {
+    if (args.gpu || args.gpu_name != "default") {
         if (args.simulator != "Aer")
             throw std::invalid_argument("At this moment, only Aer supports GPU simulation");
         const int number_of_gpus = scheme == Communications::QC ? 1 : args.n_qpus;
-        sbatchFile << "#SBATCH --gres=gpu:" << number_of_gpus << "\n";
+        
+        if (args.gpu_name != "default")
+            sbatchFile << "#SBATCH --gres=gpu:" << args.gpu_name << ":" << number_of_gpus << "\n";
+        else
+            sbatchFile << "#SBATCH --gres=gpu:" << number_of_gpus << "\n";
     }
 
-    sbatchFile << "#SBATCH --time=" << args.time << "\n";
-    sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     sbatchFile << "unset SLURM_MEM_PER_CPU SLURM_MEM_PER_NODE SLURM_CPU_BIND_LIST SLURM_CPU_BIND\n";
     sbatchFile << "EPILOG_PATH=" << cunqa::INSTALL_PATH << "/bin/epilog.sh\n";
 }
@@ -88,10 +93,19 @@ void write_run_command(std::ofstream& sbatchFile,
     #endif
         sbatchFile << " --task-epilog=$EPILOG_PATH setup_qpus " << subcommand << '\n';
     } else if (scheme == Communications::QC) {
+
+        std::vector<std::string> gpu_info{"", ""}; 
+        if (args.gpu || args.gpu_name != "default") {
+            gpu_info[0] = "--gres=gpu:0 ";
+            if (args.gpu_name != "default")
+                gpu_info[1] = "--gres=gpu:1 ";
+            else
+                gpu_info[1] = "--gres=gpu:" + args.gpu_name + ":1 ";
+        }
+
         sbatchFile 
             << "srun --exclusive -n " << args.n_qpus << " -c 1 --mem-per-cpu=1G "
-            << std::string(args.gpu ? "--gres=gpu:0 " : "") 
-            << "--task-epilog=$EPILOG_PATH setup_qpus " << subcommand << " &\n";
+            << gpu_info[0] << "--task-epilog=$EPILOG_PATH setup_qpus " << subcommand << " &\n";
 
         sbatchFile << "srun --exclusive -n 1 -c ";
 
@@ -107,8 +121,7 @@ void write_run_command(std::ofstream& sbatchFile,
         }
 
         sbatchFile 
-            << std::string(args.gpu ? "--gres=gpu:1 " : "") 
-            << "setup_executor " << args.simulator << " " << args.n_qpus << "\n";
+            << gpu_info[1] << "setup_executor " << args.simulator << " " << args.n_qpus << "\n";
     }
 }
 

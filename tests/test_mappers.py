@@ -13,8 +13,8 @@ else:
     sys.path.insert(0, HOME)
 
 # If your classes live in a different module, adjust this import accordingly.
-from cunqa.mappers import QJobMapper, QPUCircuitMapper
-import cunqa.mappers as mappers_mod
+from cunqa.tools.mappers import QJobMapper, QPUCircuitMapper
+import cunqa.tools.mappers as mappers_mod
 
 # ------------------------
 # QJobMapper tests

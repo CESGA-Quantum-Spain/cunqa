@@ -5,9 +5,6 @@ find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 find_package(OpenMP REQUIRED COMPONENTS CXX)
 
-set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-
 # =====================================================================
 #  NLOHMANN JSON - json management library
 # =====================================================================
@@ -93,5 +90,3 @@ if(argparse_ADDED)
 else()
   message(STATUS "Using existing argparse package")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

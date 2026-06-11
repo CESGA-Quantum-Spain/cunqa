@@ -4,8 +4,9 @@
 #include <string>
 
 #include "comm/client.hpp"
-#include "utils/helpers/qasm2_to_json.hpp"
-#include "utils/helpers/json_to_qasm2.hpp"
+
+#include "helpers/qasm2_to_json.hpp"
+#include "helpers/json_to_qasm2.hpp"
 #include "json.hpp"
  
 namespace py = pybind11;
@@ -13,7 +14,7 @@ using namespace cunqa::comm;
 
 PYBIND11_MODULE(qclient, m) {
 
-    m.doc() = "TODO";
+    m.doc() = "Python module binding the client for the connection with the vQPU.";
  
     py::class_<FutureWrapper<Client>>(m, "FutureWrapper")
         .def("get", &FutureWrapper<Client>::get)

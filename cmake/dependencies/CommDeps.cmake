@@ -1,6 +1,3 @@
-set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-
 # =====================================================================
 #  ZeroMQ stack: libzmq + cppzmq + pyzmq
 # =====================================================================
@@ -106,5 +103,3 @@ if(TARGET _zmq)
 else()
   message(WARNING "Target _zmq was not created by pyzmq")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

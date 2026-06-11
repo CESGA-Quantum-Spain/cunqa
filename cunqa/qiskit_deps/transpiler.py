@@ -29,13 +29,9 @@
 from typing import Union
 import copy
 
-from cunqa.qiskit_deps.cunqabackend import CunqaBackend
-from cunqa.logger import logger
-from cunqa.qpu import Backend
-from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.parameter import Param
-from cunqa.circuit.ir import to_ir
-
+from cunqa.utils.constants import CUNQA_USE_QISKIT_PY
+if not CUNQA_USE_QISKIT_PY:
+    raise ImportError("Qiskit is not available: cannot use transpiler.")
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
@@ -50,6 +46,12 @@ from qiskit.circuit import (
     ParameterExpression
 )
 
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
+from cunqa.utils.logger import logger
+from cunqa.qpu import Backend
+from cunqa.circuit import CunqaCircuit
+from cunqa.circuit.parameter import Param
+from cunqa.circuit.ir import to_ir
 
 def transpiler(
     circuit: Union[dict, QuantumCircuit, CunqaCircuit], 
@@ -161,7 +163,7 @@ SUPPORTED_QISKIT_OPERATIONS = {
     'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 'ccy', 'rzz', 
     'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 'r', 'sdg', 'csx', 'crx', 'ccz', 
     'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 
-    'if_else', 'barrier', 'reset'
+    'if_else', 'barrier', 'reset', 'save_state'
 }
 
 
@@ -279,6 +281,10 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         elif instruction_name == "unitary":
 
             qc.unitary(instruction.get("matrix", []), qiskit_Qubit)
+
+        elif instruction_name == "save_state":
+            pershot = True if (instruction["snapshot_type"] == "list") else False
+            qc.save_state(label=instruction["label"], pershot=pershot)
 
         elif instruction_name in SUPPORTED_QISKIT_OPERATIONS:
 

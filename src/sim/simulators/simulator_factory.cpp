@@ -1,4 +1,5 @@
-// simulator_factory.cpp
+
+#include <stdexcept>
 
 #include "simulator_factory.hpp"
 #include "AER/AER_simulator_adapter.hpp"
@@ -8,8 +9,6 @@
 #include "Qsim/qsim_simulator_adapter.hpp"
 #include "QuEST/quest_simulator_adapter.hpp"
 #include "Qulacs/qulacs_simulator_adapter.hpp"
-
-#include <stdexcept>
 
 namespace cunqa {
 namespace sim {

@@ -21,8 +21,8 @@ public:
     void send_info(const std::string& data, const std::string& target);
     std::string recv_info(const std::string& origin);
 
-    void send_measure(const int& measurement, const std::string& target);
-    int recv_measure(const std::string& origin);
+    void send_measure(const bool& measurement, const std::string& target);
+    bool recv_measure(const std::string& origin);
     
 private:
     struct Impl;

@@ -39,7 +39,6 @@
        scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution>`_ 
        function.
 """
-from cunqa.logger import logger
 from cunqa.qjob import gather
 from cunqa.circuit import CunqaCircuit
 from cunqa.qpu import QPU, run
@@ -192,8 +191,6 @@ class QPUCircuitMapper:
 
         """
         self.qpus = qpus
-
-        # TODO: Check when parameters get updated
         self.circuit = circuit
         self.run_parameters = run_parameters
 

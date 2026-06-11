@@ -191,7 +191,6 @@ JSON CunqaSimulatorAdapter::native_execute(const Circuit& circuit) {
     } 
     catch (const std::exception &e)
     {
-        // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Cunqa simulator.");
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }

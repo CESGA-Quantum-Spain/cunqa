@@ -47,7 +47,7 @@ try:
             # Gate conditioned by the received bit
             circuits[i].cif(clbits = 0)
             circuits[i].rz(param, 0)
-            circuits[i].endcif(0)
+            circuits[i].endcif()
 
         circuits[i].h(0)
 

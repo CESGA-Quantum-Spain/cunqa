@@ -12,13 +12,14 @@ namespace sim {
 
 class CCExecutor {
 public:
-    CCExecutor(std::unique_ptr<Simulator> simulator);
+    CCExecutor();
 
-    inline Simulator& simulator() noexcept {
-        return *simulator_;
+    void set_simulator(std::unique_ptr<Simulator> simulator)
+    {
+        simulator_ = std::move(simulator);
     }
 
-    JSON execute(const JSON& instructions, const RunConfig& run_config);
+    JSON execute(const JSON& quantum_task);
 private:
     std::unique_ptr<Simulator> simulator_;
     comm::ClassicalChannel classical_channel_;

@@ -23,7 +23,7 @@
 import json
 from typing import  Optional, Any, Union
 
-from cunqa.logger import logger
+from cunqa.utils.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
 from sympy import Symbol
@@ -223,7 +223,6 @@ class QJob:
 
         if self._result is None: 
             if self._future is not None:
-                # TODO: Improve this by having a queue of results
                 logger.warning("You have not obtained the previous results. They will be discarded.")
                 self._future.get() # we get the previous result because if not it stays in queue
             else:

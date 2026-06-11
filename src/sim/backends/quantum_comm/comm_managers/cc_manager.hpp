@@ -22,7 +22,7 @@ struct ClassicalCommManager {
 
     inline bool recv(const std::string& qpu_id, bool& value)
     {
-        if (sent_clbits.contains(qpu_id)) {
+        if (sent_clbits.contains(qpu_id) && !sent_clbits.at(qpu_id).empty()) {
             value = sent_clbits[qpu_id].front();
             sent_clbits[qpu_id].pop();
             return true;

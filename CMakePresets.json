@@ -23,7 +23,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "OPENMP_IN_QC": "ON",
         "USE_MPI_BTW_QPU": "OFF",
         "USE_ZMQ_BTW_QPU": "ON"
       }
@@ -35,7 +34,6 @@
       "description": "Preset for optimized builds.",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "OPENMP_IN_QC": "ON",
         "USE_MPI_BTW_QPU": "OFF",
         "USE_ZMQ_BTW_QPU": "ON"
       }
@@ -43,12 +41,12 @@
     {
       "name": "gpu",
       "inherits": "base",
-      "displayName": "GPU (AER)",
-      "description": "Preset to enhance AER simualtions with GPU.",
+      "displayName": "GPU",
+      "description": "Preset to enhance simulations with GPU.",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "AER_GPU": "ON",
-        "OPENMP_IN_QC": "ON",
+        "USE_GPU": "ON",
+        "GPU_ARCH": "75;80",
         "USE_MPI_BTW_QPU": "OFF",
         "USE_ZMQ_BTW_QPU": "ON"
       }

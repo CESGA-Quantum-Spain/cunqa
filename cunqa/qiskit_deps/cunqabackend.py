@@ -4,8 +4,10 @@ import json
 from typing import Any
 
 sys.path.append(os.getenv("HOME"))
-from cunqa.logger import logger
-from cunqa.qpu import Backend
+
+from cunqa.utils.constants import CUNQA_USE_QISKIT_PY
+if not CUNQA_USE_QISKIT_PY:
+    raise ImportError("Qiskit is not available: cannot use CunqaBackend")
 
 from qiskit.providers import QubitProperties, BackendV2, Options
 from qiskit_aer import AerSimulator
@@ -13,6 +15,8 @@ from qiskit.circuit.library import Measure, UnitaryGate
 from qiskit.transpiler import Target, InstructionProperties, TranspilerError
 from qiskit.circuit import Parameter
 
+from cunqa.qpu import Backend
+from cunqa.utils.logger import logger
 
 class CunqaBackend(BackendV2):
 
@@ -55,7 +59,6 @@ class CunqaBackend(BackendV2):
         readout_errors = {}
         qubits_properties = []
         for k,q in qubits.items():
-            # TODO: check if key is the correct format q[i]
             qubits_properties.append(
                 QubitProperties(
                     t1=q["T1 (s)"],

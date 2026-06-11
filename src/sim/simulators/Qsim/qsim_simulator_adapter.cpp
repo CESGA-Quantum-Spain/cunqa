@@ -19,8 +19,6 @@
 /* #include <simulator_avx.h>
 #include <simulator_sse.h> */
 
-#include "utils/constants.hpp"
-#include "utils/json.hpp"
 #include "logger.hpp"
 
 namespace {
@@ -219,7 +217,9 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
             break;
         }
         default:
-            std::cerr << "Instruction not suported!\nInstruction that failed: " << instruction_type_name(inst_type) << "\n";
+            throw 
+                std::runtime_error("Instruction not suported!\nInstruction that failed: " + 
+                std::string(instruction_type_name(inst_type)) + "\n");
         };
     }
 
@@ -605,7 +605,6 @@ JSON QsimSimulatorAdapter::native_execute(const Circuit& circuit)
     } 
     catch (const std::exception &e)
     {
-        // TODO: specify the circuit format in the docs.
         LOGGER_ERROR("Error executing the circuit in the Qsim simulator.");
         return {{"ERROR", std::string(e.what()) + ". Try checking the format of the circuit sent."}};
     }

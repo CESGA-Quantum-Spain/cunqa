@@ -109,7 +109,7 @@ ClassicalChannel::~ClassicalChannel() = default;
 void ClassicalChannel::publish()
 {
     JSON endpoint_json = { {"endpoint", endpoint}, {"rank", getenv("SLURM_PROCID")} };
-    write_on_file(endpoint_json, std::string(COMM_FILEPATH), qpu_id);
+    write_on_file(endpoint_json, COMM_FILEPATH, qpu_id);
 }
 
 
@@ -119,7 +119,7 @@ void ClassicalChannel::publish()
 void ClassicalChannel::connect(const std::string& qpu_id) 
 {
     if(!communications.contains(qpu_id))
-        communications = read_file(std::string(COMM_FILEPATH));
+        communications = read_file(COMM_FILEPATH);
 
     auto endpoint = communications.at(qpu_id).at("endpoint").get<std::string>();
     pimpl_->connect(endpoint, qpu_id);
@@ -134,8 +134,8 @@ std::string ClassicalChannel::recv_info(const std::string& origin) { return pimp
 //-----------------------------------------
 // Send and recv functions for measurements
 //-----------------------------------------
-void ClassicalChannel::send_measure(const int& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
-int ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
+void ClassicalChannel::send_measure(const bool& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
+bool ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
 
 
 } // End of comm namespace

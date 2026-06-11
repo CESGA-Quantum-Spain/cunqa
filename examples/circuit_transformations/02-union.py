@@ -3,9 +3,10 @@ import os, sys
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
-from cunqa.qjob import gather
+from cunqa.qc_protocols import cat_entangler, cat_disentangler
 from cunqa.circuit import CunqaCircuit
 from cunqa.circuit.transformations import union
+from cunqa.qjob import gather
 
 # ---------------------------
 # Acquiring resources
@@ -14,48 +15,75 @@ family_separated = qraise(2, "00:10:00", simulator="Aer", quantum_comm=True, co_
 qpus_separated = get_QPUs(co_located=True, family=family_separated)
 
 family_union = qraise(1, "00:10:00", simulator="Aer", co_located=True)
-[qpu_union]  = get_QPUs(co_located=True, family=family_union)
+[qpu_union] = get_QPUs(co_located=True, family=family_union)
 
-# ---------------------------
-# Original circuits created and executed
-# circuit1.q0: ─[H]──●──[M]─
-#                    $
-# circuit2.q0: ─────[X]─[M]─
-# Where $ represents the remote control of the gate
-# ---------------------------
-circuit1 = CunqaCircuit(1, id="circuit1") # adding ancilla
-circuit1.h(0)
+try:
+    # ---------------------------
+    # Communicated circuits created and executed.
+    # The remote control of the gate (a remote CX) is implemented with the
+    # cat-entangler / cat-disentangler telegate protocol.
+    #
+    # circuit1.data: ─[H]──●──[M]─
+    #                      $
+    # circuit2.data: ─────[X]─[M]─
+    # Where $ represents the remote control of the gate
+    # ---------------------------
+    circuit1 = CunqaCircuit((1, 1), 1, id="circuit1") # (data qubits, comm qubits), clbits
+    circuit2 = CunqaCircuit((1, 1), 1, id="circuit2")
 
-circuit2 = CunqaCircuit(1, id="circuit2")
+    data_1, comm_1 = circuit1.get_qubits()
+    data_2, comm_2 = circuit2.get_qubits()
 
-with circuit1.expose(0, circuit2) as ([rqubit], subcircuit):
-    subcircuit.cx(rqubit,0)
+    circuit1.h(data_1[0])
 
-circuit1.measure_all()
-circuit2.measure_all()
+    cat_entangler(
+        [circuit1, circuit2],
+        data_1[0],
+        [comm_1[0], comm_2[0]],
+        [0, 0],
+        tag="telegate"
+    )
 
-qjobs = run([circuit1, circuit2], qpus_separated, shots=1024)
-results = gather(qjobs)
+    circuit2.cx(comm_2[0], data_2[0])
 
-print(f"\nResult before union: {results[0].counts}") # taking only the results from the 0 circuit
-                                                     # because they both get the same due to 
-                                                     # quantum communications
+    cat_disentangler(
+        [circuit1, circuit2],
+        data_1[0],
+        [comm_2[0]],
+        [0],
+        [0]
+    )
 
-# ---------------------------
-# Take the union of the circuits and execute it
-# union_circuit.q0: ─[H]──●──[M]─
-#                         |
-# union_circuit.q1: ─────[X]─[M]─
-# ---------------------------
-union_circuit = union([circuit1, circuit2])
+    circuit1.measure(data_1[0], 0)
+    circuit2.measure(data_2[0], 0)
 
-qjob = run(union_circuit, qpu_union, shots=1024)# non-blocking call
-results = qjob.result
+    qjobs = run([circuit1, circuit2], qpus_separated, shots=1024)
+    results = gather(qjobs)
 
-print(f"Result after union: {results.counts}\n")
+    for i, result in enumerate(results):
+        print(f"\nResult before union (circuit{i + 1}): {result.counts}")
 
-# ---------------------------
-# Relinquishing resources
-# ---------------------------
-qdrop(family_union)
-qdrop(family_separated)
+    # ---------------------------
+    # Take the union of the circuits and execute it on a single QPU.
+    # The communication directives (gen_ent/send/recv) are replaced by local
+    # operations, yielding a single equivalent circuit.
+    #
+    # union_circuit.q0: ─[H]──●──[M]─
+    #                         |
+    # union_circuit.q1: ─────[X]─[M]─
+    # ---------------------------
+    union_circuit = union([circuit1, circuit2])
+
+    qjob = run(union_circuit, qpu_union, shots=1024) # non-blocking call
+    results = qjob.result
+
+    print(f"\nResult after union: {results.counts}\n")
+
+except Exception as error:
+    raise error
+finally:
+    # ---------------------------
+    # Relinquishing resources
+    # ---------------------------
+    qdrop(family_union)
+    qdrop(family_separated)

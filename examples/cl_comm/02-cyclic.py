@@ -60,7 +60,7 @@ try:
         circuit.recv(0, sending_circuit = str(i-1) if (i-1) != -1 else str(NUM_NODES-1))
         circuit.cif(clbits = 0)
         circuit.x(0)
-        circuit.endcif(0)
+        circuit.endcif()
 
         # Adding final measurement of que qubit after the x gate
         circuit.measure(0,0)

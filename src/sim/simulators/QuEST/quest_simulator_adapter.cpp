@@ -13,7 +13,6 @@
 #include "quest_circuit_adapter.hpp"
 #include "quest.h"
 
-#include "utils/constants.hpp"
 #include "logger.hpp"
 
 namespace {

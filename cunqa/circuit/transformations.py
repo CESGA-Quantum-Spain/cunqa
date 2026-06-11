@@ -3,9 +3,11 @@ import copy
 import numpy as np
 from itertools import accumulate
 
-from cunqa.logger import logger
+
 from cunqa.circuit.core import CunqaCircuit
-from cunqa.constants import REMOTE_GATES
+from cunqa.qc_protocols import cat_entangler, cat_disentangler
+from cunqa.utils.constants import REMOTE_GATES
+from cunqa.utils.logger import logger
 
 def vsplit():
     """TODO: Vertical split of a quantum circuit."""
@@ -13,29 +15,25 @@ def vsplit():
 
 def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> list[CunqaCircuit]:
     """
-    Horizontal split of a quantum circuit. 
-    
-    This function splits a circuit into a given number of subcircuits. This number is determined by 
-    the `qubits_or_sections` argument. If it is a list, then it specifies the number of qubits each 
-    subcircuit will have; however, if it is an int, it specifies the number of subcircuits to be 
-    created (each having the same number of qubits, except for one in case the split is not exact, 
-    which will take the remainder as its number of qubits).
+    Horizontal split of a quantum circuit.
 
-    If a controlled gate is divided an expose quantum directive will be used in order to maintain 
-    the global state intact.
+    This function splits a circuit into a given number of subcircuits. This number is determined by
+    the `qubits_or_sections` argument. If it is a list, then it specifies the number of qubits each
+    subcircuit will have; however, if it is an int, it specifies the number of subcircuits to be
+    created (each having the same number of qubits, except for one in case the split is not exact,
+    which will take the remainder as its number of qubits).
 
     This operation is the inverse of the :py:func:`union`.
 
     Args:
         circuit (~cunqa.circuit.core.CunqaCircuit): circuit to be splited.
-        qubits_or_sections(list[int], int): if is a list, qubits in which to split, if an int, 
+        qubits_or_sections(list[int], int): if is a list, qubits in which to split, if an int,
                                             number of subcircuits that result of the split.
 
     """
-    num_qubits = circuit.num_qubits
+    num_qubits = circuit.num_qubits[0]
 
     if isinstance(qubits_or_sections, list):
-        # handle list case.
         if np.sum(qubits_or_sections) != num_qubits:
             raise RuntimeError(f"Error: Incorrect hsplit of the circuit, {qubits_or_sections} does "
                                f"not add up to {num_qubits} qubits")
@@ -43,7 +41,6 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
         initial_qubits = [0] + [int(x) for x in np.cumsum(qubits_or_sections)]
 
     elif isinstance(qubits_or_sections, int):
-        # indices_or_sections is a scalar, not a list.
         Nsections = int(qubits_or_sections)
         if Nsections <= 0:
             raise ValueError('number sections must be larger than 0.') from None
@@ -54,87 +51,115 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
 
     def get_subcircuits(circuit, initial_qubits, Nsections):
         sub_circuits = []
-        measures = {}
-        clbits = {}
-        
+        circuits_linked = {}
+        measures = {i: [] for i in range(Nsections)}
+        clbits = {i: [] for i in range(Nsections)}
+
         for i in range(Nsections):
             num_qubits_i = initial_qubits[i + 1] - initial_qubits[i]
-            sub_circuits.append(CunqaCircuit(num_qubits_i, id= circuit.info["id"] + f"_{i}"))
+            sub_circuits.append(CunqaCircuit(num_qubits_i, id=circuit.id + f"_{i}"))
 
         def find_index(array, value):
             for i, elem in enumerate(array):
-                if(elem > value):
+                if elem > value:
                     return i - 1
 
+        last_idx = 0
+
         for inst in circuit.instructions[:]:
-            i = find_index(initial_qubits, inst["qubits"][0])
+            if "qubits" not in inst:
+                # Instructions without qubit indices (cif, endcif, send, recv, gen_ent):
+                # assign to the last active subcircuit.
+                sub_circuits[last_idx].add_instructions([inst])
+                continue
+
+            raw_qubits = inst["qubits"]
+            qubits = [raw_qubits] if isinstance(raw_qubits, int) else list(raw_qubits)
+
+            i = find_index(initial_qubits, qubits[0])
+            last_idx = i
             sub_circuit = sub_circuits[i]
-            clbits[i] = []
-            measures[i] = []
-            
+
             if inst["name"] == "measure":
-                # Measure and clbits processing
-                for b in inst["clbits"]:
-                    from bisect import bisect_left
-
-                    b = int(b)
-                    pos = bisect_left(clbits[i], b)
-                    if pos == len(clbits[i]) or clbits[i][pos] != b:
-                        clbits[i].insert(pos, b)
-                    measures[i] = measures[i] + [inst]
-                inst["qubits"][0] -= initial_qubits[i]
+                from bisect import bisect_left
+                b = int(inst["clbits"])
+                pos = bisect_left(clbits[i], b)
+                if pos == len(clbits[i]) or clbits[i][pos] != b:
+                    clbits[i].insert(pos, b)
+                measures[i].append(inst)
+                inst["qubits"] = qubits[0] - initial_qubits[i]
                 sub_circuit.add_instructions([inst])
-            elif len(inst["qubits"]) == 1:
-                # One qubit gate
-                inst["qubits"][0] -= initial_qubits[i]
+            elif len(qubits) == 1:
+                inst["qubits"] = qubits[0] - initial_qubits[i]
                 sub_circuit.add_instructions([inst])
-            elif len(inst["qubits"]) == 2:
-                # Two qubits gate
-                j = find_index(initial_qubits, inst["qubits"][1])
+            elif len(qubits) == 2:
+                j = find_index(initial_qubits, qubits[1])
+                target_circuit = sub_circuits[j]
                 if i != j:
-                    # Have to divide the gate
-                    target_circuit = sub_circuits[j]
-
+                    linked_subcircuits = frozenset({i, j})
+                    _, comm_1 = sub_circuit.get_qubits()
+                    _, comm_2 = target_circuit.get_qubits()
+                    
+                    if not circuits_linked.get(linked_subcircuits):
+                        circuits_linked[linked_subcircuits] = True
+                        sub_circuit.add_comm_qubits(len(comm_1) + 1)
+                        target_circuit.add_comm_qubits(len(comm_2) + 1)
+                        
+                    _, comm_1 = sub_circuit.get_qubits()
+                    _, comm_2 = target_circuit.get_qubits()
+                    
                     ctrl_qubit = inst["qubits"][0] - initial_qubits[i]
-                    target_qubit = inst["qubits"][1] - initial_qubits[j]
+                    inst["qubits"][0] = comm_2[-1]
+                    inst["qubits"][1] -= initial_qubits[j]
+                    
+                    cat_entangler(
+                        [sub_circuit, target_circuit],
+                        ctrl_qubit,
+                        [comm_1[0], comm_2[0]],
+                        [0, 0],
+                        tag="telegate"
+                    )
 
-                    with sub_circuit.expose(ctrl_qubit, target_circuit) as (rqubit, subcircuit):
-                        inst["qubits"][0] = rqubit
-                        inst["qubits"][1] = target_qubit
-                        subcircuit.add_instructions([inst])
+                    target_circuit.add_instructions([inst])
+
+                    cat_disentangler(
+                        [sub_circuit, target_circuit],
+                        ctrl_qubit,
+                        [comm_2[0]],
+                        [0, 1],
+                        [0, 0]
+                    )
                 else:
-                    inst["qubits"][0] -= initial_qubits[i]
-                    inst["qubits"][1] -= initial_qubits[i]
+                    inst["qubits"] = [qubits[0] - initial_qubits[i], qubits[1] - initial_qubits[i]]
                     sub_circuit.add_instructions([inst])
             else:
-                raise ValueError("Three qubits gates cannot be partitioned.")
-        
-        if len(clbits):
-            for i, sub_circuit in enumerate(sub_circuits):
-                sub_circuit.add_cl_register(f"subcl_0", len(clbits[i]))
-                for j, measure_i, in enumerate(measures[i]):
-                    measure_i["clbits"] = [clbits[i].index(clbit) for clbit in measure_i["clbits"]]
-        
-        return sub_circuits 
-    
+                raise ValueError("Three or more qubit gates cannot be partitioned.")
+
+        for i, sub_circuit in enumerate(sub_circuits):
+            if clbits[i]:
+                sub_circuit.add_cl_register("subcl_0", len(clbits[i]))
+                for measure_i in measures[i]:
+                    measure_i["clbits"] = clbits[i].index(int(measure_i["clbits"]))
+
+        return sub_circuits
+
     return get_subcircuits(copy.deepcopy(circuit), initial_qubits, Nsections)
 
 def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
     Union of circuits (addition of qubits).
 
-    This function joins the qubits of several :py:class:`~cunqa.circuit.core.CunqaCircuit` objects. 
-    These circuits may be connected via communication directives which will be replaced as follows:
+    This function joins the qubits of several :py:class:`~cunqa.circuit.core.CunqaCircuit` objects
+    into a single circuit. Circuits connected by quantum communication protocols have those
+    protocols collapsed into their equivalent local operations:
 
-    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.expose`. The gates applied remotely simply switch 
-      to local operations.
-    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.qrecv` and 
-      :py:meth:`~cunqa.circuit.core.CunqaCircuit.qsend`. Switch to be a
-      :py:meth:`~cunqa.circuit.core.CunqaCircuit.swap` operation between local qubits.
-    - :py:meth:`~cunqa.circuit.core.CunqaCircuit.send` and 
-      :py:meth:`~cunqa.circuit.core.CunqaCircuit.recv`. They provoke a special copy operation 
-      among classical registers called `copy`. For now, this operation is not available in the 
-      public API of :py:class:`~cunqa.circuit.core.CunqaCircuit`.
+    - **Telegate** (a :py:func:`~cunqa.qc_protocols.cat_entangler` / remote-controlled gate(s) /
+      :py:func:`~cunqa.qc_protocols.cat_disentangler` block). The whole protocol is removed and the
+      gate(s) the receiver applied controlled on its comm qubit are reissued as direct gate(s)
+      controlled on the sender's data qubit.
+    - **Teledata** (a :py:func:`~cunqa.qc_protocols.qsend` / :py:func:`~cunqa.qc_protocols.qrecv`
+      block). The whole protocol is removed and replaced by a ``swap`` between the sender's and the
+      receiver's data qubits.
 
     This operation is the inverse of the :py:func:`hsplit`.
 
@@ -147,142 +172,224 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
         logger.warning("Not enough circuits to perform a union, returning the original circuit.")
         return circuits[0]
 
-    circuits = copy.deepcopy(circuits) # avoid aliasing
+    circuits = copy.deepcopy(circuits)
 
-    qubit_offsets = [0] + list(accumulate(c.num_qubits for c in circuits[:-1]))
+    qubit_offsets = [0] + list(accumulate(
+        c.num_qubits[0] + c.num_qubits[1] for c in circuits[:-1]
+    ))
     clbit_offsets = [0] + list(accumulate(c.num_clbits for c in circuits[:-1]))
-    circuit_ids = {c.id for c in circuits}
+    id_to_idx = {c.id: i for i, c in enumerate(circuits)}
 
-    def reindex(instr: dict, idx: int, exposed_q: int = -1) -> dict:
+    def gq(idx: int, qubit: int) -> int:
+        """Map a circuit-local qubit index to its index in the merged circuit."""
+        return qubit + qubit_offsets[idx]
+
+    def reindex(instr: dict, idx: int, alias: dict = None) -> dict:
+        """
+        Copy ``instr`` remapping its qubit/clbit indices into the merged-circuit space.
+        ``alias`` optionally maps specific local qubit indices to already-global indices (used to
+        rewrite a comm qubit into the sender's data qubit when collapsing a telegate).
+        """
+        alias = alias or {}
+
+        def map_qubit(q: int) -> int:
+            return alias[q] if q in alias else gq(idx, q)
+
         new_instr = dict(instr)
         if "instructions" in new_instr:
-            sub_instructions = []
-            for sub_instr in new_instr["instructions"]:
-                sub_instructions.append(reindex(sub_instr, idx, exposed_q))
-            new_instr = sub_instructions
+            new_instr["instructions"] = [reindex(sub, idx, alias)
+                                         for sub in new_instr["instructions"]]
         if "qubits" in new_instr:
-            if exposed_q == -1:
-                new_instr["qubits"] = [q + qubit_offsets[idx] for q in new_instr["qubits"]]
-            else:
-                new_instr["qubits"] = [q + qubit_offsets[idx] if q != -1 else exposed_q 
-                                       for q in new_instr["qubits"]]
+            q = new_instr["qubits"]
+            new_instr["qubits"] = (map_qubit(q) if isinstance(q, int)
+                                   else [map_qubit(qi) for qi in q])
+        if "comm_qubit" in new_instr:
+            new_instr["comm_qubit"] = gq(idx, new_instr["comm_qubit"])
         if "clbits" in new_instr:
-            new_instr["clbits"] = [c + clbit_offsets[idx] for c in new_instr["clbits"]]
+            c = new_instr["clbits"]
+            new_instr["clbits"] = (c + clbit_offsets[idx] if isinstance(c, int)
+                                   else [ci + clbit_offsets[idx] for ci in c])
         return new_instr
 
-    def is_valid_remote(instr: dict) -> bool:
-        return (
-            instr["name"] in REMOTE_GATES
-            and all(cid in circuit_ids for cid in instr["circuits"])
+    # -----------------------------------------------------------------
+    # 1. Discover the quantum-communication protocols by their gen_ent tag.
+    # -----------------------------------------------------------------
+    groups: dict = {}  # tag -> {"genpos": {idx: pos}, "comms": {idx: comm_qubit}}
+    for idx, circuit in enumerate(circuits):
+        for pos, instr in enumerate(circuit.instructions):
+            if (instr.get("name") == "gen_ent"
+                    and all(cid in id_to_idx for cid in instr["circuits"])):
+                tag = instr["tag"]
+                group = groups.setdefault(tag, {"genpos": {}, "comms": {}})
+                group["genpos"][idx] = pos
+                group["comms"][idx] = instr["comm_qubit"]
+
+    # -----------------------------------------------------------------
+    # 2. Parse each protocol, collapse it into its local equivalent and record, for every
+    #    participant circuit, the instruction range that the protocol occupies.
+    # -----------------------------------------------------------------
+    collapsed: dict = {}   # tag -> local gates to emit at the barrier
+    blocks: dict = {idx: [] for idx in range(len(circuits))}  # idx -> [(start, end, tag), ...]
+
+    def find_sender(group: dict) -> int:
+        """The sender is the participant whose first directive after gen_ent is a ``send``."""
+        for idx, genpos in group["genpos"].items():
+            instrs = circuits[idx].instructions
+            for pos in range(genpos + 1, len(instrs)):
+                if instrs[pos]["name"] == "send":
+                    return idx
+                if instrs[pos]["name"] == "recv":
+                    break
+        raise ValueError("Could not identify the sender of a quantum communication protocol "
+                         "while performing the union.")
+
+    def parse_sender(idx: int, genpos: int, comm: int) -> tuple:
+        """Consume the sender block. Returns (data_qubit, end_pos, is_teledata)."""
+        instrs = circuits[idx].instructions
+        pos = genpos + 1  # skip gen_ent
+        cx_instr = instrs[pos]
+        if cx_instr["name"] != "cx" or cx_instr["qubits"][1] != comm:
+            raise ValueError("Unexpected telegate/teledata sender structure during union.")
+        data_qubit = cx_instr["qubits"][0]
+        pos += 1
+        if instrs[pos]["name"] == "h" and instrs[pos]["qubits"] == data_qubit:
+            # teledata: h(data), measure(data), measure(comm), send(s)
+            pos += 1
+            while instrs[pos]["name"] == "measure":
+                pos += 1
+            while pos < len(instrs) and instrs[pos]["name"] == "send":
+                pos += 1
+            return data_qubit, pos, True
+        # telegate: measure(comm), send(s), recv(s), cif(xor), z(data), endcif
+        pos += 1  # measure(comm)
+        while instrs[pos]["name"] == "send":
+            pos += 1
+        while instrs[pos]["name"] == "recv":
+            pos += 1
+        pos += 3  # cif, z(data), endcif
+        return data_qubit, pos, False
+
+    def parse_receiver_telegate(tag: str, idx: int, genpos: int, comm: int, data_global: int) -> int:
+        """Consume a telegate receiver block, recording the collapsed gates. Returns end_pos."""
+        instrs = circuits[idx].instructions
+        pos = genpos + 1     # skip gen_ent
+        pos += 4             # recv, cif, x(comm), endcif (entangler correction)
+        local_gates = []
+        while not (instrs[pos]["name"] == "h" and instrs[pos]["qubits"] == comm
+                   and instrs[pos + 1]["name"] == "measure" and instrs[pos + 2]["name"] == "send"):
+            local_gates.append(instrs[pos])
+            pos += 1
+        pos += 3             # h(comm), measure(comm), send (disentangler)
+        for gate in local_gates:
+            collapsed[tag].append(reindex(gate, idx, alias={comm: data_global}))
+        return pos
+
+    def parse_receiver_teledata(tag: str, idx: int, genpos: int, comm: int, data_global: int) -> int:
+        """Consume a teledata receiver block, recording the swap. Returns end_pos."""
+        instrs = circuits[idx].instructions
+        pos = genpos + 1     # skip gen_ent
+        pos += 1             # recv
+        pos += 6             # cif/x(comm)/endcif, cif/z(comm)/endcif
+        swap_instr = instrs[pos]
+        if swap_instr["name"] != "swap":
+            raise ValueError("Unexpected teledata receiver structure during union.")
+        sw = swap_instr["qubits"]
+        data_recv = sw[0] if sw[1] == comm else sw[1]
+        pos += 1
+        collapsed[tag].append({"name": "swap", "qubits": [data_global, gq(idx, data_recv)]})
+        return pos
+
+    for tag, group in groups.items():
+        collapsed[tag] = []
+        sender = find_sender(group)
+        data_qubit, sender_end, is_teledata = parse_sender(
+            sender, group["genpos"][sender], group["comms"][sender]
         )
+        data_global = gq(sender, data_qubit)
+        blocks[sender].append((group["genpos"][sender], sender_end, tag))
+
+        for idx, genpos in group["genpos"].items():
+            if idx == sender:
+                continue
+            comm = group["comms"][idx]
+            if is_teledata:
+                end = parse_receiver_teledata(tag, idx, genpos, comm, data_global)
+            else:
+                end = parse_receiver_telegate(tag, idx, genpos, comm, data_global)
+            blocks[idx].append((genpos, end, tag))
+
+    # -----------------------------------------------------------------
+    # 3. Turn every circuit into a token stream: plain instructions to emit (reindexed) and the
+    #    barrier that marks the rendezvous point of each protocol.
+    # -----------------------------------------------------------------
+    tokens: dict = {}
+    for idx, circuit in enumerate(circuits):
+        starts = {start: (end, tag) for start, end, tag in blocks[idx]}
+        stream = []
+        pos = 0
+        while pos < len(circuit.instructions):
+            if pos in starts:
+                end, tag = starts[pos]
+                stream.append(("barrier", tag))
+                pos = end
+            else:
+                stream.append(("plain", reindex(circuit.instructions[pos], idx)))
+                pos += 1
+        tokens[idx] = stream
+
+    # -----------------------------------------------------------------
+    # 4. Merge the streams, releasing each barrier (and emitting its collapsed gates) only once
+    #    every participant of the protocol has reached it.
+    # -----------------------------------------------------------------
+    union_instructions: list = []
+    pointers = [0] * len(circuits)
+    arrived: dict = {}
+    emitted: set = set()
+
+    while any(pointers[idx] < len(tokens[idx]) for idx in range(len(circuits))):
+        progress = False
+        for idx in range(len(circuits)):
+            if pointers[idx] >= len(tokens[idx]):
+                continue
+            kind, payload = tokens[idx][pointers[idx]]
+            if kind == "plain":
+                union_instructions.append(payload)
+                pointers[idx] += 1
+                progress = True
+            else:  # barrier
+                tag = payload
+                participants = set(groups[tag]["genpos"].keys())
+                arrived.setdefault(tag, set()).add(idx)
+                if arrived[tag] == participants:
+                    if tag not in emitted:
+                        union_instructions.extend(collapsed[tag])
+                        emitted.add(tag)
+                    for j in participants:
+                        pointers[j] += 1
+                    progress = True
+        if not progress:
+            raise ValueError("Deadlock while performing the union: the communication protocols "
+                             "between the given circuits could not be matched.")
 
     union_circuit = CunqaCircuit(
-        num_qubits=sum(c.num_qubits for c in circuits),
+        num_qubits=sum(c.num_qubits[0] + c.num_qubits[1] for c in circuits),
         num_clbits=sum(c.num_clbits for c in circuits),
         id="|".join(c.id for c in circuits),
     )
-    union_instructions: list[dict] = []
-    blocked: dict[str, dict] = {}
-
-    finished = [False if len(circ.instructions) > 0 else True for circ in circuits]
-    pointers = [0] * len(circuits)
-
-    def advance(idx: int) -> None:
-        pointers[idx] += 1
-        if pointers[idx] == len(circuits[idx].instructions):
-            finished[idx] = True
-
-    def process_remote(instr: dict, idx: int, circuit_id: str) -> bool:
-        """
-        Returns True if instruction was consumed.
-        """
-        for target_id in instr["circuits"]:
-            name = instr["name"]
-
-            if name == "send":
-                if target_id not in blocked:
-                    return False
-                blocked_instr = blocked[target_id]
-                if blocked_instr["name"] == "recv":
-                    instr_i = reindex(instr, idx)
-                    union_instructions.append(
-                        {
-                            "name": "copy",
-                            "l_clbits": blocked_instr["clbits"],
-                            "r_clbits": instr_i["clbits"]
-                        })
-                    
-                    del blocked[target_id]
-                    return True
-                
-            if name == "qsend":
-                if target_id not in blocked:
-                    return False
-                blocked_instr = blocked[target_id]
-                if blocked_instr["name"] == "qrecv":
-                    instr_i = reindex(instr, idx)
-                    union_instructions.append(
-                        {
-                            "name": "swap",
-                            "qubits": [
-                                instr_i["qubits"][0],
-                                blocked_instr["qubits"][0],
-                            ],
-                        }
-                    )
-                    union_instructions.append(
-                        {"name": "reset", "qubits": instr_i["qubits"]}
-                    )
-                    del blocked[target_id]
-                    return True
-
-            elif name in ("qrecv", "expose", "recv"):
-                blocked[circuit_id] = reindex(instr, idx)
-                return True
-            elif name == "rcontrol":
-                if target_id not in blocked:
-                    return False
-                blocked_instr = blocked[target_id]
-                if blocked_instr["name"] == "expose":
-                    for sub_instr in reindex(instr, idx, blocked_instr["qubits"][0]):
-                        union_instructions.append(sub_instr)
-                    del blocked[target_id]
-                    return True
-
-        return False
-
-    while not all(finished):
-        for idx, circuit in enumerate(circuits):
-            if finished[idx]:
-                continue
-
-            instr = circuit.instructions[pointers[idx]]
-            consumed = False
-
-            if is_valid_remote(instr):
-                consumed = process_remote(instr, idx, circuit.id)
-                union_circuit.is_dynamic = True
-
-            elif circuit.id not in blocked:
-                union_instructions.append(reindex(instr, idx))
-                consumed = True
-
-            if consumed:
-                advance(idx)
-
     union_circuit.add_instructions(union_instructions)
+    union_circuit.is_dynamic = any(instr.get("name") == "cif" for instr in union_instructions)
     return union_circuit
 
 def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     """
     This function concatenates the instructions of two circuits.
 
-    It appends the gates from a list of circuits into a final resulting circuit. The 
-    order of the list passed as an argument is important, since the instructions will be appended 
+    It appends the gates from a list of circuits into a final resulting circuit. The
+    order of the list passed as an argument is important, since the instructions will be appended
     in that same order.
 
-    In this operation, if two circuits in the list contain communication directives between them, 
-    an exception will be raised to prevent potential deadlocks and undefined or incorrectly 
+    In this operation, if two circuits in the list contain communication directives between them,
+    an exception will be raised to prevent potential deadlocks and undefined or incorrectly
     specified behavior.
 
     This operation is the inverse of the :py:func:`vsplit`.
@@ -297,7 +404,7 @@ def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     circuit_ids = {c.id for c in circuits}
 
     addition_circuit = CunqaCircuit(
-        num_qubits=max(c.num_qubits for c in circuits),
+        num_qubits=max(c.num_qubits[0] for c in circuits),
         num_clbits=max(c.num_clbits for c in circuits),
         id="+".join(c.id for c in circuits),
     )
@@ -307,11 +414,11 @@ def add(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     for circuit in circuits:
         for instr in circuit.instructions:
             if instr["name"] in REMOTE_GATES:
-                for circ_id in instr["circuits"]:
-                    if circ_id in circuit_ids:
-                        raise ValueError("Cannot add two circuits that communicate with eachother.")
+                for circ_id in instr.get("circuits", []):
+                    if circ_id != circuit.id and circ_id in circuit_ids:
+                        raise ValueError("Cannot add two circuits that communicate with each other.")
+                    
             addition_instructions.append(instr)
 
     addition_circuit.add_instructions(addition_instructions)
-    return addition_circuit        
-
+    return addition_circuit

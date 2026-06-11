@@ -1,6 +1,3 @@
-set(_old_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-
 # =====================================================================
 #  AER - Qiskit simulator headers
 #  Fork with version 0.17.2 minimal fix and GPU setter
@@ -30,26 +27,8 @@ if(pybind11_FOUND)
   message(STATUS "Linked pybind aer-cpp")
 endif()
 
-if(DEFINED AER_GPU)
-  message(STATUS "Compiling with AER_GPU")
-  set(COMPILATION_FOR_GPU TRUE)
-
-  # Architecture           GPUs examples         SM
-  # -------------------------------------------------
-  # Volta                  V100                  70
-  # Turing                 T4, RTX 2080          75
-  # Ampere                 A100                  80
-  # Ampere GA10x           RTX 30xx              86
-  # Ada Lovelace           RTX 40xx              89
-  # Hopper                 H100                  90
-
-  set(GPU_ARCH 80)
-  set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
-
-  enable_language(CUDA)
-
-  set(CMAKE_CUDA_STANDARD 20)
-  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+if(USE_GPU)
+  message(STATUS "Compiling AER simulator with GPU")
 
   find_package(Python REQUIRED COMPONENTS Interpreter Development)
   find_library(PMIX_LIB NAMES pmix REQUIRED)
@@ -85,7 +64,6 @@ if(DEFINED AER_GPU)
   )
 endif()
 
-
 # =====================================================================
 #  MQT-DDSIM - quantum circuit simulator
 # =====================================================================
@@ -113,17 +91,46 @@ else()
   message(STATUS "Using existing mqt-ddsim package")
 endif()
 
-set(CMAKE_CXX_FLAGS "${_ORIG_CXX_FLAGS}" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "${_ORIG_CXX_FLAGS_DEBUG}" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "${_ORIG_CXX_FLAGS_RELEASE}" CACHE STRING "" FORCE)
-
 include_directories(${_ORIG_INCLUDE_DIRS})
 add_definitions(${_ORIG_COMPILE_DEFINITIONS})
 
 
-# =====================================================================
-#  Maestro and its dependencies
-# =====================================================================
+# ===================================================================================
+#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
+# ===================================================================================
+CPMAddPackage(
+  NAME quest
+  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/QuEST.git
+  GIT_TAG v4.2.0
+)
+
+# ===================================================================================
+#  Maestro
+# ===================================================================================
+
+# ---------------------------------------------------------------------
+#  QCSim
+# ---------------------------------------------------------------------
+CPMAddPackage(
+  NAME qcsim
+  GIT_REPOSITORY git@github.com:aromanro/QCSim.git
+  GIT_TAG 76db3f97974221306c9e2b7be4c4c9f6e7318d6e
+  DOWNLOAD_ONLY YES
+)
+
+# ---------------------------------------------------------------------
+#  AER - Qiskit simulator headers, fork for Maestro
+# ---------------------------------------------------------------------
+CPMAddPackage(
+  NAME maestro_aer
+  GIT_REPOSITORY git@github.com:InvictusWingsSRL/qiskit-aer.git
+  GIT_TAG 96e82fdd1c8c1b17d749863ee5095262372e0d7e
+  DOWNLOAD_ONLY YES
+)
+
+set(AER_INCLUDE_DIR "${maestro_aer_SOURCE_DIR}/src")
+set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
+
 get_target_property(
   EIGEN5_INCLUDE_DIR
   Eigen3::Eigen
@@ -140,45 +147,6 @@ get_target_property(
 
 set(JSON_INCLUDE_DIR "${JSON_INCLUDE_PATH}")
 
-
-# ---------------------------------------------------------------------
-#  QCSim
-# ---------------------------------------------------------------------
-CPMAddPackage(
-  NAME qcsim
-  GIT_REPOSITORY git@github.com:aromanro/QCSim.git
-  GIT_TAG 76db3f97974221306c9e2b7be4c4c9f6e7318d6e
-  DOWNLOAD_ONLY YES
-)
-
-set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
-
-
-# ===================================================================================
-#  QuEST - Quantum Exact Simulation Toolkit from the EPCC at University of Edinburgh
-# ===================================================================================
-CPMAddPackage(
-  NAME quest
-  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/QuEST.git
-  GIT_TAG v4.2.0
-)
-
-# ---------------------------------------------------------------------
-#  AER - Qiskit simulator headers, fork for Maestro
-# ---------------------------------------------------------------------
-CPMAddPackage(
-  NAME maestro_aer
-  GIT_REPOSITORY git@github.com:InvictusWingsSRL/qiskit-aer.git
-  GIT_TAG 96e82fdd1c8c1b17d749863ee5095262372e0d7e
-  DOWNLOAD_ONLY YES
-)
-
-set(AER_INCLUDE_DIR "${maestro_aer_SOURCE_DIR}/src")
-
-
-# ---------------------------------------------------------------------
-#  Maestro
-# ---------------------------------------------------------------------
 set(ENV{EIGEN5_INCLUDE_DIR} "${EIGEN5_INCLUDE_DIR}")
 set(ENV{JSON_INCLUDE_DIR}   "${JSON_INCLUDE_DIR}")
 set(ENV{QCSIM_INCLUDE_DIR}  "${QCSIM_INCLUDE_DIR}")
@@ -295,5 +263,3 @@ if(qulacs_ADDED)
 else()
   message(STATUS "Using existing qulacs package")
 endif()
-
-set(CMAKE_CXX_FLAGS "${_old_CXX_FLAGS}")

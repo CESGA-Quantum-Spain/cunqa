@@ -1,4 +1,3 @@
-// simulator_factory.hpp
 #pragma once
 
 #include <memory>

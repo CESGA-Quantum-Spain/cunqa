@@ -19,11 +19,10 @@ public:
         simulator_ = std::move(simulator);
     }
 
-    inline JSON execute(const JSON& quantum_task)
+    JSON execute(const JSON& quantum_task)
     {
         if (auto it = quantum_task.find("config"); it != quantum_task.end())
             simulator_->config = RunConfig(*it);
-
             
         if (simulator_->config.is_dynamic) {
             // Either create a new circuit or update the previous one

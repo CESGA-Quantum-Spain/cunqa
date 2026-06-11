@@ -41,21 +41,6 @@ bool communication_supported_by_simulator(const std::string& simulator, const Co
     return false;
 }
 
-bool noise_supported_by_simulator(const std::string& simulator, const Communications& scheme) 
-{
-    switch (scheme) {
-        case Communications::NC:
-            return std::ranges::find(cunqa::SUPPORTED_NOISY_SIMULATORS, simulator)
-                != cunqa::SUPPORTED_NOISY_SIMULATORS.end();
-        case Communications::CC:
-            return false;
-        case Communications::QC:
-            return false;
-    }
-
-    return false;
-}
-
 std::string get_communications_name(const Communications& scheme)
 {
     switch (scheme) {

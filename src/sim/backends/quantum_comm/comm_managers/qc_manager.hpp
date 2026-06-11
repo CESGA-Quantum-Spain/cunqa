@@ -44,6 +44,7 @@ struct QuantumCommManager {
             }
             for (const auto& qubit : wait)
                 is_pending[qubit] = false;
+            ent_wait[payload.tag].clear();
         } else
             is_pending[payload.qubit] = true;
     }

@@ -6,7 +6,6 @@
 #include <functional>
 #include <cstdlib>
 
-#include "utils/constants.hpp"
 #include "utils/helpers/reverse_bitstring.hpp"
 #include "utils/helpers/json_to_qasm2.hpp"
 

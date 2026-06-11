@@ -19,29 +19,29 @@ void execute_shot_(
     comm::ClassicalChannel& classical_channel
 )
 {
-    for (int pc = 0; pc < circuit.instructions.size(); pc++) {
+    for (std::size_t pc = 0; pc < circuit.instructions.size(); pc++) {
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
             auto type = circuit.instructions[pc].type;
 
             if constexpr (std::is_same_v<T, ClassicalIf>) {
-                if (type == InstructionType::CIF) {
+                if (type == InstructionType::CIF){
+                        // Operates on the values provided, with the specified operation. 
+                        //If condition is 0, the operation negates the second operand (check cif_ops)
+                        bool result = std::accumulate(
+                            payload.clbits.begin() + 1, payload.clbits.end(), 
+                            simulator->creg[payload.clbits[0]], // Starting value
+                            [&](bool acc, std::size_t clbit) { 
+                                return cif_ops[payload.operation](acc, simulator->creg[clbit]); 
+                            }
+                        );
 
-                    // Negate the clbit value if condition is 0. If there is only one clbit, result = init
-                    bool init = (payload.condition) ? simulator->creg[payload.clbits[0]] : !simulator->creg[payload.clbits[0]];
-                    // Operates on the values provided, with the specified operation. If condition is 0, the operation negates the second operand (check cif_ops)
-                    bool result = std::accumulate(payload.clbits.begin() + 1, payload.clbits.end(), 
-                                init,                       // Starting value
-                                [&](bool acc, int clbit) { 
-                                    return cif_ops[payload.operation](acc, simulator->creg[clbit]); 
-                                });
-
-                    // If condition is not met, we skip all the gates till ENDCIF arrives.
-                    if (!result){
-                        while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
-                            ++pc;
-                    }   
-                }    
+                        // If condition is not met, we skip all the gates till ENDCIF arrives.
+                        if (result != payload.condition){
+                            while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
+                                ++pc;
+                        } 
+                    }  
                 // We always avoid ENDCIF cause it does not possess semantic meaning
                 if (type == InstructionType::ENDCIF)
                     return;
@@ -49,10 +49,10 @@ void execute_shot_(
                 if (type == InstructionType::SEND) {
                     if (payload.clbits.size() != payload.qpus.size())
                         throw std::invalid_argument("Not the same number of clbits and qpus to send!");
-                    for (int i=0; i<payload.clbits.size(); i++) 
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) 
                         classical_channel.send_measure(simulator->creg[payload.clbits[i]], payload.qpus[i]);
                 } else {
-                    for (int i=0; i<payload.clbits.size(); i++)
+                    for (std::size_t i=0; i<payload.clbits.size(); i++)
                         simulator->creg[payload.clbits[i]] = classical_channel.recv_measure(payload.qpus[i]);;
                 }
             } else if constexpr (std::is_same_v<T, GenEnt>)
@@ -70,33 +70,32 @@ void execute_shot_(
 namespace cunqa {
 namespace sim {
 
-CCExecutor::CCExecutor(std::unique_ptr<Simulator> simulator) : 
-    simulator_{std::move(simulator)},
+CCExecutor::CCExecutor() : 
     classical_channel_{get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID")}
 {
     classical_channel_.publish();
 };
 
-JSON CCExecutor::execute(const JSON& instructions, const RunConfig& run_config)
+JSON CCExecutor::execute(const JSON& quantum_task)
 {
     std::map<std::string, std::size_t> meas_counter;
     
+    if (auto it = quantum_task.find("config"); it != quantum_task.end())
+        simulator_->config = RunConfig(*it);
+
     // Either create a new circuit or update the previous one
-    if (auto it = instructions.find("instructions"); it != instructions.end()) {
-        auto& instr_values = *it;
-        last_circuit_ = std::make_unique<DynamicCircuit>(instr_values);
-    } 
-    else if (auto it = instructions.find("params"); it != instructions.end())
+    if (auto it = quantum_task.find("instructions"); it != quantum_task.end())
+        last_circuit_ = std::make_unique<DynamicCircuit>(*it);
+    else if (auto it = quantum_task.find("params"); it != quantum_task.end())
         last_circuit_->update_params(it->get<std::vector<double>>());
 
     auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
-    simulator_->config = run_config;
 
-    for(const std::string& qpu_id: run_config.sending_to)
+    for(const std::string& qpu_id: simulator_->config.sending_to)
         classical_channel_.connect(qpu_id);
         
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < run_config.shots; i++) {
+    for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
         execute_shot_(simulator_.get(), circuit, classical_channel_);
         meas_counter[simulator_->get_measures()]++;
