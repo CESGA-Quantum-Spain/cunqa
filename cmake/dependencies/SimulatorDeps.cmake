@@ -159,7 +159,7 @@ set(QCSIM_INCLUDE_DIR "${qcsim_SOURCE_DIR}/QCSim")
 # ===================================================================================
 CPMAddPackage(
   NAME quest
-  GIT_REPOSITORY git@github.com:QuEST-Kit/QuEST.git
+  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/QuEST.git
   GIT_TAG v4.2.0
 )
 

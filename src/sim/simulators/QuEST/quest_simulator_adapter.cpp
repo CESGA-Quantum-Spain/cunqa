@@ -37,10 +37,23 @@ std::vector<std::vector<qcomp>> cunqamatrix_to_questmatrix(const Matrix& cunqa_m
     return quest_mat;
 }
 
-void update_meas_counter(std::unordered_map<std::string, std::unordered_map<std::string, std::size_t>>& meas_counter, const std::unordered_map<std::string, std::string>& shot_bitstrings)
-{
-    for (const auto& [circ_id, outcome] : shot_bitstrings) {
-        meas_counter[circ_id][outcome]++;
+cunqa::JSON convert_quest_result(const std::unordered_map<int, int>& counts, int num_qubits) {
+
+    cunqa::JSON result_json;
+    for (const auto& [value, count] : counts) {
+        std::string bitstring(n_qubits, '0');
+        for (int i = 0; i < n_qubits; ++i)
+            bitstring[n_qubits - 1 - i] = ((value >> i) & 1) ? '1' : '0';
+
+        result_json[bitstring] = count;
+    }
+    return result_json;
+}
+
+void update_quest_state(Qureg qubits_state, const cunqa::QuestCircuit& quest_circuit){
+
+    for (instruction : quest_circuit.instructions){
+
     }
 }
 
@@ -602,8 +615,43 @@ void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& 
 }
 
 JSON QuestSimulatorAdapter::native_execute(const Circuit& circuit){
-    //TODO: Implement
-    return {};
+    LOGGER_DEBUG("Quest native execute.");
+
+    auto& quest_adapter_circuit = dynamic_cast<const QuestCircuit&>(circuit);
+
+    int vec_or_mat{};
+    if (config.method == "statevector" || config.method == "automatic"){
+        vec_or_mat = 0;
+    } else if (config.method == "density_matrix") {
+        vec_or_mat = 1;
+    } else {
+        LOGGER_ERROR("QuEST simulator only supports statevector or density matrix simulation, while {} was given", method);
+        throw std::invalid_argument{"QuEST simulator only supports statevector or density matrix simulation"};
+    }
+
+    float time_taken = 0.0f;
+    auto start = std::chrono::high_resolution_clock::now();
+    if (config.seed != -1) {
+        setSeeds(&seed, 1);
+    }
+
+    Qureg qubits_state = createCustomQureg(num_qubits, vec_or_mat, 0, 0, 0);
+    initZeroState(qubits_state);
+    update_quest_state(qubits_state, quest_adapter_circuit);
+    auto counts = sampleQureg(qubits_state);  // TODO: optimize with the different backends
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> duration = end - start;
+    time_taken = duration.count();
+
+    destroyQureg(qubits_state); 
+
+    JSON result_json = {
+        {"id_counts", convert_quest_result(counts, num_qubits)},
+        {"time_taken", time_taken}
+    };
+
+    return result_json;
 }
 
 } // End of sim namespace
