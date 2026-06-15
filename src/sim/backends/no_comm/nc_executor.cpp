@@ -15,7 +15,6 @@ namespace sim {
 JSON NCExecutor::custom_execute_()
 {   
     std::map<std::string, std::size_t> meas_counter;
-    LOGGER_DEBUG("Estoy ejecutando custom. shots: {}", std::to_string(simulator_->config.shots));
 
     auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
 

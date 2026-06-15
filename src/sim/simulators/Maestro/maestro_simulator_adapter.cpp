@@ -314,7 +314,6 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const Meas
                 const unsigned long long int measurement = ::Measure(simulator, q, 1);
                 creg[payload.clbit] =
                         (measurement == 1);
-                LOGGER_DEBUG("La medida me dio {}", std::to_string(measurement));
                 save_clbit[payload.clbit] = payload.save;
             } else {
                 throw std::runtime_error("Cannot store measurement: classical bit "
