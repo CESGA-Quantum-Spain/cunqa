@@ -32,8 +32,8 @@ from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
 
 class QJob:
     """
-    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output 
-    of the :py:meth:`~cunqa.qpu.run` method. The quantum job not only contains the circuit to 
+    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output
+    of the :py:func:`~cunqa.qpu.run` function. The quantum job not only contains the circuit to
     be simulated, but also simulation instructions and information of the vQPU to which the job 
     is sent. This class has a main attribute: :py:attr:`QJob.result` which stores the information 
     about the execution. 
@@ -118,7 +118,7 @@ class QJob:
         Result of the job. If no error occured during simulation, a :py:class:`~cunqa.result.Result` 
         object is retured.
 
-            >>> qjob = qpu.run(circuit)
+            >>> qjob = run(circuit, qpu)
             >>> result = qjob.result
             >>> print(result.counts)
             {'00': 524, '11': 500}
@@ -198,7 +198,7 @@ class QJob:
         First it checks weather the prior simulation's result was retrieved. If not, it is discarded,
         and the new set of parameters is sent to the server to be reassigned to the circuit for 
         simulation. This method can be used on a loop, carefully saving the intermediate results. 
-        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, check out its 
+        Also, this method is used by the class :py:class:`~cunqa.tools.mappers.QJobMapper`, check out its 
         documentation for a extensive description.
 
         There are two ways of passing new parameters. First, as a **list** with the corresponding 

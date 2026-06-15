@@ -7,16 +7,16 @@ functionalities and purposes. Each subsection follows the structure outlined bel
 1. Code examples that explore the underlying concepts.
 2. A functional example that can be executed by users to validate them.
 
-As CUNQA supports the main three DQC schemes, this section will cover
+As CUNQA supports the main three :term:`DQC` schemes, this section will cover
 all of them by the following:
 
 - :doc:`no_communications` (also called embarrasingly parallel): distributing quantum tasks without 
-  inter-QPU communications.
-- :doc:`classical_communications`: send and receive classical bits between vQPUs.
-- :doc:`quantum_communications`: quantum communications through **teledata** and **telegate** protocols.
+  inter-:term:`QPU` communications.
+- :doc:`classical_communications`: send and receive classical bits between :term:`vQPUs <vQPU>`.
+- :doc:`quantum_communications`: :term:`quantum communications` through **teledata** and **telegate** protocols.
 
 All together, these topics provide a solid foundation for understanding the design principles and
-capabilities of CUNQA in DQC scenarios.
+capabilities of CUNQA in :term:`DQC` scenarios.
 
 .. toctree::
    :maxdepth: 1

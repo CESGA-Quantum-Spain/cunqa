@@ -97,15 +97,15 @@ class CunqaCircuit:
 
         * - Local non-unitary operations
           - Local non-unitary operations
-          - :py:meth:`cif`, :py:meth:`measure`, :py:meth:`measure_all`, :py:meth:`reset`
+          - :py:meth:`cif`, :py:meth:`endcif`, :py:meth:`measure`, :py:meth:`measure_all`, :py:meth:`reset`
 
         * - Remote operations
           - Classical communication
           - :py:meth:`send`, :py:meth:`recv`
 
-        * - 
+        * -
           - Quantum communication
-          - :py:meth:`qsend`, :py:meth:`qrecv`, :py:meth:`expose`
+          - :py:meth:`gen_ent`
 
 
     Attributes
@@ -141,9 +141,14 @@ class CunqaCircuit:
     .. dropdown:: Quantum communication directives
         :animate: fade-in-slide-down
 
-        .. automethod:: qsend
-        .. automethod:: qrecv
-        .. automethod:: expose
+        .. automethod:: gen_ent
+
+        The :py:meth:`gen_ent` method is the low-level primitive that requests a shared entangled
+        (Bell/GHZ) state between the comm qubits of the participating circuits. The user-facing
+        teledata and telegate protocols are built on top of it and provided as functions in the
+        :py:mod:`cunqa.qc_protocols` subpackage (:py:func:`~cunqa.qc_protocols.qsend`,
+        :py:func:`~cunqa.qc_protocols.qrecv`, :py:func:`~cunqa.qc_protocols.cat_entangler` and
+        :py:func:`~cunqa.qc_protocols.cat_disentangler`).
 
 
     Non-unitary operations
@@ -156,6 +161,7 @@ class CunqaCircuit:
         .. automethod:: measure
         .. automethod:: reset
         .. automethod:: cif
+        .. automethod:: endcif
 
     Unitary operations
     ------------------
@@ -2537,6 +2543,24 @@ class CunqaCircuit:
         circuits: Union[str, CunqaCircuit, list[str], list[CunqaCircuit]],
         tag: str
     ):
+        """
+        Low-level quantum-communication primitive that requests a shared entangled state (a Bell
+        pair between two participants, or a GHZ state when more are involved) on the given comm
+        qubit, linking this circuit with the ``circuits`` provided.
+
+        This is the building block on top of which the high-level teledata and telegate protocols
+        are implemented. Most users should not call it directly but rely on the helpers in
+        :py:mod:`cunqa.qc_protocols` (:py:func:`~cunqa.qc_protocols.qsend`,
+        :py:func:`~cunqa.qc_protocols.qrecv`, :py:func:`~cunqa.qc_protocols.cat_entangler` and
+        :py:func:`~cunqa.qc_protocols.cat_disentangler`).
+
+        Args:
+            comm_qubit (int): communication qubit on which the entangled state is generated.
+            circuits (str | CunqaCircuit | list[str] | list[CunqaCircuit]): id(s) or circuit
+                object(s) that share the entangled state with this circuit.
+            tag (str): identifier shared by every participant of the same entanglement-generation
+                operation; it links the matching ``gen_ent`` directives across circuits.
+        """
         self.is_dynamic = True
     
         if isinstance(circuits, str):
@@ -2577,10 +2601,12 @@ class CunqaCircuit:
         operation: str = "and"
     ) -> None:
         """
-        Method for implementing a gate conditioned to a classical measurement. The control qubit 
-        provided is measured, if it's 1 the gate provided is applied to the given qubits.
+        Method to open a classically controlled block. The instructions added to the circuit after
+        this call, and up to the matching :py:meth:`endcif` call, are only executed when the
+        measurement outcomes of the given ``clbits`` match ``condition`` under the selected
+        ``operation``. Every ``cif`` call must be closed with an :py:meth:`endcif` call.
 
-        In this example, the operations defined inside the ``cif`` block are executed only if the 
+        In this example, the operations defined inside the ``cif`` block are executed only if the
         value of classical bit 0 is equal to 1. Currently, this construct does not support an 
         explicit *else* branch. This design decision is based on the observation that none of the 
         reviewed algorithms or protocols require such functionality. Support for an *else* branch 
@@ -2613,10 +2639,11 @@ class CunqaCircuit:
     
     def endcif(self) -> None:
         """
-        Method to end the classical controlled gates.
-        
-        Args:
-            clbits (int | list[int]): clbits to match the condition.
+        Method to close a classically controlled block opened with :py:meth:`cif`.
+
+        Every :py:meth:`cif` call must be paired with a matching ``endcif`` call. All the
+        instructions added to the circuit between :py:meth:`cif` and ``endcif`` are the ones that
+        are executed only when the classical condition is met. This method takes no arguments.
         """
         self.add_instructions({
             "name": "endcif",

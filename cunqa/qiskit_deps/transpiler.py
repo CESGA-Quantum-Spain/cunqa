@@ -5,26 +5,18 @@
     It is important and it is assumed that the circuit that is sent to the virtual QPU for its 
     simulation is transplated into the propper native gates and adapted to te backend's topology.
 
-    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`, 
-    :py:class:`qiskit.QuantumCircuit` or json ``dict``, :py:mod:`cunqa` provides two alternatives 
-    for transpiling it accordingly to a certain virtual QPU's backend:
+    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`,
+    :py:class:`qiskit.QuantumCircuit` or json ``dict``, the circuit must be transpiled with the
+    :py:func:`transpiler` function, providing the backend of the target virtual QPU, before being
+    submitted for simulation:
 
-        - When submmiting the circuit, set `transpile` as ``True`` and provide the rest of 
-          transpilation instructions:
-
-            >>> qpu.run(circuit, transpile = True, ...)
-
-          This option is ``False`` by default.
-
-        - Use :py:func:`transpiler` function before sending the circuit:
-
-            >>> circuit_transpiled = transpiler(circuit, target_qpu = qpu)
-            >>> qpu.run(circuit_transpiled)
+        >>> circuit_transpiled = transpiler(circuit, backend = qpu.backend)
+        >>> run(circuit_transpiled, qpu)
 
     .. warning::
-        If the circuit is not transpiled, errors will not raise, but the output of the simulation 
+        If the circuit is not transpiled, errors will not raise, but the output of the simulation
         will not be coherent.
-    
+
 """
 from typing import Union
 import copy

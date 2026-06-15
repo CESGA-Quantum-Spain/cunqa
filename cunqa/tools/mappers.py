@@ -53,7 +53,7 @@ class QJobMapper:
     Class to map the method :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` to a set of jobs sent to 
     virtual QPUs.
 
-    The core of the class is on its :py:meth:`~cunqa.mappers.QJobMapper.__call__` method, to which 
+    The core of the class is on its :py:meth:`~cunqa.tools.mappers.QJobMapper.__call__` method, to which 
     parameters that the method :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` takes are passed 
     together with a cost function, so that a the value for this cost for each initial 
     :py:class:`~cunqa.qjob.QJob` is returned.
@@ -96,7 +96,7 @@ class QJobMapper:
         Callable method to map the function *func* to the results of assigning *population* to the 
         given jobs. Regarding the *population*, each set of parameters will be assigned to each 
         :py:class:`~cunqa.qjob.QJob` object, so the list must have size (*N,p*), being *N* the 
-        lenght of :py:attr:`~cunqa.mappers.QJobMapper.qjobs` and *p* the number of parameters in the 
+        lenght of :py:attr:`~cunqa.tools.mappers.QJobMapper.qjobs` and *p* the number of parameters in the 
         circuit. Mainly, this is thought for the function to take a :py:class:`~cunqa.result.Result` 
         object and to return a value. For example, the function can evaluate the expected value of 
         an observable from the output of the circuit.
@@ -127,12 +127,12 @@ class QPUCircuitMapper:
     virtual QPUs that the optimization will require, together with the circuit and the simulation 
     instructions needed for its execution.
 
-    Then, its :py:meth:`~cunqa.mappers.QPUCircuitMapper.__call__` method takes a set of parameters 
+    Then, its :py:meth:`~cunqa.tools.mappers.QPUCircuitMapper.__call__` method takes a set of parameters 
     as *population* to assign to the circuit. Each assembled circuit is sent to each virtual QPU 
     with the instructions provided on the instatiation of the mapper. The method returns the value 
     for the provided function *func* for the result of each simulation.
 
-    Its use is pretty similar to :py:class:`~cunqa.mappers.QJobMapper`, though creating 
+    Its use is pretty similar to :py:class:`~cunqa.tools.mappers.QJobMapper`, though creating 
     :py:class:`~cunqa.qjob.QJob` objects ahead is not needed.
 
     >>> qpus = get_QPUs(...)
@@ -199,7 +199,7 @@ class QPUCircuitMapper:
         Callable method to map the function *func* to the results of the circuits sent to the given 
         QPUs after assigning them *population*. Regarding the *population*, each set of parameters 
         will be assigned to each circuit, so the list must have size (*N,p*), being *N* the lenght 
-        of :py:attr:`~cunqa.mappers.QJobMapper.qpus` and *p* the number of parameters in the circuit.
+        of :py:attr:`~cunqa.tools.mappers.QJobMapper.qpus` and *p* the number of parameters in the circuit.
         Mainly, this is thought for the function to take a :py:class:`~cunqa.result.Result` object 
         and to return a value. For example, the function can evaluate the expected value of an 
         observable from the output of the circuit.

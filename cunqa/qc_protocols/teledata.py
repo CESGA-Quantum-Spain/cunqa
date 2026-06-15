@@ -12,14 +12,21 @@ def qsend(
     tag: str = None
 ) -> None:
     """
-    Class method to send a qubit from the current circuit to another one.
-    
+    Teledata sender: teleports the state of ``data_qubit`` from ``circuit`` to a remote circuit.
+
+    This is the teleportation-protocol counterpart of :py:func:`qrecv`, which must be applied on
+    the receiving circuit with the same ``tag``. Internally it generates the shared entanglement
+    with :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent`, performs the Bell measurement and
+    sends the two classical correction bits to the remote circuit.
+
     Args:
-        data_qubit (int): computation qubit to be sent.
+        circuit (~cunqa.circuit.core.CunqaCircuit): circuit holding the qubit to be teleported.
+        data_qubit (int): computation qubit whose state is teleported.
         comm_qubit (int): communication qubit employed to send.
-        recving_circuit (str | CunqaCircuit): id of the circuit or circuit to which the qubit is 
-                                                sent.
-        tag (str): unique identifier for the operation.
+        clbits (list[int]): two classical bits used to store the Bell-measurement outcomes.
+        recving_circuit (str | CunqaCircuit): id of the circuit or circuit object to which the
+            qubit is teleported.
+        tag (str): identifier shared with the matching :py:func:`qrecv` call.
     """
     
     circuit.gen_ent(comm_qubit, recving_circuit, tag)
@@ -48,12 +55,21 @@ def qrecv(
     tag: str = None    
 ) -> None:
     """
-    Class method to receive a qubit from a remote circuit into an ancilla qubit.
-    
+    Teledata receiver: reconstructs into ``data_qubit`` the state teleported by a remote circuit.
+
+    This is the receiving counterpart of :py:func:`qsend` and must be called with the same ``tag``.
+    Internally it generates the shared entanglement with
+    :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent`, receives the two classical correction bits
+    and applies the conditional Pauli corrections.
+
     Args:
-        data_qubit (int): computation qubit the received qubit is assigned.
+        circuit (~cunqa.circuit.core.CunqaCircuit): circuit that receives the teleported state.
+        data_qubit (int): computation qubit to which the received state is assigned.
         comm_qubit (int): communication qubit employed to receive.
-        control_circuit (str | CunqaCircuit): id of the circuit from which the qubit is received.
+        clbits (list[int]): two classical bits used to store the received correction bits.
+        control_circuit (str | CunqaCircuit): id of the circuit or circuit object from which the
+            qubit is received.
+        tag (str): identifier shared with the matching :py:func:`qsend` call.
     """
     
     circuit.gen_ent(comm_qubit, control_circuit, tag)

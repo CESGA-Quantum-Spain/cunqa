@@ -6,9 +6,27 @@ def cat_entangler(
     target_circuits: list[CunqaCircuit],
     data_qubit: int,
     comm_qubits: list[int], 
-    clbits: list[int], 
+    clbits: list[int],
     tag: str = None
 ):
+    """
+    Telegate entangler: distributes the control state of ``data_qubit`` (held by the first circuit
+    in ``target_circuits``) onto the comm qubits of the remaining circuits, so that they can apply
+    gates locally controlled by it.
+
+    It opens a telegate block that must be closed with :py:func:`cat_disentangler` using the same
+    set of ``target_circuits``. Between the two calls, each receiving circuit applies the gate(s)
+    controlled on its comm qubit. Internally it requests the shared GHZ state with
+    :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent`.
+
+    Args:
+        target_circuits (list[~cunqa.circuit.core.CunqaCircuit]): participating circuits; the first
+            one owns the control ``data_qubit`` and the rest receive it on their comm qubit.
+        data_qubit (int): control qubit (in the first circuit) to be shared.
+        comm_qubits (list[int]): comm qubit of each circuit in ``target_circuits``.
+        clbits (list[int]): classical bit used by each circuit for the entangler corrections.
+        tag (str): identifier shared with the matching :py:func:`cat_disentangler` call.
+    """
     for target_circuit, comm_qubit in zip(target_circuits, comm_qubits):
         target_circuit.gen_ent(comm_qubit, target_circuits, tag) 
 
@@ -37,6 +55,22 @@ def cat_disentangler(
     recv_clbits: list[int],
     send_clbits: list[int]
 ):
+    """
+    Telegate disentangler: closes the telegate block opened by :py:func:`cat_entangler`, undoing the
+    shared entanglement and restoring the comm qubits, while propagating the required phase
+    correction back to the control ``data_qubit``.
+
+    It must be called with the same ``target_circuits`` used in the matching
+    :py:func:`cat_entangler`, after the receiving circuits have applied their controlled gates.
+
+    Args:
+        target_circuits (list[~cunqa.circuit.core.CunqaCircuit] | list[str]): the same participants
+            passed to :py:func:`cat_entangler`; the first one owns the control ``data_qubit``.
+        data_qubit (int): control qubit (in the first circuit) the correction is applied to.
+        comm_qubits (list[int]): comm qubit of each receiving circuit.
+        recv_clbits (list[int]): classical bits the first circuit uses to receive the corrections.
+        send_clbits (list[int]): classical bits the receiving circuits use to send their corrections.
+    """
     for send_circuit, clbit in zip(target_circuits[1:], recv_clbits):
         target_circuits[0].recv(clbit, send_circuit)
         

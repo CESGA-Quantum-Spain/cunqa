@@ -42,7 +42,7 @@ class Backend(TypedDict):
     .. autoattribute:: gates
     .. autoattribute:: num_qubits
     .. autoattribute:: name
-    .. autoattribute:: noise_properties_path
+    .. autoattribute:: noise_model
     .. autoattribute:: simulator
     .. autoattribute:: version
     """
@@ -302,7 +302,7 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         return qpus
     else:
         logger.warning(f"No QPUs where found with the characteristics provided: "
-                       f"co_located={co_located}, family_name={family}.")
+                       f"co_located={co_located}, family={family}.")
         return None
 
 
@@ -333,21 +333,27 @@ def qraise(n, t, *,
                  'D-HH:MM:SS'.
         classical_comm (bool): if ``True``, vQPUs will allow classical communications.
         quantum_comm (bool): if ``True``, vQPUs will allow quantum communications.
-        simulator (str): name of the desired simulator to use. Default is `Aer 
+        simulator (str): name of the desired simulator to use. Default is `Aer
                          <https://github.com/Qiskit/qiskit-aer>`_.
-        backend (str): path to a file containing the backend information.
+        backend (str): path to a backend configuration file. Used, among others, to deploy noisy
+                       vQPUs (the backend file references the noise properties to emulate).
         family (str): name to identify the group of vQPUs raised.
-        co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In 
-                           `hpc` mode, vQPUs can only be accessed from the node in which they 
-                           are deployed. In `co-located` mode, they can be accessed from other 
+        co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In
+                           `hpc` mode, vQPUs can only be accessed from the node in which they
+                           are deployed. In `co-located` mode, they can be accessed from other
                            nodes.
-        cores (str): number of cores per vQPU, the total for the SLURM job will be 
-                     `n*cores`.
-        mem_per_qpu (str): memory to allocate for each vQPU in GB, format to use is "XXG".
-        n-nodes (str): number of nodes for the SLURM job.
+        cores_per_qpu (int): number of cores per vQPU, the total for the SLURM job will be
+                             `n*cores_per_qpu`.
+        mem_per_qpu (str): memory to allocate for each vQPU in GB (the ``G`` suffix is appended
+                           automatically).
+        n_nodes (str): number of nodes for the SLURM job.
         node_list (str): list of nodes in which the vQPUs will be deployed.
         qpus_per_node (str): sets the number of vQPUs deployed on each node.
         partition (str): partition of the nodes in which the QPUs are going to be executed.
+        gpu (bool): if ``True``, the quantum simulation runs on GPU.
+        gpu_name (str): name of the GPU to execute on.
+        qmio (bool): if ``True``, deploys the real QMIO quantum computer at CESGA, enabling hybrid
+                     DQC infrastructures.
     """
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
@@ -359,7 +365,7 @@ def qraise(n, t, *,
     if simulator is not None:
         command = command + f" --simulator={str(simulator)}"
     if family is not None:
-        command = command + f" --family-name={str(family)}"
+        command = command + f" --family={str(family)}"
     if co_located:
         command = command + " --co-located"
     if cores_per_qpu is not None:
@@ -455,7 +461,7 @@ def qdrop(*families: str, remove_logs: bool = False):
     if len( families ) == 0:
         cmd.append('--all')
     else:
-        cmd.append('--fam')
+        cmd.append('--family')
         for family in families:
             cmd.append(family)
 

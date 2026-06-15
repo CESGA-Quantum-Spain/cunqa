@@ -4,30 +4,30 @@ Quick start
 Once :ref:`installed <sec_installation>`, the basic CUNQA workflow can be summarized as:
 
 1. **Deploy vQPUs:** allocate classical resources for simulation. 
-2. **Design quantum task:** create quantum circuits to be run on vQPUs. 
-3. **Execution:** send quantum tasks to vQPUs to be simulated.
+2. **Design quantum task:** create quantum circuits to be run on :term:`vQPUs <vQPU>`. 
+3. **Execution:** send quantum tasks to :term:`vQPUs <vQPU>` to be simulated.
 4. **Relinquish vQPUs:** free classical resources.
 
-The following example will deploy 4 vQPUs, for 1 hour and accessible from any HPC node. To do this,
-there are two posible worflows: raising the vQPUs with a Python function or raising the vQPUs with 
+The following example will deploy 4 :term:`vQPUs <vQPU>`, for 1 hour and accessible from any HPC node. To do this,
+there are two posible worflows: raising the :term:`vQPUs <vQPU>` with a Python function or raising the :term:`vQPUs <vQPU>` with 
 a bash command and get them in the Python program. 
 
 .. tab:: Bash command
 
-    To deploy the vQPUs we use the :doc:`../reference/commands/qraise` Bash command.
+    To deploy the :term:`vQPUs <vQPU>` we use the :doc:`../reference/commands/qraise` Bash command.
 
     .. code-block:: bash
 
         qraise -n 4 -t 01:00:00 --co-located
 
-    Once the vQPUs are deployed, we can design and execute quantum tasks:
+    Once the :term:`vQPUs <vQPU>` are deployed, we can design and execute quantum tasks:
 
     .. code-block:: python 
 
         import os, sys
 
         # Adding path to access CUNQA module
-        sys.path.append(os.getenv("</your/cunqa/installation/path>")) # os.getenv("HOME") at CESGA by default
+        sys.path.append("</your/cunqa/installation/path>") # os.getenv("HOME") at CESGA by default
 
         # Gettting the raised QPUs
         from cunqa.qpu import get_QPUs
@@ -74,12 +74,12 @@ a bash command and get them in the Python program.
         import os, sys
 
         # Adding path to access CUNQA module
-        sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+        sys.path.append("</your/cunqa/installation/path>")
 
         # Raising the QPUs
         from cunqa.qpu import qraise
 
-        family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
+        family = qraise(4, "01:00:00", simulator="Aer", co_located=True)
 
         # Gettting the raised QPUs
         from cunqa.qpu import get_QPUs

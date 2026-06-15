@@ -1,8 +1,29 @@
 Parameters and `upgrade_parameters`
 =======================================
-Parameters are placeholders for the values of parametric gates like `rx`, `rzz` or `u3`. They are 
-designed to facilitate the execution of the same circuit multiple times with different values on its
-parametric gates.
+
+CUNQA provides convenient ways of improving the implementation of Variational Quantum 
+Algorithms (VQAs). VQAs require vast amounts of circuit evaluations for their optimization processes, 
+where the circuit structure remains constant and solely the parameters of certain gates change 
+between evaluations. CUNQA facilitates working with these type of template circuits by its support 
+for Parameters. 
+
+Parameters are placeholders for the values that will be inserted on parametric gates at each evaluation. 
+They can be single variables, say `x` or expressions with multpile variables like `cos(2*x) + exp(z/2)`.
+
+Parameters are inserted as a string in parametric gates to mark that its value will vary, and their value
+is given when executing. After running a parametric circuit, new parameters can be given for another 
+evaluation using :py:meth:`~cunqa.qjob.QJob.upgrade_parameters`. If a value is not given to a 
+certain variable, it will retain the value from last evaluation.
+
+.. code-block:: python
+    
+    circuit.rx(param="x", qubit=0)
+    # Parameters are given values when running
+    qjob = run(circuit, qpu, param_values={"x": np.pi}, shots= 1024)
+    result = qjob.result
+
+    # For another execution with new parameters, use QJob.upgrade_parameters()
+    new_result = qjob.upgrade_parameters({"x": 0}).result
 
 Parameters are given as a string when adding a gate. The strings determine the label for each parameter
 or a expression built out of parameters:
@@ -45,5 +66,5 @@ list or a dict. Note that variables that are not given a new value keep the prev
 
 Check the following complete example:
 
-.. literalinclude:: ../../../examples/python/no_comm/03-upgrade_parameters.py
+.. literalinclude:: ../../../../examples/no_comm/03-upgrade_parameters.py
     :language: python
