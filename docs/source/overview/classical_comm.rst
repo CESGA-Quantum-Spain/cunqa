@@ -8,7 +8,7 @@ Classical Communications
 
     Classical Communications scheme
 
-This model extends the embarrassingly parallel approach by allowing processes to exchange 
+This model extends the :term:`embarrassingly parallel` approach by allowing processes to exchange 
 **classical information during execution**, similarly to how MPI programs operate in classical 
 HPC environments.
 
@@ -19,14 +19,14 @@ operations are applied to the designated local qubits.
 
 **How to deploy**
 ---------------------
-To lauch a set of vQPUs incorporating classical communications among them, you must use the flag
-:py:attr:`--classical-comm` when deploying.
+To lauch a set of :term:`vQPUs <vQPU>` incorporating :term:`classical communications` among them, you must use the flag
+:py:attr:`--classical_comm` when deploying.
 
 .. tab:: Bash command
 
     .. code-block:: bash
 
-        qraise -n <num qpus> -t <max time> --classical-comm [OTHER]
+        qraise -n <num qpus> -t <max time> --classical_comm [OTHER]
 
 .. tab:: Python function
 
@@ -35,11 +35,11 @@ To lauch a set of vQPUs incorporating classical communications among them, you m
         family = qraise(4, <max time>, classical_comm=True, [OTHER])
     
 
-The above command line launches vQPUs with all-to-all classical communications connectivity. For 
+The above command line launches :term:`vQPUs <vQPU>` with all-to-all :term:`classical communications` connectivity. For 
 additional options in the Bash command checkout :doc:`../reference/commands/qraise`, and check 
 :py:func:`~cunqa.qpu.qraise` for the Python function. Again, it is recomended to use the 
-``--co-located`` flag (and ``co_located`` attribute in Python), as it allows to access the vQPUs 
-from every node, not just the one the vQPUs are being set up. In this documentation we are going 
+``--co-located`` flag (and ``co_located`` attribute in Python), as it allows to access the :term:`vQPUs <vQPU>` 
+from every node, not just the one the :term:`vQPUs <vQPU>` are being set up. In this documentation we are going 
 to consider that this flag is set.
 
 
@@ -94,14 +94,14 @@ incorporates the :py:meth:`~cunqa.circuit.core.CunqaCircuit.send` and
 **Execution**
 -------------
 
-We obtain the :py:class:`~cunqa.qpu.QPU` objects associated to the displayed vQPUs with 
+We obtain the :py:class:`~cunqa.qpu.QPU` objects associated to the displayed :term:`vQPUs <vQPU>` with 
 :py:func:`~cunqa.qpu.get_QPUs`, as a common step between the three models. It is important that 
-those allow classical communications---i.e., that the aforementioned ``classical-comm`` flag was 
+those allow :term:`classical communications`---i.e., that the aforementioned ``classical_comm`` flag was
 set---, otherwise an error will be raised.
 
 For the distribution, function :py:func:`~cunqa.qpu.run` is used. By providing
 the list of circuits and the list of :py:class:`~cunqa.qpu.QPU` objects we allow their mapping to the corresponding
-vQPUs:
+:term:`vQPUs <vQPU>`:
 
 .. code-block:: python 
 
@@ -130,7 +130,7 @@ and output statistics can be accessed by
 **Basic example**
 ------------------
 
-Here we show an example on a classical communication performed from one circuit to another to classically control a quantum
+Here we show an example on a :term:`classical communication <classical communications>` performed from one circuit to another to classically control a quantum
 operation. Further examples and use cases are listed in :doc:`../further_examples/further_examples`.
 
 
@@ -177,7 +177,7 @@ operation. Further examples and use cases are listed in :doc:`../further_example
 
     for counts, qpu in zip(counts_list, qpus):
 
-    print(f"Counts from vQPU {qpu.id}: {counts}")
+        print(f"Counts from vQPU {qpu.id}: {counts}")
 
     # 4. Release classical resources
     qdrop(family_name)

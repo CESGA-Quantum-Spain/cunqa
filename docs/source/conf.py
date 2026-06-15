@@ -27,20 +27,21 @@ os.environ['SLURMD_NODENAME'] = ''
 os.environ['SLURM_JOB_ID'] = ''
 os.environ['STORE'] = ''
 
-mock_constants = types.ModuleType("cunqa.constants")
+mock_constants = types.ModuleType("cunqa.utils.constants")
 mock_constants.LIBS_DIR = ""
 mock_constants.QPUS_FILEPATH = ""
 mock_constants.CUNQA_PATH = ""
 mock_constants.REMOTE_GATES = ""
-sys.modules["cunqa.constants"] = mock_constants
+mock_constants.CUNQA_USE_QISKIT_PY = True
+sys.modules["cunqa.utils.constants"] = mock_constants
 
 autodoc_mock_imports = [
     'argparse',
-    'collections', 
+    'collections',
     'copy',
-    'cunqa.utils.constants',
     'cunqa.utils.logger',
     'cunqa.qclient',
+    'cunqa.tools.probs_helpers',
     'dateutil',
     'fcntl',
     'glob',

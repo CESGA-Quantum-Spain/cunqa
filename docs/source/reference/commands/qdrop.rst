@@ -1,10 +1,10 @@
 qdrop
 =====
 
-Release the resource of one or more vQPUs.
+Release the resource of one or more :term:`vQPUs <vQPU>`.
 
-The ``qdrop`` command is used to terminate (drop) virtual QPUs previously deployed with
-``qraise``. Targets can be specified either by their Slurm job IDs, by a family name, or by
+The ``qdrop`` command is used to terminate (drop) :term:`virtual QPUs <virtual QPU>` previously deployed with
+``qraise``. Targets can be specified either by their Slurm job IDs, by a :term:`family` name, or by
 dropping all active ``qraise`` jobs.
 
 Synopsis
@@ -21,20 +21,24 @@ Target selection options
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``IDS...``
-    Slurm IDs of the QPUs to be dropped.
+    Slurm IDs of the :term:`QPUs <QPU>` to be dropped.
     Multiple IDs can be given at a time.
 
-``--fam, --family_name <string>``
-    Family name of the QPUs to be dropped.
+``--family <string>``
+    :term:`Family` name of the :term:`QPUs <QPU>` to be dropped.
+    Multiple :term:`family` names can be given at a time.
 
 ``--all``
     Drop all ``qraise`` jobs.
+
+``--rm, --remove_logs``
+    Also delete the ``qraise_XXXXXX`` log files of the dropped jobs from the current directory.
 
 
 Basic usage
 -----------
 
-Command that relinquish all deployed vQPUs:
+Command that relinquish all deployed :term:`vQPUs <vQPU>`:
 
 .. code-block:: bash
 
@@ -44,6 +48,6 @@ Command that relinquish all deployed vQPUs:
 Notes
 -----
 
-- If multiple target selectors are provided (e.g., ``IDS...`` and ``--family_name``), the command
-  will attempt to drop all QPUs matching any of them.
-- Dropping QPUs will terminate the associated jobs and free the allocated resources.
+- Exactly one target selector must be used: either ``IDS...``, or ``--family``, or ``--all``.
+  Combining ``IDS...`` with ``--family`` is not allowed and results in an error.
+- Dropping :term:`QPUs <QPU>` will terminate the associated jobs and free the allocated resources.

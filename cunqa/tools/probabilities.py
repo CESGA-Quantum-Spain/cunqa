@@ -39,12 +39,14 @@ def probabilities(
 
         Returns:
             probs (dict, np.ndarray): probabilities per bitstring or per qubit. Order is as follows:
+            
                                       - Per bitstring: probability on each position is associated to
                                         the corresponding bitstring in ascending binary order, ie
                                         for 2 qubits ["00", "01", "10", "11"].
                                       - Per qubit: probability of "0" and "1" for each qubit 
                                         where qubit 0 is the last row and the qubit index increases 
                                         as row index decreases.
+                                        
                                       Partial preserves these orders in both cases.  
                                      
         """

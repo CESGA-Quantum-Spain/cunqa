@@ -321,3 +321,4 @@ qraise_*
 modulos.sh
 modules.sh
 jup.out
+.pytest

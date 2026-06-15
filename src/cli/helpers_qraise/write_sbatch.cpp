@@ -79,7 +79,7 @@ void write_run_command(std::ofstream& sbatchFile,
     auto subcommand =
         std::string(args.co_located ? "co_located" : "hpc") + " " +
         std::string(get_communications_name(scheme)) + " " +
-        args.family_name + " " + args.simulator;
+        args.family + " " + args.simulator;
 
     if (args.backend.has_value())
         subcommand += " " + args.backend.value();
@@ -144,7 +144,7 @@ void write_qmio(std::ofstream& sbatchFile, const CunqaArgs& args)
     sbatchFile << "EPILOG_PATH=" << cunqa::INSTALL_PATH << "/bin/epilog.sh\n";
 
     sbatchFile << "\n\n";
-    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio " + args.family_name;
+    sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qmio " + args.family;
 }
 
 } // End of anonymous namespace
@@ -169,9 +169,9 @@ void write_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
             " is not available for " + get_communications_name(scheme) + 
             " communications simulation. Aborting.");
 
-    if (exists_family_name(args.family_name, cunqa::QPUS_FILEPATH))
-        throw std::runtime_error("There are QPUs with the same family name as the provided: " + 
-            args.family_name + ".");
+    if (exists_family_name(args.family, cunqa::QPUS_FILEPATH))
+        throw std::runtime_error("There are QPUs with the same family name as the provided: " +
+            args.family + ".");
 
     if (!args.qmio) {
         write_sbatch_header(sbatchFile, args, scheme);

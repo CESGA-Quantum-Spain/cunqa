@@ -19,12 +19,13 @@ from sympy import Symbol
 
 @pytest.fixture
 def circuit_ir():
+    # After `run` remaps the ids, the circuit IR id is a (circuit_id, qpu_id) tuple.
     return {
-        "id": "circuit-123",
+        "id": ("circuit-123", "qpu-1"),
         "classical_registers": {"c": 2},
         "num_clbits": 2,
-        "num_qubits": 3,
-        "instructions": [{"name": "h", "qubits": [0]}],
+        "num_qubits": [3, 0],
+        "instructions": [{"name": "h", "qubits": 0}],
         "sending_to": ["qpu-1"],
         "is_dynamic": False,
         "params": []
@@ -75,10 +76,14 @@ def test_qjob_init_default_run_config(
     assert config["num_clbits"] == circuit_ir["num_clbits"]
     assert config["num_qubits"] == circuit_ir["num_qubits"]
 
+    # sending_to / is_dynamic now live inside the run config
+    assert config["sending_to"] == circuit_ir["sending_to"]
+    assert config["is_dynamic"] == circuit_ir["is_dynamic"]
+    assert config["qpu_id"] == circuit_ir["id"][1]
+
     # instructions / metadata copied
     assert job._quantum_task["instructions"] == circuit_ir["instructions"]
-    assert job._quantum_task["sending_to"] == circuit_ir["sending_to"]
-    assert job._quantum_task["is_dynamic"] == circuit_ir["is_dynamic"]
+    assert job._quantum_task["id"] == circuit_ir["id"][0]
 
     # warning because no run_parameters
     logger_mock.warning.assert_called_once()
@@ -345,14 +350,16 @@ def test_upgrade_with_multiple_parameters(qjob_instance, qclient_mock):
 def test_json_encoder_is_used(qjob_instance, qclient_mock):
     """Test that the custom encoder is used for JSON serialization."""
     qjob_instance._params = {"theta": 0.5}
-    
+
     with patch('json.dumps') as mock_dumps:
         mock_dumps.return_value = '{"theta": 0.5}'
         qjob_instance.upgrade_parameters({"theta": 0.5})
-        
-        # Verify encoder was passed
-        mock_dumps.assert_called_once()
-        assert mock_dumps.call_args[1]["default"] == encoder
+
+        # upgrade_parameters serializes both the params and the config, and the
+        # custom encoder must be passed on every call.
+        assert mock_dumps.call_count == 2
+        for call in mock_dumps.call_args_list:
+            assert call.kwargs["default"] == encoder
 
 
 # INTEGRATION TESTS

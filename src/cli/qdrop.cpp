@@ -20,7 +20,7 @@ using namespace std::literals;
 struct CunqaArgs : public argparse::Args
 {
     std::optional<std::vector<std::string>>& ids    = arg("Slurm IDs of the QPUs to be dropped.").multi_argument();
-    std::optional<std::vector<std::string>>& family = kwarg("fam,family_name", "Family name of the QPUs to be dropped.").multi_argument();
+    std::optional<std::vector<std::string>>& family = kwarg("family", "Family name of the QPUs to be dropped.").multi_argument();
     bool &remove_logs                               = flag("rm, remove_logs", "Logs files in current directory with name qraise_XXXXXX will be deleted.");
     bool &all                                       = flag("all", "All qraise jobs will be dropped.");
 };
@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
         }
     } else {
         std::cerr << "\033[1;31m" << "Error: " << "\033[0m" 
-                  << "You must specify either the IDs or the family name (with --fam) "
+                  << "You must specify either the IDs or the family name (with --family) "
                   << "of the jobs to be removed, or use the --all flag.\n";
         return -1;
     }

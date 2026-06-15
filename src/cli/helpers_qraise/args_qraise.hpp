@@ -17,7 +17,7 @@ struct CunqaArgs : public argparse::Args
     std::optional<std::string>& backend                 = kwarg("b,backend", "Path to the backend config file.");
     std::string& simulator                              = kwarg("sim,simulator", "Simulator reponsible of running the simulations.").set_default("Aer");
 
-    std::string& family_name                            = kwarg("fam,family-name", "Name that identifies which QPUs were raised together.").set_default("default");
+    std::string& family                                 = kwarg("family", "Name that identifies which QPUs were raised together.").set_default("default");
     bool& co_located                                    = flag("co-located", "co-located mode. The user can connect with any deployed QPU.");
     bool& cc                                            = flag("classical_comm", "Enable classical communications.");
     bool& qc                                            = flag("quantum_comm", "Enable quantum communications.");

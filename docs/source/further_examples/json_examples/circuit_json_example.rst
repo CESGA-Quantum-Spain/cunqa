@@ -110,68 +110,68 @@ Raw Quantum Circuit JSON
 
 **Quantum Communications example**
 
+:term:`Quantum communication <quantum communications>` is expressed in the IR through the ``gen_ent`` directive, which requests a
+shared entangled state on a :term:`communication qubit` between the participating circuits (identified by a
+common ``tag``). The high-level :term:`teledata` and :term:`telegate` protocols (see :py:mod:`cunqa.qc_protocols`)
+expand into a ``gen_ent`` directive followed by local gates, measurements, ``cif``/``endcif``
+corrections and the classical ``send``/``recv`` directives shown above. The snippet below shows the
+core ``gen_ent`` directive shared between two circuits (the :term:`comm qubit` is index ``1``, after the
+single :term:`data qubit` ``0``):
+
 .. code-block:: json
 
   {
-    "id":"qsender_circuit", 
+    "id":"qsender_circuit",
     "instructions": [
       {
         "name":"h",
         "qubits":[0]
       },
       {
-        "name":"qsend",
-        "qubits":[0],
-        "circuits":["qreceiver_circuit"]
-      },
-      {
-        "name":"measure",
-        "qubits":[0],
-        "clbits":[0]
+        "name":"gen_ent",
+        "comm_qubit":1,
+        "circuits":["qreceiver_circuit", "qsender_circuit"],
+        "tag":"teledata"
       }
-    ], 
+    ],
     "config":
     {
       "shots": 1024,
-      "num_qubits":1,
-      "num_clbits":1,
+      "num_qubits":2,
+      "num_clbits":2,
       "device":
       {
         "device_name":"CPU",
         "target_devices":[]
       }
     },
-    "is_dynamic":true, 
-    "sending_to":[]
+    "is_dynamic":true,
+    "sending_to":["qreceiver_circuit"]
   }
 
 .. code-block:: json
 
   {
-    "id":"qreceiver_circuit", 
+    "id":"qreceiver_circuit",
     "instructions": [
       {
-        "name":"qrecv",
-        "qubits":[0],
-        "circuits":["qsender_circuit"]
-      },
-      {
-        "name":"measure",
-        "qubits":[0],
-        "clbits":[0]
+        "name":"gen_ent",
+        "comm_qubit":1,
+        "circuits":["qsender_circuit", "qreceiver_circuit"],
+        "tag":"teledata"
       }
-    ], 
+    ],
     "config":
     {
       "shots": 1024,
-      "num_qubits":1,
-      "num_clbits":1,
+      "num_qubits":2,
+      "num_clbits":2,
       "device":
       {
         "device_name":"CPU",
         "target_devices":[]
       }
     },
-    "is_dynamic":true, 
+    "is_dynamic":true,
     "sending_to":[]
   }

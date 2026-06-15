@@ -52,6 +52,7 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
     def get_subcircuits(circuit, initial_qubits, Nsections):
         sub_circuits = []
         circuits_linked = {}
+        telegate_count = 0
         measures = {i: [] for i in range(Nsections)}
         clbits = {i: [] for i in range(Nsections)}
 
@@ -117,8 +118,9 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
                         ctrl_qubit,
                         [comm_1[0], comm_2[0]],
                         [0, 0],
-                        tag="telegate"
+                        tag=f"telegate_{telegate_count}"
                     )
+                    telegate_count += 1
 
                     target_circuit.add_instructions([inst])
 
@@ -243,6 +245,18 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
         raise ValueError("Could not identify the sender of a quantum communication protocol "
                          "while performing the union.")
 
+    def skip_cif_blocks(instrs: list, pos: int) -> int:
+        """
+        Skip consecutive ``cif ... endcif`` blocks (the comm-qubit reset corrections emitted by
+        the teledata/telegate protocols) starting at ``pos``. Returns the position right after the
+        last skipped block.
+        """
+        while pos < len(instrs) and instrs[pos]["name"] == "cif":
+            while pos < len(instrs) and instrs[pos]["name"] != "endcif":
+                pos += 1
+            pos += 1  # skip the matching endcif
+        return pos
+
     def parse_sender(idx: int, genpos: int, comm: int) -> tuple:
         """Consume the sender block. Returns (data_qubit, end_pos, is_teledata)."""
         instrs = circuits[idx].instructions
@@ -253,33 +267,42 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
         data_qubit = cx_instr["qubits"][0]
         pos += 1
         if instrs[pos]["name"] == "h" and instrs[pos]["qubits"] == data_qubit:
-            # teledata: h(data), measure(data), measure(comm), send(s)
-            pos += 1
+            # teledata sender: h(data), measure(data), measure(comm),
+            #                  cif/x(data)/endcif, cif/x(comm)/endcif, send(s)
+            pos += 1  # h(data)
             while instrs[pos]["name"] == "measure":
                 pos += 1
+            pos = skip_cif_blocks(instrs, pos)
             while pos < len(instrs) and instrs[pos]["name"] == "send":
                 pos += 1
             return data_qubit, pos, True
-        # telegate: measure(comm), send(s), recv(s), cif(xor), z(data), endcif
+        # telegate sender: measure(comm), cif/x(comm)/endcif, send(s), recv(s),
+        #                  cif(xor)/z(data)/endcif
         pos += 1  # measure(comm)
-        while instrs[pos]["name"] == "send":
+        pos = skip_cif_blocks(instrs, pos)
+        while pos < len(instrs) and instrs[pos]["name"] == "send":
             pos += 1
-        while instrs[pos]["name"] == "recv":
+        while pos < len(instrs) and instrs[pos]["name"] == "recv":
             pos += 1
-        pos += 3  # cif, z(data), endcif
+        pos = skip_cif_blocks(instrs, pos)  # cif(xor), z(data), endcif
         return data_qubit, pos, False
 
     def parse_receiver_telegate(tag: str, idx: int, genpos: int, comm: int, data_global: int) -> int:
         """Consume a telegate receiver block, recording the collapsed gates. Returns end_pos."""
         instrs = circuits[idx].instructions
-        pos = genpos + 1     # skip gen_ent
-        pos += 4             # recv, cif, x(comm), endcif (entangler correction)
+        pos = genpos + 1                      # skip gen_ent
+        pos += 1                              # recv
+        pos = skip_cif_blocks(instrs, pos)    # cif/x(comm)/endcif (entangler correction)
+        # The locally-controlled gates run until the disentangler starts: h(comm), measure(comm).
         local_gates = []
         while not (instrs[pos]["name"] == "h" and instrs[pos]["qubits"] == comm
-                   and instrs[pos + 1]["name"] == "measure" and instrs[pos + 2]["name"] == "send"):
+                   and instrs[pos + 1]["name"] == "measure"):
             local_gates.append(instrs[pos])
             pos += 1
-        pos += 3             # h(comm), measure(comm), send (disentangler)
+        pos += 2                              # h(comm), measure(comm)
+        pos = skip_cif_blocks(instrs, pos)    # cif/x(comm)/endcif (disentangler correction)
+        while pos < len(instrs) and instrs[pos]["name"] == "send":
+            pos += 1
         for gate in local_gates:
             collapsed[tag].append(reindex(gate, idx, alias={comm: data_global}))
         return pos
@@ -287,9 +310,9 @@ def union(circuits: list[CunqaCircuit]) -> CunqaCircuit:
     def parse_receiver_teledata(tag: str, idx: int, genpos: int, comm: int, data_global: int) -> int:
         """Consume a teledata receiver block, recording the swap. Returns end_pos."""
         instrs = circuits[idx].instructions
-        pos = genpos + 1     # skip gen_ent
-        pos += 1             # recv
-        pos += 6             # cif/x(comm)/endcif, cif/z(comm)/endcif
+        pos = genpos + 1                      # skip gen_ent
+        pos += 1                              # recv
+        pos = skip_cif_blocks(instrs, pos)    # cif/x(comm)/endcif, cif/z(comm)/endcif
         swap_instr = instrs[pos]
         if swap_instr["name"] != "swap":
             raise ValueError("Unexpected teledata receiver structure during union.")
