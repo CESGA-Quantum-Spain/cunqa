@@ -20,7 +20,8 @@ namespace cunqa {
 namespace sim {
 
 MaestroSimulatorAdapter::MaestroSimulatorAdapter() {
-    maestroInstance = GetMaestroObject();
+    if (maestroInstance == nullptr)
+        maestroInstance = GetMaestroObject();
 }
 MaestroSimulatorAdapter::~MaestroSimulatorAdapter() = default;
 
@@ -31,77 +32,80 @@ std::unique_ptr<Circuit> MaestroSimulatorAdapter::create_circuit(const JSON& ins
 
 void MaestroSimulatorAdapter::initialize()
 {
-    std::string method = config.method;
-    std::string sim_name;
+    if (simulator == nullptr) {
+        std::string method = config.method;
+        std::string sim_name = "aer";
 
-    if (config.simulator_specifics.contains("maestro_simulator"))
-        sim_name = config.simulator_specifics.at("maestro_simulator");
+        if (config.simulator_specifics.contains("maestro_simulator"))
+            sim_name = config.simulator_specifics.at("maestro_simulator");
 
-    // -1 for simulator type means both qiskit aer and qcsim
-    // -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
-    int simulatorType = -1; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
-    int simulationType = -1; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
+        // -1 for simulator type means both qiskit aer and qcsim
+        // -1 for simulation type means automatic, that is... statevector + stabilizer + matrix product state
+        int simulatorType = -1; // qiskit aer by default, 1 = qcsim, 2 = p-blocks qiskit aer, 3 = p-blocks qcsim, 4 = gpu
+        int simulationType = -1; // statevector by default, 1 = matrix product state, 2 = stabilizer, 3 = matrix product state
 
-    // TODO: set the method into the estimator
-    // also the parameters if any and so on
-    if (method != "automatic")
-    {
-        if (method == "statevector") {
-            simulationType = 0;
-        } else if (method == "matrix_product_state") {
-            // matrix_product_state_truncation_threshold
-            // matrix_product_state_max_bond_dimension
-            // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
-            simulationType = 1;
-        } else if (method == "stabilizer") {
-            simulationType = 2;
-        } else if (method == "tensor_network") {
-            // use qcsim for this, qiskit aer is not compiled with tensor network support
-            // in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
-            simulationType = 3;
+        // TODO: set the method into the estimator
+        // also the parameters if any and so on
+        if (method != "automatic")
+        {
+            if (method == "statevector") {
+                simulationType = 0;
+            } else if (method == "matrix_product_state") {
+                // matrix_product_state_truncation_threshold
+                // matrix_product_state_max_bond_dimension
+                // mps_sample_measure_algorithm - if 'mps_probabilities', use MPS 'measure no collapse'
+                simulationType = 1;
+            } else if (method == "stabilizer") {
+                simulationType = 2;
+            } else if (method == "tensor_network") {
+                // use qcsim for this, qiskit aer is not compiled with tensor network support
+                // in the future we'll need to discriminate between qcsim and gpu as well, but we don't have yet gpu tensor network support
+                simulationType = 3;
+            }
         }
-    }
 
-    if (sim_name == "qiskit" || sim_name == "aer") {
-        simulatorType = 0; // qiskit aer
-    } else if (sim_name == "qcsim") {
-        simulatorType = 1; // qcsim
-    } else if (sim_name == "gpu" && simulationType != 2 && simulationType != 3) { // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
-        simulatorType = 4; // gpu
-    } else if (sim_name == "composite_qiskit") {
-        simulatorType = 2; // p-blocks qiskit aer
-        simulationType = 0; // statevector
-    } else if (sim_name == "composite_qcsim") {
-        simulatorType = 3; // p-blocks qcsim
-        simulationType = 0; // statevector
-    }
-
-    /* if (simulatorType != -1 || simulationType != -1) { // if both unspecified, leave the default
-        if (simulatorType == -1 && simulationType != -1) { // simulator type not specified
-            // both qiskit aer and qcsim
-            RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, 0, simulationType);
-            AddOptimizationSimulator(simulatorHandle, 1, simulationType);
-        } else if (simulationType == -1) {
-            RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 0); // statevector
-            RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 1); // mps
-            RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 2); // stabilizer
-        } else {
-            RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, simulationType);
+        if (sim_name == "qiskit" || sim_name == "aer") {
+            simulatorType = 0; // qiskit aer
+        } else if (sim_name == "qcsim") {
+            simulatorType = 1; // qcsim
+        } else if (sim_name == "gpu" && simulationType != 2 && simulationType != 3) { // stabilizer and tensor network not supported on gpu (tensor network will be in the future)
+            simulatorType = 4; // gpu
+        } else if (sim_name == "composite_qiskit") {
+            simulatorType = 2; // p-blocks qiskit aer
+            simulationType = 0; // statevector
+        } else if (sim_name == "composite_qcsim") {
+            simulatorType = 3; // p-blocks qcsim
+            simulationType = 0; // statevector
         }
-    } */
-    auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
-    if (simulatorHandle == 0) {
-        LOGGER_ERROR("Error creating the Maestro Simulator.");
-        throw std::runtime_error("ERROR: Unable to create the Maestro Simulator.");
+
+        /* if (simulatorType != -1 || simulationType != -1) { // if both unspecified, leave the default
+            if (simulatorType == -1 && simulationType != -1) { // simulator type not specified
+                // both qiskit aer and qcsim
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, 0, simulationType);
+                AddOptimizationSimulator(simulatorHandle, 1, simulationType);
+            } else if (simulationType == -1) {
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 0); // statevector
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 1); // mps
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, 2); // stabilizer
+            } else {
+                RemoveAllOptimizationSimulatorsAndAdd(simulatorHandle, simulatorType, simulationType);
+            }
+        } */
+        auto simulatorHandle = CreateSimulator(simulatorType, simulationType);
+        if (simulatorHandle == 0) {
+            LOGGER_ERROR("Error creating the Maestro Simulator.");
+            throw std::runtime_error("ERROR: Unable to create the Maestro Simulator.");
+        }
+        
+        simulator = GetSimulator(simulatorHandle);
+        AllocateQubits(simulator, num_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
+        InitializeSimulator(simulator);
     }
-    auto simulator = GetSimulator(simulatorHandle);
-    AllocateQubits(simulator, num_qubits); // From CUNQA: Maybe allocate after shots and restart the state in each shot for better performance?
-    InitializeSimulator(simulator);
 }
 
 void MaestroSimulatorAdapter::clear()
 {
-    ClearSimulator(simulator);
+    ResetSimulator(simulator);
 }
 
 void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitNoParam& payload)
@@ -310,6 +314,7 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const Meas
                 const unsigned long long int measurement = ::Measure(simulator, q, 1);
                 creg[payload.clbit] =
                         (measurement == 1);
+                LOGGER_DEBUG("La medida me dio {}", std::to_string(measurement));
                 save_clbit[payload.clbit] = payload.save;
             } else {
                 throw std::runtime_error("Cannot store measurement: classical bit "

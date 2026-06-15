@@ -12,7 +12,7 @@ import numpy as np
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
     # The sparsematrix instruction is supported by the Qulacs simulator
-    family = qraise(1, "00:10:00", simulator="Qulacs", co_located = True)
+    family = qraise(1, "00:10:00", simulator="Maestro", co_located = True)
 except Exception as error:
     raise error
 

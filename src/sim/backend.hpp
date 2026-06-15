@@ -16,7 +16,7 @@ namespace sim {
 class Backend {
 public:
     std::string name;
-    std::string version = "0.0.1";
+    std::string version;
     std::pair<std::size_t, std::size_t> num_qubits;
     std::string description;
     std::vector<std::vector<std::size_t>> coupling_map;

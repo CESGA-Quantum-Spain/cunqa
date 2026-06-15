@@ -266,7 +266,7 @@ struct MunichSimulatorAdapter::State : public CircuitSimulator{
     inline void initializeSimulationAdapter(std::size_t nQubits) { initializeSimulation(nQubits); }
     inline void applyOperationToStateAdapter(std::unique_ptr<qc::Operation>&& op) { applyOperationToState(op); }
     inline void applyResetAdapter(NonUnitaryOperation& op) { reset(&op); }
-    inline char measureAdapter(dd::Qubit i) { return measure(i); }
+    inline bool measureAdapter(dd::Qubit i) { return (measure(i) == '1') ? true : false; }
 };
 
 struct MunichSimulatorAdapter::NoiseModel {
@@ -285,9 +285,8 @@ struct MunichSimulatorAdapter::NoiseModel {
 };
 
 MunichSimulatorAdapter::MunichSimulatorAdapter()
-    : state_(std::make_unique<State>(std::move(getQuantumComputation(num_qubits, config.num_clbits, config.seed))))
-    , noise_model_(std::make_unique<NoiseModel>())
-{ }
+    : noise_model_(std::make_unique<NoiseModel>())
+{}
 MunichSimulatorAdapter::~MunichSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> MunichSimulatorAdapter::create_circuit(const JSON& instructions_json) const
@@ -301,6 +300,8 @@ void MunichSimulatorAdapter::set_noise_model(const JSON& noise_properties)
 }
 
 void MunichSimulatorAdapter::initialize() {
+    if (state_ == nullptr)
+        state_ = std::make_unique<State>(std::move(getQuantumComputation(num_qubits, config.num_clbits, config.seed)));
     const char* num_threads_char = std::getenv("OMP_NUM_THREADS");
     unsigned num_threads = 1;
     if (num_threads_char != nullptr) {

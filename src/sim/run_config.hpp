@@ -14,7 +14,7 @@ inline constexpr int NO_SEED = -1;
 struct RunConfig {
     std::string qpu_id;
     int shots;
-    std::string method;
+    std::string method = "automatic";
     bool avoid_parallelization;
     bool is_dynamic;
     int num_clbits;

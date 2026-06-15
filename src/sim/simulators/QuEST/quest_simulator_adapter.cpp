@@ -40,9 +40,9 @@ cunqa::JSON convert_quest_result(const std::unordered_map<int, int>& counts, int
 
     cunqa::JSON result_json;
     for (const auto& [value, count] : counts) {
-        std::string bitstring(n_qubits, '0');
-        for (int i = 0; i < n_qubits; ++i)
-            bitstring[n_qubits - 1 - i] = ((value >> i) & 1) ? '1' : '0';
+        std::string bitstring(num_qubits, '0');
+        for (int i = 0; i < num_qubits; ++i)
+            bitstring[num_qubits - 1 - i] = ((value >> i) & 1) ? '1' : '0';
 
         result_json[bitstring] = count;
     }
@@ -51,7 +51,7 @@ cunqa::JSON convert_quest_result(const std::unordered_map<int, int>& counts, int
 
 void update_quest_state(Qureg qubits_state, const cunqa::QuestCircuit& quest_circuit){
 
-    for (instruction : quest_circuit.instructions){
+    for (auto instruction : quest_circuit.instructions){
 
     }
 }
@@ -89,13 +89,10 @@ Qureg init_qureg(const int& n_qubits, std::string& method, JSON& device) {
 struct QuestSimulatorAdapter::State {
     Qureg qubits_state;
 
-    // Constructor
     State(const int& n_qubits, std::string& method, JSON& device) : qubits_state(init_qureg(n_qubits, method, device)) { }
 };
 
-QuestSimulatorAdapter::QuestSimulatorAdapter()
-: state_(std::make_unique<State>(num_qubits, config.method, config.device))
-{ }
+QuestSimulatorAdapter::QuestSimulatorAdapter() = default;
 QuestSimulatorAdapter::~QuestSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> QuestSimulatorAdapter::create_circuit(const JSON& instructions_json) const
@@ -104,6 +101,8 @@ std::unique_ptr<Circuit> QuestSimulatorAdapter::create_circuit(const JSON& instr
 }
 
 void QuestSimulatorAdapter::initialize() {
+    if (state_ == nullptr)
+        state_ = std::make_unique<State>(num_qubits, config.method, config.device);
     initZeroState(state_->qubits_state);
 }
 
@@ -624,20 +623,26 @@ JSON QuestSimulatorAdapter::native_execute(const Circuit& circuit){
     } else if (config.method == "density_matrix") {
         vec_or_mat = 1;
     } else {
-        LOGGER_ERROR("QuEST simulator only supports statevector or density matrix simulation, while {} was given", method);
+        LOGGER_ERROR("QuEST simulator only supports statevector or density matrix simulation, while {} was given", config.method);
         throw std::invalid_argument{"QuEST simulator only supports statevector or density matrix simulation"};
     }
 
     float time_taken = 0.0f;
     auto start = std::chrono::high_resolution_clock::now();
     if (config.seed != -1) {
+        unsigned int seed = config.seed;
         setSeeds(&seed, 1);
     }
 
     Qureg qubits_state = createCustomQureg(num_qubits, vec_or_mat, 0, 0, 0);
     initZeroState(qubits_state);
     update_quest_state(qubits_state, quest_adapter_circuit);
-    auto counts = sampleQureg(qubits_state);  // TODO: optimize with the different backends
+
+    std::vector<int> indexes(num_qubits);
+    for (int i = 0; i < num_qubits; i++)
+        indexes[i] = i;
+
+    auto counts = sampleQureg(qubits_state, indexes.data(), num_qubits, &config.shots);  // TODO: optimize with the different backends
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = end - start;

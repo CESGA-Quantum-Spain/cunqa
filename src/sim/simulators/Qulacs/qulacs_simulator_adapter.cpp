@@ -473,9 +473,7 @@ struct QulacsSimulatorAdapter::State {
     State(const int& n_qubits) : state(n_qubits){ }
 };
 
-QulacsSimulatorAdapter::QulacsSimulatorAdapter()
-    : state_(std::make_unique<State>(num_qubits))
-{ }
+QulacsSimulatorAdapter::QulacsSimulatorAdapter() = default;
 QulacsSimulatorAdapter::~QulacsSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> QulacsSimulatorAdapter::create_circuit(const JSON& instructions_json) const
@@ -485,6 +483,8 @@ std::unique_ptr<Circuit> QulacsSimulatorAdapter::create_circuit(const JSON& inst
 
 void QulacsSimulatorAdapter::initialize()
 {
+    if (state_ == nullptr)
+        state_ = std::make_unique<State>(num_qubits);
     state_->state.set_zero_state();
 }
 
@@ -514,7 +514,6 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const OneQu
             break;
 
         case InstructionType::H:
-            LOGGER_DEBUG("Aplicamos la H");
             gate::H(payload.qubit)->update_quantum_state(&state_->state);
             break;
 
@@ -840,7 +839,7 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const Measu
         case InstructionType::MEASURE:
             if(payload.clbit < config.num_clbits) {
                     creg[payload.clbit] =
-                        (measure_adapter(state_->state, payload.qubit) == 1);
+                        (measure_adapter(state_->state, payload.qubit) == 1U);
                     save_clbit[payload.clbit] = payload.save;
                 } else {
                     throw std::runtime_error("Cannot store measurement: classical bit "

@@ -277,9 +277,7 @@ unsigned processSeed(int seed){
     return u_seed;
 }
 
-QsimSimulatorAdapter::QsimSimulatorAdapter()
-    : state_(std::make_unique<State>(getNumThreads(), num_qubits, processSeed(config.seed)))
-{ }
+QsimSimulatorAdapter::QsimSimulatorAdapter() = default;
 QsimSimulatorAdapter::~QsimSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> QsimSimulatorAdapter::create_circuit(const JSON& instructions_json) const
@@ -288,6 +286,8 @@ std::unique_ptr<Circuit> QsimSimulatorAdapter::create_circuit(const JSON& instru
 }
 
 void QsimSimulatorAdapter::initialize() {
+    if (state_ == nullptr)
+        state_ = std::make_unique<State>(getNumThreads(), num_qubits, processSeed(config.seed));
     state_->state_space.SetStateZero(state_->state);
 }
 

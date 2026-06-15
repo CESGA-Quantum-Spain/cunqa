@@ -26,9 +26,7 @@ struct CunqaSimulatorAdapter::State {
     State(const int& n_qubits) : executor(n_qubits) {}
 };
 
-CunqaSimulatorAdapter::CunqaSimulatorAdapter()
-    : state_(std::make_unique<State>(num_qubits))
-{ }
+CunqaSimulatorAdapter::CunqaSimulatorAdapter() = default;
 CunqaSimulatorAdapter::~CunqaSimulatorAdapter() = default;
 
 std::unique_ptr<Circuit> CunqaSimulatorAdapter::create_circuit(const JSON& instructions_json) const
@@ -38,6 +36,8 @@ std::unique_ptr<Circuit> CunqaSimulatorAdapter::create_circuit(const JSON& instr
 
 void CunqaSimulatorAdapter::initialize()
 {
+    if (state_ == nullptr)
+        state_ = std::make_unique<State>(num_qubits);
     state_->executor.restart_statevector();
 }
 

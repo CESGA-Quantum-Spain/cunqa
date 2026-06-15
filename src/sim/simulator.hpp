@@ -4,6 +4,7 @@
 #include <map>
 #include <string_view>
 #include <utility>
+#include <iostream>
 
 #include "dynamic_circuit/instruction_type.hpp"
 #include "dynamic_circuit/dynamic_circuit.hpp"
@@ -182,6 +183,7 @@ protected:
     template <typename Gate>
     [[noreturn]] inline void unsupported_gate(const InstructionType& type, const Gate& payload) const
     {
+        (void) payload;
         throw std::runtime_error(
             "Gate " + std::string(instruction_type_name(type)) + 
             " not supported by " + get_name() + " simulator." 
