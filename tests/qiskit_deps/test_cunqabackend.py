@@ -105,7 +105,7 @@ class TestCunqaBackend:
             "name": "NoisyBackend",
             "version": "0.0.1",
             "description": "Example of a noisy backend",
-            "n_qubits": 16,
+            "num_qubits": [16, 0],
             "basis_gates": [
                 "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr"
             ],
@@ -113,7 +113,9 @@ class TestCunqaBackend:
             "gates": [],
             "coupling_map": [],
             "simulator":"Aer",
-            "noise_properties_path":"/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
+            "noise_model": {
+                "noise_properties_path": "/opt/cesga/qmio/hpc/calibrations/2025_05_15__12_41_26.json"
+            }
         }
         
 

@@ -51,7 +51,8 @@ def test_to_ir_cunqacircuit_returns_deepcopy():
 
     fresh = mod_ir.to_ir(c)
     assert fresh["id"] == "A"
-    assert fresh["instructions"][-1] == {"name": "x", "qubits": [0]}
+    # CunqaCircuit stores single-qubit gates with a scalar qubit index.
+    assert fresh["instructions"][-1] == {"name": "x", "qubits": 0}
 
 
 def test_to_ir_dict_returns_same_object_and_warns(monkeypatch):
@@ -87,12 +88,12 @@ def test_to_ir_quantumcircuit_basic_register_mapping_and_measure(monkeypatch):
     assert ir["quantum_registers"] == {"q0": [0], "q1": [1, 2]}
     assert ir["classical_registers"] == {"c0": [0, 1]}
 
-    # First instruction: x on q1[1] => global 2
+    # First instruction: x on q1[1] => global 2 (single-qubit gates use a scalar index)
     assert ir["instructions"][0]["name"] == "x"
-    assert ir["instructions"][0]["qubits"] == [2]
+    assert ir["instructions"][0]["qubits"] == 2
 
     # Second instruction: measure q1[0] -> c0[1] => qubit 1, clbit 1
-    assert ir["instructions"][1] == {"name": "measure", "qubits": [1], "clbits": [1]}
+    assert ir["instructions"][1] == {"name": "measure", "qubits": 1, "clbits": 1, "save": True}
 
 
 def test_to_ir_quantumcircuit_barrier_is_ignored(monkeypatch):
@@ -127,7 +128,7 @@ def test_to_ir_quantumcircuit_unitary_encodes_complex_matrix(monkeypatch):
 
     instr = ir["instructions"][0]
     assert instr["name"] == "unitary"
-    assert instr["qubits"] == [0]
+    assert instr["qubits"] == 0
 
     encoded = instr["params"][0]
     assert encoded == [
@@ -160,7 +161,7 @@ def test_to_ir_quantumcircuit_classically_conditioned_gate_sets_dynamic(monkeypa
     assert len(ir["instructions"]) == 1
     assert ir["instructions"][0]["name"] == "cif"
     assert ir["instructions"][0]["instructions"][0]["name"] == "x"
-    assert ir["instructions"][0]["instructions"][0]["qubits"] == [0]
+    assert ir["instructions"][0]["instructions"][0]["qubits"] == 0
 
 
 def _build_if_else(qc):

@@ -1567,7 +1567,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rz",
             "qubits": qubits[-1],
-            "params": -np.pi/2
+            "params": [-np.pi/2]
         })
         self.add_instructions({
             "name": "ccx",
@@ -1576,7 +1576,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name": "rz",
             "qubits": qubits[-1],
-            "params": np.pi/2
+            "params": [np.pi/2]
         })
 
     def ccz(self, *qubits: int) -> None:
@@ -2296,14 +2296,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "amplitudedampingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed": seed
             })
         else:
             self.add_instructions({
                 "name": "amplitudedampingnoise",
                 "qubits": [*qubits],
-                "params": prob
+                "params": [prob]
             })
 
     def bitflipnoise(self, prob: float, *qubits: int, seed = None) -> None:
@@ -2320,14 +2320,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "bitflipnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed": seed
             })
         else:
             self.add_instructions({
                 "name": "bitflipnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
             })
 
     def dephasingnoise(self, prob: float, *qubits: int, seed = None) -> None:
@@ -2344,14 +2344,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "dephasingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed": seed
             })
         else:
             self.add_instructions({
                 "name": "dephasingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
             })
 
     def depolarizingnoise(self, prob: float, *qubits: int, seed = None) -> None:
@@ -2370,14 +2370,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "depolarizingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed": seed
             })
         else:
             self.add_instructions({
                 "name": "depolarizingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
             })
 
     def independentxznoise(self, prob: float, *qubits: int, seed = None) -> None:
@@ -2396,14 +2396,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "independentxznoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed":seed
             })
         else:
             self.add_instructions({
                 "name": "independentxznoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
             })
 
     def twoqubitdepolarizingnoise(self, prob: float, *qubits: int, seed = None) -> None:
@@ -2422,14 +2422,14 @@ class CunqaCircuit:
             self.add_instructions({
                 "name": "twoqubitdepolarizingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
                 "seed": seed
             })
         else:
             self.add_instructions({
                 "name": "twoqubitdepolarizingnoise",
                 "qubits": [*qubits],
-                "params": prob,
+                "params": [prob],
             })
 
     # Controlled-by-state gates
