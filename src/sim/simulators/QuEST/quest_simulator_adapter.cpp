@@ -53,6 +53,433 @@ void update_quest_state(Qureg qubits_state, const cunqa::QuestCircuit& quest_cir
 
     for (auto instruction : quest_circuit.instructions){
 
+        switch (cunqa::instruction_type_from_name(instruction.at("name").get<std::string>()))
+        {
+        case cunqa::InstructionType::X:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyPauliX(qubits_state, qubit);
+            break;
+        }
+            
+        case cunqa::InstructionType::Y:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyPauliY(qubits_state, qubit);
+            break;
+        }
+            
+        case cunqa::InstructionType::Z:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyPauliZ(qubits_state, qubit);
+            break;
+        }
+            
+        case cunqa::InstructionType::H:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyHadamard(qubits_state, qubit);
+            break;
+        }
+            
+        case cunqa::InstructionType::S:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyS(qubits_state, qubit);
+            break;
+        }
+            
+        case cunqa::InstructionType::T:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            applyT(qubits_state, qubit);
+            break;
+        }
+        case cunqa::InstructionType::P:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            applyPhaseShift(qubits_state, qubit, param);
+            break;
+        }
+        case cunqa::InstructionType::RX:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            applyRotateX(qubits_state, qubit, param);
+            break;
+        }
+        case cunqa::InstructionType::RY:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            applyRotateY(qubits_state, qubit, param);
+            break;
+        }
+        case cunqa::InstructionType::RZ:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            applyRotateZ(qubits_state, qubit, param);
+            break;
+        }
+        case cunqa::InstructionType::RAXIS:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            auto param = instruction.at("params").get<double>();
+            auto axis  = instruction.at("axis").get<std::vector<double>>();
+            applyRotateAroundAxis(qubits_state, qubit, param,
+                                  axis[0], axis[1], axis[2]  );
+            break;
+        }
+
+        case cunqa::InstructionType::SWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applySwap(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::SQRTSWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applySqrtSwap(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledPauliX(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledPauliY(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CZ:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledPauliZ(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CH:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledHadamard(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CS:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledS(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+        case cunqa::InstructionType::CT:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            applyControlledT(qubits_state, qubits[0], qubits[1]);
+            break;
+        }
+
+        case cunqa::InstructionType::CP: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            auto param = instruction.at("params").get<double>();
+            applyTwoQubitPhaseShift(qubits_state, qubits[0], qubits[1], param);
+            break;
+        }
+        case cunqa::InstructionType::CRX: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            auto param = instruction.at("params").get<double>();
+            applyControlledRotateX(qubits_state, qubits[0], qubits[1], param);
+            break;
+        }
+        case cunqa::InstructionType::CRY: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            auto param = instruction.at("params").get<double>();
+            applyControlledRotateY(qubits_state, qubits[0], qubits[1], param);
+            break;
+        }
+        case cunqa::InstructionType::CRZ: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            auto param = instruction.at("params").get<double>();
+            applyControlledRotateZ(qubits_state, qubits[0], qubits[1], param);
+            break;
+        }
+        case cunqa::InstructionType::CRAXIS: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<int>>();
+            auto param = instruction.at("params").get<double>();
+            auto axis = instruction.at("axis").get<std::vector<double>>();
+            applyControlledRotateAroundAxis(qubits_state, qubits[0], qubits[1], param, 
+                                            axis[0], axis[1], axis[2]);
+            break;
+        }
+        case cunqa::InstructionType::CSWAP: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            applyControlledSwap(qubits_state, qubits[0], qubits[1], qubits[2]);
+            break;
+        }
+        case cunqa::InstructionType::CSQRTSWAP: 
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            applyControlledSqrtSwap(qubits_state, qubits[0], qubits[1], qubits[2]);
+            break;
+        }
+
+        case cunqa::InstructionType::PAULISTR:
+        {
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            applyPauliStr(qubits_state, getPauliStr(paulistr));
+            break;
+        }
+        case cunqa::InstructionType::CPAULISTR:   
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            applyControlledPauliStr(qubits_state, qubits[0], getPauliStr(paulistr));
+            break;
+        }
+        case cunqa::InstructionType::MCPAULISTR:
+        {
+            auto controls = instruction.at("qubits").get<std::vector<int>>();
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            applyMultiControlledPauliStr(qubits_state, controls, getPauliStr(paulistr));
+            break;
+        }
+
+        case cunqa::InstructionType::PAULIGADGET:
+        {
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            auto param = instruction.at("params").get<double>();
+            applyPauliGadget(qubits_state, getPauliStr(paulistr), param);
+            break;
+        }
+        case cunqa::InstructionType::NONUNITARYPAULIGADGET:
+        {
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            auto param = instruction.at("params").get<double>();
+            applyNonUnitaryPauliGadget(qubits_state, getPauliStr(paulistr), param);
+            break;
+        }
+        case cunqa::InstructionType::CPAULIGADGET:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            auto param = instruction.at("params").get<double>();
+            applyControlledPauliGadget(qubits_state, qubits[0], getPauliStr(paulistr), param);
+            break;
+        }
+        case cunqa::InstructionType::MCPAULIGADGET:
+        {
+            auto controls = instruction.at("qubits").get<std::vector<int>>();
+            auto paulistr = instruction.at("paulistr").get<std::string>();
+            auto param = instruction.at("params").get<double>();
+            applyMultiControlledPauliGadget(qubits_state, controls, getPauliStr(paulistr), param);
+            break;
+        }
+        case cunqa::InstructionType::MCX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledPauliX(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledPauliY(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCZ:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledPauliZ(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCH:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledHadamard(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCS:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledS(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCT:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledT(qubits_state, controls, qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCSWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-2);
+            applyMultiControlledSwap(qubits_state, controls, *(qubits.end()-2), qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MCSQRTSWAP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-2);
+            applyMultiControlledSqrtSwap(qubits_state, controls, *(qubits.end()-2), qubits.back());
+            break;
+        }
+
+        case cunqa::InstructionType::MX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> targets(qubits.begin(), qubits.end());
+            applyMultiQubitNot(qubits_state, targets);
+            break;
+        }
+
+        case cunqa::InstructionType::CMX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            std::vector<int> targets(qubits.begin()+1, qubits.end());
+            applyControlledMultiQubitNot(qubits_state, qubits[0], targets);
+            break;
+        }
+
+        case cunqa::InstructionType::MCRX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledRotateX(qubits_state, controls, qubits.back(), param);
+            break;
+        }
+
+        case cunqa::InstructionType::MCRY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledRotateY(qubits_state, controls, qubits.back(), param);
+            break;
+        }
+
+        case cunqa::InstructionType::MCRZ:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledRotateZ(qubits_state, controls, qubits.back(), param);
+            break;
+        }
+
+        case cunqa::InstructionType::MCP:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> targets(qubits.begin(), qubits.end());
+            applyMultiQubitPhaseShift(qubits_state, targets, param);
+            break;
+        }
+
+        case cunqa::InstructionType::PHASEGADGET:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> targets(qubits.begin(), qubits.end());
+            applyPhaseGadget(qubits_state, targets, param);
+            break;
+        }
+
+        case cunqa::InstructionType::CPHASEGADGET:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> targets(qubits.begin() + 1, qubits.end());
+            applyControlledPhaseGadget(qubits_state, qubits[0], targets, param);
+            break;
+        }
+        case cunqa::InstructionType::MCRAXIS:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").get<double>();
+            auto axis = instruction.at("axis").get<std::vector<double>>();
+            std::vector<int> controls(qubits.begin(), qubits.end()-1);
+            applyMultiControlledRotateAroundAxis(qubits_state, controls, qubits.back(),
+                                                 param, axis[0], axis[1], axis[2]);
+            break;
+        }
+
+        case cunqa::InstructionType::MCMX:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto num_controls = instruction.at("num_controls").get<int>();
+            std::vector<int> controls(qubits.begin(),                   qubits.begin() + num_controls + 1);
+            std::vector<int> targets(qubits.begin() + num_controls + 1, qubits.end());
+            applyMultiControlledMultiQubitNot(qubits_state, controls, targets);
+            break;
+        }
+        case cunqa::InstructionType::MCPHASEGADGET:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto num_controls = instruction.at("num_controls").get<int>();
+            auto param = instruction.at("params").get<double>();
+            std::vector<int> controls(qubits.begin(),                   qubits.begin() + num_controls + 1);
+            std::vector<int> targets(qubits.begin() + num_controls + 1, qubits.end());
+            applyMultiControlledPhaseGadget(qubits_state, controls, targets, param);
+            break;
+        }
+        case cunqa::InstructionType::UNITARY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<double>>>>();
+            CompMatr quest_matrix = createCompMatr(qubits.size());
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(matrix));
+            
+            std::vector<int> targets(qubits.begin(), qubits.end());
+            applyCompMatr(qubits_state, targets, quest_matrix); //qubits must be std::vector<int>
+            break;
+        }
+        case cunqa::InstructionType::CUNITARY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            const auto matrix = instruction.at("matrix").get<std::vector<std::vector<std::vector<double>>>>();
+            CompMatr quest_matrix = createCompMatr(qubits.size() - 1);
+            // Using this constructor setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
+            setCompMatr(quest_matrix, cunqamatrix_to_questmatrix(matrix));
+            
+            std::vector<int> targets(qubits.begin() + 1, qubits.end());
+            applyControlledCompMatr(qubits_state, qubits[0], targets, quest_matrix);
+            break;
+        }
+        case cunqa::InstructionType::MEASURE:
+        {
+            // Here we have again the problem of ignoring intermediate measurements on non-dynamic circuits
+            break;
+        }
+        
+        default:
+            std::cerr << "Instruction not suported!\nInstruction that failed: " << instruction.at("name").get<std::string>() << "\n";
+        };
     }
 }
 
@@ -522,12 +949,12 @@ void QuestSimulatorAdapter::apply_gate(const InstructionType& type, const NumCon
     switch (type)
     {
         case InstructionType::MCPHASEGADGET:
-            {
-                std::vector<int> controls(payload.qubits.begin(), payload.qubits.begin() + payload.num_controls + 1);
-                std::vector<int> targets(payload.qubits.begin() + payload.num_controls + 1, payload.qubits.end());
-                applyMultiControlledPhaseGadget(state_->qubits_state, controls, targets, *payload.param);
-                break;
-            }
+        {
+            std::vector<int> controls(payload.qubits.begin(), payload.qubits.begin() + payload.num_controls + 1);
+            std::vector<int> targets(payload.qubits.begin() + payload.num_controls + 1, payload.qubits.end());
+            applyMultiControlledPhaseGadget(state_->qubits_state, controls, targets, *payload.param);
+            break;
+        }
 
         default:
             unsupported_gate(type, payload);
@@ -629,33 +1056,40 @@ JSON QuestSimulatorAdapter::native_execute(const Circuit& circuit){
 
     float time_taken = 0.0f;
     auto start = std::chrono::high_resolution_clock::now();
+    if (!isQuESTEnvInit()){
+        initCustomQuESTEnv(0, 0, 0);
+    }
     if (config.seed != -1) {
         unsigned int seed = config.seed;
         setSeeds(&seed, 1);
     }
-
     Qureg qubits_state = createCustomQureg(num_qubits, vec_or_mat, 0, 0, 0);
-    initZeroState(qubits_state);
-    update_quest_state(qubits_state, quest_adapter_circuit);
+    try {
+        initZeroState(qubits_state);
+        update_quest_state(qubits_state, quest_adapter_circuit);
+        
+        std::vector<int> indexes(num_qubits);
+        for (int i = 0; i < num_qubits; i++)
+            indexes[i] = i;
 
-    std::vector<int> indexes(num_qubits);
-    for (int i = 0; i < num_qubits; i++)
-        indexes[i] = i;
+        
+        auto counts = sampleQureg(qubits_state, indexes.data(), num_qubits, &config.shots);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = end - start;
+        time_taken = duration.count();
 
-    auto counts = sampleQureg(qubits_state, indexes.data(), num_qubits, &config.shots);  // TODO: optimize with the different backends
+        JSON result_json = {
+            {"counts", convert_quest_result(counts, num_qubits)},
+            {"time_taken", time_taken}
+        };
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<float> duration = end - start;
-    time_taken = duration.count();
+        destroyQureg(qubits_state);
+        return result_json;
 
-    destroyQureg(qubits_state); 
-
-    JSON result_json = {
-        {"id_counts", convert_quest_result(counts, num_qubits)},
-        {"time_taken", time_taken}
-    };
-
-    return result_json;
+    } catch (...) {
+        destroyQureg(qubits_state);
+        throw;
+    }
 }
 
 } // End of sim namespace
