@@ -10,6 +10,7 @@ import numpy as np
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
+from cunqa.qc_protocols import cat_entangler, cat_disentangler
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
@@ -20,17 +21,20 @@ N_ANCILLA_QUBITS = 10
 N_REGISTER_QUBITS = 1
 PHASE_TO_COMPUTE = 1 / 2**3
 
-shots = 100
+shots = 1
 SEED = 18
 
 try:
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_path = file_dir + "/10+1_qubit_backend.json"
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
-                    simulator="Maestro",
+                    simulator="Aer",
                     quantum_comm = True, 
                     co_located = True, 
-                    cores = CORES_PER_QPU, 
-                    mem_per_qpu = MEM_PER_QPU)
+                    cores_per_qpu = CORES_PER_QPU, 
+                    mem_per_qpu = MEM_PER_QPU,
+                    backend=backend_path)
 except Exception as error:
     raise error
 
@@ -38,19 +42,37 @@ try:
     qpus = get_QPUs(co_located = True, family = family)
 
     # 2. Design circuits modelling the QPE 
-    ancilla_circuit  = CunqaCircuit(N_ANCILLA_QUBITS, id = "ancilla_circuit")
-    register_circuit = CunqaCircuit(N_REGISTER_QUBITS, id = "register_circuit")
+    ancilla_circuit  = CunqaCircuit((N_ANCILLA_QUBITS, 1), N_ANCILLA_QUBITS, id = "ancilla_circuit")
+    register_circuit = CunqaCircuit((N_REGISTER_QUBITS, 1), 1, id = "register_circuit")
 
-    register_circuit.x(0) # Rz statevector
+    data_qubits_anc, comm_qubits_anc = ancilla_circuit.get_qubits()
+    data_qubits_reg, comm_qubits_reg = register_circuit.get_qubits()
+
+    register_circuit.x(data_qubits_reg[0]) # Rz statevector
 
     for i in range(N_ANCILLA_QUBITS):
-        ancilla_circuit.h(i)
+        ancilla_circuit.h(data_qubits_anc[i])
 
     for i in range(N_ANCILLA_QUBITS):
         ### TELEGATE ###
-        with ancilla_circuit.expose(N_ANCILLA_QUBITS - 1 - i, register_circuit) as ([rqubit], subcircuit):
-            param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE
-            subcircuit.crz(param, rqubit, 0)
+        cat_entangler(
+            target_circuits = [ancilla_circuit, register_circuit],
+            data_qubit      = data_qubits_anc[N_ANCILLA_QUBITS - 1 - i],
+            comm_qubits     = [comm_qubits_anc[0], comm_qubits_reg[0]],
+            clbits          = [0, 0],
+            tag             = "telegate"
+        )
+        
+        param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE
+        register_circuit.crz(param, comm_qubits_reg[0], data_qubits_reg[0])
+
+        cat_disentangler(
+            target_circuits = [ancilla_circuit, register_circuit],
+            data_qubit      = data_qubits_anc[N_ANCILLA_QUBITS - 1 - i],
+            comm_qubits     = [comm_qubits_reg[0]],
+            recv_clbits     = [0],
+            send_clbits     = [0]
+        )
 
     # Swap qubits
     if (N_ANCILLA_QUBITS % 2) == 0:
@@ -59,16 +81,18 @@ try:
         swap_range = int((N_ANCILLA_QUBITS - 1) / 2)
 
     for i in range(swap_range):
-        ancilla_circuit.swap(i, N_ANCILLA_QUBITS - 1 - i)
+        ancilla_circuit.swap(data_qubits_anc[i], data_qubits_anc[N_ANCILLA_QUBITS - 1 - i])
 
     # QFT dagger
     for i in range(N_ANCILLA_QUBITS):
         for j in range(i):
             angle  = (-np.pi) / (2**(i - j)) 
-            ancilla_circuit.crz(angle, N_ANCILLA_QUBITS - 1 - j, N_ANCILLA_QUBITS - 1 - i)
-        ancilla_circuit.h(N_ANCILLA_QUBITS - 1 - i)
+            ancilla_circuit.crz(angle, data_qubits_anc[N_ANCILLA_QUBITS - 1 - j], data_qubits_anc[N_ANCILLA_QUBITS - 1 - i])
+        ancilla_circuit.h(data_qubits_anc[N_ANCILLA_QUBITS - 1 - i])
 
-    ancilla_circuit.measure_all()
+    # Measure
+    for i in range(N_ANCILLA_QUBITS):
+        ancilla_circuit.measure(data_qubits_anc[i], i)
 
 
     # 3. Execute distributed QPE circuit on communicated QPUs
