@@ -28,9 +28,18 @@ int main(int argc, char *argv[])
     std::string family(argv[3]);
     std::string sim_arg(argv[4]);
 
-    JSON backend_json;
+    JSON backend_or_infrastructure;
     if (argc == 6)
-        backend_json = read_file(std::string(argv[5]));
+        backend_or_infrastructure = read_file(std::string(argv[5]));
+    
+    JSON backend_json;
+    if (backend_or_infrastructure.contains("backends")) {
+        const int slurm_procid = std::stoi(std::getenv("SLURM_PROCID"));
+        const std::string backend_path = backend_or_infrastructure.at("backends")[slurm_procid];
+        backend_json = read_file(std::string(backend_path));
+    } else {
+        backend_json = backend_or_infrastructure;
+    }
 
     if (family == "default") family = get_env_variable("SLURM_JOB_ID");
 

@@ -10,14 +10,98 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <climits>
 
 #include "json.hpp"
 
 namespace {
 
+    // Returns the absolute path of `path`. Throws on failure.
+    std::string absolute_path_of(const std::string& path)
+    {
+        char buf[PATH_MAX];
+        // realpath requires the file to exist; if it doesn't, resolve the
+        // parent directory instead and re-append the basename.
+        if (realpath(path.c_str(), buf) != nullptr) {
+            return std::string(buf);
+        }
+
+        auto pos = path.find_last_of('/');
+        std::string dir = (pos == std::string::npos) ? "." :
+                           (pos == 0 ? "/" : path.substr(0, pos));
+        std::string base = (pos == std::string::npos) ? path : path.substr(pos + 1);
+
+        if (realpath(dir.c_str(), buf) == nullptr) {
+            perror("realpath");
+            throw std::runtime_error("Failed to resolve path: " + path);
+        }
+        std::string resolved_dir(buf);
+        if (resolved_dir == "/") return resolved_dir + base;
+        return resolved_dir + "/" + base;
+    }
+
+    // Small non-cryptographic 64-bit hash (FNV-1a), good enough to
+    // disambiguate lock filenames; not security-sensitive.
+    std::string fnv1a_hex(const std::string& s)
+    {
+        uint64_t h = 1469598103934665603ULL; // FNV offset basis
+        for (unsigned char c : s) {
+            h ^= c;
+            h *= 1099511628211ULL; // FNV prime
+        }
+        char buf[17];
+        std::snprintf(buf, sizeof(buf), "%016llx", static_cast<unsigned long long>(h));
+        return std::string(buf, 16);
+    }
+
+    std::string basename_of(const std::string& path)
+    {
+        auto pos = path.find_last_of('/');
+        return (pos == std::string::npos) ? path : path.substr(pos + 1);
+    }
+
+    // Creates a directory, including parents, equivalent to `mkdir -p`.
+    void mkdir_p(const std::string& path, mode_t mode = 0755)
+    {
+        if (path.empty() || path == "/") return;
+
+        std::string current;
+        size_t pos = (path[0] == '/') ? 1 : 0;
+        if (path[0] == '/') current = "/";
+
+        while (pos <= path.size()) {
+            size_t next = path.find('/', pos);
+            std::string segment = path.substr(pos, next == std::string::npos ? std::string::npos : next - pos);
+            if (!segment.empty()) {
+                current += segment;
+                if (mkdir(current.c_str(), mode) == -1 && errno != EEXIST) {
+                    perror("mkdir");
+                    throw std::runtime_error("Failed to create directory: " + current);
+                }
+                current += "/";
+            }
+            if (next == std::string::npos) break;
+            pos = next + 1;
+        }
+    }
+
+    std::string lock_dir()
+    {
+        const char* store = std::getenv("STORE");
+        if (store == nullptr) {
+            throw std::runtime_error("Environment variable STORE is not set");
+        }
+        std::string dir = std::string(store) + "/.cunqa/locks";
+        mkdir_p(dir);
+        return dir;
+    }
+
     std::string lock_path_of(const std::string& filename)
     {
-        return filename + ".lock";
+        const std::string abspath = absolute_path_of(filename);
+        const std::string base = basename_of(abspath);
+        const std::string digest = fnv1a_hex(abspath);
+        return lock_dir() + "/" + base + "." + digest + ".lock";
     }
 
     std::string directory_of(const std::string& path)

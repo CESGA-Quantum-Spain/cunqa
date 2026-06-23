@@ -344,10 +344,25 @@ class CunqaCircuit:
             "params": self.params
         }
 
+    @property 
+    def num_data_qubits(self) -> int:
+        """
+        Number of data qubits of the circuit.
+        """
+        return sum([len(qr) for qr in self.data_regs.values()])
+
+    @property 
+    def num_comm_qubits(self) -> int:
+        """
+        Number of communication qubits of the circuit.
+        """
+
+        return len(self.comm_qubits)
+
     @property
     def num_qubits(self) -> tuple[int, int]:
         """
-        Number of qubits of the circuit.
+        Returns a pair with the number of data qubits on the first spot and the number of the communication qubits on the second spot.
         """
         return [sum([len(qr) for qr in self.data_regs.values()]), len(self.comm_qubits)]
     

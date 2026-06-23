@@ -34,9 +34,9 @@ enum class BlockType {
 struct QuantumTask {
     std::string id;
     cunqa::RunConfig config;
-    cunqa::DynamicCircuit circuit;
+    std::unique_ptr<cunqa::DynamicCircuit> circuit;
 
-    QuantumTask(std::string id, cunqa::RunConfig config, cunqa::DynamicCircuit&& circuit)
+    QuantumTask(std::string id, cunqa::RunConfig config, std::unique_ptr<cunqa::DynamicCircuit> circuit)
         : id(std::move(id))
         , config(std::move(config))
         , circuit(std::move(circuit))
@@ -45,7 +45,7 @@ struct QuantumTask {
 
 struct InstructionStream 
 {
-    std::vector<QuantumTask> quantum_tasks;
+    const std::vector<QuantumTask>& quantum_tasks;
     std::size_t num_quantum_tasks;
     std::vector<bool> finished;
     std::vector<BlockType> blocked;
@@ -66,7 +66,7 @@ struct InstructionStream
         , pointed_instruction(quantum_tasks_.size(), 0)
     {
         for (std::size_t t = 0; t < num_quantum_tasks; t++) {
-            for (auto& instr : quantum_tasks[t].circuit.instructions) {
+            for (auto& instr : quantum_tasks[t].circuit->instructions) {
                 std::visit([&](auto& payload) {
                     using T = std::decay_t<decltype(payload)>;
 
@@ -134,7 +134,7 @@ struct InstructionStream
 
     inline void complete_and_advance()
     {
-        const auto total = quantum_tasks[pointed_quantum_task].circuit.instructions.size();
+        const auto total = quantum_tasks[pointed_quantum_task].circuit->instructions.size();
 
         if (blocked[pointed_quantum_task] == BlockType::NO_BLOCK) {
             pointed_instruction[pointed_quantum_task]++;
@@ -159,17 +159,17 @@ struct InstructionStream
     inline const cunqa::Instruction& get_current() noexcept
     {
         return quantum_tasks[pointed_quantum_task]
-                    .circuit.instructions[pointed_instruction[pointed_quantum_task]];
+                    .circuit->instructions[pointed_instruction[pointed_quantum_task]];
     }
 
     inline cunqa::InstructionType skip_next() 
     {
         pointed_instruction[pointed_quantum_task]++;
-        if (pointed_instruction[pointed_quantum_task] == quantum_tasks[pointed_quantum_task].circuit.instructions.size())
+        if (pointed_instruction[pointed_quantum_task] == quantum_tasks[pointed_quantum_task].circuit->instructions.size())
             throw std::runtime_error("You reached the end of the instruction stream skipping.");
         
         return quantum_tasks[pointed_quantum_task]
-                    .circuit.instructions[pointed_instruction[pointed_quantum_task]].type;
+                    .circuit->instructions[pointed_instruction[pointed_quantum_task]].type;
     }
 
     inline void block_current(BlockType block_type) noexcept
@@ -203,8 +203,6 @@ void execute_shot_(
     cunqa::ClassicalCommManager cc_manager;
     while(!stream.all_finished()) {
         const auto& instr = stream.get_current();
-        //LOGGER_DEBUG("INSTRUCTION: {} QUANTUM_TASK: {}", 
-        //    instruction_type_name(instr.type), stream.pointed_quantum_task);
         
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
@@ -295,7 +293,7 @@ void update_measures_(
             auto it = simulator->creg.find(c);
             if (it != simulator->creg.end()) {
                 if (simulator->save_clbit.at(c))
-                    result += it->second ? '1' : '0';
+                    result = (it->second ? '1' : '0') + result;
             }
         }
         if (result != "")
@@ -386,14 +384,16 @@ void QCExecutor::run()
                 auto message = JSON::parse(classical_channel_.recv_info(qpu_id));
                 if(!message.empty()) {
                     RunConfig run_config(message.at("config"));
+                    auto dynamic_circuit = std::make_unique<cunqa::DynamicCircuit>(message.at("instructions"));
+                    const auto num_clbits = run_config.num_clbits;
                     QuantumTask quantum_task(
                         message.at("id").get<std::string>(), 
                         run_config, 
-                        DynamicCircuit(message.at("instructions"))
+                        std::move(dynamic_circuit)
                     );
-                    quantum_tasks.push_back(quantum_task);
+                    quantum_tasks.push_back(std::move(quantum_task));
                     zero_clbits_.push_back(accumulated_clbits);
-                    accumulated_clbits += quantum_task.config.num_clbits;
+                    accumulated_clbits += num_clbits;
                 }
             }
         }

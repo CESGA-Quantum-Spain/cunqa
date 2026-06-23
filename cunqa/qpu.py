@@ -310,7 +310,8 @@ def qraise(n, t, *,
            classical_comm = False, 
            quantum_comm = False,  
            simulator = None, 
-           backend = None, 
+           backend = None,
+           infrastructure = None, 
            family = None, 
            co_located = True, 
            cores_per_qpu = None, 
@@ -380,6 +381,8 @@ def qraise(n, t, *,
         command = command + f" --qpus-per-node={str(qpus_per_node)}"
     if backend is not None:
         command = command + f" --backend={str(backend)}"
+    if infrastructure is not None:
+        command = command + f" --infrastructure={str(infrastructure)}"
     if partition is not None:
         command = command + f" --partition={str(partition)}"
     if gpu:

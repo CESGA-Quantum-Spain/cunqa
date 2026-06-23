@@ -4,13 +4,31 @@ import json
 import os
 import tempfile
 import fcntl
+import hashlib
 
 from typing import Any, Optional
 
+from cunqa.utils.constants import CUNQA_PATH
 from cunqa.utils.logger import logger
 
+LOCK_DIR = os.path.join(CUNQA_PATH, "locks")
+os.makedirs(LOCK_DIR, exist_ok=True)
+
+
+def _lockpath_for(filepath: str) -> str:
+    """
+    Map a data file's absolute path to a unique lock file path inside
+    LOCK_DIR, avoiding collisions between files that share a basename
+    in different directories.
+    """
+    abspath = os.path.abspath(filepath)
+    digest = hashlib.sha256(abspath.encode("utf-8")).hexdigest()[:16]
+    basename = os.path.basename(abspath)
+    return os.path.join(LOCK_DIR, f"{basename}.{digest}.lock")
+
+
 def read_json(filepath: str) -> Optional[Any]:
-    lockpath = filepath + ".lock"
+    lockpath = _lockpath_for(filepath)
 
     with open(lockpath, "a+", encoding="utf-8") as lock_f:
         fcntl.lockf(lock_f, fcntl.LOCK_SH)
@@ -34,7 +52,7 @@ def write_json(filepath: str, data: dict, indent: int = 4) -> None:
     parent_dir = os.path.dirname(filepath) or "."
     os.makedirs(parent_dir, exist_ok=True)
 
-    lockpath = filepath + ".lock"
+    lockpath = _lockpath_for(filepath)
 
     with open(lockpath, "a+", encoding="utf-8") as lock_f:
         fcntl.lockf(lock_f, fcntl.LOCK_EX)

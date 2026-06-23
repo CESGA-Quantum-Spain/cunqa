@@ -50,8 +50,13 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
     }
     
     if (args.mem_per_qpu.has_value()) {
-        const int total_mem = args.mem_per_qpu.value() * args.n_qpus;
-        sbatchFile << "#SBATCH --mem=" << total_mem << "G\n";
+        if (args.n_nodes.has_value()) {
+            const int mem_per_cpu = static_cast<int>(args.mem_per_qpu.value() / args.cores_per_qpu);
+            sbatchFile << "#SBATCH --mem-per-cpu=" << mem_per_cpu << "G\n";
+        } else {
+            const int total_mem = args.mem_per_qpu.value() * args.n_qpus;
+            sbatchFile << "#SBATCH --mem=" << total_mem << "G\n";
+        }
     }
 
     sbatchFile << "#SBATCH --time=" << args.time << "\n";
@@ -81,8 +86,11 @@ void write_run_command(std::ofstream& sbatchFile,
         std::string(get_communications_name(scheme)) + " " +
         args.family + " " + args.simulator;
 
-    if (args.backend.has_value())
+    if (args.infrastructure.has_value()) { 
+        subcommand += " " + args.infrastructure.value();
+    } else if (args.backend.has_value()) {
         subcommand += " " + args.backend.value();
+    }
 
     if (scheme == Communications::NC) {
         sbatchFile << "srun --task-epilog=$EPILOG_PATH setup_qpus " << subcommand << "\n";
