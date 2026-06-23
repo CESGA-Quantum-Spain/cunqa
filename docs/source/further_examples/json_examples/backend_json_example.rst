@@ -20,6 +20,8 @@ Here it is presented how to specify a :term:`backend` using JSON. Supported
 
 **Ideal backend**
 
+This is the simplest backend example. The only thing to note is that the number of qubits is specified under the key _num_qubits_ as a list where the first element is the number of data qubits and the second element is the number of communication qubits.
+
 .. code-block:: json
 
     {
@@ -27,14 +29,11 @@ Here it is presented how to specify a :term:`backend` using JSON. Supported
             "name": "IdealBackend", 
             "version": "0.0.1",
             "description": "Example of an ideal backend",
-            "n_qubits": 16, 
+            "num_qubits": [16,0], 
             "basis_gates": [
                 "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr"
             ], 
-            "custom_instructions": "",
-            "gates": [],
             "coupling_map": [],
-            "simulator":"Aer"
         }
     }
 
@@ -52,12 +51,11 @@ will be convert to the specific noise model format supported for the correspondi
             "name": "NoisyBackend", 
             "version": "0.0.1",
             "description": "Example of a noisy backend",
-            "n_qubits": 16, 
+            "num_qubits": [16, 0], 
             "basis_gates": [
                 "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr"
             ], 
             "coupling_map": [],
-            "simulator":"Aer",
             "noise_model": {
                 "noise_properties_path": "/path/to/noise/properties/json",
                 "thermal_relaxation": true,
@@ -67,3 +65,22 @@ will be convert to the specific noise model format supported for the correspondi
         }
     }
 
+
+**Quantum Communications backend**
+
+The only unique feature of this type of backend is that it specifies the number of communication qubits as the second element in the list associated with the key _num_qubits_. In this example, the vQPU would have 16 data qubits and 3 communication qubits associated with it.
+
+.. code-block:: json
+
+    {
+        "backend":{
+            "name": "IdealBackend", 
+            "version": "0.0.1",
+            "description": "Example of an ideal backend",
+            "num_qubits": [16,3], 
+            "basis_gates": [
+                "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr"
+            ], 
+            "coupling_map": [],
+        }
+    }
