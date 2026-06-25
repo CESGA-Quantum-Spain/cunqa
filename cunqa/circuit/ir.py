@@ -68,7 +68,7 @@ if CUNQA_USE_QISKIT_PY:
             "is_dynamic": False,
             "instructions":[],
             "sending_to":[],
-            "num_qubits":sum([q.size for q in c.qregs]),
+            "num_qubits":[sum([q.size for q in c.qregs]),0],
             "num_clbits": sum([c.size for c in c.cregs]),
             "quantum_registers": quantum_registers,
             "classical_registers": classical_registers, 
