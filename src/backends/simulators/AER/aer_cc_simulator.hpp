@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aer_adapters/aer_internal_fwd.hpp" 
 #include "quantum_task.hpp"
 #include "backends/cc_backend.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
@@ -14,6 +15,7 @@ namespace sim {
 class AerCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     AerCCSimulator();
+    AerCCSimulator(const JSON& backend_json);
     ~AerCCSimulator() = default;
 
     inline std::string get_name() const override {return "Aer";}
@@ -21,6 +23,7 @@ public:
 
 private:
     comm::ClassicalChannel classical_channel;
+    aer_detail::NoiseModelPtr noise_model;
 };
 
 

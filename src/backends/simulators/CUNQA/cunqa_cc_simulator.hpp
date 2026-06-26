@@ -15,6 +15,7 @@ class CunqaCCSimulator final : public SimulatorStrategy<CCBackend>
 {
 public:
     CunqaCCSimulator();
+    CunqaCCSimulator(const JSON& backend_json);
     ~CunqaCCSimulator() = default;
 
     inline std::string get_name() const override {return "Cunqa";}

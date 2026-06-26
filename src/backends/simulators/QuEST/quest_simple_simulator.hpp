@@ -14,6 +14,7 @@ class QuestSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     QuestSimpleSimulator() = default;
+    QuestSimpleSimulator(const JSON& backend_json) {}
     ~QuestSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "Quest";} 

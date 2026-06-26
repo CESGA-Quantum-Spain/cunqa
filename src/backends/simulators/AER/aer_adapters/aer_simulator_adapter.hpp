@@ -6,14 +6,9 @@
 #include "classical_channel/classical_channel.hpp"
 #include "backends/backend.hpp"
 #include "aer_computation_adapter.hpp"
+#include "aer_internal_fwd.hpp"
 
 #include "utils/json.hpp"
-
-namespace AER {
-namespace Noise {
-class NoiseModel;
-}
-}
 
 namespace cunqa {
 namespace sim {
@@ -21,16 +16,14 @@ namespace sim {
 class AerSimulatorAdapter
 {
 public:
-    AerSimulatorAdapter();
-    AerSimulatorAdapter(AerComputationAdapter& qc);
-    ~AerSimulatorAdapter();
+    AerSimulatorAdapter() = default;
+    AerSimulatorAdapter(AerComputationAdapter& qc) : qc{qc} {}
+    ~AerSimulatorAdapter() = default;
     
-    JSON simulate(const Backend* backend);
+    JSON simulate(const Backend* backend, AER::Noise::NoiseModel& noise_model);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 
     AerComputationAdapter qc;
-    std::unique_ptr<AER::Noise::NoiseModel> noise_model;
-    bool is_noise_model_constructed = false;
 
 };
 

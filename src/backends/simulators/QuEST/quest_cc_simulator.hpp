@@ -14,6 +14,7 @@ namespace sim {
 class QuestCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     QuestCCSimulator();
+    QuestCCSimulator(const JSON& backend_json);
     ~QuestCCSimulator() = default;
 
     inline std::string get_name() const override {return "Quest";}

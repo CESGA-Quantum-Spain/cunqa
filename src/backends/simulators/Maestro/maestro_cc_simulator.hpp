@@ -14,6 +14,7 @@ namespace sim {
 class MaestroCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     MaestroCCSimulator();
+    MaestroCCSimulator(const JSON& backend_json);
     ~MaestroCCSimulator() = default;
 
     inline std::string get_name() const override {return "Maestro";}

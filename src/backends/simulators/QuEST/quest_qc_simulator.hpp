@@ -13,6 +13,7 @@ namespace sim {
 class QuestQCSimulator final : public SimulatorStrategy<QCBackend> {
 public:
     QuestQCSimulator();
+    QuestQCSimulator(const JSON& backend_json);
     ~QuestQCSimulator() = default;
 
     inline std::string get_name() const override {return "Quest";}

@@ -16,6 +16,7 @@ namespace sim {
 class MunichQCSimulator final : public SimulatorStrategy<QCBackend> {
 public:
     MunichQCSimulator();
+    MunichQCSimulator(const JSON& backend_json);
     ~MunichQCSimulator() = default;
 
     inline std::string get_name() const override {return "Munich";}

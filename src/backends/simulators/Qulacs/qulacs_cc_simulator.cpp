@@ -13,6 +13,12 @@ QulacsCCSimulator::QulacsCCSimulator() :
     classical_channel.publish();
 };
 
+QulacsCCSimulator::QulacsCCSimulator(const JSON& backend_json) :
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+};
+
 // Distributed QulacsSimulator
 JSON QulacsCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {

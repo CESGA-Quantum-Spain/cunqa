@@ -72,7 +72,7 @@ void turn_ON_QPU(
     const std::string& name, const std::string& family, const std::string& comm
 )
 {
-    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
+    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>(backend_json);
     Config config;
     config.set_basis_gates(get_basis_gates(simulator->get_name()));
     if (!backend_json.empty())

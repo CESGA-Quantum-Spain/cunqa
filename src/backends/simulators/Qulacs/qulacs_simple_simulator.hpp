@@ -14,6 +14,7 @@ class QulacsSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     QulacsSimpleSimulator() = default;
+    QulacsSimpleSimulator(const JSON& backend_json) {}
     ~QulacsSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "Qulacs";} 

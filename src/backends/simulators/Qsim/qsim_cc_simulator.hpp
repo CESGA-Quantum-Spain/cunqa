@@ -14,6 +14,7 @@ namespace sim {
 class QsimCCSimulator final : public SimulatorStrategy<CCBackend> {
 public:
     QsimCCSimulator();
+    QsimCCSimulator(const JSON& backend_json);
     ~QsimCCSimulator() = default;
 
     inline std::string get_name() const override {return "Qsim";}

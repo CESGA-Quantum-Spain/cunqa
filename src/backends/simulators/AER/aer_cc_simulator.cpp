@@ -7,12 +7,6 @@ using namespace std::string_literals;
 namespace cunqa {
 namespace sim {
 
-AerCCSimulator::AerCCSimulator() : 
-    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
-{
-    classical_channel.publish();
-};
-
 // Distributed AerSimulator
 JSON AerCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {
@@ -28,9 +22,21 @@ JSON AerCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantu
             {"time_taken", result.at("time_taken")}
         };
     } else {
-        return aer_sa.simulate(&backend);
+        return aer_sa.simulate(&backend, *noise_model);
     }
 }
+
+AerCCSimulator::AerCCSimulator() : classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+};
+
+AerCCSimulator::AerCCSimulator(const JSON& backend_json) : classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+    noise_model = aer_detail::make_noise_model();
+};
+
 
 } // End namespace sim
 } // End namespace cunqa

@@ -13,6 +13,12 @@ QsimCCSimulator::QsimCCSimulator() :
     classical_channel.publish();
 };
 
+QsimCCSimulator::QsimCCSimulator(const JSON& backend_json) :
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+};
+
 // Distributed QsimSimulator
 JSON QsimCCSimulator::execute(const CCBackend& backend, const QuantumTask& quantum_task)
 {

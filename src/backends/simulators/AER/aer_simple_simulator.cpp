@@ -1,6 +1,7 @@
 #include "aer_simple_simulator.hpp"
 #include "aer_adapters/aer_computation_adapter.hpp"
 #include "aer_adapters/aer_simulator_adapter.hpp"
+#include "aer_adapters/aer_internal_fwd.hpp"
 
 #include "utils/json.hpp"
 
@@ -19,8 +20,15 @@ JSON AerSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask
             {"time_taken", result.at("time_taken")}
         };
     } else {
-        return aer_sa.simulate(&backend);
+        return aer_sa.simulate(&backend, *noise_model);
     }
+}
+
+AerSimpleSimulator::AerSimpleSimulator() = default;
+AerSimpleSimulator::AerSimpleSimulator(const JSON& backend_json)
+{
+    if (backend_json.contains("noise_model"))
+        noise_model = aer_detail::make_noise_model(backend_json.at("noise_model").get<JSON>());
 }
 
 } // End namespace sim

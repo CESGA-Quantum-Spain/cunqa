@@ -14,6 +14,7 @@ class MaestroSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     MaestroSimpleSimulator() = default;
+    MaestroSimpleSimulator(const JSON& backend_json) {}
     ~MaestroSimpleSimulator() override;
 
     inline std::string get_name() const override {return "Maestro";} 

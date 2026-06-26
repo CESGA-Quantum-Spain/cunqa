@@ -1,3 +1,9 @@
+add_library(aer_internal "${CMAKE_CURRENT_SOURCE_DIR}/aer_internal.cpp")
+target_include_directories(aer_internal PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_link_libraries(aer_internal PUBLIC aer_headers 
+                                   PRIVATE json logger_qpu LAPACK::LAPACK ${Python_LIBRARIES} OpenMP::OpenMP_CXX)
+
+
 add_library(aer_adapters "${CMAKE_CURRENT_SOURCE_DIR}/aer_simulator_adapter.cpp")
 
 if (DEFINED AER_GPU)
@@ -10,8 +16,10 @@ if (DEFINED AER_GPU)
         CUDA_STANDARD_REQUIRED ON)
 endif()
 
+
 target_include_directories(aer_adapters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
-target_link_libraries(aer_adapters PUBLIC classical_channel aer_headers
+target_link_libraries(aer_adapters PUBLIC classical_channel aer_headers aer_internal 
                                             PRIVATE json logger_qpu LAPACK::LAPACK ${Python_LIBRARIES}
                                             OpenMP::OpenMP_CXX)
 target_compile_definitions(aer_adapters PRIVATE OPENMP_IN_QC)
+

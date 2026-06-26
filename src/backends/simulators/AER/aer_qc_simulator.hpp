@@ -13,6 +13,7 @@ namespace sim {
 class AerQCSimulator final : public SimulatorStrategy<QCBackend> {
 public:
     AerQCSimulator();
+    AerQCSimulator(const JSON& backend_json);
     ~AerQCSimulator() = default;
 
     inline std::string get_name() const override {return "Aer";}

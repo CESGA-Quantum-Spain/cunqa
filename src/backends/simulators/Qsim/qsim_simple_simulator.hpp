@@ -14,6 +14,7 @@ class QsimSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
 
     QsimSimpleSimulator() = default;
+    QsimSimpleSimulator(const JSON& backend_json) {}
     ~QsimSimpleSimulator() = default;
 
     inline std::string get_name() const override {return "Qsim";} 

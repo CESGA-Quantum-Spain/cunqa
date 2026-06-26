@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aer_adapters/aer_internal_fwd.hpp" 
 #include "quantum_task.hpp"
 #include "backends/simple_backend.hpp"
 #include "backends/simulators/simulator_strategy.hpp"
@@ -12,11 +13,15 @@ namespace sim {
 
 class AerSimpleSimulator final : public SimulatorStrategy<SimpleBackend> {
 public:
-    AerSimpleSimulator() = default;
-    ~AerSimpleSimulator() = default;
+    AerSimpleSimulator(); 
+    AerSimpleSimulator(const JSON& backend_json);
+    ~AerSimpleSimulator() = default; 
 
     inline std::string get_name() const override {return "Aer";} 
     JSON execute(const SimpleBackend& backend, const QuantumTask& circuit) override;
+
+    aer_detail::NoiseModelPtr noise_model;
+    bool is_noise_model_constructed = false;
 };
 
 } // End of sim namespace

@@ -13,6 +13,7 @@ namespace sim {
 class MaestroQCSimulator final : public SimulatorStrategy<QCBackend> {
 public:
     MaestroQCSimulator();
+    MaestroQCSimulator(const JSON& backend_json);
     ~MaestroQCSimulator() = default;
 
     inline std::string get_name() const override {return "Maestro";}

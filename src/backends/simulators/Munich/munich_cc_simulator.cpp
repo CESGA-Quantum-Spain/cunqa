@@ -18,6 +18,12 @@ MunichCCSimulator::MunichCCSimulator() :
     classical_channel.publish();
 };
 
+MunichCCSimulator::MunichCCSimulator(const JSON& backend_json) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+};
+
 JSON MunichCCSimulator::execute([[maybe_unused]] const CCBackend& backend, const QuantumTask& quantum_task)
 {
     for(const auto& qpu_id: quantum_task.sending_to)

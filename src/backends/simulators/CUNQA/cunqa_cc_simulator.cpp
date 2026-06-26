@@ -13,6 +13,12 @@ CunqaCCSimulator::CunqaCCSimulator() :
     classical_channel.publish();
 };
 
+CunqaCCSimulator::CunqaCCSimulator(const JSON& backend_json) : 
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")}
+{
+    classical_channel.publish();
+};
+
 JSON CunqaCCSimulator::execute([[maybe_unused]] const CCBackend& backend, const QuantumTask& quantum_task)
 {
     for(const auto& qpu_id: quantum_task.sending_to)

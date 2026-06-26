@@ -12,25 +12,25 @@ std::vector<std::string> get_basis_gates(const std::string simulator)
 {
   switch (SIMULATORS_MAP.at(simulator))
   {
-  case AER:
+  case cunqa::constants::AER:
       return AER_BASIS_GATES;
       break;
-  case MUNICH:
+  case cunqa::constants::MUNICH:
       return MUNICH_BASIS_GATES;
       break;
-  case MAESTRO:
+  case cunqa::constants::MAESTRO:
       return MAESTRO_BASIS_GATES;
       break;
-  case QULACS:
+  case cunqa::constants::QULACS:
       return QULACS_BASIS_GATES;
       break;
-  case QSIM:
+  case cunqa::constants::QSIM:
       return QSIM_BASIS_GATES;
       break;
-  case QUEST:
+  case cunqa::constants::QUEST:
       return QUEST_BASIS_GATES;
       break;
-  case CUNQASIM:
+  case cunqa::constants::CUNQASIM:
       return CUNQASIM_BASIS_GATES;
       break;
   default:

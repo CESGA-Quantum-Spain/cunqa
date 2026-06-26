@@ -19,6 +19,15 @@ MaestroQCSimulator::MaestroQCSimulator() :
     classical_channel.connect(executor_id);
 };
 
+MaestroQCSimulator::MaestroQCSimulator(const JSON& backend_json) :
+    classical_channel{std::getenv("SLURM_JOB_ID") + "_"s + std::getenv("SLURM_TASK_PID")},
+    executor_id{std::getenv("SLURM_JOB_ID") + "_executor"s}
+{
+    classical_channel.publish();
+    auto ready = classical_channel.recv_info(executor_id);
+    classical_channel.connect(executor_id);
+};
+
 
 JSON MaestroQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
