@@ -2,6 +2,8 @@
 #include "aer_adapters/aer_computation_adapter.hpp"
 #include "aer_adapters/aer_simulator_adapter.hpp"
 
+#include "utils/json.hpp"
+
 namespace cunqa {
 namespace sim {
 

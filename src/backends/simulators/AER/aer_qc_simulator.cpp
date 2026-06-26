@@ -19,6 +19,7 @@ AerQCSimulator::AerQCSimulator() :
     classical_channel.connect(executor_id);
 };
 
+
 JSON AerQCSimulator::execute([[maybe_unused]] const QCBackend& backend, const QuantumTask& quantum_task)
 {
     auto circuit = to_string(quantum_task);

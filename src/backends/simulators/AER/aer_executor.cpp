@@ -3,8 +3,8 @@
 #include <thread>
 #include <chrono>
 
-#include "aer_adapters/aer_simulator_adapter.hpp"
 #include "aer_adapters/aer_computation_adapter.hpp"
+#include "aer_adapters/aer_simulator_adapter.hpp"
 #include "quantum_task.hpp"
 #include "aer_executor.hpp"
 

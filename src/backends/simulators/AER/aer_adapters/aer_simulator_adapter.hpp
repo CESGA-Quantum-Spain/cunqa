@@ -9,19 +9,28 @@
 
 #include "utils/json.hpp"
 
+namespace AER {
+namespace Noise {
+class NoiseModel;
+}
+}
+
 namespace cunqa {
 namespace sim {
 
 class AerSimulatorAdapter
 {
 public:
-    AerSimulatorAdapter() = default;
-    AerSimulatorAdapter(AerComputationAdapter& qc) : qc{qc} {}
+    AerSimulatorAdapter();
+    AerSimulatorAdapter(AerComputationAdapter& qc);
+    ~AerSimulatorAdapter();
     
     JSON simulate(const Backend* backend);
     JSON simulate(comm::ClassicalChannel* classical_channel = nullptr, const bool allows_qc = false);
 
     AerComputationAdapter qc;
+    std::unique_ptr<AER::Noise::NoiseModel> noise_model;
+    bool is_noise_model_constructed = false;
 
 };
 

@@ -12,8 +12,8 @@
 
 #include "simulators/circuit_executor.hpp"
 #include "framework/config.hpp"
-#include "noise/noise_model.hpp"
 #include "framework/circuit.hpp"
+#include "noise/noise_model.hpp"
 #include "controllers/controller_execute.hpp"
 #include "framework/results/result.hpp"
 #include "controllers/aer_controller.hpp"
@@ -821,12 +821,13 @@ JSON AerSimulatorAdapter::simulate(const Backend* backend)
             run_config_json["seed_simulator"] = quantum_task.config.at("seed");
         }
         Config aer_config(run_config_json);
-        Noise::NoiseModel noise_model;
-        if (backend->config.contains("noise_model")) {
-            noise_model.load_from_json(backend->config.at("noise_model").get<JSON>());
-        }
 
-        Result result = controller_execute<Controller>(circuits, noise_model, aer_config);
+        if (!is_noise_model_constructed && backend->config.contains("noise_model")) {
+            noise_model->load_from_json(backend->config.at("noise_model").get<JSON>());
+        }
+        is_noise_model_constructed = true;
+
+        Result result = controller_execute<Controller>(circuits, *noise_model, aer_config);
 
         JSON result_json = result.to_json();
         convert_standard_results_Aer(result_json, n_clbits);
@@ -950,6 +951,16 @@ AER::AerState get_configured_aer_state(const JSON& config)
 
     return state;
 }
+
+AerSimulatorAdapter::AerSimulatorAdapter()
+    : noise_model(std::make_unique<AER::Noise::NoiseModel>())
+{}
+
+AerSimulatorAdapter::AerSimulatorAdapter(AerComputationAdapter& qc_)
+    : qc{qc_}, noise_model(std::make_unique<AER::Noise::NoiseModel>())
+{}
+
+AerSimulatorAdapter::~AerSimulatorAdapter() = default;
 
 } // End of sim namespace
 } // End of cunqa namespace
