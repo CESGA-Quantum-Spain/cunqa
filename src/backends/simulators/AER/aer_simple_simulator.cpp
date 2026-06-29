@@ -27,8 +27,11 @@ JSON AerSimpleSimulator::execute(const SimpleBackend& backend, const QuantumTask
 AerSimpleSimulator::AerSimpleSimulator() = default;
 AerSimpleSimulator::AerSimpleSimulator(const JSON& backend_json)
 {
-    if (backend_json.contains("noise_model"))
+    if (backend_json.contains("noise_model")) {
         noise_model = aer_detail::make_noise_model(backend_json.at("noise_model").get<JSON>());
+    } else {
+         noise_model = aer_detail::make_noise_model();
+    }
 }
 
 } // End namespace sim
