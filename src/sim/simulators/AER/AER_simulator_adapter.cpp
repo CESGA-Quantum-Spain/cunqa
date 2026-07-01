@@ -91,14 +91,13 @@ constexpr std::array<std::string_view, 68> AER_CONFIG_KEYS = {{
     "runtime_parameter_bind_enable",
 }};
 
-AER::Config config_to_AER(const cunqa::RunConfig& config, std::size_t num_qubits)
+AER::Config config_to_AER(const cunqa::RunConfig& config)
 {
     cunqa::JSON AER_config = {
         {"shots", config.shots},
         {"method", config.method},
         {"avoid_parallelization", config.avoid_parallelization},
-        {"num_clbits", config.num_clbits},
-        {"num_qubits", num_qubits}
+        {"num_clbits", config.num_clbits}
     };
 
     // Generic Aer configuration options
@@ -584,10 +583,11 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
             }))
         };
 
-        auto AER_config = config_to_AER(config, num_qubits);
-        auto AER_noise_model = noise_model_->AER_noise_model;
-
-        auto AER_result = AER::controller_execute<AER::Controller>(circuits, AER_noise_model, AER_config);
+        auto AER_result = AER::controller_execute<AER::Controller>(
+            circuits, 
+            noise_model_->AER_noise_model, 
+            config_to_AER(config)
+        );
         result = AER_result.to_json();
 
         AER_to_results(result, config.num_clbits);
