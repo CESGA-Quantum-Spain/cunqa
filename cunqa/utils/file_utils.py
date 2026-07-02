@@ -4,7 +4,6 @@ import json
 import os
 import tempfile
 import fcntl
-import hashlib
 
 from typing import Any, Optional
 
@@ -15,14 +14,32 @@ LOCK_DIR = os.path.join(CUNQA_PATH, "locks")
 os.makedirs(LOCK_DIR, exist_ok=True)
 
 
+def _fnv1a_hex(s: str) -> str:
+    """
+    64-bit FNV-1a hash rendered as 16 hex chars. This must stay byte-for-byte
+    identical to fnv1a_hex() in src/utils/json.cpp so both implementations
+    derive the same lock filename for a given data file.
+    """
+    h = 0xCBF29CE484222325  # FNV offset basis
+    for c in s.encode("utf-8"):
+        h ^= c
+        h = (h * 0x100000001B3) & 0xFFFFFFFFFFFFFFFF  # FNV prime, 64-bit wrap
+    return f"{h:016x}"
+
+
 def _lockpath_for(filepath: str) -> str:
     """
     Map a data file's absolute path to a unique lock file path inside
     LOCK_DIR, avoiding collisions between files that share a basename
     in different directories.
+
+    Both the path normalization (realpath, resolving symlinks) and the hash
+    (FNV-1a) must match the C++ side (src/utils/json.cpp), otherwise Python
+    and C++ would lock different inodes for the same file and fail to exclude
+    each other, and duplicate lock files would accumulate.
     """
-    abspath = os.path.abspath(filepath)
-    digest = hashlib.sha256(abspath.encode("utf-8")).hexdigest()[:16]
+    abspath = os.path.realpath(filepath)
+    digest = _fnv1a_hex(abspath)
     basename = os.path.basename(abspath)
     return os.path.join(LOCK_DIR, f"{basename}.{digest}.lock")
 

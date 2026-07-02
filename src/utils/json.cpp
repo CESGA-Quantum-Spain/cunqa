@@ -42,12 +42,14 @@ namespace {
 
     // Small non-cryptographic 64-bit hash (FNV-1a), good enough to
     // disambiguate lock filenames; not security-sensitive.
+    // NOTE: must stay identical to _fnv1a_hex() in cunqa/utils/file_utils.py
+    // so the Python and C++ sides derive the same lock filename for a file.
     std::string fnv1a_hex(const std::string& s)
     {
-        uint64_t h = 1469598103934665603ULL; // FNV offset basis
+        uint64_t h = 14695981039346656037ULL; // FNV-64 offset basis (0xcbf29ce484222325)
         for (unsigned char c : s) {
             h ^= c;
-            h *= 1099511628211ULL; // FNV prime
+            h *= 1099511628211ULL; // FNV-64 prime (0x100000001b3)
         }
         char buf[17];
         std::snprintf(buf, sizeof(buf), "%016llx", static_cast<unsigned long long>(h));

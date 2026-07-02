@@ -583,10 +583,11 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
             }))
         };
 
+        auto AER_config = config_to_AER(config);
         auto AER_result = AER::controller_execute<AER::Controller>(
             circuits, 
             noise_model_->AER_noise_model, 
-            config_to_AER(config)
+            AER_config
         );
         result = AER_result.to_json();
 
