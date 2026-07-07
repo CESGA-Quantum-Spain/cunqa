@@ -13,7 +13,8 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-
+    env:
+      STORE: ${{ github.workspace }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,6 +57,7 @@ jobs:
         run: |
           cp cunqa/utils/constants.py.in cunqa/utils/constants.py
           sed -i 's/CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@/CUNQA_USE_QISKIT_PY = True/' cunqa/utils/constants.py
+          sed -i 's/os.getenv("STORE")/""/' cunqa/utils/constants.py
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
