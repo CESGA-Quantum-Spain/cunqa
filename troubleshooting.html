@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Troubleshooting &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="_static/css/sidebar.css?v=5efd4b3e" />
+      <link rel="stylesheet" type="text/css" href="_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="_static/cunca.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/tabs.js?v=3ee01567"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Noise properties JSON" href="further_examples/json_examples/noise_properties_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+  <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+    </form>
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#deployment-qraise">Deployment (<code class="docutils literal notranslate"><span class="pre">qraise</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#querying-releasing-qinfo-qdrop">Querying / releasing (<code class="docutils literal notranslate"><span class="pre">qinfo</span></code> / <code class="docutils literal notranslate"><span class="pre">qdrop</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execution-run">Execution (<code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/adding_a_simulator.html">Adding a simulator</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/troubleshooting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a starting list seeded from the error and warning messages CUNQA currently emits. It is
+meant to grow over time as new issues and resolutions are collected.</p>
+</div>
+<section id="deployment-qraise">
+<h2>Deployment (<code class="docutils literal notranslate"><span class="pre">qraise</span></code>)<a class="headerlink" href="#deployment-qraise" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>“qraise needs two mandatory arguments”</strong></dt><dd><p>Both the number of <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> (<code class="docutils literal notranslate"><span class="pre">-n</span></code>/<code class="docutils literal notranslate"><span class="pre">--num-qpus</span></code>) and the maximum time (<code class="docutils literal notranslate"><span class="pre">-t</span></code>/<code class="docutils literal notranslate"><span class="pre">--time</span></code>) must
+be provided. The time follows the SLURM format <code class="docutils literal notranslate"><span class="pre">[D-]HH:MM:SS</span></code>.</p>
+</dd>
+<dt><strong>“Simulator &lt;name&gt; is not available for &lt;scheme&gt; communications simulation”</strong></dt><dd><p>The chosen <code class="docutils literal notranslate"><span class="pre">--simulator</span></code> does not support the requested communication scheme. Check the
+supported combinations in <a class="reference internal" href="reference/simulators.html"><span class="doc">Simulators</span></a>. Note also that the value passed to
+<code class="docutils literal notranslate"><span class="pre">--simulator</span></code> is the CUNQA name (e.g. <code class="docutils literal notranslate"><span class="pre">Munich</span></code>), not the library name (MQT-DDSIM).</p>
+</dd>
+<dt><strong>“There are QPUs with the same family name as the provided”</strong></dt><dd><p>A group of <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> with that <code class="docutils literal notranslate"><span class="pre">--family</span></code> name is already deployed. Choose a different <a class="reference internal" href="glossary.html#term-family"><span class="xref std std-term">family</span></a> name,
+or release the existing one with <code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">--family</span> <span class="pre">&lt;name&gt;</span></code> first.</p>
+</dd>
+<dt><strong>“At this moment, only Aer supports GPU simulation”</strong></dt><dd><p>GPU execution (<code class="docutils literal notranslate"><span class="pre">--gpu</span></code>/<code class="docutils literal notranslate"><span class="pre">--gpu-name</span></code>) is only available with <code class="docutils literal notranslate"><span class="pre">--simulator</span> <span class="pre">Aer</span></code>, and requires
+a GPU-enabled build (<code class="docutils literal notranslate"><span class="pre">-DUSE_GPU=ON</span></code>); see <a class="reference internal" href="installation/getting_started.html"><span class="doc">Installation</span></a>.</p>
+</dd>
+<dt><strong>“cores_per_qpu must be equal or greater than 2”</strong></dt><dd><p>The quantum-communications scheme reserves one core per <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> for the shared <a class="reference internal" href="glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> process, so
+<code class="docutils literal notranslate"><span class="pre">--cores-per-qpu</span></code> must be at least <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+</dd>
+<dt><strong>“sbatch submission failed” (Python</strong> <a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.qraise" title="cunqa.qpu.qraise"><code class="xref py py-func docutils literal notranslate"><span class="pre">qraise</span></code></a> <strong>)</strong></dt><dd><p>The underlying <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> call returned an error. Inspect the reported <code class="docutils literal notranslate"><span class="pre">stderr</span></code> — common causes
+are an invalid partition, requesting more resources than available, or a malformed time string.</p>
+</dd>
+</dl>
+</section>
+<section id="querying-releasing-qinfo-qdrop">
+<h2>Querying / releasing (<code class="docutils literal notranslate"><span class="pre">qinfo</span></code> / <code class="docutils literal notranslate"><span class="pre">qdrop</span></code>)<a class="headerlink" href="#querying-releasing-qinfo-qdrop" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>“Could not open the QPUs info file” / “There are not deployed QPUs!”</strong></dt><dd><p>No <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> are currently registered. Deploy some with <code class="docutils literal notranslate"><span class="pre">qraise</span></code> first. This file lives under
+<code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus.json</span></code>.</p>
+</dd>
+<dt><strong>“Problem accessing to the QPUs on the current node. Probably the command was run on a login node”</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">qinfo</span> <span class="pre">--mynode</span></code> relies on the <code class="docutils literal notranslate"><span class="pre">SLURMD_NODENAME</span></code> variable, which is only set on compute
+nodes. Run it from within an allocation, or query a specific node with <code class="docutils literal notranslate"><span class="pre">qinfo</span> <span class="pre">&lt;node&gt;</span></code>.</p>
+</dd>
+<dt><strong>“No qraise jobs are currently running with the specified id / family names”</strong></dt><dd><p>The given IDs or <a class="reference internal" href="glossary.html#term-family"><span class="xref std std-term">family</span></a> names did not match any deployed <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>. Use <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> to list what is
+currently deployed.</p>
+</dd>
+<dt><strong>“You must specify either the IDs or the family name (with –family) … or use the –all flag”</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">qdrop</span></code> needs exactly one target selector: job IDs, <code class="docutils literal notranslate"><span class="pre">--family</span></code>, or <code class="docutils literal notranslate"><span class="pre">--all</span></code>. Combining IDs
+with <code class="docutils literal notranslate"><span class="pre">--family</span></code> is not allowed.</p>
+</dd>
+</dl>
+</section>
+<section id="execution-run">
+<h2>Execution (<a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a>)<a class="headerlink" href="#execution-run" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>“No QPUs were provided”</strong></dt><dd><p><a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> was called with <code class="docutils literal notranslate"><span class="pre">qpus=None</span></code>. This usually means
+<a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a> returned nothing — see the next entries.</p>
+</dd>
+<dt><strong>“There are not enough QPUs”</strong></dt><dd><p>More circuits than <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> were submitted. Provide at least as many <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> as circuits (a single
+circuit may be broadcast to several <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>, but not the other way around).</p>
+</dd>
+<dt><strong>“Not enough data qubits / comm qubits in the QPU for the circuit”</strong></dt><dd><p>The circuit needs more (data or communication) qubits than the target <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>’s <a class="reference internal" href="glossary.html#term-backend"><span class="xref std std-term">backend</span></a> provides.
+Reduce the circuit size or deploy <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> with a larger <a class="reference internal" href="glossary.html#term-backend"><span class="xref std std-term">backend</span></a>.</p>
+</dd>
+<dt><strong>“You are searching for QPUs in a login node, none are found” (warning)</strong></dt><dd><p><a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a> was called without <code class="docutils literal notranslate"><span class="pre">co_located=True</span></code> from a login node. Use
+<code class="docutils literal notranslate"><span class="pre">co_located=True</span></code> if the <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> were deployed in <a class="reference internal" href="glossary.html#term-co-located-mode"><span class="xref std std-term">co-located mode</span></a>, or run from a compute node.</p>
+</dd>
+<dt><strong>“No QPUs were found” / “No QPUs were found with the characteristics provided” (warning)</strong></dt><dd><p>No registered <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> matched the requested <code class="docutils literal notranslate"><span class="pre">co_located</span></code> / <code class="docutils literal notranslate"><span class="pre">family</span></code> filters. Verify the <a class="reference internal" href="glossary.html#term-family"><span class="xref std std-term">family</span></a>
+name and the access mode used at deployment with <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="further_examples/json_examples/noise_properties_example.html" class="btn btn-neutral float-left" title="Noise properties JSON" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="glossary.html" class="btn btn-neutral float-right" title="Glossary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -23,8 +23,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
@@ -33,7 +33,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="CUNQA overview" href="../cunqa_overview/cunqa_overview.html" />
+    <link rel="next" title="Overview" href="../overview/overview.html" />
     <link rel="prev" title="Installation" href="../installation/getting_started.html" /> 
 </head>
 
@@ -71,9 +71,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -114,24 +117,24 @@
 <p>Once <a class="reference internal" href="../installation/getting_started.html#sec-installation"><span class="std std-ref">installed</span></a>, the basic CUNQA workflow can be summarized as:</p>
 <ol class="arabic simple">
 <li><p><strong>Deploy vQPUs:</strong> allocate classical resources for simulation.</p></li>
-<li><p><strong>Design quantum task:</strong> create quantum circuits to be run on vQPUs.</p></li>
-<li><p><strong>Execution:</strong> send quantum tasks to vQPUs to be simulated.</p></li>
+<li><p><strong>Design quantum task:</strong> create quantum circuits to be run on <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></li>
+<li><p><strong>Execution:</strong> send quantum tasks to <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> to be simulated.</p></li>
 <li><p><strong>Relinquish vQPUs:</strong> free classical resources.</p></li>
 </ol>
-<p>The following example will deploy 4 vQPUs, for 1 hour and accessible from any HPC node. To do this,
-there are two posible worflows: raising the vQPUs with a Python function or raising the vQPUs with
+<p>The following example will deploy 4 <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>, for 1 hour and accessible from any HPC node. To do this,
+there are two posible worflows: raising the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> with a Python function or raising the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> with
 a bash command and get them in the Python program.</p>
 <div class="tab-set docutils">
 <input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--1">Bash command</label><div class="tab-content docutils">
-<p>To deploy the vQPUs we use the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command.</p>
+<p>To deploy the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> we use the <a class="reference internal" href="../reference/commands/qraise.html"><span class="doc">qraise</span></a> Bash command.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qraise<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>-t<span class="w"> </span><span class="m">01</span>:00:00<span class="w"> </span>--co-located
 </pre></div>
 </div>
-<p>Once the vQPUs are deployed, we can design and execute quantum tasks:</p>
+<p>Once the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> are deployed, we can design and execute quantum tasks:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Adding path to access CUNQA module</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">))</span> <span class="c1"># os.getenv(&quot;HOME&quot;) at CESGA by default</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">)</span> <span class="c1"># os.getenv(&quot;HOME&quot;) at CESGA by default</span>
 
 <span class="c1"># Gettting the raised QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
@@ -174,12 +177,12 @@ a bash command and get them in the Python program.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Adding path to access CUNQA module</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">)</span>
 
 <span class="c1"># Raising the QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">qraise</span>
 
-<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Gettting the raised QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
@@ -226,7 +229,7 @@ a bash command and get them in the Python program.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../installation/getting_started.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../cunqa_overview/cunqa_overview.html" class="btn btn-neutral float-right" title="CUNQA overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../overview/overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

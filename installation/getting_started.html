@@ -23,8 +23,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
@@ -71,14 +71,16 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#clone-repository">Clone repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#install-as-lmod-module">Install as Lmod module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#uninstall">Uninstall</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -154,52 +156,80 @@ in three main groups:</p>
 <ul class="simple">
 <li><p><strong>Must be installed by the user</strong> before configuration.</p></li>
 </ul>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>gcc             12.3.0
-qiskit          1.2.4
-CMake           3.21.0
-python          3.9 (recommended 3.11)
-pybind11        2.7 (recommended 2.12)
-MPI             3.1
-OpenMP          4.5
-Boost           1.85.0
-Eigen           5.0.0
-Blas            -
-Lapack          -
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>   gcc             12.3.0
+   qiskit          1.2.4
+   CMake           3.24 (recommended 3.27.6)
+   python          3.11 (3.11.9 used at CESGA)
+   pybind11        2.12 (recommended 2.13.6)
+   MPI             3.1
+   OpenMP          4.5
+   Boost           1.85.0
+   Blas            -
+   Lapack          -
+
+
+- **Can be installed by the user**, but if they are not they will be automatically installed by the configuration process.
+
+.. code-block:: text
+
+   nlohmann JSON   3.12.0
+   Eigen           5.0.0
+   spdlog          1.16.0
+   MQT-DDSIM       2.2.0
+   QuEST           4.2.0
+   qsim            0.22.0
+   libzmq          4.3.5
+   cppzmq          4.9.0
+   CunqaSimulator  0.1.2
+
+- **Will be installed automatically** by the configuration process.
 </pre></div>
 </div>
-<ul class="simple">
-<li><p><strong>Can be installed by the user</strong>, but if they are not they will be automatically installed by the configuration process.</p></li>
-</ul>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nlohmann JSON   3.11.3
-spdlog          1.16.0
-MQT-DDSIM       1.24.0
-libzmq          4.3.5
-cppzmq          4.11.0
-CunqaSimulator  0.1.1
-</pre></div>
-</div>
-<ul class="simple">
-<li><p><strong>Will be installed automatically</strong> by the configuration process.</p></li>
-</ul>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>argparse        -
 qiskit-aer      0.17.2 (modified version)
+pyzmq           27.1.0
+Maestro         - (bundles QCSim and a qiskit-aer fork)
+Qulacs          - (modified version)
 </pre></div>
 </div>
 <p class="rubric">Configure, build and install</p>
 <p>To build, compile, and install CUNQA, the three usual steps in a CMake project are followed.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
 <span class="go">cmake --build build/ --parallel $(nproc)</span>
 <span class="go">cmake --install build/</span>
 </pre></div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_INSTALL</span></code> is not provided, CUNQA will be installed where the environment variable <code class="docutils literal notranslate"><span class="pre">HOME</span></code> points.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> is not provided, CUNQA will be installed where the environment variable <code class="docutils literal notranslate"><span class="pre">HOME</span></code> points.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To enable GPU execution (only supported by the Aer <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>), configure with
+<code class="docutils literal notranslate"><span class="pre">-DUSE_GPU=ON</span></code>. The target CUDA architecture(s) can optionally be set with <code class="docutils literal notranslate"><span class="pre">-DGPU_ARCH</span></code>
+(e.g. <code class="docutils literal notranslate"><span class="pre">75;80</span></code>); if omitted, it defaults to <code class="docutils literal notranslate"><span class="pre">all-major</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH=&quot;75;80&quot;</span>
+</pre></div>
+</div>
+<p>Equivalently, use the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> CMake preset:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake --preset gpu -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
+<span class="go">cmake --build --preset gpu</span>
+<span class="go">cmake --install build/gpu</span>
+</pre></div>
+</div>
 </div>
 <p>You can also employ <a class="reference external" href="https://ninja-build.org/">Ninja</a> to perform this task.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
 <span class="go">ninja -C build/ -j $(nproc)</span>
 <span class="go">cmake --install build/</span>
+</pre></div>
+</div>
+<p class="rubric">Using CMake presets</p>
+<p>CUNQA ships a <code class="docutils literal notranslate"><span class="pre">CMakePresets.json</span></code> with ready-made configurations (<code class="docutils literal notranslate"><span class="pre">dev</span></code>, <code class="docutils literal notranslate"><span class="pre">release</span></code> and
+<code class="docutils literal notranslate"><span class="pre">gpu</span></code>). Each preset builds into <code class="docutils literal notranslate"><span class="pre">build/&lt;preset&gt;/</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake --preset release -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
+<span class="go">cmake --build --preset release</span>
+<span class="go">cmake --install build/release</span>
 </pre></div>
 </div>
 <p>Alternatively, you can use the <code class="docutils literal notranslate"><span class="pre">configure.sh</span></code> file, but only after all the dependencies have been
@@ -207,57 +237,70 @@ solved.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">source configure.sh /your/installation/path</span>
 </pre></div>
 </div>
+<p class="rubric">Install as Lmod module</p>
+<p>If your HPC center is interested in using it this way, EasyBuild files employed to install it in
+CESGA are available inside <code class="docutils literal notranslate"><span class="pre">easybuild/</span></code> folder.</p>
 </div>
 <input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio" /><label class="tab-label" for="tab-set--0-input--2">CESGA</label><div class="tab-content docutils">
 <p class="rubric">Configure, build and install</p>
 <p>To build, compile, and install CUNQA, the three usual steps in a CMake project are followed.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
 <span class="go">cmake --build build/ --parallel $(nproc)</span>
 <span class="go">cmake --install build/</span>
 </pre></div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_INSTALL</span></code> is not provided, CUNQA will be installed where the environment variable <code class="docutils literal notranslate"><span class="pre">HOME</span></code> points.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> is not provided, CUNQA will be installed where the environment variable <code class="docutils literal notranslate"><span class="pre">HOME</span></code> points.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To enable the GPU execution provided by AerSimulator, the flag <code class="docutils literal notranslate"><span class="pre">-DAER_GPU=TRUE</span></code> must be provided at build time:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path -DAER_GPU=TRUE</span>
+<p>To enable GPU execution (only supported by the Aer <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>), configure with
+<code class="docutils literal notranslate"><span class="pre">-DUSE_GPU=ON</span></code>. The target CUDA architecture(s) can optionally be set with <code class="docutils literal notranslate"><span class="pre">-DGPU_ARCH</span></code>
+(e.g. <code class="docutils literal notranslate"><span class="pre">75;80</span></code>); if omitted, it defaults to <code class="docutils literal notranslate"><span class="pre">all-major</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH=&quot;75;80&quot;</span>
+</pre></div>
+</div>
+<p>Equivalently, use the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> CMake preset:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake --preset gpu -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
+<span class="go">cmake --build --preset gpu</span>
+<span class="go">cmake --install build/gpu</span>
 </pre></div>
 </div>
 </div>
 <p>You can also employ <a class="reference external" href="https://ninja-build.org/">Ninja</a> to perform this task.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -G Ninja -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path</span>
 <span class="go">ninja -C build/ -j $(nproc)</span>
 <span class="go">cmake --install build/</span>
 </pre></div>
 </div>
-<p>Alternatively, you can use the <code class="docutils literal notranslate"><span class="pre">configure.sh</span></code> file.</p>
+<p>Alternatively, you can use the <code class="docutils literal notranslate"><span class="pre">configure.sh</span></code> file, which loads the required modules for the
+detected CESGA system (QMIO or FT3) and then configures, builds and installs CUNQA.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">source configure.sh /your/installation/path</span>
 </pre></div>
 </div>
-</div>
-</div>
-</section>
-<section id="install-as-lmod-module">
-<h2>Install as Lmod module<a class="headerlink" href="#install-as-lmod-module" title="Link to this heading"></a></h2>
+<p class="rubric">Install as Lmod module</p>
 <p>CUNQA is available as Lmod module in CESGA. To use it all you have to do is:</p>
 <ul class="simple">
 <li><p>In QMIO:</p></li>
 </ul>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load qmio/hpc gcc/12.3.0 cunqa/2.0.0-python-3.9.9-mpi</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load qmio/hpc gcc/12.3.0 cunqa/3.0.0-python-3.11.9-mpi</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>In FT3:</p></li>
 </ul>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load cesga/2022 gcc/system cunqa/2.0.0 # without GPUs</span>
-<span class="go">module load cesga/2022 gcc/system cunqa/2.0.0-cuda-12.8.0 # with GPUs</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">module load cesga/2022 gcc/system cunqa/3.0.0 # without GPUs</span>
+<span class="go">module load cesga/2022 gcc/system cunqa/3.0.0-cuda-12.8.0 # with GPUs</span>
 </pre></div>
 </div>
-<p>If your HPC center is interested in using it this way, EasyBuild files employed to install it in
-CESGA are available inside <code class="docutils literal notranslate"><span class="pre">easybuild/</span></code> folder.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Module names and available versions may change over time. Run <code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">spider</span> <span class="pre">cunqa</span></code> (or
+<code class="docutils literal notranslate"><span class="pre">ml</span> <span class="pre">av</span> <span class="pre">cunqa</span></code>) to list the exact module strings installed on your system.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="uninstall">
 <h2>Uninstall<a class="headerlink" href="#uninstall" title="Link to this heading"></a></h2>

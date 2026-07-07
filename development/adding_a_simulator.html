@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding a simulator &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=5efd4b3e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Glossary" href="../glossary.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+  <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+    </form>
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding a simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#steps">Steps</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Adding a simulator</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/development/adding_a_simulator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adding-a-simulator">
+<h1>Adding a simulator<a class="headerlink" href="#adding-a-simulator" title="Link to this heading"></a></h1>
+<p>CUNQA is designed so that new <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulators</span></a> can be plugged in without touching the rest of the
+platform. Each <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> is wrapped in an <strong>adapter</strong> that implements a common C++ interface, and is
+then registered with a factory and exposed to the <code class="docutils literal notranslate"><span class="pre">qraise</span></code> command. This page describes the steps
+involved.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a developer-oriented guide. It assumes familiarity with the CUNQA build
+(<a class="reference internal" href="../installation/getting_started.html"><span class="doc">Installation</span></a>) and with C++/CMake.</p>
+</div>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The relevant pieces live under <code class="docutils literal notranslate"><span class="pre">src/sim/</span></code> and <code class="docutils literal notranslate"><span class="pre">src/utils/</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/sim/simulator.hpp</span></code> — the abstract <code class="docutils literal notranslate"><span class="pre">Simulator</span></code> interface every adapter derives
+from.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/sim/simulators/&lt;NAME&gt;/</span></code> — one directory per <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> adapter (<code class="docutils literal notranslate"><span class="pre">AER</span></code>, <code class="docutils literal notranslate"><span class="pre">Munich</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Qulacs</span></code>, …).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/sim/simulators/simulator_factory.cpp</span></code> — maps the <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> name string to the adapter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/utils/constants.hpp.in</span></code> — declares which <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulators</span></a> are accepted by <code class="docutils literal notranslate"><span class="pre">qraise</span></code> for each
+communication scheme.</p></li>
+</ul>
+</section>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><strong>Create the adapter.</strong>
+Add a new directory <code class="docutils literal notranslate"><span class="pre">src/sim/simulators/&lt;NAME&gt;/</span></code> with a class (e.g.
+<code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_simulator_adapter.hpp/.cpp</span></code>) deriving from <code class="docutils literal notranslate"><span class="pre">cunqa::sim::Simulator</span></code>. Implement the pure
+virtual methods of the interface:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_name()</span></code> — the <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>’s CUNQA name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_basis_gates()</span></code> — the native gate set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initialize()</span></code> / <code class="docutils literal notranslate"><span class="pre">clear()</span></code> — per-execution setup and teardown.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">create_circuit(...)</span></code> — builds the <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>’s circuit object from the instruction JSON.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">native_execute(...)</span></code> — runs the circuit and returns the result JSON.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_noise_model(...)</span></code> — apply a noise model (may be a no-op if noise is unsupported).</p></li>
+</ul>
+<p>Then override the <code class="docutils literal notranslate"><span class="pre">apply_gate(...)</span></code> overloads for every gate the <a class="reference internal" href="../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> supports. Any overload
+you do <strong>not</strong> override falls back to the base-class implementation, which raises a clear
+“Gate … not supported by &lt;name&gt; <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>” error — so you only implement what the <a class="reference internal" href="../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> can
+actually do.</p>
+</li>
+<li><p><strong>Register the adapter in the factory.</strong>
+In <code class="docutils literal notranslate"><span class="pre">src/sim/simulators/simulator_factory.cpp</span></code>, include the new header and add a branch to
+<code class="docutils literal notranslate"><span class="pre">make_simulator()</span></code> returning your adapter for the chosen name string.</p></li>
+<li><p><strong>Declare it as supported.</strong>
+In <code class="docutils literal notranslate"><span class="pre">src/utils/constants.hpp.in</span></code>, add the name to the relevant arrays:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SUPPORTED_SIMPLE_SIMULATORS</span></code> (no-communications scheme),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SUPPORTED_CC_SIMULATORS</span></code> (<a class="reference internal" href="../glossary.html#term-classical-communications"><span class="xref std std-term">classical communications</span></a>),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SUPPORTED_QC_SIMULATORS</span></code> (<a class="reference internal" href="../glossary.html#term-quantum-communications"><span class="xref std std-term">quantum communications</span></a>),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SUPPORTED_NOISY_SIMULATORS</span></code> if it supports noise models.</p></li>
+</ul>
+<p>Only add the name to the schemes the adapter actually supports — <code class="docutils literal notranslate"><span class="pre">qraise</span></code> uses these arrays to
+accept or reject a deployment, and the C++ <code class="docutils literal notranslate"><span class="pre">apply_gate</span></code> fallbacks guard the rest.</p>
+</li>
+<li><p><strong>Wire up the build.</strong>
+Add the new directory to <code class="docutils literal notranslate"><span class="pre">src/sim/simulators/CMakeLists.txt</span></code> (an <code class="docutils literal notranslate"><span class="pre">add_subdirectory(&lt;NAME&gt;)</span></code>
+entry and the adapter library in the <code class="docutils literal notranslate"><span class="pre">simulator_factory</span></code> link list), and provide a
+<code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> inside the new directory that builds the adapter library and links the
+<a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>’s own dependencies.</p></li>
+<li><p><strong>Document it.</strong>
+Add a row to the table in <a class="reference internal" href="../reference/simulators.html"><span class="doc">Simulators</span></a> with the <code class="docutils literal notranslate"><span class="pre">--simulator</span></code> value, the
+library, and the supported features.</p></li>
+</ol>
+<p>Once built and installed, the new <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> can be selected like any other:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qraise</span> <span class="o">-</span><span class="n">n</span> <span class="mi">2</span> <span class="o">-</span><span class="n">t</span> <span class="mi">01</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="o">--</span><span class="n">simulator</span> <span class="o">&lt;</span><span class="n">NAME</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">co</span><span class="o">-</span><span class="n">located</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../glossary.html" class="btn btn-neutral float-left" title="Glossary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

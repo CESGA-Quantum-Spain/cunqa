@@ -23,8 +23,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
       <script src="_static/tabs.js?v=3ee01567"></script>
@@ -70,9 +70,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -111,15 +114,15 @@
   <h1 class=big-cunqa>CUNQA</h1>
 <p style="text-align: center;"><strong>Emulator of Distributed Quantum Computing for HPC environments</strong></p><section id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h1>
-<p><strong>CUNQA</strong> is a Python/C++ platform that emulates distributed quantum computing (DQC) architectures
+<p><strong>CUNQA</strong> is a Python/C++ platform that emulates <a class="reference internal" href="glossary.html#term-Distributed-Quantum-Computing"><span class="xref std std-term">distributed quantum computing</span></a> (<a class="reference internal" href="glossary.html#term-DQC"><span class="xref std std-term">DQC</span></a>) architectures
 on HPC environments. To achieve this, CUNQA defines the concept of a <strong>virtual QPU (vQPU)</strong>, which
 is a combination of classical resources and simulation software that, working together, simulate
-the appearance and operation of a real QPU. These vQPUs are responsible for executing the quantum
+the appearance and operation of a real <a class="reference internal" href="glossary.html#term-QPU"><span class="xref std std-term">QPU</span></a>. These <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> are responsible for executing the quantum
 tasks defined by the user.</p>
-<p>For these vQPUs to work, they require a management system. This system is written in C++, aiming
+<p>For these <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> to work, they require a management system. This system is written in C++, aiming
 for higher performance and better integration with the simulation libraries, most of which are also
 written in this language. In addition to this management system, it was necessary to define an API
-that allows the definition of quantum tasks and their subsequent submission to the vQPUs, providing
+that allows the definition of quantum tasks and their subsequent submission to the <a class="reference internal" href="glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>, providing
 an intuitive and convenient way of using the platform. The API was implemented in Python, as it
 offers a more accessible and user-friendly entry point.</p>
 <p>This documentation will exclusively detail the parts of the library that are required by the user

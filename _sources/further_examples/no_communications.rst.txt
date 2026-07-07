@@ -5,12 +5,12 @@ No-communications scheme
 Ideal execution
 ===============
 Let's showcase here more advanced examples of the no-communication model that showcase a more complex
-use of CUNQA than the one displayed in the :doc:`../cunqa_overview/embarrassingly_parallel` section.
+use of CUNQA than the one displayed in the :doc:`../overview/embarrassingly_parallel` section.
 
 .. nbgallery::
    notebooks/Multiple_circuits_execution.ipynb
 
-For optimization algorithms, the :py:mod:`~cunqa.mappers` submodule and the
+For optimization algorithms, the :py:mod:`~cunqa.tools.mappers` submodule and the
 :py:meth:`~cunqa.qjob.QJob.upgrade_parameters` method of the the :py:class:`~cunqa.qjob.QJob` were 
 developed. The usage of these two features can be seen in the following examples.
 
@@ -26,48 +26,40 @@ The following example shows how to obtain different statistics from :py:class:`~
 
 Finally, we present an example of the local `iterative QPE <https://arxiv.org/abs/quant-ph/0610214>`_, so that the results obtained can be compared with the ones in :doc:`classical_communications` and :doc:`quantum_communications`.
 
-.. literalinclude:: ../../../examples/python/no_comm/05-iterative_QPE.py
+.. literalinclude:: ../../../examples/no_comm/05-iterative_QPE.py
       :language: python
 
 Noisy execution
 ===============
-The program scheme does not change one bit with the existing of noise in the vQPUs. It just changes 
-the way these vQPUs are deployed, because they need to receive the path a JSON specifying the noise 
-model properties. 
+Running on noisy :term:`vQPUs <vQPU>` requires two changes with respect to an ideal execution: the
+:term:`vQPUs <vQPU>` must be deployed with a :term:`backend` configuration describing the noise model
+to emulate, and the circuit must be transpiled to the :term:`vQPU`'s backend before being run.
 
-To do this, as it was explained in :doc:`../cunqa_overview/cunqa_overview`, the 
-:doc:`../reference/commands/qraise` Bash command or its Python function counterpart 
-:py:func:`~cunqa.qpu.qraise` have to be employed with the flag `noise-properties`, in the first 
-case, and with the argument `noise_properties_path`, in the second; with both being the path 
-to a noise properties JSON file. The format of this JSON file is shown in 
+To deploy the noisy :term:`vQPUs <vQPU>`, as it was explained in
+:doc:`../overview/overview`, the :doc:`../reference/commands/qraise` Bash command or its
+Python function counterpart :py:func:`~cunqa.qpu.qraise` have to be employed with the ``--backend`` flag,
+in the first case, and with the ``backend`` argument, in the second; both being the path to a
+:term:`backend` configuration JSON file. This :term:`backend` file points, through its
+``noise_model.noise_properties_path`` field, to a noise properties JSON file. The format of both files
+is shown in :doc:`../further_examples/json_examples/backend_json_example` and
 :doc:`../further_examples/json_examples/noise_properties_example`.
 
 .. tab:: Bash command
 
     .. code-block:: bash
 
-        qraise -n 4 -t 01:00:00 --co-located --noise-properties="complete/path/to/noise.json"
+        qraise -n 4 -t 01:00:00 --co-located --backend="complete/path/to/backend.json"
 
 .. tab:: Python function
 
     .. code-block:: python
 
-        family = qraise(4, "01:00:00", co_located=True, noise_properties_path="complete/path/to/noise.json")
+        family = qraise(4, "01:00:00", co_located=True, backend="complete/path/to/backend.json")
 
-Moreover, as also described in :doc:`../cunqa_overview/cunqa_overview`, it is possible to deploy a 
-vQPU configured with the noise model of `CESGA's QMIO quantum computer <https://www.cesga.es/infraestructuras/cuantica/>`_, 
-provided that CUNQA is running within the CESGA infrastructure. This setup can be enabled by using 
-the ``fakeqmio`` option in the :doc:`../reference/commands/qraise` Bash command or by passing the 
-``fakeqmio`` argument to the :py:func:`~cunqa.qpu.qraise` Python function.
+Once the noisy :term:`vQPUs <vQPU>` are deployed, the circuit has to be transpiled to the
+:term:`vQPU`'s backend with the :py:func:`~cunqa.qiskit_deps.transpiler.transpiler` function before
+running it. This step is required so that the circuit is expressed in terms of the basis gates and the
+connectivity supported by the noisy backend. The following example shows the complete workflow:
 
-.. tab:: Bash command
-
-    .. code-block:: bash
-
-        qraise -n 4 -t 01:00:00 --co-located --fakeqmio
-
-.. tab:: Python function
-
-    .. code-block:: python
-
-        family = qraise(4, "01:00:00", co_located=True, fakeqmio=True)
+.. literalinclude:: ../../../examples/no_comm/04-transpilation_and_noisy_execution.py
+      :language: python

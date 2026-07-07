@@ -23,8 +23,8 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/tabs.js?v=3ee01567"></script>
@@ -33,7 +33,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="cunqa.qpu" href="../api/cunqa.qpu.html" />
+    <link rel="next" title="Simulators" href="../simulators.html" />
     <link rel="prev" title="qdrop" href="qdrop.html" /> 
 </head>
 
@@ -71,9 +71,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../reference.html#resource-management">Resource management</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="qraise.html">    qraise</a></li>
 <li class="toctree-l3"><a class="reference internal" href="qdrop.html">    qdrop</a></li>
@@ -86,9 +85,15 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#configuration-and-files">Configuration and files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference.html#python-api">Python API</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -114,7 +119,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference</a></li>
       <li class="breadcrumb-item active">qinfo</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/reference/commands/qinfo.rst.txt" rel="nofollow"> View page source</a>
@@ -127,9 +132,9 @@
              
   <section id="qinfo">
 <h1>qinfo<a class="headerlink" href="#qinfo" title="Link to this heading"></a></h1>
-<p>Get information about deployed vQPUs.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> command is used to display information about currently deployed virtual QPUs.
-It can show the QPUs deployed on a specific node, or on the current node.</p>
+<p>Get information about deployed <a class="reference internal" href="../../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> command is used to display information about currently deployed <a class="reference internal" href="../../glossary.html#term-virtual-QPU"><span class="xref std std-term">virtual QPUs</span></a>.
+It can show the <a class="reference internal" href="../../glossary.html#term-QPU"><span class="xref std std-term">QPUs</span></a> deployed on a specific node, or on the current node.</p>
 <section id="synopsis">
 <h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qinfo<span class="w"> </span><span class="o">[</span>node<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -141,16 +146,16 @@ It can show the QPUs deployed on a specific node, or on the current node.</p>
 <section id="node-selection-options">
 <h3>Node selection options<a class="headerlink" href="#node-selection-options" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">node</span></code></dt><dd><p>Info about the QPUs on the selected node.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">node</span></code></dt><dd><p>Info about the <a class="reference internal" href="../../glossary.html#term-QPU"><span class="xref std std-term">QPUs</span></a> on the selected node.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">-m,</span> <span class="pre">--mynode</span></code></dt><dd><p>Info about the QPUs on the current node.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">--mynode</span></code></dt><dd><p>Info about the <a class="reference internal" href="../../glossary.html#term-QPU"><span class="xref std std-term">QPUs</span></a> on the current node.</p>
 </dd>
 </dl>
 </section>
 </section>
 <section id="basic-usage">
 <h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
-<p>Command that bring information about the vQPUs on a specific node:</p>
+<p>Command that bring information about the <a class="reference internal" href="../../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> on a specific node:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qinfo<span class="w"> </span>c7-13
 </pre></div>
 </div>
@@ -160,6 +165,8 @@ It can show the QPUs deployed on a specific node, or on the current node.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">node</span></code> is provided, information will be shown for that node.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">--mynode</span></code> is set, information will be shown for the node where the command is executed.</p></li>
+<li><p>If neither <code class="docutils literal notranslate"><span class="pre">node</span></code> nor <code class="docutils literal notranslate"><span class="pre">--mynode</span></code> is given, the number of <a class="reference internal" href="../../glossary.html#term-QPU"><span class="xref std std-term">QPUs</span></a> per <a class="reference internal" href="../../glossary.html#term-family"><span class="xref std std-term">family</span></a>
+is shown for every node with deployed <a class="reference internal" href="../../glossary.html#term-QPU"><span class="xref std std-term">QPUs</span></a>.</p></li>
 </ul>
 </section>
 </section>
@@ -169,7 +176,7 @@ It can show the QPUs deployed on a specific node, or on the current node.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="qdrop.html" class="btn btn-neutral float-left" title="qdrop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api/cunqa.qpu.html" class="btn btn-neutral float-right" title="cunqa.qpu" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../simulators.html" class="btn btn-neutral float-right" title="Simulators" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

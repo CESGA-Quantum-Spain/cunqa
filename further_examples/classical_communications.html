@@ -23,8 +23,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
@@ -71,7 +71,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="further_examples.html">Further Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="no_communications.html">   No-communications</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">   Classical-communications</a></li>
@@ -79,7 +80,9 @@
 <li class="toctree-l2"><a class="reference internal" href="json_examples/json_examples.html">   Raw JSON examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -118,8 +121,8 @@
              
   <section id="classical-communications-scheme">
 <h1>Classical-communications scheme<a class="headerlink" href="#classical-communications-scheme" title="Link to this heading"></a></h1>
-<p>The classical-communications directives, together with simple examples, are explained in the <a class="reference internal" href="../cunqa_overview/classical_comm.html"><span class="doc">Classical Communications</span></a> section.
-This section will present a couple of examples are presented to highlight the use of classical communications.</p>
+<p>The classical-communications directives, together with simple examples, are explained in the <a class="reference internal" href="../overview/classical_comm.html"><span class="doc">Classical Communications</span></a> section.
+This section will present a couple of examples are presented to highlight the use of <a class="reference internal" href="../glossary.html#term-classical-communications"><span class="xref std std-term">classical communications</span></a>.</p>
 <p>In this first example we present a cyclic exchange of classic bits between 3 circuits:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
@@ -181,8 +184,9 @@ This section will present a couple of examples are presented to highlight the us
 
         <span class="c1"># Here we recieve the bit sent by the prior circuit and use it for conditioning an x gate at qubit 0</span>
         <span class="n">circuit</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sending_circuit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">NUM_NODES</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-        <span class="k">with</span> <span class="n">circuit</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="n">clbits</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
-            <span class="n">cgates</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="n">clbits</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">endcif</span><span class="p">()</span>
 
         <span class="c1"># Adding final measurement of que qubit after the x gate</span>
         <span class="n">circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
@@ -220,7 +224,7 @@ This section will present a couple of examples are presented to highlight the us
     <span class="k">raise</span> <span class="n">error</span>
 </pre></div>
 </div>
-<p>In this second example we present the distributed <a class="reference external" href="https://arxiv.org/abs/quant-ph/0610214">iterative QPE</a> in several vQPUs. Compare with the QPE presented in <a class="reference internal" href="no_communications.html"><span class="doc">No-communications scheme</span></a> and <a class="reference internal" href="quantum_communications.html"><span class="doc">Quantum-communications scheme</span></a>.</p>
+<p>In this second example we present the distributed <a class="reference external" href="https://arxiv.org/abs/quant-ph/0610214">iterative QPE</a> in several <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>. Compare with the QPE presented in <a class="reference internal" href="no_communications.html"><span class="doc">No-communications scheme</span></a> and <a class="reference internal" href="quantum_communications.html"><span class="doc">Quantum-communications scheme</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Code implementing the Iterative Quantum Phase Estimation (iQPE) algorithm with classical communications. To understand the algorithm without communications check:</span>
 <span class="sd">    - Original paper (here referred to as Iterative Phase Estimation Algorithm): https://arxiv.org/abs/quant-ph/0610214</span>
@@ -268,8 +272,9 @@ This section will present a couple of examples are presented to highlight the us
             <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sending_circuit</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cc_</span><span class="si">{</span><span class="n">recv_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="c1"># Gate conditioned by the received bit</span>
-            <span class="k">with</span> <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">cgates</span><span class="p">:</span>
-                <span class="n">cgates</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cif</span><span class="p">(</span><span class="n">clbits</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rz</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">endcif</span><span class="p">()</span>
 
         <span class="n">circuits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -294,7 +299,6 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="n">binary_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts_list</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
         <span class="c1"># Extract the most frequent measurement (the best estimate of theta)</span>
         <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
         <span class="n">binary_string</span> <span class="o">+=</span> <span class="n">most_frequent_output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

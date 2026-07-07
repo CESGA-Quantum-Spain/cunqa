@@ -23,8 +23,8 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/tabs.js?v=3ee01567"></script>
@@ -33,7 +33,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Noise properties JSON" href="noise_properties_example.html" />
+    <link rel="next" title="Infrastructure JSON" href="infrastructure_json_example.html" />
     <link rel="prev" title="Raw Quantum Circuit JSON" href="circuit_json_example.html" /> 
 </head>
 
@@ -71,7 +71,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../further_examples.html">Further Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../no_communications.html">   No-communications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../classical_communications.html">   Classical-communications</a></li>
@@ -79,12 +80,15 @@
 <li class="toctree-l2 current"><a class="reference internal" href="json_examples.html">   Raw JSON examples</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="circuit_json_example.html">   Raw circuit examples</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">   Backend example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="infrastructure_json_example.html">   Infrastructure example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="noise_properties_example.html">   Noise properties example</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -124,10 +128,11 @@
              
   <section id="backend-json">
 <h1>Backend JSON<a class="headerlink" href="#backend-json" title="Link to this heading"></a></h1>
-<p>Here it is presented how to specify a backend using JSON. Supported simulators must be indicated with the following aliases:</p>
+<p>Here it is presented how to specify a <a class="reference internal" href="../../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> using JSON. Supported
+<a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulators</span></a> must be indicated with the following aliases:</p>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><strong>Simulator Name</strong></p></td>
+<tr class="row-odd"><td><p><strong>Siulator Name</strong></p></td>
 <td><p><strong>Alias for the backend</strong></p></td>
 </tr>
 <tr class="row-even"><td><p>AerSimulator</p></td>
@@ -148,39 +153,57 @@
 </tbody>
 </table>
 <p><strong>Ideal backend</strong></p>
+<p>This is the simplest backend example. The only thing to note is that the number of qubits is specified under the key _num_qubits_ as a list where the first element is the number of data qubits and the second element is the number of communication qubits.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;backend&quot;</span><span class="p">:{</span>
 <span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IdealBackend&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example of an ideal backend&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;n_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">16</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
 <span class="w">        </span><span class="nt">&quot;basis_gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cz&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ecr&quot;</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;custom_instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">        </span><span class="nt">&quot;coupling_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">        </span><span class="nt">&quot;simulator&quot;</span><span class="p">:</span><span class="s2">&quot;Aer&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p><strong>Noisy backend</strong></p>
-<p>The simplest way to specify a noisy backend is through a JSON file containing the desired noise properties in the format specified in <a class="reference internal" href="noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>. Then, internally it will be convert to the specific noise model format supported for the corresponding simulator.</p>
+<p>The simplest way to specify a noisy <a class="reference internal" href="../../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> is through a JSON file containing the desired
+noise properties in the format specified in <a class="reference internal" href="noise_properties_example.html"><span class="doc">Noise properties JSON</span></a>. Then, internally it
+will be convert to the specific noise model format supported for the corresponding <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;backend&quot;</span><span class="p">:{</span>
+<span class="w">    </span><span class="nt">&quot;backend&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NoisyBackend&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example of a noisy backend&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;n_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">],</span>
 <span class="w">        </span><span class="nt">&quot;basis_gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cz&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ecr&quot;</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;custom_instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">        </span><span class="nt">&quot;coupling_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">        </span><span class="nt">&quot;simulator&quot;</span><span class="p">:</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;noise_properties_path&quot;</span><span class="p">:</span><span class="s2">&quot;/path/to/noise/properties/json&quot;</span>
+<span class="w">        </span><span class="nt">&quot;noise_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;noise_properties_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/noise/properties/json&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;thermal_relaxation&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;readout_error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;gate_error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Quantum Communications backend</strong></p>
+<p>The only unique feature of this type of backend is that it specifies the number of communication qubits as the second element in the list associated with the key _num_qubits_. In this example, the vQPU would have 16 data qubits and 3 communication qubits associated with it.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;backend&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IdealBackend&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example of an ideal backend&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">16</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;basis_gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cz&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ecr&quot;</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;coupling_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -192,7 +215,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="circuit_json_example.html" class="btn btn-neutral float-left" title="Raw Quantum Circuit JSON" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="noise_properties_example.html" class="btn btn-neutral float-right" title="Noise properties JSON" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="infrastructure_json_example.html" class="btn btn-neutral float-right" title="Infrastructure JSON" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

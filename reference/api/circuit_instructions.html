@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CunqaCircuit instructions &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=5efd4b3e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Run configuration" href="run_configuration.html" />
+    <link rel="prev" title="cunqa.qc_protocols" href="cunqa.qc_protocols.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+  <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+    </form>
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#configuration-and-files">Configuration and files</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.tools.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.probabilities.html">cunqa.tools.probabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qc_protocols.html">cunqa.qc_protocols</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CunqaCircuit instructions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#construction-and-registers">Construction and registers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#single-qubit-gates-no-parameters">Single-qubit gates (no parameters)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#single-qubit-gates-parametric">Single-qubit gates (parametric)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#two-qubit-gates">Two-qubit gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multi-qubit-and-controlled-gates">Multi-qubit and controlled gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pauli-strings-and-gadgets">Pauli strings and gadgets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#matrix-and-special-instructions">Matrix and special instructions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#noise-instructions">Noise instructions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#measurement-and-state">Measurement and state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#classical-control">Classical control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#distributed-directives">Distributed directives</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run_configuration.html">Run configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrade_parameters.html">Parameters and <cite>upgrade_parameters</cite></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference</a></li>
+      <li class="breadcrumb-item active">CunqaCircuit instructions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/circuit_instructions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cunqacircuit-instructions">
+<h1>CunqaCircuit instructions<a class="headerlink" href="#cunqacircuit-instructions" title="Link to this heading"></a></h1>
+<p>This page is a curated, categorized overview of the instructions offered by
+<a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a>. It is meant as an entry point; the <strong>complete and
+authoritative</strong> list of methods (with full signatures) is generated from the source in the
+<a class="reference internal" href="cunqa.circuit.html"><span class="doc">cunqa.circuit</span></a> API reference.</p>
+<p>Unless stated otherwise, the <code class="docutils literal notranslate"><span class="pre">param</span></code>/<code class="docutils literal notranslate"><span class="pre">theta</span></code> argument of parametric gates accepts a number or a
+parameter string (a placeholder whose value is supplied at execution time; see
+<a class="reference internal" href="upgrade_parameters.html"><span class="doc">Parameters and upgrade_parameters</span></a>). Methods taking <code class="docutils literal notranslate"><span class="pre">*qubits</span></code> receive the involved qubit
+indices in order (controls first, target last).</p>
+<section id="construction-and-registers">
+<h2>Construction and registers<a class="headerlink" href="#construction-and-registers" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method / property</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CunqaCircuit(num_qubits,</span> <span class="pre">num_clbits,</span> <span class="pre">id=...)</span></code></p></td>
+<td><p>Create a circuit. <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code> may be an <code class="docutils literal notranslate"><span class="pre">int</span></code> (<a class="reference internal" href="../../glossary.html#term-data-qubit"><span class="xref std std-term">data qubits</span></a> only) or a tuple
+<code class="docutils literal notranslate"><span class="pre">(num_data_qubits,</span> <span class="pre">num_comm_qubits)</span></code> to reserve <a class="reference internal" href="../../glossary.html#term-comm-qubit"><span class="xref std std-term">communication qubits</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_qubits</span></code></p></td>
+<td><p>Returns the <code class="docutils literal notranslate"><span class="pre">(data_qubits,</span> <span class="pre">comm_qubits)</span></code> index lists.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_comm_qubits</span></code></p></td>
+<td><p>Reserve additional <a class="reference internal" href="../../glossary.html#term-communication-qubit"><span class="xref std std-term">communication qubits</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_data_register</span></code> / <code class="docutils literal notranslate"><span class="pre">add_cl_register</span></code></p></td>
+<td><p>Add a named quantum / classical register.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code> / <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code> / <code class="docutils literal notranslate"><span class="pre">num_clbits</span></code> / <code class="docutils literal notranslate"><span class="pre">info</span></code></p></td>
+<td><p>Properties exposing the circuit identifier, sizes and the serialized circuit.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="single-qubit-gates-no-parameters">
+<h2>Single-qubit gates (no parameters)<a class="headerlink" href="#single-qubit-gates-no-parameters" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">s</span></code>, <code class="docutils literal notranslate"><span class="pre">sdg</span></code>, <code class="docutils literal notranslate"><span class="pre">sx</span></code>, <code class="docutils literal notranslate"><span class="pre">sxdg</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">tdg</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code>, <code class="docutils literal notranslate"><span class="pre">vdg</span></code>
+and other fixed single-qubit gates. All take a single <code class="docutils literal notranslate"><span class="pre">qubit</span></code> index, e.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="single-qubit-gates-parametric">
+<h2>Single-qubit gates (parametric)<a class="headerlink" href="#single-qubit-gates-parametric" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rx</span></code> / <code class="docutils literal notranslate"><span class="pre">ry</span></code> / <code class="docutils literal notranslate"><span class="pre">rz</span></code></p></td>
+<td><p>Rotations about the X / Y / Z axis: <code class="docutils literal notranslate"><span class="pre">rx(theta,</span> <span class="pre">qubit)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">p</span></code> / <code class="docutils literal notranslate"><span class="pre">u1</span></code></p></td>
+<td><p>Phase gate: <code class="docutils literal notranslate"><span class="pre">p(theta,</span> <span class="pre">qubit)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">r</span></code> / <code class="docutils literal notranslate"><span class="pre">u2</span></code></p></td>
+<td><p>Two-parameter single-qubit gates: <code class="docutils literal notranslate"><span class="pre">u2(theta,</span> <span class="pre">phi,</span> <span class="pre">qubit)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">u3</span></code> / <code class="docutils literal notranslate"><span class="pre">u</span></code></p></td>
+<td><p>General single-qubit gate: <code class="docutils literal notranslate"><span class="pre">u(theta,</span> <span class="pre">phi,</span> <span class="pre">lam,</span> <span class="pre">qubit)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">raxis</span></code></p></td>
+<td><p>Rotation about an arbitrary axis: <code class="docutils literal notranslate"><span class="pre">raxis(theta,</span> <span class="pre">axis,</span> <span class="pre">qubit)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="two-qubit-gates">
+<h2>Two-qubit gates<a class="headerlink" href="#two-qubit-gates" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cx</span></code> / <code class="docutils literal notranslate"><span class="pre">cy</span></code> / <code class="docutils literal notranslate"><span class="pre">cz</span></code> / <code class="docutils literal notranslate"><span class="pre">ch</span></code></p></td>
+<td><p>Controlled Pauli / Hadamard: <code class="docutils literal notranslate"><span class="pre">cx(control,</span> <span class="pre">target)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">swap</span></code> / <code class="docutils literal notranslate"><span class="pre">iswap</span></code> / <code class="docutils literal notranslate"><span class="pre">sqrtswap</span></code> / <code class="docutils literal notranslate"><span class="pre">dcx</span></code> / <code class="docutils literal notranslate"><span class="pre">ecr</span></code></p></td>
+<td><p>Two-qubit non-controlled gates: <code class="docutils literal notranslate"><span class="pre">swap(q0,</span> <span class="pre">q1)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">crx</span></code> / <code class="docutils literal notranslate"><span class="pre">cry</span></code> / <code class="docutils literal notranslate"><span class="pre">crz</span></code> / <code class="docutils literal notranslate"><span class="pre">cp</span></code> / <code class="docutils literal notranslate"><span class="pre">cu1</span></code></p></td>
+<td><p>Controlled rotations / phase: <code class="docutils literal notranslate"><span class="pre">crz(theta,</span> <span class="pre">control,</span> <span class="pre">target)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rxx</span></code> / <code class="docutils literal notranslate"><span class="pre">ryy</span></code> / <code class="docutils literal notranslate"><span class="pre">rzz</span></code> / <code class="docutils literal notranslate"><span class="pre">rzx</span></code> / <code class="docutils literal notranslate"><span class="pre">rxy</span></code></p></td>
+<td><p>Two-qubit interaction rotations: <code class="docutils literal notranslate"><span class="pre">rzz(theta,</span> <span class="pre">q0,</span> <span class="pre">q1)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cu</span></code> / <code class="docutils literal notranslate"><span class="pre">cu2</span></code> / <code class="docutils literal notranslate"><span class="pre">cu3</span></code> / <code class="docutils literal notranslate"><span class="pre">fs</span></code> / <code class="docutils literal notranslate"><span class="pre">xxpyy</span></code> / <code class="docutils literal notranslate"><span class="pre">xxmyy</span></code></p></td>
+<td><p>Other parametric two-qubit gates.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="multi-qubit-and-controlled-gates">
+<h2>Multi-qubit and controlled gates<a class="headerlink" href="#multi-qubit-and-controlled-gates" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ccx</span></code> / <code class="docutils literal notranslate"><span class="pre">ccy</span></code> / <code class="docutils literal notranslate"><span class="pre">ccz</span></code> / <code class="docutils literal notranslate"><span class="pre">cswap</span></code></p></td>
+<td><p>Three-qubit gates (Toffoli, Fredkin, …).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mcx</span></code> / <code class="docutils literal notranslate"><span class="pre">mcy</span></code> / <code class="docutils literal notranslate"><span class="pre">mcz</span></code> / <code class="docutils literal notranslate"><span class="pre">mch</span></code> / <code class="docutils literal notranslate"><span class="pre">mcswap</span></code> …</p></td>
+<td><p>Multi-controlled versions; controls first, target last.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mcrx</span></code> / <code class="docutils literal notranslate"><span class="pre">mcry</span></code> / <code class="docutils literal notranslate"><span class="pre">mcrz</span></code> / <code class="docutils literal notranslate"><span class="pre">mcp</span></code> / <code class="docutils literal notranslate"><span class="pre">mcu</span></code> …</p></td>
+<td><p>Multi-controlled parametric gates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mcmx</span></code> / <code class="docutils literal notranslate"><span class="pre">mcraxis</span></code> / <code class="docutils literal notranslate"><span class="pre">mcstatex</span></code></p></td>
+<td><p>Multi-controlled gates with explicit control count / axis / control states.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pauli-strings-and-gadgets">
+<h2>Pauli strings and gadgets<a class="headerlink" href="#pauli-strings-and-gadgets" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">paulistr</span></code> / <code class="docutils literal notranslate"><span class="pre">cpaulistr</span></code> / <code class="docutils literal notranslate"><span class="pre">mcpaulistr</span></code></p></td>
+<td><p>Apply a Pauli string (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;XYZ&quot;</span></code>) to the given qubits.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pauligadget</span></code> / <code class="docutils literal notranslate"><span class="pre">cpauligadget</span></code> / <code class="docutils literal notranslate"><span class="pre">mcpauligadget</span></code> / <code class="docutils literal notranslate"><span class="pre">nonunitarypauligadget</span></code></p></td>
+<td><p>Pauli exponential (“gadget”) rotations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phasegadget</span></code> / <code class="docutils literal notranslate"><span class="pre">cphasegadget</span></code> / <code class="docutils literal notranslate"><span class="pre">mcphasegadget</span></code></p></td>
+<td><p>Phase gadget instructions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">multipauli</span></code> / <code class="docutils literal notranslate"><span class="pre">multipaulirotation</span></code></p></td>
+<td><p>Multi-qubit Pauli operators and rotations.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="matrix-and-special-instructions">
+<h2>Matrix and special instructions<a class="headerlink" href="#matrix-and-special-instructions" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">unitary</span></code> / <code class="docutils literal notranslate"><span class="pre">cunitary</span></code></p></td>
+<td><p>Apply an arbitrary (controlled) unitary matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sparsematrix</span></code> / <code class="docutils literal notranslate"><span class="pre">diagonal</span></code></p></td>
+<td><p>Apply a sparse or diagonal matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">randomunitary</span></code></p></td>
+<td><p>Apply a random unitary (optional <code class="docutils literal notranslate"><span class="pre">seed</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fusedswap</span></code></p></td>
+<td><p>Block-wise fused swap.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="noise-instructions">
+<h2>Noise instructions<a class="headerlink" href="#noise-instructions" title="Link to this heading"></a></h2>
+<p>Circuit-level noise channels (only meaningful on noise-capable <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulators</span></a>, see
+<a class="reference internal" href="../simulators.html"><span class="doc">Simulators</span></a>): <code class="docutils literal notranslate"><span class="pre">amplitudedampingnoise</span></code>, <code class="docutils literal notranslate"><span class="pre">bitflipnoise</span></code>, <code class="docutils literal notranslate"><span class="pre">dephasingnoise</span></code>,
+<code class="docutils literal notranslate"><span class="pre">depolarizingnoise</span></code>, <code class="docutils literal notranslate"><span class="pre">independentxznoise</span></code>, <code class="docutils literal notranslate"><span class="pre">twoqubitdepolarizingnoise</span></code>. Each takes a
+probability and the target qubit(s), e.g. <code class="docutils literal notranslate"><span class="pre">circuit.depolarizingnoise(0.01,</span> <span class="pre">0)</span></code>.</p>
+</section>
+<section id="measurement-and-state">
+<h2>Measurement and state<a class="headerlink" href="#measurement-and-state" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.measure" title="cunqa.circuit.core.CunqaCircuit.measure"><code class="xref py py-meth docutils literal notranslate"><span class="pre">measure</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">measure(qubits,</span> <span class="pre">clbits,</span> <span class="pre">save=True)</span></code> — measure qubit(s) into classical bit(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.measure_all" title="cunqa.circuit.core.CunqaCircuit.measure_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">measure_all</span></code></a></p></td>
+<td><p>Measure all <a class="reference internal" href="../../glossary.html#term-data-qubit"><span class="xref std std-term">data qubits</span></a> into a new <code class="docutils literal notranslate"><span class="pre">&quot;measure&quot;</span></code> register.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.reset" title="cunqa.circuit.core.CunqaCircuit.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset</span></code></a></p></td>
+<td><p>Reset qubit(s) to <span class="math notranslate nohighlight">\(|0\rangle\)</span> (use after a measurement).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.save_state" title="cunqa.circuit.core.CunqaCircuit.save_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_state</span></code></a></p></td>
+<td><p>Save the simulation state (statevector / density matrix) into the result.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classical-control">
+<h2>Classical control<a class="headerlink" href="#classical-control" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.cif" title="cunqa.circuit.core.CunqaCircuit.cif"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cif</span></code></a></p></td>
+<td><p>Open a classically conditioned block: <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">circuit.cif(clbits,</span> <span class="pre">condition=1,</span> <span class="pre">operation=&quot;and&quot;)</span>
+<span class="pre">as</span> <span class="pre">sub:</span></code>. Supported operations: <code class="docutils literal notranslate"><span class="pre">and</span></code>, <code class="docutils literal notranslate"><span class="pre">or</span></code>, <code class="docutils literal notranslate"><span class="pre">xor</span></code>, <code class="docutils literal notranslate"><span class="pre">nand</span></code>, <code class="docutils literal notranslate"><span class="pre">nor</span></code>, <code class="docutils literal notranslate"><span class="pre">xnor</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.endcif" title="cunqa.circuit.core.CunqaCircuit.endcif"><code class="xref py py-meth docutils literal notranslate"><span class="pre">endcif</span></code></a></p></td>
+<td><p>Close a <code class="docutils literal notranslate"><span class="pre">cif</span></code> block (handled automatically by the context manager).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="distributed-directives">
+<h2>Distributed directives<a class="headerlink" href="#distributed-directives" title="Link to this heading"></a></h2>
+<p>These instructions only work on <a class="reference internal" href="../../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> deployed with the corresponding communications enabled.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 74.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.send" title="cunqa.circuit.core.CunqaCircuit.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send</span></code></a> / <a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.recv" title="cunqa.circuit.core.CunqaCircuit.recv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recv</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../glossary.html#term-classical-communications"><span class="xref std std-term">Classical-communications</span></a> primitives: send / receive a
+measured classical bit to / from a remote circuit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit.gen_ent" title="cunqa.circuit.core.CunqaCircuit.gen_ent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gen_ent</span></code></a></p></td>
+<td><p>Low-level entanglement-generation primitive underlying the <a class="reference internal" href="../../glossary.html#term-quantum-communications"><span class="xref std std-term">quantum communications</span></a>
+protocols.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For the high-level <a class="reference internal" href="../../glossary.html#term-teledata"><span class="xref std std-term">teledata</span></a> and <a class="reference internal" href="../../glossary.html#term-telegate"><span class="xref std std-term">telegate</span></a> protocols built on top of <code class="docutils literal notranslate"><span class="pre">gen_ent</span></code>, use
+the <a class="reference internal" href="cunqa.qc_protocols.html#module-cunqa.qc_protocols" title="cunqa.qc_protocols"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qc_protocols</span></code></a> helpers (<code class="xref py py-func docutils literal notranslate"><span class="pre">qsend</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">qrecv</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">cat_entangler</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">cat_disentangler</span></code>).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cunqa.qc_protocols.html" class="btn btn-neutral float-left" title="cunqa.qc_protocols" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="run_configuration.html" class="btn btn-neutral float-right" title="Run configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

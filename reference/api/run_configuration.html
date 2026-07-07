@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run configuration &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/sidebar.css?v=5efd4b3e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../../_static/cunca.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/tabs.js?v=3ee01567"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Parameters and upgrade_parameters" href="upgrade_parameters.html" />
+    <link rel="prev" title="CunqaCircuit instructions" href="circuit_instructions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+  <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+    </form>
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#configuration-and-files">Configuration and files</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.result.html">cunqa.result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.tools.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.probabilities.html">cunqa.tools.probabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qc_protocols.html">cunqa.qc_protocols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circuit_instructions.html">CunqaCircuit instructions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Run configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-parameters">Common parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulator-specific-parameters">Simulator-specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quantum-communications-constraint">Quantum-communications constraint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upgrade_parameters.html">Parameters and <cite>upgrade_parameters</cite></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference</a></li>
+      <li class="breadcrumb-item active">Run configuration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/api/run_configuration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="run-configuration">
+<h1>Run configuration<a class="headerlink" href="#run-configuration" title="Link to this heading"></a></h1>
+<p>When a quantum task is submitted with <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> (or
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code>), any extra keyword arguments are forwarded as <strong>run parameters</strong>
+that configure the simulation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuits</span><span class="p">,</span> <span class="n">qpus</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These are assembled into the run configuration carried to the C++ side, whose canonical definition is
+the <code class="docutils literal notranslate"><span class="pre">RunConfig</span></code> struct (<code class="docutils literal notranslate"><span class="pre">src/sim/run_config.hpp</span></code>). Parameters fall into two groups: the
+<strong>common</strong> ones recognized by every <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>, and <strong>simulator-specific</strong> ones, which are passed
+through untouched to the selected <a class="reference internal" href="../../glossary.html#term-backend"><span class="xref std std-term">backend</span></a>.</p>
+<section id="common-parameters">
+<h2>Common parameters<a class="headerlink" href="#common-parameters" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 14.0%" />
+<col style="width: 16.0%" />
+<col style="width: 48.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">shots</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1024</span></code></p></td>
+<td><p>Number of measurement repetitions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">method</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;automatic&quot;</span></code></p></td>
+<td><p>Simulation method. Valid values are <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>-specific (e.g. <code class="docutils literal notranslate"><span class="pre">statevector</span></code>,
+<code class="docutils literal notranslate"><span class="pre">density_matrix</span></code> for <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">Aer</span></a>); <code class="docutils literal notranslate"><span class="pre">automatic</span></code> lets the <a class="reference internal" href="../../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> choose.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">seed</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><em>(unset)</em></p></td>
+<td><p>Seed for the random number generator. If omitted, a non-deterministic seed is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">avoid_parallelization</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>Disable internal parallelization of the simulation.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some entries of <code class="docutils literal notranslate"><span class="pre">RunConfig</span></code> (<code class="docutils literal notranslate"><span class="pre">qpu_id</span></code>, <code class="docutils literal notranslate"><span class="pre">num_clbits</span></code>, <code class="docutils literal notranslate"><span class="pre">is_dynamic</span></code>, <code class="docutils literal notranslate"><span class="pre">sending_to</span></code>,
+<code class="docutils literal notranslate"><span class="pre">device</span></code>) are <strong>set automatically</strong> by CUNQA from the circuit and deployment, and are not meant
+to be supplied as run parameters.</p>
+</div>
+</section>
+<section id="simulator-specific-parameters">
+<h2>Simulator-specific parameters<a class="headerlink" href="#simulator-specific-parameters" title="Link to this heading"></a></h2>
+<p>Any keyword argument that is not one of the common parameters above is collected into
+<code class="docutils literal notranslate"><span class="pre">simulator_specifics</span></code> and handed to the chosen <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> as-is. The accepted keys therefore depend
+on the <a class="reference internal" href="../../glossary.html#term-backend"><span class="xref std std-term">backend</span></a> selected with <code class="docutils literal notranslate"><span class="pre">--simulator</span></code>; refer to <a class="reference internal" href="../simulators.html"><span class="doc">Simulators</span></a> and to the upstream
+documentation of each <a class="reference internal" href="../../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> for the options it understands.</p>
+</section>
+<section id="quantum-communications-constraint">
+<h2>Quantum-communications constraint<a class="headerlink" href="#quantum-communications-constraint" title="Link to this heading"></a></h2>
+<p>In the <a class="reference internal" href="../../glossary.html#term-quantum-communications"><span class="xref std std-term">quantum communications</span></a> scheme the participating <a class="reference internal" href="../../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> share a single simulation, so
+their run configurations must be <strong>mutually consistent</strong>. CUNQA enforces that all circuits in a QC
+execution use the same <code class="docutils literal notranslate"><span class="pre">method</span></code>, the same <code class="docutils literal notranslate"><span class="pre">shots</span></code>, the same <code class="docutils literal notranslate"><span class="pre">avoid_parallelization</span></code> setting,
+and the same device type; otherwise an error is raised. If their <code class="docutils literal notranslate"><span class="pre">seed</span></code> values differ, the seed is
+left unset for the combined run.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="circuit_instructions.html" class="btn btn-neutral float-left" title="CunqaCircuit instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="upgrade_parameters.html" class="btn btn-neutral float-right" title="Parameters and upgrade_parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

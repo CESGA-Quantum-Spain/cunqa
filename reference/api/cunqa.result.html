@@ -23,8 +23,8 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/tabs.js?v=3ee01567"></script>
@@ -33,7 +33,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="cunqa.mappers" href="cunqa.mappers.html" />
+    <link rel="next" title="cunqa.tools.mappers" href="cunqa.mappers.html" />
     <link rel="prev" title="cunqa.qjob" href="cunqa.qjob.html" /> 
 </head>
 
@@ -71,10 +71,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">CUNQA reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html#configuration-and-files">Configuration and files</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../reference.html#python-api">Python API</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qjob.html">cunqa.qjob</a></li>
@@ -82,12 +83,21 @@
 <li class="toctree-l4"><a class="reference internal" href="#cunqa.result.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.mappers.html">cunqa.tools.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.probabilities.html">cunqa.tools.probabilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cunqa.circuit.html">cunqa.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cunqa.qc_protocols.html">cunqa.qc_protocols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circuit_instructions.html">CunqaCircuit instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run_configuration.html">Run configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrade_parameters.html">Parameters and <cite>upgrade_parameters</cite></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -113,7 +123,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../reference.html">CUNQA reference</a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference</a></li>
       <li class="breadcrumb-item active">cunqa.result</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/reference/api/cunqa.result.rst.txt" rel="nofollow"> View page source</a>
@@ -144,7 +154,7 @@ simulation and the time that the simulation took in seconds:</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="cunqa.result.Result">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circ_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.result.Result" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circ_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.result.Result" title="Link to this definition"></a></dt>
 <dd><p>Class to describe the result of a simulation.</p>
 <p>There are two main attributes, <a class="reference internal" href="#cunqa.result.Result.counts" title="cunqa.result.Result.counts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.counts</span></code></a> and <a class="reference internal" href="#cunqa.result.Result.time_taken" title="cunqa.result.Result.time_taken"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Result.time_taken</span></code></a>, common
 to every simulator available on the backends.Nevertheless, depending on the simulator used, more
@@ -206,7 +216,7 @@ product of the simulation, and so the <code class="docutils literal notranslate"
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cunqa.qjob.html" class="btn btn-neutral float-left" title="cunqa.qjob" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cunqa.mappers.html" class="btn btn-neutral float-right" title="cunqa.mappers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cunqa.mappers.html" class="btn btn-neutral float-right" title="cunqa.tools.mappers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

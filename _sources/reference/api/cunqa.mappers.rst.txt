@@ -1,6 +1,6 @@
-﻿cunqa.mappers
-=============
+cunqa.tools.mappers
+===================
 
-.. automodule:: cunqa.mappers
+.. automodule:: cunqa.tools.mappers
    :members:
    :exclude-members: qpus

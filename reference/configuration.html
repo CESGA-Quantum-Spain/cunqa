@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration and files &mdash; CUNQA</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/nbgallery.css?v=50762a64" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/table.css?v=9571698f" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sidebar.css?v=5efd4b3e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/python_domain.css?v=0ad3a607" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/general.css?v=1c682fb6" />
+
+  
+    <link rel="shortcut icon" href="../_static/cunca.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cunqa.qpu" href="api/cunqa.qpu.html" />
+    <link rel="prev" title="Simulators" href="simulators.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+  <div class="sidebar-header">
+    
+    <div class="project-name"> 
+      <a href="../index.html">CUNQA</a>
+    </div>
+    <div class="project-version">latest</div>
+    <div></div>
+
+    <!--<div class="version-switcher">
+      <select onchange="location = this.value;">
+        
+      </select>
+    </div>-->
+  </div>
+
+  <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+    </form>
+  </div>
+
+
+        </div>
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="reference.html#resource-management">Resource management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#simulators">Simulators</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html#configuration-and-files">Configuration and files</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">    Configuration and files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-cunqa-directory">The <code class="docutils literal notranslate"><span class="pre">.cunqa</span></code> directory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-qpus-json-registry">The <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> registry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recovering-from-stale-state">Recovering from stale state</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#python-api">Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_a_simulator.html">Adding a simulator</a></li>
+</ul>
+
+        </div>
+  <div class="sidebar-logos">
+    <a class="sidebar-logos__item" href="https://www.cesga.es/" target="_blank" rel="noopener">
+      <img src="../_static/logo_cesga_blanco.png" alt="CESGA">
+    </a>
+    <a class="sidebar-logos__item" href="https://quantumspain-project.es/" target="_blank" rel="noopener">
+      <img src="../_static/QuantumSpain_logo_white.png" alt="Quantum Spain">
+    </a>
+  </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CUNQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="reference.html">Reference</a></li>
+      <li class="breadcrumb-item active">Configuration and files</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/configuration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-and-files">
+<h1>Configuration and files<a class="headerlink" href="#configuration-and-files" title="Link to this heading"></a></h1>
+<p>CUNQA keeps a small amount of state on disk to track deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> and their
+communication setup. This page describes where that state lives and what it contains.</p>
+<section id="the-cunqa-directory">
+<h2>The <code class="docutils literal notranslate"><span class="pre">.cunqa</span></code> directory<a class="headerlink" href="#the-cunqa-directory" title="Link to this heading"></a></h2>
+<p>All runtime state is stored under <code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/</span></code>. The location is derived at build time from the
+<code class="docutils literal notranslate"><span class="pre">STORE</span></code> environment variable (see <a class="reference internal" href="../installation/getting_started.html"><span class="doc">Installation</span></a>):</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Path</p></th>
+<th class="head"><p>Contents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/</span></code></p></td>
+<td><p>Root directory for CUNQA runtime state.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus.json</span></code></p></td>
+<td><p>Registry of currently deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>. Read by <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> and
+<a class="reference internal" href="api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/communications.json</span></code></p></td>
+<td><p>Communication endpoints used between <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition, each <code class="docutils literal notranslate"><span class="pre">qraise</span></code> deployment writes a SLURM log file named <code class="docutils literal notranslate"><span class="pre">qraise_&lt;jobid&gt;</span></code> in the
+directory from which the command was launched. These can be removed together with the job using
+<code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">...</span> <span class="pre">--rm</span></code>.</p>
+</section>
+<section id="the-qpus-json-registry">
+<h2>The <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> registry<a class="headerlink" href="#the-qpus-json-registry" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> is a JSON object whose <strong>keys are vQPU identifiers</strong> (of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;slurm_job_id&gt;_&lt;index&gt;</span></code>) and whose values describe each <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>. The most relevant fields, as
+consumed by the tooling, are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></td>
+<td><p><a class="reference internal" href="../glossary.html#term-family"><span class="xref std std-term">family</span></a> name the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> belongs to.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">slurm_job_id</span></code></p></td>
+<td><p>SLURM job that deployed the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">backend</span></code></p></td>
+<td><p><a class="reference internal" href="../glossary.html#term-backend"><span class="xref std std-term">Backend</span></a> description: <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, <code class="docutils literal notranslate"><span class="pre">simulator</span></code>, <code class="docutils literal notranslate"><span class="pre">basis_gates</span></code>,
+<code class="docutils literal notranslate"><span class="pre">coupling_map</span></code>, <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code>, …</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">net.nodename</span></code></p></td>
+<td><p>Compute node the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> runs on.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">net.mode</span></code></p></td>
+<td><p>Access mode: <code class="docutils literal notranslate"><span class="pre">co_located</span></code> or <code class="docutils literal notranslate"><span class="pre">hpc</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">net.endpoint</span></code></p></td>
+<td><p>Address the Python client connects to.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">net.device</span></code></p></td>
+<td><p>Device info; <code class="docutils literal notranslate"><span class="pre">device.device_name</span></code> is <code class="docutils literal notranslate"><span class="pre">QPU</span></code> for real hardware (e.g. QMIO) and otherwise
+identifies the simulated device.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Illustrative entry (fields trimmed for brevity):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;507805_1071427&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;backend&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;basis_gates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">         </span><span class="nt">&quot;coupling_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Backend with quantum communications.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QCBackend&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">             </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">             </span><span class="mi">1</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;simulator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;family&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;507805&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;507805_1071427&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;net&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target_devices&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tcp://10.5.7.3:45653&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;co_located&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;nodename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c7-3&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;slurm_job_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;507805&quot;</span>
+<span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="recovering-from-stale-state">
+<h2>Recovering from stale state<a class="headerlink" href="#recovering-from-stale-state" title="Link to this heading"></a></h2>
+<p>If a deployment ends abnormally, <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> may keep entries for <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> that are no longer running.
+Running <code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">--all</span></code> cancels any remaining jobs and resets <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> to an empty object
+(<code class="docutils literal notranslate"><span class="pre">{}</span></code>). After that, <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> will report that there are no deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> until you <code class="docutils literal notranslate"><span class="pre">qraise</span></code>
+again.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simulators.html" class="btn btn-neutral float-left" title="Simulators" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/cunqa.qpu.html" class="btn btn-neutral float-right" title="cunqa.qpu" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Álvaro Carballido, Marta Losada, Jorge Vázquez, Daniel Expósito.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

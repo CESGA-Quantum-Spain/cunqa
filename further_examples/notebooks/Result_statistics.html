@@ -24,15 +24,15 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/tabs.js?v=3ee01567"></script>
       <script src="../../_static/design-tabs.js?v=f930bc37"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
       <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -74,7 +74,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../further_examples.html">Further Examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../no_communications.html">   No-communications</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../no_communications.html#ideal-execution">Ideal execution</a><ul class="current">
@@ -92,7 +93,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../json_examples/json_examples.html">   Raw JSON examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -146,6 +149,7 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.tools.probabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">probabilities</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">qdrop</span>
 
 <span class="c1"># Auxiliar functions to print statevectors, density matrices and probability distributions</span>
@@ -198,11 +202,21 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;State  |  Probability&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">bitstring</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">decimals</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|</span><span class="si">{</span><span class="n">bitstring</span><span class="si">}</span><span class="s2">&gt;  |  </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">num_qubits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">probs</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">bitstring</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">decimals</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|</span><span class="si">{</span><span class="n">bitstring</span><span class="si">}</span><span class="s2">&gt;  |  </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">probs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">decimals</span><span class="p">)</span>
+            <span class="n">bitstring</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;0</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2">b&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|</span><span class="si">{</span><span class="n">bitstring</span><span class="si">}</span><span class="s2">&gt;  |  </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">display_partial_per_qubit_probabilities</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">partial</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
     <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -232,13 +246,13 @@ Requested QPUs with command:
 QPUs ready to work ✅
 
 QPU properties:
-         id: 379049_781905, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+         id: 506440_2088700, backend: NCBackend, simulator: Aer, version: 0.0.1.
 
 QPU properties:
-         id: 379049_781906, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+         id: 506440_2088701, backend: NCBackend, simulator: Aer, version: 0.0.1.
 
 QPU properties:
-         id: 379049_781907, backend: SimpleBackend, simulator: AerSimulator, version: 0.0.1.
+         id: 506440_2088702, backend: NCBackend, simulator: Aer, version: 0.0.1.
 </pre></div></div>
 </div>
 <section id="Saving-Quantum-States">
@@ -247,7 +261,7 @@ QPU properties:
 <p>This enables inspecting the exact quantum state before measurement collapses it and allows comparing different physical simulation models without modifying the circuit definition.</p>
 <p>We construct a simple test circuit to illustrate how states can be saved during execution:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circ</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -265,7 +279,7 @@ QPU properties:
 <p>It is important so include such instruction <strong>before</strong> measurements so the state does not collapse to the computational basis and we can recover all the information in the other bases.</p>
 <p>Now we execute the circuit with different simulation methods:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qjob_vec</span>     <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">)</span>
@@ -274,7 +288,7 @@ QPU properties:
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">statevec</span> <span class="o">=</span> <span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">statevector</span>
@@ -312,7 +326,7 @@ and the density matrix
 <p>CUNQA supports saving the state at multiple points within the same circuit. When more than one state is stored, each call to <code class="docutils literal notranslate"><span class="pre">save_state()</span></code> must include a unique label. If two saved states share the same label, an error will be raised.</p>
 <p>Now we construct a circuit that prepares a Bell pair state and then applies additional unitaries to modify it. Both the prepared Bell pair and the final state are extracted.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circ_sev</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -334,7 +348,7 @@ and the density matrix
 </div>
 <p>Once again, they will be executed via both simulation methods:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qjob_vec_sev</span>     <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circ_sev</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">)</span>
@@ -344,7 +358,7 @@ and the density matrix
 </div>
 <p>When multiple states are saved, the result object returns a dictionary whose keys correspond to the provided labels and whose values correspond to the quantum states at those specific points in the circuit:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">statevecs_dict</span> <span class="o">=</span> <span class="n">qjob_vec_sev</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">statevector</span>
@@ -430,12 +444,12 @@ Final state:
 </div>
 <p>Now we can compare its output with the ones obtained before:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probs_vec</span>      <span class="o">=</span> <span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">()</span>
-<span class="n">probs_densmat</span>  <span class="o">=</span> <span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">()</span>
-<span class="n">probs_sampling</span> <span class="o">=</span> <span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probs_vec</span>      <span class="o">=</span> <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+<span class="n">probs_densmat</span>  <span class="o">=</span> <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+<span class="n">probs_sampling</span> <span class="o">=</span> <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Statevector probabilities:&quot;</span><span class="p">)</span>
 <span class="n">display_probabilities</span><span class="p">(</span><span class="n">probs_vec</span><span class="p">)</span>
@@ -497,10 +511,10 @@ State  |  Probability
 Sampling probabilities:
 State  |  Probability
 ------------------------
-|000&gt;  |  0.475586
+|000&gt;  |  0.507812
 |001&gt;  |  0.0
 |010&gt;  |  0.0
-|011&gt;  |  0.524414
+|011&gt;  |  0.492188
 |100&gt;  |  0.0
 |101&gt;  |  0.0
 |110&gt;  |  0.0
@@ -526,17 +540,17 @@ State  |  Probability
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Per qubit probabilities with statevector:&quot;</span><span class="p">)</span>
 <span class="n">display_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Per qubit probabilities with density_matrix:&quot;</span><span class="p">)</span>
 <span class="n">display_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Per qubit probabilities with sampling:&quot;</span><span class="p">)</span>
 <span class="n">display_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
 <br/></pre></div>
 </div>
@@ -550,23 +564,23 @@ State  |  Probability
 Per qubit probabilities with statevector:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.5      0.5
+q0     |  1.0      0.0
 q1     |  0.5      0.5
-q2     |  1.0      0.0
+q2     |  0.5      0.5
 
 Per qubit probabilities with density_matrix:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.5      0.5
+q0     |  1.0      0.0
 q1     |  0.5      0.5
-q2     |  1.0      0.0
+q2     |  0.5      0.5
 
 Per qubit probabilities with sampling:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.475586 0.524414
-q1     |  0.475586 0.524414
-q2     |  1.0      0.0
+q0     |  1.0      0.0
+q1     |  0.507812 0.492188
+q2     |  0.507812 0.492188
 </pre></div></div>
 </div>
 </section>
@@ -576,24 +590,24 @@ q2     |  1.0      0.0
 <p>CUNQA allows marginalization over a selected subset of qubits. When using this option, bitstrings are reduced to the chosen indices, and the remaining qubits are marginalized out. The resulting probabilities correspond only to the subsystem of interest.</p>
 <p>This provides a convenient way to discard ancillas, analyze subsystems, and extract reduced statistics from larger circuits.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] probabilities with statevector:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] probabilities with density_matrix:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] probabilities with sampling:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 <br/></pre></div>
@@ -610,24 +624,24 @@ State  |  Probability
 ------------------------
 |00&gt;  |  0.5
 |01&gt;  |  0
-|10&gt;  |  0
-|11&gt;  |  0.5
+|10&gt;  |  0.5
+|11&gt;  |  0
 
 Partial [0, 1] probabilities with density_matrix:
 State  |  Probability
 ------------------------
 |00&gt;  |  0.5
 |01&gt;  |  0
-|10&gt;  |  0
-|11&gt;  |  0.5
+|10&gt;  |  0.5
+|11&gt;  |  0
 
 Partial [0, 1] probabilities with sampling:
 State  |  Probability
 ------------------------
-|00&gt;  |  0.475586
+|00&gt;  |  0.507812
 |01&gt;  |  0
-|10&gt;  |  0
-|11&gt;  |  0.524414
+|10&gt;  |  0.492188
+|11&gt;  |  0
 </pre></div></div>
 </div>
 </section>
@@ -636,24 +650,24 @@ State  |  Probability
 <p>Both marginalization over selected qubits and per-qubit probabilities can be combined. In this case, the output provides marginal single-qubit probabilities restricted to the chosen subset.</p>
 <p>This allows flexible post-processing of measurement data and supports detailed subsystem analysis within CUNQA workflows.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] per qubit probabilities with statevector:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_vec</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] per qubit probabilities with density_matrix:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_densmat</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Partial [0, 1] per qubit probabilities with sampling:&quot;</span><span class="p">)</span>
 <span class="n">display_partial_per_qubit_probabilities</span><span class="p">(</span>
-    <span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">probabilities</span><span class="p">(</span><span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="n">probabilities</span><span class="p">(</span><span class="n">qjob_sampling</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">per_qubit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
     <span class="n">partial</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 <br/></pre></div>
@@ -668,26 +682,26 @@ State  |  Probability
 Partial [0, 1] per qubit probabilities with statevector:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.5      0.5
+q0     |  1.0      0.0
 q1     |  0.5      0.5
 
 Partial [0, 1] per qubit probabilities with density_matrix:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.5      0.5
+q0     |  1.0      0.0
 q1     |  0.5      0.5
 
 Partial [0, 1] per qubit probabilities with sampling:
 Qubit  |  P(0)     P(1)
 ----------------------------
-q0     |  0.475586 0.524414
-q1     |  0.475586 0.524414
+q0     |  1.0      0.0
+q1     |  0.507812 0.492188
 </pre></div></div>
 </div>
 <p>We demonstrated how CUNQA allows saving quantum states at different stages of a circuit and retrieving them under different simulation methods. We also showed how to extract probabilities in flexible ways, including per bitstring, per qubit, and over selected subsets of qubits.</p>
 <p>Finally, once execution is complete, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> must be called to properly release the allocated classical resources.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
@@ -699,8 +713,16 @@ q1     |  0.475586 0.524414
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Removed job(s) with ID(s): <span class="ansi-green-intense-fg ansi-bold">379049 </span>
+Removed job(s) with ID(s): <span class="ansi-green-intense-fg ansi-bold">506440 </span>
 </pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
 </div>
 </section>
 </section>

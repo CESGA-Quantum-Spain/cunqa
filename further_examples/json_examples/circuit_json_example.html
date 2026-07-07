@@ -23,8 +23,8 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/tabs.js?v=3ee01567"></script>
@@ -71,7 +71,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../further_examples.html">Further Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../no_communications.html">   No-communications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../classical_communications.html">   Classical-communications</a></li>
@@ -79,12 +80,15 @@
 <li class="toctree-l2 current"><a class="reference internal" href="json_examples.html">   Raw JSON examples</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">   Raw circuit examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="backend_json_example.html">   Backend example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="infrastructure_json_example.html">   Infrastructure example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="noise_properties_example.html">   Noise properties example</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">CUNQA reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -224,6 +228,13 @@
 </pre></div>
 </div>
 <p><strong>Quantum Communications example</strong></p>
+<p><a class="reference internal" href="../../glossary.html#term-quantum-communications"><span class="xref std std-term">Quantum communication</span></a> is expressed in the IR through the <code class="docutils literal notranslate"><span class="pre">gen_ent</span></code> directive, which requests a
+shared entangled state on a <a class="reference internal" href="../../glossary.html#term-communication-qubit"><span class="xref std std-term">communication qubit</span></a> between the participating circuits (identified by a
+common <code class="docutils literal notranslate"><span class="pre">tag</span></code>). The high-level <a class="reference internal" href="../../glossary.html#term-teledata"><span class="xref std std-term">teledata</span></a> and <a class="reference internal" href="../../glossary.html#term-telegate"><span class="xref std std-term">telegate</span></a> protocols (see <a class="reference internal" href="../../reference/api/cunqa.qc_protocols.html#module-cunqa.qc_protocols" title="cunqa.qc_protocols"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qc_protocols</span></code></a>)
+expand into a <code class="docutils literal notranslate"><span class="pre">gen_ent</span></code> directive followed by local gates, measurements, <code class="docutils literal notranslate"><span class="pre">cif</span></code>/<code class="docutils literal notranslate"><span class="pre">endcif</span></code>
+corrections and the classical <code class="docutils literal notranslate"><span class="pre">send</span></code>/<code class="docutils literal notranslate"><span class="pre">recv</span></code> directives shown above. The snippet below shows the
+core <code class="docutils literal notranslate"><span class="pre">gen_ent</span></code> directive shared between two circuits (the <a class="reference internal" href="../../glossary.html#term-comm-qubit"><span class="xref std std-term">comm qubit</span></a> is index <code class="docutils literal notranslate"><span class="pre">1</span></code>, after the
+single <a class="reference internal" href="../../glossary.html#term-data-qubit"><span class="xref std std-term">data qubit</span></a> <code class="docutils literal notranslate"><span class="pre">0</span></code>):</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;qsender_circuit&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -232,21 +243,17 @@
 <span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
 <span class="w">    </span><span class="p">},</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;qsend&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">]</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;clbits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;gen_ent&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;comm_qubit&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;qsender_circuit&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;tag&quot;</span><span class="p">:</span><span class="s2">&quot;teledata&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;shots&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;device&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;device_name&quot;</span><span class="p">:</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
@@ -254,7 +261,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;is_dynamic&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[]</span>
+<span class="w">  </span><span class="nt">&quot;sending_to&quot;</span><span class="p">:[</span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -262,21 +269,17 @@
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;instructions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;qrecv&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;qsender_circuit&quot;</span><span class="p">]</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;measure&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;qubits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;clbits&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">]</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;gen_ent&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;comm_qubit&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;circuits&quot;</span><span class="p">:[</span><span class="s2">&quot;qsender_circuit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;qreceiver_circuit&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;tag&quot;</span><span class="p">:</span><span class="s2">&quot;teledata&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">],</span>
 <span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;shots&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;num_qubits&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;num_clbits&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;device&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;device_name&quot;</span><span class="p">:</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span>

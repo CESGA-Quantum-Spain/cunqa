@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CUNQA reference &mdash; CUNQA</title>
+  <title>Reference &mdash; CUNQA</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -23,8 +23,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
@@ -34,7 +34,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="qraise" href="commands/qraise.html" />
-    <link rel="prev" title="Noise properties JSON" href="../further_examples/json_examples/noise_properties_example.html" /> 
+    <link rel="prev" title="Quantum Communication" href="../overview/quantum_comm.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -71,25 +71,41 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation/getting_started.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quick_start/quick_start.html">Quick start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cunqa_overview/cunqa_overview.html">CUNQA overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CUNQA reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#resource-management">Resource management</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="commands/qraise.html">    qraise</a></li>
 <li class="toctree-l3"><a class="reference internal" href="commands/qdrop.html">    qdrop</a></li>
 <li class="toctree-l3"><a class="reference internal" href="commands/qinfo.html">    qinfo</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#simulators">Simulators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulators.html">    Simulators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-and-files">Configuration and files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html">    Configuration and files</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#python-api">Python API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/cunqa.qpu.html">cunqa.qpu</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/cunqa.qjob.html">cunqa.qjob</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/cunqa.result.html">cunqa.result</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/cunqa.mappers.html">cunqa.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.mappers.html">cunqa.tools.mappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.probabilities.html">cunqa.tools.probabilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/cunqa.circuit.html">cunqa.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/cunqa.qc_protocols.html">cunqa.qc_protocols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/circuit_instructions.html">CunqaCircuit instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/run_configuration.html">Run configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/upgrade_parameters.html">Parameters and <cite>upgrade_parameters</cite></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../further_examples/further_examples.html">Further Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_a_simulator.html">Adding a simulator</a></li>
 </ul>
 
         </div>
@@ -115,7 +131,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">CUNQA reference</li>
+      <li class="breadcrumb-item active">Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/reference.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -125,55 +141,91 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cunqa-reference">
-<h1>CUNQA reference<a class="headerlink" href="#cunqa-reference" title="Link to this heading"></a></h1>
+  <section id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Link to this heading"></a></h1>
 <p>This section will explain deeper the main components of CUNQA. As CUNQA manages the resources of a quantum infrastructure through a set of bash commands and provides an platform-user interaction through a Python API, this section is divided into two subsections: <strong>resource management</strong> and <strong>Python API</strong>.</p>
 <section id="resource-management">
 <span id="subs-resource-management"></span><h2>Resource management<a class="headerlink" href="#resource-management" title="Link to this heading"></a></h2>
 <p>Three commands cover the quantum infrastructures management: <code class="docutils literal notranslate"><span class="pre">qraise</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code>, and <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="commands/qraise.html"><span class="doc">qraise</span></a>. Responsible for deploying the vQPUs to build
-DQC infrastructures.</p></li>
-<li><p><a class="reference internal" href="commands/qdrop.html"><span class="doc">qdrop</span></a>. Responsible for releasing the resources of vQPUs when they are no
+<li><p><a class="reference internal" href="commands/qraise.html"><span class="doc">qraise</span></a>. Responsible for deploying the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> to build
+<a class="reference internal" href="../glossary.html#term-DQC"><span class="xref std std-term">DQC</span></a> infrastructures.</p></li>
+<li><p><a class="reference internal" href="commands/qdrop.html"><span class="doc">qdrop</span></a>. Responsible for releasing the resources of <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> when they are no
 longer needed.</p></li>
 <li><p><a class="reference internal" href="commands/qinfo.html"><span class="doc">qinfo</span></a>. Built to obtain information about the available
-vQPUs.</p></li>
+<a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></li>
 </ul>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="simulators">
+<span id="subs-simulators"></span><h2>Simulators<a class="headerlink" href="#simulators" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a> that each <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> uses to run quantum tasks is chosen at deployment time. The
+<a class="reference internal" href="simulators.html"><span class="doc">Simulators</span></a> page lists the available simulators, the <code class="docutils literal notranslate"><span class="pre">--simulator</span></code> value to select each one,
+and which communication schemes, noise and GPU execution they support.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="configuration-and-files">
+<span id="subs-configuration"></span><h2>Configuration and files<a class="headerlink" href="#configuration-and-files" title="Link to this heading"></a></h2>
+<p>CUNQA stores the state of the deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> on disk. The <a class="reference internal" href="configuration.html"><span class="doc">Configuration and files</span></a> page describes the
+<code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa</span></code> directory, the <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> registry read by <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>/<code class="docutils literal notranslate"><span class="pre">qdrop</span></code>/<code class="docutils literal notranslate"><span class="pre">get_QPUs</span></code>,
+and how to recover from stale state.</p>
 <div class="toctree-wrapper compound">
 </div>
 </section>
 <section id="python-api">
 <span id="subs-python-api"></span><h2>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h2>
-<p>The Python API handles two basic things: the interaction user-vQPU by sending and receiving quantum tasks and
+<p>The Python API handles two basic things: the interaction user-<a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> by sending and receiving quantum tasks and
 the actual design of quantum tasks.</p>
 <ul class="simple">
-<li><p>The module <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code> allows submitting quantum tasks and retrieving their result to one or several vQPUs by leveraging the tools provided by the <a class="reference internal" href="api/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a> and <a class="reference internal" href="api/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.result</span></code></a> modules.</p></li>
-<li><p>The design of circuits is handled by the module <a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">circuit</span></code></a>. This module contains a class called <a class="reference internal" href="api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> which contains the necessary directives to model a quantum task with and without communications. It also contains the submodule <a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit.transformations" title="cunqa.circuit.transformations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transformations</span></code></a>, a series of special directives to perform cuts and unions of different circuits.</p></li>
+<li><p>The module <a class="reference internal" href="api/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a> allows submitting quantum tasks and retrieving their result to one or several <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> by leveraging the tools provided by the <a class="reference internal" href="api/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a> and <a class="reference internal" href="api/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.result</span></code></a> modules.</p></li>
+<li><p>The design of circuits is handled by the module <a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">circuit</span></code></a>. This module contains a class called <a class="reference internal" href="api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> which contains the necessary directives to model a quantum task with and without communications. It also contains the submodule <code class="xref py py-mod docutils literal notranslate"><span class="pre">transformations</span></code>, a series of special directives to perform cuts and unions of different circuits.</p></li>
 </ul>
 <table class="docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p>Module</p></td>
-<td><p>Description</p></td>
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></p></td>
-<td><p>Contains the <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> class and the main
-functions interact with vQPUs.</p></td>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.qpu.html#module-cunqa.qpu" title="cunqa.qpu"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qpu</span></code></a></p></td>
+<td><p>Contains the <a class="reference internal" href="api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> class and the main functions to interact with <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/cunqa.qjob.html#module-cunqa.qjob" title="cunqa.qjob"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qjob</span></code></a></p></td>
 <td><p>Contains the class that defines and manages quantum jobs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.result.html#module-cunqa.result" title="cunqa.result"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.result</span></code></a></p></td>
-<td><p>Contains the <a class="reference internal" href="api/cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>, which contains the
-output of the executions.</p></td>
+<td><p>Contains the <a class="reference internal" href="api/cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>, which holds the output of the executions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.mappers</span></code></p></td>
-<td><p>Contains map-like callables to distribute circuits among vQPUs.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cunqa.mappers.html#module-cunqa.tools.mappers" title="cunqa.tools.mappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.tools.mappers</span></code></a></p></td>
+<td><p>Contains map-like callables to distribute circuits among <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.circuit</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.probabilities.html#module-cunqa.tools.probabilities" title="cunqa.tools.probabilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.tools.probabilities</span></code></a></p></td>
+<td><p>Helpers to extract probability distributions (or frequency estimates) from results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cunqa.circuit.html#module-cunqa.circuit" title="cunqa.circuit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.circuit</span></code></a></p></td>
 <td><p>Quantum circuit abstraction for the <code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa</span></code> API.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cunqa.qc_protocols.html#module-cunqa.qc_protocols" title="cunqa.qc_protocols"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cunqa.qc_protocols</span></code></a></p></td>
+<td><p><a class="reference internal" href="../glossary.html#term-teledata"><span class="xref std std-term">Teledata</span></a> and <a class="reference internal" href="../glossary.html#term-telegate"><span class="xref std std-term">telegate</span></a> quantum-communication protocols.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="toctree-wrapper compound">
+</div>
+<p>In addition to the module API reference, three usage-oriented pages complement it:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/circuit_instructions.html"><span class="doc">CunqaCircuit instructions</span></a> — a categorized overview of the
+<a class="reference internal" href="api/cunqa.circuit.html#cunqa.circuit.core.CunqaCircuit" title="cunqa.circuit.core.CunqaCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">CunqaCircuit</span></code></a> instruction set.</p></li>
+<li><p><a class="reference internal" href="api/run_configuration.html"><span class="doc">Run configuration</span></a> — an explanation of the configuration parameters accepted
+by <a class="reference internal" href="api/cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code>.</p></li>
+<li><p><a class="reference internal" href="api/upgrade_parameters.html"><span class="doc">Parameters and upgrade_parameters</span></a> — a detailed example of the use of gate parameters and its updating.</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 </div>
 </section>
@@ -183,7 +235,7 @@ output of the executions.</p></td>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../further_examples/json_examples/noise_properties_example.html" class="btn btn-neutral float-left" title="Noise properties JSON" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../overview/quantum_comm.html" class="btn btn-neutral float-left" title="Quantum Communication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="commands/qraise.html" class="btn btn-neutral float-right" title="qraise" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
