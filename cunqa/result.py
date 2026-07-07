@@ -16,17 +16,13 @@
         >>> result.time_taken
         0.056
 """
+import logging
+import math
 import numpy as np
-from typing import Union
-from itertools import accumulate
-from collections import Counter
 
-class CunqaCounts(Counter):
-    """
-    Modified Counter that eliminates the word 'Counter' from its string representation.
-    """
-    def __str__(self):
-        return str(dict(self))
+from typing import  Union
+from cunqa.utils.logger import logger
+from itertools import accumulate
 
 class Result:
     """
@@ -71,8 +67,6 @@ class Result:
         else:
             self._result = result
 
-
-    # TODO: Use length of counts to justify time_taken (ms) at the end of the line.
     def __str__(self):
         YELLOW = "\033[33m"
         RESET = "\033[0m"   
@@ -107,24 +101,23 @@ class Result:
                 {'001 11':23, '110 10':77}
         """
         if "qmio_results" in list(self._result.keys()): 
-            counts = self._result["qmio_results"]["c"] #TODO: More registers? 
+            counts = self._result["qmio_results"]["c"]
         elif "results" in list(self._result.keys()): # aer
             counts = self._result["results"][0]["data"]["counts"]
         elif "counts" in list(self._result.keys()): # munich and cunqa
             counts = self._result["counts"]
         else:
             raise RuntimeError(f"The result format is unknown: no counts in it.")
-
+        
         if len(self._registers) == 1:
-            return CunqaCounts(counts)
+            return counts
 
-        # reversed to keep the order of counts keys
-        lengths = [len(reg) for reg in reversed(self._registers.values())]
+        lengths = [len(reg) for reg in self._registers.values()]
         if not lengths:
-            return CunqaCounts(counts)
+            return counts
         cuts = (0, *accumulate(lengths))
-        return CunqaCounts({' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
-                count for bitstring, count in counts.items()})
+        return {' '.join(bitstring[i:j] for i, j in zip(cuts, cuts[1:])): 
+                count for bitstring, count in counts.items()}
 
     @property
     def time_taken(self) -> str:
@@ -166,8 +159,7 @@ class Result:
                     if len(statevector) == 1:
                         statevector = list(statevector.values())[0] # Extract the statevector if we only have one
                 
-            # TODO: ensure this actually works in C++
-            elif "statevector" in self._result:             # MUNICH and CUNQA_SIMULATOR
+            elif "statevector" in self._result: # MUNICH and CUNQA_SIMULATOR
                 statevector = self._result["statevector"]
                 if isinstance(statevector, dict):
                     for k, v in statevector.items():

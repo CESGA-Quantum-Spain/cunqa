@@ -23,7 +23,7 @@
 import json
 from typing import  Optional, Any, Union
 
-from cunqa.logger import logger
+from cunqa.utils.logger import logger
 from cunqa.result import Result
 from cunqa.qclient import QClient, FutureWrapper
 from sympy import Symbol
@@ -32,8 +32,8 @@ from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
 
 class QJob:
     """
-    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output 
-    of the :py:meth:`~cunqa.qpu.run` method. The quantum job not only contains the circuit to 
+    Class to handle jobs sent to vQPUs. A :py:class:`QJob` object is created as the output
+    of the :py:func:`~cunqa.qpu.run` function. The quantum job not only contains the circuit to
     be simulated, but also simulation instructions and information of the vQPU to which the job 
     is sent. This class has a main attribute: :py:attr:`QJob.result` which stores the information 
     about the execution. 
@@ -86,11 +86,14 @@ class QJob:
 
         run_config = {
             "shots": 1024, 
-            "method": "automatic", 
+            "method":"automatic", 
             "avoid_parallelization": False,
             "num_clbits": circuit_ir["num_clbits"], 
             "num_qubits": circuit_ir["num_qubits"], 
-            "device": self._device
+            "device": self._device,
+            "sending_to": circuit_ir["sending_to"],
+            "is_dynamic": circuit_ir["is_dynamic"],
+            "qpu_id": circuit_ir["id"][1]
         }
 
         if (run_parameters == None) or (len(run_parameters) == 0):
@@ -104,9 +107,7 @@ class QJob:
         self._quantum_task = {
             "config": run_config, 
             "instructions": circuit_ir["instructions"],
-            "sending_to": circuit_ir["sending_to"],
-            "is_dynamic": circuit_ir["is_dynamic"],
-            "id": circuit_ir["id"][1]
+            "id": circuit_ir["id"][0]
         }
       
         logger.debug("Qjob configured")
@@ -117,7 +118,7 @@ class QJob:
         Result of the job. If no error occured during simulation, a :py:class:`~cunqa.result.Result` 
         object is retured.
 
-            >>> qjob = qpu.run(circuit)
+            >>> qjob = run(circuit, qpu)
             >>> result = qjob.result
             >>> print(result.counts)
             {'00': 524, '11': 500}
@@ -190,15 +191,14 @@ class QJob:
             
     def upgrade_parameters(
         self, 
-        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]],
-        shots: int = None
+        param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]]
     ) -> None:
         """
         Method to upgrade the parameters in a previously submitted job of parametric circuit.
         First it checks weather the prior simulation's result was retrieved. If not, it is discarded,
         and the new set of parameters is sent to the server to be reassigned to the circuit for 
         simulation. This method can be used on a loop, carefully saving the intermediate results. 
-        Also, this method is used by the class :py:class:`~cunqa.mappers.QJobMapper`, check out its 
+        Also, this method is used by the class :py:class:`~cunqa.tools.mappers.QJobMapper`, check out its 
         documentation for a extensive description.
 
         There are two ways of passing new parameters. First, as a **list** with the corresponding 
@@ -219,12 +219,10 @@ class QJob:
                                         parametrized circuit or a dictionary with keys being the 
                                         free parameters' names and its values being its 
                                         corresponding new values.
-            shots (int): number of shots for the next circuit execution
         """
 
         if self._result is None: 
             if self._future is not None:
-                # TODO: Improve this by having a queue of results
                 logger.warning("You have not obtained the previous results. They will be discarded.")
                 self._future.get() # we get the previous result because if not it stays in queue
             else:
@@ -236,11 +234,10 @@ class QJob:
 
         self.assign_parameters_(param_values)
               
-        if shots is None:
-            shots = self._quantum_task["config"]["shots"]
         try:
-            premessage = json.dumps(self._params, default=encoder)
-            message = """{{"params":{}, "shots": {}}}""".format(premessage, shots).replace("'", '"')
+            params_str = json.dumps(self._params, default=encoder)
+            config_str = json.dumps(self._quantum_task["config"], default=encoder)
+            message = """{{"params": {}, "config": {}}}""".format(params_str, config_str).replace("'", '"')
             self._future = self._qclient.send_parameters(message)
             self._updated = False
         except Exception as error:

@@ -57,15 +57,15 @@ void add_qreg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& au
     auto p4 = sv_inst.find('[', p3);
     auto p5 = sv_inst.find(']', p4);
 
-    int num_qubits = circuit_json["num_qubits"];
+    std::pair<std::size_t, std::size_t> num_qubits = circuit_json["num_qubits"];
     int num_qregs = std::stoi(std::string(sv_inst.substr(p4+1, p5-p4-1)));
 
     std::vector<int> qreg_indexes(num_qregs);
-    std::iota(qreg_indexes.begin(), qreg_indexes.end(), num_qubits);
+    std::iota(qreg_indexes.begin(), qreg_indexes.end(), num_qubits.first);
     circuit_json["quantum_registers"][std::string(sv_inst.substr(p3, p4-p3))] = qreg_indexes;
 
-    circuit_json["num_qubits"] = circuit_json.value("num_qubits", 0) + num_qregs;
-
+    num_qubits.first += num_qregs;
+    circuit_json["num_qubits"] = num_qubits;
 }
 
 void add_creg_instruction(std::string_view sv_inst, JSON& circuit_json, JSON& aux_json)
@@ -487,8 +487,6 @@ std::unordered_map<std::string_view, AddersFn> add_instruction {
     {"cy", add_2q0p_instruction},
     {"cz", add_2q0p_instruction},
     {"csx", add_2q0p_instruction},
-    {"csy", add_2q0p_instruction},
-    {"csz", add_2q0p_instruction},
     {"ct", add_2q0p_instruction},
 
     {"cp", add_2q1p_instruction},
@@ -502,7 +500,6 @@ std::unordered_map<std::string_view, AddersFn> add_instruction {
     {"rzx", add_2q1p_instruction},
 
     {"cu2", add_2q2p_instruction},
-    {"cr", add_2q2p_instruction},
 
     {"cu3", add_2q3p_instruction},
     {"cu", add_2q3p_instruction},
@@ -522,7 +519,7 @@ JSON qasm2_to_json(const std::string& circuit_qasm) {
     JSON circuit_json = 
     {
         {"instructions", std::vector<JSON>()},
-        {"num_qubits", 0},
+        {"num_qubits", std::pair<std::size_t, std::size_t>()},
         {"num_clbits", 0},
         {"quantum_registers", JSON()},
         {"classical_registers", JSON()}

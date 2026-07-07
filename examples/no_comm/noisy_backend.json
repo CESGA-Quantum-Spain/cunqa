@@ -1,0 +1,12 @@
+{
+    "name": "NoisyBackend",
+    "description": "Example of a noisy backend.",
+    "num_qubits": [24, 0],
+    "noise_model":
+    {
+        "noise_properties_path": "/mnt/netapp1/Store_CESGA/home/cesga/jvazquez/works/cunqa/examples/no_comm/noise_properties_example.json",
+        "thermal_relaxation": true,
+        "readout_error": true,
+        "gate_error": true
+    }
+}

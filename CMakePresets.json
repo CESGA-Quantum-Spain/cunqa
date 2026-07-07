@@ -1,0 +1,69 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "dev",
+      "inherits": "base",
+      "displayName": "Development (Debug)",
+      "description": "Preset recommended for local development.",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "USE_MPI_BTW_QPU": "OFF",
+        "USE_ZMQ_BTW_QPU": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release",
+      "description": "Preset for optimized builds.",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_MPI_BTW_QPU": "OFF",
+        "USE_ZMQ_BTW_QPU": "ON"
+      }
+    },
+    {
+      "name": "gpu",
+      "inherits": "base",
+      "displayName": "GPU",
+      "description": "Preset to enhance simulations with GPU.",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_GPU": "ON",
+        "GPU_ARCH": "75;80",
+        "USE_MPI_BTW_QPU": "OFF",
+        "USE_ZMQ_BTW_QPU": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "gpu",
+      "configurePreset": "gpu"
+    }
+  ]
+}

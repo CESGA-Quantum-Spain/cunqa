@@ -1,7 +1,0 @@
-add_subdirectory(AER)
-add_subdirectory(Munich)
-add_subdirectory(CUNQA)
-add_subdirectory(Maestro)
-add_subdirectory(Qulacs)
-add_subdirectory(Qsim)
-add_subdirectory(QuEST)

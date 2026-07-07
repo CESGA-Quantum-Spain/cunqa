@@ -22,14 +22,16 @@ import re
 from typing import Union, Any, Optional, TypedDict
 from sympy import Symbol
 
-from collections import Counter
+from sympy import Symbol
+from qiskit import QuantumCircuit
 
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob
-from cunqa.logger import logger
-from cunqa.constants import QPUS_FILEPATH, REMOTE_GATES
+from cunqa.utils import read_json, write_json
+from cunqa.utils.logger import logger
+from cunqa.utils.constants import QPUS_FILEPATH, REMOTE_GATES
 
 class Backend(TypedDict):
     """
@@ -38,9 +40,9 @@ class Backend(TypedDict):
     .. autoattribute:: custom_instructions
     .. autoattribute:: description
     .. autoattribute:: gates
-    .. autoattribute:: n_qubits
+    .. autoattribute:: num_qubits
     .. autoattribute:: name
-    .. autoattribute:: noise_properties_path
+    .. autoattribute:: noise_model
     .. autoattribute:: simulator
     .. autoattribute:: version
     """
@@ -49,9 +51,9 @@ class Backend(TypedDict):
     custom_instructions: str #: Any custom instructions that the Backend has defined.
     description: str #: Custom description of the Backend itself.
     gates: list[str] #: Specific gates supported.
-    n_qubits: int #: Number of qubits that form the Backend, which determines the maximal number of qubits supported for a quantum circuit.
+    num_qubits: tuple[int] #: Number of qubits that form the Backend: computation and communication qubits available.
     name: str #: Name assigned to the Backend.
-    noise_properties_path: str #: Path to the noise model json file gathering the noise instructions needed for the simulator.
+    noise_model: dict #: Path to the noise model json file gathering the noise instructions needed for the simulator.
     simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
     version: str #: Version of the Backend.
 
@@ -87,7 +89,7 @@ class QPU:
         self._family = family
         
         if (device['device_name'] == 'QPU'):
-            self._qclient = QMIOClient() # TODO: Generalize QPU
+            self._qclient = QMIOClient()
         else:
             self._qclient = QClient()
 
@@ -139,7 +141,7 @@ class QPU:
 
 
 def run(
-        circuits: Union[list[Union[dict, 'QuantumCircuit', CunqaCircuit]], Union[dict, 'QuantumCircuit', CunqaCircuit]], 
+        circuits: Union[list[Union[dict, QuantumCircuit, CunqaCircuit]], Union[dict, QuantumCircuit, CunqaCircuit]], 
         qpus: Union[list[QPU], QPU], 
         param_values: Union[dict[Symbol, Union[float, int]], list[Union[float, int]]] = None,
         **run_args: Any
@@ -167,8 +169,7 @@ def run(
     .. note::
         This method will check if two circuits are related, i.e., if one of them was part of a 
         transformation and the other is the result of a transformation. If this is true and a third
-        circuit tries to communicate with them, an error will be raised. A detailed example can be 
-        seen in #TODO.
+        circuit tries to communicate with them, an error will be raised.
 
     Args:
         circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
@@ -186,20 +187,21 @@ def run(
     else:
         circuits_ir = [to_ir(circuits)]
 
-    def expand_mapping(items: list[str], blocks_with_comms: list[str]) -> dict[str, str]:
+    def expand_mapping(items: list[str]) -> dict[str, str]:
         def split(item: str) -> list[str]:
             return [p for p in re.split(r"[|+]", item) if p]
 
-        occurrences = Counter()
-        # Count in how many of the items each circuit id appears
-        for item in items:
-            occurrences.update(set(split(item)))
+        singles = {item for item in items if len(split(item)) == 1}
 
-        conflicts      = {item for item, count in occurrences.items() if count >= 2}
-        conflict_comms = [circ_id for circ_id in blocks_with_comms if circ_id in conflicts]
+        conflicts = {
+            part
+            for item in items
+            if len(split(item)) > 1
+            for part in split(item)
+            if part in singles
+        }
 
-        # Raise error if any conflict circuit has communications
-        if conflict_comms:
+        if conflicts:
             raise ValueError(f"Conflicting identifiers found: {sorted(conflicts)}")
 
         return {
@@ -222,22 +224,23 @@ def run(
     elif len(circuits_ir) < len(qpus):
         logger.warning("More QPUs provided than the number of circuits. "
                        "Last QPUs will remain unused.")
-        
-    # Needed for union and add compatibility check
-    blocks_with_comms = []
-    for circ in circuits_ir:
-        if "blocks_with_comms" in circ:
-            blocks_with_comms += circ["blocks_with_comms"]
     
-    # translate circuit ids in comm instruction to qpu endpoints
-    transformed_circs = expand_mapping([c["id"] for c in circuits_ir], blocks_with_comms)
+    # check whether the QPU has enough qubits for the circuit
+    for qpu, circuit_ir in zip(qpus, circuits_ir):
+        if qpu.backend["num_qubits"][0] < circuit_ir["num_qubits"][0]:
+            raise ValueError("Not enough data qubits in the QPU for the circuit.")
+        if qpu.backend["num_qubits"][1] < circuit_ir["num_qubits"][1]:
+            raise ValueError("Not enough comm qubits in the QPU for the circuit.")
+    
+    # translate circuit ids in comm instruction to qpu ids
+    transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
     correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
     for circuit in circuits_ir:
         for instr in circuit["instructions"]:
             if instr["name"] in REMOTE_GATES:
                 instr["qpus"] = [correspondence[transformed_circs[circ]] for circ in instr["circuits"]]
                 instr.pop("circuits")
-        circuit["sending_to"] = [correspondence[target_circuit] 
+        circuit["sending_to"] = [correspondence[transformed_circs[target_circuit]] 
                                     for target_circuit in circuit["sending_to"]]
         circuit["id"] = (circuit["id"], correspondence[circuit["id"]])
 
@@ -248,27 +251,6 @@ def run(
         return qjobs[0]
     return qjobs
 
-
-def _acquire_lockfile(lockfile: str, timeout: float = 5.0, retry_interval: float = 0.001):
-    """Acquire atomic lockfile, raises if timeout exceeded."""
-    start = time.time()
-    while True:
-        try:
-            fd = os.open(lockfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
-            os.close(fd)
-            return  # Lock acquired
-        except FileExistsError:
-            if time.time() - start > timeout:
-                raise TimeoutError(f"Timeout waiting for lockfile: {lockfile}")
-            time.sleep(retry_interval)
-
-def _release_lockfile(lockfile: str):
-    """Release atomic lockfile."""
-    try:
-        os.unlink(lockfile)
-    except FileNotFoundError:
-        pass  # Already released
-
 def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs raised by the user. It 
@@ -278,18 +260,13 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         co_located (bool): if ``False``, filters by the vQPUs available at the local node.
         family (str): filters vQPUs by their family name.    
     """
-    lockfile = QPUS_FILEPATH + ".lock"
-    _acquire_lockfile(lockfile)
-    try:
-        with open(QPUS_FILEPATH, "r") as f:
-            qpus_json = json.load(f)
-            if len(qpus_json) == 0:
-                logger.warning(f"No QPUs were found.")
-                return None
-    finally:
-        _release_lockfile(lockfile)
+    # access raised QPUs information on qpu.json file
+    qpus_json = read_json(QPUS_FILEPATH)
+    if len(qpus_json) == 0:
+        logger.warning(f"No QPUs were found.")
+        return None
 
-    # Rest of the function unchanged...
+    # extract selected QPUs from qpu.json information 
     local_node = os.getenv("SLURMD_NODENAME")
     if co_located:
         targets = {
@@ -309,7 +286,7 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
                 if ((info["net"].get("nodename") == local_node) and 
                     (family is None or info.get("family") == family))
             }
-
+    
     qpus = [
         QPU(
             id = id,
@@ -319,13 +296,13 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
             endpoint = info['net']['endpoint']
         ) for id, info in targets.items()
     ]
-
+        
     if len(qpus) != 0:
         logger.debug(f"{len(qpus)} QPU objects were created.")
         return qpus
     else:
         logger.warning(f"No QPUs where found with the characteristics provided: "
-                       f"co_located={co_located}, family_name={family}.")
+                       f"co_located={co_located}, family={family}.")
         return None
 
 
@@ -333,22 +310,19 @@ def qraise(n, t, *,
            classical_comm = False, 
            quantum_comm = False,  
            simulator = None, 
-           backend = None, 
-           noise_properties_path = None, 
-           no_thermal_relaxation = False,
-           no_readout_error = False,
-           no_gate_error = False,
-           fakeqmio = False, 
+           backend = None,
+           infrastructure = None, 
            family = None, 
            co_located = True, 
            cores_per_qpu = None, 
            mem_per_qpu = None, 
            n_nodes = None, 
            node_list = None, 
-           qpus_per_node= None,
-           partition=None,
-           gpu=False,
-           qmio=False
+           qpus_per_node = None,
+           partition = None,
+           gpu = False,
+           gpu_name = None,
+           qmio = False
         ) -> str:
     """
     Raises vQPUs and returns the family name associated them. This function raises 
@@ -360,44 +334,31 @@ def qraise(n, t, *,
                  'D-HH:MM:SS'.
         classical_comm (bool): if ``True``, vQPUs will allow classical communications.
         quantum_comm (bool): if ``True``, vQPUs will allow quantum communications.
-        simulator (str): name of the desired simulator to use. Default is `Aer 
+        simulator (str): name of the desired simulator to use. Default is `Aer
                          <https://github.com/Qiskit/qiskit-aer>`_.
-        backend (str): path to a file containing the backend information.
-        noise_properties_path (str): Path to the noise properties json file, only supported for 
-                                simulator Aer. Default: None
-        no_thermal_relaxation (bool): if ``True``, deactivate thermal relaxation in a noisy backend. Default: ``false``
-        no_readout_error (bool): if ``True``, deactivate readout error in a noisy backend. Default: ``false``
-        no_gate_error (bool): if ``True``, deactivate gate error in a noisy backend. Default: ``false``
-        fakeqmio (bool): ``True`` for raising `n` vQPUs with FakeQmio backend. Only available 
-                         at CESGA.
+        backend (str): path to a backend configuration file. Used, among others, to deploy noisy
+                       vQPUs (the backend file references the noise properties to emulate).
         family (str): name to identify the group of vQPUs raised.
-        co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In 
-                           `hpc` mode, vQPUs can only be accessed from the node in which they 
-                           are deployed. In `co-located` mode, they can be accessed from other 
+        co_located (bool): if ``True``, `co-located` mode is set, otherwise `hpc` mode is set. In
+                           `hpc` mode, vQPUs can only be accessed from the node in which they
+                           are deployed. In `co-located` mode, they can be accessed from other
                            nodes.
-        cores_per_qpu (str): number of cores per vQPU, the total for the SLURM job will be 
-                     `n*cores_per_qpu`.
-        mem_per_qpu (str): memory to allocate for each vQPU in GB, format to use is "XXG".
+        cores_per_qpu (int): number of cores per vQPU, the total for the SLURM job will be
+                             `n*cores_per_qpu`.
+        mem_per_qpu (str): memory to allocate for each vQPU in GB (the ``G`` suffix is appended
+                           automatically).
         n_nodes (str): number of nodes for the SLURM job.
         node_list (str): list of nodes in which the vQPUs will be deployed.
         qpus_per_node (str): sets the number of vQPUs deployed on each node.
         partition (str): partition of the nodes in which the QPUs are going to be executed.
-        gpu (bool): enable execution in GPU. CUNQA must be previously compiled to support GPU execution.
-        qmio (bool): deploy QMIO, the quantum computer at CESGA, as a vQPU to interact with it.
+        gpu (bool): if ``True``, the quantum simulation runs on GPU.
+        gpu_name (str): name of the GPU to execute on.
+        qmio (bool): if ``True``, deploys the real QMIO quantum computer at CESGA, enabling hybrid
+                     DQC infrastructures.
     """
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
 
-    if noise_properties_path is not None:
-        command = command + f" --noise-properties={str(noise_properties_path)}"
-    if no_thermal_relaxation:
-        command = command + " --no-termal-relaxation"
-    if no_readout_error:
-        command = command + " --no-readout-error"
-    if no_gate_error:
-        command = command + " --no-gate-error"
-    if fakeqmio:
-        command = command + " --fakeqmio"
     if classical_comm:
         command = command + " --classical_comm"
     if quantum_comm:
@@ -405,7 +366,7 @@ def qraise(n, t, *,
     if simulator is not None:
         command = command + f" --simulator={str(simulator)}"
     if family is not None:
-        command = command + f" --family_name={str(family)}"
+        command = command + f" --family={str(family)}"
     if co_located:
         command = command + " --co-located"
     if cores_per_qpu is not None:
@@ -413,23 +374,26 @@ def qraise(n, t, *,
     if mem_per_qpu is not None:
         command = command + f" --mem-per-qpu={str(mem_per_qpu)}G"
     if n_nodes is not None:
-        command = command + f" --n_nodes={str(n_nodes)}"
+        command = command + f" --n-nodes={str(n_nodes)}"
     if node_list is not None:
-        command = command + f" --node_list={str(node_list)}"
+        command = command + f" --nodelist={str(node_list)}"
     if qpus_per_node is not None:
-        command = command + f" --qpus_per_node={str(qpus_per_node)}"
+        command = command + f" --qpus-per-node={str(qpus_per_node)}"
     if backend is not None:
         command = command + f" --backend={str(backend)}"
+    if infrastructure is not None:
+        command = command + f" --infrastructure={str(infrastructure)}"
     if partition is not None:
         command = command + f" --partition={str(partition)}"
     if gpu:
         command = command + " --gpu"
+    if gpu_name is not None:
+        command = command + f" --gpu-name={str(gpu_name)}"
     if qmio:
         command = command + " --qmio"
 
     if not os.path.exists(QPUS_FILEPATH):
-        with open(QPUS_FILEPATH, "w") as file:
-            file.write("{}")
+        write_json(QPUS_FILEPATH, "{}")
 
     print(f"Requested QPUs with command:\n\t{command}")
 
@@ -465,11 +429,7 @@ def qraise(n, t, *,
             check = True
         ).stdout.strip()
         if state == "RUNNING":
-            try:     
-                with open(QPUS_FILEPATH, "r") as file:
-                    data = json.load(file)
-            except json.JSONDecodeError:
-                continue
+            data = read_json(QPUS_FILEPATH)
             count = sum(1 for key in data if key.startswith(job_id))
             if count == n:
                 break
@@ -482,31 +442,31 @@ def qraise(n, t, *,
     return family if family is not None else str(job_id)
     
 
-def qdrop(families: Union[str, list[str]] = [], remove_logs: bool = False):
+def qdrop(*families: str, remove_logs: bool = False):
     """
-    Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as 
-    argument the vQPU family names (and it does not accept the job ID as the bash command). This is 
-    done because the Python version of the `qraise` bash command returns only the family name. 
+    Same functionality as the `qdrop` bash command, with the peculiarity that it only takes as
+    argument the vQPU family names (and it does not accept the job ID as the bash command). This is
+    done because the Python version of the `qraise` bash command returns only the family name.
 
     If no families are provided, all vQPUs deployed by the user will be dropped.
 
     Args:
         families (str): family names of the groups of vQPUs to be dropped.
+
+        remove_logs (bool): if ``True``, the ``qraise_XXXXXX`` log files of the dropped jobs are
+            also deleted. Defaults to ``False``.
     """
-    if isinstance(families, str):
-        families = [families]
 
     # Building the terminal command to drop the specified families
-    cmd = ['qdrop'] 
+    cmd = ['qdrop']
 
     # If no QPU is provided we drop all QPU slurm jobs
     if len( families ) == 0:
-        cmd.append('--all') 
+        cmd.append('--all')
     else:
-        family_str = f"--fam={families[0]}"
-        for family in families[1:]:
-            family_str += (',' + str(family))
-        cmd.append(family_str)
+        cmd.append('--family')
+        for family in families:
+            cmd.append(family)
 
     if remove_logs:
         cmd.append('--rm')

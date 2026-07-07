@@ -1,0 +1,25 @@
+include_guard(GLOBAL)
+
+function(cunqa_detect_platform)
+  set(_system_name "$ENV{LMOD_SYSTEM_NAME}")
+  if(NOT _system_name OR NOT (_system_name STREQUAL "QMIO" OR _system_name STREQUAL "FT3"))
+    set(_system_name "EXTERNAL_CLUSTER")
+  endif()
+  set(SYSTEM_NAME "${_system_name}" PARENT_SCOPE)
+endfunction()
+
+function(cunqa_configure_python_and_pybind11)
+  if(SYSTEM_NAME STREQUAL "QMIO" OR SYSTEM_NAME STREQUAL "FT3")
+    find_package(Python 3.9 COMPONENTS Interpreter Development)
+
+    set(pybind11_DIR "$ENV{EBROOTPYBIND11}/lib64/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages/pybind11/share/cmake/pybind11/")
+    find_package(pybind11 2.13 REQUIRED)
+  else()
+    find_package(Python 3.9 COMPONENTS Interpreter Development)
+    find_package(pybind11 2.7 REQUIRED)
+  endif()
+
+  set(pybind11_FOUND "${pybind11_FOUND}" PARENT_SCOPE)
+  set(Python_INCLUDE_DIRS "${Python_INCLUDE_DIRS}" PARENT_SCOPE)
+  set(Python_LIBRARIES "${Python_LIBRARIES}" PARENT_SCOPE)
+endfunction()

@@ -4,7 +4,7 @@
     <img src="https://img.shields.io/badge/os-linux-blue" alt="Python version" height="18">
   </a>
   <a>
-    <img src="https://img.shields.io/badge/python-3.9-blue.svg" alt="Python version" height="18">
+    <img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python version" height="18">
   </a>
   <a href="cesga-quantum-spain.github.io/cunqa/">
     <img src="https://img.shields.io/badge/docs-blue.svg" alt="Python version" height="18">
@@ -124,9 +124,9 @@ CUNQA has a set of dependencies, as any other platform. The versions listed belo
 ```text
 gcc             12.3.0
 qiskit          1.2.4
-CMake           3.24.0
-python          3.9 (recommended 3.11)
-pybind11        2.7 (recommended 2.12)
+CMake           3.24 (recommended 3.27.6)
+python          3.11 (3.11.9 used at CESGA)
+pybind11        2.12 (recommended 2.13.6)
 MPI             3.1
 OpenMP          4.5
 Boost           1.85.0
@@ -161,32 +161,51 @@ qiskit-aer      0.17.2 (modified version)
 To build, compile, and install CUNQA, follow the standard three-step CMake workflow:
 
 ```bash
-cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
+cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path
 cmake --build build/ --parallel $(nproc)
 cmake --install build/
 ```
 
 > [!WARNING]
-> If `CMAKE_PREFIX_INSTALL` is not provided, CUNQA will be installed in the directory pointed to by 
+> If `CMAKE_INSTALL_PREFIX` is not provided, CUNQA will be installed in the directory pointed to by 
 the `HOME` environment variable.
 
 > [!NOTE] 
-> To enable GPU execution provided by AerSimulator, add the `-DAER_GPU=TRUE` flag at build time:
+> To enable GPU execution (only supported by the Aer simulator), configure with `-DUSE_GPU=ON`. The 
+> target CUDA architecture(s) can optionally be set with `-DGPU_ARCH` (e.g. `75;80`); if omitted, it 
+> defaults to `all-major`:
 >
 > ```bash
-> cmake -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path -DAER_GPU=TRUE
+> cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH="75;80"
+> ```
+>
+> Equivalently, use the `gpu` CMake preset:
+>
+> ```bash
+> cmake --preset gpu -DCMAKE_INSTALL_PREFIX=/your/installation/path
+> cmake --build --preset gpu
+> cmake --install build/gpu
 > ```
 
 You can also use [Ninja](https://ninja-build.org/) to perform this task:
 
 ```bash
-cmake -G Ninja -B build/ -DCMAKE_PREFIX_INSTALL=/your/installation/path
+cmake -G Ninja -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path
 ninja -C build/ -j $(nproc)
 cmake --install build/
 ```
 
-Alternatively, you can use the `configure.sh` script, but only after all dependencies have been 
-resolved:
+CUNQA also ships a `CMakePresets.json` with ready-made `dev`, `release` and `gpu` configurations 
+(each building into `build/<preset>/`):
+
+```bash
+cmake --preset release -DCMAKE_INSTALL_PREFIX=/your/installation/path
+cmake --build --preset release
+cmake --install build/release
+```
+
+Alternatively, you can use the `configure.sh` script, which loads the required modules for the 
+detected CESGA system (QMIO or FT3) and then configures, builds and installs CUNQA:
 
 ```bash
 source configure.sh /your/installation/path
@@ -200,14 +219,18 @@ CUNQA is available as an Lmod module at CESGA. To use it:
 
 - In QMIO:
   ```bash
-  module load qmio/hpc gcc/12.3.0 cunqa/2.4.0-python-3.11.9-mpi
+  module load qmio/hpc gcc/12.3.0 cunqa/3.0.0-python-3.11.9-mpi
   ```
 
 - In FT3:
   ```bash
-  module load cesga/2022 gcc/system cunqa/2.4.0 # without GPUs
-  module load cesga/2022 gcc/system cunqa/2.4.0-cuda-12.8.0 # with GPUs
+  module load cesga/2022 gcc/system cunqa/3.0.0 # without GPUs
+  module load cesga/2022 gcc/system cunqa/3.0.0-cuda-12.8.0 # with GPUs
   ```
+
+> [!TIP]
+> Module names and available versions may change over time. Run `module spider cunqa` (or 
+> `ml av cunqa`) to list the exact module strings installed on your system.
 
 If your HPC center is interested in deploying it this way, the EasyBuild files used at CESGA are 
 available in the `easybuild/` folder.
@@ -258,7 +281,7 @@ Once the vQPUs are deployed, we can design and execute quantum tasks:
 import os, sys
 
 # Adding path to access CUNQA module
-sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+sys.path.append("</your/cunqa/installation/path>")
 
 # Gettting the raised QPUs
 from cunqa.qpu import get_QPUs
@@ -307,12 +330,12 @@ Here, the `qraise` and `qdrop` steps are integrated into the Python executable.
 import os, sys
 
 # Adding path to access CUNQA module
-sys.path.append(os.getenv("</your/cunqa/installation/path>"))
+sys.path.append("</your/cunqa/installation/path>")
 
 # Raising the QPUs
 from cunqa.qpu import qraise
 
-family = qraise(2, "00:10:00", simulator="Aer", co_located=True)
+family = qraise(4, "01:00:00", simulator="Aer", co_located=True)
 
 # Gettting the raised QPUs
 from cunqa.qpu import get_QPUs

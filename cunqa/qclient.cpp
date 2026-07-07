@@ -1,0 +1,48 @@
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+#include <string>
+
+#include "comm/client.hpp"
+
+#include "helpers/qasm2_to_json.hpp"
+#include "helpers/json_to_qasm2.hpp"
+#include "json.hpp"
+ 
+namespace py = pybind11;
+using namespace cunqa::comm;
+
+PYBIND11_MODULE(qclient, m) {
+
+    m.doc() = "Python module binding the client for the connection with the vQPU.";
+ 
+    py::class_<FutureWrapper<Client>>(m, "FutureWrapper")
+        .def("get", &FutureWrapper<Client>::get)
+        .def("valid", &FutureWrapper<Client>::valid);
+
+    py::class_<Client>(m, "QClient")
+ 
+        .def(py::init<>())
+
+        .def("connect", [](Client &c, const std::string& endpoint) { 
+            c.connect(endpoint); 
+        })
+ 
+        .def("send_circuit", [](Client &c, const std::string& circuit) { 
+            return FutureWrapper<Client>(c.send_circuit(circuit)); 
+        })
+
+        .def("send_parameters", [](Client &c, const std::string& parameters) { 
+            return FutureWrapper<Client>(c.send_parameters(parameters)); 
+        });
+
+    m.def("qasm2_to_json", [](const std::string& circuit_qasm) {
+        return qasm2_to_json(circuit_qasm).dump();
+    });
+    m.def("json_to_qasm2", [](const std::string& circuit_str) {
+        JSON circuit_json = JSON::parse(circuit_str);
+
+        return json_to_qasm2(circuit_json["instructions"], circuit_json["config"]);
+    });
+
+}

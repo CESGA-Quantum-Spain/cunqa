@@ -55,7 +55,7 @@
                                         "type": "string"
                                     }
                                 },
-                                "n_qubits":
+                                "num_qubits":
                                 {
                                     "description":"Number of qubits of the QPU",
                                     "type":"integer",

@@ -4,15 +4,19 @@ import json
 from typing import Any
 
 sys.path.append(os.getenv("HOME"))
-from cunqa.logger import logger
-from cunqa.qpu import Backend
+
+from cunqa.utils.constants import CUNQA_USE_QISKIT_PY
+if not CUNQA_USE_QISKIT_PY:
+    raise ImportError("Qiskit is not available: cannot use CunqaBackend")
 
 from qiskit.providers import QubitProperties, BackendV2, Options
 from qiskit_aer import AerSimulator
-from qiskit.circuit.library import Measure, UnitaryGate, Reset
+from qiskit.circuit.library import Measure, UnitaryGate
 from qiskit.transpiler import Target, InstructionProperties, TranspilerError
 from qiskit.circuit import Parameter
 
+from cunqa.qpu import Backend
+from cunqa.utils.logger import logger
 
 class CunqaBackend(BackendV2):
 
@@ -31,10 +35,10 @@ class CunqaBackend(BackendV2):
                                  name = backend["name"],
                                  description = backend["description"])
 
-                # non-ideal backend, we gather noise_properties
-                if ("noise_properties_path" in backend and backend["noise_properties_path"].strip()):
+                # non-ideal backend, we get to gather noise_properties
+                if backend["noise_model"]["noise_properties_path"] and backend["noise_model"]["noise_properties_path"].strip():
 
-                    with open(backend["noise_properties_path"], "r") as file:
+                    with open(backend["noise_model"]["noise_properties_path"], "r") as file:
                         noise_properties_json = json.load(file)
 
                     self._from_noise_properties(noise_properties_json)
@@ -55,7 +59,6 @@ class CunqaBackend(BackendV2):
         readout_errors = {}
         qubits_properties = []
         for k,q in qubits.items():
-            # TODO: check if key is the correct format q[i]
             qubits_properties.append(
                 QubitProperties(
                     t1=q["T1 (s)"],
@@ -81,12 +84,12 @@ class CunqaBackend(BackendV2):
         target.add_instruction(Measure(),readout_errors)
 
         logger.debug(f"Readout errors added for {len(readout_errors)} qubits.")
-        
+
 
         # loading single-qubit-gate errors
         single_qubit_gates = {}
 
-        for qubit, gates_dict in noise_properties_json["Q1Gates"].items():
+        for qubit,gates_dict in noise_properties_json["Q1Gates"].items():
             for gate in gates_dict.keys():
                 try:
                     single_qubit_gates[gate]=(_get_gate(gate),{})
@@ -195,42 +198,32 @@ class CunqaBackend(BackendV2):
 
     def _from_backend_json(self, backend_json):
         
-        if backend_json["name"] in ["SimpleBackend", "CCBackend", "QCBackend"]:
+        if backend_json["name"] in ["NCBackend", "CCBackend", "QCBackend"]:
 
             target =  AerSimulator().target
         
         else:
 
-            target = Target(num_qubits = backend_json["n_qubits"])
+            target = Target(num_qubits = backend_json["num_qubits"])
 
             if len(backend_json["coupling_map"]) == 0:
                 coupling_map = []
-                for i in range(backend_json["n_qubits"]):
-                    for j in range(backend_json["n_qubits"]):
+                for i in range(backend_json["num_qubits"]):
+                    for j in range(backend_json["num_qubits"]):
                         if i != j:
                             coupling_map.append([i,j])
                         
-                        for k in range(backend_json["n_qubits"]):
+                        for k in range(backend_json["num_qubits"]):
                             if k != j and k != i:
                                 coupling_map.append([i,j,k])
             else:
                 coupling_map = backend_json["coupling_map"]
 
-            target.add_instruction(Measure(), { (q,): None for q in range(backend_json["n_qubits"]) })
+            target.add_instruction(Measure(), { (q,): None for q in range(backend_json["num_qubits"]) })
 
             for gate in backend_json["basis_gates"]:
 
                 if gate == "measure":
-                    continue
-
-                elif gate == "reset":
-                    
-                    reset_obj = Reset()
-                    reset_inst_map = {
-                        (q,): InstructionProperties(duration=None, error=0.0) 
-                        for q in range(backend_json["n_qubits"])
-                    }
-                    target.add_instruction(reset_obj, reset_inst_map)
                     continue
 
                 elif gate == "unitary":
@@ -246,7 +239,7 @@ class CunqaBackend(BackendV2):
                                     if len(couple) == gate_object.num_qubits}
 
                     else:
-                        inst_map = { (q,): None for q in range(backend_json["n_qubits"]) }
+                        inst_map = { (q,): None for q in range(backend_json["num_qubits"]) }
 
                     target.add_instruction(gate_object, inst_map)
 
@@ -267,8 +260,8 @@ class CunqaBackend(BackendV2):
     
     @property
     def coupling_map_list(self):
-        return list(self._target.build_coupling_map())
-
+        return list(self.coupling_map)
+    
     @property
     def basis_gates(self):
         return [gate for gate in self.target._gate_map.keys() if gate != "measure"]
@@ -311,7 +304,7 @@ def _get_gate(name: str):
         "id": IGate, "x": XGate, "y": YGate, "z": ZGate, "h": HGate, "s": SGate, "sdg": SdgGate,
         "sx": SXGate, "sxdg": SXdgGate, "t": TGate, "tdg": TdgGate, "swap": SwapGate, "cx": CXGate,
         "cy":  CYGate, "cz": CZGate, "csx": CSXGate, "ccx": CCXGate, "ccz": CCZGate, 
-        "cswap": CSwapGate, "ecr":ECRGate, "reset": Reset
+        "cswap": CSwapGate, "ecr":ECRGate
     }
 
     param_gate_map = {

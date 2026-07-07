@@ -2,17 +2,9 @@ from __future__ import annotations
 from functools import singledispatch
 import copy
 
-from cunqa.constants import CUNQA_USE_QISKIT_PY
 from cunqa.circuit import CunqaCircuit
 from cunqa.utils import generate_id
-from cunqa.logger import logger
-
-SUPPORTED_QISKIT_OPERATIONS = {
-    'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 
-    'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 
-    'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 
-    'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset', 'save_state', 'set_statevector'
-}
+from cunqa.utils.logger import logger
 
 @singledispatch
 def to_ir(circuit: object) -> dict:
@@ -33,12 +25,21 @@ def _(c: dict) -> dict:
     logger.warning("Circuit is already in IR format, returning it as is.")
     return c
 
+from cunqa.utils.constants import CUNQA_USE_QISKIT_PY
 
 if CUNQA_USE_QISKIT_PY:
-
+    
+    SUPPORTED_QISKIT_OPERATIONS = {
+        'unitary','ryy', 'rz', 'z', 'p', 'rxx', 'rx', 'cx', 'id', 'x', 'sxdg', 'u1', 
+        'ccy', 'rzz', 'rzx', 'ry', 's', 'cu', 'crz', 'ecr', 't', 'ccx', 'y', 'cswap', 
+        'r', 'sdg', 'csx', 'crx', 'ccz', 'u3', 'u2', 'u', 'cp', 'tdg', 'sx', 'cu1', 
+        'swap', 'cy', 'cry', 'cz','h', 'cu3', 'measure', 'if_else', 'barrier', 'reset', 
+        'save_state', 'set_statevector'
+    }
+    
     from qiskit import QuantumCircuit
     from qiskit.circuit import Parameter
-
+    
     @to_ir.register
     def _(c: QuantumCircuit) -> dict:
         """
@@ -67,12 +68,11 @@ if CUNQA_USE_QISKIT_PY:
             "is_dynamic": False,
             "instructions":[],
             "sending_to":[],
-            "num_qubits":sum([q.size for q in c.qregs]),
+            "num_qubits":[sum([q.size for q in c.qregs]),0],
             "num_clbits": sum([c.size for c in c.cregs]),
             "quantum_registers": quantum_registers,
             "classical_registers": classical_registers, 
-            "params":[],
-            "component_comms": {}
+            "params":[]
         }
 
         for instruction in c.data:
@@ -83,41 +83,34 @@ if CUNQA_USE_QISKIT_PY:
             qubit = [q._index for q in instruction.qubits]
             
             clreg = [r._register.name for r in instruction.clbits]
-            bit = [b._index for b in instruction.clbits]
+            clbit = [b._index for b in instruction.clbits]
 
             if instruction.operation.name == "barrier":
                 pass
 
             elif instruction.operation.name == "measure":
+                qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+                if (len(qubits) == 1):
+                    qubits = qubits[0]
+                clbits = [classical_registers[k][c] for k,c in zip(clreg, clbit)]
+                if (len(clbits) == 1):
+                    clbits = clbits[0]
                 json_data["instructions"].append({
                     "name":instruction.operation.name,
-                    "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                    "clbits":[classical_registers[k][b] for k,b in zip(clreg, bit)]
+                    "qubits": qubits,
+                    "clbits": clbits,
+                    "save": True
                 })
 
             elif instruction.operation.name == "unitary":
+                qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+                if (len(qubits) == 1):
+                    qubits = qubits[0]
                 json_data["instructions"].append({
                     "name":instruction.operation.name, 
-                    "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
+                    "qubits": qubits,
                     "params":[[list(map(lambda z: [z.real, z.imag], row)) 
                             for row in instruction.operation.params[0].tolist()]]
-                })
-
-            elif instruction.operation.name == "save_state":
-                json_data["instructions"].append({
-                    "name":instruction.operation.name, 
-                    "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                    "snapshot_type": instruction.operation._subtype,
-                    "label": instruction.operation.label
-                })
-            elif instruction.operation.name == "set_statevector":
-                json_data["instructions"].append({
-                "name":instruction.operation.name,
-                "qubits":list(range(sum([q.size for q in c.qregs]))),
-                "params": [
-                    list(map(lambda z: [z.real, z.imag],
-                    instruction.operation.params[0].tolist()))
-                    ]
                 })
 
             elif instruction.operation.name == "if_else":
@@ -132,9 +125,8 @@ if CUNQA_USE_QISKIT_PY:
                         if sub_circuit is not None
                     ][0]
 
-
-                if (condition := instruction.condition[1]) not in [0, 1]:
-                    raise ValueError("Only 0 or 1 are accepted as conditions for classically controlled "
+                if instruction.condition[1] not in [1]:
+                    raise ValueError("Only 1 is accepted as condition for classicaly controlled "
                                     "operations for the current version.")
                 
                 for re in c.qregs:
@@ -144,24 +136,46 @@ if CUNQA_USE_QISKIT_PY:
 
                 cc_instruction = {
                     "name": "cif",
-                    "clbits": [classical_registers[k][b] for k,b in zip(clreg, bit)],
-                    "instructions": sub_instructions,
-                    "condition": condition
+                    "clbits": [classical_registers[k][b] for k,b in zip(clreg, clbit)],
+                    "instructions": sub_instructions
                     }
                 
                 json_data["instructions"].append(cc_instruction)
+                
+            elif instruction.operation.name == "save_state":
+                
+                json_data["instructions"].append({
+                    "name": instruction.operation.name,
+                    "qubits": [quantum_registers[k][q] for k, q in zip(qreg, qubit)],
+                    "snapshot_type": instruction.operation._subtype,
+                    "label": instruction.operation.label
+                })
 
+            elif instruction.operation.name == "set_statevector":
+                json_data["instructions"].append({
+                    "name": instruction.operation.name,
+                    "qubits": list(range(sum([q.size for q in c.qregs]))),
+                    "params": [
+                        list(map(lambda z: [z.real, z.imag],
+                        instruction.operation.params[0].tolist()))
+                    ]
+                })
+            
             else:
 
                 instruction_params = [
                     str(param) if (isinstance(param, Parameter) or isinstance(param, Parameter)) else param 
                     for param in instruction.operation.params
                 ]
-            
-                instr = {"name":instruction.operation.name, 
-                        "qubits":[quantum_registers[k][q] for k,q in zip(qreg, qubit)],
-                        "params":instruction_params
-                        }
+
+                qubits = [quantum_registers[k][q] for k,q in zip(qreg, qubit)]
+                if (len(qubits) == 1):
+                    qubits = qubits[0]
+                instr = {
+                    "name":instruction.operation.name, 
+                    "qubits": qubits,
+                    "params":instruction_params
+                }
                 
                 if instruction.operation.condition != None:
 

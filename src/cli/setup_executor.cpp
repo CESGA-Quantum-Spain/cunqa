@@ -5,20 +5,11 @@
 #include <string>
 #include <sstream>
 
-#include "qpu.hpp"
-#include "backends/simulators/CUNQA/cunqa_executor.hpp"
-#include "backends/simulators/AER/aer_executor.hpp"
-#include "backends/simulators/Munich/munich_executor.hpp"
-#include "backends/simulators/Maestro/maestro_executor.hpp"
-#include "backends/simulators/Qulacs/qulacs_executor.hpp"
-#include "backends/simulators/Qsim/qsim_executor.hpp"
-#include "backends/simulators/QuEST/quest_executor.hpp"
+#include "sim/backends/quantum_comm/qc_executor.hpp"
+#include "sim/simulators/simulator_factory.hpp"
 
-#include "utils/json.hpp"
-#include "utils/helpers/murmur_hash.hpp"
 #include "logger.hpp"
 
-using namespace std::string_literals;
 using namespace cunqa::sim;
 
 int main(int argc, char *argv[])
@@ -33,59 +24,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    switch(murmur::hash(sim_arg)) {
-        case murmur::hash("Aer"): 
-        {
-            LOGGER_DEBUG("Raising executor with Aer.");
-            AerExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Munich"):
-        {
-            LOGGER_DEBUG("Raising executor with Munich.");
-            MunichExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Cunqa"):
-        {
-            LOGGER_DEBUG("Raising executor with Cunqa.");
-            CunqaExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Maestro"):
-        {
-            LOGGER_DEBUG("Raising executor with Maestro.");
-            MaestroExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Qulacs"):
-        {
-            LOGGER_DEBUG("Raising executor with Qulacs.");
-            QulacsExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Qsim"):
-        {
-            LOGGER_DEBUG("Raising executor with Qsim.");
-            QsimExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        case murmur::hash("Quest"):
-        {
-            LOGGER_DEBUG("Raising executor with QuEST.");
-            QuestExecutor executor(n_qpus);
-            executor.run();
-            break;
-        }
-        default:
-            LOGGER_ERROR("Not a supported simulator: {}.", sim_arg);
-            return EXIT_FAILURE;
-    }     
+    QCExecutor executor(make_simulator(sim_arg), n_qpus);
+    executor.run();
+    
     return EXIT_SUCCESS;
 }

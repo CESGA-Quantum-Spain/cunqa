@@ -193,7 +193,7 @@ def test_add_instruction_complex_expression():
     assert len(circuit.params) == 1
     assert isinstance(instr["params"][0], Param)
 
-from cunqa.circuit.core import CunqaCircuit, QuantumControlContext
+from cunqa.circuit.core import CunqaCircuit
 import cunqa.circuit.core as circuit_mod
 
 def test_init_generates_id_and_adds_default_q_register(monkeypatch):
@@ -202,8 +202,9 @@ def test_init_generates_id_and_adds_default_q_register(monkeypatch):
     circuit = CunqaCircuit(2)
 
     assert circuit.id == "CunqaCircuit_ABC"
-    assert circuit.num_qubits == 2
-    assert circuit.quantum_regs["q0"] == [0, 1]
+    # num_qubits is now a [data_qubits, comm_qubits] pair.
+    assert circuit.num_qubits == [2, 0]
+    assert circuit.data_regs["q0"] == [0, 1]
 
 
 def test_init_with_num_clbits_adds_default_classical_register(monkeypatch):
@@ -235,9 +236,9 @@ def test_info_property(monkeypatch):
     info = circuit.info
     assert info["id"] == circuit.id
     assert info["instructions"] == circuit.instructions
-    assert info["num_qubits"] == 2
+    assert info["num_qubits"] == [2, 0]
     assert info["num_clbits"] == 1
-    assert info["quantum_registers"] == circuit.quantum_regs
+    assert info["quantum_registers"] == circuit.data_regs
     assert info["classical_registers"] == circuit.classical_regs
     assert info["is_dynamic"] == circuit.is_dynamic
     assert info["sending_to"] == list(circuit.sending_to)
@@ -249,7 +250,7 @@ def test_add_q_register_num_qubits_not_positive(monkeypatch):
 
     circuit = CunqaCircuit(1)
     with pytest.raises(ValueError):
-        circuit.add_q_register("qX", 0)
+        circuit.add_data_register("qX", 0)
 
 
 def test_add_q_register_name_in_use(monkeypatch):
@@ -258,11 +259,11 @@ def test_add_q_register_name_in_use(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "QREG2")
 
     circuit = CunqaCircuit(1)  # creates "q0"
-    new_name = circuit.add_q_register("q0", 1)
+    new_name = circuit.add_data_register("q0", 1)
 
     assert new_name == "q0_0"
-    assert circuit.num_qubits == 2
-    assert "q0_0" in circuit.quantum_regs
+    assert circuit.num_qubits == [2, 0]
+    assert "q0_0" in circuit.data_regs
     logger_mock.warning.assert_called_once()
 
 
@@ -287,28 +288,28 @@ def test_add_cl_register_name_in_use(monkeypatch):
     assert "c0_0" in circuit.classical_regs
     logger_mock.warning.assert_called_once()
 
+# Single-qubit gates store the qubit index as a scalar. `reset` is the exception and keeps a list.
 ONEQUBIT_NOPARAM = [
-    ("i",       (0,), {"name": "id",    "qubits": [0]}),
-    ("x",       (0,), {"name": "x",     "qubits": [0]}),
-    ("y",       (0,), {"name": "y",     "qubits": [0]}),
-    ("z",       (0,), {"name": "z",     "qubits": [0]}),
-    ("h",       (0,), {"name": "h",     "qubits": [0]}),
-    ("s",       (0,), {"name": "s",     "qubits": [0]}),
-    ("sdg",     (0,), {"name": "sdg",   "qubits": [0]}),
-    ("sx",      (0,), {"name": "sx",    "qubits": [0]}),
-    ("sxdg",    (0,), {"name": "sxdg",  "qubits": [0]}),
-    ("sy",      (0,), {"name": "sy",    "qubits": [0]}),
-    ("sydg",    (0,), {"name": "sydg",  "qubits": [0]}),
-    ("sz",      (0,), {"name": "sz",    "qubits": [0]}),
-    ("szdg",    (0,), {"name": "szdg",  "qubits": [0]}),
-    ("t",       (0,), {"name": "t",     "qubits": [0]}),
-    ("tdg",     (0,), {"name": "tdg",   "qubits": [0]}),
-    ("p0",      (0,), {"name": "p0",    "qubits": [0]}),
-    ("p1",      (0,), {"name": "p1",    "qubits": [0]}),
-    ("v",       (0,), {"name": "v",     "qubits": [0]}),
-    ("vdg",     (0,), {"name": "vdg",   "qubits": [0]}),
-    ("k",       (0,), {"name": "k",     "qubits": [0]}),
-    ("hz2",     (0,), {"name": "hz2",   "qubits": [0]}),
+    ("i",       (0,), {"name": "id",    "qubits": 0}),
+    ("x",       (0,), {"name": "x",     "qubits": 0}),
+    ("y",       (0,), {"name": "y",     "qubits": 0}),
+    ("z",       (0,), {"name": "z",     "qubits": 0}),
+    ("h",       (0,), {"name": "h",     "qubits": 0}),
+    ("s",       (0,), {"name": "s",     "qubits": 0}),
+    ("sdg",     (0,), {"name": "sdg",   "qubits": 0}),
+    ("sx",      (0,), {"name": "sx",    "qubits": 0}),
+    ("sxdg",    (0,), {"name": "sxdg",  "qubits": 0}),
+    ("sy",      (0,), {"name": "sy",    "qubits": 0}),
+    ("sydg",    (0,), {"name": "sydg",  "qubits": 0}),
+    ("sz",      (0,), {"name": "sz",    "qubits": 0}),
+    ("szdg",    (0,), {"name": "szdg",  "qubits": 0}),
+    ("t",       (0,), {"name": "t",     "qubits": 0}),
+    ("tdg",     (0,), {"name": "tdg",   "qubits": 0}),
+    ("p0",      (0,), {"name": "p0",    "qubits": 0}),
+    ("p1",      (0,), {"name": "p1",    "qubits": 0}),
+    ("v",       (0,), {"name": "v",     "qubits": 0}),
+    ("vdg",     (0,), {"name": "vdg",   "qubits": 0}),
+    ("k",       (0,), {"name": "k",     "qubits": 0}),
     ("reset",   (0,), {"name": "reset", "qubits": [0]})
 ]
 @pytest.mark.parametrize("method, args, expected", ONEQUBIT_NOPARAM)
@@ -319,7 +320,6 @@ def test_onequbit_noparam_gates(method, args, expected):
     assert circuit.instructions[-1] == expected
 
 TWOQUBIT_NOPARAM = [
-    ("id2",       (0,1,), {"name": "id2",       "qubits": [0,1]}),
     ("swap",      (0,1,), {"name": "swap",      "qubits": [0,1]}),
     ("iswap",     (0,1,), {"name": "iswap",     "qubits": [0,1]}),
     ("ecr",       (0,1,), {"name": "ecr",       "qubits": [0,1]}),
@@ -344,6 +344,7 @@ def test_twoqubit_noparam_gates(method, args, expected):
 THREEQUBIT_NOPARAM = [
     ("ccx",   (0,1,2), {"name": "ccx",   "qubits": [0,1,2]}),
     ("ccz",   (0,1,2), {"name": "ccz",   "qubits": [0,1,2]}),
+    ("cecr",  (0,1,2), {"name": "cecr",  "qubits": [0,1,2]}),
     ("cswap", (0,1,2), {"name": "cswap", "qubits": [0,1,2]}),
 ]
 @pytest.mark.parametrize("method, args, expected", THREEQUBIT_NOPARAM)
@@ -353,19 +354,29 @@ def test_threequbit_noparam_gates(method, args, expected):
 
     assert circuit.instructions[-1] == expected
 
+# this gate is added already decomposed
+def test_ccy():
+    circuit = CunqaCircuit(3)
+    circuit.ccy(0,1,2)
+
+    assert circuit.instructions[-1] == {"name":"rz",   "qubits":2, "params":[np.pi/2]}
+    assert circuit.instructions[-2] == {"name": "ccx", "qubits": [0,1,2]}
+    assert circuit.instructions[-3] == {"name":"rz",   "qubits":2, "params":[-np.pi/2]}
+
+# Single-qubit parametric gates use a scalar qubit index. `p` is the exception and keeps a list.
 ONEQUBIT_PARAM = [
-    ("u1",      (0.1,0,),         {"name": "u1",      "qubits": [0], "params": [0.1]}),
-    ("u2",      (0.1,0.2,0,),     {"name": "u2",      "qubits": [0], "params": [0.1,0.2]}),
-    ("u3",      (0.1,0.2,0.3,0,), {"name": "u3",      "qubits": [0], "params": [0.1,0.2,0.3]}),
-    ("u",       (0.1,0.2,0.3,0,), {"name": "u",       "qubits": [0], "params": [0.1,0.2,0.3]}),
+    ("u1",      (0.1,0,),         {"name": "u1",      "qubits": 0,   "params": [0.1]}),
+    ("u2",      (0.1,0.2,0,),     {"name": "u2",      "qubits": 0,   "params": [0.1,0.2]}),
+    ("u3",      (0.1,0.2,0.3,0,), {"name": "u3",      "qubits": 0,   "params": [0.1,0.2,0.3]}),
+    ("u",       (0.1,0.2,0.3,0,), {"name": "u",       "qubits": 0,   "params": [0.1,0.2,0.3]}),
     ("p",       (0.1,0,),         {"name": "p",       "qubits": [0], "params": [0.1]}),
-    ("r",       (0.1,0.2,0,),     {"name": "r",       "qubits": [0], "params": [0.1,0.2]}),
-    ("rx",      (0.1,0,),         {"name": "rx",      "qubits": [0], "params": [0.1]}),
-    ("ry",      (0.1,0,),         {"name": "ry",      "qubits": [0], "params": [0.1]}),
-    ("rz",      (0.1,0,),         {"name": "rz",      "qubits": [0], "params": [0.1]}), 
-    ("rotinvx", (0.1,0,),         {"name": "rotinvx", "qubits": [0], "params": [0.1]}),
-    ("rotinvy", (0.1,0,),         {"name": "rotinvy", "qubits": [0], "params": [0.1]}),
-    ("rotinvz", (0.1,0,),         {"name": "rotinvz", "qubits": [0], "params": [0.1]}),
+    ("r",       (0.1,0.2,0,),     {"name": "r",       "qubits": 0,   "params": [0.1,0.2]}),
+    ("rx",      (0.1,0,),         {"name": "rx",      "qubits": 0,   "params": [0.1]}),
+    ("ry",      (0.1,0,),         {"name": "ry",      "qubits": 0,   "params": [0.1]}),
+    ("rz",      (0.1,0,),         {"name": "rz",      "qubits": 0,   "params": [0.1]}),
+    ("rotinvx", (0.1,0,),         {"name": "rotinvx", "qubits": 0,   "params": [0.1]}),
+    ("rotinvy", (0.1,0,),         {"name": "rotinvy", "qubits": 0,   "params": [0.1]}),
+    ("rotinvz", (0.1,0,),         {"name": "rotinvz", "qubits": 0,   "params": [0.1]}),
 ]
 @pytest.mark.parametrize("method, args, expected", ONEQUBIT_PARAM)
 def test_onequbit_param_gates(method, args, expected):
@@ -378,9 +389,7 @@ TWOQUBIT_PARAM = [
     ("rxx",   (0.1,0,1,),             {"name": "rxx",   "qubits": [0,1], "params": [0.1]}),
     ("ryy",   (0.1,0,1,),             {"name": "ryy",   "qubits": [0,1], "params": [0.1]}),
     ("rzz",   (0.1,0,1,),             {"name": "rzz",   "qubits": [0,1], "params": [0.1]}),
-    ("rxy",   (0.1,0,1,),             {"name": "rxy",   "qubits": [0,1], "params": [0.1]}),
     ("rzx",   (0.1,0,1,),             {"name": "rzx",   "qubits": [0,1], "params": [0.1]}),
-    ("cr",    (0.1,0,1,),             {"name": "cr",    "qubits": [0,1], "params": [0.1]}),
     ("crx",   (0.1,0,1,),             {"name": "crx",   "qubits": [0,1], "params": [0.1]}),
     ("cry",   (0.1,0,1,),             {"name": "cry",   "qubits": [0,1], "params": [0.1]}),
     ("crz",   (0.1,0,1,),             {"name": "crz",   "qubits": [0,1], "params": [0.1]}),
@@ -392,7 +401,6 @@ TWOQUBIT_PARAM = [
     ("cu",    (0.1,0.2,0.3,0.4,0,1,), {"name": "cu",    "qubits": [0,1], "params": [0.1,0.2,0.3,0.4]}),
     ("xxmyy", (0.1,0.2,0,1,),         {"name": "xxmyy", "qubits": [0,1], "params": [0.1,0.2]}),
     ("xxpyy", (0.1,0.2,0,1,),         {"name": "xxpyy", "qubits": [0,1], "params": [0.1,0.2]}),
-    ("fs",    (0.1,0.2,0,1,),         {"name": "fs",    "qubits": [0,1], "params": [0.1,0.2]}),
 ]
 @pytest.mark.parametrize("method, args, expected", TWOQUBIT_PARAM)
 def test_twoqubit_param_gates(method, args, expected):
@@ -428,27 +436,17 @@ SPECIAL_GATES = [
         {
             "name": "unitary",
             "qubits": [0],
-            "matrix": [[
+            "matrix": [
                 [[1.0, 0.0], [0.0, 0.0]],
                 [[0.0, 0.0], [1.0, 0.0]],
-            ]],
-        },
-    ),
-    ("cunitary", ([[1.0 + 0.0j, 0.0 + 0.0j], [0.0 + 0.0j, 1.0 + 0.0j]], 0, 1),
-        {
-            "name": "cunitary",
-            "qubits": [0, 1],
-            "matrix": [[
-                [[1.0, 0.0], [0.0, 0.0]],
-                [[0.0, 0.0], [1.0, 0.0]],
-            ]],
+            ],
         },
     ),
     ("randomunitary",              (0,1,),                   {"name": "randomunitary",             "qubits": [0,1]}),
-    ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[[1.0,1.0],[0.0,-1.0]]]}),
-    ("fusedswap",                  (3,0,1),                  {"name": "fusedswap",                 "qubits": [0,1],"block_size":[3]}),
+    ("diagonal",                   ([1.0+1.0j,0.0-1.0j],0,), {"name": "diagonal",                  "qubits": [0],  "matrix":[[1.0,1.0],[0.0,-1.0]]}),
+    ("fusedswap",                  (3,0,1),                  {"name": "fusedswap",                 "qubits": [0,1],"block_size":3}),
     ("multipauli",                 ([1,2,3],0,),             {"name": "multipauli",                "qubits": [0],  "pauli_id_list":[1,2,3]}),
-    ("multipaulirotation",         (1.0,[1,2,3],0,),         {"name": "multipaulirotation",        "qubits": [0],  "params":[1.0], "pauli_id_list":[1,2,3]}),
+    ("multipaulirotation",         (1.0,[1,2,3],0,),         {"name": "multipaulirotation",        "qubits": [0],  "param":1.0, "pauli_id_list":[1,2,3]}),
     ("amplitudedampingnoise",      (1.0,0,1,),               {"name": "amplitudedampingnoise",     "qubits": [0,1],"params":[1.0]}),
     ("bitflipnoise",               (1.0,0,),                 {"name": "bitflipnoise",              "qubits": [0],  "params":[1.0]}),
     ("dephasingnoise",             (1.0,0,),                 {"name": "dephasingnoise",            "qubits": [0],  "params":[1.0]}),
@@ -457,7 +455,7 @@ SPECIAL_GATES = [
     ("twoqubitdepolarizingnoise",  (1.0,0,1,),               {"name": "twoqubitdepolarizingnoise", "qubits": [0,1],"params":[1.0]}),
 ]
 @pytest.mark.parametrize("method, args, expected", SPECIAL_GATES)
-def test_twoqubit_param_gates(method, args, expected):
+def test_special_gates(method, args, expected):
     circuit = CunqaCircuit(2)
     getattr(circuit, method)(*args)
 
@@ -476,7 +474,8 @@ def test_unitary_accepts_numpy(monkeypatch):
     assert instr["name"] == "unitary"
     assert instr["qubits"] == [0]
 
-    encoded = instr["matrix"][0]
+    # The matrix is stored as a list of rows, each entry encoded as [real, imag].
+    encoded = instr["matrix"]
     assert encoded == [
         [[1.0, 0.0], [0.0, 0.0]],
         [[0.0, 0.0], [1.0, 0.0]],
@@ -498,8 +497,8 @@ def test_measure(monkeypatch):
     circuit.measure(0, 0)
     circuit.measure([1], [1])
 
-    assert circuit.instructions[-2] == {"name": "measure", "qubits": [0], "clbits": [0]}
-    assert circuit.instructions[-1] == {"name": "measure", "qubits": [1], "clbits": [1]}
+    assert circuit.instructions[-2] == {"name": "measure", "qubits": 0, "clbits": 0, "save": True}
+    assert circuit.instructions[-1] == {"name": "measure", "qubits": 1, "clbits": 1, "save": True}
 
 def test_measure_all(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "MEASALL")
@@ -514,31 +513,43 @@ def test_measure_all(monkeypatch):
     assert len(measure_instrs) == 2
 
 
-def test_cif_context_adds_cif_instruction(monkeypatch):
+def test_cif_opens_classically_controlled_block(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "CIF")
 
     circuit = CunqaCircuit(1, num_clbits=1)
 
-    with circuit.cif(0) as sub:
-        sub.x(0)
-        sub.h(0)
+    # cif/endcif are plain methods that bracket the conditioned instructions.
+    circuit.cif(0)
+    circuit.x(0)
+    circuit.h(0)
+    circuit.endcif()
 
     assert circuit.is_dynamic is True
-    cif_instr = circuit.instructions[-1]
-    assert cif_instr["name"] == "cif"
-    assert cif_instr["clbits"] == [0]
-    assert [i["name"] for i in cif_instr["instructions"]] == ["x", "h"]
+    assert circuit.instructions[0] == {
+        "name": "cif", "clbits": [0], "condition": 1, "operation": "and"
+    }
+    assert [i["name"] for i in circuit.instructions] == ["cif", "x", "h", "endcif"]
+    assert circuit.instructions[-1] == {"name": "endcif", "clbits": [0]}
 
 
-def test_cif_context_rejects_remote_ops(monkeypatch):
-    
+def test_cif_with_condition_and_operation(monkeypatch):
+    monkeypatch.setattr(circuit_mod, "generate_id", lambda: "CIFOP")
+
+    circuit = CunqaCircuit(2, num_clbits=2)
+    circuit.cif([0, 1], condition=0, operation="xor")
+
+    assert circuit.instructions[-1] == {
+        "name": "cif", "clbits": [0, 1], "condition": 0, "operation": "xor"
+    }
+
+
+def test_cif_rejects_unsupported_operation(monkeypatch):
     monkeypatch.setattr(circuit_mod, "generate_id", lambda: "CIFBAD")
 
     circuit = CunqaCircuit(1, num_clbits=1)
 
-    with pytest.raises(RuntimeError):
-        with circuit.cif(0) as sub:
-            sub.qsend(0, "B")
+    with pytest.raises(ValueError):
+        circuit.cif(0, operation="not_supported")
 
 B_CIRCUIT = [
     (lambda: CunqaCircuit(1, id="B"), "B"),
@@ -570,56 +581,48 @@ def test_recv(target_factory, expected_id):
     assert c1.instructions[-1] == {"name": "recv", "clbits": [0, 1], "circuits": [expected_id]}
     assert c1.instructions[-2] == {"name": "recv", "clbits": [0], "circuits": [expected_id]}
 
-@pytest.mark.parametrize("target_factory, expected_id", B_CIRCUIT)
-def test_qsend(target_factory, expected_id):
-    c1 = CunqaCircuit(1, num_clbits=2, id="A")
-    target = target_factory()
-
-    c1.qsend(0, target)
-
-    assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "qsend", "qubits": [0], "circuits": [expected_id]}
+# ------------------------
+# gen_ent (quantum communication primitive)
+# ------------------------
 
 @pytest.mark.parametrize("target_factory, expected_id", B_CIRCUIT)
-def test_qrecv(target_factory, expected_id):
-    c1 = CunqaCircuit(1, num_clbits=2, id="A")
+def test_gen_ent_with_single_target(target_factory, expected_id):
+    # The circuit needs a comm qubit: (num_data, num_comm).
+    c1 = CunqaCircuit((1, 1), id="A")
     target = target_factory()
 
-    c1.qrecv(0, target)
+    c1.gen_ent(1, target, tag="bell")
 
     assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "qrecv", "qubits": [0], "circuits": [expected_id]}
-
-@pytest.mark.parametrize("target_factory, expected_id", B_CIRCUIT)
-def test_expose(target_factory, expected_id):
-    c1 = CunqaCircuit(1, id="A")
-    target = target_factory()
-
-    ctx = c1.expose(0, target)
-
-    assert c1.is_dynamic is True
-    assert c1.instructions[-1] == {"name": "expose", "qubits": [0], "circuits": [expected_id]}
-    assert isinstance(ctx, QuantumControlContext)
+    instr = c1.instructions[-1]
+    assert instr["name"] == "gen_ent"
+    assert instr["comm_qubit"] == 1
+    assert instr["tag"] == "bell"
+    # The current circuit id is always part of the participants.
+    assert set(instr["circuits"]) == {"A", expected_id}
 
 
-def test_quantum_control_context_adds_rcontrol_to_target():
-    control = CunqaCircuit(1, id="CTRL")
-    target = CunqaCircuit(1, id="TGT")
+def test_gen_ent_with_list_of_targets():
+    c1 = CunqaCircuit((1, 1), id="A")
+    cb = CunqaCircuit((1, 1), id="B")
 
-    with control.expose(0, target) as ([rqubit], subcircuit):
-        assert rqubit == -1
-        subcircuit.x(0)
+    c1.gen_ent(1, [cb, "C"], tag="ghz")
 
-    rcontrol_instr = target.instructions[-1]
-    assert rcontrol_instr["name"] == "rcontrol"
-    assert rcontrol_instr["circuits"] == ["CTRL"]
-    assert [i["name"] for i in rcontrol_instr["instructions"]] == ["x"]
+    instr = c1.instructions[-1]
+    assert instr["name"] == "gen_ent"
+    assert set(instr["circuits"]) == {"A", "B", "C"}
 
 
-def test_quantum_control_context_rejects_remote_ops_inside_block():
-    control = CunqaCircuit(1, id="CTRL")
-    target = CunqaCircuit(1, id="TGT")
+def test_gen_ent_defaults_tag_when_missing():
+    c1 = CunqaCircuit((1, 1), id="A")
 
-    with pytest.raises(RuntimeError):
-        with control.expose(0, target) as (rqubit, subcircuit):
-            subcircuit.recv(0, "OTHER")  # forbidden by __exit__
+    c1.gen_ent(1, "B", tag=None)
+
+    assert c1.instructions[-1]["tag"] == "NO_TAG"
+
+
+def test_gen_ent_rejects_invalid_circuit_type():
+    c1 = CunqaCircuit((1, 1), id="A")
+
+    with pytest.raises(ValueError):
+        c1.gen_ent(1, [123], tag="t")

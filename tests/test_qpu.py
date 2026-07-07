@@ -131,12 +131,14 @@ def test_execute_creates_qjob_and_submits_with_var_values(monkeypatch, qpu):
 from cunqa.qpu import run
 
 def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
-    c1_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
-    c2_ir = {"id": "c2", "instructions": [{"name": "x"}], "sending_to": []}
+    c1_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": [], "num_qubits": [1, 0]}
+    c2_ir = {"id": "c2", "instructions": [{"name": "x"}], "sending_to": [], "num_qubits": [1, 0]}
     circuits = ["c1", "c2"]
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1.id, qpu2.id = 1, 2
+    qpu1.backend = {"num_qubits": [10, 10]}
+    qpu2.backend = {"num_qubits": [10, 10]}
     job1, job2 = Mock(name="Job1"), Mock(name="Job2")
     qpu1.execute.return_value, qpu2.execute.return_value = job1, job2
 
@@ -159,10 +161,11 @@ def test_run_with_list_converts_to_ir_and_executes_on_each_qpu(monkeypatch):
 
 def test_run_with_single_circuit_returns_single_qjob(monkeypatch):
     circuit = "c1"
-    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
+    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": [], "num_qubits": [1, 0]}
 
     qpu, job = Mock(name="QPU"), Mock(name="Job")
     qpu.id = 1
+    qpu.backend = {"num_qubits": [10, 10]}
     qpu.execute.return_value = job
 
     to_ir_mock = Mock(return_value=circuit_ir)
@@ -197,11 +200,13 @@ def test_run_raises_if_not_enough_qpus(monkeypatch):
     qpu.execute.assert_not_called()
 
 def test_run_warns_if_extra_qpus_and_ignores_them(monkeypatch):
-    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": []}
+    circuit_ir = {"id": "c1", "instructions": [{"name": "x"}], "sending_to": [], "num_qubits": [1, 0]}
     circuits = [circuit_ir]
 
     qpu1, qpu2 = Mock(name="QPU1"), Mock(name="QPU2")
     qpu1.id, qpu2.id = 1, 2
+    qpu1.backend = {"num_qubits": [10, 10]}
+    qpu2.backend = {"num_qubits": [10, 10]}
     job1 = Mock(name="Job1")
     qpu1.execute.return_value = job1
 
@@ -227,11 +232,13 @@ def test_run_updates_remote_instructions_sending_to_and_ids(monkeypatch):
             {"name": "REMOTE_GATE", "circuits": ["c1"]},
             {"name": "LOCAL_GATE"},
         ],
-        "sending_to": ["c1"]
+        "sending_to": ["c1"],
+        "num_qubits": [1, 0]
     }
 
     qpu = Mock(name="QPU")
     qpu.id = 10
+    qpu.backend = {"num_qubits": [10, 10]}
     job = Mock(name="Job")
     qpu.execute.return_value = job
 
@@ -258,10 +265,12 @@ def test_run_does_not_touch_instructions_without_remote_gates_but_remaps_ids(mon
         "id": "c1",
         "instructions": [original_instr],
         "sending_to": ["c1"],
+        "num_qubits": [1, 0],
     }
 
     qpu = Mock(name="QPU")
     qpu.id = 7
+    qpu.backend = {"num_qubits": [10, 10]}
     job = Mock(name="Job")
     qpu.execute.return_value = job
 
@@ -282,11 +291,13 @@ def test_run_passes_param_values_to_execute(monkeypatch):
     circuit_ir = {
         "id": "c1",
         "instructions": [],
-        "sending_to": []
+        "sending_to": [],
+        "num_qubits": [1, 0]
     }
 
     qpu = Mock(name="QPU")
     qpu.id = 42
+    qpu.backend = {"num_qubits": [10, 10]}
     job = Mock(name="QJob")
     qpu.execute.return_value = job
 
@@ -342,10 +353,9 @@ def test_qraise_builds_command_and_returns_job_id_without_family(monkeypatch):
     n, t = 1, "00:10:00"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr("builtins.open", mock_open())
-
-    load_mock = Mock(return_value={"12345-0": {}})
-    monkeypatch.setattr(qpu_mod.json, "load", load_mock)
+    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"12345-0": {}})
+    monkeypatch.setattr(qpu_mod, "write_json", Mock())
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
     run_mock.side_effect = _subprocess_run_side_effect_ok("12345")
@@ -377,10 +387,9 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     family = "my_family"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr("builtins.open", mock_open())
-
-    load_mock = Mock(return_value={"54321-0": {}, "54321-1": {}})
-    monkeypatch.setattr(qpu_mod.json, "load", load_mock)
+    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"54321-0": {}, "54321-1": {}})
+    monkeypatch.setattr(qpu_mod, "write_json", Mock())
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
     run_mock.side_effect = _subprocess_run_side_effect_ok("54321")
@@ -392,11 +401,6 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
         quantum_comm=True,
         simulator="aer_sim",
         backend="/path/to/backend.json",
-        fakeqmio=True,
-        noise_properties_path="/path/to/noise_properties.json",
-        no_thermal_relaxation=True,
-        no_readout_error=True,
-        no_gate_error=True,
         family=family,
         co_located=True,
         cores_per_qpu=8,
@@ -409,27 +413,21 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
 
     (cmd_str,), _ = run_mock.call_args_list[0]
 
-    assert "--fakeqmio" in cmd_str
-    assert "--noise-properties=/path/to/noise_properties.json" in cmd_str
-    assert "--no-termal-relaxation" in cmd_str
-    assert "--no-readout-error" in cmd_str
-    assert "--no-gate-error" in cmd_str
     assert "--classical_comm" in cmd_str
     assert "--quantum_comm" in cmd_str
     assert "--simulator=aer_sim" in cmd_str
     assert "--backend=/path/to/backend.json" in cmd_str
-    assert "--family_name=my_family" in cmd_str
+    assert "--family=my_family" in cmd_str
     assert "--co-located" in cmd_str
     assert "--cores-per-qpu=8" in cmd_str
     assert "--mem-per-qpu=16G" in cmd_str
-    assert "--n_nodes=3" in cmd_str
-    assert "--node_list=node01,node02" in cmd_str
-    assert "--qpus_per_node=2" in cmd_str
-    assert cmd_str == (f"qraise -n {2} -t {t} --noise-properties=/path/to/noise_properties.json "
-                       "--no-termal-relaxation --no-readout-error --no-gate-error --fakeqmio "
-                       f"--classical_comm --quantum_comm --simulator=aer_sim --family_name={family} "
-                       "--co-located --cores-per-qpu=8 --mem-per-qpu=16G --n_nodes=3 "
-                       "--node_list=node01,node02 --qpus_per_node=2 "
+    assert "--n-nodes=3" in cmd_str
+    assert "--nodelist=node01,node02" in cmd_str
+    assert "--qpus-per-node=2" in cmd_str
+    assert cmd_str == (f"qraise -n {2} -t {t} "
+                       f"--classical_comm --quantum_comm --simulator=aer_sim --family={family} "
+                       "--co-located --cores-per-qpu=8 --mem-per-qpu=16G --n-nodes=3 "
+                       "--nodelist=node01,node02 --qpus-per-node=2 "
                        "--backend=/path/to/backend.json --partition=partition1")
     assert result == family
 
@@ -441,11 +439,10 @@ def test_qraise_creates_qpus_file_if_not_exists(monkeypatch):
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: False)
 
-    m_open = mock_open()
-    monkeypatch.setattr("builtins.open", m_open)
-
-    load_mock = Mock(return_value={"99999-0": {}})
-    monkeypatch.setattr(qpu_mod.json, "load", load_mock)
+    write_mock = Mock()
+    monkeypatch.setattr(qpu_mod, "write_json", write_mock)
+    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"99999-0": {}})
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
     run_mock.side_effect = _subprocess_run_side_effect_ok("99999")
@@ -453,33 +450,32 @@ def test_qraise_creates_qpus_file_if_not_exists(monkeypatch):
 
     result = qraise(n, t)
 
-    # Ensure file initialisation "{}" was written
-    m_open.assert_any_call(qpu_mod.QPUS_FILEPATH, "w")
-    handle = m_open()
-    handle.write.assert_called_once_with("{}")
+    # Ensure the QPUs file was initialised with an empty json object.
+    write_mock.assert_called_once_with(qpu_mod.QPUS_FILEPATH, "{}")
 
     assert result == "99999"
 
 
-# --- JSON decode retry logic ---
+# --- Waiting until the requested QPUs are registered ---
 
-def test_qraise_retries_on_jsondecodeerror_until_valid_json(monkeypatch):
+def test_qraise_waits_until_qpus_are_registered(monkeypatch):
     n, t = 1, "00:05:00"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr("builtins.open", mock_open())
+    monkeypatch.setattr(qpu_mod, "write_json", Mock())
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
     run_mock.side_effect = _subprocess_run_side_effect_ok("77777")
     monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
 
-    # mock de json.load con primer intento que lanza JSONDecodeError y segundo que va bien
-    decode_error = qpu_mod.json.JSONDecodeError("bad json", "{}", 0)
-    load_mock = Mock(side_effect=[decode_error, {"77777-0": {}}])
-    monkeypatch.setattr(qpu_mod.json, "load", load_mock)
+    # First read shows the QPUs are not registered yet, the second one has them all.
+    read_mock = Mock(side_effect=[{}, {"77777-0": {}}])
+    monkeypatch.setattr(qpu_mod, "read_json", read_mock)
+
     result = qraise(n, t)
 
-    assert load_mock.call_count >= 2
+    assert read_mock.call_count >= 2
     assert result == "77777"
 
 
@@ -497,7 +493,7 @@ def test_qraise_raises_runtimeerror_on_subprocess_error(monkeypatch):
     )
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr("builtins.open", mock_open())
+    monkeypatch.setattr(qpu_mod, "write_json", Mock())
 
     run_mock = Mock(return_value=completed)
     monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
@@ -528,7 +524,7 @@ def test_qdrop_no_families(monkeypatch):
 
 
 def test_qdrop_single_family(monkeypatch):
-    """If one family is passed, qdrop should call: ['qdrop', '--fam=family']."""
+    """If one family is passed, qdrop should call: ['qdrop', '--fam', family]."""
     called = {}
 
     def fake_run(cmd, *args, **kwargs):
@@ -537,13 +533,13 @@ def test_qdrop_single_family(monkeypatch):
     monkeypatch.setattr(qpu_mod.subprocess, "run", fake_run)
     qdrop("famA")
 
-    assert called["cmd"] == ["qdrop", "--fam=famA"]
+    assert called["cmd"] == ["qdrop", "--family", "famA"]
 
 
 def test_qdrop_multiple_families(monkeypatch):
     """
     If multiple families are passed, qdrop should call:
-    ['qdrop', '--fam=fam1,fam2,...'] preserving order.
+    ['qdrop', '--family', fam1, fam2, ...] preserving order.
     """
     called = {}
 
@@ -551,9 +547,9 @@ def test_qdrop_multiple_families(monkeypatch):
         called["cmd"] = cmd
 
     monkeypatch.setattr(qpu_mod.subprocess, "run", fake_run)
-    qdrop(["famA", "famB", "famC"])
+    qdrop("famA", "famB", "famC")
 
-    assert called["cmd"] == ["qdrop", "--fam=famA,famB,famC"]
+    assert called["cmd"] == ["qdrop", "--family", "famA", "famB", "famC"]
 
 # ------------------------
 # get_QPUs tests
@@ -562,16 +558,10 @@ from cunqa.qpu import get_QPUs
 
 def _mock_qpus_json(monkeypatch, qpus_dict: dict):
     """
-    Make get_QPUs read QPU info from `qpus_dict` instead of a real file.
-    We:
-      - mock `open` in the module where get_QPUs is defined
-      - mock `json.load` in that same module to just return our dict
+    Make get_QPUs read QPU info from `qpus_dict` instead of a real file by mocking the
+    `read_json` helper used in the qpu module.
     """
-    monkeypatch.setattr("builtins.open", mock_open())
-    monkeypatch.setattr("os.open", lambda path, flags, mode: 123)
-    os_close_mock = Mock()
-    monkeypatch.setattr("os.close", os_close_mock)
-    monkeypatch.setattr(qpu_mod.json, "load", lambda f: qpus_dict)
+    monkeypatch.setattr(qpu_mod, "read_json", lambda f: qpus_dict)
 
 
 @pytest.fixture

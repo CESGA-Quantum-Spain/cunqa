@@ -48,9 +48,6 @@ class Param:
         evaluation and directly sets the internal value.
         """
         self._value = value
-
-    def __repr__(self):
-        return f"Param({self.expr!r}, {self._value!r})"
         
 def encoder(obj):
     if isinstance(obj, Param):

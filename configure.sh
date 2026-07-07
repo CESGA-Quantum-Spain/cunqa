@@ -2,7 +2,7 @@
 
 if [ $LMOD_SYSTEM_NAME == "QMIO" ]; then
     # Execution for QMIO
-    ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 gcccore/12.3.0 eigen/5.0.0 ninja/1.9.0 nlohmann_json/3.12.0 cython/3.0.9-python-3.11.9 pybind11/2.13.6-python-3.11.9 qiskit/1.2.4-python-3.11.9
+    ml load qmio/hpc gcc/12.3.0 hpcx-ompi flexiblas/3.3.0 boost cmake/3.27.6 gcccore/12.3.0 eigen/5.0.0 ninja/1.9.0 nlohmann_json/3.12.0 pybind11/2.13.6-python-3.11.9 qiskit/1.2.4-python-3.11.9
     conda deactivate
 elif [ $LMOD_SYSTEM_NAME == "FT3" ]; then
     # Execution for FT3 
@@ -23,9 +23,9 @@ else
 fi
 
 if [ -n "$1" ]; then
-    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1 #-DAER_GPU=TRUE
+    cmake -B build/ -DCMAKE_INSTALL_PREFIX=$1
 else
-    cmake -B build/ #-DAER_GPU=TRUE
+    cmake -B build/
 fi
 cmake --build build/ --parallel $(nproc)
 cmake --install build/

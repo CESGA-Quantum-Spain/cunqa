@@ -8,8 +8,9 @@
 #include <condition_variable>
 
 #include "comm/server.hpp"
-#include "backends/backend.hpp"
+#include "sim/backend.hpp"
 #include "utils/json.hpp"
+#include "utils/helpers/environment.hpp"
 
 using namespace std::string_literals;
 
@@ -20,20 +21,32 @@ public:
     std::unique_ptr<sim::Backend> backend;
     std::unique_ptr<comm::Server> server;
 
-    QPU(std::unique_ptr<sim::Backend> backend, const std::string& mode, 
-        const std::string& name, const std::string& family, const std::string& comm);
+    QPU(
+        std::unique_ptr<sim::Backend> backend, 
+        const std::string& mode, 
+        const std::string& name, 
+        const std::string& family
+    );
+    
     void turn_ON();
 
 private:
+    // Requests received by the I/O thread, consumed by the compute thread.
     std::queue<std::string> message_queue_;
     std::condition_variable queue_condition_;
     std::mutex queue_mutex_;
+
+    // Results produced by the compute thread, sent by the I/O thread (the only
+    // thread allowed to touch the socket).
+    std::queue<std::string> result_queue_;
+    std::mutex result_mutex_;
+
     std::string family_;
     std::string name_;
-    std::string comm_;
 
     void compute_result_();
     void recv_data_();
+    void send_ready_results_();
     
     friend void to_json(JSON& j, const QPU& obj) {
         JSON backend_json = obj.backend->to_json();
@@ -42,9 +55,8 @@ private:
             {"backend", backend_json},
             {"net", server_json},
             {"name", obj.name_},
-            {"communications", obj.comm_},
             {"family", obj.family_},
-            {"slurm_job_id", std::getenv("SLURM_JOB_ID")}
+            {"slurm_job_id", get_env_variable("SLURM_JOB_ID")}
         };
     }
 };

@@ -17,9 +17,11 @@
 #include <netpacket/packet.h>
 #include <net/if_arp.h>
 
-#include "logger.hpp"
+#include "utils/helpers/environment.hpp"
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
+
+#include "logger.hpp"
 
 using namespace cunqa;
 using namespace std::string_literals;
@@ -38,22 +40,27 @@ TO legacy_size_cast(FROM value)
 // ------------- Net getter functions -------------
 // ------------------------------------------------
 
-inline std::string get_hostname(){
+inline std::string get_hostname()
+{
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
     return hostname;
 }
 
-inline std::string get_nodename(){
-    auto nodename = std::getenv("SLURMD_NODENAME");
-    if (!nodename)
-        return "login"s;
-    return nodename;
+inline std::string get_nodename() 
+{
+    try {
+        return get_env_variable("SLURMD_NODENAME");
+    } catch (const std::exception& e) {
+        LOGGER_WARN("{}", e.what());
+    }
+    return "login";
 }
 
 // --------- Functions to get the fastest interface's IP ------------
 
-inline bool read_line(const std::string& path, std::string& out) {
+inline bool read_line(const std::string& path, std::string& out) 
+{
     std::ifstream f(path);
     if (!f.is_open()) return false;
     std::getline(f, out);
@@ -61,14 +68,16 @@ inline bool read_line(const std::string& path, std::string& out) {
     return true;
 }
 
-inline int read_int(const std::string& path) {
+inline int read_int(const std::string& path) 
+{
     std::ifstream f(path);
     if (!f.is_open()) return -1;
     int v = -1; f >> v;
     return f.fail() ? -1 : v;
 }
 
-inline int arphrd_from_ifaddrs(struct ifaddrs* head, const std::string& ifname) {
+inline int arphrd_from_ifaddrs(struct ifaddrs* head, const std::string& ifname) 
+{
     for (auto p=head; p; p=p->ifa_next) {
         if (!p->ifa_addr || p->ifa_addr->sa_family!=AF_PACKET) continue;
         if (ifname==p->ifa_name) {
@@ -79,7 +88,8 @@ inline int arphrd_from_ifaddrs(struct ifaddrs* head, const std::string& ifname) 
     return -1;
 }
 
-inline std::vector<std::string> list_names(const std::string& path) {
+inline std::vector<std::string> list_names(const std::string& path) 
+{
     std::vector<std::string> v;
     DIR* d = opendir(path.c_str()); if (!d) return v;
     if (auto* e=readdir(d)) do {
@@ -89,12 +99,14 @@ inline std::vector<std::string> list_names(const std::string& path) {
     return v;
 }
 
-inline long speed_eth_mbps(const std::string& ifname) {
+inline long speed_eth_mbps(const std::string& ifname) 
+{
     int v = read_int("/sys/class/net/" + ifname + "/speed");
     return (v > 0) ? v : -1;
 }
 
-inline bool ib_hca(const std::string& ifname, std::string& hca) {
+inline bool ib_hca(const std::string& ifname, std::string& hca) 
+{
     auto v = list_names("/sys/class/net/" + ifname + "/device/infiniband");
     
     if (v.empty()) return false; 
@@ -102,7 +114,8 @@ inline bool ib_hca(const std::string& ifname, std::string& hca) {
     return true;
 }
 
-inline long speed_ib_mbps(const std::string& ifname) {
+inline long speed_ib_mbps(const std::string& ifname) 
+{
     std::string hca; if (!ib_hca(ifname, hca)) return -1;
     int port = read_int("/sys/class/net/" + ifname + "/dev_port"); if (port <= 0) port = 1;
     std::string rate; if (!read_line("/sys/class/infiniband/" + hca + "/ports/" + std::to_string(port) + "/rate", rate)) return -1;
@@ -114,7 +127,8 @@ inline long speed_ib_mbps(const std::string& ifname) {
     return -1;
 }
 
-inline long link_speed_mbps(struct ifaddrs* head, const std::string& ifname) {
+inline long link_speed_mbps(struct ifaddrs* head, const std::string& ifname) 
+{
     long s = speed_eth_mbps(ifname);
     if (s > 0) return s;
     int arphrd = arphrd_from_ifaddrs(head, ifname);
@@ -127,7 +141,8 @@ inline long link_speed_mbps(struct ifaddrs* head, const std::string& ifname) {
 
 // ------ Functions to check if the interface is UP ------
 
-inline bool oper_up(const std::string& ifname) {
+inline bool oper_up(const std::string& ifname) 
+{
     std::string st;
     if (read_line("/sys/class/net/" + ifname + "/operstate", st))
         return st == "up";
@@ -135,7 +150,8 @@ inline bool oper_up(const std::string& ifname) {
     return car == 1; // fallback
 }
 
-inline bool admin_up(struct ifaddrs* head, const std::string& ifname) {
+inline bool admin_up(struct ifaddrs* head, const std::string& ifname) 
+{
     for (auto p=head; p; p=p->ifa_next) {
         if (!p->ifa_name) continue;
         if (ifname==p->ifa_name) return (p->ifa_flags & IFF_UP);
@@ -143,7 +159,8 @@ inline bool admin_up(struct ifaddrs* head, const std::string& ifname) {
     return false;
 }
 
-inline bool get_first_ipv4(struct ifaddrs* head, const std::string& ifname, std::string& ip_out) {
+inline bool get_first_ipv4(struct ifaddrs* head, const std::string& ifname, std::string& ip_out) 
+{
     char buf[INET_ADDRSTRLEN];
     for (auto p=head; p; p=p->ifa_next) {
         if (!p->ifa_addr || !p->ifa_name) continue;
@@ -160,7 +177,8 @@ inline bool get_first_ipv4(struct ifaddrs* head, const std::string& ifname, std:
 
 // Function employing all the others above to return the IP
 
-inline std::string get_IP_address() {
+inline std::string get_IP_address() 
+{
     struct ifaddrs* ifaddr = nullptr;
     if (getifaddrs(&ifaddr) == -1) { perror("getifaddrs"); return ""; }
 
@@ -195,28 +213,61 @@ inline std::string get_IP_address() {
 
 // Auxiliary GPU functions
 
-inline JSON get_device() {
+inline JSON get_device() 
+{
     JSON device = {
         {"device_name", "CPU"},
-        {"target_devices", std::vector<int>()}
+        {"target_devices", std::vector<int>{}}
     };
 
-    const char* visible_devices = std::getenv("CUDA_VISIBLE_DEVICES");
-    if (!visible_devices) {
+    const auto& visible_devices = std::getenv("CUDA_VISIBLE_DEVICES");
+    if (!visible_devices)
         return device;
-    }
-    device["device_name"] = "GPU";
 
-    std::string envStr(visible_devices);
-    std::stringstream ss(envStr);
-    std::string token;
-    std::vector<int> available_gpus;
-    while (std::getline(ss, token, ',')) {
-        available_gpus.push_back(std::stoi(token));
+    try {
+        const auto slurm_proc_id = get_env_variable("SLURM_PROCID");
+
+        std::vector<int> available_gpus;
+
+        std::stringstream ss(visible_devices);
+        std::string token;
+
+        while (std::getline(ss, token, ',')) {
+            if (token.empty()) {
+                continue;
+            }
+
+            std::size_t pos = 0;
+            auto gpu_id = std::stoi(token, &pos);
+
+            if (pos != token.size())
+                throw std::runtime_error("Invalid CUDA_VISIBLE_DEVICES entry: " + token);
+
+            available_gpus.push_back(gpu_id);
+        }
+
+        if (available_gpus.empty())
+            throw std::runtime_error("CUDA_VISIBLE_DEVICES is empty");
+
+        std::size_t pos = 0;
+        auto proc_id = static_cast<std::size_t>(std::stoul(slurm_proc_id, &pos));
+
+        if (pos != slurm_proc_id.size())
+            throw std::runtime_error("Invalid SLURM_PROCID: " + slurm_proc_id);
+
+        if (proc_id >= available_gpus.size())
+            throw std::runtime_error("SLURM_PROCID out of CUDA_VISIBLE_DEVICES range");
+
+        device["device_name"] = "GPU";
+        device["target_devices"] = std::vector<int>{available_gpus[proc_id]};
+
+    } catch (const std::exception& e) {
+        LOGGER_WARN("{}", e.what());
+        device = {
+            {"device_name", "CPU"},
+            {"target_devices", std::vector<int>{}}
+        };
     }
 
-    const char* slurm_procid = std::getenv("SLURM_PROCID");
-    int index = std::stoi(slurm_procid);
-    device["target_devices"].push_back(available_gpus[index]);
     return device;
 }

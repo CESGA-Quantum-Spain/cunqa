@@ -5,38 +5,26 @@
     It is important and it is assumed that the circuit that is sent to the virtual QPU for its 
     simulation is transplated into the propper native gates and adapted to te backend's topology.
 
-    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`, 
-    :py:class:`qiskit.QuantumCircuit` or json ``dict``, :py:mod:`cunqa` provides two alternatives 
-    for transpiling it accordingly to a certain virtual QPU's backend:
+    Once the user has decribed the circuit :py:class:`~cunqa.circuit.CunqaCircuit`,
+    :py:class:`qiskit.QuantumCircuit` or json ``dict``, the circuit must be transpiled with the
+    :py:func:`transpiler` function, providing the backend of the target virtual QPU, before being
+    submitted for simulation:
 
-        - When submmiting the circuit, set `transpile` as ``True`` and provide the rest of 
-          transpilation instructions:
-
-            >>> qpu.run(circuit, transpile = True, ...)
-
-          This option is ``False`` by default.
-
-        - Use :py:func:`transpiler` function before sending the circuit:
-
-            >>> circuit_transpiled = transpiler(circuit, target_qpu = qpu)
-            >>> qpu.run(circuit_transpiled)
+        >>> circuit_transpiled = transpiler(circuit, backend = qpu.backend)
+        >>> run(circuit_transpiled, qpu)
 
     .. warning::
-        If the circuit is not transpiled, errors will not raise, but the output of the simulation 
+        If the circuit is not transpiled, errors will not raise, but the output of the simulation
         will not be coherent.
-    
+
 """
 from typing import Union
 import copy
 
-from cunqa.qiskit_deps.cunqabackend import CunqaBackend
-from cunqa.logger import logger
-from cunqa.qpu import Backend, QPU
-from cunqa.circuit import CunqaCircuit
-from cunqa.circuit.parameter import Param
-from cunqa.circuit.ir import to_ir
+from cunqa.utils.constants import CUNQA_USE_QISKIT_PY
+if not CUNQA_USE_QISKIT_PY:
+    raise ImportError("Qiskit is not available: cannot use transpiler.")
 
-from qiskit_aer.library import default_qubits
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import TranspilerError
 from qiskit.circuit import (
@@ -50,10 +38,16 @@ from qiskit.circuit import (
     ParameterExpression
 )
 
+from cunqa.qiskit_deps.cunqabackend import CunqaBackend
+from cunqa.utils.logger import logger
+from cunqa.qpu import Backend
+from cunqa.circuit import CunqaCircuit
+from cunqa.circuit.parameter import Param
+from cunqa.circuit.ir import to_ir
 
 def transpiler(
     circuit: Union[dict, QuantumCircuit, CunqaCircuit], 
-    backend: Union[Backend, QPU], 
+    backend: Backend, 
     opt_level: int = 1, 
     initial_layout: list[int] = None, 
     seed: int = None
@@ -71,8 +65,7 @@ def transpiler(
     Args:
         circuit (dict | qiskit.QuantumCircuit | ~cunqa.circuit.CunqaCircuit): circuit to be 
                                                                               transpiled.
-        backend (~cunqa.qpu.Backend | ~cunqa.qpu.QPU): transpilation will be done with respect to the 
-                                                       provided backend or the provided QPU's backend.
+        backend (~cunqa.qpu.Backend): backend which transpilation will be done respect to.
         opt_level (int): optimization level for creating the 
                          `qiskit.transpiler.passmanager.StagedPassManager`. Default set to 1.
         initial_layout (list[int]): initial position of virtual qubits on physical qubits for 
@@ -115,7 +108,6 @@ def transpiler(
 
     # transpilation
     try:
-        backend = backend.backend if isinstance(backend, QPU) else backend
         cunqabackend = CunqaBackend(backend = backend)
         qc_transpiled = transpile(
             qc, 
@@ -149,7 +141,7 @@ def transpiler(
         dict_transpiled = to_ir(qc_transpiled)
 
         cunqac_transpiled = CunqaCircuit(
-            dict_transpiled["num_qubits"], 
+            dict_transpiled["num_qubits"][0], 
             dict_transpiled["num_clbits"], 
             id=circuit._id + "_transpiled"
         )
@@ -211,9 +203,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
             circuit_clbits.append(i)
         qc.add_register(ClassicalRegister(len(lista), cr))
 
-    # Track Parameter objects to avoid different Parameters with the same string (raises ERROR)
-    parameter_tracker = {}
-
     # processing instructions
     for instruction in copy.deepcopy(instructions):
 
@@ -225,18 +214,28 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         # instanciating instruction's classical and quantum bits
         qiskit_Clbit = []; qiskit_Qubit = []
 
-        if (instruction_clbits is not None) and (len(instruction_clbits) != 0):
+        if instruction_clbits is not None:
 
-            for inst_clbit in instruction_clbits:
+            if (isinstance(instruction_clbits, list)):
+                for inst_clbit in instruction_clbits:
+                    for k,v in classical_registers.items():
+                        if inst_clbit in v:
+                            qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(inst_clbit)))
+            else:
                 for k,v in classical_registers.items():
-                    if inst_clbit in v:
-                        qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(inst_clbit)))
+                    if instruction_clbits in v:
+                        qiskit_Clbit.append(Clbit(ClassicalRegister(len(v),k), v.index(instruction_clbits)))
 
-        if (instruction_qubits is not None) and (len(instruction_qubits) != 0):
-            for inst_qubit in instruction_qubits:
+        if instruction_qubits is not None:
+            if (isinstance(instruction_qubits, list)):
+                for inst_qubit in instruction_qubits:
+                    for k,v in quantum_registers.items():
+                        if inst_qubit in v:
+                            qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
+            else:
                 for k,v in quantum_registers.items():
-                    if inst_qubit in v:
-                        qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(inst_qubit)))
+                    if instruction_qubits in v:
+                        qiskit_Qubit.append(Qubit(QuantumRegister(len(v),k), v.index(instruction_qubits)))
 
         # processing params: Param, value or instructions for subcircuits in cif instruction
         qiskit_params = []; qiskit_cif_subcircs = []
@@ -245,16 +244,9 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
             if isinstance(param, Param):
 
-                symbol_map = {}
-                # Transfor Params to ParameterExpressions avoiding Parameter duplication
-                # Otherwise: symbol_map = {Parameter(symbol.name): symbol for symbol in param.variables}
-                for symbol in param.variables:
-                    if not symbol.name in parameter_tracker:
-                        parameter_tracker[symbol.name] = Parameter(symbol.name)
-
-                    symbol_map[parameter_tracker[symbol.name]] = symbol
-
+                symbol_map = {Parameter(symbol.name): symbol for symbol in param.variables}
                 qiskit_paramexp = ParameterExpression(symbol_map, param.expr)
+
                 qiskit_params.append(qiskit_paramexp)
 
             elif isinstance(param, float) or isinstance(param, int):
@@ -276,9 +268,7 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
 
         # processing of the instruction itself
         if  instruction_name == "measure":
-
-            for qubit,clbit in zip(instruction_qubits, instruction_clbits):
-                qc.measure(qubit,clbit)
+            qc.measure(instruction_qubits, instruction_clbits)
 
         elif instruction_name == "unitary":
 
@@ -287,11 +277,6 @@ def _from_ir_to_qc(circuit_dict: dict) -> QuantumCircuit:
         elif instruction_name == "save_state":
             pershot = True if (instruction["snapshot_type"] == "list") else False
             qc.save_state(label=instruction["label"], pershot=pershot)
-
-        elif instruction_name == "cif":
-
-            with qc.if_test((qiskit_Clbit, 1)) as else_:
-                qc.append(qiskit_cif_subcircs)
 
         elif instruction_name in SUPPORTED_QISKIT_OPERATIONS:
 

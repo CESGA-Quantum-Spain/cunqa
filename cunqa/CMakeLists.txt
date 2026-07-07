@@ -1,32 +1,33 @@
-add_subdirectory(circuit)
-add_subdirectory(qiskit_deps)
-add_subdirectory(real_qpus)
-add_subdirectory(utils)
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall> $<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
 
-set(LIB_NAME "qclient")
+pybind11_add_module(qclient qclient.cpp)
 
-# QClient pybind module
-pybind11_add_module(${LIB_NAME} bindings.cpp)
-
-target_include_directories(${LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
-target_link_libraries(${LIB_NAME} PRIVATE client json)
-
-install(TARGETS ${LIB_NAME} DESTINATION cunqa)
-
-# counts_and_probs pybind module
-pybind11_add_module(counts_and_probs bindings.cpp)
-
-target_include_directories(counts_and_probs PRIVATE "${CMAKE_SOURCE_DIR}/src/utils")
-target_link_libraries(counts_and_probs PRIVATE client json)
-
-install(TARGETS counts_and_probs DESTINATION cunqa)
-
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/constants.py.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/constants.py"
-    @ONLY
+target_include_directories(qclient 
+  PRIVATE 
+    "${CMAKE_SOURCE_DIR}/src/utils"
+    "${CMAKE_SOURCE_DIR}/src"
 )
+target_link_libraries(qclient 
+  PRIVATE 
+    client
+    json
+)
+install(TARGETS qclient DESTINATION cunqa)
 
-file(GLOB PYTHON_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
-install(FILES ${PYTHON_SCRIPTS} DESTINATION cunqa)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/constants.py" DESTINATION cunqa)
+file(GLOB MAIN_PY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
+install(FILES ${MAIN_PY} DESTINATION cunqa)
+
+file(GLOB CIRCUIT_PY "${CMAKE_CURRENT_SOURCE_DIR}/circuit/*.py")
+install(FILES ${CIRCUIT_PY} DESTINATION cunqa/circuit)
+
+file(GLOB QISKIT_DEPS_PY "${CMAKE_CURRENT_SOURCE_DIR}/qiskit_deps/*.py")
+install(FILES ${QISKIT_DEPS_PY} DESTINATION cunqa/qiskit_deps)
+
+file(GLOB REAL_QPUS_PY "${CMAKE_CURRENT_SOURCE_DIR}/real_qpus/*.py")
+install(FILES ${REAL_QPUS_PY} DESTINATION cunqa/real_qpus)
+
+file(GLOB QC_PROTOCOLS_PY "${CMAKE_CURRENT_SOURCE_DIR}/qc_protocols/*.py")
+install(FILES ${QC_PROTOCOLS_PY} DESTINATION cunqa/qc_protocols)
+
+add_subdirectory(utils)
+add_subdirectory(tools)

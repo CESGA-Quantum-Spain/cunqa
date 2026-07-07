@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "backends/simple_backend.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -32,7 +31,14 @@ public:
     Server(const std::string& mode);
     ~Server();
 
-    void accept();
+    // Block until a request can be received (returns true) or interrupt() is
+    // called from another thread (returns false). Must be called only from the
+    // single thread that owns the socket (the one that also calls recv_data()
+    // and send_result()).
+    bool wait_for_request();
+    // Wake a thread blocked in wait_for_request(). Thread-safe.
+    void interrupt();
+
     std::string recv_data();
     void send_result(const std::string& result);
     void close();

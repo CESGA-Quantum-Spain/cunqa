@@ -6,20 +6,25 @@ Documentation is available in the docstrings.
 
 Subpackages
 -----------
-- circuit       --- Circuit-related utilities
+- circuit       --- Quantum circuit abstraction and circuit transformations
+- qc_protocols  --- Quantum communication protocols (teledata and telegate)
+- qiskit_deps   --- Qiskit-dependent helpers (backend and transpiler)
+- real_qpus     --- Clients to connect to real QPUs
+- tools         --- Extra utilities (mappers for VQAs, probabilities, ...)
+- utils         --- Internal helpers (logger, constants, file/id utilities)
 
 Top-level modules
 -----------------
 - qjob
 - result
 - qpu
-- mappers
 
 Public API in the main cunqa namespace
 --------------------------------------
 - get_QPUs
 - qraise
 - qdrop
+- gather
 """
 
 from __future__ import annotations
@@ -27,11 +32,14 @@ import importlib as _importlib
 
 _submodules = [
     "circuit",
+    "qc_protocols",
     "qiskit_deps",
+    "real_qpus",
+    "tools",
+    "utils",
     "qjob",
     "result",
     "qpu",
-    "mappers"
 ]
 
 _lazy_symbols = {

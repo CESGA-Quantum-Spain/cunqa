@@ -3,7 +3,6 @@ sys.path.append(os.getenv("HOME"))
 
 import zmq
 import json
-import glob
 import psutil
 import socket
 import pickle
@@ -11,10 +10,10 @@ import threading
 from queue import Queue
 from typing import Optional
 
-from cunqa.constants import QPUS_FILEPATH, LIBS_DIR
-from cunqa.utils import write_json
 from cunqa.qclient import json_to_qasm2
-from cunqa.logger import logger
+from cunqa.utils.constants import QPUS_FILEPATH, LIBS_DIR
+from cunqa.utils.logger import logger
+from cunqa.utils import write_json
 
 try:
     sys.path.append(LIBS_DIR)
@@ -27,27 +26,17 @@ PREFERRED_NETWORK_IFACE = "ib"
 
 def _get_qmio_config(family : str, endpoint : str) -> dict:
     SLURM_JOB_ID = os.getenv("SLURM_JOB_ID") 
-    # Find the most recent calibration file
-    CALIBRATION_FILES_PATH = "/opt/cesga/qmio/hpc/calibrations"
-    calibration_files = glob.glob(os.path.join(CALIBRATION_FILES_PATH, "????_??_??__??_??_??.json"))
-    
-    if not calibration_files:
-        raise FileNotFoundError("No calibration files found")
-    
-    last_calibration_file = max(calibration_files, key=os.path.getctime)
-    logger.debug(f"Using latest calibration file: {last_calibration_file}")
-    
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
-        "n_qubits":32,
+        "num_qubits":32,
         "description":"Backend of real QMIO",
         "coupling_map":[[0,1],[2,1],[2,3],[4,3],[5,4],[6,3],[6,12],[7,0],[7,9],[9,10],
                         [11,10],[11,12],[13,21],[14,11],[14,18],[15,8],[15,16],[18,17],
                         [18,19],[20,19],[22,21],[22,31],[23,20],[23,30],[24,17],[24,27],
                         [25,16],[25,26],[26,27],[28,27],[28,29],[30,29],[30,31]],
         "basis_gates":["sx", "x", "rz", "ecr"],
-        "noise_properties_path":last_calibration_file,
+        "noise":"",
     }
 
     qmio_config_json = {

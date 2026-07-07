@@ -1,85 +1,25 @@
-
+#include <chrono>
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <stdexcept>
 #include <string>
-#include <vector>
-#include <fcntl.h>
+#include <thread>
 #include <sys/file.h>
-#include <unistd.h>
+#include <fcntl.h> 
+#include <unistd.h> 
 
 #include "qpu.hpp"
-#include "backends/simple_backend.hpp"
-#include "backends/cc_backend.hpp"
-#include "backends/simulators/AER/aer_simple_simulator.hpp"
-#include "backends/simulators/AER/aer_cc_simulator.hpp"
-#include "backends/simulators/AER/aer_qc_simulator.hpp"
-#include "backends/simulators/Munich/munich_simple_simulator.hpp"
-#include "backends/simulators/Munich/munich_cc_simulator.hpp"
-#include "backends/simulators/Munich/munich_qc_simulator.hpp"
-#include "backends/simulators/Maestro/maestro_simple_simulator.hpp"
-#include "backends/simulators/Maestro/maestro_cc_simulator.hpp"
-#include "backends/simulators/Maestro/maestro_qc_simulator.hpp"
-#include "backends/simulators/CUNQA/cunqa_simple_simulator.hpp"
-#include "backends/simulators/CUNQA/cunqa_cc_simulator.hpp"
-#include "backends/simulators/CUNQA/cunqa_qc_simulator.hpp"
-#include "backends/simulators/Qulacs/qulacs_simple_simulator.hpp"
-#include "backends/simulators/Qulacs/qulacs_cc_simulator.hpp"
-#include "backends/simulators/Qulacs/qulacs_qc_simulator.hpp"
-#include "backends/simulators/Qsim/qsim_simple_simulator.hpp"
-#include "backends/simulators/Qsim/qsim_cc_simulator.hpp"
-#include "backends/simulators/Qsim/qsim_qc_simulator.hpp"
-#include "backends/simulators/QuEST/quest_simple_simulator.hpp"
-#include "backends/simulators/QuEST/quest_cc_simulator.hpp"
-#include "backends/simulators/QuEST/quest_qc_simulator.hpp"
+#include "sim/simulators/simulator_factory.hpp"
+#include "sim/backends/backend_factory.hpp"
 
+#include "utils/helpers/environment.hpp"
 #include "utils/constants.hpp"
 #include "utils/json.hpp"
-#include "utils/helpers/murmur_hash.hpp"
+
 #include "logger.hpp"
 
-using namespace std::string_literals;
 using namespace cunqa;
 using namespace cunqa::sim;
-
-std::string generate_noise_instructions(const JSON& back_path_json, const std::string& family)
-{
-    std::string backend_path;
-
-    if (back_path_json.contains("backend_path")){
-        LOGGER_DEBUG("backend_path provided");
-        backend_path=back_path_json.at("backend_path").get<std::string>();
-    } else {
-        LOGGER_DEBUG("No backend_path provided, defining backend from noise_properties.");
-        backend_path = "default";
-    }
-    std::string command("python "s + constants::INSTALL_PATH + "/cunqa/qiskit_deps/noise_instructions.py "s
-                                   + back_path_json.at("noise_properties_path").get<std::string>() + " "s
-                                   + backend_path + " "s
-                                   + back_path_json.at("thermal_relaxation").get<std::string>() + " "s
-                                   + back_path_json.at("readout_error").get<std::string>() + " "s
-                                   + back_path_json.at("gate_error").get<std::string>() + " "s
-                                   + family + " "s
-                                   + back_path_json.at("fakeqmio").get<std::string>());
-                                   
-    std::system(command.c_str());
-    return "";
-}
-
-template<typename Simulator, typename Config, typename BackendType>
-void turn_ON_QPU(
-    const JSON& backend_json, const std::string& mode, 
-    const std::string& name, const std::string& family, const std::string& comm
-)
-{
-    std::unique_ptr<Simulator> simulator = std::make_unique<Simulator>();
-    Config config;
-    config.set_basis_gates(get_basis_gates(simulator->get_name()));
-    if (!backend_json.empty())
-        config = backend_json;
-    QPU qpu(std::make_unique<BackendType>(config, std::move(simulator)), mode, name, family, comm);
-    qpu.turn_ON();
-}
 
 int main(int argc, char *argv[])
 {
@@ -88,151 +28,28 @@ int main(int argc, char *argv[])
     std::string family(argv[3]);
     std::string sim_arg(argv[4]);
 
-    if (family == "default")
-        family = std::getenv("SLURM_JOB_ID");
-    std::string name = std::getenv("SLURM_JOB_ID") + "_"s 
-                     + std::getenv("SLURM_TASK_PID");
+    JSON backend_or_infrastructure;
+    if (argc == 6)
+        backend_or_infrastructure = read_file(std::string(argv[5]));
     
-    auto back_path_json = (argc == 6 ? JSON::parse(std::string(argv[5])) : JSON());
     JSON backend_json;
-
-    if (back_path_json.contains("noise_properties_path")) {
-        if (sim_arg != "Aer")
-            throw std::runtime_error("Noise is only available with AER at the moment.");
-        std::string fpath = get_cunqa_path() + "/tmp_noisy_backend_" + std::getenv("SLURM_JOB_ID") + ".json";
-
-        if (std::getenv("SLURM_PROCID") && std::string(std::getenv("SLURM_PROCID")) == "0") {
-            generate_noise_instructions(back_path_json, family);
-            LOGGER_DEBUG("Correctly created tmp noise intructions file.");
-        } else {
-            int fd = open(fpath.c_str(), O_RDONLY);
-            while (fd == -1 || flock(fd, LOCK_SH) != 0) {
-                if (fd != -1) close(fd);
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                fd = open(fpath.c_str(), O_RDONLY);
-            }
-            close(fd);
-        }
-
-        std::ifstream f(fpath);
-        backend_json = JSON::parse(f);
-    } else if (back_path_json.contains("backend_path")) {
-        std::ifstream f(back_path_json.at("backend_path").get<std::string>());
-        backend_json = JSON::parse(f);
+    if (backend_or_infrastructure.contains("backends")) {
+        const int slurm_procid = std::stoi(std::getenv("SLURM_PROCID"));
+        const std::string backend_path = backend_or_infrastructure.at("backends")[slurm_procid];
+        backend_json = read_file(std::string(backend_path));
+    } else {
+        backend_json = backend_or_infrastructure;
     }
 
-    switch(murmur::hash(communications)) {
-        case murmur::hash("no_comm"): 
-            LOGGER_DEBUG("Raising QPU without communications.");
-            switch(murmur::hash(sim_arg)) {
-                case murmur::hash("Aer"): 
-                    LOGGER_DEBUG("QPU going to turn on with AerSimpleSimulator.");
-                    turn_ON_QPU<AerSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Munich"):
-                    LOGGER_DEBUG("QPU going to turn on with MunichSimpleSimulator.");
-                    turn_ON_QPU<MunichSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Maestro"):
-                    LOGGER_DEBUG("QPU going to turn on with MaestroSimpleSimulator.");
-                    turn_ON_QPU<MaestroSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Cunqa"):
-                    LOGGER_DEBUG("QPU going to turn on with CunqaSimpleSimulator.");
-                    turn_ON_QPU<CunqaSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Qulacs"):
-                    LOGGER_DEBUG("QPU going to turn on with QulacsSimpleSimulator.");
-                    turn_ON_QPU<QulacsSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Qsim"):
-                    LOGGER_DEBUG("QPU going to turn on with QsimSimpleSimulator.");
-                    turn_ON_QPU<QsimSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                case murmur::hash("Quest"):
-                    LOGGER_DEBUG("QPU going to turn on with QuestSimpleSimulator.");
-                    turn_ON_QPU<QuestSimpleSimulator, SimpleConfig, SimpleBackend>(backend_json, mode, name, family, "no_comm");
-                    break;
-                default:
-                    LOGGER_ERROR("Simulator {} do not support simple simulation or does not exist.", sim_arg);
-                    return EXIT_FAILURE;
-            }
-            break;
-        case murmur::hash("cc"): 
-            LOGGER_DEBUG("Raising QPU with classical communications.");
-            switch(murmur::hash(sim_arg)) {
-                case murmur::hash("Aer"): 
-                    LOGGER_DEBUG("QPU going to turn on with AerCCSimulator.");
-                    turn_ON_QPU<AerCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Munich"): 
-                    LOGGER_DEBUG("QPU going to turn on with MunichCCSimulator.");
-                    turn_ON_QPU<MunichCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Maestro"):
-                    LOGGER_DEBUG("QPU going to turn on with MaestroCCSimulator.");
-                    turn_ON_QPU<MaestroCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Cunqa"): 
-                    LOGGER_DEBUG("QPU going to turn on with CunqaCCSimulator.");
-                    turn_ON_QPU<CunqaCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Qulacs"): 
-                    LOGGER_DEBUG("QPU going to turn on with QulacsCCSimulator.");
-                    turn_ON_QPU<QulacsCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Qsim"):
-                    LOGGER_DEBUG("QPU going to turn on with QsimCCSimulator.");
-                    turn_ON_QPU<QsimCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                case murmur::hash("Quest"):
-                    LOGGER_DEBUG("QPU going to turn on with QuestCCSimulator.");
-                    turn_ON_QPU<QuestCCSimulator, CCConfig, CCBackend>(backend_json, mode, name, family, "classical_comm");
-                    break;
-                default:
-                    LOGGER_ERROR("Simulator {} do not support classical communication simulation or does not exist.", sim_arg);
-                    return EXIT_FAILURE;
-            }
-            break;
-        case murmur::hash("qc"):
-            LOGGER_DEBUG("Raising QPU with quantum communications.");
-            switch(murmur::hash(sim_arg)) {
-                case murmur::hash("Aer"): 
-                    LOGGER_DEBUG("QPU going to turn on with AerQCSimulator.");
-                    turn_ON_QPU<AerQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Munich"): 
-                    LOGGER_DEBUG("QPU going to turn on with MunichQCSimulator.");
-                    turn_ON_QPU<MunichQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Maestro"):
-                    LOGGER_DEBUG("QPU going to turn on with MaestroQCSimulator.");
-                    turn_ON_QPU<MaestroQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Cunqa"): 
-                    LOGGER_DEBUG("QPU going to turn on with CunqaQCSimulator.");
-                    turn_ON_QPU<CunqaQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Qulacs"): 
-                    LOGGER_DEBUG("QPU going to turn on with QulacsQCSimulator.");
-                    turn_ON_QPU<QulacsQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Qsim"):
-                    LOGGER_DEBUG("QPU going to turn on with QsimQCSimulator."); 
-                    turn_ON_QPU<QsimQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                case murmur::hash("Quest"):
-                    LOGGER_DEBUG("QPU going to turn on with QuestQCSimulator.");
-                    turn_ON_QPU<QuestQCSimulator, QCConfig, QCBackend>(backend_json, mode, name, family, "quantum_comm");
-                    break;
-                default:
-                    LOGGER_ERROR("Simulator {} do not support quantum communication simulation or does not exist.", sim_arg);
-                    return EXIT_FAILURE;
-            }
-            break;
-        default:
-            LOGGER_ERROR("No {} communication method available.", communications);
-            return EXIT_FAILURE;
-    }
+    if (family == "default") family = get_env_variable("SLURM_JOB_ID");
+
+    QPU qpu(
+        make_backend(make_simulator(sim_arg), communications, backend_json), 
+        mode, 
+        get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID"), 
+        family
+    );
+    qpu.turn_ON();
+
     return EXIT_SUCCESS;
 }
