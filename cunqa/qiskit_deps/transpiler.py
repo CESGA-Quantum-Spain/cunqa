@@ -141,7 +141,7 @@ def transpiler(
         dict_transpiled = to_ir(qc_transpiled)
 
         cunqac_transpiled = CunqaCircuit(
-            dict_transpiled["num_qubits"], 
+            dict_transpiled["num_qubits"][0], 
             dict_transpiled["num_clbits"], 
             id=circuit._id + "_transpiled"
         )

@@ -82,7 +82,7 @@ def test_to_ir_quantumcircuit_basic_register_mapping_and_measure(monkeypatch):
     ir = mod_ir.to_ir(qc)
 
     assert ir["id"] == "QuantumCircuit_GID"
-    assert ir["num_qubits"] == 3
+    assert ir["num_qubits"] == [3, 0]
     assert ir["num_clbits"] == 2
 
     assert ir["quantum_registers"] == {"q0": [0], "q1": [1, 2]}
