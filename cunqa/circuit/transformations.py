@@ -128,7 +128,7 @@ def hsplit(circuit: CunqaCircuit, qubits_or_sections: Union[list[int], int]) -> 
                         [sub_circuit, target_circuit],
                         ctrl_qubit,
                         [comm_2[0]],
-                        [0, 1],
+                        [0],
                         [0, 0]
                     )
                 else:

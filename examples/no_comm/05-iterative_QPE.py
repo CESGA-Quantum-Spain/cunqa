@@ -61,8 +61,8 @@ try:
             "x2": x2
         }
         
-        # 3. Execution 
-        result = run(parametric_circuit, qpus[k%10], params, shots = 2000, seed = SEED).result
+        # 3. Execution
+        result = run(parametric_circuit, qpus[k % len(qpus)], params, shots = SHOTS, seed = SEED).result
         counts = result.counts
 
         zeros = sum([counts for result, counts in counts.items() if result.endswith('0')])

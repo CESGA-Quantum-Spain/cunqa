@@ -1,0 +1,5 @@
+{
+    "name": "04-qdistributed_QPE",
+    "description": "Example of a quantum backend with 11 data qubits and 2 communication qubits.",
+    "num_qubits": [10, 1]
+}

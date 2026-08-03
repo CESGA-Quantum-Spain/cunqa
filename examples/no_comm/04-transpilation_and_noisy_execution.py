@@ -3,7 +3,6 @@ import os, sys
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, run, qraise, qdrop
-from cunqa.qjob import gather
 from cunqa.circuit import CunqaCircuit
 from cunqa.qiskit_deps.transpiler import transpiler
 
@@ -17,7 +16,7 @@ except Exception as error:
     raise error
 
 try:
-    [qpu]  = get_QPUs(co_located=True)
+    [qpu]  = get_QPUs(co_located=True, family=family)
 
     # 2. Design circuit as any other execution
     qc = CunqaCircuit(num_qubits = 2)

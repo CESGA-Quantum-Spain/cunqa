@@ -29,7 +29,7 @@ def _get_qmio_config(family : str, endpoint : str) -> dict:
     qmio_backend_config = {
         "name":"QMIOBackend",
         "version":"",
-        "num_qubits":32,
+        "num_qubits": [32, 0],
         "description":"Backend of real QMIO",
         "coupling_map":[[0,1],[2,1],[2,3],[4,3],[5,4],[6,3],[6,12],[7,0],[7,9],[9,10],
                         [11,10],[11,12],[13,21],[14,11],[14,18],[15,8],[15,16],[18,17],

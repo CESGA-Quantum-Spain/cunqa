@@ -19,7 +19,7 @@ try:
     circuit_2 = CunqaCircuit(1, 1, id="circuit_2")
 
     circuit_1.h(0)
-    circuit_1.measure(0, 0, save = False)
+    circuit_1.measure(0, 0)
     circuit_1.send(0, recving_circuit = "circuit_2")
     
     circuit_2.recv(0, sending_circuit = "circuit_1")

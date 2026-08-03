@@ -1,5 +1,4 @@
 import os, sys
-from time import sleep
 
 # In order to import cunqa, we append to the search path the cunqa installation path
 sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA

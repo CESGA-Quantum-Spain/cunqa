@@ -24,7 +24,7 @@ struct CunqaArgs : public argparse::Args
     std::optional<std::string>& infrastructure          = kwarg("infrastructure", "Path to a infrastructure configuration file");
     bool& qmio                                          = flag("qmio", "Deploy QMIO.").set_default(false);
     bool& gpu                                           = flag("gpu", "Run on GPU").set_default(false);
-    std::string& gpu_name                               = kwarg("gpu-name", "Name of the GPU to execute on.").set_default("default"); 
+    std::optional<std::string>& gpu_name                = kwarg("gpu-name", "Name of the GPU to execute on."); 
 
     void welcome() {
         std::cout << "Welcome to qraise command, a command responsible for turning on the required QPUs.\n" << std::endl;

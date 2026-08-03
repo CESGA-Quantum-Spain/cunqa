@@ -131,6 +131,8 @@ MPI             3.1
 OpenMP          4.5
 Boost           1.85.0
 Eigen           5.0.0
+CUDA            12.8.0
+Cython          >= 3.0
 Blas            -
 Lapack          -
 ```
@@ -140,7 +142,7 @@ Lapack          -
 ```text
 nlohmann JSON   3.12.0
 spdlog          1.16.0
-MQT-DDSIM       1.24.0
+MQT-DDSIM       2.2.0
 libzmq          4.3.5
 cppzmq          4.11.0
 CunqaSimulator  0.1.1

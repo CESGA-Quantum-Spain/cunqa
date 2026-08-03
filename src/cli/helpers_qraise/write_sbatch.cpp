@@ -62,13 +62,13 @@ void write_sbatch_header(std::ofstream& sbatchFile, const CunqaArgs& args, Commu
     sbatchFile << "#SBATCH --time=" << args.time << "\n";
     sbatchFile << "#SBATCH --output=qraise_%j\n\n";
     
-    if (args.gpu || args.gpu_name != "default") {
+    if (args.gpu || args.gpu_name.has_value()) {
         if (args.simulator != "Aer")
             throw std::invalid_argument("At this moment, only Aer supports GPU simulation");
         const int number_of_gpus = scheme == Communications::QC ? 1 : args.n_qpus;
         
-        if (args.gpu_name != "default")
-            sbatchFile << "#SBATCH --gres=gpu:" << args.gpu_name << ":" << number_of_gpus << "\n";
+        if (args.gpu_name.has_value())
+            sbatchFile << "#SBATCH --gres=gpu:" << args.gpu_name.value() << ":" << number_of_gpus << "\n";
         else
             sbatchFile << "#SBATCH --gres=gpu:" << number_of_gpus << "\n";
     }
@@ -102,20 +102,19 @@ void write_run_command(std::ofstream& sbatchFile,
         sbatchFile << " --task-epilog=$EPILOG_PATH setup_qpus " << subcommand << '\n';
     } else if (scheme == Communications::QC) {
 
-        std::vector<std::string> gpu_info{"", ""}; 
-        if (args.gpu || args.gpu_name != "default") {
-            gpu_info[0] = "--gres=gpu:0 ";
-            if (args.gpu_name != "default")
+        std::vector<std::string> gpu_info{"--gres=none ", "--gres=none "}; 
+        if (args.gpu || args.gpu_name.has_value()) {
+            if (!args.gpu_name.has_value())
                 gpu_info[1] = "--gres=gpu:1 ";
             else
-                gpu_info[1] = "--gres=gpu:" + args.gpu_name + ":1 ";
+                gpu_info[1] = "--gres=gpu:" + args.gpu_name.value() + ":1 ";
         }
 
         sbatchFile 
-            << "srun --exclusive -n " << args.n_qpus << " -c 1 --mem-per-cpu=1G "
+            << "srun --exact --exclusive -n " << args.n_qpus << " -c 1 --mem-per-cpu=1G "
             << gpu_info[0] << "--task-epilog=$EPILOG_PATH setup_qpus " << subcommand << " &\n";
 
-        sbatchFile << "srun --exclusive -n 1 -c ";
+        sbatchFile << "srun --exact --exclusive " << gpu_info[1] << "-n 1 -c ";
 
         const int simulator_n_cores = args.n_qpus * (args.cores_per_qpu - 1);
         if (simulator_n_cores <= 0)

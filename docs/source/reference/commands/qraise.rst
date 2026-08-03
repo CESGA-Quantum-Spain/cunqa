@@ -84,8 +84,6 @@ GPU execution
 
 ``--gpu-name <string>``
     Name (type) of the GPU to request for the execution (e.g. ``a100``, ``t4``).
-    Default: ``default``
-
 
 Real QPU
 ~~~~~~~~~~~~~~~~~~~~~~
