@@ -2048,10 +2048,8 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit.transformations</span><span class="w"> </span><span class="kn">import</span> <span class="n">add</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
 <span class="c1"># ---------------------------</span>
 <span class="c1"># Acquiring the resources</span>
@@ -2073,24 +2071,28 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
 <span class="c1">#                         |</span>
 <span class="c1"># added_circuit.q1: ─────[X]─[M]─</span>
 <span class="c1"># ---------------------------</span>
-<span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
-<span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
+    <span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
-<span class="n">circuit2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+    <span class="n">circuit2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">added_circuit</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">])</span>
-<span class="n">added_circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+    <span class="n">added_circuit</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">])</span>
+    <span class="n">added_circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
 
-<span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">added_circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">)</span><span class="c1"># non-blocking call</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
+    <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">added_circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">)</span><span class="c1"># non-blocking call</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result after addition: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result after addition: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># ---------------------------</span>
-<span class="c1"># Relinquishing resources</span>
-<span class="c1"># ---------------------------</span>
-<span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">error</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1"># Relinquishing resources</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

@@ -203,11 +203,11 @@ list or a dict. Note that variables that are not given a new value keep the prev
     <span class="k">raise</span> <span class="n">error</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">qpu</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">qpu</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
 
     <span class="c1"># ---------------------------</span>
     <span class="c1"># 2. Design circuit:</span>
-    <span class="c1">#  circ_upgrade.q0   ─[RX(cos(x))]─────[M]─</span>
+    <span class="c1">#  circ_upgrade.q0   ─[RX(pi*cos(x))]──[M]─</span>
     <span class="c1">#                        </span>
     <span class="c1">#  circ_upgrade.q1   ─[RX(y)]──────────[M]─</span>
     <span class="c1">#</span>

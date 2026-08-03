@@ -152,7 +152,7 @@ This section will present a couple of examples are presented to highlight the us
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-    <span class="n">backend_path</span> <span class="o">=</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s2">&quot;/10+1_qubit_backend.json&quot;</span>
+    <span class="n">backend_path</span> <span class="o">=</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s2">&quot;/04-qdistributed_QPE.json&quot;</span>
     <span class="c1"># 1. Deploy vQPUs</span>
     <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> 
                     <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
@@ -181,12 +181,14 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">):</span>
         <span class="c1">### TELEGATE ###</span>
+        <span class="c1"># Every telegate block needs its own tag, so that each entanglement</span>
+        <span class="c1"># generation is matched with the right one at the other circuit</span>
         <span class="n">cat_entangler</span><span class="p">(</span>
             <span class="n">target_circuits</span> <span class="o">=</span> <span class="p">[</span><span class="n">ancilla_circuit</span><span class="p">,</span> <span class="n">register_circuit</span><span class="p">],</span>
             <span class="n">data_qubit</span>      <span class="o">=</span> <span class="n">data_qubits_anc</span><span class="p">[</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">],</span>
             <span class="n">comm_qubits</span>     <span class="o">=</span> <span class="p">[</span><span class="n">comm_qubits_anc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">comm_qubits_reg</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
             <span class="n">clbits</span>          <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-            <span class="n">tag</span>             <span class="o">=</span> <span class="s2">&quot;telegate&quot;</span>
+            <span class="n">tag</span>             <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;telegate_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         
         <span class="n">param</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span>

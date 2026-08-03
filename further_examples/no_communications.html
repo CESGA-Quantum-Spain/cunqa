@@ -232,8 +232,8 @@ developed. The usage of these two features can be seen in the following examples
             <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2</span>
         <span class="p">}</span>
         
-        <span class="c1"># 3. Execution </span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">parametric_circuit</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="n">k</span><span class="o">%</span><span class="mi">10</span><span class="p">],</span> <span class="n">params</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">SEED</span><span class="p">)</span><span class="o">.</span><span class="n">result</span>
+        <span class="c1"># 3. Execution</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">parametric_circuit</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="n">k</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">qpus</span><span class="p">)],</span> <span class="n">params</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="n">SHOTS</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">SEED</span><span class="p">)</span><span class="o">.</span><span class="n">result</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">counts</span>
 
         <span class="n">zeros</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)])</span>
@@ -293,7 +293,6 @@ connectivity supported by the noisy backend. The following example shows the com
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qiskit_deps.transpiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">transpiler</span>
 
@@ -307,7 +306,7 @@ connectivity supported by the noisy backend. The following example shows the com
     <span class="k">raise</span> <span class="n">error</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="p">[</span><span class="n">qpu</span><span class="p">]</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">qpu</span><span class="p">]</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
 
     <span class="c1"># 2. Design circuit as any other execution</span>
     <span class="n">qc</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
