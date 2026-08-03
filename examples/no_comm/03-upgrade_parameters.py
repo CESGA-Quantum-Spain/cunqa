@@ -15,11 +15,11 @@ except Exception as error:
     raise error
 
 try:
-    qpu = get_QPUs(co_located = True, family = family)
+    [qpu] = get_QPUs(co_located = True, family = family)
 
     # ---------------------------
     # 2. Design circuit:
-    #  circ_upgrade.q0   ─[RX(cos(x))]─────[M]─
+    #  circ_upgrade.q0   ─[RX(pi*cos(x))]──[M]─
     #                        
     #  circ_upgrade.q1   ─[RX(y)]──────────[M]─
     #

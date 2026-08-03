@@ -16,61 +16,64 @@ qpus  = get_QPUs(co_located=True, family=family)
 
 try:
     # ---------------------------
-    # Original circuits created and executed
-    # 
-    # circuit1.q0: ─[H]────────────
+    # Original circuits created
     #
-    # circuit2.q0: ──●───●─────────
-    #                │   $
-    # circuit2.q1: ─[X]──$─────────
-    #                    $
-    # circuit3.q0: ─────[X]──[M]───
+    # circuit1.data0: ─[H]────────────
     #
-    # Where $ represents the remote control of the gate
+    # circuit2.data0: ──●─────────────
+    #                   │
+    # circuit2.data1: ─[X]──╌╌╌╌╌╌╌╌╌╌► teledata
+    #                                   ╎
+    # circuit3.data0: ◄╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯──[M]───
     # ---------------------------
 
     circuit1 = CunqaCircuit(1, id = "circuit1")
     circuit1.h(0)
 
-    circuit2 = CunqaCircuit((2, 1), id = "circuit2")
-    circuit2.cx(0,1)
+    # The circuits taking part in the teledata must reserve a comm qubit and the two
+    # classical bits that carry the Bell-measurement corrections
+    circuit2 = CunqaCircuit((2, 1), 2, id = "circuit2")
+    circuit2.cx(0, 1)
     data_qubits2, comm_qubits2 = circuit2.get_qubits()
-    qsend(circuit2, data_qubits2[0], comm_qubits2[0], [0, 1], recving_circuit="circuit3", tag="teledata")
-    
-    circuit3 = CunqaCircuit((1, 1), id = "circuit3")
-    data_qubits3, comm_qubits3 = circuit3.get_qubits()
-    qrecv(circuit3, data_qubits3[0], comm_qubits2[0], [0, 1], control_circuit = "circuit2", tag="teledata")
-    
-    circuit3.measure_all()
+    qsend(circuit2, data_qubits2[1], comm_qubits2[0], [0, 1], recving_circuit="circuit3", tag="teledata")
 
+    circuit3 = CunqaCircuit((1, 1), 2, id = "circuit3")
+    data_qubits3, comm_qubits3 = circuit3.get_qubits()
+    qrecv(circuit3, data_qubits3[0], comm_qubits3[0], [0, 1], control_circuit = "circuit2", tag="teledata")
+
+    circuit3.measure(data_qubits3[0], 0)
 
     # ---------------------------
     # Addition of circuits
-    # 
-    # added_circuit.q0: ─[H]──●───●───[M]───
-    #                         │   $
-    # added_circuit.q1: ─────[X]──$───[M]───
-    #                             $
-    # circuit3.q0:      ─────────[X]──[M]───
     #
-    # Where $ represents the remoteness of the gate
+    # added_circuit.data0: ─[H]──●─────────[M]───
+    #                            │
+    # added_circuit.data1: ─────[X]──╌╌╌╌╌╌╌╌╌╌►
+    #                                           ╎
+    # circuit3.data0:      ◄╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯──[M]───
     # ---------------------------
     added_circuit = add([circuit1, circuit2])
-    #print(added_circuit.instructions)
-    
-    added_circuit.measure_all()
 
-    qjobs = run([circuit3, added_circuit], qpus, shots = 1024)# non-blocking call
+    # add() concatenates instructions and data qubits only, so the comm qubits and
+    # the communication metadata of the operand have to be carried over explicitly
+    added_circuit.add_comm_qubits(circuit2.num_qubits[1])
+    added_circuit.sending_to = set(circuit2.sending_to)
+    added_circuit.is_dynamic = circuit2.is_dynamic
+
+    added_circuit.measure(0, 0)
+
+    qjobs = run([added_circuit, circuit3], qpus, shots = 1024) # non-blocking call
     results = gather(qjobs)
 
+    # Half of the Bell pair built by the addition is teleported to circuit3, so both
+    # results are expected to show the same distribution of '0' and '1'
     for result in results:
-            print(f"Result after split: {result.counts}")
-        
+        print(f"Result after addition: {result.counts}")
+
 except Exception as error:
     raise error
 finally:
     # ---------------------------
     # Relinquishing resources
-    # ---------------------------                                  
+    # ---------------------------
     qdrop(family)
-

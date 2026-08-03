@@ -1,0 +1,5 @@
+{
+    "name": "06-several_comm_qubits",
+    "description": "Example of a quantum backend with 11 data qubits and 2 communication qubits.",
+    "num_qubits": [2, 2]
+}

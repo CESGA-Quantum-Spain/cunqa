@@ -26,7 +26,7 @@ SEED = 18
 
 try:
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    backend_path = file_dir + "/10+1_qubit_backend.json"
+    backend_path = file_dir + "/04-qdistributed_QPE.json"
     # 1. Deploy vQPUs
     family = qraise(N_QPUS, "00:10:00", 
                     simulator="Aer",
@@ -55,12 +55,14 @@ try:
 
     for i in range(N_ANCILLA_QUBITS):
         ### TELEGATE ###
+        # Every telegate block needs its own tag, so that each entanglement
+        # generation is matched with the right one at the other circuit
         cat_entangler(
             target_circuits = [ancilla_circuit, register_circuit],
             data_qubit      = data_qubits_anc[N_ANCILLA_QUBITS - 1 - i],
             comm_qubits     = [comm_qubits_anc[0], comm_qubits_reg[0]],
             clbits          = [0, 0],
-            tag             = "telegate"
+            tag             = f"telegate_{i}"
         )
         
         param = (2**i) * 2 * 2 * np.pi * PHASE_TO_COMPUTE

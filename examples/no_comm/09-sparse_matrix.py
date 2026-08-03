@@ -5,19 +5,18 @@ sys.path.append(os.getenv("HOME")) # HOME as install path is specific to CESGA
 
 from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
-from cunqa.qjob import gather
 
 import numpy as np
 
 try:
     # 1. Deploy vQPUs (allocates classical resources for the simulation job) and retrieve them using get_QPUs
     # The sparsematrix instruction is supported by the Qulacs simulator
-    family = qraise(1, "00:10:00", simulator="Maestro", co_located = True)
+    family = qraise(1, "00:10:00", simulator="Qulacs", co_located = True)
 except Exception as error:
     raise error
 
 try:
-    qpus = get_QPUs(co_located=True, family = family)
+    [qpu] = get_QPUs(co_located=True, family = family)
 
     # 2. Design circuit:
     # ---------------------------------
@@ -34,18 +33,17 @@ try:
                      [0, 0, 0, 1]], dtype=complex)
 
     qc = CunqaCircuit(2, 2, id="qc")
-    qc.is_dynamic = True
     qc.h(0)
-    #qc.sparsematrix(SWAP, 0, 1)
+    qc.sparsematrix(SWAP, 0, 1)
     qc.measure(0, 0)
     qc.measure(1, 1)
 
     # 3. Execute circuit and get the results
     # H puts q0 in superposition; the SWAP moves that superposition onto q1. We expect
     # two basis states with roughly equal probability (~50% each over 1024 shots).
-    qresult = run(qc, qpus, shots=1024).result
+    qresult = run(qc, qpu, shots=1024).result
     print(f"Result: {qresult}")
-    
+
 except Exception as error:
     raise error
 finally:
