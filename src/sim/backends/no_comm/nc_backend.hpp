@@ -40,12 +40,17 @@ public:
     {
         auto quantum_task = JSON::parse(quantum_task_str);
 
+        std::string id;
         if (quantum_task.contains("id")) {
-            auto id = quantum_task.at("id").get<std::string>();
+            id = quantum_task.at("id").get<std::string>();
             quantum_task.erase("id");
         }
 
-        return executor_.execute(quantum_task);
+        auto result = executor_.execute(quantum_task);
+        if (!id.empty())
+            result["id"] = id;
+
+        return result;
     }
 
     JSON to_json() const override
