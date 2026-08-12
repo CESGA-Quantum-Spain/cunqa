@@ -75,12 +75,12 @@ def qrecv(
     circuit.gen_ent(comm_qubit, control_circuit, tag)
     
     circuit.recv(clbits, control_circuit)
-    
-    circuit.cif(clbits[0])
+
+    circuit.cif(clbits[1])
     circuit.x(comm_qubit)
     circuit.endcif()
-    
-    circuit.cif(clbits[1])
+
+    circuit.cif(clbits[0])
     circuit.z(comm_qubit)
     circuit.endcif()
     
