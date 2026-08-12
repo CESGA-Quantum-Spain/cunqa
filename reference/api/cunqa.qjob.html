@@ -80,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cunqa.qpu.html">cunqa.qpu</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cunqa.qjob</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.QJob"><code class="docutils literal notranslate"><span class="pre">QJob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.ResultBuffer"><code class="docutils literal notranslate"><span class="pre">ResultBuffer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cunqa.qjob.gather"><code class="docutils literal notranslate"><span class="pre">gather</span></code></a></li>
 </ul>
 </li>
@@ -158,7 +159,7 @@ which receives a list of <a class="reference internal" href="#cunqa.qjob.QJob" t
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="cunqa.qjob.QJob">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit_ir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit_ir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
 <dd><p>Class to handle jobs sent to vQPUs. A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output
 of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> function. The quantum job not only contains the circuit to
 be simulated, but also simulation instructions and information of the vQPU to which the job
@@ -170,6 +171,7 @@ about the execution.</p>
 <li><p><strong>qclient</strong> (<em>cunqa.qclient.QClient</em><em> | </em><em>QMIOClient</em>)</p></li>
 <li><p><strong>device</strong> (<em>dict</em>)</p></li>
 <li><p><strong>circuit_ir</strong> (<em>dict</em>)</p></li>
+<li><p><strong>result_buffer</strong> (<a class="reference internal" href="#cunqa.qjob.ResultBuffer" title="cunqa.qjob.ResultBuffer"><em>ResultBuffer</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>run_parameters</strong> (<em>Any</em>)</p></li>
 </ul>
 </dd>
@@ -192,13 +194,15 @@ call, which means that the program will be blocked until the <code class="xref p
 recieved from the corresponding server the outcome of the job. The result is not sent
 from the server to the <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code> until this method is called.</p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Because of how the client-server comunication is built, the user must be careful and call
-for the results in the same order in which the jobs where submited. If the order is not
-respected, no errors would be raised but results will not correspond to the job -
-a mix up would happen. This is because the server follows the FIFO rule (<em>First in
-first out</em>): if we want to receive the second result, the first one has to be out.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Results can be called in any order, no matter the order in which the jobs were
+submitted. Every quantum task carries the id of its circuit and the vQPU stamps it
+back on the result, so when the result received is not the one being asked for, it is
+kept by the <a class="reference internal" href="#cunqa.qjob.ResultBuffer" title="cunqa.qjob.ResultBuffer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultBuffer</span></code></a> of the vQPU and delivered to the
+<a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> that owns it as soon as that job asks for it. Note that results
+coming from a real QPU carry no id, and so for them the <em>first in first out</em> rule
+still applies.</p>
 </div>
 </dd></dl>
 
@@ -285,6 +289,26 @@ corresponding new values.</p>
 </aside>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="cunqa.qjob.ResultBuffer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ResultBuffer</span></span><a class="headerlink" href="#cunqa.qjob.ResultBuffer" title="Link to this definition"></a></dt>
+<dd><p>Router of the results coming from a vQPU that is shared by several <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
+<p>Every <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> holds a single <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>, therefore
+all the jobs sent to that vQPU read from the same socket: the result that arrives first is
+handed to whoever asks first, no matter which job it belongs to. To avoid such a mix up, the
+quantum tasks travel with the id of their circuit and the vQPU stamps that id back on the
+result. This class reads the results as they arrive and, when the one received is not the one
+being asked for, it stores it so that the <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> that owns it can take it directly
+instead of going to the socket again.</p>
+<p>Results that carry no id (as the ones coming from QMIO) cannot be routed, so they are
+given to the caller, falling back to the FIFO behaviour.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One buffer is created per <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a>, since the ordering problem it solves
+only exists among the jobs that share a connection.</p>
+</div>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="cunqa.qjob.gather">
 <span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qjobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.gather" title="Link to this definition"></a></dt>
@@ -296,10 +320,11 @@ corresponding new values.</p>
 <p>This is a blocking call, results will be called sequentialy in . Since they are being run
 simultaneously, even if the first one on the list takes the longest, when it finishes the
 rest would have been done, so just the small overhead from calling them will be added.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Since this is mainly a for loop, the order must be respected when submiting jobs to the
-same vQPU.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The jobs can be given in any order, even if several of them were sent to the same
+vQPU, since each result is identified by the id of its circuit. Have a look at
+<a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code></a> for the details.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

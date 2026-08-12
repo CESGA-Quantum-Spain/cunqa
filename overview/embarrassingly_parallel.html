@@ -199,6 +199,16 @@ function.</p>
 <p>This call for the results is a blocking call, since all simulations running in parallel need to be
 done for the <a class="reference internal" href="../reference/api/cunqa.result.html#cunqa.result.Result" title="cunqa.result.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> objects to be returned. To access information such as
 time of simulation or output statistics there are class attributes, such as the shown below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Results are identified by the id of the circuit that produced them, not by the order in which
+the jobs were submitted: every quantum task travels with its circuit id and the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>
+stamps it back on the result. Therefore, results can be asked for in any order, even when
+several jobs were sent to the same <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>, and the result of each
+<a class="reference internal" href="../reference/api/cunqa.qjob.html#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> is always the one of its own circuit. The exception is the real
+QPU, whose results carry no id and have to be retrieved in the order in which the jobs were
+submitted.</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">times_list</span>  <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 <span class="n">counts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 </pre></div>
