@@ -28,7 +28,7 @@ from qiskit import QuantumCircuit
 from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.real_qpus.qmioclient import QMIOClient
-from cunqa.qjob import QJob
+from cunqa.qjob import QJob, ResultBuffer
 from cunqa.utils import read_json, write_json
 from cunqa.utils.logger import logger
 from cunqa.utils.constants import QPUS_FILEPATH, REMOTE_GATES
@@ -76,18 +76,20 @@ class QPU:
         :annotation: : str
 
     """
-    _id: int 
+    _id: int
     _backend: Backend
     _family: str
     _qclient: Union[QClient, QMIOClient]
     _device: dict
+    _result_buffer: ResultBuffer
 
     def __init__(self, id: int, backend: Backend, device: dict, family: str, endpoint: str):
         self._id = id
         self._backend = backend
         self._device = device
         self._family = family
-        
+        self._result_buffer = ResultBuffer()
+
         if (device['device_name'] == 'QPU'):
             self._qclient = QMIOClient()
         else:
@@ -133,7 +135,13 @@ class QPU:
                                         corresponding new values.
             **run_parameters: any other simulation instructions.
         """
-        qjob = QJob(self._qclient, self._device, circuit_ir, **run_parameters)
+        qjob = QJob(
+            self._qclient,
+            self._device,
+            circuit_ir,
+            self._result_buffer,
+            **run_parameters
+        )
         qjob.submit(param_values)
         logger.debug(f"Qjob submitted to QPU {self._id}.")
 

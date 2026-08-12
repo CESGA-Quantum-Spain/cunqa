@@ -21,6 +21,7 @@
     """
 
 import json
+from collections import Counter, defaultdict, deque
 from typing import  Optional, Any, Union
 
 from cunqa.utils.logger import logger
@@ -29,6 +30,108 @@ from cunqa.qclient import QClient, FutureWrapper
 from sympy import Symbol
 from cunqa.circuit.parameter import encoder, Param
 from cunqa.real_qpus.qmioclient import QMIOClient, QMIOFuture
+
+
+class ResultBuffer:
+    """
+    Router of the results coming from a vQPU that is shared by several :py:class:`QJob` objects.
+
+    Every :py:class:`~cunqa.qpu.QPU` holds a single :py:class:`~cunqa.qclient.QClient`, therefore
+    all the jobs sent to that vQPU read from the same socket: the result that arrives first is
+    handed to whoever asks first, no matter which job it belongs to. To avoid such a mix up, the
+    quantum tasks travel with the id of their circuit and the vQPU stamps that id back on the
+    result. This class reads the results as they arrive and, when the one received is not the one
+    being asked for, it stores it so that the :py:class:`QJob` that owns it can take it directly
+    instead of going to the socket again.
+
+    Results that carry no id (as the ones coming from QMIO) cannot be routed, so they are
+    given to the caller, falling back to the FIFO behaviour.
+
+    .. note::
+        One buffer is created per :py:class:`~cunqa.qpu.QPU`, since the ordering problem it solves
+        only exists among the jobs that share a connection.
+    """
+    _stored: dict[str, deque[str]]
+    _outstanding: Counter
+
+    def __init__(self):
+        self._stored = defaultdict(deque)
+        self._outstanding = Counter()
+
+    def register(self, circuit_id: str) -> None:
+        """
+        Announces that a quantum task was submitted and that its result is still to be collected.
+        Keeping track of what is in flight is what allows :py:meth:`~ResultBuffer.get` to refuse
+        to read a result that nobody is waiting for, instead of blocking forever on the socket.
+
+        Args:
+            circuit_id (str): identificator of the circuit whose result is expected.
+        """
+        self._outstanding[circuit_id] += 1
+
+    def get(self, future: Union[FutureWrapper, QMIOFuture], circuit_id: str) -> str:
+        """
+        Returns the result of the circuit `circuit_id` as the raw string sent by the vQPU. If the
+        result was already received while waiting for another job, it is taken from the store.
+        If not, results are read from the connection - and stored as they come - until the
+        expected one shows up.
+
+        Since all the jobs sent to the same vQPU share the connection, any of their futures reads
+        from the same socket, so the `future` given is just the handle used to pull the results.
+
+        Args:
+            future (~cunqa.qclient.FutureWrapper | ~cunqa.real_qpus.qmioclient.QMIOFuture): handle
+                to the connection with the vQPU.
+
+            circuit_id (str): identificator of the circuit whose result is expected.
+
+        Return:
+            The result of the simulation as the raw string sent by the vQPU.
+        """
+        if self._outstanding[circuit_id] <= 0:
+            raise RuntimeError(f"No result is pending for circuit {circuit_id}, either it was "
+                               f"already collected or the job was never submitted.")
+
+        if self._stored[circuit_id]:
+            return self._collect_(circuit_id, self._stored[circuit_id].popleft())
+
+        # Ours has not arrived yet, so results are read until it does. Everything received in the
+        # meantime belongs to another job and is stored for when that job asks for it.
+        while True:
+            raw_result = future.get()
+            result_id = self._id_of_(raw_result)
+
+            if result_id is None:
+                logger.debug(f"A result with no id was received, it is assumed to be the one of "
+                             f"circuit {circuit_id}.")
+                return self._collect_(circuit_id, raw_result)
+
+            if result_id == circuit_id:
+                return self._collect_(circuit_id, raw_result)
+
+            logger.debug(f"Result of circuit {result_id} was received while waiting for "
+                         f"{circuit_id}, it is stored.")
+            self._stored[result_id].append(raw_result)
+
+    def _collect_(self, circuit_id: str, raw_result: str) -> str:
+        """Marks the result of `circuit_id` as collected and hands it to the caller."""
+        self._outstanding[circuit_id] -= 1
+        if not self._stored[circuit_id]:
+            self._stored.pop(circuit_id, None)
+        return raw_result
+
+    @staticmethod
+    def _id_of_(raw_result: str) -> Optional[str]:
+        """
+        Extracts the circuit id stamped by the vQPU on the result. ``None`` is returned when the
+        result carries no id, which is also the case of a result that cannot be parsed: it is
+        given to the caller so that the error is raised where it can be understood.
+        """
+        try:
+            return json.loads(raw_result).get("id")
+        except (ValueError, TypeError, AttributeError):
+            return None
+
 
 class QJob:
     """
@@ -61,28 +164,35 @@ class QJob:
     """
     qclient: Union[QClient, QMIOClient]
     _circuit_id: str
+    _id: str
     _updated: bool
     _device: dict
-    _future: Union[FutureWrapper, QMIOFuture] 
+    _future: Union[FutureWrapper, QMIOFuture]
     _result: Optional[Result]
+    _result_buffer: ResultBuffer
     _quantum_task: dict
     _params: list[Param]
 
     def __init__(
-            self, 
-            qclient: Union[QClient, QMIOClient], 
-            device: dict, 
-            circuit_ir: dict, 
+            self,
+            qclient: Union[QClient, QMIOClient],
+            device: dict,
+            circuit_ir: dict,
+            result_buffer: Optional[ResultBuffer] = None,
             **run_parameters: Any
     ):
         self._qclient = qclient
         self._device = device
         self._circuit_id = circuit_ir["id"]
+        self._id = circuit_ir["id"][0]
         self._cregisters = circuit_ir["classical_registers"]
         self._params = circuit_ir["params"]
         self._updated = False
         self._future = None
         self._result = None
+        # Without a buffer shared with the rest of the jobs sent to the same vQPU there is nobody
+        # to route the results to, so a private one is enough.
+        self._result_buffer = result_buffer if result_buffer is not None else ResultBuffer()
 
         run_config = {
             "shots": 1024, 
@@ -93,7 +203,7 @@ class QJob:
             "device": self._device,
             "sending_to": circuit_ir["sending_to"],
             "is_dynamic": circuit_ir["is_dynamic"],
-            "qpu_id": circuit_ir["id"][1]
+            "qpu_id": self._circuit_id[1]
         }
 
         if (run_parameters == None) or (len(run_parameters) == 0):
@@ -105,9 +215,9 @@ class QJob:
             logger.warning("Error when reading `run_parameters`, default were set.")
 
         self._quantum_task = {
-            "config": run_config, 
+            "config": run_config,
             "instructions": circuit_ir["instructions"],
-            "id": circuit_ir["id"][0]
+            "id": self._id
         }
       
         logger.debug("Qjob configured")
@@ -129,20 +239,22 @@ class QJob:
             recieved from the corresponding server the outcome of the job. The result is not sent 
             from the server to the :py:class:`QClient` until this method is called.
         
-        .. warning::
-            Because of how the client-server comunication is built, the user must be careful and call 
-            for the results in the same order in which the jobs where submited. If the order is not 
-            respected, no errors would be raised but results will not correspond to the job -
-            a mix up would happen. This is because the server follows the FIFO rule (*First in 
-            first out*): if we want to receive the second result, the first one has to be out.
+        .. note::
+            Results can be called in any order, no matter the order in which the jobs were
+            submitted. Every quantum task carries the id of its circuit and the vQPU stamps it
+            back on the result, so when the result received is not the one being asked for, it is
+            kept by the :py:class:`ResultBuffer` of the vQPU and delivered to the
+            :py:class:`QJob` that owns it as soon as that job asks for it. Note that results
+            coming from a real QPU carry no id, and so for them the *first in first out* rule
+            still applies.
 
         """
         if self._future is not None:
             if (self._result is not None and not self._updated) or (self._result is None):
-                res = self._future.get()
+                res = self._result_buffer.get(self._future, self._id)
                 self._result = Result(
-                    json.loads(res), 
-                    circ_id=self._circuit_id[0], 
+                    json.loads(res),
+                    circ_id=self._circuit_id[0],
                     registers=self._cregisters
                 )
                 self._updated = True
@@ -186,7 +298,8 @@ class QJob:
                     default=encoder
                 )
             )
-            
+            self._result_buffer.register(self._id)
+
             logger.debug("Circuit was sent.")
             
     def upgrade_parameters(
@@ -221,10 +334,12 @@ class QJob:
                                         corresponding new values.
         """
 
-        if self._result is None: 
+        if self._result is None:
             if self._future is not None:
                 logger.warning("You have not obtained the previous results. They will be discarded.")
-                self._future.get() # we get the previous result because if not it stays in queue
+                # We get the previous result because if not it stays in queue. It goes through the
+                # buffer so that only ours is discarded, keeping the ones of the other jobs.
+                self._result_buffer.get(self._future, self._id)
             else:
                 raise RuntimeError("No circuit was sent before calling update_parameters().")
 
@@ -237,8 +352,15 @@ class QJob:
         try:
             params_str = json.dumps(self._params, default=encoder)
             config_str = json.dumps(self._quantum_task["config"], default=encoder)
-            message = """{{"params": {}, "config": {}}}""".format(params_str, config_str).replace("'", '"')
+            # The id travels with the update as it does with the circuit, so that the vQPU can
+            # stamp it on the result and it can be routed back to this job.
+            message = """{{"params": {}, "config": {}, "id": "{}"}}""".format(
+                params_str.replace("'", '"'),
+                config_str.replace("'", '"'),
+                self._id
+            )
             self._future = self._qclient.send_parameters(message)
+            self._result_buffer.register(self._id)
             self._updated = False
         except Exception as error:
             logger.error(f"Some error occured when sending the new parameters to "
@@ -285,9 +407,10 @@ def gather(qjobs: list[QJob]) -> list[Result]:
         simultaneously, even if the first one on the list takes the longest, when it finishes the 
         rest would have been done, so just the small overhead from calling them will be added.
 
-        .. warning::
-            Since this is mainly a for loop, the order must be respected when submiting jobs to the 
-            same vQPU.
+        .. note::
+            The jobs can be given in any order, even if several of them were sent to the same
+            vQPU, since each result is identified by the id of its circuit. Have a look at
+            :py:attr:`QJob.result` for the details.
 
         Args:
             qjobs (list[QJob]): list of objects to get the result from.

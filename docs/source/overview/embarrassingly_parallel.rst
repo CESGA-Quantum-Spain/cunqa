@@ -74,9 +74,18 @@ function.
 
     results = gather(qjobs)
 
-This call for the results is a blocking call, since all simulations running in parallel need to be 
-done for the :py:class:`~cunqa.result.Result` objects to be returned. To access information such as 
+This call for the results is a blocking call, since all simulations running in parallel need to be
+done for the :py:class:`~cunqa.result.Result` objects to be returned. To access information such as
 time of simulation or output statistics there are class attributes, such as the shown below.
+
+.. note::
+    Results are identified by the id of the circuit that produced them, not by the order in which
+    the jobs were submitted: every quantum task travels with its circuit id and the :term:`vQPU`
+    stamps it back on the result. Therefore, results can be asked for in any order, even when
+    several jobs were sent to the same :term:`vQPU`, and the result of each
+    :py:class:`~cunqa.qjob.QJob` is always the one of its own circuit. The exception is the real
+    QPU, whose results carry no id and have to be retrieved in the order in which the jobs were
+    submitted.
 
 .. code-block:: python
 

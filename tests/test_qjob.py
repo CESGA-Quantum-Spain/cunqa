@@ -12,7 +12,7 @@ else:
     sys.path.insert(0, HOME)
 
 import cunqa.qjob as qjob_mod
-from cunqa.qjob import QJob, gather
+from cunqa.qjob import QJob, ResultBuffer, gather
 from cunqa.circuit.parameter import encoder
 from sympy import Symbol
 
@@ -126,6 +126,9 @@ def test_result_fetches_once_and_caches(
 
     job = QJob(qclient_mock, default_device, circuit_ir)
     job._future = future_mock
+    # The job is not submitted through `submit`, so the buffer is told by hand that a result of
+    # this circuit is on its way.
+    job._result_buffer.register(job._id)
 
     # first access
     r1 = job.result
@@ -286,8 +289,11 @@ def test_no_result_but_future_exists_gets_result(qjob_instance, qclient_mock):
     """Test that when _result is None but _future exists, the result is fetched."""
     qjob_instance._result = None
     mock_future = Mock()
+    mock_future.get.return_value = json.dumps({"counts": {"00": 10}, "id": qjob_instance._id})
     qjob_instance._future = mock_future
-    
+    # The fixture does not go through `submit`, so the pending result is registered by hand.
+    qjob_instance._result_buffer.register(qjob_instance._id)
+
     qjob_instance.upgrade_parameters({"theta": 0.5})
     
     # The future's get() method should be called
@@ -394,9 +400,184 @@ def test_multiple_consecutive_upgrades(qjob_instance, qclient_mock):
     qjob_instance.upgrade_parameters({"theta": 0.5})
     qjob_instance.upgrade_parameters({"theta": 1.0})
     qjob_instance.upgrade_parameters({"theta": 1.5})
-    
+
     assert qclient_mock.send_parameters.call_count == 3
     assert qjob_instance.assign_parameters_.call_count == 3
+
+
+def test_upgrade_parameters_sends_the_circuit_id(qjob_instance, qclient_mock):
+    """The update must carry the id, otherwise the result of it could not be routed back."""
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+
+    message = json.loads(qclient_mock.send_parameters.call_args.args[0])
+    assert message["id"] == qjob_instance._id
+
+
+def test_upgrade_parameters_registers_the_new_result(qjob_instance, qclient_mock):
+    """After resending, a new result is on its way and the buffer must expect it."""
+    qjob_instance.upgrade_parameters({"theta": 0.5})
+
+    assert qjob_instance._result_buffer._outstanding[qjob_instance._id] == 1
+
+
+# ------------------------
+# ResultBuffer
+# ------------------------
+
+def _raw_result(circuit_id=None, counts=None):
+    """Builds a result as the vQPU sends it: a raw json string, with the id stamped on it."""
+    result = {"counts": counts if counts is not None else {"00": 1024}, "time_taken": 0.1}
+    if circuit_id is not None:
+        result["id"] = circuit_id
+    return json.dumps(result)
+
+
+@pytest.fixture
+def result_buffer():
+    return ResultBuffer()
+
+
+def test_buffer_returns_the_result_asked_for(result_buffer):
+    future = Mock()
+    future.get.return_value = _raw_result("circuit-a")
+    result_buffer.register("circuit-a")
+
+    assert json.loads(result_buffer.get(future, "circuit-a"))["id"] == "circuit-a"
+    future.get.assert_called_once()
+
+
+def test_buffer_stores_results_of_other_jobs(result_buffer):
+    """Results arriving out of order are kept for the job that owns them."""
+    future = Mock()
+    # The vQPUs answer in the opposite order to the one in which the jobs are asked for.
+    future.get.side_effect = [_raw_result("circuit-b"), _raw_result("circuit-a")]
+    result_buffer.register("circuit-a")
+    result_buffer.register("circuit-b")
+
+    assert json.loads(result_buffer.get(future, "circuit-a"))["id"] == "circuit-a"
+    assert future.get.call_count == 2
+
+    # The result of `circuit-b` was stored on the way, so it is taken from there and the
+    # connection is not read again.
+    assert json.loads(result_buffer.get(future, "circuit-b"))["id"] == "circuit-b"
+    assert future.get.call_count == 2
+
+
+def test_buffer_keeps_the_order_of_results_with_the_same_id(result_buffer):
+    """The same circuit can be in flight twice, and its results are kept first in first out."""
+    future = Mock()
+    future.get.side_effect = [
+        _raw_result("circuit-b", counts={"00": 1}),
+        _raw_result("circuit-b", counts={"11": 2}),
+        _raw_result("circuit-a"),
+    ]
+    result_buffer.register("circuit-a")
+    result_buffer.register("circuit-b")
+    result_buffer.register("circuit-b")
+
+    result_buffer.get(future, "circuit-a")
+
+    assert json.loads(result_buffer.get(future, "circuit-b"))["counts"] == {"00": 1}
+    assert json.loads(result_buffer.get(future, "circuit-b"))["counts"] == {"11": 2}
+    assert future.get.call_count == 3
+
+
+def test_buffer_falls_back_to_fifo_with_results_with_no_id(result_buffer):
+    """Results of a real QPU carry no id, so they are given to whoever is asking."""
+    future = Mock()
+    future.get.return_value = _raw_result()
+    result_buffer.register("circuit-a")
+
+    assert json.loads(result_buffer.get(future, "circuit-a"))["counts"] == {"00": 1024}
+    future.get.assert_called_once()
+
+
+def test_buffer_does_not_read_when_nothing_is_pending(result_buffer):
+    """Asking for a result that nobody is waiting for must not block on the connection."""
+    future = Mock()
+
+    with pytest.raises(RuntimeError, match="No result is pending"):
+        result_buffer.get(future, "circuit-a")
+
+    future.get.assert_not_called()
+
+
+def test_buffer_does_not_deliver_the_same_result_twice(result_buffer):
+    future = Mock()
+    future.get.return_value = _raw_result("circuit-a")
+    result_buffer.register("circuit-a")
+
+    result_buffer.get(future, "circuit-a")
+
+    with pytest.raises(RuntimeError, match="No result is pending"):
+        result_buffer.get(future, "circuit-a")
+
+
+# ------------------------
+# QJob and ResultBuffer
+# ------------------------
+
+def test_submit_registers_the_expected_result(
+    monkeypatch, qclient_mock, circuit_ir, default_device
+):
+    qclient_mock.send_circuit.return_value = Mock()
+
+    job = QJob(qclient_mock, default_device, circuit_ir)
+    job.submit()
+
+    assert job._result_buffer._outstanding[job._id] == 1
+
+
+def test_results_are_routed_between_jobs_of_the_same_qpu(
+    monkeypatch, qclient_mock, circuit_ir, default_device
+):
+    """Two jobs sharing a vQPU get their own result even if they are asked for out of order."""
+    monkeypatch.setattr(
+        qjob_mod, "Result",
+        lambda result, circ_id, registers: result  # the raw dict is enough to identify it
+    )
+
+    other_circuit_ir = dict(circuit_ir, id=("circuit-456", "qpu-1"))
+
+    buffer = ResultBuffer()
+    future = Mock()
+    # The result of the second job is the first one to arrive.
+    future.get.side_effect = [_raw_result("circuit-456"), _raw_result("circuit-123")]
+    qclient_mock.send_circuit.return_value = future
+
+    job_1 = QJob(qclient_mock, default_device, circuit_ir, result_buffer=buffer)
+    job_2 = QJob(qclient_mock, default_device, other_circuit_ir, result_buffer=buffer)
+    job_1.submit()
+    job_2.submit()
+
+    assert job_1.result["id"] == "circuit-123"
+    assert job_2.result["id"] == "circuit-456"
+    assert future.get.call_count == 2
+
+
+def test_gather_returns_each_result_to_its_job(
+    monkeypatch, qclient_mock, circuit_ir, default_device
+):
+    monkeypatch.setattr(
+        qjob_mod, "Result",
+        lambda result, circ_id, registers: result
+    )
+
+    other_circuit_ir = dict(circuit_ir, id=("circuit-456", "qpu-1"))
+
+    buffer = ResultBuffer()
+    future = Mock()
+    future.get.side_effect = [_raw_result("circuit-456"), _raw_result("circuit-123")]
+    qclient_mock.send_circuit.return_value = future
+
+    jobs = [
+        QJob(qclient_mock, default_device, circuit_ir, result_buffer=buffer),
+        QJob(qclient_mock, default_device, other_circuit_ir, result_buffer=buffer)
+    ]
+    for job in jobs:
+        job.submit()
+
+    assert [result["id"] for result in gather(jobs)] == ["circuit-123", "circuit-456"]
 
 # ------------------------
 # assign_parameters_

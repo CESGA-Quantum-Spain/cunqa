@@ -429,6 +429,7 @@ void QCExecutor::run()
 
         for(const auto& quantum_task: quantum_tasks) {
             JSON qpu_result = {
+                {"id", quantum_task.id},
                 {"counts", meas_counter[quantum_task.config.qpu_id]},
                 {"time_taken", time_taken}
             };

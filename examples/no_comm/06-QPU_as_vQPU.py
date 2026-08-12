@@ -24,8 +24,10 @@ try:
     circuit.measure_all()
 
     # 3. Execute circuit on QMIO.
-    #    Both jobs are submitted without blocking; the results must be retrieved
-    #    in the same order in which the jobs were submitted.
+    #    Both jobs are submitted without blocking. Opposite to the results of a vQPU, which are
+    #    identified by the id of their circuit and can be retrieved in any order, the ones coming
+    #    from QMIO carry no id, so they must be retrieved in the same order in which the jobs
+    #    were submitted.
     qjob0 = run(circuit, qmio, shots = 100)
     qjob1 = run(circuit, qmio, shots = 100)
 

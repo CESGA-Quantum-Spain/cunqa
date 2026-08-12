@@ -49,7 +49,17 @@ void QPU::compute_result_()
             } catch(const std::exception& e) {
                 LOGGER_ERROR("There has happened an error executing the circuit, the server keeps on iterating.");
                 LOGGER_ERROR("Message of the error: {}", e.what());
-                result = "{\"ERROR\":\""s + std::string(e.what()) + "\"}"s;
+
+                JSON error_result = {{"ERROR", std::string(e.what())}};
+                try {
+                    const auto quantum_task = JSON::parse(quantum_task_str);
+                    if (quantum_task.contains("id"))
+                        error_result["id"] = quantum_task.at("id");
+                } catch (const std::exception& parsing_error) {
+                    LOGGER_ERROR("The id of the failed circuit could not be read: {}", parsing_error.what());
+                }
+
+                result = error_result.dump();
             }
 
             {
@@ -65,8 +75,6 @@ void QPU::compute_result_()
     }
 }
 
-// I/O thread: the sole owner of the socket. It multiplexes receiving requests
-// and sending the results the compute thread has finished.
 void QPU::recv_data_()
 {
     while (true) {

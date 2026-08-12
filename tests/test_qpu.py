@@ -101,7 +101,8 @@ def test_execute_creates_qjob_submits_and_returns_without_param(monkeypatch, qpu
     QJobMock.assert_called_once_with(
         qpu._qclient, 
         {"device_name": "CPU", "target_devices": []},
-        circuit, 
+        circuit,
+        qpu._result_buffer,
         **run_parameters
     )
     qjob_instance.submit.assert_called_once_with(None)
@@ -119,6 +120,7 @@ def test_execute_creates_qjob_and_submits_with_var_values(monkeypatch, qpu):
         qpu._qclient,
         qpu._device,
         circuit,
+        qpu._result_buffer,
         shots=100
     )
     qjob_instance.submit.assert_called_once_with(param_values)
