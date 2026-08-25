@@ -229,70 +229,70 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
         case cunqa::InstructionType::U1:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_U1_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RX:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RY:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::RZ:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RZ_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVX:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotInvX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVY:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotInvY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTINVZ:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotInvZ_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTX:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotX_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTY:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotY_gate(qubit, param);
             break;
         }
         case cunqa::InstructionType::ROTZ:
         {
             auto qubit = instruction.at("qubits").get<unsigned int>();
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_RotZ_gate(qubit, param);
             break;
         }
@@ -329,6 +329,17 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
             circuit.add_ECR_gate(qubits[0], qubits[1]);
             break;
         }
+        case cunqa::InstructionType::CP:
+        {
+            // Qulacs has no controlled-phase gate: U1 already is a matrix gate,
+            // so the control qubit can be attached to it directly.
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto param = instruction.at("params").at(0).get<double>();
+            auto* cp_gate = gate::U1(qubits[1], param);
+            cp_gate->add_control_qubit(qubits[0], 1);
+            circuit.add_gate(cp_gate);
+            break;
+        }
         case cunqa::InstructionType::SWAP:
         {
             auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
@@ -355,7 +366,7 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
             for (int i = 0; i < qubits.size(); i++) {
                 uiqubits.push_back(qubits[i]);
             }
-            auto param = instruction.at("params").get<double>();
+            auto param = instruction.at("params").at(0).get<double>();
             circuit.add_multi_Pauli_rotation_gate(uiqubits, instruction.at("pauli_id_list").get<std::vector<unsigned int>>(), param);
             break;
         }
@@ -429,6 +440,60 @@ inline void update_qulacs_circuit(QuantumCircuit& circuit, const cunqa::QulacsCi
                 uiqubits.push_back(qubits[i]);
             }
             circuit.add_random_unitary_gate(uiqubits, static_cast<UINT>(instruction.at("seed").get<int>()));
+            break;
+        }
+        case cunqa::InstructionType::ID:
+        {
+            auto qubit = instruction.at("qubits").get<unsigned int>();
+            circuit.add_gate(gate::Identity(qubit));
+            break;
+        }
+        case cunqa::InstructionType::BITFLIPNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::BitFlipNoise(qubits[0], prob, seed));
+            break;
+        }
+        case cunqa::InstructionType::DEPHASINGNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::DephasingNoise(qubits[0], prob, seed));
+            break;
+        }
+        case cunqa::InstructionType::INDEPENDENTXZNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::IndependentXZNoise(qubits[0], prob, seed));
+            break;
+        }
+        case cunqa::InstructionType::DEPOLARIZINGNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::DepolarizingNoise(qubits[0], prob, seed));
+            break;
+        }
+        case cunqa::InstructionType::AMPLITUDEDAMPINGNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::AmplitudeDampingNoise(qubits[0], prob, seed));
+            break;
+        }
+        case cunqa::InstructionType::TWOQUBITDEPOLARIZINGNOISE:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+            auto prob = instruction.at("params").at(0).get<double>();
+            int seed = instruction.contains("seed") ? instruction.at("seed").get<int>() : 0;
+            circuit.add_gate(gate::TwoQubitDepolarizingNoise(qubits[0], qubits[1], prob, seed));
             break;
         }
         default:
@@ -594,6 +659,18 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const OneQu
             gate::RotInvZ(payload.qubit, *payload.param)->update_quantum_state(&state_->state);
             break;
 
+        case InstructionType::ROTX:
+            gate::RotX(payload.qubit, *payload.param)->update_quantum_state(&state_->state);
+            break;
+
+        case InstructionType::ROTY:
+            gate::RotY(payload.qubit, *payload.param)->update_quantum_state(&state_->state);
+            break;
+
+        case InstructionType::ROTZ:
+            gate::RotZ(payload.qubit, *payload.param)->update_quantum_state(&state_->state);
+            break;
+
         default:
             unsupported_gate(type, payload);
     }
@@ -647,6 +724,25 @@ void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQu
             break;
 
         
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QulacsSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitOneParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::CP:
+        {
+            // Qulacs has no controlled-phase gate: U1 already is a matrix gate,
+            // so the control qubit can be attached to it directly.
+            std::unique_ptr<QuantumGateMatrix> cp_gate(gate::U1(payload.qubits[1], *payload.param));
+            cp_gate->add_control_qubit(payload.qubits[0], 1);
+            cp_gate->update_quantum_state(&state_->state);
+            break;
+        }
 
         default:
             unsupported_gate(type, payload);

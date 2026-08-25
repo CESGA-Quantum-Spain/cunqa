@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string_view>
 
@@ -45,6 +46,7 @@ public:
     void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) override;
 
     void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
     void apply_gate(const InstructionType& type, const FusedSwap& payload) override;
     void apply_gate(const InstructionType& type, const MultiPauli& payload) override;
 
@@ -62,16 +64,17 @@ private:
     struct State;
     std::unique_ptr<State> state_;
 
-    static constexpr std::array<std::string_view, 49> QULACS_BASIS_GATES = {{
+    static constexpr auto QULACS_BASIS_GATES = std::to_array<std::string_view>({
         "measure",
         "id", "x", "y", "z", "h", "s", "sdg", "t", "tdg", "p0", "p1", "sx", "sxdg", "sy", "sydg", "multipauli",
-        "u1", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz", "rotx", "roty", "rotz", "parametricrx", "parametricry", "parametricrz", "multipaulirotation",
+        "u1", "rx", "ry", "rz", "rotinvx", "rotinvy", "rotinvz", "rotx", "roty", "rotz", "multipaulirotation",
         "u2",
         "u3",
         "cx", "cz", "swap", "fusedswap", "ecr",
         "cp",
-        "amplitudedampingnoise", "bitflipnoise", "densematrix", "dephasingnoise", "depolarizingnoise", "diagonalmatrix", "independentxznoise", "randomunitary", "sparsematrix", "twoqubitdepolarizingnoise",
-    }};
+        "amplitudedampingnoise", "bitflipnoise", "dephasingnoise", "depolarizingnoise", "independentxznoise", "twoqubitdepolarizingnoise",
+        "unitary", "diagonal", "sparsematrix", "randomunitary",
+    });
 
 };
 

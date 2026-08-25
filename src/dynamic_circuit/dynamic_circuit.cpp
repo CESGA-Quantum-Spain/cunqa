@@ -12,6 +12,31 @@
 
 namespace cunqa {
 
+namespace {
+
+// The *raxis gates carry the rotation angle in "params" and the rotation axis in
+// a separate "axis" field, while the simulators expect them flattened into
+// (angle, axis_x, axis_y, axis_z).
+std::array<double, 4> raxis_params(const JSON& instruction)
+{
+    auto axis = instruction.at("axis").get<std::vector<double>>();
+    if (axis.size() != 3) {
+        throw std::runtime_error(
+            "The rotation axis must have 3 components, but " +
+            std::to_string(axis.size()) + " were given."
+        );
+    }
+
+    return {
+        instruction.at("params").at(0).get<double>(),
+        axis[0],
+        axis[1],
+        axis[2]
+    };
+}
+
+} // End of anonymous namespace
+
 DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
 {
     for (auto const& instruction : instructions_json) {
@@ -39,6 +64,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 case InstructionType::V:
                 case InstructionType::VDG:
                 case InstructionType::K:
+                case InstructionType::HZ2:
                 {
                     cunqa_instruction = {
                         .type = instruction_type,
@@ -74,6 +100,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 }
                 case InstructionType::U2:
                 case InstructionType::R:
+                case InstructionType::RXY:
                 {
                     auto instr_params = instruction.at("params").get<std::array<double, 2>>();
                     auto param_ptrs = params.add_parameters(instr_params);
@@ -107,15 +134,29 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = OneQubitFourParam {
-                            instruction.at("qubits").get<std::size_t>(), 
+                            instruction.at("qubits").get<std::size_t>(),
                             param_ptrs
                         }
                     };
                     break;
                 }
+                case InstructionType::RAXIS:
+                {
+                    auto param_ptrs = params.add_parameters(raxis_params(instruction));
+                    cunqa_instruction = {
+                        .type = instruction_type,
+                        .payload = OneQubitFourParam {
+                            instruction.at("qubits").get<std::size_t>(),
+                            param_ptrs
+                        }
+                    };
+                    break;
+                }
+                case InstructionType::ID2:
                 case InstructionType::ECR:
                 case InstructionType::SWAP:
                 case InstructionType::ISWAP:
+                case InstructionType::SQRTSWAP:
                 case InstructionType::CX:
                 case InstructionType::CY:
                 case InstructionType::CZ:
@@ -159,6 +200,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 case InstructionType::CU2:
                 case InstructionType::XXMYY:
                 case InstructionType::XXPYY:
+                case InstructionType::FS:
                 {
                     auto instr_params = instruction.at("params").get<std::array<double, 2>>();
                     auto param_ptrs = params.add_parameters(instr_params);
@@ -188,6 +230,18 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 {
                     auto instr_params = instruction.at("params").get<std::array<double, 4>>();
                     auto param_ptrs = params.add_parameters(instr_params);
+                    cunqa_instruction = {
+                        .type = instruction_type,
+                        .payload = TwoQubitFourParam{
+                            instruction.at("qubits").get<std::array<std::size_t, 2>>(),
+                            param_ptrs
+                        }
+                    };
+                    break;
+                }
+                case InstructionType::CRAXIS:
+                {
+                    auto param_ptrs = params.add_parameters(raxis_params(instruction));
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = TwoQubitFourParam{
@@ -235,7 +289,6 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 case InstructionType::MCRX:
                 case InstructionType::MCRY:
                 case InstructionType::MCRZ:
-                case InstructionType::MCRAXIS:
                 case InstructionType::MCP:
                 case InstructionType::MCU1:
                 case InstructionType::MCU2:
@@ -251,6 +304,19 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                         .payload = MultiParam{
                             instruction.at("qubits").get<std::vector<std::size_t>>(), 
                             param_ptrs
+                        }
+                    };
+                    break;
+                }
+                case InstructionType::MCRAXIS:
+                {
+                    auto instr_params = raxis_params(instruction);
+                    std::vector<double> flat_params(instr_params.begin(), instr_params.end());
+                    cunqa_instruction = {
+                        .type = instruction_type,
+                        .payload = MultiParam{
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            params.add_parameters(flat_params)
                         }
                     };
                     break;
@@ -303,13 +369,15 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = NumControlsParam{
-                            instruction.at("qubits").get<std::vector<std::size_t>>(), 
-                            param
+                            instruction.at("qubits").get<std::vector<std::size_t>>(),
+                            param,
+                            instruction.at("num_controls").get<int>()
                         }
                     };
                     break;
                 }
                 case InstructionType::UNITARY:
+                case InstructionType::CUNITARY:
                 case InstructionType::SPARSEMATRIX:
                 {
                     cunqa_instruction = {
@@ -358,9 +426,10 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                 case InstructionType::MULTIPAULI:
                 case InstructionType::MULTIPAULIROTATION:
                 {
+                    // multipauli carries no angle; multipaulirotation carries one.
                     double instr_param = 0.0;
-                    if (instruction.contains("param")) {
-                        instr_param = instruction.at("param").at(0).get<double>();
+                    if (instruction.contains("params")) {
+                        instr_param = instruction.at("params").at(0).get<double>();
                     }
                     auto* param = params.add_parameter(instr_param);
                     cunqa_instruction = {
@@ -385,7 +454,7 @@ DynamicCircuit::DynamicCircuit(const JSON& instructions_json)
                     cunqa_instruction = {
                         .type = instruction_type,
                         .payload = OneQubitNoise{
-                            instruction.at("qubits").get<std::size_t>(), 
+                            instruction.at("qubits").at(0).get<std::size_t>(),
                             param,
                             seed
                         }

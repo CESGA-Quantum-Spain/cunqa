@@ -49,8 +49,18 @@ const std::unordered_map<cunqa::InstructionType, OpType> MUNICH_INSTRUCTIONS_MAP
     // ONE QUBIT TWO PARAM
     {cunqa::InstructionType::U2, OpType::U2},
 
-    // ONE QUBIT THREE PARAM 
+    // ONE QUBIT THREE PARAM
     {cunqa::InstructionType::U3, OpType::U},
+
+    // ONE QUBIT FOUR PARAM
+    // MQT's U only carries (theta, phi, lambda); the fourth cunqa parameter is
+    // the global phase, applied as a separate GPhase operation.
+    {cunqa::InstructionType::U, OpType::U},
+
+    // TWO QUBITS FOUR PARAMS
+    // Likewise CU: the fourth parameter is a phase that only applies when the
+    // control is |1>, so it becomes a phase gate on the control qubit.
+    {cunqa::InstructionType::CU, OpType::U},
 
     // TWO QUBIT NO PARAM
     {cunqa::InstructionType::CX, OpType::X},
@@ -139,7 +149,7 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::U1:
             {
                 auto qubit = instruction.at("qubits").get<unsigned int>();
-                auto param = instruction.at("params").get<double>();
+                auto param = instruction.at("params").at(0).get<double>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubit, MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
                 break;
             }
@@ -180,10 +190,17 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::CSX:
             case cunqa::InstructionType::CS:
             case cunqa::InstructionType::CSDG:
-            case cunqa::InstructionType::CSWAP:
             {
                 std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
+                break;
+            }
+            case cunqa::InstructionType::CSWAP:
+            {
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+                Control control(qubits[0]);
+                Targets targets = {qubits[1], qubits[2]};
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(control, targets, MUNICH_INSTRUCTIONS_MAP.at(inst_type)));
                 break;
             }
             case cunqa::InstructionType::RXX:
@@ -193,9 +210,11 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::XXMYY:
             case cunqa::InstructionType::XXPYY:
             {
+                // XXminusYY and XXplusYY are two-parameter gates: passing a single
+                // one made MQT read parameter[1] out of bounds.
                 std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
-                auto param = instruction.at("params").get<double>();
-                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits, MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
+                auto params = instruction.at("params").get<std::vector<double>>();
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits, MUNICH_INSTRUCTIONS_MAP.at(inst_type), params));
                 break;
             }
             case cunqa::InstructionType::CP:
@@ -205,13 +224,26 @@ inline void cunqa_circuit_to_mqt_circuit(const cunqa::MunichCircuit& circuit, Qu
             case cunqa::InstructionType::CU1:
             {
                 std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
-                auto param = instruction.at("params").get<double>();
+                auto param = instruction.at("params").at(0).get<double>();
                 mqt_circuit.emplace_back(std::make_unique<StandardOperation>(qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type), std::vector<double>({param})));
+                break;
+            }
+            case cunqa::InstructionType::CU:
+            {
+                // MQT's U takes (theta, phi, lambda). cunqa's fourth parameter is a
+                // phase conditioned on the control, i.e. a phase gate on the control.
+                std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
+                auto params = instruction.at("params").get<std::vector<double>>();
+
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(
+                    qubits[0], qubits[1], MUNICH_INSTRUCTIONS_MAP.at(inst_type),
+                    std::vector<double>(params.begin(), params.begin() + 3)));
+                mqt_circuit.emplace_back(std::make_unique<StandardOperation>(
+                    qubits[0], OpType::P, std::vector<double>({params.at(3)})));
                 break;
             }
             case cunqa::InstructionType::CU2:
             case cunqa::InstructionType::CU3:
-            case cunqa::InstructionType::CU:
             {
                 std::vector<unsigned int> qubits = instruction.at("qubits").get<std::vector<unsigned int>>();
                 auto params = instruction.at("params").get<std::vector<double>>();
@@ -355,16 +387,79 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const OneQu
         case InstructionType::GLOBALP:
         case InstructionType::P:
         case InstructionType::U1:
-        case InstructionType::U2:
-        case InstructionType::U3:
-        case InstructionType::U:
         {
             std::vector<double> params = {*payload.param};
             auto param_one_gate = std::make_unique<StandardOperation>(payload.qubit, MUNICH_INSTRUCTIONS_MAP.at(type), params);
             state_->applyOperationToStateAdapter(std::move(param_one_gate));
             break;
         }
-        
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitTwoParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::U2:
+        {
+            std::vector<double> params;
+            params.reserve(payload.params.size());
+            for (double* const ptr : payload.params) {
+                params.push_back(*ptr);
+            }
+            auto param_one_gate = std::make_unique<StandardOperation>(payload.qubit, MUNICH_INSTRUCTIONS_MAP.at(type), params);
+            state_->applyOperationToStateAdapter(std::move(param_one_gate));
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitThreeParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::U3:
+        {
+            std::vector<double> params;
+            params.reserve(payload.params.size());
+            for (double* const ptr : payload.params) {
+                params.push_back(*ptr);
+            }
+            auto param_one_gate = std::make_unique<StandardOperation>(payload.qubit, MUNICH_INSTRUCTIONS_MAP.at(type), params);
+            state_->applyOperationToStateAdapter(std::move(param_one_gate));
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitFourParam& payload)
+{
+    switch (type)
+    {
+        case InstructionType::U:
+        {
+            // MQT's U is the three-parameter gate, so the fourth cunqa parameter
+            // (the global phase) is applied as a separate GPhase operation.
+            std::vector<double> params = {
+                *payload.params[0], *payload.params[1], *payload.params[2]
+            };
+            auto param_one_gate = std::make_unique<StandardOperation>(payload.qubit, MUNICH_INSTRUCTIONS_MAP.at(type), params);
+            state_->applyOperationToStateAdapter(std::move(param_one_gate));
+
+            auto global_phase = std::make_unique<StandardOperation>(payload.qubit, OpType::GPhase, std::vector<double>{*payload.params[3]});
+            state_->applyOperationToStateAdapter(std::move(global_phase));
+            break;
+        }
+
         default:
             unsupported_gate(type, payload);
     }
@@ -391,7 +486,6 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQu
         case InstructionType::CSX:
         case InstructionType::CS:
         case InstructionType::CSDG:
-        case InstructionType::CSWAP:
         {
             Control control(payload.qubits[0]);
             auto two_gate = std::make_unique<StandardOperation>(control, payload.qubits[1], MUNICH_INSTRUCTIONS_MAP.at(type));
@@ -498,13 +592,16 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQu
     {
         case InstructionType::CU:
         {
-            std::vector<double> vec_params;
-            vec_params.reserve(payload.params.size());
-            for (double* const ptr : payload.params) {
-                vec_params.push_back(*ptr);
-            }
+            // MQT's U takes (theta, phi, lambda); the fourth cunqa parameter is a
+            // phase conditioned on the control, i.e. a phase gate on the control.
+            std::vector<double> vec_params = {
+                *payload.params[0], *payload.params[1], *payload.params[2]
+            };
             auto two_4param_gate = std::make_unique<StandardOperation>(payload.qubits[0], payload.qubits[1], MUNICH_INSTRUCTIONS_MAP.at(type), vec_params);
             state_->applyOperationToStateAdapter(std::move(two_4param_gate));
+
+            auto control_phase = std::make_unique<StandardOperation>(payload.qubits[0], OpType::P, std::vector<double>{*payload.params[3]});
+            state_->applyOperationToStateAdapter(std::move(control_phase));
             break;
         }
         
@@ -520,8 +617,9 @@ void MunichSimulatorAdapter::apply_gate(const InstructionType& type, const Three
         case InstructionType::CSWAP:
         {
             Control control(payload.qubits[0]);
-            auto two_gate = std::make_unique<StandardOperation>(control, payload.qubits[1], MUNICH_INSTRUCTIONS_MAP.at(type));
-            state_->applyOperationToStateAdapter(std::move(two_gate));
+            Targets targets = {static_cast<unsigned int>(payload.qubits[1]), static_cast<unsigned int>(payload.qubits[2])};
+            auto three_gate = std::make_unique<StandardOperation>(control, targets, MUNICH_INSTRUCTIONS_MAP.at(type));
+            state_->applyOperationToStateAdapter(std::move(three_gate));
             break;
         }
         
