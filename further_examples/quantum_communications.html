@@ -124,16 +124,16 @@
 <p>The quantum-communications directives, together with simple examples, are explained in the <a class="reference internal" href="../overview/quantum_comm.html"><span class="doc">Quantum Communication</span></a> section.
 This section will present a couple of examples are presented to highlight the use of <a class="reference internal" href="../glossary.html#term-quantum-communications"><span class="xref std std-term">quantum communications</span></a>.</p>
 <p>In this first example we present an example of distributed QPE, so that the results obtained can be compared with the ones in <a class="reference internal" href="no_communications.html"><span class="doc">No-communications scheme</span></a> and <a class="reference internal" href="classical_communications.html"><span class="doc">Classical-communications scheme</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
 <span class="sd">Code implementing a simple distribution variant of the QPE algorithm. </span>
 <span class="sd">We use the telegate protocol to apply gates on a circuit that has the eigenvector from a circuit where the bits of the phase will be measured.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qc_protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">cat_entangler</span><span class="p">,</span> <span class="n">cat_disentangler</span>
@@ -152,10 +152,10 @@ This section will present a couple of examples are presented to highlight the us
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-    <span class="n">backend_path</span> <span class="o">=</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s2">&quot;/04-qdistributed_QPE.json&quot;</span>
+    <span class="n">backend_path</span> <span class="o">=</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s2">"/04-qdistributed_QPE.json"</span>
     <span class="c1"># 1. Deploy vQPUs</span>
-    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> 
-                    <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span>
+    <span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="n">N_QPUS</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> 
+                    <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span>
                     <span class="n">quantum_comm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">cores_per_qpu</span> <span class="o">=</span> <span class="n">CORES_PER_QPU</span><span class="p">,</span> 
@@ -168,8 +168,8 @@ This section will present a couple of examples are presented to highlight the us
     <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="p">)</span>
 
     <span class="c1"># 2. Design circuits modelling the QPE </span>
-    <span class="n">ancilla_circuit</span>  <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">N_ANCILLA_QUBITS</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;ancilla_circuit&quot;</span><span class="p">)</span>
-    <span class="n">register_circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="n">N_REGISTER_QUBITS</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;register_circuit&quot;</span><span class="p">)</span>
+    <span class="n">ancilla_circuit</span>  <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="n">N_ANCILLA_QUBITS</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">N_ANCILLA_QUBITS</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">"ancilla_circuit"</span><span class="p">)</span>
+    <span class="n">register_circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="n">N_REGISTER_QUBITS</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">"register_circuit"</span><span class="p">)</span>
 
     <span class="n">data_qubits_anc</span><span class="p">,</span> <span class="n">comm_qubits_anc</span> <span class="o">=</span> <span class="n">ancilla_circuit</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
     <span class="n">data_qubits_reg</span><span class="p">,</span> <span class="n">comm_qubits_reg</span> <span class="o">=</span> <span class="n">register_circuit</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
@@ -188,7 +188,7 @@ This section will present a couple of examples are presented to highlight the us
             <span class="n">data_qubit</span>      <span class="o">=</span> <span class="n">data_qubits_anc</span><span class="p">[</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">],</span>
             <span class="n">comm_qubits</span>     <span class="o">=</span> <span class="p">[</span><span class="n">comm_qubits_anc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">comm_qubits_reg</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
             <span class="n">clbits</span>          <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-            <span class="n">tag</span>             <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;telegate_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">tag</span>             <span class="o">=</span> <span class="sa">f</span><span class="s2">"telegate_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         
         <span class="n">param</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">PHASE_TO_COMPUTE</span>
@@ -230,20 +230,20 @@ This section will present a couple of examples are presented to highlight the us
 
     <span class="c1"># 4. Post-processing results to extract estimated phase </span>
     <span class="n">counts</span> <span class="o">=</span> <span class="n">result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">counts</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time taken: </span><span class="si">{</span><span class="n">result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time_taken</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Time taken: </span><span class="si">{</span><span class="n">result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time_taken</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">most_frequent_output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Most frequent output is </span><span class="si">{</span><span class="n">most_frequent_output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Most frequent output is </span><span class="si">{</span><span class="n">most_frequent_output</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">estimated_theta</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">digit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">most_frequent_output</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">digit</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">digit</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
             <span class="n">estimated_theta</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">N_ANCILLA_QUBITS</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span>
 
     
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated angle: </span><span class="si">{</span><span class="n">estimated_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimated angle: </span><span class="si">{</span><span class="n">estimated_theta</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Real angle: </span><span class="si">{</span><span class="n">PHASE_TO_COMPUTE</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 5. Drop the deployed QPUs </span>
     <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>

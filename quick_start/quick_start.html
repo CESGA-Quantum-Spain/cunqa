@@ -134,7 +134,7 @@ a bash command and get them in the Python program.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Adding path to access CUNQA module</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">)</span> <span class="c1"># os.getenv(&quot;HOME&quot;) at CESGA by default</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"&lt;/your/cunqa/installation/path&gt;"</span><span class="p">)</span> <span class="c1"># os.getenv("HOME") at CESGA by default</span>
 
 <span class="c1"># Gettting the raised QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
@@ -164,7 +164,7 @@ a bash command and get them in the Python program.</p>
 <span class="n">counts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts_list</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">)</span> <span class="c1"># Format: {&#39;00&#39;:546, &#39;11&#39;:454}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span> <span class="p">)</span> <span class="c1"># Format: {'00':546, '11':454}</span>
 </pre></div>
 </div>
 <p>It is a good practice to relinquish resources when the work is done. This is achieved by the <a class="reference internal" href="../reference/commands/qdrop.html"><span class="doc">qdrop</span></a> command:</p>
@@ -177,12 +177,12 @@ a bash command and get them in the Python program.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Adding path to access CUNQA module</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;/your/cunqa/installation/path&gt;&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"&lt;/your/cunqa/installation/path&gt;"</span><span class="p">)</span>
 
 <span class="c1"># Raising the QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">qraise</span>
 
-<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">"01:00:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Gettting the raised QPUs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span>
@@ -212,7 +212,7 @@ a bash command and get them in the Python program.</p>
 <span class="n">counts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">counts_list</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">)</span> <span class="c1"># Format: {&#39;00&#39;:546, &#39;11&#39;:454}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Counts: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span> <span class="p">)</span> <span class="c1"># Format: {'00':546, '11':454}</span>
 
 <span class="c1"># Relinquishing the resources</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">qdrop</span>

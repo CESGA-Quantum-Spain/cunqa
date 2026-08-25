@@ -844,7 +844,7 @@ are executed only when the classical condition is met. This method takes no argu
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cunqa.circuit.core.CunqaCircuit.u">
-<span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.u" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.circuit.core.CunqaCircuit.u" title="Link to this definition"></a></dt>
 <dd><p class="sd-card-text">Class method to apply u gate to the given qubit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -853,6 +853,7 @@ are executed only when the classical condition is met. This method takes no argu
 <li><p class="sd-card-text"><strong>phi</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – angle.</p></li>
 <li><p class="sd-card-text"><strong>lam</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – angle.</p></li>
 <li><p class="sd-card-text"><strong>qubit</strong> (<em>int</em>) – qubit in which the gate is applied.</p></li>
+<li><p class="sd-card-text"><strong>gamma</strong> (<em>float</em><em> | </em><em>int</em><em> | </em><em>str</em>) – global phase angle. Defaults to 0.0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -2045,7 +2046,7 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
 <p>Full example of the <a class="reference internal" href="#cunqa.circuit.transformations.add" title="cunqa.circuit.transformations.add"><code class="xref py py-func docutils literal notranslate"><span class="pre">add</span></code></a> function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
@@ -2054,7 +2055,7 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
 <span class="c1"># ---------------------------</span>
 <span class="c1"># Acquiring the resources</span>
 <span class="c1"># ---------------------------</span>
-<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">[</span><span class="n">qpu</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
 
 <span class="c1"># ---------------------------</span>
@@ -2072,10 +2073,10 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
 <span class="c1"># added_circuit.q1: ─────[X]─[M]─</span>
 <span class="c1"># ---------------------------</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
+    <span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">"circuit1"</span><span class="p">)</span> <span class="c1"># adding ancilla</span>
     <span class="n">circuit1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+    <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="s2">"circuit2"</span><span class="p">)</span>
     <span class="n">circuit2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">added_circuit</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">])</span>
@@ -2084,7 +2085,7 @@ to communicate with the next subcircuit, which wouldn’t respond until executio
     <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">added_circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">)</span><span class="c1"># non-blocking call</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result after addition: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Result after addition: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
     <span class="k">raise</span> <span class="n">error</span>
@@ -2128,11 +2129,11 @@ receiver’s data qubits.</p></li>
 </dd></dl>
 
 <p>Basic usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit1&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"circuit1"</span><span class="p">)</span>
 <span class="n">c1</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">c1</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">c2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+<span class="n">c2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"circuit2"</span><span class="p">)</span>
 <span class="n">c2</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">union_circuit</span> <span class="o">=</span> <span class="n">union</span><span class="p">([</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">])</span>
@@ -2141,7 +2142,7 @@ receiver’s data qubits.</p></li>
 <p>Full example of the <a class="reference internal" href="#cunqa.circuit.transformations.union" title="cunqa.circuit.transformations.union"><code class="xref py py-func docutils literal notranslate"><span class="pre">union</span></code></a> function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qc_protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">cat_entangler</span><span class="p">,</span> <span class="n">cat_disentangler</span>
@@ -2152,10 +2153,10 @@ receiver’s data qubits.</p></li>
 <span class="c1"># ---------------------------</span>
 <span class="c1"># Acquiring resources</span>
 <span class="c1"># ---------------------------</span>
-<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">qpus_separated</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_separated</span><span class="p">)</span>
 
-<span class="n">family_union</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family_union</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">[</span><span class="n">qpu_union</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_union</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -2169,8 +2170,8 @@ receiver’s data qubits.</p></li>
     <span class="c1"># circuit2.data: ─────[X]─[M]─</span>
     <span class="c1"># Where $ represents the remote control of the gate</span>
     <span class="c1"># ---------------------------</span>
-    <span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit1&quot;</span><span class="p">)</span> <span class="c1"># (data qubits, comm qubits), clbits</span>
-    <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit2&quot;</span><span class="p">)</span>
+    <span class="n">circuit1</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"circuit1"</span><span class="p">)</span> <span class="c1"># (data qubits, comm qubits), clbits</span>
+    <span class="n">circuit2</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"circuit2"</span><span class="p">)</span>
 
     <span class="n">data_1</span><span class="p">,</span> <span class="n">comm_1</span> <span class="o">=</span> <span class="n">circuit1</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
     <span class="n">data_2</span><span class="p">,</span> <span class="n">comm_2</span> <span class="o">=</span> <span class="n">circuit2</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
@@ -2182,7 +2183,7 @@ receiver’s data qubits.</p></li>
         <span class="n">data_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="p">[</span><span class="n">comm_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">comm_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;telegate&quot;</span>
+        <span class="n">tag</span><span class="o">=</span><span class="s2">"telegate"</span>
     <span class="p">)</span>
 
     <span class="n">circuit2</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">comm_2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -2202,7 +2203,7 @@ receiver’s data qubits.</p></li>
     <span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result before union (circuit</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Result before union (circuit</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># ---------------------------</span>
     <span class="c1"># Take the union of the circuits and execute it on a single QPU.</span>
@@ -2218,7 +2219,7 @@ receiver’s data qubits.</p></li>
     <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">union_circuit</span><span class="p">,</span> <span class="n">qpu_union</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># non-blocking call</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result after union: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Result after union: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
     <span class="k">raise</span> <span class="n">error</span>
@@ -2285,7 +2286,7 @@ number of subcircuits that result of the split.</p></li>
 <p>Full example of the <a class="reference internal" href="#cunqa.circuit.transformations.hsplit" title="cunqa.circuit.transformations.hsplit"><code class="xref py py-func docutils literal notranslate"><span class="pre">hsplit</span></code></a> function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span> <span class="c1"># HOME as install path is specific to CESGA</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qjob</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
@@ -2296,10 +2297,10 @@ number of subcircuits that result of the split.</p></li>
 <span class="c1"># Acquiring resources</span>
 <span class="c1"># ---------------------------</span>
 
-<span class="n">family_original</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family_original</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">[</span><span class="n">qpu_original</span><span class="p">]</span>  <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_original</span><span class="p">)</span>
 
-<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">&quot;Aer&quot;</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">family_separated</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="s2">"Aer"</span><span class="p">,</span> <span class="n">quantum_comm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">qpus_separated</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family_separated</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -2309,7 +2310,7 @@ number of subcircuits that result of the split.</p></li>
     <span class="c1">#                         |</span>
     <span class="c1"># union_circuit.q1: ─────[X]─[M]─</span>
     <span class="c1"># ---------------------------</span>
-    <span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;circuit&quot;</span><span class="p">)</span>
+    <span class="n">circuit</span> <span class="o">=</span> <span class="n">CunqaCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"circuit"</span><span class="p">)</span>
     <span class="n">circuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">circuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">circuit</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
@@ -2317,7 +2318,7 @@ number of subcircuits that result of the split.</p></li>
     <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu_original</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># non-blocking call</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">qjob</span><span class="o">.</span><span class="n">result</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Result before hsplit: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Result before hsplit: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># ---------------------------</span>
     <span class="c1"># Split original circuit to create two communicated circuits, and execute them</span>
@@ -2329,16 +2330,16 @@ number of subcircuits that result of the split.</p></li>
     <span class="p">[</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">]</span> <span class="o">=</span> <span class="n">hsplit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="n">data1</span><span class="p">,</span> <span class="n">comm1</span> <span class="o">=</span> <span class="n">circuit1</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">comm1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">comm1</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     
     <span class="n">data2</span><span class="p">,</span> <span class="n">comm2</span> <span class="o">=</span> <span class="n">circuit2</span><span class="o">.</span><span class="n">get_qubits</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data2</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">comm2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data2</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">comm2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">qjobs</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">circuit1</span><span class="p">,</span> <span class="n">circuit2</span><span class="p">],</span> <span class="n">qpus_separated</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result after split: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result after split: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
     <span class="k">raise</span> <span class="n">error</span>
 <span class="k">finally</span><span class="p">:</span>

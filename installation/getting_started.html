@@ -128,7 +128,7 @@
 <p class="admonition-title">Warning</p>
 <p>If SSH cloning fails, you may not have properly linked your environment to GitHub. To do this,
 run the following commands:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">eval &quot;$(ssh-agent -s)&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">eval "$(ssh-agent -s)"</span>
 <span class="go">ssh-add ~/.ssh/SSH_KEY</span>
 </pre></div>
 </div>
@@ -208,7 +208,7 @@ Qulacs          - (modified version)
 <p>To enable GPU execution (only supported by the Aer <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>), configure with
 <code class="docutils literal notranslate"><span class="pre">-DUSE_GPU=ON</span></code>. The target CUDA architecture(s) can optionally be set with <code class="docutils literal notranslate"><span class="pre">-DGPU_ARCH</span></code>
 (e.g. <code class="docutils literal notranslate"><span class="pre">75;80</span></code>); if omitted, it defaults to <code class="docutils literal notranslate"><span class="pre">all-major</span></code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH=&quot;75;80&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH="75;80"</span>
 </pre></div>
 </div>
 <p>Equivalently, use the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> CMake preset:</p>
@@ -258,7 +258,7 @@ CESGA are available inside <code class="docutils literal notranslate"><span clas
 <p>To enable GPU execution (only supported by the Aer <a class="reference internal" href="../glossary.html#term-simulator"><span class="xref std std-term">simulator</span></a>), configure with
 <code class="docutils literal notranslate"><span class="pre">-DUSE_GPU=ON</span></code>. The target CUDA architecture(s) can optionally be set with <code class="docutils literal notranslate"><span class="pre">-DGPU_ARCH</span></code>
 (e.g. <code class="docutils literal notranslate"><span class="pre">75;80</span></code>); if omitted, it defaults to <code class="docutils literal notranslate"><span class="pre">all-major</span></code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH=&quot;75;80&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -B build/ -DCMAKE_INSTALL_PREFIX=/your/installation/path -DUSE_GPU=ON -DGPU_ARCH="75;80"</span>
 </pre></div>
 </div>
 <p>Equivalently, use the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> CMake preset:</p>

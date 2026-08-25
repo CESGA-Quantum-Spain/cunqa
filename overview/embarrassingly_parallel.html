@@ -221,7 +221,7 @@ Further examples and use cases are listed in <a class="reference internal" href=
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="c1"># In order to import cunqa, we append to the search path the cunqa installation path.</span>
 <span class="c1"># In CESGA, we install by default on the $HOME path as $HOME/bin is in the PATH variable</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">qdrop</span><span class="p">,</span> <span class="n">run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.circuit</span><span class="w"> </span><span class="kn">import</span> <span class="n">CunqaCircuit</span>
@@ -229,7 +229,7 @@ Further examples and use cases are listed in <a class="reference internal" href=
 
 <span class="c1"># 1. QPU deployment</span>
 
-<span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;01:00:00&quot;</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="s2">&quot;qpu_no_comms&quot;</span><span class="p">)</span>
+<span class="n">family_name</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"01:00:00"</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="s2">"qpu_no_comms"</span><span class="p">)</span>
 <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">family</span> <span class="o">=</span> <span class="n">family_name</span><span class="p">)</span>
 
 
@@ -250,7 +250,7 @@ Further examples and use cases are listed in <a class="reference internal" href=
 
 <span class="k">for</span> <span class="n">counts</span><span class="p">,</span> <span class="n">qpu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">counts_list</span><span class="p">,</span> <span class="n">qpus</span><span class="p">):</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Counts from vQPU </span><span class="si">{</span><span class="n">qpu</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Counts from vQPU </span><span class="si">{</span><span class="n">qpu</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 4. Release classical resources</span>
 <span class="n">qdrop</span><span class="p">(</span><span class="n">family_name</span><span class="p">)</span>

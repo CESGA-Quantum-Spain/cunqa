@@ -144,7 +144,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># If this is not done before the cunqa module imports, it will fail to find them</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_QPUs</span><span class="p">,</span> <span class="n">qraise</span><span class="p">,</span> <span class="n">gather</span><span class="p">,</span> <span class="n">qdrop</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cunqa.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
@@ -166,14 +166,14 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;00:10:00&quot;</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">&quot;Aer&quot;</span><span class="p">,</span>  <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">family</span> <span class="o">=</span> <span class="n">qraise</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"00:10:00"</span><span class="p">,</span> <span class="n">simulator</span> <span class="o">=</span> <span class="s2">"Aer"</span><span class="p">,</span>  <span class="n">co_located</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <span class="c1"># bash equivalent: qraise -n 2 -t 00:10:00 --sim Aer --co-located</span>
 
 <span class="n">qpus</span> <span class="o">=</span> <span class="n">get_QPUs</span><span class="p">(</span><span class="n">co_located</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">QPUs properties:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">QPUs properties:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;simulator&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"QPU </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, backend: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">, simulator: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">'simulator'</span><span class="p">]</span><span class="si">}</span><span class="s2">, version: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">'version'</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -278,7 +278,7 @@ meas: 5/════════════════════════
 <span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_histogram</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="n">plot_histogram</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">bar_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;QPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qpus</span><span class="p">))])</span>
+<span class="n">plot_histogram</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">bar_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"QPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qpus</span><span class="p">))])</span>
 </pre></div>
 </div>
 </div>
@@ -302,7 +302,7 @@ meas: 5/════════════════════════
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="c1"># impoting from examples/circuits/</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;circuits/circuit_15qubits_10layers.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"circuits/circuit_15qubits_10layers.json"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
     <span class="n">circuit</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
 <span class="n">qjob</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
@@ -311,7 +311,7 @@ meas: 5/════════════════════════
 <span class="n">time</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">time_taken</span>
 <span class="n">counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: Time taken: </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: Time taken: </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> s."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -343,10 +343,10 @@ Result: Time taken: 20.09280778 s.
 <span class="n">results</span> <span class="o">=</span> <span class="n">gather</span><span class="p">(</span><span class="n">qjobs</span><span class="p">)</span> <span class="c1"># this is a bloking call</span>
 <span class="n">tack</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time taken to run </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> circuits in parallel: </span><span class="si">{</span><span class="n">tack</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tick</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Time of each execution:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Time taken to run </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> circuits in parallel: </span><span class="si">{</span><span class="n">tack</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tick</span><span class="si">}</span><span class="s2"> s."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Time of each execution:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For QJob </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, time taken: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span><span class="si">}</span><span class="s2"> s.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"For QJob </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, time taken: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">time_taken</span><span class="si">}</span><span class="s2"> s."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
 
 <span class="n">qdrop</span><span class="p">(</span><span class="n">family</span><span class="p">)</span>
