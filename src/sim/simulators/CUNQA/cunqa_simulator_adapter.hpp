@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string_view>
 
@@ -52,13 +53,15 @@ private:
     struct State;
     std::unique_ptr<State> state_;
 
-    static constexpr std::array<std::string_view, 17> CUNQA_BASIS_GATES = {
-        "measure", 
+    // std::to_array deduces the size, so the list can never drift out of sync
+    // with a hardcoded extent (which would pad it with empty gate names).
+    static constexpr auto CUNQA_BASIS_GATES = std::to_array<std::string_view>({
+        "measure",
         "id", "x", "y", "z", "h", "sx",
         "rx", "ry", "rz", 
         "swap", "cx", "cy", "cz", 
         "crx", "cry", "crz",
-    };
+    });
 
 };
 

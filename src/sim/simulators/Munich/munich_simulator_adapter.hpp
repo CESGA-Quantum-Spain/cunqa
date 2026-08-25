@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string_view>
 
@@ -38,6 +39,9 @@ public:
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitTwoParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitFourParam& payload) override;
 
     void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
@@ -61,7 +65,7 @@ private:
     struct NoiseModel;
     std::unique_ptr<NoiseModel> noise_model_;
 
-static constexpr std::array<std::string_view, 51> MUNICH_BASIS_GATES = {{
+static constexpr auto MUNICH_BASIS_GATES = std::to_array<std::string_view>({
     "measure",
     "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
     "u1", "gp", "p", "rx", "ry", "rz",
@@ -75,7 +79,7 @@ static constexpr std::array<std::string_view, 51> MUNICH_BASIS_GATES = {{
     "cswap",
     "mcx", "mcp",
     "reset"
-}};
+});
 
 };
 

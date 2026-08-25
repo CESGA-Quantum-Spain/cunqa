@@ -1,6 +1,8 @@
 #pragma once
 
+#include <array>
 #include <vector>
+#include <string_view>
 
 #include "circuit.hpp"
 #include "sim/simulator.hpp"
@@ -64,7 +66,7 @@ private:
     struct State;
     std::unique_ptr<State> state_;
 
-    static constexpr std::array<std::string_view, 53> QUEST_BASIS_GATES = {{
+    static constexpr auto QUEST_BASIS_GATES = std::to_array<std::string_view>({
         "s", "cs", "mcs",
         "t", "ct", "mct",
         "h", "ch", "mch",
@@ -83,7 +85,7 @@ private:
         "p", "cp", "mcp",
         "mx", "cmx", "mcmx",
         "measure"
-    }};
+    });
 };
 
 

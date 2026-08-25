@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string_view>
 
@@ -38,11 +39,16 @@ public:
 
     void apply_gate(const InstructionType& type, const OneQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const OneQubitTwoParam& payload) override;
     void apply_gate(const InstructionType& type, const OneQubitThreeParam& payload) override;
 
     void apply_gate(const InstructionType& type, const TwoQubitNoParam& payload) override;
     void apply_gate(const InstructionType& type, const TwoQubitOneParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload) override;
+    void apply_gate(const InstructionType& type, const TwoQubitThreeParam& payload) override;
     void apply_gate(const InstructionType& type, const TwoQubitFourParam& payload) override;
+
+    void apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload) override;
 
     void apply_gate(const InstructionType& type, const MultiNoParam& payload) override;
     void apply_gate(const InstructionType& type, const MultiParam& payload) override;
@@ -59,7 +65,7 @@ private:
     struct NoiseModel;
     std::unique_ptr<NoiseModel> noise_model_;
 
-    static constexpr std::array<std::string_view, 63> AER_BASIS_GATES = {{
+    static constexpr auto AER_BASIS_GATES = std::to_array<std::string_view>({
         "measure",
         "id", "x", "y", "z", "h", "s", "sdg", "sx", "sxdg", "t", "tdg",
         "u1", "gp", "rx", "ry", "rz",
@@ -76,7 +82,7 @@ private:
         "mcu3",
         "mcswap",
         "unitary", "diagonal",
-    }};
+    });
 
 };
 
