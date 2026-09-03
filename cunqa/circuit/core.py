@@ -830,7 +830,7 @@ class CunqaCircuit:
         """
         self.add_instructions({
             "name":"p",
-            "qubits":[qubit],
+            "qubits":qubit,
             "params":[param]
         })
     
@@ -1009,11 +1009,12 @@ class CunqaCircuit:
     # One qubit four params gates
 
     def u(
-        self, 
-        theta: Union[float, int, str], 
-        phi: Union[float, int, str], 
-        lam: Union[float, int, str], 
-        qubit: int
+        self,
+        theta: Union[float, int, str],
+        phi: Union[float, int, str],
+        lam: Union[float, int, str],
+        qubit: int,
+        gamma: Union[float, int, str] = 0.0
     ) -> None:
         """
         Class method to apply u gate to the given qubit.
@@ -1023,11 +1024,12 @@ class CunqaCircuit:
             phi (float | int | str): angle.
             lam (float | int | str): angle.
             qubit (int): qubit in which the gate is applied.
+            gamma (float | int | str): global phase angle. Defaults to 0.0.
         """
         self.add_instructions({
             "name": "u",
             "qubits": qubit,
-            "params": [theta, phi, lam]
+            "params": [theta, phi, lam, gamma]
         })
 
     # Two qubits no params gates
@@ -1355,18 +1357,24 @@ class CunqaCircuit:
             "params": [param]
         })
 
-    def rxy(self, param: Union[float, int, str], *qubits: int) -> None:
+    def rxy(
+        self,
+        theta: Union[float, int, str],
+        phi: Union[float, int, str],
+        qubit: int
+    ) -> None:
         """
-        Class method to apply rxy gate to the given qubits.
+        Class method to apply rxy gate, a rotation around an arbitrary axis in the XY-plane.
 
         Args:
-            param (float | int | str): parameter for the parametric gate.
-            qubits (int): qubits in which the gate is applied.
+            theta (float | int | str): angle selecting the rotation axis in the XY-plane.
+            phi (float | int | str): rotation angle around that axis.
+            qubit (int): qubit in which the gate is applied.
         """
         self.add_instructions({
             "name":"rxy",
-            "qubits": [*qubits],
-            "params": [param]
+            "qubits": qubit,
+            "params": [theta, phi]
         })
 
     # Two qubits two params gates
@@ -2182,7 +2190,7 @@ class CunqaCircuit:
         self.add_instructions({
             "name":"multipaulirotation",
             "qubits": [*qubits],
-            "param": param,
+            "params": [param],
             "pauli_id_list": pauli_id_list
         })
 

@@ -55,6 +55,7 @@ enum class InstructionType {
 
     U2,
     R,
+    RXY,
 
     U3,
 
@@ -85,7 +86,6 @@ enum class InstructionType {
     RXX,
     RYY,
     RZZ,
-    RXY,
     RZX,
 
     CU2,
@@ -226,6 +226,8 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     // ONE QUBIT TWO PARAM
     InstructionTypeEntry{"u2", InstructionType::U2},
     InstructionTypeEntry{"r", InstructionType::R},
+    // qsim's rxy: a one-qubit rotation about an axis in the XY-plane
+    InstructionTypeEntry{"rxy", InstructionType::RXY},
 
     // ONE QUBIT THREE PARAM
     InstructionTypeEntry{"u3", InstructionType::U3},
@@ -260,7 +262,6 @@ inline constexpr std::array INSTRUCTION_TYPE_ENTRIES{
     InstructionTypeEntry{"rxx", InstructionType::RXX},
     InstructionTypeEntry{"ryy", InstructionType::RYY},
     InstructionTypeEntry{"rzz", InstructionType::RZZ},
-    InstructionTypeEntry{"rxy", InstructionType::RXY},
     InstructionTypeEntry{"rzx", InstructionType::RZX},
 
     // TWO QUBIT TWO PARAM

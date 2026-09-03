@@ -139,6 +139,9 @@ void MaestroSimulatorAdapter::apply_gate(const InstructionType& type, const OneQ
         case InstructionType::SX:
             ApplySX(simulator, payload.qubit);
             break;
+        case InstructionType::SXDG:
+            ApplySXDG(simulator, payload.qubit);
+            break;
         case InstructionType::K:
             ApplyK(simulator, payload.qubit);
             break;

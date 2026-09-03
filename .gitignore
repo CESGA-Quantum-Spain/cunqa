@@ -322,3 +322,4 @@ modulos.sh
 modules.sh
 jup.out
 .pytest
+.cunqa_tests

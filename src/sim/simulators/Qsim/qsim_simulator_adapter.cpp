@@ -127,21 +127,21 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
         case cunqa::InstructionType::RX: 
         {
             auto qubit = instruction.at("qubits").get<unsigned>();
-            auto param = instruction.at("params").get<float>();
+            auto param = instruction.at("params").at(0).get<float>();
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRX<float>::Create(0, qubit, param), state);
             break;
         }
         case cunqa::InstructionType::RY: 
         {
             auto qubit = instruction.at("qubits").get<unsigned>();
-            auto param = instruction.at("params").get<float>();
+            auto param = instruction.at("params").at(0).get<float>();
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRY<float>::Create(0, qubit, param), state);
             break;
         }
         case cunqa::InstructionType::RZ: 
         {
             auto qubit = instruction.at("qubits").get<unsigned>();
-            auto param = instruction.at("params").get<float>();
+            auto param = instruction.at("params").at(0).get<float>();
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRZ<float>::Create(0, qubit, param), state);
             break;
         }
@@ -177,16 +177,21 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
         }
         case cunqa::InstructionType::CP:
         {
+            // KNOWN DEVIATION: qsim's GateCP is diag(1, 1, 1, cos(phi) - i*sin(phi)),
+            // i.e. exp(-i*phi), while AER/Qiskit use exp(+i*phi). cunqa follows the AER
+            // convention, so Qsim disagrees in sign for every angle except 0 and pi.
+            // Negate the angle here once this is addressed.
             auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
-            auto param = instruction.at("params").get<float>();
+            auto param = instruction.at("params").at(0).get<float>();
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateCP<float>::Create(0, qubits[0], qubits[1], param), state);
             break;
         }
-        case cunqa::InstructionType::RXY: 
+        case cunqa::InstructionType::RXY:
         {
-            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            // rxy acts on a single qubit, so "qubits" is a scalar (like u2 and r).
+            auto qubit = instruction.at("qubits").get<unsigned>();
             auto params = instruction.at("params").get<std::vector<float>>();
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, qubits[0], params[0], params[1]), state);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateRXY<float>::Create(0, qubit, params[0], params[1]), state);
             break;
         }
         case cunqa::InstructionType::FS:
@@ -198,15 +203,17 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
         }
         case cunqa::InstructionType::GLOBALP:
         {
-            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
-            auto params = instruction.at("params").get<std::vector<float>>();
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateGPh<float>::Create(0, params[0]), state);
+            // A global phase acts on no particular qubit, so "qubits" is unused
+            // (it is emitted as the scalar placeholder 0).
+            auto param = instruction.at("params").at(0).get<float>();
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateGPh<float>::Create(0, param), state);
             break;
         }
         case cunqa::InstructionType::UNITARY:
         {
             auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
-            auto cunqa_matrix = instruction.at("matrix").get<std::vector<cunqa::Matrix>>()[0];
+            // "matrix" is emitted as [[[re, im], ...], ...], i.e. a single Matrix.
+            auto cunqa_matrix = instruction.at("matrix").get<cunqa::Matrix>();
             qsim::Matrix<float> qsim_matrix = cunqamatrix_to_qsimmatrix(cunqa_matrix);
 
             if (qubits.size() > 1) {
@@ -214,6 +221,29 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
             } else {
                 qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix1<float>::Create(0, qubits[0], std::move(qsim_matrix)), state);
             }
+            break;
+        }
+        case cunqa::InstructionType::CUNITARY:
+        {
+            auto qubits = instruction.at("qubits").get<std::vector<unsigned>>();
+            auto cunqa_matrix = instruction.at("matrix").get<cunqa::Matrix>();
+
+            // Promote the target unitary to its controlled version: identity on the
+            // low block, the gate itself on the high block.
+            const size_t dim = cunqa_matrix.size();
+            const size_t ctrl_dim = 2 * dim;
+            cunqa::Matrix ctrl_matrix(ctrl_dim,
+                std::vector<std::vector<double>>(ctrl_dim, {0.0, 0.0}));
+
+            for (size_t i = 0; i < dim; i++)
+                ctrl_matrix[i][i] = {1.0, 0.0};
+
+            for (size_t i = 0; i < dim; i++)
+                for (size_t j = 0; j < dim; j++)
+                    ctrl_matrix[dim + i][dim + j] = cunqa_matrix[i][j];
+
+            qsim::Matrix<float> qsim_matrix = cunqamatrix_to_qsimmatrix(ctrl_matrix);
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(simulator, qsim::GateMatrix2<float>::Create(0, qubits[0], qubits[1], std::move(qsim_matrix)), state);
             break;
         }
         default:
@@ -226,18 +256,27 @@ void update_qsim_state(const cunqa::JSON& circuit_json, qsim::SimulatorBasic<qsi
 }
 
 cunqa::JSON convert_qsim_result(const std::vector<uint64_t>& sample, const int n_qubits) {
-    std::unordered_map<uint64_t, int> counts;
+    std::unordered_map<uint64_t, uint64_t> raw_counts;
     for (uint64_t v : sample)
-        counts[v]++;
+        raw_counts[v]++;
 
-    cunqa::JSON result_json;
-    for (const auto& [value, count] : counts) {
+    // The sampled values span the whole simulated register, while the counts are
+    // reported over the circuit's classical bits only, so several values collapse
+    // onto the same bitstring. Their counts have to be ADDED: assigning here made
+    // each collision overwrite the previous one and silently lose those shots.
+    std::unordered_map<std::string, uint64_t> counts;
+    for (const auto& [value, count] : raw_counts) {
         std::string bitstring(n_qubits, '0');
         for (int i = 0; i < n_qubits; ++i)
             bitstring[n_qubits - 1 - i] = ((value >> i) & 1) ? '1' : '0';
 
-        result_json[bitstring] = count;
+        counts[bitstring] += count;
     }
+
+    cunqa::JSON result_json;
+    for (const auto& [bitstring, count] : counts)
+        result_json[bitstring] = count;
+
     return result_json;
 }
 
@@ -386,7 +425,30 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubi
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRZ<float>::Create(0, payload.qubit, static_cast<float>(*payload.param)), state_->state);
             break;
         }
-        
+
+        case InstructionType::GLOBALP:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateGPh<float>::Create(0, static_cast<float>(*payload.param)), state_->state);
+            break;
+        }
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitTwoParam& payload)
+{
+    switch (type)
+    {
+        // qsim's GateRXY declares num_qubits = 1: it is a rotation around an axis
+        // in the XY-plane of a single qubit, selected by theta and applied by phi.
+        case InstructionType::RXY:
+        {
+            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRXY<float>::Create(0, payload.qubit, static_cast<float>(*payload.params[0]), static_cast<float>(*payload.params[1])), state_->state);
+            break;
+        }
+
         default:
             unsupported_gate(type, payload);
     }
@@ -437,13 +499,11 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubi
     {
         case InstructionType::CP:
         {
+            // KNOWN DEVIATION: qsim's GateCP is diag(1, 1, 1, cos(phi) - i*sin(phi)),
+            // i.e. exp(-i*phi), while AER/Qiskit use exp(+i*phi). cunqa follows the AER
+            // convention, so Qsim disagrees in sign for every angle except 0 and pi.
+            // Negate the angle here once this is addressed.
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateCP<float>::Create(0, payload.qubits[0], payload.qubits[1], *payload.param), state_->state);
-            break;
-        }
-        
-        case InstructionType::GLOBALP:
-        {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateGPh<float>::Create(0, *payload.param), state_->state);
             break;
         }
 
@@ -456,12 +516,6 @@ void QsimSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubi
 {
     switch (type)
     {
-        case InstructionType::RXY: //TODO: check if it's actually two-qubit
-        {
-            qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateRXY<float>::Create(0, payload.qubits[0], *payload.params[0], *payload.params[1]), state_->state);
-            break;
-        }
-
         case InstructionType::FS:
         {
             qsim::ApplyGate<qsim::SimulatorBasic<qsim::ParallelFor>, qsim::GateQSim<float>>(state_->simulator, qsim::GateFS<float>::Create(0, payload.qubits[0], payload.qubits[1], *payload.params[0], *payload.params[1]), state_->state);

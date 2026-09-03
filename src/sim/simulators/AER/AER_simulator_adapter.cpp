@@ -91,6 +91,28 @@ constexpr std::array<std::string_view, 68> AER_CONFIG_KEYS = {{
     "runtime_parameter_bind_enable",
 }};
 
+// AerState only exposes typed helpers for a subset of its gate set. Every one of
+// them just buffers an Operations::Op carrying the gate name, so gates without a
+// helper (rxx, ecr, ccz, cu2, ...) are applied by buffering the op directly. The
+// names below are the ones AER itself registers, so the semantics match exactly
+// what the AER controller would apply for the same instruction.
+void apply_AER_gate(AER::AerState& aer_state,
+                    const std::string& name,
+                    const AER::reg_t& qubits,
+                    const std::vector<double>& params = {})
+{
+    AER::Operations::Op op;
+    op.type = AER::Operations::OpType::gate;
+    op.name = name;
+    op.qubits = qubits;
+
+    op.params.reserve(params.size());
+    for (const auto& param : params)
+        op.params.emplace_back(param, 0.0);
+
+    aer_state.buffer_op(std::move(op));
+}
+
 AER::Config config_to_AER(const cunqa::RunConfig& config)
 {
     cunqa::JSON AER_config = {
@@ -163,7 +185,14 @@ void AER_to_results(cunqa::JSON& res, const int& num_clbits)
             binary_string += bits[i] ? '1' : '0';
         }
 
-        modified_counts[binary_string] = inner; 
+        // Truncating to num_clbits can map two outcomes onto the same bitstring, so
+        // the counts are added rather than assigned: assigning would let the later
+        // one overwrite the earlier and silently drop those shots.
+        auto it = modified_counts.find(binary_string);
+        if (it == modified_counts.end())
+            modified_counts[binary_string] = inner;
+        else
+            *it = it->get<std::size_t>() + inner.get<std::size_t>();
     }
 
     res.at("results")[0].at("data").at("counts") = modified_counts;
@@ -264,6 +293,26 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubit
             state_->aer_state.apply_mcsx({qubit});
             break;
 
+        case InstructionType::SXDG:
+            apply_AER_gate(state_->aer_state, "sxdg", {qubit});
+            break;
+
+        case InstructionType::S:
+            apply_AER_gate(state_->aer_state, "s", {qubit});
+            break;
+
+        case InstructionType::SDG:
+            apply_AER_gate(state_->aer_state, "sdg", {qubit});
+            break;
+
+        case InstructionType::T:
+            apply_AER_gate(state_->aer_state, "t", {qubit});
+            break;
+
+        case InstructionType::TDG:
+            apply_AER_gate(state_->aer_state, "tdg", {qubit});
+            break;
+
         default:
             unsupported_gate(type, payload);
     }
@@ -288,6 +337,38 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubit
 
         case InstructionType::GLOBALP:
             state_->aer_state.apply_global_phase(*(payload.param));
+            break;
+
+        case InstructionType::U1:
+            apply_AER_gate(state_->aer_state, "u1", qubit, {*(payload.param)});
+            break;
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubitTwoParam& payload)
+{
+    AER::reg_t qubit = {static_cast<AER::uint_t>(payload.qubit)};
+    switch (type)
+    {
+        case InstructionType::U2:
+            apply_AER_gate(
+                state_->aer_state,
+                "u2",
+                qubit,
+                {*(payload.params[0]), *(payload.params[1])}
+            );
+            break;
+
+        case InstructionType::R:
+            apply_AER_gate(
+                state_->aer_state,
+                "r",
+                qubit,
+                {*(payload.params[0]), *(payload.params[1])}
+            );
             break;
 
         default:
@@ -335,6 +416,14 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubit
             state_->aer_state.apply_mcz(qubits);
             break;
 
+        case InstructionType::CSX:
+            state_->aer_state.apply_mcsx(qubits);
+            break;
+
+        case InstructionType::ECR:
+            apply_AER_gate(state_->aer_state, "ecr", qubits);
+            break;
+
         default:
             unsupported_gate(type, payload);
     }
@@ -357,6 +446,68 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubit
             state_->aer_state.apply_mcrz(qubits, *(payload.param));
             break;
 
+        case InstructionType::CP:
+            apply_AER_gate(state_->aer_state, "cp", qubits, {*(payload.param)});
+            break;
+
+        case InstructionType::CU1:
+            apply_AER_gate(state_->aer_state, "cu1", qubits, {*(payload.param)});
+            break;
+
+        case InstructionType::RXX:
+            apply_AER_gate(state_->aer_state, "rxx", qubits, {*(payload.param)});
+            break;
+
+        case InstructionType::RYY:
+            apply_AER_gate(state_->aer_state, "ryy", qubits, {*(payload.param)});
+            break;
+
+        case InstructionType::RZZ:
+            apply_AER_gate(state_->aer_state, "rzz", qubits, {*(payload.param)});
+            break;
+
+        case InstructionType::RZX:
+            apply_AER_gate(state_->aer_state, "rzx", qubits, {*(payload.param)});
+            break;
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitTwoParam& payload)
+{
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
+    {
+        case InstructionType::CU2:
+            apply_AER_gate(
+                state_->aer_state,
+                "cu2",
+                qubits,
+                {*(payload.params[0]), *(payload.params[1])}
+            );
+            break;
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubitThreeParam& payload)
+{
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
+    {
+        case InstructionType::CU3:
+            apply_AER_gate(
+                state_->aer_state,
+                "cu3",
+                qubits,
+                {*(payload.params[0]), *(payload.params[1]), *(payload.params[2])}
+            );
+            break;
+
         default:
             unsupported_gate(type, payload);
     }
@@ -375,6 +526,28 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubit
                 *(payload.params[2]),
                 *(payload.params[3])
             );
+            break;
+
+        default:
+            unsupported_gate(type, payload);
+    }
+}
+
+void AERSimulatorAdapter::apply_gate(const InstructionType& type, const ThreeQubitNoParam& payload)
+{
+    AER::reg_t qubits(payload.qubits.begin(), payload.qubits.end());
+    switch (type)
+    {
+        case InstructionType::CCX:
+            state_->aer_state.apply_mcx(qubits);
+            break;
+
+        case InstructionType::CCZ:
+            state_->aer_state.apply_mcz(qubits);
+            break;
+
+        case InstructionType::CSWAP:
+            state_->aer_state.apply_mcswap(qubits);
             break;
 
         default:
@@ -433,6 +606,28 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MultiPar
             state_->aer_state.apply_mcphase(qubits, *(payload.params[0]));
             break;
 
+        case InstructionType::MCU1:
+            apply_AER_gate(state_->aer_state, "mcu1", qubits, {*(payload.params[0])});
+            break;
+
+        case InstructionType::MCU2:
+            apply_AER_gate(
+                state_->aer_state,
+                "mcu2",
+                qubits,
+                {*(payload.params[0]), *(payload.params[1])}
+            );
+            break;
+
+        case InstructionType::MCU3:
+            apply_AER_gate(
+                state_->aer_state,
+                "mcu3",
+                qubits,
+                {*(payload.params[0]), *(payload.params[1]), *(payload.params[2])}
+            );
+            break;
+
         case InstructionType::MCU:
             state_->aer_state.apply_mcu(
                 qubits,
@@ -455,23 +650,25 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const MatrixGa
     {
         case InstructionType::UNITARY:
         {
-            std::vector<complex_t> matrix_data;
-
-            for (const auto& row : payload.matrix) {
-                for (const auto& complex_parts : row) {
-                    // Convert [real, imag] to complex_t
-                    complex_t val(complex_parts[0], complex_parts.size() > 1 ? complex_parts[1] : 0.0);
-                    matrix_data.push_back(val);
-                }
-            }
-
             const auto dim = payload.matrix.size();
 
-            matrix<complex_t> aer_matrix{
-                dim,
-                dim,
-                matrix_data.data()
-            };
+            // AER's matrix<T> takes ownership of any pointer handed to its
+            // (rows, cols, data) constructor and releases it with free(), so it must
+            // never be given a std::vector's buffer. Letting it allocate its own
+            // storage also means operator()(i, j) places each element at the right
+            // offset for its column-major layout.
+            matrix<complex_t> aer_matrix(dim, dim);
+
+            for (std::size_t i = 0; i < dim; ++i) {
+                const auto& row = payload.matrix[i];
+                for (std::size_t j = 0; j < dim; ++j) {
+                    const auto& complex_parts = row[j];
+                    aer_matrix(i, j) = complex_t(
+                        complex_parts[0],
+                        complex_parts.size() > 1 ? complex_parts[1] : 0.0
+                    );
+                }
+            }
 
             state_->aer_state.apply_unitary(qubits, aer_matrix);
             break;
@@ -576,9 +773,12 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
     try {
         auto& AER_circuit = dynamic_cast<const AERCircuit&>(circuit);
 
+        // AERCircuit already keeps "gp" out of `instructions` and tracks its angles,
+        // so the global phase costs a sum over the gp gates alone (usually none).
         auto circuits = std::vector<std::shared_ptr<AER::Circuit>>{
             std::make_shared<AER::Circuit>(JSON({
                 {"config", {{"memory_slots", config.num_clbits}}},
+                {"header", {{"global_phase", AER_circuit.global_phase()}}},
                 {"instructions", AER_circuit.instructions}
             }))
         };

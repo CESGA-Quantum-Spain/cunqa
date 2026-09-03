@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string_view>
 
@@ -56,8 +57,8 @@ public:
 private:
     void* maestroInstance = nullptr;
     void* simulator;
-
-    static constexpr std::array<std::string_view, 32> MAESTRO_BASIS_GATES = {{
+ 
+    static constexpr auto MAESTRO_BASIS_GATES = std::to_array<std::string_view>({
         "measure",
         "x", "y", "z", "h", "s", "sdg", "t", "tdg", "sx", "sxdg", "k",
         "p", "rx", "ry", "rz",
@@ -66,8 +67,15 @@ private:
         "cp", "crx", "cry", "crz",
         "ccx", "cswap",
         "cu",
-        "reset",
-    }};
+        // "reset" is deliberately NOT advertised. apply_gate() implements it via
+        // maestrolib's ApplyReset, so it works on the dynamic path, but maestrolib's
+        // JSON circuit format has no reset operation at all: its parser accepts
+        // "measure" plus a fixed gate map, and anything else raises "Gate type not
+        // supported." Since native_execute is the default path, listing reset here
+        // would promise something a plain circuit cannot do. maestrolib's QASM 2.0
+        // parser does handle reset, so routing native execution through QASM would
+        // let it be advertised again.
+    });
 
 };
 
