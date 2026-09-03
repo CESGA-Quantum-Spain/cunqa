@@ -84,7 +84,7 @@ For a complete and exhaustive explanation and functionality showcase of CUNQA vi
 To get the source code, simply clone the CUNQA repository:
 
 ```bash
-git clone git@github.com:CESGA-Quantum-Spain/cunqa.git
+git clone https://github.com/CESGA-Quantum-Spain/cunqa.git
 ```
 
 > [!WARNING]

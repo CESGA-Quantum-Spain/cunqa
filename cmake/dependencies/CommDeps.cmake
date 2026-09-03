@@ -78,7 +78,7 @@ endif()
 
 CPMAddPackage(
   NAME pyzmq
-  GIT_REPOSITORY git@github.com:zeromq/pyzmq.git
+  GIT_REPOSITORY https://github.com/zeromq/pyzmq.git
   GIT_TAG v27.1.0
 )
 

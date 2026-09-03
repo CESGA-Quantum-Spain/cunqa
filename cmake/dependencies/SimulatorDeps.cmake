@@ -4,7 +4,7 @@
 # =====================================================================
 CPMAddPackage(
   NAME aer
-  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git
+  GIT_REPOSITORY https://github.com/CESGA-Quantum-Spain/qiskit-aer_v0.17.2.git
   GIT_TAG 8679dbe68458a43661222bc86e6e877d1084125b
   DOWNLOAD_ONLY YES
 )
@@ -79,7 +79,7 @@ set(BUILD_SHARED_LIBS OFF)
 CPMAddPackage(
   NAME mqt-ddsim
   VERSION 2.2.0
-  GIT_REPOSITORY git@github.com:munich-quantum-toolkit/ddsim.git
+  GIT_REPOSITORY https://github.com/munich-quantum-toolkit/ddsim.git
   GIT_TAG v2.2.0
   OPTIONS
     "BUILD_MQT_CORE_MLIR OFF"
@@ -100,7 +100,7 @@ add_definitions(${_ORIG_COMPILE_DEFINITIONS})
 # ===================================================================================
 CPMAddPackage(
   NAME quest
-  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/QuEST.git
+  GIT_REPOSITORY https://github.com/CESGA-Quantum-Spain/QuEST.git
   GIT_TAG main
 )
 
@@ -113,7 +113,7 @@ CPMAddPackage(
 # ---------------------------------------------------------------------
 CPMAddPackage(
   NAME qcsim
-  GIT_REPOSITORY git@github.com:aromanro/QCSim.git
+  GIT_REPOSITORY https://github.com/aromanro/QCSim.git
   GIT_TAG 76db3f97974221306c9e2b7be4c4c9f6e7318d6e
   DOWNLOAD_ONLY YES
 )
@@ -123,7 +123,7 @@ CPMAddPackage(
 # ---------------------------------------------------------------------
 CPMAddPackage(
   NAME maestro_aer
-  GIT_REPOSITORY git@github.com:InvictusWingsSRL/qiskit-aer.git
+  GIT_REPOSITORY https://github.com/InvictusWingsSRL/qiskit-aer.git
   GIT_TAG 96e82fdd1c8c1b17d749863ee5095262372e0d7e
   DOWNLOAD_ONLY YES
 )
@@ -157,7 +157,7 @@ set(BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 
 CPMAddPackage(
   NAME maestro
-  GIT_REPOSITORY git@github.com:QoroQuantum/maestro.git
+  GIT_REPOSITORY https://github.com/QoroQuantum/maestro.git
   GIT_TAG a4d54721a718189362a4a9c8329d7211b662a8f9
   OPTIONS
     "BUILD_PYTHON_BINDINGS OFF"
@@ -190,7 +190,7 @@ endif()
 CPMAddPackage(
   NAME qsim
   VERSION 0.22.0
-  GIT_REPOSITORY git@github.com:quantumlib/qsim.git
+  GIT_REPOSITORY https://github.com/quantumlib/qsim.git
   GIT_TAG v0.22.0
   SOURCE_SUBDIR intentionally_non_existent_dir
 )
@@ -201,7 +201,7 @@ CPMAddPackage(
 CPMAddPackage(
   NAME cunqasimulator
   VERSION 0.1.2
-  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/cunqasimulator.git
+  GIT_REPOSITORY https://github.com/CESGA-Quantum-Spain/cunqasimulator.git
   GIT_TAG v0.1.2
 )
 
@@ -219,7 +219,7 @@ endif()
 # =====================================================================
 CPMAddPackage(
   NAME qulacs
-  GIT_REPOSITORY git@github.com:CESGA-Quantum-Spain/qulacs.git
+  GIT_REPOSITORY https://github.com/CESGA-Quantum-Spain/qulacs.git
   GIT_TAG main
   DOWNLOAD_ONLY YES
 )
