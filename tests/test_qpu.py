@@ -453,7 +453,7 @@ def test_qraise_creates_qpus_file_if_not_exists(monkeypatch):
     result = qraise(n, t)
 
     # Ensure the QPUs file was initialised with an empty json object.
-    write_mock.assert_called_once_with(qpu_mod.QPUS_FILEPATH, "{}")
+    write_mock.assert_called_once_with(qpu_mod.QPUS_FILEPATH, {})
 
     assert result == "99999"
 
