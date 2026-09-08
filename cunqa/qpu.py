@@ -401,7 +401,7 @@ def qraise(n, t, *,
         command = command + " --qmio"
 
     if not os.path.exists(QPUS_FILEPATH):
-        write_json(QPUS_FILEPATH, "{}")
+        write_json(QPUS_FILEPATH, {})
 
     print(f"Requested QPUs with command:\n\t{command}")
 
