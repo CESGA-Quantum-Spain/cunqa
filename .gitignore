@@ -323,3 +323,4 @@ modules.sh
 jup.out
 .pytest
 .cunqa_env
+install_*

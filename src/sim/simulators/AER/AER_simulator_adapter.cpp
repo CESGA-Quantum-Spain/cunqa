@@ -773,14 +773,10 @@ JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)
     try {
         auto& AER_circuit = dynamic_cast<const AERCircuit&>(circuit);
 
-        // AERCircuit already keeps "gp" out of `instructions` and tracks its angles,
-        // so the global phase costs a sum over the gp gates alone (usually none).
+        // AERCircuit builds the AER circuit once and keeps it, so a parameter update
+        // only rebinds angles; each run executes a copy carrying the current global phase.
         auto circuits = std::vector<std::shared_ptr<AER::Circuit>>{
-            std::make_shared<AER::Circuit>(JSON({
-                {"config", {{"memory_slots", config.num_clbits}}},
-                {"header", {{"global_phase", AER_circuit.global_phase()}}},
-                {"instructions", AER_circuit.instructions}
-            }))
+            AER_circuit.circuit_for_run(config.num_clbits)
         };
 
         auto AER_config = config_to_AER(config);

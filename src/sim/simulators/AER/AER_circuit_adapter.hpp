@@ -1,8 +1,13 @@
 #pragma once
 
+#include <complex>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+// AER dependencies
+#include "framework/circuit.hpp"
 
 #include "circuit.hpp"
 #include "dynamic_circuit/instruction_type.hpp"
@@ -22,6 +27,16 @@ struct AERCircuit : public Circuit {
     // Subset of `params` pointing at the "gp" angles, so the total global phase is
     // a sum over just those (usually none) rather than a pass over every gate.
     std::vector<double*> global_phase_params;
+
+    // Where each entry of `params` lives in the kept AER::Circuit: AER builds one op per
+    // instruction, so op `op` is `instructions[op]` and the angle is its param `k`. "gp"
+    // angles live in no op; they reach AER as the circuit's global phase.
+    struct ParamTarget {
+        bool global_phase;
+        std::size_t op;
+        std::size_t k;
+    };
+    std::vector<ParamTarget> param_targets;
 
     explicit AERCircuit(const JSON& instructions_json)
     {
@@ -100,6 +115,14 @@ struct AERCircuit : public Circuit {
                 instruction_type_from_name(instruction.at("name").get<std::string>());
 
             const std::size_t params_before = params.size();
+            auto bind = [&](std::size_t k) {
+                auto* param = instruction.at("params").at(k).get_ptr<double*>();
+                if (param == nullptr) {
+                    throw std::runtime_error("Expected a floating-point JSON parameter.");
+                }
+                params.push_back(param);
+                param_targets.push_back({is_global_phase, index, k});
+            };
 
             switch (instruction_type) {
                 // One-parameter gates
@@ -130,11 +153,7 @@ struct AERCircuit : public Circuit {
                 case InstructionType::MCP:
                 case InstructionType::MCU1:
                 {
-                    auto* param = instruction.at("params").at(0).get_ptr<double*>();
-                    if (param == nullptr) {
-                        throw std::runtime_error("Expected a floating-point JSON parameter.");
-                    }
-                    params.push_back(param);
+                    bind(0);
                     break;
                 }
 
@@ -144,13 +163,8 @@ struct AERCircuit : public Circuit {
                 case InstructionType::CU2:
                 case InstructionType::MCU2:
                 {
-                    for (std::size_t i = 0; i < 2; ++i) {
-                        auto* param = instruction.at("params").at(i).get_ptr<double*>();
-                        if (param == nullptr) {
-                            throw std::runtime_error("Expected a floating-point JSON parameter.");
-                        }
-                        params.push_back(param);
-                    }
+                    for (std::size_t i = 0; i < 2; ++i)
+                        bind(i);
                     break;
                 }
 
@@ -159,13 +173,8 @@ struct AERCircuit : public Circuit {
                 case InstructionType::CU3:
                 case InstructionType::MCU3:
                 {
-                    for (std::size_t i = 0; i < 3; ++i) {
-                        auto* param = instruction.at("params").at(i).get_ptr<double*>();
-                        if (param == nullptr) {
-                            throw std::runtime_error("Expected a floating-point JSON parameter.");
-                        }
-                        params.push_back(param);
-                    }
+                    for (std::size_t i = 0; i < 3; ++i)
+                        bind(i);
                     break;
                 }
 
@@ -174,13 +183,8 @@ struct AERCircuit : public Circuit {
                 case InstructionType::CU:
                 case InstructionType::MCU:
                 {
-                    for (std::size_t i = 0; i < 4; ++i) {
-                        auto* param = instruction.at("params").at(i).get_ptr<double*>();
-                        if (param == nullptr) {
-                            throw std::runtime_error("Expected a floating-point JSON parameter.");
-                        }
-                        params.push_back(param);
-                    }
+                    for (std::size_t i = 0; i < 4; ++i)
+                        bind(i);
                     break;
                 }
 
@@ -217,6 +221,78 @@ struct AERCircuit : public Circuit {
         for (std::size_t i = 0; i < params.size(); ++i) {
             *(params[i]) = new_params[i];
         }
+
+        // Keep the built circuit in step, so an update needs no rebuild.
+        if (kept_) {
+            for (std::size_t i = 0; i < params.size(); ++i) {
+                const auto& target = param_targets[i];
+                if (!target.global_phase)
+                    kept_->ops[target.op].params[target.k] = new_params[i];
+            }
+        }
+    }
+
+    // The AER::Circuit to run now. Building one from the JSON instructions costs about
+    // as much as simulating it, so it is built once and kept; each run gets a copy,
+    // because AER modifies the circuit it executes in place (qubit truncation, metadata,
+    // gate fusion) and the kept one must stay as built for the next update.
+    std::shared_ptr<AER::Circuit> circuit_for_run(int num_clbits) const
+    {
+        if (!rebindable_)
+            return build_(num_clbits);
+
+        if (!kept_ || kept_clbits_ != num_clbits) {
+            kept_ = build_(num_clbits);
+            kept_clbits_ = num_clbits;
+            if (!matches_instructions_(*kept_)) {
+                // Cannot rebind this circuit in place: rebuild it on every run instead.
+                LOGGER_DEBUG("AER circuit does not map one op per instruction; it will be "
+                             "rebuilt on every run.");
+                rebindable_ = false;
+                auto circuit = std::move(kept_);
+                kept_.reset();
+                return circuit;
+            }
+        }
+
+        auto circuit = std::make_shared<AER::Circuit>(*kept_);
+        circuit->global_phase_angle = global_phase();
+        // A built AER::Circuit draws a fresh random seed, and AER samples with it unless
+        // the run sets seed_simulator. A copy would inherit the kept circuit's seed, so
+        // every run would sample the same shot noise; draw a new one as a rebuild would.
+        circuit->set_random_seed();
+        return circuit;
+    }
+
+private:
+    mutable std::shared_ptr<AER::Circuit> kept_;
+    mutable int kept_clbits_ = -1;
+    mutable bool rebindable_ = true;
+
+    std::shared_ptr<AER::Circuit> build_(int num_clbits) const
+    {
+        return std::make_shared<AER::Circuit>(JSON({
+            {"config", {{"memory_slots", num_clbits}}},
+            {"header", {{"global_phase", global_phase()}}},
+            {"instructions", instructions}
+        }));
+    }
+
+    // Rebinding in place relies on AER building exactly one op per instruction and
+    // keeping every angle where the JSON had it.
+    bool matches_instructions_(const AER::Circuit& circuit) const
+    {
+        if (circuit.ops.size() != instructions.size())
+            return false;
+        for (std::size_t i = 0; i < params.size(); ++i) {
+            const auto& target = param_targets[i];
+            if (target.global_phase)
+                continue;
+            const auto& op_params = circuit.ops[target.op].params;
+            if (target.k >= op_params.size() || op_params[target.k] != std::complex<double>(*params[i], 0.0))
+                return false;
+        }
+        return true;
     }
 };
 
