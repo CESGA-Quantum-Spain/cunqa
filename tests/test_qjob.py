@@ -513,6 +513,31 @@ def test_buffer_does_not_deliver_the_same_result_twice(result_buffer):
         result_buffer.get(future, "circuit-a")
 
 
+def test_buffer_forgets_collected_circuits(result_buffer):
+    """Nothing is kept for a circuit once its results are collected, so the buffer does
+    not grow with the number of circuits ever sent."""
+    future = Mock()
+    future.get.side_effect = [
+        _raw_result("circuit-b"),
+        _raw_result("circuit-a"),
+        _raw_result("circuit-b"),
+    ]
+    result_buffer.register("circuit-a")
+    result_buffer.register("circuit-b")
+    result_buffer.register("circuit-b")
+
+    result_buffer.get(future, "circuit-a")
+    result_buffer.get(future, "circuit-b")
+    # One result of `circuit-b` is still pending, so its count must survive.
+    assert result_buffer._outstanding["circuit-b"] == 1
+    result_buffer.get(future, "circuit-b")
+
+    assert len(result_buffer._outstanding) == 0
+    assert len(result_buffer._stored) == 0
+    with pytest.raises(RuntimeError, match="No result is pending"):
+        result_buffer.get(future, "circuit-b")
+
+
 # ------------------------
 # QJob and ResultBuffer
 # ------------------------
