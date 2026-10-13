@@ -84,3 +84,50 @@ The only unique feature of this type of backend is that it specifies the number 
             "coupling_map": [],
         }
     }
+
+**Backend with simulated time**
+
+By default every :term:`vQPU` runs on wall-clock time: ``time_taken`` only measures how long the
+simulation took on the HPC. Adding a ``timing`` block gives the vQPU a logical clock, so that each
+operation, classical message and entanglement generation has a simulated duration. All durations
+are given in nanoseconds and every field is optional:
+
+.. code-block:: json
+
+    {
+        "backend": {
+            "name": "TimedBackend",
+            "version": "0.0.1",
+            "description": "Example of a backend with simulated time",
+            "num_qubits": [16, 0],
+            "basis_gates": [
+                "id", "h", "x", "y", "z", "cx", "cy", "cz", "ecr"
+            ],
+            "coupling_map": [],
+            "timing": {
+                "one_qubit_gate": 50,
+                "multi_qubit_gate": 300,
+                "measure": 1000,
+                "reset": 1000,
+                "classical_latency": 500,
+                "entanglement": 2000,
+                "gate_durations": {"cx": 250, "rz": 0}
+            }
+        }
+    }
+
+* ``one_qubit_gate`` (default 50) and ``multi_qubit_gate`` (default 300) are the durations of gates
+  without an entry in ``gate_durations``. Noise channels and ``save_state`` take no time.
+* ``measure`` and ``reset`` default to 1000.
+* ``classical_latency`` (default 0) is added to the send time of every classical message the vQPU
+  receives.
+* ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. The state becomes available
+  on every vQPU taking part at the same simulated time.
+* ``gate_durations`` overrides the duration of specific instructions, by name.
+
+Operations are scheduled as soon as their qubits and classical bits are ready, so independent gates
+run in parallel and gates inside a classically controlled block wait until the condition is known.
+The result then includes a ``simulated_time`` entry (see
+:py:attr:`~cunqa.result.Result.simulated_time`) with the mean, minimum and maximum duration of a
+shot and the mean idle time of each qubit. When :term:`vQPUs <vQPU>` communicate, every one of them
+must define a ``timing`` block.

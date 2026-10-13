@@ -26,7 +26,9 @@ struct QuantumCommManager {
         }
     }
 
-    void get_ghz(std::shared_ptr<cunqa::sim::Simulator> simulator, const cunqa::GenEnt& payload)
+    // Returns the qubits of the GHZ state once every participant has asked for
+    // it, and an empty vector while it is still pending.
+    std::vector<std::size_t> get_ghz(std::shared_ptr<cunqa::sim::Simulator> simulator, const cunqa::GenEnt& payload)
     {
         auto& wait = ent_wait[payload.tag];
         wait.push_back(payload.qubit);
@@ -44,9 +46,10 @@ struct QuantumCommManager {
             }
             for (const auto& qubit : wait)
                 is_pending[qubit] = false;
-            ent_wait[payload.tag].clear();
-        } else
-            is_pending[payload.qubit] = true;
+            return std::exchange(ent_wait[payload.tag], {});
+        }
+        is_pending[payload.qubit] = true;
+        return {};
     }
 };    
 

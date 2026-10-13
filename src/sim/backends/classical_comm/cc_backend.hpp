@@ -17,6 +17,7 @@ public:
         load_common_fields(backend_json, simulator.get());
 
         executor_.set_simulator(std::move(simulator));
+        executor_.set_timing(timing);
     }
 
     inline JSON execute(const std::string& quantum_task_str) override

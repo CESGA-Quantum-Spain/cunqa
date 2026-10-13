@@ -18,9 +18,12 @@ JSON NCExecutor::custom_execute_()
 
     auto& circuit = static_cast<DynamicCircuit&>(*last_circuit_);
 
+    TimingStats timing_stats;
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
+        if (clock_)
+            clock_->reset();
         for (std::size_t pc = 0; pc < circuit.instructions.size(); ++pc) {
             
             std::visit([&](const auto& payload) {
@@ -43,21 +46,30 @@ JSON NCExecutor::custom_execute_()
                         if (result != payload.condition){
                             while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
                                 ++pc;
-                        } 
+                        } else if (clock_)
+                            clock_->begin_conditional(payload.clbits);
                     }
                     // We always avoid ENDCIF cause it does not possess semantic meaning
-                    if (type == InstructionType::ENDCIF)
+                    if (type == InstructionType::ENDCIF) {
+                        if (clock_)
+                            clock_->end_conditional();
                         return;
+                    }
                 } else if constexpr (std::is_same_v<T, ClassicalComm> ||std::is_same_v<T, GenEnt>)
                     throw std::runtime_error("No communications allowed in the no communication scheme!");
                 else if constexpr (std::is_same_v<T, std::monostate>)
                     throw std::runtime_error("Empty circuit received.");
-                else
+                else {
                     simulator_->apply_gate(type, payload);
+                    if (clock_)
+                        clock_->apply(type, payload);
+                }
             }, circuit.instructions[pc].payload);
 
         }
 
+        if (clock_)
+            timing_stats.add_shot(*clock_);
         meas_counter[simulator_->get_measures()]++;
         simulator_->clear();
     }
@@ -65,10 +77,26 @@ JSON NCExecutor::custom_execute_()
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    return {
+    JSON result = {
         {"counts", meas_counter},
         {"time_taken", time_taken}
     };
+    if (clock_)
+        result["simulated_time"] = timing_stats.to_json();
+    return result;
+}
+
+JSON NCExecutor::static_timing_of_(const JSON& instructions)
+{
+    try {
+        clock_->schedule(instructions);
+        TimingStats timing_stats;
+        timing_stats.add_shot(*clock_);
+        return timing_stats.to_json();
+    } catch (const std::exception& e) {
+        LOGGER_WARN("Simulated time could not be computed for this circuit: {}", e.what());
+        return {{"ERROR", std::string(e.what())}};
+    }
 }
 
 } // End of sim namespace

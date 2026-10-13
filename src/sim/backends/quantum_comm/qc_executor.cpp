@@ -11,6 +11,7 @@
 
 #include "qc_executor.hpp"
 #include "sim/run_config.hpp"
+#include "sim/timing.hpp"
 #include "dynamic_circuit/instruction_type.hpp"
 #include "dynamic_circuit/dynamic_circuit.hpp"
 #include "utils/helpers/environment.hpp"
@@ -193,16 +194,46 @@ struct InstructionStream
     }
 };
 
+// The GHZ state is ready on every participant at the same simulated time:
+// generation starts once all the communication qubits are free and lasts the
+// longest entanglement duration among the vQPUs involved.
+void synchronize_entanglement_(
+    std::vector<cunqa::sim::SimClock>& clocks,
+    const std::vector<std::size_t>& qubits
+)
+{
+    auto clock_of = [&](std::size_t qubit) -> cunqa::sim::SimClock& {
+        for (auto& clock : clocks)
+            if (clock.owns_qubit(qubit))
+                return clock;
+        throw std::out_of_range("No vQPU owns qubit " + std::to_string(qubit) + ".");
+    };
+
+    double start = 0.0;
+    double duration = 0.0;
+    for (auto q : qubits) {
+        auto& clock = clock_of(q);
+        start = std::max(start, clock.qubit_time(q));
+        duration = std::max(duration, clock.model().entanglement_duration());
+    }
+    for (auto q : qubits)
+        clock_of(q).occupy(q, start, start + duration);
+}
+
+// `clocks` holds one simulated clock per quantum task, or none if simulated
+// time is disabled.
 void execute_shot_(
     std::shared_ptr<cunqa::sim::Simulator> simulator, 
     InstructionStream& stream,
-    const std::vector<std::vector<std::size_t>> communication_qubits_
+    const std::vector<std::vector<std::size_t>> communication_qubits_,
+    std::vector<cunqa::sim::SimClock>& clocks
 )
 {
     cunqa::QuantumCommManager qc_manager{communication_qubits_};
     cunqa::ClassicalCommManager cc_manager;
     while(!stream.all_finished()) {
         const auto& instr = stream.get_current();
+        auto* clock = clocks.empty() ? nullptr : &clocks[stream.pointed_quantum_task];
         
         std::visit([&](const auto& payload) {
             using T = std::decay_t<decltype(payload)>;
@@ -229,17 +260,26 @@ void execute_shot_(
                         do {
                             type = stream.skip_next();
                         } while (type != cunqa::InstructionType::ENDCIF);
-                    }
-                } 
+                    } else if (clock)
+                        clock->begin_conditional(payload.clbits);
+                } else if (type == cunqa::InstructionType::ENDCIF && clock)
+                    clock->end_conditional();
             } else if constexpr (std::is_same_v<T, cunqa::ClassicalComm>) {
                 if (type == cunqa::InstructionType::SEND) {
                     for (std::size_t i=0; i<payload.clbits.size(); i++) 
-                        cc_manager.send(simulator->creg[payload.clbits[i]], payload.qpus[0]);
+                        cc_manager.send(
+                            simulator->creg[payload.clbits[i]],
+                            payload.qpus[0],
+                            clock ? clock->classical_time({payload.clbits[i]}) : 0.0
+                        );
                 } else {
                     bool value_i;
+                    double send_time_i;
                     for (std::size_t i=0; i<payload.clbits.size(); i++) {
-                        if (cc_manager.recv(payload.qpus[0], value_i)) {
+                        if (cc_manager.recv(payload.qpus[0], value_i, send_time_i)) {
                             simulator->creg[payload.clbits[i]] = value_i;
+                            if (clock)
+                                clock->receive_clbit(payload.clbits[i], send_time_i);
                             simulator->save_clbit[payload.clbits[i]] = false;
                             if (stream.is_current_blocked())
                                 stream.unblock_current();
@@ -248,7 +288,9 @@ void execute_shot_(
                     }
                 }
             } else if constexpr (std::is_same_v<T, cunqa::GenEnt>) {
-                qc_manager.get_ghz(simulator, payload);
+                auto ghz_qubits = qc_manager.get_ghz(simulator, payload);
+                if (clock && !ghz_qubits.empty())
+                    synchronize_entanglement_(clocks, ghz_qubits);
             } else if constexpr (std::is_same_v<T, std::monostate>) {
                 throw std::runtime_error("Empty circuit received.");
             }
@@ -269,6 +311,8 @@ void execute_shot_(
                 if (stream.is_current_blocked())
                     stream.unblock_current();
                 simulator->apply_gate(type, payload);
+                if (clock)
+                    clock->apply(type, payload);
             }
                 
         }, instr.payload);
@@ -356,12 +400,28 @@ QCExecutor::QCExecutor(
         return backends.size() == qpus_ids_.size();
     }, "QPUs backend definition");
     
+    // Simulated time needs a clock on every vQPU, as they share messages and
+    // entangled states.
+    const auto n_timed = std::count_if(qpus_ids_.begin(), qpus_ids_.end(), [&](const auto& qpu_id) {
+        return backends.at(qpu_id).at("backend").contains("timing");
+    });
+    const bool timed = n_timed == static_cast<std::ptrdiff_t>(qpus_ids_.size());
+    if (!timed && n_timed > 0)
+        LOGGER_WARN("Simulated time disabled: only some of the vQPUs define a \"timing\" block.");
+
     std::size_t accumulated_qubits{0};
     for (const auto& qpu_id : qpus_ids_) {
         zero_qubits_.push_back(accumulated_qubits);
 
-        const std::size_t n_computation_qubits = backends.at(qpu_id).at("backend").at("num_qubits")[0];
-        const std::size_t n_communication_qubits = backends.at(qpu_id).at("backend").at("num_qubits")[1];
+        const auto& backend = backends.at(qpu_id).at("backend");
+        const std::size_t n_computation_qubits = backend.at("num_qubits")[0];
+        const std::size_t n_communication_qubits = backend.at("num_qubits")[1];
+        if (timed)
+            clocks_.emplace_back(
+                TimingModel(backend.at("timing")),
+                n_computation_qubits + n_communication_qubits,
+                accumulated_qubits
+            );
 
         const std::size_t comm_start = accumulated_qubits + n_computation_qubits;
         accumulated_qubits = comm_start + n_communication_qubits;
@@ -410,15 +470,21 @@ void QCExecutor::run()
             simulator_->config = RunConfig::combine_configs(run_configs);
         }
 
+        std::vector<TimingStats> timing_stats(clocks_.empty() ? 0 : quantum_tasks.size());
+
         MeasCounter meas_counter;
         InstructionStream stream(quantum_tasks, zero_clbits_, zero_qubits_);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (std::size_t i=0; i<simulator_->config.shots; i++) {
             simulator_->initialize();
+            for (auto& clock : clocks_)
+                clock.reset();
 
-            execute_shot_(simulator_, stream, communication_qubits_);
+            execute_shot_(simulator_, stream, communication_qubits_, clocks_);
             stream.reset();
+            for (std::size_t t = 0; t < timing_stats.size(); t++)
+                timing_stats[t].add_shot(clocks_[t]);
 
             update_measures_(simulator_, quantum_tasks, zero_clbits_, meas_counter);
             simulator_->clear();
@@ -427,12 +493,15 @@ void QCExecutor::run()
         std::chrono::duration<float> duration = end - start;
         float time_taken = duration.count();
 
-        for(const auto& quantum_task: quantum_tasks) {
+        for (std::size_t t = 0; t < quantum_tasks.size(); t++) {
+            const auto& quantum_task = quantum_tasks[t];
             JSON qpu_result = {
                 {"id", quantum_task.id},
                 {"counts", meas_counter[quantum_task.config.qpu_id]},
                 {"time_taken", time_taken}
             };
+            if (!timing_stats.empty())
+                qpu_result["simulated_time"] = timing_stats[t].to_json();
             classical_channel_.send_info(qpu_result.dump(), quantum_task.config.qpu_id);
         }
     }

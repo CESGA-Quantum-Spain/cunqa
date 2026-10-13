@@ -4,6 +4,7 @@
 
 #include "sim/simulator.hpp"
 #include "comm/classical_channel.hpp"
+#include "sim/timing.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -22,6 +23,8 @@ private:
     std::vector<std::string> qpus_ids_;
     std::vector<std::vector<std::size_t>> communication_qubits_; 
     std::vector<std::size_t> zero_qubits_;
+    // One simulated clock per vQPU, or none if simulated time is disabled.
+    std::vector<SimClock> clocks_;
 };
 
 } // End of sim namespace

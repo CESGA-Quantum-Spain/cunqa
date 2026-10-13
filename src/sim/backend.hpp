@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <utility>
 #include <vector>
 #include <string>
@@ -8,6 +9,7 @@
 #include <stdexcept>
 
 #include "sim/simulator.hpp"
+#include "sim/timing.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
@@ -22,6 +24,8 @@ public:
     std::vector<std::vector<std::size_t>> coupling_map;
     std::vector<std::string> basis_gates;
     std::string simulator_name;
+    // Simulated-time model; empty when the backend runs on wall-clock time only.
+    std::optional<TimingModel> timing;
 
     virtual inline JSON execute(const std::string& quantum_task_str) = 0;
     virtual JSON to_json() const = 0;
@@ -73,12 +77,15 @@ protected:
                 throw std::invalid_argument("The defined basis gates are not supported by the simulator!");
         }
 
+        if (backend_json.contains("timing"))
+            timing.emplace(backend_json.at("timing"));
+
         simulator_name = simulator->get_name();
     }
 
     JSON base_json() const
     {
-        return {
+        JSON j = {
             {"name", name},
             {"version", version},
             {"num_qubits", num_qubits},
@@ -87,6 +94,9 @@ protected:
             {"basis_gates", basis_gates},
             {"simulator", simulator_name}
         };
+        if (timing)
+            j["timing"] = timing->to_json();
+        return j;
     }
 };
 
