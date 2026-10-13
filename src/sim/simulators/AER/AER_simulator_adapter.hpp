@@ -59,6 +59,13 @@ public:
     void apply_gate(const InstructionType& type, const Measure& payload) override;
     void apply_gate(const InstructionType& type, const Reset& payload) override;
     void apply_gate(const InstructionType& type, const Copy& payload) override;
+
+    bool supports_kraus() const override;
+    bool supports_reset() const override
+    {
+        return true;
+    }
+    void apply_kraus(const std::vector<std::size_t>& qubits, const KrausOperators& operators) override;
 private:
     struct State;
     std::unique_ptr<State> state_;

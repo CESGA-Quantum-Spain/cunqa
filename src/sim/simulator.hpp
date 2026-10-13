@@ -1,9 +1,11 @@
 #pragma once
 
+#include <complex>
 #include <span>
 #include <map>
 #include <string_view>
 #include <utility>
+#include <vector>
 #include <iostream>
 
 #include "dynamic_circuit/instruction_type.hpp"
@@ -12,6 +14,9 @@
 
 namespace cunqa {
 namespace sim {
+
+// Kraus operators of a quantum channel, each one stored row-major as a 2^n x 2^n matrix.
+using KrausOperators = std::vector<std::vector<std::complex<double>>>;
 
 class Simulator {
 public:
@@ -177,6 +182,26 @@ public:
     virtual void apply_gate(const InstructionType& type, const Copy& payload)
     {
         unsupported_gate(type, payload);
+    }
+
+    // Capabilities used by the time-aware noise model of the quantum-communications scheme.
+    // Without Kraus channels (e.g. amplitude damping) it falls back to Pauli-twirled ones;
+    // without reset, the communication qubits are not re-initialized when a pair arrives.
+    virtual bool supports_kraus() const
+    {
+        return false;
+    }
+
+    virtual bool supports_reset() const
+    {
+        return false;
+    }
+
+    virtual void apply_kraus(const std::vector<std::size_t>& qubits, const KrausOperators& operators)
+    {
+        (void) qubits;
+        (void) operators;
+        throw std::runtime_error("Kraus channels are not supported by " + get_name() + " simulator.");
     }
 
 protected:
