@@ -1,5 +1,7 @@
 
 #include <string>
+#include <sstream>
+#include <limits>
 #include <queue>
 #include <memory>
 #include <algorithm>
@@ -136,6 +138,28 @@ std::string ClassicalChannel::recv_info(const std::string& origin) { return pimp
 //-----------------------------------------
 void ClassicalChannel::send_measure(const bool& measurement, const std::string& target) { pimpl_->send(std::to_string(measurement), target); }
 bool ClassicalChannel::recv_measure(const std::string& origin) { return std::stoi(pimpl_->recv(origin)); }
+
+//------------------------------------------------------------------------
+// Measurements with the simulated send time, encoded as "<value>@<time>". 
+// recv_measure still accepts these messages, as std::stoi stops at the '@'.
+//------------------------------------------------------------------------
+void ClassicalChannel::send_measure(const bool& measurement, double send_time, const std::string& target)
+{
+    std::ostringstream message;
+    message.precision(std::numeric_limits<double>::max_digits10);
+    message << measurement << '@' << send_time;
+    pimpl_->send(message.str(), target);
+}
+
+std::pair<bool, std::optional<double>> ClassicalChannel::recv_timed_measure(const std::string& origin)
+{
+    auto message = pimpl_->recv(origin);
+    bool measurement = std::stoi(message);
+    auto at = message.find('@');
+    if (at == std::string::npos)
+        return {measurement, std::nullopt};
+    return {measurement, std::stod(message.substr(at + 1))};
+}
 
 
 } // End of comm namespace

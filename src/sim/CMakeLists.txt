@@ -10,6 +10,21 @@ target_sources(backend
 target_link_libraries(backend
   INTERFACE
     json
+    timing
+)
+
+add_library(timing INTERFACE)
+target_sources(timing
+  INTERFACE
+    FILE_SET HEADERS
+    BASE_DIRS "${PROJECT_SOURCE_DIR}/src"
+    FILES
+      "${CMAKE_CURRENT_SOURCE_DIR}/timing.hpp"
+)
+target_link_libraries(timing
+  INTERFACE
+    json
+    dynamic_circuit
 )
 
 add_library(run_config INTERFACE)

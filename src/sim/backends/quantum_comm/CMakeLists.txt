@@ -23,6 +23,7 @@ target_link_libraries(qc_executor
     dynamic_circuit
     logger_executor
     run_config
+    timing
 )
 
 add_library(qc_backend INTERFACE)

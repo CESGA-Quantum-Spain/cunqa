@@ -97,3 +97,15 @@ def test_str_contains_id_counts_and_time_taken():
     assert "counts" in s
     assert "time_taken" in s
     assert "0.1" in s
+
+
+def test_simulated_time_absent_by_default():
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5}, circ_id="c", registers={"c": [0]})
+    assert r.simulated_time is None
+
+
+def test_simulated_time_reported():
+    timing = {"unit": "ns", "mean": 1350.0, "min": 1350.0, "max": 1350.0, "idle_mean": [0.0, 50.0]}
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5, "simulated_time": timing},
+               circ_id="c", registers={"c": [0]})
+    assert r.simulated_time == timing

@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <optional>
+#include <utility>
 
 #include "utils/json.hpp"
 
@@ -23,6 +25,11 @@ public:
 
     void send_measure(const bool& measurement, const std::string& target);
     bool recv_measure(const std::string& origin);
+
+    // Same as above, but the message also carries the simulated time at which
+    // it was sent. The timestamp is empty if the sender has no simulated clock.
+    void send_measure(const bool& measurement, double send_time, const std::string& target);
+    std::pair<bool, std::optional<double>> recv_timed_measure(const std::string& origin);
     
 private:
     struct Impl;

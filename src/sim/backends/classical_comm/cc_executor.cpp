@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 
 #include "cc_executor.hpp"
 #include "dynamic_circuit/dynamic_circuit.hpp"
@@ -16,7 +17,8 @@ using namespace cunqa;
 void execute_shot_(
     sim::Simulator* simulator,
     const DynamicCircuit& circuit,
-    comm::ClassicalChannel& classical_channel
+    comm::ClassicalChannel& classical_channel,
+    std::optional<sim::SimClock>& clock
 )
 {
     for (std::size_t pc = 0; pc < circuit.instructions.size(); pc++) {
@@ -40,27 +42,51 @@ void execute_shot_(
                         if (result != payload.condition){
                             while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
                                 ++pc;
-                        } 
+                        } else if (clock)
+                            clock->begin_conditional(payload.clbits);
                     }  
                 // We always avoid ENDCIF cause it does not possess semantic meaning
-                if (type == InstructionType::ENDCIF)
+                if (type == InstructionType::ENDCIF) {
+                    if (clock)
+                        clock->end_conditional();
                     return;
+                }
             } else if constexpr (std::is_same_v<T, ClassicalComm>){
                 if (type == InstructionType::SEND) {
                     if (payload.clbits.size() != payload.qpus.size())
                         throw std::invalid_argument("Not the same number of clbits and qpus to send!");
-                    for (std::size_t i=0; i<payload.clbits.size(); i++) 
-                        classical_channel.send_measure(simulator->creg[payload.clbits[i]], payload.qpus[i]);
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) {
+                        if (clock)
+                            classical_channel.send_measure(
+                                simulator->creg[payload.clbits[i]],
+                                clock->classical_time({payload.clbits[i]}),
+                                payload.qpus[i]
+                            );
+                        else
+                            classical_channel.send_measure(simulator->creg[payload.clbits[i]], payload.qpus[i]);
+                    }
                 } else {
-                    for (std::size_t i=0; i<payload.clbits.size(); i++)
-                        simulator->creg[payload.clbits[i]] = classical_channel.recv_measure(payload.qpus[i]);;
+                    for (std::size_t i=0; i<payload.clbits.size(); i++) {
+                        if (clock) {
+                            auto [value, send_time] = classical_channel.recv_timed_measure(payload.qpus[i]);
+                            static bool warned = false;
+                            if (!send_time && !std::exchange(warned, true))
+                                LOGGER_WARN("Message from {} carries no simulated time; assuming it was sent at t=0.", payload.qpus[i]);
+                            simulator->creg[payload.clbits[i]] = value;
+                            clock->receive_clbit(payload.clbits[i], send_time.value_or(0.0));
+                        } else
+                            simulator->creg[payload.clbits[i]] = classical_channel.recv_measure(payload.qpus[i]);
+                    }
                 }
             } else if constexpr (std::is_same_v<T, GenEnt>)
                 throw std::runtime_error("No communications allowed in the no communication scheme!");
             else if constexpr (std::is_same_v<T, std::monostate>)
                 throw std::runtime_error("Empty circuit received.");
-            else
+            else {
                 simulator->apply_gate(type, payload);
+                if (clock)
+                    clock->apply(type, payload);
+            }
         }, circuit.instructions[pc].payload);
     }
 }
@@ -93,11 +119,17 @@ JSON CCExecutor::execute(const JSON& quantum_task)
 
     for(const std::string& qpu_id: simulator_->config.sending_to)
         classical_channel_.connect(qpu_id);
-        
+    
+    TimingStats timing_stats;
+
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
-        execute_shot_(simulator_.get(), circuit, classical_channel_);
+        if (clock_)
+            clock_->reset();
+        execute_shot_(simulator_.get(), circuit, classical_channel_, clock_);
+        if (clock_)
+            timing_stats.add_shot(*clock_);
         meas_counter[simulator_->get_measures()]++;
         simulator_->clear();
     } // End all shots
@@ -105,10 +137,13 @@ JSON CCExecutor::execute(const JSON& quantum_task)
     std::chrono::duration<float> duration = end - start;
     float time_taken = duration.count();
 
-    return {
+    JSON result = {
         {"counts", meas_counter},
         {"time_taken", time_taken}
     };
+    if (clock_)
+        result["simulated_time"] = timing_stats.to_json();
+    return result;
 }
 
 } // End of sim namespace

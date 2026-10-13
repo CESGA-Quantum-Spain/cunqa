@@ -20,7 +20,7 @@ import logging
 import math
 import numpy as np
 
-from typing import  Union
+from typing import  Optional, Union
 from cunqa.utils.logger import logger
 from itertools import accumulate
 
@@ -35,6 +35,7 @@ class Result:
 
     .. autoattribute:: counts
     .. autoattribute:: time_taken
+    .. autoattribute:: simulated_time
     .. autoattribute:: result
     """
     _result: dict
@@ -139,6 +140,21 @@ class Result:
             return time
         else:
             raise RuntimeError(f"The result format is unknown: no time_taken in it.")
+
+    @property
+    def simulated_time(self) -> Optional[dict]:
+        """
+        Simulated (logical) time of the execution on the virtual QPU, independent of how long the
+        simulation took. It is only available if the QPU backend defines a ``"timing"`` block, and
+        is ``None`` otherwise. Times are given in nanoseconds:
+
+            >>> result.simulated_time
+            {'unit': 'ns', 'mean': 1350.0, 'min': 1350.0, 'max': 1350.0, 'idle_mean': [0.0, 50.0]}
+
+        ``mean``, ``min`` and ``max`` describe the duration of a shot, while ``idle_mean`` holds,
+        for each qubit, the average time per shot it spent waiting for other operations.
+        """
+        return self._result.get("simulated_time")
         
     @property
     def statevector(self) -> Union[dict[np.array], np.array]:

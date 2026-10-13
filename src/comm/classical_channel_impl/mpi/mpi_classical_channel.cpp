@@ -105,5 +105,19 @@ bool ClassicalChannel::recv_measure(const std::string& origin)
     return pimpl_->recv(origin);
 }
 
+// MPI messages are typed, so both ends must use the timed variants.
+void ClassicalChannel::send_measure(const bool& measurement, double send_time, const std::string& target)
+{
+    double message[2] = {static_cast<double>(measurement), send_time};
+    MPI_Send(message, 2, MPI_DOUBLE, std::atoi(target.c_str()), 2, MPI_COMM_WORLD);
+}
+
+std::pair<bool, std::optional<double>> ClassicalChannel::recv_timed_measure(const std::string& origin)
+{
+    double message[2];
+    MPI_Recv(message, 2, MPI_DOUBLE, std::atoi(origin.c_str()), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    return {message[0] != 0.0, message[1]};
+}
+
 } // End of comm namespace
 } // End of cunqa namespace
