@@ -7,6 +7,8 @@ include(GoogleTest)
 add_executable(cunqa_cpp_tests
   test_timing.cpp
   test_nc_executor.cpp
+  test_random_delay.cpp
+  test_channels.cpp
 )
 
 target_include_directories(cunqa_cpp_tests
@@ -21,6 +23,7 @@ target_link_libraries(cunqa_cpp_tests
     "$<LINK_LIBRARY:WHOLE_ARCHIVE,logger_executor>"
     GTest::gtest_main
     timing
+    noise
     nc_executor
     AER_simulator_adapter
 )
