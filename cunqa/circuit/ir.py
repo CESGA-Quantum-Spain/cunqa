@@ -125,7 +125,7 @@ if CUNQA_USE_QISKIT_PY:
                         if sub_circuit is not None
                     ][0]
 
-                if instruction.condition[1] not in [1]:
+                if instruction.operation.condition[1] not in [1]:
                     raise ValueError("Only 1 is accepted as condition for classicaly controlled "
                                     "operations for the current version.")
                 
@@ -177,7 +177,7 @@ if CUNQA_USE_QISKIT_PY:
                     "params":instruction_params
                 }
                 
-                if instruction.operation.condition != None:
+                if getattr(instruction.operation, "condition", None) is not None:
 
                     if instruction.operation._condition[1] not in [1]:
                         raise ValueError("Only 1 is accepted as condition for classicaly controlled "
