@@ -129,8 +129,11 @@ are given in seconds and every field is optional:
   mean m. The bits that one ``recv`` takes from the same vQPU travel in one message and share it.
 * ``feed_forward_latency`` (default 0) is the time the controller takes to act on a condition once
   its bits are known: the operations of a classically controlled block start that much later.
-* ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. The state becomes available
-  on every vQPU taking part at the same simulated time.
+* ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. It starts once every vQPU
+  taking part has asked for the state, that is, once its communication qubit is free and the work
+  issued before the request is done, and the state becomes available on all of them at the same
+  simulated time. With the :ref:`communication noise model <sec_comm_model>`, the attempts of the
+  entanglement generator of each link are added to it.
 * ``gate_durations`` overrides the duration of specific instructions, by name.
 
 Operations are scheduled as soon as their qubits and classical bits are ready, so independent gates
@@ -140,4 +143,5 @@ the controller cannot go on before knowing it.
 The result then includes a ``simulated_time`` entry (see
 :py:attr:`~cunqa.result.Result.simulated_time`) with the mean, minimum and maximum duration of a
 shot and the mean idle time of each qubit. When :term:`vQPUs <vQPU>` communicate, every one of them
-must define a ``timing`` block.
+must define a ``timing`` block, except with the :ref:`communication noise model <sec_comm_model>`,
+which uses the default durations for those without it.
