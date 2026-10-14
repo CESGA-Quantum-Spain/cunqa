@@ -14,29 +14,35 @@
 
 #include "dynamic_circuit/instruction.hpp"
 #include "dynamic_circuit/instruction_type.hpp"
+#include "sim/random_delay.hpp"
 #include "utils/json.hpp"
 
 namespace cunqa {
 namespace sim {
 
 // Simulated (logical) time of a vQPU. Every quantity here is expressed in
-// nanoseconds of *simulated* time and is completely independent of how long
+// seconds of *simulated* time and is completely independent of how long
 // the simulation takes on the HPC.
 //
 // Timing is enabled by adding a "timing" block to the backend JSON:
 //
 //   "timing": {
-//       "one_qubit_gate": 50,       // default duration of 1-qubit gates
-//       "multi_qubit_gate": 300,    // default duration of gates on >= 2 qubits
-//       "measure": 1000,
-//       "reset": 1000,
+//       "one_qubit_gate": 5e-8,     // default duration of 1-qubit gates
+//       "multi_qubit_gate": 3e-7,   // default duration of gates on >= 2 qubits
+//       "measure": 1e-6,
+//       "reset": 1e-6,
 //       "classical_latency": 0,     // latency of an incoming classical message
+//       "classical_jitter": { "distribution": "exponential", "mean": 1e-7 },
+//                                   // random extra latency of each incoming message
+//       "feed_forward_latency": 0,  // from knowing the bits of a condition to acting on it
 //       "entanglement": 0,          // duration of a GEN_ENT (EPR/GHZ generation)
-//       "gate_durations": { "cx": 250, "rz": 0 }   // per-gate overrides
+//       "gate_durations": { "cx": 2.5e-7, "rz": 0 }   // per-gate overrides
 //   }
 //
 // Every field is optional. Noise channels and save_state take no time unless
-// they are overridden in "gate_durations".
+// they are overridden in "gate_durations". The jitter follows either
+// {"distribution": "uniform", "width": w}, uniform in [0, w], or
+// {"distribution": "exponential", "mean": m}.
 class TimingModel {
 public:
     TimingModel() { by_type_.fill(UNSET); }
@@ -54,9 +60,11 @@ public:
         one_qubit_gate_ = read_duration_(timing_json, "one_qubit_gate", one_qubit_gate_);
         multi_qubit_gate_ = read_duration_(timing_json, "multi_qubit_gate", multi_qubit_gate_);
         classical_latency_ = read_duration_(timing_json, "classical_latency", classical_latency_);
+        classical_jitter_ = read_jitter_(timing_json);
+        feed_forward_latency_ = read_duration_(timing_json, "feed_forward_latency", feed_forward_latency_);
         entanglement_ = read_duration_(timing_json, "entanglement", entanglement_);
-        by_type_[index_(InstructionType::MEASURE)] = read_duration_(timing_json, "measure", 1000.0);
-        by_type_[index_(InstructionType::RESET)] = read_duration_(timing_json, "reset", 1000.0);
+        by_type_[index_(InstructionType::MEASURE)] = read_duration_(timing_json, "measure", 1e-6);
+        by_type_[index_(InstructionType::RESET)] = read_duration_(timing_json, "reset", 1e-6);
 
         for (auto type : {InstructionType::AMPLITUDEDAMPINGNOISE, InstructionType::BITFLIPNOISE,
                           InstructionType::DEPHASINGNOISE, InstructionType::DEPOLARIZINGNOISE,
@@ -79,6 +87,9 @@ public:
     }
 
     double classical_latency() const { return classical_latency_; }
+    // Random extra latency of each incoming message; null when there is none.
+    const RandomDelayPtr& classical_jitter() const { return classical_jitter_; }
+    double feed_forward_latency() const { return feed_forward_latency_; }
     double entanglement_duration() const { return entanglement_; }
 
     JSON to_json() const { return config_; }
@@ -86,16 +97,19 @@ public:
 private:
     static constexpr double UNSET = std::numeric_limits<double>::quiet_NaN();
     static constexpr std::size_t N_TYPES = static_cast<std::size_t>(InstructionType::MEASURE) + 1;
-    static constexpr std::array<std::string_view, 7> KEYS = {
+    static constexpr std::array<std::string_view, 9> KEYS = {
         "one_qubit_gate", "multi_qubit_gate", "measure", "reset",
-        "classical_latency", "entanglement", "gate_durations"
+        "classical_latency", "classical_jitter", "feed_forward_latency",
+        "entanglement", "gate_durations"
     };
 
     JSON config_ = JSON::object();
     std::array<double, N_TYPES> by_type_;
-    double one_qubit_gate_ = 50.0;
-    double multi_qubit_gate_ = 300.0;
+    double one_qubit_gate_ = 5e-8;
+    double multi_qubit_gate_ = 3e-7;
     double classical_latency_ = 0.0;
+    RandomDelayPtr classical_jitter_;
+    double feed_forward_latency_ = 0.0;
     double entanglement_ = 0.0;
 
     static constexpr std::size_t index_(InstructionType type) { return static_cast<std::size_t>(type); }
@@ -103,13 +117,41 @@ private:
     static double check_duration_(const std::string& key, double value)
     {
         if (!(value >= 0.0) || !std::isfinite(value))
-            throw std::invalid_argument("timing: '" + key + "' must be a finite, non-negative duration (ns).");
+            throw std::invalid_argument("timing: '" + key + "' must be a finite, non-negative duration (s).");
         return value;
     }
 
     static double read_duration_(const JSON& j, const std::string& key, double fallback)
     {
         return j.contains(key) ? check_duration_(key, j.at(key).get<double>()) : fallback;
+    }
+
+    static RandomDelayPtr read_jitter_(const JSON& j)
+    {
+        if (!j.contains("classical_jitter") || j.at("classical_jitter").is_null())
+            return nullptr;
+
+        const auto& jitter = j.at("classical_jitter");
+        const auto distribution = jitter.is_object() ? jitter.value("distribution", std::string{}) : std::string{};
+        const auto parameter = (distribution == "uniform") ? "width" : "mean";
+        if (distribution != "uniform" && distribution != "exponential")
+            throw std::invalid_argument(
+                "timing: 'classical_jitter' must be {\"distribution\": \"uniform\", \"width\": w} "
+                "or {\"distribution\": \"exponential\", \"mean\": m}.");
+        for (const auto& [key, value] : jitter.items()) {
+            if (key != "distribution" && key != parameter)
+                throw std::invalid_argument("timing: unknown field 'classical_jitter." + key + "'.");
+        }
+        if (!jitter.contains(parameter))
+            throw std::invalid_argument(std::string("timing: 'classical_jitter' needs its '") + parameter + "'.");
+
+        const double value = check_duration_(std::string("classical_jitter.") + parameter,
+                                             jitter.at(parameter).get<double>());
+        if (value == 0.0)
+            return nullptr;
+        if (distribution == "uniform")
+            return std::make_shared<UniformDelay>(0.0, value);
+        return std::make_shared<ExponentialDelay>(0.0, value);
     }
 };
 
@@ -196,8 +238,27 @@ public:
     }
 
     // Operations inside a CIF block cannot start before the condition is known.
-    void begin_conditional(const std::vector<std::size_t>& clbits) { condition_time_ = classical_time(clbits); }
+    void begin_conditional(const std::vector<std::size_t>& clbits) { condition_time_ = decision_time(clbits); }
     void end_conditional() { condition_time_ = 0.0; }
+
+    // A CIF block whose condition is not met is not applied, but the controller only knows
+    // that once the condition is known: until then, the qubits of the block cannot start
+    // anything else, exactly as if the block had been applied.
+    void skip_conditional(const std::vector<std::size_t>& clbits, const std::vector<std::size_t>& qubits)
+    {
+        const double decided = decision_time(clbits);
+        for (auto q : qubits) {
+            const double start = std::max(decided, qubit_ready_[local_(q)]);
+            occupy(q, start, start);
+        }
+    }
+
+    // Time at which the controller acts on the condition on these clbits: once they are
+    // known, after the feed-forward latency.
+    double decision_time(const std::vector<std::size_t>& clbits) const
+    {
+        return classical_time(clbits) + model_.feed_forward_latency();
+    }
 
     // Earliest time at which a classical operation on these clbits can happen.
     double classical_time(const std::vector<std::size_t>& clbits) const
@@ -208,10 +269,11 @@ public:
         return t;
     }
 
-    // A message sent at send_time arrives after the modeled latency.
-    void receive_clbit(std::size_t clbit, double send_time)
+    // A message sent at send_time arrives after the modeled latency, plus the jitter
+    // drawn for it from model().classical_jitter().
+    void receive_clbit(std::size_t clbit, double send_time, double jitter = 0.0)
     {
-        set_clbit_time(clbit, std::max(condition_time_, send_time + model_.classical_latency()));
+        set_clbit_time(clbit, std::max(condition_time_, send_time + model_.classical_latency() + jitter));
     }
 
     double clbit_time(std::size_t clbit) const
@@ -232,6 +294,10 @@ public:
     }
 
     double qubit_time(std::size_t qubit) const { return std::max(condition_time_, qubit_ready_[local_(qubit)]); }
+
+    // The two terms of qubit_time(), for callers that need to know which one sets it.
+    double qubit_ready(std::size_t qubit) const { return qubit_ready_[local_(qubit)]; }
+    double condition_time() const { return condition_time_; }
 
     // Keep `qubit` busy in [start, end), with start >= qubit_time(qubit). Used
     // for operations spanning several vQPUs, such as entanglement generation.
@@ -287,6 +353,20 @@ private:
 };
 
 
+// Qubits an instruction acts on, e.g. to reserve those of a skipped CIF block.
+inline std::vector<std::size_t> instruction_qubits(const InstructionVariant& payload)
+{
+    return std::visit([](const auto& p) -> std::vector<std::size_t> {
+        if constexpr (requires { p.qubits; })
+            return std::vector<std::size_t>(p.qubits.begin(), p.qubits.end());
+        else if constexpr (requires { p.qubit; })
+            return {p.qubit};
+        else
+            return {};
+    }, payload);
+}
+
+
 // Simulated-time statistics accumulated over the shots of an execution.
 class TimingStats {
 public:
@@ -310,7 +390,7 @@ public:
         std::vector<double> idle_mean(idle_sum_.size());
         std::transform(idle_sum_.begin(), idle_sum_.end(), idle_mean.begin(), [n](double s) { return s / n; });
         return {
-            {"unit", "ns"},
+            {"unit", "s"},
             {"mean", sum_ / n},
             {"min", min_},
             {"max", max_},

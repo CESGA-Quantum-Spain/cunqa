@@ -105,7 +105,19 @@ def test_simulated_time_absent_by_default():
 
 
 def test_simulated_time_reported():
-    timing = {"unit": "ns", "mean": 1350.0, "min": 1350.0, "max": 1350.0, "idle_mean": [0.0, 50.0]}
+    timing = {"unit": "s", "mean": 1.35e-6, "min": 1.35e-6, "max": 1.35e-6, "idle_mean": [0.0, 5e-8]}
     r = Result({"counts": {"0": 1}, "time_taken": 0.5, "simulated_time": timing},
                circ_id="c", registers={"c": [0]})
     assert r.simulated_time == timing
+
+
+def test_comm_stats_absent_by_default():
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5}, circ_id="c", registers={"c": [0]})
+    assert r.comm_stats is None
+
+
+def test_comm_stats_reported():
+    stats = {"entanglement_requests_per_shot": 1.0, "mean_generation_time": 1e-6}
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5, "comm_stats": stats},
+               circ_id="c", registers={"c": [0]})
+    assert r.comm_stats == stats

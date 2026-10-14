@@ -36,6 +36,7 @@ class Result:
     .. autoattribute:: counts
     .. autoattribute:: time_taken
     .. autoattribute:: simulated_time
+    .. autoattribute:: comm_stats
     .. autoattribute:: result
     """
     _result: dict
@@ -146,15 +147,30 @@ class Result:
         """
         Simulated (logical) time of the execution on the virtual QPU, independent of how long the
         simulation took. It is only available if the QPU backend defines a ``"timing"`` block, and
-        is ``None`` otherwise. Times are given in nanoseconds:
+        is ``None`` otherwise. Times are given in seconds:
 
             >>> result.simulated_time
-            {'unit': 'ns', 'mean': 1350.0, 'min': 1350.0, 'max': 1350.0, 'idle_mean': [0.0, 50.0]}
+            {'unit': 's', 'mean': 1.35e-06, 'min': 1.35e-06, 'max': 1.35e-06, 'idle_mean': [0.0, 5e-08]}
 
         ``mean``, ``min`` and ``max`` describe the duration of a shot, while ``idle_mean`` holds,
         for each qubit, the average time per shot it spent waiting for other operations.
         """
         return self._result.get("simulated_time")
+
+    @property
+    def comm_stats(self) -> Optional[dict]:
+        """
+        Statistics of the quantum communications of the circuit. They are only available if the
+        communication noise model is set (see :ref:`sec_comm_model`), and are ``None`` otherwise:
+
+            >>> result.comm_stats
+            {'entanglement_requests_per_shot': 1.0, 'mean_generation_time': 1e-05}
+
+        ``entanglement_requests_per_shot`` counts the entangled states the circuit asked for in a
+        shot, and ``mean_generation_time`` is the mean time, in seconds, from the moment every
+        participant asked for one of them until it was delivered.
+        """
+        return self._result.get("comm_stats")
         
     @property
     def statevector(self) -> Union[dict[np.array], np.array]:

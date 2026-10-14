@@ -20,6 +20,7 @@ target_sources(timing
     BASE_DIRS "${PROJECT_SOURCE_DIR}/src"
     FILES
       "${CMAKE_CURRENT_SOURCE_DIR}/timing.hpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/random_delay.hpp"
 )
 target_link_libraries(timing
   INTERFACE
@@ -52,6 +53,23 @@ target_link_libraries(simulator
   INTERFACE
     run_config
     dynamic_circuit
+)
+
+# Noise channels applied instruction by instruction (idle relaxation, gate and readout errors).
+add_library(noise INTERFACE)
+target_sources(noise
+  INTERFACE
+    FILE_SET HEADERS
+    BASE_DIRS "${PROJECT_SOURCE_DIR}/src"
+    FILES
+      "${CMAKE_CURRENT_SOURCE_DIR}/noise/channels.hpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/noise/channel_applier.hpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/noise/device_noise.hpp"
+)
+target_link_libraries(noise
+  INTERFACE
+    simulator
+    json
 )
 
 add_subdirectory(simulators)

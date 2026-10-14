@@ -6,8 +6,9 @@ from cunqa.qpu import get_QPUs, qraise, qdrop, run
 from cunqa.circuit import CunqaCircuit
 from cunqa.qjob import gather
 
-# 1. QPU deployment with simulated time. Every vQPU uses the "timing" block of the backend:
-#    1-qubit gates 50 ns, measurements 1000 ns and 500 ns of latency for each classical message.
+# 1. QPU deployment with simulated time. Every vQPU uses the "timing" block of the backend (in
+#    seconds): 1-qubit gates 0.05 us, measurements 1 us and 0.5 us of latency for each classical
+#    message. The times below are in us, while the result reports them in seconds.
 file_dir = os.path.dirname(os.path.abspath(__file__))
 backend_path = file_dir + "/timed_backend.json"
 
@@ -19,15 +20,16 @@ try:
 
     # 2. Circuit design with classical communications directives.
     # ---------------------------------------------------------------
-    #  circuit_1:  q0 ─[H]─[M]─ send ─>      H: [0, 50)  M: [50, 1050), sent at 1050 ns
-    #                                        -> every shot lasts 1050 ns
+    #  circuit_1:  q0 ─[H]─[M]─ send ─>      H: [0, 0.05)  M: [0.05, 1.05), sent at 1.05 us
+    #                                        -> every shot lasts 1.05 us
     #
-    #  circuit_2:  recv ─> c0                arrives at 1050 + 500 (latency) = 1550 ns
-    #              q0 ──────[X]──[M]─        if c0 == 1: q0 idles 1550 ns, X: [1550, 1600),
-    #                                                    M: [1600, 2600) -> shot lasts 2600 ns
-    #                                        if c0 == 0: M: [0, 1000), shot lasts 1550 ns
+    #  circuit_2:  recv ─> c0                arrives at 1.05 + 0.5 (latency) = 1.55 us
+    #              q0 ──────[X]──[M]─        if c0 == 1: q0 idles 1.55 us, X: [1.55, 1.6),
+    #                                                    M: [1.6, 2.6) -> shot lasts 2.6 us
+    #                                        if c0 == 0: X is skipped, but q0 still waits for
+    #                                                    c0, M: [1.55, 2.55) -> shot lasts 2.55 us
     # ---------------------------------------------------------------
-    #  Expected for circuit_2: min 1550, max 2600, mean ~2075, idle_mean ~[775, 0]
+    #  Expected for circuit_2: min 2.55 us, max 2.6 us, mean ~2.575 us, idle_mean ~[1.55 us, 0]
     circuit_1 = CunqaCircuit(1, 1, id="circuit_1")
     circuit_2 = CunqaCircuit(1, 1, id="circuit_2")
 

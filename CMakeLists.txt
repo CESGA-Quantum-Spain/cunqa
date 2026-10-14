@@ -30,10 +30,18 @@ endif()
 
 include(dependencies/CoreDeps)
 include(dependencies/CommDeps)
+if(CUNQA_BUILD_TESTS)
+  include(dependencies/TestDeps)
+endif()
 include(dependencies/SimulatorDeps)
 
 add_subdirectory(src)
 add_subdirectory(cunqa)
+
+if(CUNQA_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests/cpp)
+endif()
 
 # uninstall target
 if(NOT TARGET uninstall)

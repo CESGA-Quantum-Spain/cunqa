@@ -1,12 +1,12 @@
 {
     "name": "TimedBackend",
-    "description": "Example of a backend with simulated time (durations in ns).",
+    "description": "Example of a backend with simulated time (durations in s).",
     "num_qubits": [2, 0],
     "timing": {
-        "one_qubit_gate": 50,
-        "multi_qubit_gate": 300,
-        "measure": 1000,
-        "reset": 1000,
-        "classical_latency": 500
+        "one_qubit_gate": 5e-8,
+        "multi_qubit_gate": 3e-7,
+        "measure": 1e-6,
+        "reset": 1e-6,
+        "classical_latency": 5e-7
     }
 }

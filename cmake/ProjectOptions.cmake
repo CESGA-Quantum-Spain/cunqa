@@ -13,6 +13,7 @@ function(cunqa_setup_project_defaults)
   option(USE_MPI_BTW_QPU "Using the MPI library for communication between QPUs" OFF)
   option(USE_ZMQ_BTW_QPU "Using the ZMQ library for communication between QPUs" OFF)
   option(USE_GPU "Compile CUNQA with GPU (CUDA) support" OFF)
+  option(CUNQA_BUILD_TESTS "Build the C++ unit tests (tests/cpp), fetching GoogleTest" OFF)
 
   if(NOT USE_MPI_BTW_QPU AND NOT USE_ZMQ_BTW_QPU)
     set(USE_ZMQ_BTW_QPU ON CACHE BOOL "Using ZMQ by default" FORCE)

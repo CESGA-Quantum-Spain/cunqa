@@ -13,8 +13,9 @@ from cunqa.qjob import gather
 
 try:
     # 1. Deploy vQPUs with simulated time. Every vQPU must define the "timing" block, since they
-    #    share entangled states and messages: 1-qubit gates 50 ns, measurements and resets
-    #    1000 ns, entanglement generation 2000 ns and 500 ns of latency per classical message.
+    #    share entangled states and messages. In seconds: 1-qubit gates 0.05 us, measurements and
+    #    resets 1 us, entanglement generation 2 us and 0.5 us of latency per classical message.
+    #    The times below are in us, while the result reports them in seconds.
     file_dir = os.path.dirname(os.path.abspath(__file__))
     backend_path = file_dir + "/08-simulated_time.json"
 
@@ -26,26 +27,27 @@ try:
     qpus = get_QPUs(co_located=True, family=family)
 
     # 2. Design circuits. Bob's comm qubit is busy with a reset when Alice asks for the Bell pair,
-    #    so the entanglement generation starts once both comm qubits are free (t = 1000 ns) and
-    #    the pair is ready on both vQPUs at the same time (t = 3000 ns). Then Alice measures her
+    #    so the entanglement generation starts once both comm qubits are free (t = 1 us) and
+    #    the pair is ready on both vQPUs at the same time (t = 3 us). Then Alice measures her
     #    half of the pair and sends the outcome, and Bob flips his data qubit if it is 1.
     # -------------------------------------------------------------------------------------------
-    #  Alice.data  ─[H]─[M]──────────────────────────  H: [0, 50)  M: [50, 1050)
+    #  Alice.data  ─[H]─[M]──────────────────────────  H: [0, 0.05)  M: [0.05, 1.05)
     #
-    #  Alice.comm  ────────╌ gen_ent ╌─[M]─ send ─>    idles 1000 ns waiting for Bob's comm qubit,
-    #                          ╎                       pair: [1000, 3000)  M: [3000, 4000),
-    #                          ╎                       sent at 4000 ns -> every shot lasts 4000 ns
-    #  Bob.comm    ─[reset]─╌ gen_ent ╌─[M]──────      reset: [0, 1000)  pair: [1000, 3000)
-    #                                                  M: [3000, 4000)
-    #  Bob recv    <─ arrives at 4000 + 500 = 4500 ns
-    #  Bob.data    ─────────────────────[X]─[M]──      if bit == 1: idles 4500 ns, X: [4500, 4550),
-    #                                                               M: [4550, 5550) -> 5550 ns
-    #                                                  if bit == 0: M: [0, 1000), the shot ends when
-    #                                                               the message arrives -> 4500 ns
+    #  Alice.comm  ────────╌ gen_ent ╌─[M]─ send ─>    idles 1 us waiting for Bob's comm qubit,
+    #                          ╎                       pair: [1, 3)  M: [3, 4),
+    #                          ╎                       sent at 4 us -> every shot lasts 4 us
+    #  Bob.comm    ─[reset]─╌ gen_ent ╌─[M]──────      reset: [0, 1)  pair: [1, 3)
+    #                                                  M: [3, 4)
+    #  Bob recv    <─ arrives at 4 + 0.5 = 4.5 us
+    #  Bob.data    ─────────────────────[X]─[M]──      if bit == 1: idles 4.5 us, X: [4.5, 4.55),
+    #                                                               M: [4.55, 5.55) -> 5.55 us
+    #                                                  if bit == 0: X is skipped, but the data qubit
+    #                                                               still waits for the bit,
+    #                                                               M: [4.5, 5.5) -> 5.5 us
     # -------------------------------------------------------------------------------------------
     #  Expected (idle_mean is [data, comm]):
-    #    Alice: min = max = mean = 4000, idle_mean = [0, 1000]
-    #    Bob:   min 4500, max 5550, mean ~5025, idle_mean ~[2250, 0]
+    #    Alice: min = max = mean = 4 us, idle_mean = [0, 1 us]
+    #    Bob:   min 5.5 us, max 5.55 us, mean ~5.525 us, idle_mean ~[4.5 us, 0]
     alice = CunqaCircuit((1, 1), 2, id="Alice")
     a_data, a_comm = alice.get_qubits()
 

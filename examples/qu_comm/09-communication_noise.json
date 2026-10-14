@@ -1,0 +1,18 @@
+{
+    "name": "09-communication_noise",
+    "description": "Quantum communications backend with simulated time (durations in s) and a communication noise model: 2 data qubits and 1 communication qubit.",
+    "num_qubits": [2, 1],
+    "timing": {
+        "one_qubit_gate": 5e-8,
+        "multi_qubit_gate": 3e-7,
+        "measure": 1e-6,
+        "reset": 1e-6,
+        "classical_latency": 1e-6,
+        "feed_forward_latency": 2e-7
+    },
+    "comm_model": {
+        "data_qubits": {"T1": 1e-4, "T2": 5e-5},
+        "comm_qubits": {"T1": 1e-3, "T2": 5e-4},
+        "epr": {"fidelity": 0.97, "success_probability": 0.1, "attempt_time": 1e-6}
+    }
+}

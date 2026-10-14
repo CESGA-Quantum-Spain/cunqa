@@ -64,4 +64,25 @@ In the :term:`quantum communications` scheme the participating :term:`vQPUs <vQP
 their run configurations must be **mutually consistent**. CUNQA enforces that all circuits in a QC
 execution use the same ``method``, the same ``shots``, the same ``avoid_parallelization`` setting,
 and the same device type; otherwise an error is raised. If their ``seed`` values differ, the seed is
-left unset for the combined run.
+left unset for the combined run. With a common ``seed``, every shot draws its own seed from it, so
+the run is reproducible and its shots are still independent.
+
+Communication noise model
+-------------------------
+
+In the :term:`quantum communications` scheme, the ``comm_model`` run parameter sets the
+:ref:`communication noise model <sec_comm_model>` of that run: entanglement generation and idle
+decoherence in simulated time. It is merged into the model deployed with the vQPUs (the
+``comm_model`` of their backends), so only the keys given change, and it must be the same for every
+circuit of the execution, as :py:func:`~cunqa.qpu.run` does. Its per-link entries name the two
+linked circuits in ``"circuits"``; :py:func:`~cunqa.qpu.run` translates them into the vQPUs that run
+them. The durations and latencies come from the ``timing`` block of each backend and cannot be
+changed per run.
+
+.. code-block:: python
+
+   qjobs = run(circuits, qpus, shots=4000, seed=7, comm_model={
+       "strategy": "averaged",
+       "epr": {"success_probability": 0.05, "attempt_time": 1e-6},
+       "links": [{"circuits": ["circuit_1", "circuit_2"], "epr": {"fidelity": 0.9}}],
+   })

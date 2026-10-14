@@ -289,8 +289,10 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const OneQubit
             state_->aer_state.apply_h(qubit);
             break;
 
+        // Plain gate names are accepted by every AER method; the multicontrolled ones
+        // (mcsx, mcx, ...) are rejected by density_matrix and stabilizer.
         case InstructionType::SX:
-            state_->aer_state.apply_mcsx({qubit});
+            apply_AER_gate(state_->aer_state, "sx", {qubit});
             break;
 
         case InstructionType::SXDG:
@@ -401,19 +403,19 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const TwoQubit
     switch (type)
     {
         case InstructionType::SWAP:
-            state_->aer_state.apply_mcswap(qubits);
+            apply_AER_gate(state_->aer_state, "swap", qubits);
             break;
 
         case InstructionType::CX:
-            state_->aer_state.apply_mcx(qubits);
+            apply_AER_gate(state_->aer_state, "cx", qubits);
             break;
 
         case InstructionType::CY:
-            state_->aer_state.apply_mcy(qubits);
+            apply_AER_gate(state_->aer_state, "cy", qubits);
             break;
 
         case InstructionType::CZ:
-            state_->aer_state.apply_mcz(qubits);
+            apply_AER_gate(state_->aer_state, "cz", qubits);
             break;
 
         case InstructionType::CSX:
@@ -765,6 +767,32 @@ void AERSimulatorAdapter::apply_gate(const InstructionType& type, const Copy& pa
         default:
             unsupported_gate(type, payload);
     }
+}
+
+bool AERSimulatorAdapter::supports_kraus() const
+{
+    // The stabilizer methods only accept Pauli noise.
+    return config.method != "stabilizer" && config.method != "extended_stabilizer";
+}
+
+void AERSimulatorAdapter::apply_kraus(const std::vector<std::size_t>& qubits, const KrausOperators& operators)
+{
+    AER::reg_t aer_qubits(qubits.begin(), qubits.end());
+    const std::size_t dim = std::size_t{1} << qubits.size();
+
+    std::vector<cmatrix_t> aer_operators;
+    aer_operators.reserve(operators.size());
+    for (const auto& op : operators) {
+        if (op.size() != dim * dim)
+            throw std::invalid_argument("Kraus operator size does not match the number of qubits.");
+        cmatrix_t aer_op(dim, dim);
+        for (std::size_t i = 0; i < dim; ++i)
+            for (std::size_t j = 0; j < dim; ++j)
+                aer_op(i, j) = op[i * dim + j];
+        aer_operators.push_back(std::move(aer_op));
+    }
+
+    state_->aer_state.apply_kraus(aer_qubits, aer_operators);
 }
 
 JSON AERSimulatorAdapter::native_execute(const Circuit& circuit)

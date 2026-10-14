@@ -324,6 +324,55 @@ def test_run_passes_param_values_to_execute(monkeypatch):
 
     assert result is job
 
+def _two_comm_circuits(monkeypatch):
+    circuits_ir = [
+        {"id": "c1", "instructions": [], "sending_to": [], "num_qubits": [1, 1]},
+        {"id": "c2", "instructions": [], "sending_to": [], "num_qubits": [1, 1]},
+    ]
+    qpus = []
+    for qpu_id in ("qpu_1", "qpu_2"):
+        qpu = Mock(name=qpu_id)
+        qpu.id = qpu_id
+        qpu.backend = {"num_qubits": [10, 10]}
+        qpus.append(qpu)
+    monkeypatch.setattr(qpu_mod, "to_ir", Mock(side_effect=circuits_ir))
+    return circuits_ir, qpus
+
+def test_run_translates_comm_model_links_to_qpu_ids(monkeypatch):
+    circuits_ir, qpus = _two_comm_circuits(monkeypatch)
+    comm_model = {
+        "epr": {"fidelity": 0.9},
+        "links": [{"circuits": ["c2", "c1"], "epr": {"success_probability": 0.1}}],
+    }
+
+    run(["c1", "c2"], qpus, shots=100, comm_model=comm_model)
+
+    expected_model = {
+        "epr": {"fidelity": 0.9},
+        "links": [{"qpus": ["qpu_2", "qpu_1"], "epr": {"success_probability": 0.1}}],
+    }
+    for qpu, circuit_ir in zip(qpus, circuits_ir):
+        qpu.execute.assert_called_once_with(circuit_ir, None, shots=100, comm_model=expected_model)
+    # The model given by the user is not modified.
+    assert comm_model["links"][0]["circuits"] == ["c2", "c1"]
+
+def test_run_rejects_comm_model_links_with_unknown_circuits(monkeypatch):
+    _, qpus = _two_comm_circuits(monkeypatch)
+
+    with pytest.raises(ValueError):
+        run(["c1", "c2"], qpus, comm_model={"links": [{"circuits": ["c1", "c3"]}]})
+
+    for qpu in qpus:
+        qpu.execute.assert_not_called()
+
+def test_run_passes_comm_model_without_links_untouched(monkeypatch):
+    circuits_ir, qpus = _two_comm_circuits(monkeypatch)
+    comm_model = {"strategy": "averaged", "epr": {"fidelity": 0.95}}
+
+    run(["c1", "c2"], qpus, comm_model=comm_model)
+
+    qpus[0].execute.assert_called_once_with(circuits_ir[0], None, comm_model=comm_model)
+
 
 # ------------------------
 # qraise tests

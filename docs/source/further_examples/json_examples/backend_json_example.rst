@@ -90,7 +90,7 @@ The only unique feature of this type of backend is that it specifies the number 
 By default every :term:`vQPU` runs on wall-clock time: ``time_taken`` only measures how long the
 simulation took on the HPC. Adding a ``timing`` block gives the vQPU a logical clock, so that each
 operation, classical message and entanglement generation has a simulated duration. All durations
-are given in nanoseconds and every field is optional:
+are given in seconds and every field is optional:
 
 .. code-block:: json
 
@@ -105,29 +105,43 @@ are given in nanoseconds and every field is optional:
             ],
             "coupling_map": [],
             "timing": {
-                "one_qubit_gate": 50,
-                "multi_qubit_gate": 300,
-                "measure": 1000,
-                "reset": 1000,
-                "classical_latency": 500,
-                "entanglement": 2000,
-                "gate_durations": {"cx": 250, "rz": 0}
+                "one_qubit_gate": 5e-8,
+                "multi_qubit_gate": 3e-7,
+                "measure": 1e-6,
+                "reset": 1e-6,
+                "classical_latency": 5e-7,
+                "classical_jitter": {"distribution": "exponential", "mean": 1e-7},
+                "feed_forward_latency": 1e-7,
+                "entanglement": 2e-6,
+                "gate_durations": {"cx": 2.5e-7, "rz": 0}
             }
         }
     }
 
-* ``one_qubit_gate`` (default 50) and ``multi_qubit_gate`` (default 300) are the durations of gates
-  without an entry in ``gate_durations``. Noise channels and ``save_state`` take no time.
-* ``measure`` and ``reset`` default to 1000.
+* ``one_qubit_gate`` (default 5e-8) and ``multi_qubit_gate`` (default 3e-7) are the durations of
+  gates without an entry in ``gate_durations``. Noise channels and ``save_state`` take no time.
+* ``measure`` and ``reset`` default to 1e-6.
 * ``classical_latency`` (default 0) is added to the send time of every classical message the vQPU
   receives.
-* ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. The state becomes available
-  on every vQPU taking part at the same simulated time.
+* ``classical_jitter`` (default none) adds a random delay to every classical message the vQPU
+  receives, drawn in each shot: ``{"distribution": "uniform", "width": w}`` draws it uniformly in
+  [0, w] and ``{"distribution": "exponential", "mean": m}`` from an exponential distribution of
+  mean m. The bits that one ``recv`` takes from the same vQPU travel in one message and share it.
+* ``feed_forward_latency`` (default 0) is the time the controller takes to act on a condition once
+  its bits are known: the operations of a classically controlled block start that much later.
+* ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. It starts once every vQPU
+  taking part has asked for the state, that is, once its communication qubit is free and the work
+  issued before the request is done, and the state becomes available on all of them at the same
+  simulated time. With the :ref:`communication noise model <sec_comm_model>`, the attempts of the
+  entanglement generator of each link are added to it.
 * ``gate_durations`` overrides the duration of specific instructions, by name.
 
 Operations are scheduled as soon as their qubits and classical bits are ready, so independent gates
 run in parallel and gates inside a classically controlled block wait until the condition is known.
+When the condition is not met the block is skipped, but its qubits still wait for the condition:
+the controller cannot go on before knowing it.
 The result then includes a ``simulated_time`` entry (see
 :py:attr:`~cunqa.result.Result.simulated_time`) with the mean, minimum and maximum duration of a
 shot and the mean idle time of each qubit. When :term:`vQPUs <vQPU>` communicate, every one of them
-must define a ``timing`` block.
+must define a ``timing`` block, except with the :ref:`communication noise model <sec_comm_model>`,
+which uses the default durations for those without it.

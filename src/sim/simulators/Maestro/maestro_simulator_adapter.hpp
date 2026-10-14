@@ -52,6 +52,11 @@ public:
 
     void apply_gate(const InstructionType& type, const Measure& payload) override;
     void apply_gate(const InstructionType& type, const Reset& payload) override;
+
+    bool supports_reset() const override
+    {
+        return true;
+    }
     void apply_gate(const InstructionType& type, const Copy& payload) override;
 
 private:

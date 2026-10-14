@@ -1,10 +1,12 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "sim/simulator.hpp"
 #include "comm/classical_channel.hpp"
-#include "sim/timing.hpp"
+
+#include "qc_engine.hpp"
 
 namespace cunqa {
 namespace sim {
@@ -12,7 +14,7 @@ namespace sim {
 class QCExecutor {
 public:
     QCExecutor(
-        std::shared_ptr<Simulator> simulator, 
+        std::shared_ptr<Simulator> simulator,
         const std::size_t& n_qpus
     );
 
@@ -21,10 +23,7 @@ private:
     std::shared_ptr<Simulator> simulator_;
     comm::ClassicalChannel classical_channel_;
     std::vector<std::string> qpus_ids_;
-    std::vector<std::vector<std::size_t>> communication_qubits_; 
-    std::vector<std::size_t> zero_qubits_;
-    // One simulated clock per vQPU, or none if simulated time is disabled.
-    std::vector<SimClock> clocks_;
+    std::unique_ptr<QCEngine> engine_;
 };
 
 } // End of sim namespace

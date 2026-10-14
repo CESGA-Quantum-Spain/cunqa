@@ -57,6 +57,18 @@ Glossary
        and telegate). Declared with the tuple form
        ``CunqaCircuit((num_data_qubits, num_comm_qubits), num_clbits)``.
 
+   EPR pair
+       A pair of entangled qubits (a Bell pair) shared by two communication qubits, consumed by
+       the teledata and telegate protocols. In the :ref:`communication noise model <sec_comm_model>`
+       it is delivered by the generator of the link after a random number of attempts.
+
+   simulated time
+       Logical time of a vQPU, independent of how long the emulation takes on the HPC: operations,
+       entanglement generation and classical messages take the durations of the ``timing`` block of
+       its backend (see :doc:`further_examples/json_examples/backend_json_example`), and the
+       :ref:`communication noise model <sec_comm_model>` turns the time qubits spend idle into
+       decoherence.
+
    teledata
        Quantum-communication protocol that **teleports** the state of a data qubit from one circuit
        to another. Exposed through :py:func:`~cunqa.qc_protocols.qsend` /

@@ -7,7 +7,8 @@ def cat_entangler(
     data_qubit: int,
     comm_qubits: list[int], 
     clbits: list[int],
-    tag: str = None
+    tag: str = None,
+    prefetched: bool = False
 ):
     """
     Telegate entangler: distributes the control state of ``data_qubit`` (held by the first circuit
@@ -26,9 +27,13 @@ def cat_entangler(
         comm_qubits (list[int]): comm qubit of each circuit in ``target_circuits``.
         clbits (list[int]): classical bit used by each circuit for the entangler corrections.
         tag (str): identifier shared with the matching :py:func:`cat_disentangler` call.
+        prefetched (bool): if ``True``, every circuit already requested the shared state with
+            :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent` on its comm qubit earlier in the
+            circuit (prefetching it), so it is only consumed here. Default: ``False``.
     """
-    for target_circuit, comm_qubit in zip(target_circuits, comm_qubits):
-        target_circuit.gen_ent(comm_qubit, target_circuits, tag) 
+    if not prefetched:
+        for target_circuit, comm_qubit in zip(target_circuits, comm_qubits):
+            target_circuit.gen_ent(comm_qubit, target_circuits, tag)
 
     target_circuits[0].cx(data_qubit, comm_qubits[0])
     target_circuits[0].measure(comm_qubits[0], clbits[0], save=False)
