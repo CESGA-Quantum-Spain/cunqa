@@ -196,8 +196,23 @@ public:
     }
 
     // Operations inside a CIF block cannot start before the condition is known.
-    void begin_conditional(const std::vector<std::size_t>& clbits) { condition_time_ = classical_time(clbits); }
+    void begin_conditional(const std::vector<std::size_t>& clbits) { condition_time_ = decision_time(clbits); }
     void end_conditional() { condition_time_ = 0.0; }
+
+    // A CIF block whose condition is not met is not applied, but the controller only knows
+    // that once the condition is known: until then, the qubits of the block cannot start
+    // anything else, exactly as if the block had been applied.
+    void skip_conditional(const std::vector<std::size_t>& clbits, const std::vector<std::size_t>& qubits)
+    {
+        const double decided = decision_time(clbits);
+        for (auto q : qubits) {
+            const double start = std::max(decided, qubit_ready_[local_(q)]);
+            occupy(q, start, start);
+        }
+    }
+
+    // Time at which the controller knows the condition on these clbits.
+    double decision_time(const std::vector<std::size_t>& clbits) const { return classical_time(clbits); }
 
     // Earliest time at which a classical operation on these clbits can happen.
     double classical_time(const std::vector<std::size_t>& clbits) const
@@ -285,6 +300,20 @@ private:
         return end;
     }
 };
+
+
+// Qubits an instruction acts on, e.g. to reserve those of a skipped CIF block.
+inline std::vector<std::size_t> instruction_qubits(const InstructionVariant& payload)
+{
+    return std::visit([](const auto& p) -> std::vector<std::size_t> {
+        if constexpr (requires { p.qubits; })
+            return std::vector<std::size_t>(p.qubits.begin(), p.qubits.end());
+        else if constexpr (requires { p.qubit; })
+            return {p.qubit};
+        else
+            return {};
+    }, payload);
+}
 
 
 // Simulated-time statistics accumulated over the shots of an execution.

@@ -48,10 +48,10 @@ try:
     #              ‖
     #  q1   ──────[X]──[M]───      if c0 == 1: q1 idles 1.05 us, X: [1.05, 1.1),
     #                                          M: [1.1, 2.1) -> shot lasts 2.1 us
-    #                              if c0 == 0: X is skipped, M: [0, 1)
-    #                                          -> shot lasts 1.05 us (c0 is ready at 1.05)
+    #                              if c0 == 0: X is skipped, but q1 still waits for c0,
+    #                                          M: [1.05, 2.05) -> shot lasts 2.05 us
     # ---------------------------------------------------------------
-    #  Expected: min 1.05 us, max 2.1 us, mean ~1.575 us, idle_mean ~[0, 0.525 us, 0]
+    #  Expected: min 2.05 us, max 2.1 us, mean ~2.075 us, idle_mean ~[0, 1.05 us, 0]
     qc = CunqaCircuit(2, 2)
     qc.h(0)
     qc.measure(0, 0)

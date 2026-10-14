@@ -41,12 +41,13 @@ try:
     #  Bob recv    <─ arrives at 4 + 0.5 = 4.5 us
     #  Bob.data    ─────────────────────[X]─[M]──      if bit == 1: idles 4.5 us, X: [4.5, 4.55),
     #                                                               M: [4.55, 5.55) -> 5.55 us
-    #                                                  if bit == 0: M: [0, 1), the shot ends when
-    #                                                               the message arrives -> 4.5 us
+    #                                                  if bit == 0: X is skipped, but the data qubit
+    #                                                               still waits for the bit,
+    #                                                               M: [4.5, 5.5) -> 5.5 us
     # -------------------------------------------------------------------------------------------
     #  Expected (idle_mean is [data, comm]):
     #    Alice: min = max = mean = 4 us, idle_mean = [0, 1 us]
-    #    Bob:   min 4.5 us, max 5.55 us, mean ~5.025 us, idle_mean ~[2.25 us, 0]
+    #    Bob:   min 5.5 us, max 5.55 us, mean ~5.525 us, idle_mean ~[4.5 us, 0]
     alice = CunqaCircuit((1, 1), 2, id="Alice")
     a_data, a_comm = alice.get_qubits()
 

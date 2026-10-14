@@ -257,9 +257,17 @@ void execute_shot_(
                     // Circuits must not contain nested CIF blocks.
                     if (result != payload.condition){
                         cunqa::InstructionType type;
+                        std::vector<std::size_t> skipped_qubits;
                         do {
                             type = stream.skip_next();
+                            if (clock && type != cunqa::InstructionType::ENDCIF) {
+                                const auto qubits = cunqa::sim::instruction_qubits(stream.get_current().payload);
+                                skipped_qubits.insert(skipped_qubits.end(), qubits.begin(), qubits.end());
+                            }
                         } while (type != cunqa::InstructionType::ENDCIF);
+                        // The skipped gates still wait for the condition to be known.
+                        if (clock)
+                            clock->skip_conditional(payload.clbits, skipped_qubits);
                     } else if (clock)
                         clock->begin_conditional(payload.clbits);
                 } else if (type == cunqa::InstructionType::ENDCIF && clock)

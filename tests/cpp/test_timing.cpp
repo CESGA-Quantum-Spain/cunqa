@@ -97,6 +97,22 @@ TEST(SimClock, ExecutedConditionalBlockWaitsForItsBits)
     EXPECT_NEAR(clock.idle_times()[1], 1e-6, EPS);
 }
 
+TEST(SimClock, SkippedConditionalBlockStillWaitsForItsBits)
+{
+    SimClock clock(model({{"one_qubit_gate", 1e-7}, {"measure", 1e-6}}), 3);
+    clock.apply(InstructionType::MEASURE, Measure{0, 0, true});    // bit known at 1 us
+    clock.skip_conditional({0}, {1, 1});                            // two gates on q1, not applied
+
+    // q1 cannot start anything before the decision, and that wait is idle time, counted once.
+    EXPECT_NEAR(clock.qubit_time(1), 1e-6, EPS);
+    EXPECT_NEAR(clock.idle_times()[1], 1e-6, EPS);
+    // Qubits outside the block are not affected.
+    EXPECT_NEAR(clock.qubit_time(2), 0.0, EPS);
+
+    clock.apply(InstructionType::MEASURE, Measure{1, 1, true});
+    EXPECT_NEAR(clock.clbit_time(1), 2e-6, EPS);
+}
+
 TEST(SimClock, ReceivedBitsArriveAfterTheLatency)
 {
     SimClock clock(model({{"classical_latency", 5e-7}}), 1);

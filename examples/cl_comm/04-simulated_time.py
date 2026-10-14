@@ -26,9 +26,10 @@ try:
     #  circuit_2:  recv ─> c0                arrives at 1.05 + 0.5 (latency) = 1.55 us
     #              q0 ──────[X]──[M]─        if c0 == 1: q0 idles 1.55 us, X: [1.55, 1.6),
     #                                                    M: [1.6, 2.6) -> shot lasts 2.6 us
-    #                                        if c0 == 0: M: [0, 1), shot lasts 1.55 us
+    #                                        if c0 == 0: X is skipped, but q0 still waits for
+    #                                                    c0, M: [1.55, 2.55) -> shot lasts 2.55 us
     # ---------------------------------------------------------------
-    #  Expected for circuit_2: min 1.55 us, max 2.6 us, mean ~2.075 us, idle_mean ~[0.775 us, 0]
+    #  Expected for circuit_2: min 2.55 us, max 2.6 us, mean ~2.575 us, idle_mean ~[1.55 us, 0]
     circuit_1 = CunqaCircuit(1, 1, id="circuit_1")
     circuit_2 = CunqaCircuit(1, 1, id="circuit_2")
 

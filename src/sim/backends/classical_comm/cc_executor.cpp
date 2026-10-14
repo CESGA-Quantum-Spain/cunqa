@@ -40,8 +40,18 @@ void execute_shot_(
 
                         // If condition is not met, we skip all the gates till ENDCIF arrives.
                         if (result != payload.condition){
+                            const auto cif_pc = pc;
                             while (pc < circuit.instructions.size() && circuit.instructions[pc].type != InstructionType::ENDCIF)
                                 ++pc;
+                            // The skipped gates still wait for the condition to be known.
+                            if (clock) {
+                                std::vector<std::size_t> qubits;
+                                for (auto skipped = cif_pc + 1; skipped < pc; ++skipped) {
+                                    const auto skipped_qubits = sim::instruction_qubits(circuit.instructions[skipped].payload);
+                                    qubits.insert(qubits.end(), skipped_qubits.begin(), skipped_qubits.end());
+                                }
+                                clock->skip_conditional(payload.clbits, qubits);
+                            }
                         } else if (clock)
                             clock->begin_conditional(payload.clbits);
                     }  

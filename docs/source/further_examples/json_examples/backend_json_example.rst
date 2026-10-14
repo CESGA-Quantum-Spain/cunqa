@@ -127,6 +127,8 @@ are given in seconds and every field is optional:
 
 Operations are scheduled as soon as their qubits and classical bits are ready, so independent gates
 run in parallel and gates inside a classically controlled block wait until the condition is known.
+When the condition is not met the block is skipped, but its qubits still wait for the condition:
+the controller cannot go on before knowing it.
 The result then includes a ``simulated_time`` entry (see
 :py:attr:`~cunqa.result.Result.simulated_time`) with the mean, minimum and maximum duration of a
 shot and the mean idle time of each qubit. When :term:`vQPUs <vQPU>` communicate, every one of them
