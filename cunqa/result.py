@@ -146,10 +146,10 @@ class Result:
         """
         Simulated (logical) time of the execution on the virtual QPU, independent of how long the
         simulation took. It is only available if the QPU backend defines a ``"timing"`` block, and
-        is ``None`` otherwise. Times are given in nanoseconds:
+        is ``None`` otherwise. Times are given in seconds:
 
             >>> result.simulated_time
-            {'unit': 'ns', 'mean': 1350.0, 'min': 1350.0, 'max': 1350.0, 'idle_mean': [0.0, 50.0]}
+            {'unit': 's', 'mean': 1.35e-06, 'min': 1.35e-06, 'max': 1.35e-06, 'idle_mean': [0.0, 5e-08]}
 
         ``mean``, ``min`` and ``max`` describe the duration of a shot, while ``idle_mean`` holds,
         for each qubit, the average time per shot it spent waiting for other operations.

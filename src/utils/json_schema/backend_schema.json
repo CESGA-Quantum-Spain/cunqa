@@ -98,14 +98,14 @@
                 },
                 "timing":
                 {
-                    "description":"Simulated time model of the vQPU. Durations are in nanoseconds. If absent, the vQPU runs on wall-clock time only.",
+                    "description":"Simulated time model of the vQPU. Durations are in seconds. If absent, the vQPU runs on wall-clock time only.",
                     "type":"object",
                     "properties":
                     {
-                        "one_qubit_gate": {"type":"number", "minimum":0, "default":50},
-                        "multi_qubit_gate": {"type":"number", "minimum":0, "default":300},
-                        "measure": {"type":"number", "minimum":0, "default":1000},
-                        "reset": {"type":"number", "minimum":0, "default":1000},
+                        "one_qubit_gate": {"type":"number", "minimum":0, "default":5e-8},
+                        "multi_qubit_gate": {"type":"number", "minimum":0, "default":3e-7},
+                        "measure": {"type":"number", "minimum":0, "default":1e-6},
+                        "reset": {"type":"number", "minimum":0, "default":1e-6},
                         "classical_latency": {"type":"number", "minimum":0, "default":0},
                         "entanglement": {"type":"number", "minimum":0, "default":0},
                         "gate_durations":

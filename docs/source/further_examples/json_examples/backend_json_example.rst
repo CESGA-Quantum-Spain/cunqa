@@ -90,7 +90,7 @@ The only unique feature of this type of backend is that it specifies the number 
 By default every :term:`vQPU` runs on wall-clock time: ``time_taken`` only measures how long the
 simulation took on the HPC. Adding a ``timing`` block gives the vQPU a logical clock, so that each
 operation, classical message and entanglement generation has a simulated duration. All durations
-are given in nanoseconds and every field is optional:
+are given in seconds and every field is optional:
 
 .. code-block:: json
 
@@ -105,20 +105,20 @@ are given in nanoseconds and every field is optional:
             ],
             "coupling_map": [],
             "timing": {
-                "one_qubit_gate": 50,
-                "multi_qubit_gate": 300,
-                "measure": 1000,
-                "reset": 1000,
-                "classical_latency": 500,
-                "entanglement": 2000,
-                "gate_durations": {"cx": 250, "rz": 0}
+                "one_qubit_gate": 5e-8,
+                "multi_qubit_gate": 3e-7,
+                "measure": 1e-6,
+                "reset": 1e-6,
+                "classical_latency": 5e-7,
+                "entanglement": 2e-6,
+                "gate_durations": {"cx": 2.5e-7, "rz": 0}
             }
         }
     }
 
-* ``one_qubit_gate`` (default 50) and ``multi_qubit_gate`` (default 300) are the durations of gates
-  without an entry in ``gate_durations``. Noise channels and ``save_state`` take no time.
-* ``measure`` and ``reset`` default to 1000.
+* ``one_qubit_gate`` (default 5e-8) and ``multi_qubit_gate`` (default 3e-7) are the durations of
+  gates without an entry in ``gate_durations``. Noise channels and ``save_state`` take no time.
+* ``measure`` and ``reset`` default to 1e-6.
 * ``classical_latency`` (default 0) is added to the send time of every classical message the vQPU
   receives.
 * ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. The state becomes available

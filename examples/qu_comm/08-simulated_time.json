@@ -1,13 +1,13 @@
 {
     "name": "08-simulated_time",
-    "description": "Quantum communications backend with simulated time (durations in ns): 1 data qubit and 1 communication qubit.",
+    "description": "Quantum communications backend with simulated time (durations in s): 1 data qubit and 1 communication qubit.",
     "num_qubits": [1, 1],
     "timing": {
-        "one_qubit_gate": 50,
-        "multi_qubit_gate": 300,
-        "measure": 1000,
-        "reset": 1000,
-        "classical_latency": 500,
-        "entanglement": 2000
+        "one_qubit_gate": 5e-8,
+        "multi_qubit_gate": 3e-7,
+        "measure": 1e-6,
+        "reset": 1e-6,
+        "classical_latency": 5e-7,
+        "entanglement": 2e-6
     }
 }

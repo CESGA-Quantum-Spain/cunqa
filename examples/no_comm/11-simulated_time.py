@@ -7,8 +7,9 @@ from cunqa.circuit import CunqaCircuit
 
 try:
     # 1. Deploy a vQPU with simulated time. The "timing" block of the backend gives each
-    #    operation a duration (ns), independent of how long the simulation takes on the HPC:
-    #    1-qubit gates 50 ns, 2-qubit gates 300 ns, measurements 1000 ns.
+    #    operation a duration (in seconds), independent of how long the simulation takes on the
+    #    HPC: 1-qubit gates 0.05 us, 2-qubit gates 0.3 us, measurements 1 us. The times below are
+    #    in us, while the result reports them in seconds.
     file_dir = os.path.dirname(os.path.abspath(__file__))
     backend_path = file_dir + "/timed_backend.json"
 
@@ -22,13 +23,13 @@ try:
     # 2. Static circuit: operations are scheduled as soon as their qubits are free, so
     #    independent gates run in parallel.
     # ---------------------------------------------------------------
-    #  q0   ─[H]──■──[M]─      H: [0, 50)   CX: [50, 350)  M: [350, 1350)
+    #  q0   ─[H]──■──[M]─      H: [0, 0.05)   CX: [0.05, 0.35)  M: [0.35, 1.35)
     #             │
-    #  q1   ─────[X]─[M]─      idles 50 ns waiting for the CX, M: [350, 1350)
+    #  q1   ─────[X]─[M]─      idles 0.05 us waiting for the CX, M: [0.35, 1.35)
     #
-    #  q2   ─[H]─[M]─────      H: [0, 50)   M: [50, 1050)
+    #  q2   ─[H]─[M]─────      H: [0, 0.05)   M: [0.05, 1.05)
     # ---------------------------------------------------------------
-    #  Expected: every shot lasts 1350 ns, idle_mean = [0, 50, 0]
+    #  Expected: every shot lasts 1.35 us, idle_mean = [0, 0.05 us, 0]
     qc = CunqaCircuit(3)
     qc.h(0)
     qc.h(2)
@@ -43,14 +44,14 @@ try:
 
     # 3. Dynamic circuit: the X on q1 waits until the measurement of q0 is known.
     # ---------------------------------------------------------------
-    #  q0   ─[H]─[M]─────────      H: [0, 50)  M: [50, 1050) -> c0 ready at 1050
+    #  q0   ─[H]─[M]─────────      H: [0, 0.05)  M: [0.05, 1.05) -> c0 ready at 1.05
     #              ‖
-    #  q1   ──────[X]──[M]───      if c0 == 1: q1 idles 1050 ns, X: [1050, 1100),
-    #                                          M: [1100, 2100) -> shot lasts 2100 ns
-    #                              if c0 == 0: X is skipped, M: [0, 1000)
-    #                                          -> shot lasts 1050 ns (c0 is ready at 1050)
+    #  q1   ──────[X]──[M]───      if c0 == 1: q1 idles 1.05 us, X: [1.05, 1.1),
+    #                                          M: [1.1, 2.1) -> shot lasts 2.1 us
+    #                              if c0 == 0: X is skipped, M: [0, 1)
+    #                                          -> shot lasts 1.05 us (c0 is ready at 1.05)
     # ---------------------------------------------------------------
-    #  Expected: min 1050, max 2100, mean ~1575, idle_mean ~[0, 525, 0]
+    #  Expected: min 1.05 us, max 2.1 us, mean ~1.575 us, idle_mean ~[0, 0.525 us, 0]
     qc = CunqaCircuit(2, 2)
     qc.h(0)
     qc.measure(0, 0)

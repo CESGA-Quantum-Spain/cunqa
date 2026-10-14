@@ -20,19 +20,19 @@ namespace cunqa {
 namespace sim {
 
 // Simulated (logical) time of a vQPU. Every quantity here is expressed in
-// nanoseconds of *simulated* time and is completely independent of how long
+// seconds of *simulated* time and is completely independent of how long
 // the simulation takes on the HPC.
 //
 // Timing is enabled by adding a "timing" block to the backend JSON:
 //
 //   "timing": {
-//       "one_qubit_gate": 50,       // default duration of 1-qubit gates
-//       "multi_qubit_gate": 300,    // default duration of gates on >= 2 qubits
-//       "measure": 1000,
-//       "reset": 1000,
+//       "one_qubit_gate": 5e-8,     // default duration of 1-qubit gates
+//       "multi_qubit_gate": 3e-7,   // default duration of gates on >= 2 qubits
+//       "measure": 1e-6,
+//       "reset": 1e-6,
 //       "classical_latency": 0,     // latency of an incoming classical message
 //       "entanglement": 0,          // duration of a GEN_ENT (EPR/GHZ generation)
-//       "gate_durations": { "cx": 250, "rz": 0 }   // per-gate overrides
+//       "gate_durations": { "cx": 2.5e-7, "rz": 0 }   // per-gate overrides
 //   }
 //
 // Every field is optional. Noise channels and save_state take no time unless
@@ -55,8 +55,8 @@ public:
         multi_qubit_gate_ = read_duration_(timing_json, "multi_qubit_gate", multi_qubit_gate_);
         classical_latency_ = read_duration_(timing_json, "classical_latency", classical_latency_);
         entanglement_ = read_duration_(timing_json, "entanglement", entanglement_);
-        by_type_[index_(InstructionType::MEASURE)] = read_duration_(timing_json, "measure", 1000.0);
-        by_type_[index_(InstructionType::RESET)] = read_duration_(timing_json, "reset", 1000.0);
+        by_type_[index_(InstructionType::MEASURE)] = read_duration_(timing_json, "measure", 1e-6);
+        by_type_[index_(InstructionType::RESET)] = read_duration_(timing_json, "reset", 1e-6);
 
         for (auto type : {InstructionType::AMPLITUDEDAMPINGNOISE, InstructionType::BITFLIPNOISE,
                           InstructionType::DEPHASINGNOISE, InstructionType::DEPOLARIZINGNOISE,
@@ -93,8 +93,8 @@ private:
 
     JSON config_ = JSON::object();
     std::array<double, N_TYPES> by_type_;
-    double one_qubit_gate_ = 50.0;
-    double multi_qubit_gate_ = 300.0;
+    double one_qubit_gate_ = 5e-8;
+    double multi_qubit_gate_ = 3e-7;
     double classical_latency_ = 0.0;
     double entanglement_ = 0.0;
 
@@ -103,7 +103,7 @@ private:
     static double check_duration_(const std::string& key, double value)
     {
         if (!(value >= 0.0) || !std::isfinite(value))
-            throw std::invalid_argument("timing: '" + key + "' must be a finite, non-negative duration (ns).");
+            throw std::invalid_argument("timing: '" + key + "' must be a finite, non-negative duration (s).");
         return value;
     }
 
@@ -310,7 +310,7 @@ public:
         std::vector<double> idle_mean(idle_sum_.size());
         std::transform(idle_sum_.begin(), idle_sum_.end(), idle_mean.begin(), [n](double s) { return s / n; });
         return {
-            {"unit", "ns"},
+            {"unit", "s"},
             {"mean", sum_ / n},
             {"min", min_},
             {"max", max_},

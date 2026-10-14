@@ -105,7 +105,7 @@ def test_simulated_time_absent_by_default():
 
 
 def test_simulated_time_reported():
-    timing = {"unit": "ns", "mean": 1350.0, "min": 1350.0, "max": 1350.0, "idle_mean": [0.0, 50.0]}
+    timing = {"unit": "s", "mean": 1.35e-6, "min": 1.35e-6, "max": 1.35e-6, "idle_mean": [0.0, 5e-8]}
     r = Result({"counts": {"0": 1}, "time_taken": 0.5, "simulated_time": timing},
                circ_id="c", registers={"c": [0]})
     assert r.simulated_time == timing
