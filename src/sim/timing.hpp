@@ -248,6 +248,10 @@ public:
 
     double qubit_time(std::size_t qubit) const { return std::max(condition_time_, qubit_ready_[local_(qubit)]); }
 
+    // The two terms of qubit_time(), for callers that need to know which one sets it.
+    double qubit_ready(std::size_t qubit) const { return qubit_ready_[local_(qubit)]; }
+    double condition_time() const { return condition_time_; }
+
     // Keep `qubit` busy in [start, end), with start >= qubit_time(qubit). Used
     // for operations spanning several vQPUs, such as entanglement generation.
     void occupy(std::size_t qubit, double start, double end)
