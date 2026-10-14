@@ -115,7 +115,12 @@ class ResultBuffer:
 
     def _collect_(self, circuit_id: str, raw_result: str) -> str:
         """Marks the result of `circuit_id` as collected and hands it to the caller."""
+        # Forget the id once nothing is pending for it: every circuit carries its own id,
+        # so a key left at 0 would stay forever and grow with every circuit ever sent. An
+        # absent key still reads as 0, which is what `get` checks.
         self._outstanding[circuit_id] -= 1
+        if self._outstanding[circuit_id] <= 0:
+            del self._outstanding[circuit_id]
         if not self._stored[circuit_id]:
             self._stored.pop(circuit_id, None)
         return raw_result
