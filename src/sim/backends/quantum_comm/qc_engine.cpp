@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cmath>
 #include <deque>
+#include <iterator>
 #include <limits>
 #include <numeric>
 #include <optional>
@@ -311,6 +312,13 @@ const DelayIds NO_DELAYS;
 DelayIds with_delay(DelayIds ids, std::uint32_t id)
 {
     ids.insert(std::upper_bound(ids.begin(), ids.end(), id), id);
+    return ids;
+}
+
+DelayIds with_delays(const DelayIds& a, const DelayIds& b)
+{
+    DelayIds ids;
+    std::set_union(a.begin(), a.end(), b.begin(), b.end(), std::back_inserter(ids));
     return ids;
 }
 
@@ -725,19 +733,23 @@ private:
             return;
         }
 
+        // The bits of a RECV travel in one message, so they share its jitter.
         auto& clock = clock_(task);
+        DelayIds jitter_delays;
+        const double jitter = delayed_(0.0, jitter_delays, clock.model().classical_jitter());
         for (const auto c : payload.clbits) {
             auto message = std::move(queue.front());
             queue.pop_front();
             sim_.creg[c] = message.value;
             sim_.save_clbit[c] = false;
             if (averaged_) {
+                const auto arrival_delays = with_delays(message.delays, jitter_delays);
                 Latest arrival;
                 arrival.consider(clock.condition_time(), condition_delays_[task]);
-                arrival.consider(message.send_time + clock.model().classical_latency(), message.delays);
+                arrival.consider(message.send_time + clock.model().classical_latency() + jitter, arrival_delays);
                 clbit_delays_[c] = *arrival.delays;
             }
-            clock.receive_clbit(c, message.send_time);
+            clock.receive_clbit(c, message.send_time, jitter);
         }
         if (stream.is_current_blocked())
             stream.unblock_current();

@@ -1,3 +1,5 @@
+#include <map>
+#include <random>
 #include <string>
 #include <utility>
 
@@ -18,7 +20,8 @@ void execute_shot_(
     sim::Simulator* simulator,
     const DynamicCircuit& circuit,
     comm::ClassicalChannel& classical_channel,
-    std::optional<sim::SimClock>& clock
+    std::optional<sim::SimClock>& clock,
+    sim::Rng& rng
 )
 {
     for (std::size_t pc = 0; pc < circuit.instructions.size(); pc++) {
@@ -76,6 +79,9 @@ void execute_shot_(
                             classical_channel.send_measure(simulator->creg[payload.clbits[i]], payload.qpus[i]);
                     }
                 } else {
+                    // The bits that a RECV takes from one vQPU travel in one message, so they
+                    // share its jitter.
+                    std::map<std::string, double> jitter_of;
                     for (std::size_t i=0; i<payload.clbits.size(); i++) {
                         if (clock) {
                             auto [value, send_time] = classical_channel.recv_timed_measure(payload.qpus[i]);
@@ -83,7 +89,15 @@ void execute_shot_(
                             if (!send_time && !std::exchange(warned, true))
                                 LOGGER_WARN("Message from {} carries no simulated time; assuming it was sent at t=0.", payload.qpus[i]);
                             simulator->creg[payload.clbits[i]] = value;
-                            clock->receive_clbit(payload.clbits[i], send_time.value_or(0.0));
+
+                            double jitter = 0.0;
+                            if (const auto& delay = clock->model().classical_jitter()) {
+                                const auto [it, drawn] = jitter_of.try_emplace(payload.qpus[i], 0.0);
+                                if (drawn)
+                                    it->second = delay->sample(rng);
+                                jitter = it->second;
+                            }
+                            clock->receive_clbit(payload.clbits[i], send_time.value_or(0.0), jitter);
                         } else
                             simulator->creg[payload.clbits[i]] = classical_channel.recv_measure(payload.qpus[i]);
                     }
@@ -131,13 +145,16 @@ JSON CCExecutor::execute(const JSON& quantum_task)
         classical_channel_.connect(qpu_id);
     
     TimingStats timing_stats;
+    // Jitter of the incoming messages, reproducible in seeded runs.
+    const auto seed = simulator_->config.seed;
+    Rng rng(seed != NO_SEED ? static_cast<std::uint64_t>(seed) : std::random_device{}());
 
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < simulator_->config.shots; i++) {
         simulator_->initialize();
         if (clock_)
             clock_->reset();
-        execute_shot_(simulator_.get(), circuit, classical_channel_, clock_);
+        execute_shot_(simulator_.get(), circuit, classical_channel_, clock_, rng);
         if (clock_)
             timing_stats.add_shot(*clock_);
         meas_counter[simulator_->get_measures()]++;

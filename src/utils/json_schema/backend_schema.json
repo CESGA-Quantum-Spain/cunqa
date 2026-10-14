@@ -107,6 +107,20 @@
                         "measure": {"type":"number", "minimum":0, "default":1e-6},
                         "reset": {"type":"number", "minimum":0, "default":1e-6},
                         "classical_latency": {"type":"number", "minimum":0, "default":0},
+                        "classical_jitter":
+                        {
+                            "description":"Random extra latency of each incoming classical message: uniform in [0, width] or exponential with the given mean.",
+                            "type":"object",
+                            "properties":
+                            {
+                                "distribution": {"enum": ["uniform", "exponential"]},
+                                "width": {"type":"number", "minimum":0},
+                                "mean": {"type":"number", "minimum":0}
+                            },
+                            "required": ["distribution"],
+                            "additionalProperties": false
+                        },
+                        "feed_forward_latency": {"type":"number", "minimum":0, "default":0},
                         "entanglement": {"type":"number", "minimum":0, "default":0},
                         "gate_durations":
                         {

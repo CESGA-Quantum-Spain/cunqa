@@ -110,6 +110,8 @@ are given in seconds and every field is optional:
                 "measure": 1e-6,
                 "reset": 1e-6,
                 "classical_latency": 5e-7,
+                "classical_jitter": {"distribution": "exponential", "mean": 1e-7},
+                "feed_forward_latency": 1e-7,
                 "entanglement": 2e-6,
                 "gate_durations": {"cx": 2.5e-7, "rz": 0}
             }
@@ -121,6 +123,12 @@ are given in seconds and every field is optional:
 * ``measure`` and ``reset`` default to 1e-6.
 * ``classical_latency`` (default 0) is added to the send time of every classical message the vQPU
   receives.
+* ``classical_jitter`` (default none) adds a random delay to every classical message the vQPU
+  receives, drawn in each shot: ``{"distribution": "uniform", "width": w}`` draws it uniformly in
+  [0, w] and ``{"distribution": "exponential", "mean": m}`` from an exponential distribution of
+  mean m. The bits that one ``recv`` takes from the same vQPU travel in one message and share it.
+* ``feed_forward_latency`` (default 0) is the time the controller takes to act on a condition once
+  its bits are known: the operations of a classically controlled block start that much later.
 * ``entanglement`` (default 0) is the time a GHZ/EPR generation takes. The state becomes available
   on every vQPU taking part at the same simulated time.
 * ``gate_durations`` overrides the duration of specific instructions, by name.

@@ -28,6 +28,8 @@ TEST(TimingModel, DefaultsAreInSeconds)
     EXPECT_DOUBLE_EQ(timing.duration(InstructionType::RESET, 1), 1e-6);
     EXPECT_DOUBLE_EQ(timing.duration(InstructionType::DEPOLARIZINGNOISE, 1), 0.0);
     EXPECT_DOUBLE_EQ(timing.classical_latency(), 0.0);
+    EXPECT_EQ(timing.classical_jitter(), nullptr);
+    EXPECT_DOUBLE_EQ(timing.feed_forward_latency(), 0.0);
     EXPECT_DOUBLE_EQ(timing.entanglement_duration(), 0.0);
 }
 
@@ -40,6 +42,30 @@ TEST(TimingModel, PerGateDurationsAndValidation)
 
     EXPECT_THROW(model({{"one_qubit_gte", 1e-8}}), std::invalid_argument);
     EXPECT_THROW(model({{"measure", -1e-6}}), std::invalid_argument);
+}
+
+TEST(TimingModel, ClassicalJitterAndFeedForwardLatency)
+{
+    const auto uniform = model({{"classical_jitter", {{"distribution", "uniform"}, {"width", 4e-7}}},
+                                {"feed_forward_latency", 1e-7}});
+    ASSERT_NE(uniform.classical_jitter(), nullptr);
+    EXPECT_DOUBLE_EQ(uniform.classical_jitter()->mean(), 2e-7);
+    EXPECT_DOUBLE_EQ(uniform.classical_jitter()->min(), 0.0);
+    EXPECT_DOUBLE_EQ(uniform.feed_forward_latency(), 1e-7);
+
+    const auto exponential = model({{"classical_jitter", {{"distribution", "exponential"}, {"mean", 3e-7}}}});
+    ASSERT_NE(exponential.classical_jitter(), nullptr);
+    EXPECT_DOUBLE_EQ(exponential.classical_jitter()->mean(), 3e-7);
+
+    // A zero jitter is no jitter.
+    EXPECT_EQ(model({{"classical_jitter", {{"distribution", "uniform"}, {"width", 0.0}}}}).classical_jitter(), nullptr);
+
+    EXPECT_THROW(model({{"classical_jitter", {{"distribution", "gaussian"}, {"mean", 1e-7}}}}), std::invalid_argument);
+    EXPECT_THROW(model({{"classical_jitter", {{"distribution", "uniform"}, {"mean", 1e-7}}}}), std::invalid_argument);
+    EXPECT_THROW(model({{"classical_jitter", {{"distribution", "exponential"}}}}), std::invalid_argument);
+    EXPECT_THROW(model({{"classical_jitter", {{"distribution", "exponential"}, {"mean", -1e-7}}}}), std::invalid_argument);
+    EXPECT_THROW(model({{"classical_jitter", 1e-7}}), std::invalid_argument);
+    EXPECT_THROW(model({{"feed_forward_latency", -1e-7}}), std::invalid_argument);
 }
 
 TEST(SimClock, SchedulesOperationsAsSoonAsPossible)
@@ -113,12 +139,33 @@ TEST(SimClock, SkippedConditionalBlockStillWaitsForItsBits)
     EXPECT_NEAR(clock.clbit_time(1), 2e-6, EPS);
 }
 
+TEST(SimClock, FeedForwardLatencyDelaysEveryDecision)
+{
+    SimClock clock(model({{"one_qubit_gate", 1e-7}, {"measure", 1e-6}, {"feed_forward_latency", 2e-7}}), 3);
+    clock.apply(InstructionType::MEASURE, Measure{0, 0, true});    // bit known at 1 us
+    EXPECT_NEAR(clock.decision_time({0}), 1.2e-6, EPS);
+
+    clock.begin_conditional({0});
+    clock.apply(InstructionType::X, OneQubitNoParam{1});           // [1.2, 1.3) us
+    clock.end_conditional();
+    EXPECT_NEAR(clock.qubit_time(1), 1.3e-6, EPS);
+
+    clock.skip_conditional({0}, {2});
+    EXPECT_NEAR(clock.qubit_time(2), 1.2e-6, EPS);
+    // Sending a bit does not wait for any decision.
+    EXPECT_NEAR(clock.classical_time({0}), 1e-6, EPS);
+}
+
 TEST(SimClock, ReceivedBitsArriveAfterTheLatency)
 {
     SimClock clock(model({{"classical_latency", 5e-7}}), 1);
     clock.receive_clbit(0, 2e-6);
     EXPECT_NEAR(clock.clbit_time(0), 2.5e-6, EPS);
     EXPECT_NEAR(clock.now(), 2.5e-6, EPS);
+
+    // The jitter drawn for a message adds to the latency.
+    clock.receive_clbit(1, 2e-6, 3e-7);
+    EXPECT_NEAR(clock.clbit_time(1), 2.8e-6, EPS);
 }
 
 TEST(SimClock, OccupySpansSeveralVQPUs)

@@ -443,10 +443,51 @@ TEST(QCEngineTime, ClassicalLatencyDegradesTeledata)
     }
 }
 
+TEST(QCEngineTime, JitterIsSampledPerShot)
+{
+    // Exponential jitter of mean m on top of latency L: E[exp(-(L + J)/T2)] = e^(-L/T2) / (1 + m/T2).
+    const double t2 = 20e-6, latency = 5e-6, mean_jitter = 10e-6;
+    RunOptions options;
+    options.shots = 6000;
+    options.timing = ZERO_DURATIONS;
+    options.timing["classical_latency"] = latency;
+    options.timing["classical_jitter"] = {{"distribution", "exponential"}, {"mean", mean_jitter}};
+    options.comm_model = {{"comm_qubits", {{"T1", 1e3}, {"T2", t2}}}};
+    const double expected = 0.5 * (1.0 + std::exp(-latency / t2) / (1.0 + mean_jitter / t2));
+    EXPECT_NEAR(teledata_fidelity(PAULI_EIGENSTATES[2], options), expected, tolerance(expected, options.shots));
+
+    options.comm_model["strategy"] = "averaged";
+    EXPECT_NEAR(teledata_fidelity(PAULI_EIGENSTATES[2], options), expected, tolerance(expected, options.shots));
+}
+
+TEST(QCEngineTiming, JitterSpreadsTheArrivalOfEachMessage)
+{
+    // Uniform jitter in [0, 1) us on 2 us of latency, without the noise model: the two
+    // corrections travel in one message, so B finishes in [2, 3) us, at 2.5 us on average.
+    Circuit a("A", 1, 1, 2), b("B", 1, 1, 3);
+    a.gate("h", 0);
+    qsend(a, 0, a.comm(), 0, 1, "B", "t");
+    qrecv(b, 0, b.comm(), 0, 1, "A", "t");
+    b.measure(0, 2);
+
+    RunOptions options;
+    options.shots = 2000;
+    options.timing = ZERO_DURATIONS;
+    options.timing["classical_latency"] = 2e-6;
+    options.timing["classical_jitter"] = {{"distribution", "uniform"}, {"width", 1e-6}};
+    const auto timing = run({a, b}, options)[1].at("simulated_time");
+    EXPECT_GE(timing.at("min").get<double>(), 2e-6);
+    EXPECT_LT(timing.at("max").get<double>(), 3e-6);
+    EXPECT_GT(timing.at("max").get<double>() - timing.at("min").get<double>(), 0.9e-6);
+    EXPECT_NEAR(timing.at("mean").get<double>(), 2.5e-6, 4.5 * 1e-6 / std::sqrt(12.0 * options.shots));
+    // The data qubit waits for the message, a single draw per shot.
+    EXPECT_NEAR(timing.at("idle_mean")[0].get<double>(), timing.at("mean").get<double>(), 1e-15);
+}
+
 TEST(QCEngineTime, SimulatedTimeFollowsTheTimeline)
 {
-    // Deterministic timeline: pair ready at 1 us, CX and SWAP 300 ns, measurements 1 us and
-    // 2 us of classical latency.
+    // Deterministic timeline: pair ready at 1 us, CX and SWAP 300 ns, measurements 1 us,
+    // decisions 100 ns after the bits are known and 2 us of classical latency.
     RunOptions options;
     options.shots = 50;
     options.timing = {
@@ -454,7 +495,8 @@ TEST(QCEngineTime, SimulatedTimeFollowsTheTimeline)
         {"multi_qubit_gate", 300e-9},
         {"measure", 1e-6},
         {"reset", 0.0},
-        {"classical_latency", 2e-6}
+        {"classical_latency", 2e-6},
+        {"feed_forward_latency", 100e-9}
     };
     options.comm_model = {{"epr", {{"attempt_time", 1e-6}}}};
 
@@ -465,11 +507,11 @@ TEST(QCEngineTime, SimulatedTimeFollowsTheTimeline)
     b.measure(0, 2);
     const auto results = run({a, b}, options);
 
-    // A: CX [1, 1.3], measurements [1.3, 2.3], corrections of its qubits at 2.3.
-    // B: corrections at 2.3 + 2 = 4.3, SWAP [4.3, 4.6], measurement [4.6, 5.6].
-    EXPECT_NEAR(results[0].at("simulated_time").at("mean").get<double>(), 2.3e-6, 1e-12);
-    EXPECT_NEAR(results[1].at("simulated_time").at("min").get<double>(), 5.6e-6, 1e-12);
-    EXPECT_NEAR(results[1].at("simulated_time").at("max").get<double>(), 5.6e-6, 1e-12);
+    // A: CX [1, 1.3], measurements [1.3, 2.3], resets of its qubits decided at 2.4.
+    // B: corrections decided at 2.3 + 2 + 0.1 = 4.4, SWAP [4.4, 4.7], measurement [4.7, 5.7].
+    EXPECT_NEAR(results[0].at("simulated_time").at("mean").get<double>(), 2.4e-6, 1e-12);
+    EXPECT_NEAR(results[1].at("simulated_time").at("min").get<double>(), 5.7e-6, 1e-12);
+    EXPECT_NEAR(results[1].at("simulated_time").at("max").get<double>(), 5.7e-6, 1e-12);
     EXPECT_NEAR(results[1].at("comm_stats").at("mean_generation_time").get<double>(), 1e-6, 1e-12);
 }
 
