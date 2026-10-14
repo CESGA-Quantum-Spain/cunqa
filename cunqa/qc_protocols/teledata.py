@@ -9,7 +9,8 @@ def qsend(
     comm_qubit: int, 
     clbits: list[int],
     recving_circuit: Union[str, 'CunqaCircuit'],
-    tag: str = None
+    tag: str = None,
+    prefetched: bool = False
 ) -> None:
     """
     Teledata sender: teleports the state of ``data_qubit`` from ``circuit`` to a remote circuit.
@@ -27,9 +28,14 @@ def qsend(
         recving_circuit (str | CunqaCircuit): id of the circuit or circuit object to which the
             qubit is teleported.
         tag (str): identifier shared with the matching :py:func:`qrecv` call.
+        prefetched (bool): if ``True``, the entangled pair was already requested with
+            :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent` on ``comm_qubit`` earlier in the
+            circuit (prefetching it), so it is only consumed here. Default: ``False``, the pair
+            is requested right before it is used.
     """
     
-    circuit.gen_ent(comm_qubit, recving_circuit, tag)
+    if not prefetched:
+        circuit.gen_ent(comm_qubit, recving_circuit, tag)
     circuit.cx(data_qubit, comm_qubit)
     circuit.h(data_qubit)
     
@@ -52,7 +58,8 @@ def qrecv(
     comm_qubit: int, 
     clbits: list[int],
     control_circuit: Union[str, 'CunqaCircuit'],
-    tag: str = None    
+    tag: str = None,
+    prefetched: bool = False
 ) -> None:
     """
     Teledata receiver: reconstructs into ``data_qubit`` the state teleported by a remote circuit.
@@ -70,9 +77,13 @@ def qrecv(
         control_circuit (str | CunqaCircuit): id of the circuit or circuit object from which the
             qubit is received.
         tag (str): identifier shared with the matching :py:func:`qsend` call.
+        prefetched (bool): if ``True``, the entangled pair was already requested with
+            :py:meth:`~cunqa.circuit.core.CunqaCircuit.gen_ent` on ``comm_qubit`` earlier in the
+            circuit, so it is only consumed here. Default: ``False``.
     """
     
-    circuit.gen_ent(comm_qubit, control_circuit, tag)
+    if not prefetched:
+        circuit.gen_ent(comm_qubit, control_circuit, tag)
     
     circuit.recv(clbits, control_circuit)
 

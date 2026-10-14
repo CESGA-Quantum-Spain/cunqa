@@ -96,3 +96,32 @@ def test_qrecv_swaps_comm_into_data_qubit():
     swap = circuit.instructions[-1]
     assert swap["name"] == "swap"
     assert swap["qubits"] == [1, 0]
+
+
+# ------------------------
+# prefetched pairs
+# ------------------------
+
+def test_qsend_prefetched_only_consumes_the_pair():
+    circuit = CunqaCircuit((1, 1), num_clbits=2, id="A")
+    circuit.gen_ent(1, "B", "td")
+    circuit.h(0)
+
+    qsend(circuit, 0, 1, [0, 1], "B", tag="td", prefetched=True)
+
+    names = [i["name"] for i in circuit.instructions]
+    # The pair requested before the local work is the only gen_ent of the circuit.
+    assert names.count("gen_ent") == 1
+    assert names[:3] == ["gen_ent", "h", "cx"]
+
+
+def test_qrecv_prefetched_only_consumes_the_pair():
+    circuit = CunqaCircuit((1, 1), num_clbits=2, id="B")
+    circuit.gen_ent(1, "A", "td")
+
+    qrecv(circuit, 0, 1, [0, 1], "A", tag="td", prefetched=True)
+
+    names = [i["name"] for i in circuit.instructions]
+    assert names == [
+        "gen_ent", "recv", "cif", "x", "endcif", "cif", "z", "endcif", "swap",
+    ]

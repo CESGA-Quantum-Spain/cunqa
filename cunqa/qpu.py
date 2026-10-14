@@ -15,6 +15,7 @@ into two subgroups:
 """
 
 import os
+import copy
 import time
 import json
 import subprocess
@@ -43,6 +44,8 @@ class Backend(TypedDict):
     .. autoattribute:: num_qubits
     .. autoattribute:: name
     .. autoattribute:: noise_model
+    .. autoattribute:: comm_model
+    .. autoattribute:: timing
     .. autoattribute:: simulator
     .. autoattribute:: version
     """
@@ -54,6 +57,8 @@ class Backend(TypedDict):
     num_qubits: tuple[int] #: Number of qubits that form the Backend: computation and communication qubits available.
     name: str #: Name assigned to the Backend.
     noise_model: dict #: Path to the noise model json file gathering the noise instructions needed for the simulator.
+    comm_model: dict #: Communication noise model deployed with vQPUs with quantum communications (see :ref:`sec_comm_model`).
+    timing: dict #: Simulated-time model of the vQPU, with durations in seconds (see :doc:`/further_examples/json_examples/backend_json_example`).
     simulator: str #: Name of the simulator that simulates the circuits accordingly to the Backend.
     version: str #: Version of the Backend.
 
@@ -179,6 +184,11 @@ def run(
         transformation and the other is the result of a transformation. If this is true and a third
         circuit tries to communicate with them, an error will be raised.
 
+    .. note::
+        With quantum communications, the ``comm_model`` run argument sets the communication noise
+        model for this run (see :ref:`sec_comm_model`). Its per-link entries name the linked
+        circuits in ``"circuits"``, which are translated here into the vQPUs that run them.
+
     Args:
         circuits (list[dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit] | dict | ~cunqa.circuit.core.CunqaCircuit | ~qiskit.QuantumCircuit): circuits to be run.
         qpus (list[~cunqa.qpu.QPU] | ~cunqa.qpu.QPU): QPU objects associated to the vQPUs in which 
@@ -243,6 +253,21 @@ def run(
     # translate circuit ids in comm instruction to qpu ids
     transformed_circs = expand_mapping([c["id"] for c in circuits_ir])
     correspondence = {c["id"]: qpus[i].id for i, c in enumerate(circuits_ir)}
+
+    def qpu_of(circuit: Union[str, CunqaCircuit]) -> str:
+        circuit_id = circuit.id if isinstance(circuit, CunqaCircuit) else circuit
+        if circuit_id not in transformed_circs:
+            raise ValueError(f"Circuit {circuit_id} is not among the circuits being run.")
+        return correspondence[transformed_circs[circuit_id]]
+
+    if isinstance(run_args.get("comm_model"), dict) and "links" in run_args["comm_model"]:
+        # The user's model is left untouched: the translated copy travels with the jobs.
+        comm_model = copy.deepcopy(run_args["comm_model"])
+        for link in comm_model["links"]:
+            if "circuits" in link:
+                link["qpus"] = [qpu_of(circuit) for circuit in link.pop("circuits")]
+        run_args = {**run_args, "comm_model": comm_model}
+
     for circuit in circuits_ir:
         for instr in circuit["instructions"]:
             if instr["name"] in REMOTE_GATES:

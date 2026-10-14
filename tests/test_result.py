@@ -109,3 +109,15 @@ def test_simulated_time_reported():
     r = Result({"counts": {"0": 1}, "time_taken": 0.5, "simulated_time": timing},
                circ_id="c", registers={"c": [0]})
     assert r.simulated_time == timing
+
+
+def test_comm_stats_absent_by_default():
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5}, circ_id="c", registers={"c": [0]})
+    assert r.comm_stats is None
+
+
+def test_comm_stats_reported():
+    stats = {"entanglement_requests_per_shot": 1.0, "mean_generation_time": 1e-6}
+    r = Result({"counts": {"0": 1}, "time_taken": 0.5, "comm_stats": stats},
+               circ_id="c", registers={"c": [0]})
+    assert r.comm_stats == stats

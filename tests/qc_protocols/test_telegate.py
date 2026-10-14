@@ -100,3 +100,18 @@ def test_cat_disentangler_phase_correction_targets_control_data_qubit(pair):
 
     z_instr = next(i for i in control.instructions if i["name"] == "z")
     assert z_instr["qubits"] == 0
+
+
+def test_cat_entangler_prefetched_only_consumes_the_state(pair):
+    control, target = pair
+    for circuit in (control, target):
+        circuit.gen_ent(1, [control, target], "tg")
+
+    cat_entangler([control, target], 0, [1, 1], [0, 0], tag="tg", prefetched=True)
+
+    assert [i["name"] for i in control.instructions] == [
+        "gen_ent", "cx", "measure", "cif", "x", "endcif", "send",
+    ]
+    assert [i["name"] for i in target.instructions] == [
+        "gen_ent", "recv", "cif", "x", "endcif",
+    ]
