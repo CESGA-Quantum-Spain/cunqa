@@ -31,12 +31,15 @@ try:
     # 2. Circuit design: multiple circuits implementing the classically distributed Iterative Phase Estimation
     circuits = []
     for i in range(N_QPUS): 
-        theta = 2**(N_QPUS - 1 - i) * PHASE_TO_COMPUTE * 2 * np.pi
+        # U = Rz(2*theta) with theta = 2*pi*phase. Subcircuit i applies the controlled
+        # U^(2^(N_QPUS-1-i)), i.e. crz(2*theta*2^(N_QPUS-1-i)) = crz(4*pi*phase*2^(N_QPUS-1-i))
+        theta = 2 * np.pi * PHASE_TO_COMPUTE
+        angle = 2**(N_QPUS - 1 - i) * 2 * theta
 
         circuits.append(CunqaCircuit(2, 2, id= f"cc_{i}"))
         circuits[i].h(0)
         circuits[i].x(1)
-        circuits[i].crz(theta, 0, 1)
+        circuits[i].crz(angle, 0, 1)
 
         for j in range(i):
             param = -np.pi * 2**(-j - 1)
@@ -79,7 +82,7 @@ try:
     estimated_theta = 0.0
     for i, digit in enumerate(reversed(binary_string)):
         if digit == '1':
-            estimated_theta += 1 / (2**i)
+            estimated_theta += 1 / (2**(i + 1))   # last subcircuit gives the 2^-1 bit
 
     print(f"Estimated angle: {estimated_theta}")
     print(f"Real angle: {PHASE_TO_COMPUTE}")
