@@ -18,22 +18,29 @@ All runtime state is stored under ``$STORE/.cunqa/``. The location is derived at
      - Contents
    * - ``$STORE/.cunqa/``
      - Root directory for CUNQA runtime state.
-   * - ``$STORE/.cunqa/qpus.json``
-     - Registry of currently deployed :term:`vQPUs <vQPU>`. Read by ``qinfo``, ``qdrop`` and
-       :py:func:`~cunqa.qpu.get_QPUs`.
-   * - ``$STORE/.cunqa/communications.json``
-     - Communication endpoints used between :term:`vQPUs <vQPU>`.
+   * - ``$STORE/.cunqa/qpus/<family>/<vqpu_id>.json``
+     - Registry of currently deployed :term:`vQPUs <vQPU>`, one file per :term:`vQPU` grouped by
+       :term:`family`. Read by ``qinfo``, ``qdrop`` and :py:func:`~cunqa.qpu.get_QPUs`.
+   * - ``$STORE/.cunqa/communications/<slurm_job_id>/<id>.json``
+     - Communication endpoints used between :term:`vQPUs <vQPU>`, one file per endpoint grouped by
+       SLURM job.
 
 In addition, each ``qraise`` deployment writes a SLURM log file named ``qraise_<jobid>`` in the
 directory from which the command was launched. These can be removed together with the job using
 ``qdrop ... --rm``.
 
-The ``qpus.json`` registry
---------------------------
+The vQPU registry
+-----------------
 
-``qpus.json`` is a JSON object whose **keys are vQPU identifiers** (of the form
-``<slurm_job_id>_<index>``) and whose values describe each :term:`vQPU`. The most relevant fields, as
-consumed by the tooling, are:
+Each :term:`vQPU` registers itself in its own file, ``$STORE/.cunqa/qpus/<family>/<vqpu_id>.json``,
+where the identifier is of the form ``<slurm_job_id>_<index>``. Every file is written only once, and
+atomically, by the :term:`vQPU` it describes, so no file locks are needed. This keeps the registry
+consistent on shared filesystems such as NFS even when :term:`vQPUs <vQPU>` on several nodes start
+at the same time. The files are removed when the SLURM job ends, and so is the directory of the
+:term:`family` once it is empty.
+
+The content of each file describes the :term:`vQPU`. The most relevant fields, as consumed by the
+tooling, are:
 
 .. list-table::
    :header-rows: 1
@@ -58,11 +65,11 @@ consumed by the tooling, are:
      - Device info; ``device.device_name`` is ``QPU`` for real hardware (e.g. QMIO) and otherwise
        identifies the simulated device.
 
-Illustrative entry (fields trimmed for brevity):
+Illustrative content of ``qpus/507805/507805_1071427.json`` (fields trimmed for brevity):
 
 .. code-block:: json
 
-   "507805_1071427": {
+   {
         "backend": {
             "basis_gates": [],
             "coupling_map": [],
@@ -92,7 +99,7 @@ Illustrative entry (fields trimmed for brevity):
 Recovering from stale state
 ---------------------------
 
-If a deployment ends abnormally, ``qpus.json`` may keep entries for :term:`vQPUs <vQPU>` that are no longer running.
-Running ``qdrop --all`` cancels any remaining jobs and resets ``qpus.json`` to an empty object
-(``{}``). After that, ``qinfo`` will report that there are no deployed :term:`vQPUs <vQPU>` until you ``qraise``
+If a deployment ends abnormally, the registry may keep files for :term:`vQPUs <vQPU>` that are no
+longer running. Running ``qdrop --all`` cancels any remaining jobs and removes the
+``$STORE/.cunqa/qpus`` and ``$STORE/.cunqa/communications`` directories. After that, ``qinfo`` will report that there are no deployed :term:`vQPUs <vQPU>` until you ``qraise``
 again.

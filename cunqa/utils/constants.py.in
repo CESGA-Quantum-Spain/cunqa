@@ -1,7 +1,7 @@
 import os
 
 CUNQA_PATH = os.getenv("STORE") + "/.cunqa"
-QPUS_FILEPATH = CUNQA_PATH + "/qpus.json"
+QPUS_DIR = CUNQA_PATH + "/qpus" # One <family>/<qpu_id>.json file per vQPU, see src/utils/registry.hpp
 
 LIBS_DIR = "@CMAKE_INSTALL_PREFIX@/lib"
 CUNQA_USE_QISKIT_PY = @CUNQA_USE_QISKIT_PY@

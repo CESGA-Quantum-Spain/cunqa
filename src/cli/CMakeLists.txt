@@ -96,9 +96,5 @@ target_include_directories(setup_qmio
 target_link_directories(setup_qmio PRIVATE "${ZMQ_BINARY_DIR}/lib")
 install(TARGETS setup_qmio DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
-# Epilog tool erase_key
-add_executable(erase_key erase_key.cpp)
-target_link_libraries(erase_key PRIVATE json)
-install(TARGETS erase_key DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/epilog.sh" DESTINATION "${CMAKE_INSTALL_BINDIR}")

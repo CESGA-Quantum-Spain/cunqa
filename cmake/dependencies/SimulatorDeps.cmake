@@ -157,8 +157,8 @@ set(BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 
 CPMAddPackage(
   NAME maestro
-  GIT_REPOSITORY https://github.com/QoroQuantum/maestro.git
-  GIT_TAG a4d54721a718189362a4a9c8329d7211b662a8f9
+  URL https://github.com/QoroQuantum/maestro/archive/a4d54721a718189362a4a9c8329d7211b662a8f9.tar.gz
+  URL_HASH SHA256=e7c6a015eed2d5d256900ec2344e7262df4052ea15b561da20093da2f607f5bc
   OPTIONS
     "BUILD_PYTHON_BINDINGS OFF"
 )

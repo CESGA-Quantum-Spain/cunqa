@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "qpu.hpp"
-#include "utils/constants.hpp"
+#include "utils/registry.hpp"
 
 #include "logger.hpp"
 
@@ -24,7 +24,7 @@ void QPU::turn_ON()
     std::thread compute([this](){this->compute_result_();});
 
     JSON qpu_config = *this;
-    write_on_file(qpu_config, QPUS_FILEPATH, name_);
+    write_file(qpu_config, qpu_filepath(family_, name_));
 
     io.join();
     compute.join();

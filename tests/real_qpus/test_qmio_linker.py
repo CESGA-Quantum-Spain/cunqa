@@ -124,7 +124,7 @@ def test_init_binds_connects_writes_config(monkeypatch):
     assert linker.port == 43210
     assert linker.endpoint == "tcp://10.1.2.3:43210"
     req_socket.connect.assert_called_once_with("tcp://127.0.0.1:5555")
-    write_json.assert_called_once_with(qmio_linked_mod.QPUS_FILEPATH, {"393219_7": {"cfg":1}})
+    write_json.assert_called_once_with(qmio_linked_mod.qpu_filepath("famX", "393219_7"), {"cfg":1})
 
 
 def test_run_starts_two_threads(monkeypatch):

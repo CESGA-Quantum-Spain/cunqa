@@ -11,7 +11,8 @@ else:
     sys.path.insert(0, HOME)
 
 import cunqa.qpu as qpu_mod
-from cunqa.qpu import QPU
+from cunqa.qpu import QPU, read_qpus, qpu_filepath
+from cunqa.utils import write_json
 
 
 # ------------------------
@@ -355,8 +356,7 @@ def test_qraise_builds_command_and_returns_job_id_without_family(monkeypatch):
     n, t = 1, "00:10:00"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"12345-0": {}})
-    monkeypatch.setattr(qpu_mod, "write_json", Mock())
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: {"12345-0": {}})
     monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
@@ -389,8 +389,7 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     family = "my_family"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"54321-0": {}, "54321-1": {}})
-    monkeypatch.setattr(qpu_mod, "write_json", Mock())
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: {"54321-0": {}, "54321-1": {}})
     monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
@@ -434,28 +433,24 @@ def test_qraise_builds_full_command_with_all_options_and_family_tuple_return(mon
     assert result == family
 
 
-# --- QPUS_FILEPATH creation ---
+# --- Registry directory of the family ---
 
-def test_qraise_creates_qpus_file_if_not_exists(monkeypatch):
+@pytest.mark.parametrize("family, registry_family", [(None, "99999"), ("default", "99999"), ("famX", "famX")])
+def test_qraise_reads_registry_of_the_family(monkeypatch, family, registry_family):
     n, t = 1, "00:05:00"
 
-    monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: False)
-
-    write_mock = Mock()
-    monkeypatch.setattr(qpu_mod, "write_json", write_mock)
-    monkeypatch.setattr(qpu_mod, "read_json", lambda _: {"99999-0": {}})
+    read_mock = Mock(return_value={"99999_0": {}})
+    monkeypatch.setattr(qpu_mod, "read_qpus", read_mock)
     monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
     run_mock.side_effect = _subprocess_run_side_effect_ok("99999")
     monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
 
-    result = qraise(n, t)
+    qraise(n, t, family=family)
 
-    # Ensure the QPUs file was initialised with an empty json object.
-    write_mock.assert_called_once_with(qpu_mod.QPUS_FILEPATH, {})
-
-    assert result == "99999"
+    # The vQPUs of the default family are registered under the job id
+    read_mock.assert_called_with(registry_family)
 
 
 # --- Waiting until the requested QPUs are registered ---
@@ -464,7 +459,6 @@ def test_qraise_waits_until_qpus_are_registered(monkeypatch):
     n, t = 1, "00:05:00"
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr(qpu_mod, "write_json", Mock())
     monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
 
     run_mock = Mock()
@@ -473,7 +467,7 @@ def test_qraise_waits_until_qpus_are_registered(monkeypatch):
 
     # First read shows the QPUs are not registered yet, the second one has them all.
     read_mock = Mock(side_effect=[{}, {"77777-0": {}}])
-    monkeypatch.setattr(qpu_mod, "read_json", read_mock)
+    monkeypatch.setattr(qpu_mod, "read_qpus", read_mock)
 
     result = qraise(n, t)
 
@@ -495,7 +489,6 @@ def test_qraise_raises_runtimeerror_on_subprocess_error(monkeypatch):
     )
 
     monkeypatch.setattr(qpu_mod.os.path, "exists", lambda _: True)
-    monkeypatch.setattr(qpu_mod, "write_json", Mock())
 
     run_mock = Mock(return_value=completed)
     monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
@@ -561,9 +554,9 @@ from cunqa.qpu import get_QPUs
 def _mock_qpus_json(monkeypatch, qpus_dict: dict):
     """
     Make get_QPUs read QPU info from `qpus_dict` instead of a real file by mocking the
-    `read_json` helper used in the qpu module.
+    `read_qpus` helper used in the qpu module.
     """
-    monkeypatch.setattr(qpu_mod, "read_json", lambda f: qpus_dict)
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: qpus_dict)
 
 
 @pytest.fixture
@@ -822,3 +815,34 @@ def test_co_located_with_family_filter(monkeypatch, qpu_mock):
     assert qpu_mock.call_args.kwargs["family"] == "fam-B"
     assert qpu_mock.call_args.kwargs["backend"] == "backend-B"
     
+
+
+# ------------------------
+# vQPU registry
+# ------------------------
+
+@pytest.fixture
+def qpus_dir(monkeypatch, tmp_path):
+    monkeypatch.setattr(qpu_mod, "QPUS_DIR", str(tmp_path))
+    return tmp_path
+
+
+def test_qpu_filepath(qpus_dir):
+    assert qpu_filepath("famA", "123_4") == str(qpus_dir / "famA" / "123_4.json")
+
+
+def test_read_qpus_by_family_and_all(qpus_dir):
+    write_json(qpu_filepath("famA", "1_1"), {"family": "famA"})
+    write_json(qpu_filepath("famA", "1_2"), {"family": "famA"})
+    write_json(qpu_filepath("famB", "2_1"), {"family": "famB"})
+
+    assert set(read_qpus("famA")) == {"1_1", "1_2"}
+    assert set(read_qpus("famB")) == {"2_1"}
+    assert read_qpus("famC") == {}
+    assert set(read_qpus()) == {"1_1", "1_2", "2_1"}
+
+
+def test_read_qpus_without_registry_returns_empty(monkeypatch, tmp_path):
+    monkeypatch.setattr(qpu_mod, "QPUS_DIR", str(tmp_path / "does_not_exist"))
+
+    assert read_qpus() == {}

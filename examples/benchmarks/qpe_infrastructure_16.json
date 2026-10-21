@@ -1,0 +1,6 @@
+{
+    "backends": [
+        "/mnt/netapp1/Store_CESGA/home/cesga/jvazquez/works/cunqa/examples/benchmarks/qpe_backend_16_1.json",
+        "/mnt/netapp1/Store_CESGA/home/cesga/jvazquez/works/cunqa/examples/benchmarks/qpe_backend_1_1.json"
+    ]
+}
