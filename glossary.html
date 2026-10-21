@@ -120,13 +120,13 @@ resources that simulates the behaviour of a real QPU. It is composed of a <stron
 user–vQPU communication) and a <strong>simulator</strong> (performs the actual execution). See
 <a class="reference internal" href="overview/overview.html#sec-virtual-qpu"><span class="std std-ref">Virtual QPU</span></a>.</p>
 </dd>
-<dt id="term-QPU">QPU<a class="headerlink" href="#term-QPU" title="Link to this term"></a></dt><dd><p>In this documentation, the <a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> Python object that represents a deployed
+<dt id="term-QPU">QPU<a class="headerlink" href="#term-QPU" title="Link to this term"></a></dt><dd><p>In this documentation, the <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> Python object that represents a deployed
 vQPU and is used to submit quantum tasks to it. Also refers to real quantum hardware (e.g.
 CESGA’s QMIO), which can be <em>deployed</em> alongside vQPUs.</p>
 </dd>
 <dt id="term-family">family<a class="headerlink" href="#term-family" title="Link to this term"></a></dt><dd><p>A name that identifies a group of vQPUs deployed together by a single <code class="docutils literal notranslate"><span class="pre">qraise</span></code> call. It is
 set with the <code class="docutils literal notranslate"><span class="pre">--family</span></code> flag (Bash) or the <code class="docutils literal notranslate"><span class="pre">family</span></code> argument (Python) and is later used
-to select (<a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>) or release (<code class="docutils literal notranslate"><span class="pre">qdrop</span></code>) that group. If not provided,
+to select (<code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code>) or release (<code class="docutils literal notranslate"><span class="pre">qdrop</span></code>) that group. If not provided,
 it defaults to the SLURM job id of the deployment.</p>
 </dd>
 <dt id="term-co-located-mode">co-located mode<a class="headerlink" href="#term-co-located-mode" title="Link to this term"></a></dt><dd><p>Deployment mode in which a vQPU can be accessed from any node, not only the one it was
@@ -165,7 +165,7 @@ controlled gate can be applied locally. Exposed through
 </dd>
 <dt id="term-backend">backend<a class="headerlink" href="#term-backend" title="Link to this term"></a></dt><dd><p>The configuration describing the device a vQPU emulates (basis gates, coupling map, noise
 model, simulator, …). Provided as a JSON file through <code class="docutils literal notranslate"><span class="pre">--backend</span></code> / <code class="docutils literal notranslate"><span class="pre">backend</span></code> and
-represented in Python by <a class="reference internal" href="reference/api/cunqa.qpu.html#cunqa.qpu.Backend" title="cunqa.qpu.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>.</p>
+represented in Python by <code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code>.</p>
 </dd>
 <dt id="term-simulator">simulator<a class="headerlink" href="#term-simulator" title="Link to this term"></a></dt><dd><p>The software library that performs the quantum simulation inside a vQPU (e.g. Aer, Munich,
 Qulacs). Selected with <code class="docutils literal notranslate"><span class="pre">--simulator</span></code>; see <a class="reference internal" href="reference/simulators.html"><span class="doc">Simulators</span></a>.</p>

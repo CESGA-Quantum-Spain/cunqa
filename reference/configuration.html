@@ -78,7 +78,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="reference.html#configuration-and-files">Configuration and files</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">    Configuration and files</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#the-cunqa-directory">The <code class="docutils literal notranslate"><span class="pre">.cunqa</span></code> directory</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-qpus-json-registry">The <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> registry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-vqpu-registry">The vQPU registry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#recovering-from-stale-state">Recovering from stale state</a></li>
 </ul>
 </li>
@@ -149,12 +149,13 @@ communication setup. This page describes where that state lives and what it cont
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/</span></code></p></td>
 <td><p>Root directory for CUNQA runtime state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus.json</span></code></p></td>
-<td><p>Registry of currently deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>. Read by <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> and
-<a class="reference internal" href="api/cunqa.qpu.html#cunqa.qpu.get_QPUs" title="cunqa.qpu.get_QPUs"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus/&lt;family&gt;/&lt;vqpu_id&gt;.json</span></code></p></td>
+<td><p>Registry of currently deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>, one file per <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> grouped by
+<a class="reference internal" href="../glossary.html#term-family"><span class="xref std std-term">family</span></a>. Read by <code class="docutils literal notranslate"><span class="pre">qinfo</span></code>, <code class="docutils literal notranslate"><span class="pre">qdrop</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">get_QPUs</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/communications.json</span></code></p></td>
-<td><p>Communication endpoints used between <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/communications/&lt;slurm_job_id&gt;/&lt;id&gt;.json</span></code></p></td>
+<td><p>Communication endpoints used between <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a>, one file per endpoint grouped by
+SLURM job.</p></td>
 </tr>
 </tbody>
 </table>
@@ -162,11 +163,16 @@ communication setup. This page describes where that state lives and what it cont
 directory from which the command was launched. These can be removed together with the job using
 <code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">...</span> <span class="pre">--rm</span></code>.</p>
 </section>
-<section id="the-qpus-json-registry">
-<h2>The <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> registry<a class="headerlink" href="#the-qpus-json-registry" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> is a JSON object whose <strong>keys are vQPU identifiers</strong> (of the form
-<code class="docutils literal notranslate"><span class="pre">&lt;slurm_job_id&gt;_&lt;index&gt;</span></code>) and whose values describe each <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>. The most relevant fields, as
-consumed by the tooling, are:</p>
+<section id="the-vqpu-registry">
+<h2>The vQPU registry<a class="headerlink" href="#the-vqpu-registry" title="Link to this heading"></a></h2>
+<p>Each <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> registers itself in its own file, <code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus/&lt;family&gt;/&lt;vqpu_id&gt;.json</span></code>,
+where the identifier is of the form <code class="docutils literal notranslate"><span class="pre">&lt;slurm_job_id&gt;_&lt;index&gt;</span></code>. Every file is written only once, and
+atomically, by the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a> it describes, so no file locks are needed. This keeps the registry
+consistent on shared filesystems such as NFS even when <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> on several nodes start
+at the same time. The files are removed when the SLURM job ends, and so is the directory of the
+<a class="reference internal" href="../glossary.html#term-family"><span class="xref std std-term">family</span></a> once it is empty.</p>
+<p>The content of each file describes the <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPU</span></a>. The most relevant fields, as consumed by the
+tooling, are:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28.0%" />
@@ -203,8 +209,8 @@ identifies the simulated device.</p></td>
 </tr>
 </tbody>
 </table>
-<p>Illustrative entry (fields trimmed for brevity):</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">"507805_1071427"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<p>Illustrative content of <code class="docutils literal notranslate"><span class="pre">qpus/507805/507805_1071427.json</span></code> (fields trimmed for brevity):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">     </span><span class="nt">"backend"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">"basis_gates"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">         </span><span class="nt">"coupling_map"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
@@ -235,9 +241,9 @@ identifies the simulated device.</p></td>
 </section>
 <section id="recovering-from-stale-state">
 <h2>Recovering from stale state<a class="headerlink" href="#recovering-from-stale-state" title="Link to this heading"></a></h2>
-<p>If a deployment ends abnormally, <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> may keep entries for <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> that are no longer running.
-Running <code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">--all</span></code> cancels any remaining jobs and resets <code class="docutils literal notranslate"><span class="pre">qpus.json</span></code> to an empty object
-(<code class="docutils literal notranslate"><span class="pre">{}</span></code>). After that, <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> will report that there are no deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> until you <code class="docutils literal notranslate"><span class="pre">qraise</span></code>
+<p>If a deployment ends abnormally, the registry may keep files for <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> that are no
+longer running. Running <code class="docutils literal notranslate"><span class="pre">qdrop</span> <span class="pre">--all</span></code> cancels any remaining jobs and removes the
+<code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/qpus</span></code> and <code class="docutils literal notranslate"><span class="pre">$STORE/.cunqa/communications</span></code> directories. After that, <code class="docutils literal notranslate"><span class="pre">qinfo</span></code> will report that there are no deployed <a class="reference internal" href="../glossary.html#term-vQPU"><span class="xref std std-term">vQPUs</span></a> until you <code class="docutils literal notranslate"><span class="pre">qraise</span></code>
 again.</p>
 </section>
 </section>

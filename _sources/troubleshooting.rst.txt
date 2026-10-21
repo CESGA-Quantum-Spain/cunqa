@@ -37,9 +37,9 @@ Deployment (``qraise``)
 Querying / releasing (``qinfo`` / ``qdrop``)
 --------------------------------------------
 
-**"Could not open the QPUs info file" / "There are not deployed QPUs!"**
-    No :term:`vQPUs <vQPU>` are currently registered. Deploy some with ``qraise`` first. This file lives under
-    ``$STORE/.cunqa/qpus.json``.
+**"There are not deployed QPUs!"**
+    No :term:`vQPUs <vQPU>` are currently registered. Deploy some with ``qraise`` first. The registry
+    lives under ``$STORE/.cunqa/qpus/``.
 
 **"Problem accessing to the QPUs on the current node. Probably the command was run on a login node"**
     ``qinfo --mynode`` relies on the ``SLURMD_NODENAME`` variable, which is only set on compute

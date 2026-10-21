@@ -140,7 +140,7 @@
 <span id="cunqa-qjob"></span><h1>cunqa.qjob<a class="headerlink" href="#module-cunqa.qjob" title="Link to this heading"></a></h1>
 <p>Contains objects that define and manage quantum emulation jobs. The core of this module is the
 class <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a>. These objects are created when a quantum job is sent to a
-vQPU, as a return of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> function:</p>
+vQPU, as a return of the <code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code> function:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qpu</span><span class="p">)</span>
 <span class="go">&lt;cunqa.qjob.QJob object at XXXXXXXX&gt;</span>
 </pre></div>
@@ -161,7 +161,7 @@ which receives a list of <a class="reference internal" href="#cunqa.qjob.QJob" t
 <dt class="sig sig-object py" id="cunqa.qjob.QJob">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">QJob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qclient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circuit_ir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">run_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cunqa.qjob.QJob" title="Link to this definition"></a></dt>
 <dd><p>Class to handle jobs sent to vQPUs. A <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> object is created as the output
-of the <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.run" title="cunqa.qpu.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code></a> function. The quantum job not only contains the circuit to
+of the <code class="xref py py-func docutils literal notranslate"><span class="pre">run</span></code> function. The quantum job not only contains the circuit to
 be simulated, but also simulation instructions and information of the vQPU to which the job
 is sent. This class has a main attribute: <a class="reference internal" href="#cunqa.qjob.QJob.result" title="cunqa.qjob.QJob.result"><code class="xref py py-attr docutils literal notranslate"><span class="pre">QJob.result</span></code></a> which stores the information
 about the execution.</p>
@@ -252,7 +252,7 @@ This parameter update is done using the <a class="reference internal" href="#cun
 First it checks weather the prior simulation’s result was retrieved. If not, it is discarded,
 and the new set of parameters is sent to the server to be reassigned to the circuit for
 simulation. This method can be used on a loop, carefully saving the intermediate results.
-Also, this method is used by the class <a class="reference internal" href="cunqa.mappers.html#cunqa.tools.mappers.QJobMapper" title="cunqa.tools.mappers.QJobMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code></a>, check out its
+Also, this method is used by the class <code class="xref py py-class docutils literal notranslate"><span class="pre">QJobMapper</span></code>, check out its
 documentation for a extensive description.</p>
 <p>There are two ways of passing new parameters. First, as a <strong>list</strong> with the corresponding
 values in the order of the gates in the circuit, in which case missing parameters will
@@ -293,7 +293,7 @@ corresponding new values.</p>
 <dt class="sig sig-object py" id="cunqa.qjob.ResultBuffer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ResultBuffer</span></span><a class="headerlink" href="#cunqa.qjob.ResultBuffer" title="Link to this definition"></a></dt>
 <dd><p>Router of the results coming from a vQPU that is shared by several <a class="reference internal" href="#cunqa.qjob.QJob" title="cunqa.qjob.QJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">QJob</span></code></a> objects.</p>
-<p>Every <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a> holds a single <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>, therefore
+<p>Every <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code> holds a single <code class="xref py py-class docutils literal notranslate"><span class="pre">QClient</span></code>, therefore
 all the jobs sent to that vQPU read from the same socket: the result that arrives first is
 handed to whoever asks first, no matter which job it belongs to. To avoid such a mix up, the
 quantum tasks travel with the id of their circuit and the vQPU stamps that id back on the
@@ -304,7 +304,7 @@ instead of going to the socket again.</p>
 given to the caller, falling back to the FIFO behaviour.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>One buffer is created per <a class="reference internal" href="cunqa.qpu.html#cunqa.qpu.QPU" title="cunqa.qpu.QPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code></a>, since the ordering problem it solves
+<p>One buffer is created per <code class="xref py py-class docutils literal notranslate"><span class="pre">QPU</span></code>, since the ordering problem it solves
 only exists among the jobs that share a connection.</p>
 </div>
 </dd></dl>
