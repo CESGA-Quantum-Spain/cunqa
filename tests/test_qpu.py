@@ -346,6 +346,8 @@ def _subprocess_run_side_effect_ok(job_id="12345"):
         # squeue calls
         proc = Mock()
         proc.stdout = "RUNNING\n"
+        proc.stderr = ""
+        proc.returncode = 0
         return proc
     return _side_effect
 
@@ -473,6 +475,69 @@ def test_qraise_waits_until_qpus_are_registered(monkeypatch):
 
     assert read_mock.call_count >= 2
     assert result == "77777"
+
+
+# --- Job ending or never registering its QPUs ---
+
+def _subprocess_run_side_effect_states(job_id: str, squeue_results):
+    """
+    Like :py:func:`_subprocess_run_side_effect_ok`, but the successive squeue calls return the
+    given ``(stdout, stderr, returncode)`` tuples, repeating the last one.
+    """
+    results = iter(squeue_results)
+    last = [None]
+    def _side_effect(*args, **kwargs):
+        proc = Mock()
+        if kwargs.get("shell", False):  # qraise call
+            proc.stdout = f"{job_id};my_cluster\n"
+            proc.returncode = 0
+            return proc
+        if args[0][0] == "scancel":
+            proc.returncode = 0
+            return proc
+        last[0] = next(results, last[0])
+        proc.stdout, proc.stderr, proc.returncode = last[0]
+        return proc
+    return _side_effect
+
+
+@pytest.mark.parametrize("squeue_results", [
+    [("PENDING\n", "", 0), ("", "", 0)],                                     # left the queue
+    [("PENDING\n", "", 0), ("FAILED\n", "", 0)],                            # failed
+    [("RUNNING\n", "", 0), ("", "slurm_load_jobs error: Invalid job id specified", 1)], # purged
+])
+def test_qraise_raises_if_job_ends_before_registering(monkeypatch, squeue_results):
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: {})
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
+    monkeypatch.setattr(qpu_mod.subprocess, "run",
+                        Mock(side_effect=_subprocess_run_side_effect_states("11111", squeue_results)))
+
+    with pytest.raises(RuntimeError, match="11111"):
+        qraise(2, "00:05:00")
+
+
+def test_qraise_retries_on_transient_squeue_error(monkeypatch):
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: {"22222_0": {}})
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
+    run_mock = Mock(side_effect=_subprocess_run_side_effect_states(
+        "22222", [("", "slurm_load_jobs error: Socket timed out", 1), ("RUNNING\n", "", 0)]))
+    monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
+
+    assert qraise(1, "00:05:00") == "22222"
+
+
+def test_qraise_timeout_cancels_job(monkeypatch):
+    monkeypatch.setattr(qpu_mod, "read_qpus", lambda *_: {})
+    monkeypatch.setattr(qpu_mod.time, "sleep", lambda *_: None)
+    clock = iter(range(0, 1000, 10))
+    monkeypatch.setattr(qpu_mod.time, "monotonic", lambda: next(clock))
+    run_mock = Mock(side_effect=_subprocess_run_side_effect_states("33333", [("RUNNING\n", "", 0)]))
+    monkeypatch.setattr(qpu_mod.subprocess, "run", run_mock)
+
+    with pytest.raises(TimeoutError, match="33333"):
+        qraise(1, "00:05:00", timeout=30)
+
+    run_mock.assert_any_call(["scancel", "33333"])
 
 
 # --- subprocess error handling ---

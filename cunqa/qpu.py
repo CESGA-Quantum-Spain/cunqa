@@ -336,6 +336,9 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         return None
 
 
+# Slurm states in which the qraise job may still register its vQPUs
+_ALIVE_JOB_STATES = {"PENDING", "CONFIGURING", "RUNNING", "REQUEUED", "RESIZING", "SUSPENDED"}
+
 def qraise(n, t, *, 
            classical_comm = False, 
            quantum_comm = False,  
@@ -352,7 +355,8 @@ def qraise(n, t, *,
            partition = None,
            gpu = False,
            gpu_name = None,
-           qmio = False
+           qmio = False,
+           timeout = None
         ) -> str:
     """
     Raises vQPUs and returns the family name associated them. This function raises 
@@ -385,6 +389,12 @@ def qraise(n, t, *,
         gpu_name (str): name of the GPU to execute on.
         qmio (bool): if ``True``, deploys the real QMIO quantum computer at CESGA, enabling hybrid
                      DQC infrastructures.
+        timeout (float): maximum seconds to wait for the vQPUs to be registered. If exceeded, the
+                         job is cancelled and a ``TimeoutError`` is raised. Default waits with no
+                         limit while the job is alive.
+
+    Raises:
+        RuntimeError: if the job ends before all the vQPUs are registered.
     """
     logger.debug("Setting up the requested QPUs...")
     command = f"qraise -n {n} -t {t}"
@@ -447,21 +457,36 @@ def qraise(n, t, *,
     job_id = output.split(";", 1)[0]
 
     cmd_getstate = ["squeue", "-h", "-j", job_id, "-o", "%T"]
-    
+    # setup_qpus registers the vQPUs of the default family under the job id
+    registry_family = job_id if family in (None, "default") else family
+    start = time.monotonic()
+
     while True:
-        state = subprocess.run(
-            cmd_getstate, 
-            capture_output = True, 
-            text = True, 
-            check = True
-        ).stdout.strip()
+        squeue = subprocess.run(cmd_getstate, capture_output = True, text = True)
+        if squeue.returncode != 0 and "Invalid job id" not in squeue.stderr:
+            # Transient failure of squeue, retry
+            state = None
+        else:
+            # An empty state (or an invalid job id) means the job is no longer in the queue
+            state = squeue.stdout.strip()
+
         if state == "RUNNING":
-            # setup_qpus registers the vQPUs of the default family under the job id
-            registry_family = job_id if family in (None, "default") else family
             data = read_qpus(registry_family)
             count = sum(1 for key in data if key.startswith(job_id))
             if count == n:
                 break
+        elif state is not None and state not in _ALIVE_JOB_STATES:
+            raise RuntimeError(
+                f"qraise job {job_id} ended ({state or 'not in queue'}) before registering "
+                f"the {n} vQPUs. Check its log file qraise_{job_id}."
+            )
+
+        if timeout is not None and time.monotonic() - start > timeout:
+            subprocess.run(["scancel", job_id])
+            raise TimeoutError(
+                f"The {n} vQPUs of job {job_id} were not registered within {timeout} s, "
+                f"the job has been cancelled."
+            )
         # We do this to prevent an overload of the Slurm deamon 
         time.sleep(1)
 
