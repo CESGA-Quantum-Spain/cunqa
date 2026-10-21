@@ -15,8 +15,9 @@ namespace cunqa {
 inline std::string get_cunqa_path() { return get_env_variable("STORE") + "/.cunqa"; }
 
 inline const std::string INSTALL_PATH = "@CMAKE_INSTALL_PREFIX@";
-inline const std::string QPUS_FILEPATH = get_cunqa_path() + "/qpus.json";
-inline const std::string COMM_FILEPATH = get_cunqa_path() + "/communications.json";
+// Registry directories, see utils/registry.hpp
+inline const std::string QPUS_DIR = get_cunqa_path() + "/qpus";
+inline const std::string COMM_DIR = get_cunqa_path() + "/communications";
 
 inline constexpr std::array<std::string_view, 7> SUPPORTED_SIMPLE_SIMULATORS = {"Aer", "Cunqa", "Munich", "Maestro", "Qsim", "Quest", "Qulacs"};
 inline constexpr std::array<std::string_view, 7> SUPPORTED_CC_SIMULATORS = {"Aer", "Cunqa", "Munich", "Maestro", "Qsim", "Quest", "Qulacs"};

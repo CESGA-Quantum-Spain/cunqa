@@ -12,8 +12,7 @@
 #include <filesystem>
 
 #include "argparse/argparse.hpp"
-#include "utils/constants.hpp"
-#include "utils/json.hpp"
+#include "utils/registry.hpp"
 
 using namespace std::literals;
 
@@ -24,14 +23,6 @@ struct CunqaArgs : public argparse::Args
     bool &remove_logs                               = flag("rm, remove_logs", "Logs files in current directory with name qraise_XXXXXX will be deleted.");
     bool &all                                       = flag("all", "All qraise jobs will be dropped.");
 };
-
-cunqa::JSON read_qpus_json() 
-{
-    std::ifstream in(cunqa::QPUS_FILEPATH);
-    cunqa::JSON j;
-    in >> j;
-    return j;
-}
 
 std::vector<std::string> get_qpus_ids(const cunqa::JSON& jobs)
 {
@@ -50,22 +41,20 @@ std::vector<std::string> get_qpus_ids(const cunqa::JSON& jobs)
     return ids;
 }
 
-std::vector<std::string> find_family_id(const cunqa::JSON& qpus, std::vector<std::string> target_families) {
+std::vector<std::string> find_family_id(const std::vector<std::string>& target_families) {
     std::vector<std::string> ids;
 
     for (const auto& target_family: target_families) {
+        // Kept in a variable: the range-for would not extend the lifetime of the temporary behind items()
+        const auto qpus = cunqa::read_qpus(target_family);
         for (const auto& [key, entry] : qpus.items()) {
             if (!entry.is_object()) continue;
 
-            auto itFam = entry.find("family");
             auto itJob = entry.find("slurm_job_id");
-            if (itFam == entry.end() || itJob == entry.end()) continue;
+            if (itJob == entry.end()) continue;
 
-            std::string fam = itFam->get<std::string>();
-            if (fam == target_family) {
-                ids.push_back(itJob->get<std::string>());
-                break;
-            }
+            ids.push_back(itJob->get<std::string>());
+            break;
         }
     }
 
@@ -89,13 +78,11 @@ void removeJobs(
               << job_ids_str
               << "\033[0m" << "\n";
 
-    // In case the qpus.json is not correctly removed
+    // In case the registry entries are not correctly removed by the epilog
     if (all) {
-        auto left_jobs = read_qpus_json();
-        if(size(left_jobs)) {
-            std::ofstream ofs(cunqa::QPUS_FILEPATH, std::ios::trunc);
-            ofs << "{}";
-        }
+        std::error_code ec;
+        std::filesystem::remove_all(cunqa::QPUS_DIR, ec);
+        std::filesystem::remove_all(cunqa::COMM_DIR, ec);
     }
 
     if (remove_logs) {
@@ -129,14 +116,14 @@ int main(int argc, char* argv[])
     auto args = argparse::parse<CunqaArgs>(argc, argv);
 
     if (args.all) {
-        auto ids = get_qpus_ids(read_qpus_json());
+        auto ids = get_qpus_ids(cunqa::read_qpus());
 
         if (size(ids)) 
-            removeJobs(ids, args.remove_logs);
+            removeJobs(ids, args.remove_logs, true);
         else
             return EXIT_FAILURE;
     } else if (args.ids.has_value() && !args.family.has_value()) {
-        auto ids = get_qpus_ids(read_qpus_json());
+        auto ids = get_qpus_ids(cunqa::read_qpus());
 
         std::unordered_set<std::string> keep(args.ids.value().begin(), args.ids.value().end());
         auto ids_rng = ids | std::views::filter([&](const std::string& id){ return keep.count(id); });
@@ -150,7 +137,7 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
     } else if (!args.ids.has_value() && args.family.has_value()) {
-        auto ids = find_family_id(read_qpus_json(), args.family.value());
+        auto ids = find_family_id(args.family.value());
 
         if (size(ids)) 
             removeJobs(ids, args.remove_logs);

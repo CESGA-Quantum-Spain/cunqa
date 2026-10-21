@@ -14,7 +14,7 @@
 #include "dynamic_circuit/instruction_type.hpp"
 #include "dynamic_circuit/dynamic_circuit.hpp"
 #include "utils/helpers/environment.hpp"
-#include "utils/constants.hpp"
+#include "utils/registry.hpp"
 
 #include "comm_managers/qc_manager.hpp"
 #include "comm_managers/cc_manager.hpp"
@@ -332,10 +332,10 @@ QCExecutor::QCExecutor(
 
     poll_until_([&] {
         qpus_ids_.clear();
-        const auto communications = read_file(COMM_FILEPATH);
-        for (const auto& [qpu_id, value] : communications.items())
-            if (slurm_job_id == qpu_id.substr(0, qpu_id.find('_')))
-                qpus_ids_.push_back(qpu_id);
+        const auto communications = read_dir(comm_dirpath(slurm_job_id));
+        for (const auto& [id, value] : communications.items())
+            if (id != slurm_job_id + "_executor")
+                qpus_ids_.push_back(id);
         return qpus_ids_.size() == n_qpus;
     }, "QPU communication entries");
 
@@ -348,7 +348,7 @@ QCExecutor::QCExecutor(
     JSON backends;
     poll_until_([&] {
         backends.clear();
-        const auto all_backends = read_file(QPUS_FILEPATH);
+        const auto all_backends = read_qpus();
         for (const auto& [qpu_id, value] : all_backends.items()) {
             if (std::find(qpus_ids_.begin(), qpus_ids_.end(), qpu_id) != qpus_ids_.end())
                 backends[qpu_id] = value;

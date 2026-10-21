@@ -3,25 +3,20 @@
 #include <algorithm>
 #include <ranges>
 
-#include "utils/constants.hpp"
-#include "utils/json.hpp"
+#include "utils/registry.hpp"
 #include "logger.hpp"
 
 enum class Communications { NC, CC, QC };
 
-bool exists_family_name(const std::string& family, const std::string& info_path)
+bool exists_family_name(const std::string& family)
 {
-    try {
-        auto qpus_json = cunqa::read_file(info_path);
-        for (auto& [key, value] : qpus_json.items()) {
-            if (value["family"] == family)
-                return true;
-        }
-    } catch (const std::exception& e) {
-        LOGGER_DEBUG("The qpus.json file was completely empty. An empty json will be written on it.");
-        cunqa::write_on_file({}, info_path);
-    }
-    return false;
+    return !cunqa::read_qpus(family).empty();
+}
+
+// The family name is used as the name of its registry directory
+bool valid_family_name(const std::string& family)
+{
+    return !family.empty() && family[0] != '.' && family.find('/') == std::string::npos;
 }
 
 bool communication_supported_by_simulator(const std::string& simulator, const Communications& scheme) 

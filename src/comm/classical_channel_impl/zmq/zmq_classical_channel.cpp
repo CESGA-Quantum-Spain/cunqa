@@ -9,7 +9,7 @@
 #include "comm/classical_channel.hpp"
 #include "utils/helpers/net_functions.hpp"
 
-#include "utils/json.hpp"
+#include "utils/registry.hpp"
 #include "logger.hpp"
 
 namespace cunqa {
@@ -109,7 +109,7 @@ ClassicalChannel::~ClassicalChannel() = default;
 void ClassicalChannel::publish()
 {
     JSON endpoint_json = { {"endpoint", endpoint}, {"rank", getenv("SLURM_PROCID")} };
-    write_on_file(endpoint_json, COMM_FILEPATH, qpu_id);
+    write_file(endpoint_json, comm_filepath(qpu_id));
 }
 
 
@@ -118,8 +118,12 @@ void ClassicalChannel::publish()
 //--------------------------------------------------
 void ClassicalChannel::connect(const std::string& qpu_id) 
 {
-    if(!communications.contains(qpu_id))
-        communications = read_file(COMM_FILEPATH);
+    if(!communications.contains(qpu_id)) {
+        auto endpoint_info = read_file(comm_filepath(qpu_id));
+        if (endpoint_info.is_null())
+            throw std::runtime_error("No communication endpoint published for " + qpu_id + ".");
+        communications[qpu_id] = std::move(endpoint_info);
+    }
 
     auto endpoint = communications.at(qpu_id).at("endpoint").get<std::string>();
     pimpl_->connect(endpoint, qpu_id);

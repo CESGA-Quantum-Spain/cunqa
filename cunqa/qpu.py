@@ -29,9 +29,9 @@ from cunqa.qclient import QClient
 from cunqa.circuit import CunqaCircuit, to_ir
 from cunqa.real_qpus.qmioclient import QMIOClient
 from cunqa.qjob import QJob, ResultBuffer
-from cunqa.utils import read_json, write_json
+from cunqa.utils import read_json_dir
 from cunqa.utils.logger import logger
-from cunqa.utils.constants import QPUS_FILEPATH, REMOTE_GATES
+from cunqa.utils.constants import REMOTE_GATES, QPUS_DIR
 
 class Backend(TypedDict):
     """
@@ -259,6 +259,28 @@ def run(
         return qjobs[0]
     return qjobs
 
+def qpu_filepath(family: str, qpu_id: str) -> str:
+    """Path of the registry file of a vQPU: ``QPUS_DIR/<family>/<qpu_id>.json``."""
+    return os.path.join(QPUS_DIR, family, f"{qpu_id}.json")
+
+def read_qpus(family: Optional[str] = None) -> dict:
+    """
+    Returns ``{<qpu_id>: <qpu info>}`` for the vQPUs of a family, or of all families if none is
+    given. Each vQPU is registered in its own file (``QPUS_DIR/<family>/<qpu_id>.json``) written
+    only by itself, so no locks are needed.
+    """
+    if family is not None:
+        return read_json_dir(os.path.join(QPUS_DIR, family))
+
+    qpus = {}
+    try:
+        families = os.listdir(QPUS_DIR)
+    except FileNotFoundError:
+        return qpus
+    for family_dir in families:
+        qpus.update(read_json_dir(os.path.join(QPUS_DIR, family_dir)))
+    return qpus
+
 def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU]:
     """
     Returns :py:class:`~cunqa.qpu.QPU` objects corresponding to the vQPUs raised by the user. It 
@@ -268,8 +290,8 @@ def get_QPUs(co_located: bool = False, family: Optional[str] = None) -> list[QPU
         co_located (bool): if ``False``, filters by the vQPUs available at the local node.
         family (str): filters vQPUs by their family name.    
     """
-    # access raised QPUs information on qpu.json file
-    qpus_json = read_json(QPUS_FILEPATH)
+    # access raised QPUs information on the registry
+    qpus_json = read_qpus(family)
     if len(qpus_json) == 0:
         logger.warning(f"No QPUs were found.")
         return None
@@ -400,9 +422,6 @@ def qraise(n, t, *,
     if qmio:
         command = command + " --qmio"
 
-    if not os.path.exists(QPUS_FILEPATH):
-        write_json(QPUS_FILEPATH, {})
-
     print(f"Requested QPUs with command:\n\t{command}")
 
         #run the command on terminal and capture its output on the variable 'output'
@@ -437,7 +456,9 @@ def qraise(n, t, *,
             check = True
         ).stdout.strip()
         if state == "RUNNING":
-            data = read_json(QPUS_FILEPATH)
+            # setup_qpus registers the vQPUs of the default family under the job id
+            registry_family = job_id if family in (None, "default") else family
+            data = read_qpus(registry_family)
             count = sum(1 for key in data if key.startswith(job_id))
             if count == n:
                 break

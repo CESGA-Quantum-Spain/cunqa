@@ -11,9 +11,10 @@ from queue import Queue
 from typing import Optional
 
 from cunqa.qclient import json_to_qasm2
-from cunqa.utils.constants import QPUS_FILEPATH, LIBS_DIR
+from cunqa.utils.constants import LIBS_DIR
 from cunqa.utils.logger import logger
 from cunqa.utils import write_json
+from cunqa.qpu import qpu_filepath
 
 try:
     sys.path.append(LIBS_DIR)
@@ -124,8 +125,7 @@ class QMIOLinker:
 
         name = f"{os.getenv('SLURM_JOB_ID')}_{os.getenv('SLURM_TASK_PID')}"
         qmio_config = _get_qmio_config(family, self.endpoint)
-        payload = {name: qmio_config}
-        write_json(QPUS_FILEPATH, payload)
+        write_json(qpu_filepath(family, name), qmio_config)
 
     def run(self):
         """

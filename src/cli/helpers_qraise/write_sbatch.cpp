@@ -176,7 +176,11 @@ void write_sbatch(std::ofstream& sbatchFile, const CunqaArgs& args)
             " is not available for " + get_communications_name(scheme) + 
             " communications simulation. Aborting.");
 
-    if (exists_family_name(args.family, cunqa::QPUS_FILEPATH))
+    if (!valid_family_name(args.family))
+        throw std::invalid_argument("Invalid family name " + args.family + 
+            ": it can not be empty, start with '.' or contain '/'.");
+
+    if (exists_family_name(args.family))
         throw std::runtime_error("There are QPUs with the same family name as the provided: " +
             args.family + ".");
 

@@ -3,7 +3,7 @@
 Tests for :py:mod:`cunqa.utils.file_utils`.
 
 Template covering :py:func:`~cunqa.utils.file_utils.read_json` and
-:py:func:`~cunqa.utils.file_utils.write_json`. These helpers do real (locked) file I/O, so
+:py:func:`~cunqa.utils.file_utils.write_json`. These helpers do real file I/O, so
 the tests use pytest's ``tmp_path`` fixture rather than mocking ``open``.
 """
 import os, sys
@@ -18,7 +18,7 @@ else:
     HOME = os.getenv("HOME")
     sys.path.insert(0, HOME)
 
-from cunqa.utils.file_utils import read_json, write_json
+from cunqa.utils.file_utils import read_json, write_json, read_json_dir
 
 
 # ------------------------
@@ -64,3 +64,27 @@ def test_read_json_invalid_json_returns_none(tmp_path):
     filepath.write_text("{not valid json", encoding="utf-8")
 
     assert read_json(str(filepath)) is None
+
+
+def test_write_json_leaves_no_temporary_files(tmp_path):
+    write_json(str(tmp_path / "data.json"), {"x": 1})
+
+    assert os.listdir(tmp_path) == ["data.json"]
+
+
+# ------------------------
+# read_json_dir
+# ------------------------
+
+def test_read_json_dir_missing_directory_returns_empty(tmp_path):
+    assert read_json_dir(str(tmp_path / "does_not_exist")) == {}
+
+
+def test_read_json_dir_skips_hidden_non_json_and_invalid_files(tmp_path):
+    write_json(str(tmp_path / "a.json"), {"x": 1})
+    write_json(str(tmp_path / "b.json"), {"y": 2})
+    (tmp_path / ".tmp_123").write_text('{"z": 3}', encoding="utf-8")
+    (tmp_path / "notes.txt").write_text("hello", encoding="utf-8")
+    (tmp_path / "broken.json").write_text("{not valid json", encoding="utf-8")
+
+    assert read_json_dir(str(tmp_path)) == {"a": {"x": 1}, "b": {"y": 2}}

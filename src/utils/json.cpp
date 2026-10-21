@@ -8,103 +8,15 @@
 #include <cerrno>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
-#include <climits>
 
 #include "json.hpp"
 
+namespace fs = std::filesystem;
+
 namespace {
-
-    // Returns the absolute path of `path`. Throws on failure.
-    std::string absolute_path_of(const std::string& path)
-    {
-        char buf[PATH_MAX];
-        // realpath requires the file to exist; if it doesn't, resolve the
-        // parent directory instead and re-append the basename.
-        if (realpath(path.c_str(), buf) != nullptr) {
-            return std::string(buf);
-        }
-
-        auto pos = path.find_last_of('/');
-        std::string dir = (pos == std::string::npos) ? "." :
-                           (pos == 0 ? "/" : path.substr(0, pos));
-        std::string base = (pos == std::string::npos) ? path : path.substr(pos + 1);
-
-        if (realpath(dir.c_str(), buf) == nullptr) {
-            perror("realpath");
-            throw std::runtime_error("Failed to resolve path: " + path);
-        }
-        std::string resolved_dir(buf);
-        if (resolved_dir == "/") return resolved_dir + base;
-        return resolved_dir + "/" + base;
-    }
-
-    // Small non-cryptographic 64-bit hash (FNV-1a), good enough to
-    // disambiguate lock filenames; not security-sensitive.
-    // NOTE: must stay identical to _fnv1a_hex() in cunqa/utils/file_utils.py
-    // so the Python and C++ sides derive the same lock filename for a file.
-    std::string fnv1a_hex(const std::string& s)
-    {
-        uint64_t h = 14695981039346656037ULL; // FNV-64 offset basis (0xcbf29ce484222325)
-        for (unsigned char c : s) {
-            h ^= c;
-            h *= 1099511628211ULL; // FNV-64 prime (0x100000001b3)
-        }
-        char buf[17];
-        std::snprintf(buf, sizeof(buf), "%016llx", static_cast<unsigned long long>(h));
-        return std::string(buf, 16);
-    }
-
-    std::string basename_of(const std::string& path)
-    {
-        auto pos = path.find_last_of('/');
-        return (pos == std::string::npos) ? path : path.substr(pos + 1);
-    }
-
-    // Creates a directory, including parents, equivalent to `mkdir -p`.
-    void mkdir_p(const std::string& path, mode_t mode = 0755)
-    {
-        if (path.empty() || path == "/") return;
-
-        std::string current;
-        size_t pos = (path[0] == '/') ? 1 : 0;
-        if (path[0] == '/') current = "/";
-
-        while (pos <= path.size()) {
-            size_t next = path.find('/', pos);
-            std::string segment = path.substr(pos, next == std::string::npos ? std::string::npos : next - pos);
-            if (!segment.empty()) {
-                current += segment;
-                if (mkdir(current.c_str(), mode) == -1 && errno != EEXIST) {
-                    perror("mkdir");
-                    throw std::runtime_error("Failed to create directory: " + current);
-                }
-                current += "/";
-            }
-            if (next == std::string::npos) break;
-            pos = next + 1;
-        }
-    }
-
-    std::string lock_dir()
-    {
-        const char* store = std::getenv("STORE");
-        if (store == nullptr) {
-            throw std::runtime_error("Environment variable STORE is not set");
-        }
-        std::string dir = std::string(store) + "/.cunqa/locks";
-        mkdir_p(dir);
-        return dir;
-    }
-
-    std::string lock_path_of(const std::string& filename)
-    {
-        const std::string abspath = absolute_path_of(filename);
-        const std::string base = basename_of(abspath);
-        const std::string digest = fnv1a_hex(abspath);
-        return lock_dir() + "/" + base + "." + digest + ".lock";
-    }
 
     std::string directory_of(const std::string& path)
     {
@@ -112,42 +24,6 @@ namespace {
         if (pos == std::string::npos) return ".";
         if (pos == 0) return "/";
         return path.substr(0, pos);
-    }
-
-    int open_lock(const std::string& filename)
-    {
-        const std::string lp = lock_path_of(filename);
-        int fd = open(lp.c_str(), O_RDWR | O_CREAT, 0666);
-        if (fd == -1) {
-            perror("open - lock file");
-            throw std::runtime_error("Failed to open lock file: " + lp);
-        }
-
-        return fd;
-    }
-
-    enum class LockMode { Read, Write };
-
-    struct flock lock(const int& fd, const LockMode& mode)
-    {
-        struct flock fl;
-        fl.l_type = (mode == LockMode::Write) ? F_WRLCK : F_RDLCK;
-        fl.l_whence = SEEK_SET;
-        fl.l_start = 0;
-        fl.l_len = 0; // Lock entire file
-
-        if (fcntl(fd, F_SETLKW, &fl) == -1) {
-            perror("fcntl - lock");
-            throw std::runtime_error("Failed to acquire file lock");
-        }
-        return fl;
-    }
-
-    void unlock(const int& fd, struct flock& fl)
-    {
-        fl.l_type = F_UNLCK;
-        if (fcntl(fd, F_SETLK, &fl) == -1)
-            perror("fcntl - unlock");
     }
 
     cunqa::JSON read_data(const std::string& filename)
@@ -194,6 +70,11 @@ namespace {
         output.push_back('\n');
 
         const std::string dir = directory_of(filename);
+        std::error_code ec;
+        fs::create_directories(dir, ec);
+        if (ec)
+            throw std::runtime_error("Failed to create directory " + dir + ": " + ec.message());
+
         std::string tmpl = dir + "/.tmp_XXXXXX";
         std::vector<char> tmpl_buf(tmpl.begin(), tmpl.end());
         tmpl_buf.push_back('\0');
@@ -255,71 +136,40 @@ namespace cunqa {
 
 JSON read_file(const std::string &filename)
 {
-    int lock_fd = -1;
     try {
-        lock_fd = open_lock(filename);
-        auto fl = lock(lock_fd, LockMode::Read);
-        auto j = read_data(filename);
-        unlock(lock_fd, fl);
-        close(lock_fd);
-        return j;
+        return read_data(filename);
     } catch (const std::exception &e) {
-        if (lock_fd != -1) close(lock_fd);
-        std::string msg =
-            "Error reading JSON safely using POSIX (fcntl) locks.\nSystem message: ";
-        throw std::runtime_error(msg + e.what());
-    }
-
-    return {};
-}
-
-void write_on_file(JSON local_data, const std::string &filename, const std::string &id)
-{
-    int lock_fd = -1;
-    try {
-        lock_fd = open_lock(filename);
-        auto fl = lock(lock_fd, LockMode::Write);
-        auto j = read_data(filename);
-
-        j[id] = local_data;
-
-        write_data_atomic(filename, j);
-        unlock(lock_fd, fl);
-        close(lock_fd);
-    } catch (const std::exception &e) {
-        if (lock_fd != -1) close(lock_fd);
-        std::string msg =
-            "Error writing JSON safely using POSIX (fcntl) locks.\nSystem message: ";
-        throw std::runtime_error(msg + e.what());
+        throw std::runtime_error("Error reading JSON file " + filename + ".\nSystem message: " + e.what());
     }
 }
 
-void remove_from_file(const std::string &filename, const std::string &rm_key)
+void write_file(const JSON& data, const std::string &filename)
 {
-    int lock_fd = -1;
     try {
-        lock_fd = open_lock(filename);
-        auto fl = lock(lock_fd, LockMode::Write);
-        auto j = read_data(filename);
-
-        JSON out = JSON::object();
-        for (auto it = j.begin(); it != j.end(); ++it) {
-            const std::string& key = it.key();
-            bool starts_with = key.rfind(rm_key, 0) == 0;
-            if (!starts_with) {
-                out[it.key()] = it.value();
-            }
-        }
-
-        write_data_atomic(filename, out);
-        unlock(lock_fd, fl);
-        close(lock_fd);
+        write_data_atomic(filename, data);
     } catch (const std::exception &e) {
-        if (lock_fd != -1) close(lock_fd);
-        std::string msg =
-            "Error writing JSON safely using POSIX (fcntl) locks.\nSystem message: ";
-        throw std::runtime_error(msg + e.what());
+        throw std::runtime_error("Error writing JSON file " + filename + ".\nSystem message: " + e.what());
     }
+}
+
+JSON read_dir(const std::string &dirname)
+{
+    JSON out = JSON::object();
+    std::error_code ec;
+    fs::directory_iterator it(dirname, ec), end;
+
+    // The directory may not exist yet, or be removed while iterating (e.g. by the epilog)
+    for (; !ec && it != end; it.increment(ec)) {
+        const auto& path = it->path();
+        const std::string name = path.filename().string();
+        if (name.empty() || name[0] == '.' || path.extension() != ".json")
+            continue;
+
+        auto content = read_file(path.string());
+        if (!content.is_null()) // Removed between listing and reading
+            out[path.stem().string()] = std::move(content);
+    }
+    return out;
 }
 
 } // End of cunqa namespace

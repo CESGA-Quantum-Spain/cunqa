@@ -25,10 +25,12 @@ target_sources(json
     BASE_DIRS "${CMAKE_SOURCE_DIR}/src"
     FILES
       "${CMAKE_SOURCE_DIR}/src/utils/json.hpp"
+      "${CMAKE_SOURCE_DIR}/src/utils/registry.hpp"
 )
 target_link_libraries(json 
     PUBLIC 
         nlohmann_json::nlohmann_json
+        constants
     PRIVATE 
         Threads::Threads
 )

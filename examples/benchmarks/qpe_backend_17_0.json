@@ -1,0 +1,8 @@
+{
+    "name": "qpe_backend_17_0",
+    "description": "Backend with 17 data qubits and 0 communication qubits.",
+    "num_qubits": [
+        17,
+        0
+    ]
+}

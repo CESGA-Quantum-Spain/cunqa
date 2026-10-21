@@ -44,7 +44,7 @@ and which communication schemes, noise and GPU execution they support.
 Configuration and files
 -----------------------
 CUNQA stores the state of the deployed :term:`vQPUs <vQPU>` on disk. The :doc:`configuration` page describes the
-``$STORE/.cunqa`` directory, the ``qpus.json`` registry read by ``qinfo``/``qdrop``/``get_QPUs``,
+``$STORE/.cunqa`` directory, the vQPU registry read by ``qinfo``/``qdrop``/``get_QPUs``,
 and how to recover from stale state.
 
 .. toctree::

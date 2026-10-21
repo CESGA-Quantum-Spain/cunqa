@@ -3,7 +3,7 @@
 
 #include "classical_channel.hpp"
 #include "utils/helpers/net_functions.hpp"
-#include "utils/json.hpp"
+#include "utils/registry.hpp"
 
 #include "logger.hpp"
 
@@ -77,7 +77,7 @@ void ClassicalChannel::publish()
     {
         {"endpoint", endpoint}
     };
-    write_on_file(endpoint, COMM_FILEPATH, qpu_id);
+    write_file(endpoint, comm_filepath(qpu_id));
 }
 
 void connect(const std::string& qpu_id)
