@@ -115,7 +115,7 @@ def test_init_binds_connects_writes_config(monkeypatch):
     monkeypatch.setattr(qmio_linked_mod, "write_json", write_json)
     monkeypatch.setattr(qmio_linked_mod, "ZMQ_ENDPOINT", "tcp://127.0.0.1:5555")
     monkeypatch.setenv("SLURM_JOB_ID", "393219")
-    monkeypatch.setenv("SLURM_TASK_PID", "7")
+    monkeypatch.setenv("SLURM_PROCID", "7")
 
     linker = qmio_linked_mod.QMIOLinker("famX")
 

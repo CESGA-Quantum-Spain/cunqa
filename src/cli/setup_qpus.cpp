@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     QPU qpu(
         make_backend(make_simulator(sim_arg), communications, backend_json), 
         mode, 
-        get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID"), 
+        get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_PROCID"), 
         family
     );
     qpu.turn_ON();

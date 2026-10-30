@@ -123,7 +123,7 @@ class QMIOLinker:
         self.qmio_comm_socket = self.context.socket(zmq.REQ)
         self.qmio_comm_socket.connect(ZMQ_ENDPOINT)
 
-        name = f"{os.getenv('SLURM_JOB_ID')}_{os.getenv('SLURM_TASK_PID')}"
+        name = f"{os.getenv('SLURM_JOB_ID')}_{os.getenv('SLURM_PROCID')}"
         qmio_config = _get_qmio_config(family, self.endpoint)
         write_json(qpu_filepath(family, name), qmio_config)
 

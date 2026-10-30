@@ -260,27 +260,23 @@ def benchmark(config, args):
 
     print(f"\n=== {config}: {n_qpus} vQPUs, {shots} shots/vQPU, {args.reps} repetitions ===")
 
-    # 1. QPU deployment. Without communications the vQPUs are independent, so they are raised as one
-    # single-node family per group of qpus_per_node, one after another: vQPUs of several nodes
-    # registering at the same time in qpus.json (on NFS) lose entries and qraise never returns.
-    if config.startswith("nocomm") and cfg.get("qpus_per_node"):
-        group_sizes = [min(cfg["qpus_per_node"], n_qpus - i)
-                       for i in range(0, n_qpus, cfg["qpus_per_node"])]
-    else:
-        group_sizes = [n_qpus]
+    # 1. QPU deployment
+    if cfg.get("qpus_per_node") and cfg.get("n_nodes") is None:
+        cfg["n_nodes"] = -(-n_qpus // cfg["qpus_per_node"])
 
     families, wall_times, sim_times, phases = [], [], [], []
     try:
-        for g, group_size in enumerate(group_sizes):
-            families.append(qraise(group_size, cfg["time"],
-                                   simulator     = args.simulator,
-                                   co_located    = True,
-                                   cores_per_qpu = cfg.get("cores_per_qpu"),
-                                   mem_per_qpu   = cfg.get("mem_per_qpu"),
-                                   n_nodes       = cfg.get("n_nodes"),
-                                   partition     = args.partition,
-                                   family        = f"qpe_bench_{config}_{g}",
-                                   **raise_kwargs))
+        families.append(qraise(n_qpus, cfg["time"],
+                               simulator     = args.simulator,
+                               co_located    = True,
+                               cores_per_qpu = cfg.get("cores_per_qpu"),
+                               mem_per_qpu   = cfg.get("mem_per_qpu"),
+                               n_nodes       = cfg.get("n_nodes"),
+                               qpus_per_node = cfg.get("qpus_per_node"),
+                               node_list     = args.node_list,
+                               partition     = args.partition,
+                               family        = f"qpe_bench_{config}",
+                               **raise_kwargs))
 
         qpus = [qpu for family in families for qpu in get_QPUs(co_located=True, family=family)]
         if config == "qucomm":
@@ -347,6 +343,7 @@ def main():
     parser.add_argument("--n-nodes", dest="n_nodes", type=int, default=None)
     parser.add_argument("--qpus-per-node", dest="qpus_per_node", type=int, default=None)
     parser.add_argument("--partition", default=None)
+    parser.add_argument("--node-list", dest="node_list", default=None, help="Nodes for qraise.")
     parser.add_argument("--simulator", default="Aer")
     parser.add_argument("--output", default=None, help="JSON file with the raw results.")
     args = parser.parse_args()

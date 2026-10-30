@@ -11,7 +11,7 @@ namespace sim {
 class QCBackend final : public Backend {
 public:
     QCBackend(std::unique_ptr<Simulator> simulator, const JSON& backend_json)
-        : classical_channel_{get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID")}
+        : classical_channel_{get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_PROCID")}
         , executor_id_{get_env_variable("SLURM_JOB_ID") + "_executor"}
     {
         name = "QCBackend";

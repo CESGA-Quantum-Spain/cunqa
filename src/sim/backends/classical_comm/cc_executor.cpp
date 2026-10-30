@@ -71,7 +71,7 @@ namespace cunqa {
 namespace sim {
 
 CCExecutor::CCExecutor() : 
-    classical_channel_{get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_TASK_PID")}
+    classical_channel_{get_env_variable("SLURM_JOB_ID") + "_" + get_env_variable("SLURM_PROCID")}
 {
     classical_channel_.publish();
 };
