@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <a href="https://cesga-quantum.github.io/cunqa/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png" width="600" height="150">
     <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_black.png" width="600" height="150">
@@ -56,10 +56,10 @@
 </ul>
 
 ## Documentation
-For a complete and exhaustive explanation and functionality showcase of CUNQA visit the [CUNQA documentation](https://cesga-quantum-spain.github.io/cunqa/).
+For a complete and exhaustive explanation and functionality showcase of CUNQA visit the [CUNQA documentation](https://cesga-quantum.github.io/cunqa/).
 
 <p align="center">
-  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <a href="https://cesga-quantum.github.io/cunqa/">
   <img width=30% src="https://img.shields.io/badge/documentation-black?style=for-the-badge&logo=read%20the%20docs" alt="Documentation">
   </a>
 </p>
