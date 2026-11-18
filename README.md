@@ -6,7 +6,7 @@
   <a>
     <img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python version" height="18">
   </a>
-  <a href="cesga-quantum-spain.github.io/cunqa/">
+  <a href="cesga-quantum.github.io/cunqa/">
     <img src="https://img.shields.io/badge/docs-blue.svg" alt="Python version" height="18">
   </a>
 </p>
