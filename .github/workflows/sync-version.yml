@@ -1,0 +1,63 @@
+name: Sync version with latest tag
+
+# When a version tag (e.g. 3.2.0 or v3.2.0) is pushed, update every file that
+# hardcodes the version and commit the result to main.
+on:
+  push:
+    tags:
+      - 'v?[0-9]+.[0-9]+.[0-9]+'
+
+# The push to main is done with a deploy key (VERSION_SYNC_DEPLOY_KEY secret)
+# that is on the bypass list of the "Main protected" ruleset, so the
+# GITHUB_TOKEN only needs read access.
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          ssh-key: ${{ secrets.VERSION_SYNC_DEPLOY_KEY }}
+
+      - name: Update version files
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          TODAY="$(date -u +%Y-%m-%d)"
+          echo "Syncing files to version ${VERSION}"
+
+          # CMake fallback when building without .git (tarballs, EasyBuild)
+          printf '%s' "${VERSION}" > VERSION.txt
+
+          # Citation metadata
+          sed -i "s/^version: .*/version: ${VERSION}/" CITATION.cff
+          if grep -q '^date-released:' CITATION.cff; then
+            sed -i "s/^date-released: .*/date-released: \"${TODAY}\"/" CITATION.cff
+          else
+            sed -i "/^version: /a date-released: \"${TODAY}\"" CITATION.cff
+          fi
+
+          # EasyBuild recipes: version field and file name (cunqa-<version>-<suffix>.eb)
+          for f in easybuild/cunqa-*.eb; do
+            sed -i "s/^version = '.*'/version = '${VERSION}'/" "$f"
+            new="$(echo "$f" | sed -E "s#^easybuild/cunqa-[0-9]+\.[0-9]+\.[0-9]+-#easybuild/cunqa-${VERSION}-#")"
+            if [ "$f" != "$new" ]; then
+              git mv "$f" "$new"
+            fi
+          done
+
+      - name: Commit and push
+        run: |
+          git add -A VERSION.txt CITATION.cff easybuild/
+          if git diff --cached --quiet; then
+            echo "Version files already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sync version files to ${GITHUB_REF_NAME#v}"
+          git push origin HEAD:main

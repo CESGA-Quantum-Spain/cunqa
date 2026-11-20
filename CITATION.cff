@@ -14,7 +14,7 @@ authors:
     given-names: "Jorge"
     orcid: "https://orcid.org/0009-0002-1442-4181"
 title: "CUNQA: a Distributed Quantum Computing emulator for HPC."
-version: 1.0.0
+version: 3.2.0
 url: "https://github.com/CESGA-Quantum-Spain/cunqa"
 
  

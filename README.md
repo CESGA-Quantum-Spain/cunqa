@@ -1,49 +1,41 @@
-
-<p align="center">
-  <a>
-    <img src="https://img.shields.io/badge/os-linux-blue" alt="Python version" height="18">
-  </a>
-  <a>
-    <img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python version" height="18">
-  </a>
-  <a href="cesga-quantum-spain.github.io/cunqa/">
-    <img src="https://img.shields.io/badge/docs-blue.svg" alt="Python version" height="18">
-  </a>
-</p>
-
 <p align="center">
   <a href="https://cesga-quantum-spain.github.io/cunqa/">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png" width="600" height="150">
-    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_black.png" width="600" height="150">
-    <img src="docs/source/_static/logo_cunqa_black.png" width="30%" style="display: inline-block;" alt="CUNQA logo">
-  </picture>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png">
+      <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_blue.png">
+      <img src="docs/source/_static/logo_cunqa_blue.png" width="360" alt="CUNQA logo">
+    </picture>
   </a>
 </p>
 
+<h3 align="center">A Distributed Quantum Computing emulator for HPC</h3>
+
 <p align="center">
-  A Distributed Quantum Computing emulator for HPC 
+  <a href="https://github.com/CESGA-Quantum-Spain/cunqa/tags"><img src="https://img.shields.io/github/v/tag/CESGA-Quantum-Spain/cunqa?sort=semver&label=version&color=0B5394" alt="Latest version"></a>
+  <img src="https://img.shields.io/badge/os-linux-0B5394?logo=linux&logoColor=white" alt="OS: Linux">
+  <img src="https://img.shields.io/badge/python-3.11-0B5394?logo=python&logoColor=white" alt="Python 3.11">
+  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-Apache%202.0-0B5394" alt="License: Apache 2.0"></a>
+  <a href="https://cesga-quantum-spain.github.io/cunqa/"><img src="https://img.shields.io/badge/docs-online-0B5394?logo=readthedocs&logoColor=white" alt="Documentation"></a>
 </p>
 
 <br>
 
-<p>
-    <div align="center">
-      <a href="https://www.cesga.es/">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cesga_blanco.png" width="200" height="50">
-          <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cesga_negro.png" width="200" height="50">
-          <img src="docs/source/_static/logo_cesga_negro.png" width="30%" style="display: inline-block;" alt="CESGA logo">
-        </picture>
-      </a>
-      <a href="https://quantumspain-project.es/">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/QuantumSpain_logo_white.png" width="240" height="50">
-          <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/QuantumSpain_logo_color.png" width="240" height="50">
-          <img src="docs/source/_static/QuantumSpain_logo_white.png" width="30%" style="display: inline-block;" alt="QuantumSpain logo">
-        </picture>
-      </a>
-    </div>
+<p align="center">
+  <a href="https://www.cesga.es/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cesga_blanco.png">
+      <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cesga_negro.png">
+      <img src="docs/source/_static/logo_cesga_negro.png" height="44" alt="CESGA logo">
+    </picture>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://quantumspain-project.es/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/QuantumSpain_logo_white.png">
+      <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/QuantumSpain_logo_color.png">
+      <img src="docs/source/_static/QuantumSpain_logo_color.png" height="44" alt="Quantum Spain logo">
+    </picture>
+  </a>
 </p>
 
 ## Authors 
