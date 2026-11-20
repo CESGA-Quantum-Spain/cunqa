@@ -1,10 +1,22 @@
 <p align="center">
-  <a href="https://cesga-quantum-spain.github.io/cunqa/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png">
-      <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_blue.png">
-      <img src="docs/source/_static/logo_cunqa_blue.png" width="360" alt="CUNQA logo">
-    </picture>
+  <a>
+    <img src="https://img.shields.io/badge/os-linux-blue" alt="Python version" height="18">
+  </a>
+  <a>
+    <img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python version" height="18">
+  </a>
+  <a href="cesga-quantum.github.io/cunqa/">
+    <img src="https://img.shields.io/badge/docs-blue.svg" alt="Python version" height="18">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://cesga-quantum.github.io/cunqa/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_cunqa_white.png" width="600" height="150">
+    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_cunqa_black.png" width="600" height="150">
+    <img src="docs/source/_static/logo_cunqa_black.png" width="30%" style="display: inline-block;" alt="CUNQA logo">
+  </picture>
   </a>
 </p>
 
@@ -48,10 +60,10 @@
 </ul>
 
 ## Documentation
-For a complete and exhaustive explanation and functionality showcase of CUNQA visit the [CUNQA documentation](https://cesga-quantum-spain.github.io/cunqa/).
+For a complete and exhaustive explanation and functionality showcase of CUNQA visit the [CUNQA documentation](https://cesga-quantum.github.io/cunqa/).
 
 <p align="center">
-  <a href="https://cesga-quantum-spain.github.io/cunqa/">
+  <a href="https://cesga-quantum.github.io/cunqa/">
   <img width=30% src="https://img.shields.io/badge/documentation-black?style=for-the-badge&logo=read%20the%20docs" alt="Documentation">
   </a>
 </p>
