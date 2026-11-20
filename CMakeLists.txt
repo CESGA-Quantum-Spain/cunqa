@@ -8,8 +8,27 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.27.6")
     cmake_policy(SET CMP0135 NEW)
 endif()
 
-file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
-string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
+# Version: nearest git tag when building from a clone; VERSION.txt otherwise
+# (release tarballs, EasyBuild). The sync-version workflow keeps VERSION.txt
+# in step with new tags.
+set(PROJECT_VERSION "")
+find_program(GIT_EXECUTABLE git)
+if(GIT_EXECUTABLE AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(GIT_TAG MATCHES "^v?([0-9]+\\.[0-9]+\\.[0-9]+)$")
+        set(PROJECT_VERSION "${CMAKE_MATCH_1}")
+    endif()
+endif()
+if(NOT PROJECT_VERSION)
+    file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
+    string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
+endif()
 project(CUNQA VERSION ${PROJECT_VERSION} LANGUAGES CXX C)
 message(STATUS "Building CUNQA ${PROJECT_VERSION}")
 
